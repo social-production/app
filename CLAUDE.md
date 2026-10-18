@@ -37,4 +37,4 @@ Railway project `social-production-p2p` (services `bootstrap`, `seed-node` with 
 Never lose `LAIR_PASSPHRASE`. Finish each milestone with a numbered Grokbot retest sheet.
 
 ## Status
-M0 (foundation) is in progress. See `README.md#roadmap`.
+M0 and M1 (identity) are done and live; M2 (projects) is next. Current state and roadmap: `README.md` (keep its Status section current after every deploy).

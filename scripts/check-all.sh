@@ -15,4 +15,7 @@ bash scripts/build-happ.sh
 
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
+cargo test --workspace --exclude scenarios
+# Multi-conductor scenarios one at a time: on small CI runners, parallel conductors starve
+# each other until signed zome calls expire (BadNonce "Expired").
+cargo test -p scenarios -- --test-threads=1

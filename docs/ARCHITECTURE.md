@@ -92,4 +92,4 @@ enforces this. Full rules are in [CODE_RULES.md](CODE_RULES.md).
 
 ## Status
 
-M0 (this skeleton) is in progress. See the roadmap in [../README.md](../README.md).
+M0 and M1 are live; see the Status section and roadmap in [../README.md](../README.md).

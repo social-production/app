@@ -49,6 +49,9 @@ hosted users restore their recovery phrase into a desktop/phone app and carry on
   (gossip rounds timed out over the relay before converging). All nodes did converge.
   Cause: Kitsune2 defaults (15 s round timeout, 5 min before retrying a peer). M1 tunes all
   nodes for a small network (ADR 0025, `sp_core::network`). Re-measure after each deploy.
+- 2026-10-18 (M1.1, live): a new person was visible on another person's People page after **3 s**
+  (`tests/e2e/people-lag.mjs`); testers had seen ~8 min before the tuning and the network reset.
+  Signup ≈ 9 s on the live seed node.
 
 ## Storage growth and sharding
 
