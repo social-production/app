@@ -1,0 +1,17 @@
+/target
+node_modules/
+*.wasm
+*.dna
+*.happ
+*.webhapp
+/workdir
+.svelte-kit/
+ui/build/
+.hc*
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+.direnv/
+result

@@ -1,0 +1,12 @@
+[package]
+name = "sp_core"
+description = "Shared limits and small value types used by zomes, gateway and native."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+
+[lints]
+workspace = true

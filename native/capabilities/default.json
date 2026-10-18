@@ -1,0 +1,7 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "The UI needs no Tauri APIs: it talks to the local gateway over HTTP/WS.",
+  "windows": ["main"],
+  "permissions": []
+}

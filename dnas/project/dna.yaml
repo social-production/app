@@ -1,0 +1,18 @@
+# Cloned once per project: membership, governance, discussion, chat, activities.
+# Zome WASM comes from scripts/build-zomes.sh (cargo --profile zome).
+manifest_version: "0"
+name: sp_project
+integrity:
+  network_seed: ~
+  # Part of the DNA hash: keeps the three networks distinct while they share zomes.
+  properties:
+    kind: project
+  zomes:
+    - name: health_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
+coordinator:
+  zomes:
+    - name: health
+      path: ../../target/wasm32-unknown-unknown/zome/health.wasm
+      dependencies:
+        - name: health_integrity

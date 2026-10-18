@@ -1,0 +1,26 @@
+[package]
+name = "gateway"
+description = "Seed-node gateway: passkey login, hosted-agent provisioning, app tokens, ws proxy, index API."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+anyhow = "1"
+axum = { version = "0.8", features = ["ws"] }
+futures-util = "0.3"
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+holochain_client = "=0.9.1"
+holochain_types = "=0.7.1"
+holochain_zome_types = "=0.7.1"
+rand = "0.8"
+serde = { workspace = true }
+tokio = { workspace = true, features = ["net", "signal"] }
+tokio-tungstenite = "0.28"
+tower-http = { version = "0.6", features = ["cors"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+[lints]
+workspace = true

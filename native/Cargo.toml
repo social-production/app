@@ -1,0 +1,30 @@
+[package]
+name = "native"
+description = "Desktop (later mobile) app: Tauri 2 shell + in-process conductor + local gateway."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[[bin]]
+name = "social-production"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.7", features = [] }
+
+[dependencies]
+anyhow = "1"
+gateway = { path = "../services/gateway" }
+holochain = { workspace = true, features = ["wasmer-sys-cranelift"] }
+holochain_types = "=0.7.1"
+rand = "0.8"
+serde_json = "1"
+tauri = { version = "2.12", features = [] }
+tokio = { workspace = true, features = ["net", "sync"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url2 = "0.0.6"
+
+[lints]
+workspace = true

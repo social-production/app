@@ -1,0 +1,29 @@
+# The Social Production hApp: one agent, three roles.
+# project and conversation cells are created as clones (one per project / chat), so the
+# base cell of those roles stays empty. Clone limits are per agent; revisit in M2/M4.
+manifest_version: "0"
+name: social_production
+description: Social Production P2P app
+roles:
+  - name: directory
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      path: ../dnas/directory/sp_directory.dna
+      clone_limit: 0
+  - name: project
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      path: ../dnas/project/sp_project.dna
+      clone_limit: 1000
+  - name: conversation
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      path: ../dnas/conversation/sp_conversation.dna
+      clone_limit: 1000
+allow_deferred_memproofs: false

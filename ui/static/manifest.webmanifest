@@ -1,0 +1,9 @@
+{
+  "name": "Social Production",
+  "short_name": "Social Production",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#181a1b",
+  "theme_color": "#181a1b",
+  "icons": []
+}

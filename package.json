@@ -1,0 +1,16 @@
+{
+  "name": "social-production",
+  "private": true,
+  "license": "AGPL-3.0-or-later",
+  "workspaces": ["ui"],
+  "scripts": {
+    "build:zomes": "bash scripts/build-zomes.sh",
+    "build:happ": "bash scripts/build-happ.sh",
+    "dev:ui": "npm run dev -w ui",
+    "check": "bash scripts/check-all.sh",
+    "test:scenarios": "npm run build:happ && cargo test -p scenarios"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

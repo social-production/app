@@ -1,0 +1,12 @@
+[package]
+name = "sp_governance"
+description = "Pure governance rules: quorum, tally, standing. No HDK, no I/O."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+
+[lints]
+workspace = true

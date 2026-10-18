@@ -1,0 +1,9 @@
+[package]
+name = "sp_index"
+description = "Local feed/search index built by every full node (gateway, native). Filled in M2."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lints]
+workspace = true

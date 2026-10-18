@@ -1,0 +1,6 @@
+manifest_version: "0"
+name: social_production
+ui:
+  path: ../ui/ui.zip
+happ:
+  path: ./social_production.happ

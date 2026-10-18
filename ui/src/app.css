@@ -1,0 +1,14 @@
+@import './lib/components/tokens.css';
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--page-background);
+  color: var(--text-main);
+  font-family: system-ui, sans-serif;
+}

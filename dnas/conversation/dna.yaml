@@ -1,0 +1,18 @@
+# Cloned once per DM or group chat; only participants may join (membrane lands in M4).
+# Zome WASM comes from scripts/build-zomes.sh (cargo --profile zome).
+manifest_version: "0"
+name: sp_conversation
+integrity:
+  network_seed: ~
+  # Part of the DNA hash: keeps the three networks distinct while they share zomes.
+  properties:
+    kind: conversation
+  zomes:
+    - name: health_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
+coordinator:
+  zomes:
+    - name: health
+      path: ../../target/wasm32-unknown-unknown/zome/health.wasm
+      dependencies:
+        - name: health_integrity

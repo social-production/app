@@ -1,0 +1,17 @@
+[package]
+name = "health"
+description = "Health coordinator zome: ping, post and list heartbeats."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+health_integrity = { workspace = true }
+
+[lints]
+workspace = true

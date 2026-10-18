@@ -1,0 +1,16 @@
+[package]
+name = "scenarios"
+description = "Multi-agent scenario tests (Holochain sweettest) against the packed DNAs."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+
+[dev-dependencies]
+holochain = { workspace = true, features = ["wasmer-sys-cranelift", "test_utils"] }
+tokio = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,56 @@
+[workspace]
+resolver = "2"
+members = [
+  "crates/*",
+  "zomes/*/integrity",
+  "zomes/*/coordinator",
+  # DNA-specific zomes land in M1+ as dnas/<dna>/zomes/{integrity,coordinator}/<name>;
+  # add those globs then (cargo rejects globs that match nothing).
+  "services/gateway",
+  "native",
+  "tests/scenarios",
+]
+
+[workspace.package]
+edition = "2021"
+license = "AGPL-3.0-or-later"
+version = "0.0.1"
+repository = "https://github.com/social-production/app"
+
+[workspace.dependencies]
+# Holochain 0.7.x — bump together, never one at a time (docs/DEPLOYMENT.md#versions).
+hdi = "=0.8.1"
+hdk = "=0.7.1"
+holochain = { version = "=0.7.1", default-features = false }
+holochain_serialized_bytes = "=0.0.57"
+serde = { version = "1", features = ["derive"] }
+thiserror = "2"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+
+# Our pure crates
+sp_core = { path = "crates/sp_core" }
+sp_governance = { path = "crates/sp_governance" }
+sp_index = { path = "crates/sp_index" }
+health_integrity = { path = "zomes/health/integrity" }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }
+pedantic = { level = "warn", priority = -1 }
+unwrap_used = "warn"
+too_many_lines = "warn"
+module_name_repetitions = "allow"
+needless_pass_by_value = "allow" # hdk_extern inputs are taken by value
+missing_errors_doc = "allow"    # every hdk_extern returns ExternResult
+unnecessary_wraps = "allow"     # validation helpers share the ExternResult signature
+
+# Zome WASM is built with `--profile zome` (scripts/build-zomes.sh): small binaries
+# without forcing size optimisation on the gateway and native app.
+[profile.zome]
+inherits = "release"
+opt-level = "z"
+lto = true
+codegen-units = 1

@@ -1,0 +1,18 @@
+[package]
+name = "health_integrity"
+description = "Heartbeat entries: proves a node can author, validate and gossip in a DNA."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdi = { workspace = true }
+serde = { workspace = true }
+holochain_serialized_bytes = { workspace = true }
+sp_core = { workspace = true }
+
+[lints]
+workspace = true
