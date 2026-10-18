@@ -18,3 +18,8 @@ holochain = { workspace = true, features = ["encryption", "schema"] }
 
 [lints]
 workspace = true
+
+# The encrypted database (SQLCipher) links OpenSSL; phones have none to link against,
+# so build it from source for mobile targets.
+[target.'cfg(any(target_os = "android", target_os = "ios"))'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }

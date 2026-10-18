@@ -17,6 +17,9 @@ jobs:
   ios:
     runs-on: macos-latest
     timeout-minutes: 120
+    # Known blocker (ADR 0020): Holochain 0.7's keystore needs sysinfo ^0.38, which does
+    # not compile for iOS. Kept running so we notice the day it goes green.
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
       - run: rustup target add aarch64-apple-ios

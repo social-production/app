@@ -21,3 +21,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0017](./0017-own-tauri-shell.md) Own Tauri 2 shell embedding the holochain crate
 - [0018](./0018-sweettest-scenarios.md) Scenario tests use Holochain sweettest (Rust), not Tryorama
 - [0019](./0019-sveltekit-3.md) SvelteKit 3 with #lib imports
+- [0020](./0020-mobile-platform-findings.md) Mobile platform findings (M0 platform check)
