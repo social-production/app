@@ -1,0 +1,7 @@
+# SPA: unknown paths fall back to index.html. Railway provides $PORT.
+:{$PORT:8080} {
+	root * /srv
+	encode gzip
+	try_files {path} /index.html
+	file_server
+}
