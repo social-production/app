@@ -1,7 +1,7 @@
 use hdk::prelude::*;
-use identity_integrity::{Avatar, EntryTypes, LinkTypes, Profile};
+use identity_integrity::{Avatar, EntryTypes, LinkTypes, Profile, UnitEntryTypes};
 
-use crate::records::{action_targets, decode, latest, links};
+use crate::records::{action_targets, decode, latest, links, own_latest};
 
 const ALL_PEOPLE: &str = "all_people";
 
@@ -22,7 +22,7 @@ pub fn set(input: ProfileInput) -> ExternResult<ActionHash> {
         home_area: input.home_area.trim().to_string(),
         avatar: input.avatar,
     };
-    if let Some(original) = original_of(&me)? {
+    if let Some(original) = own_original()?.or(original_of(&me)?) {
         return update_entry(original, &EntryTypes::Profile(profile));
     }
     let hash = create_entry(&EntryTypes::Profile(profile))?;
@@ -33,6 +33,11 @@ pub fn set(input: ProfileInput) -> ExternResult<ActionHash> {
 }
 
 pub fn get(agent: &AgentPubKey) -> ExternResult<Option<Profile>> {
+    if agent == &agent_info()?.agent_initial_pubkey {
+        if let Some(record) = own_latest(UnitEntryTypes::Profile)? {
+            return decode::<Profile>(&record);
+        }
+    }
     let Some(original) = original_of(agent)? else {
         return Ok(None);
     };
@@ -64,4 +69,12 @@ fn original_of(agent: &AgentPubKey) -> ExternResult<Option<ActionHash>> {
     let mut found = links(agent.clone(), LinkTypes::AgentToProfile)?;
     found.sort_by_key(|l| l.timestamp);
     Ok(action_targets(found).into_iter().next())
+}
+
+/// The caller's first profile, straight from their own chain.
+fn own_original() -> ExternResult<Option<ActionHash>> {
+    let filter = ChainQueryFilter::new()
+        .entry_type(EntryType::App(UnitEntryTypes::Profile.try_into()?))
+        .action_type(ActionType::Create);
+    Ok(query(filter)?.first().map(|r| r.action_address().clone()))
 }

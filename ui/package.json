@@ -16,7 +16,9 @@
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@holochain/client": "0.21.1"
+    "@holochain/client": "0.21.1",
+    "@noble/hashes": "2.4.0",
+    "@scure/bip39": "2.4.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

@@ -7,7 +7,14 @@ async fn main() -> anyhow::Result<()> {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .init();
-    gateway::serve(gateway::Config::from_env(), |_| {}, shutdown()).await
+    let passphrase = gateway::keystore_passphrase()?;
+    Box::pin(gateway::serve(
+        gateway::Config::from_env(),
+        passphrase,
+        |_| {},
+        shutdown(),
+    ))
+    .await
 }
 
 /// Railway sends SIGTERM on redeploy; ctrl-c covers local runs.

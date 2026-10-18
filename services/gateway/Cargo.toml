@@ -1,6 +1,6 @@
 [package]
 name = "gateway"
-description = "Seed-node gateway: passkey login, hosted-agent provisioning, app tokens, ws proxy, index API."
+description = "Seed node: embedded conductor + HTTP gateway (passkeys, hosted agents, sessions, ws proxy)."
 edition.workspace = true
 license.workspace = true
 version.workspace = true
@@ -11,16 +11,25 @@ anyhow = "1"
 axum = { version = "0.8", features = ["ws"] }
 futures-util = "0.3"
 holo_hash = { version = "=0.7.1", features = ["encoding"] }
-holochain_client = "=0.9.1"
+holochain = { workspace = true, features = ["wasmer-sys-cranelift", "encryption", "schema"] }
+holochain_keystore = "=0.7.1"
 holochain_types = "=0.7.1"
-holochain_zome_types = "=0.7.1"
+lair_keystore_api = "=0.7.1"
 rand = "0.8"
+rustls = "0.23"
 serde = { workspace = true }
-tokio = { workspace = true, features = ["net", "signal"] }
+serde_json = "1"
+sha2 = "0.10"
+sodoken = "0.1"
+sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }
+tokio = { workspace = true, features = ["net", "signal", "sync", "time"] }
 tokio-tungstenite = "0.28"
 tower-http = { version = "0.6", features = ["cors"] }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+url2 = "0.0.6"
+uuid = { version = "1", features = ["v4"] }
+webauthn-rs = { version = "0.5", features = ["conditional-ui"] }
 
 [lints]
 workspace = true

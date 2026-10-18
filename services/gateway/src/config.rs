@@ -1,32 +1,57 @@
 use std::net::{Ipv4Addr, SocketAddr};
 use std::path::PathBuf;
 
-/// Gateway settings, read once from the environment at startup.
+/// Gateway settings, read once from the environment at startup (docs/DEPLOYMENT.md).
+/// The keystore passphrase is read separately so it never lands in a `Debug` print.
 #[derive(Clone, Debug)]
 pub struct Config {
     pub bind_addr: SocketAddr,
-    /// Conductor admin port (localhost only; never exposed).
-    pub admin_port: u16,
-    /// Conductor app-websocket port that `/ws` forwards to.
+    /// Conductor data, keystore and the gateway database (a Railway volume in production).
+    pub data_dir: PathBuf,
+    /// Conductor app-websocket port, localhost only; `/ws` forwards to it.
     pub app_ws_port: u16,
     pub happ_path: PathBuf,
+    pub bootstrap_url: String,
+    pub relay_url: String,
+    /// `WebAuthn` relying party: the UI's domain and origin (passkeys are bound to it).
+    pub rp_id: String,
+    pub rp_origin: String,
+    /// Signup proof-of-work difficulty in leading zero bits (20 ≈ a few seconds).
+    pub pow_bits: u32,
+    pub signups_per_ip_per_day: u32,
 }
 
 impl Config {
+    #[must_use]
     pub fn from_env() -> Self {
+        let bootstrap_url = env_or("BOOTSTRAP_URL", "https://dev-test-bootstrap2.holochain.org");
         Self {
-            bind_addr: SocketAddr::from((Ipv4Addr::UNSPECIFIED, env_port("PORT", 8080))),
-            admin_port: env_port("ADMIN_PORT", 4444),
-            app_ws_port: env_port("APP_WS_PORT", 8888),
-            happ_path: std::env::var("HAPP_PATH").map_or_else(
-                |_| PathBuf::from("happ/social_production.happ"),
-                PathBuf::from,
-            ),
+            bind_addr: SocketAddr::from((Ipv4Addr::UNSPECIFIED, env_num("PORT", 8080))),
+            data_dir: PathBuf::from(env_or("DATA_DIR", "./.gateway-data")),
+            app_ws_port: env_num("APP_WS_PORT", 8888),
+            happ_path: PathBuf::from(env_or("HAPP_PATH", "happ/social_production.happ")),
+            relay_url: env_or("RELAY_URL", &bootstrap_url),
+            bootstrap_url,
+            rp_id: env_or("RP_ID", "localhost"),
+            rp_origin: env_or("RP_ORIGIN", "http://localhost:5173"),
+            pow_bits: env_num("POW_BITS", 20),
+            signups_per_ip_per_day: env_num("SIGNUPS_PER_IP_PER_DAY", 5),
         }
     }
 }
 
-fn env_port(key: &str, default: u16) -> u16 {
+/// `LAIR_PASSPHRASE` unlocks every hosted agent's key. Required; losing it loses them all.
+pub fn keystore_passphrase() -> anyhow::Result<Vec<u8>> {
+    std::env::var("LAIR_PASSPHRASE")
+        .map(String::into_bytes)
+        .map_err(|_| anyhow::anyhow!("LAIR_PASSPHRASE must be set"))
+}
+
+fn env_or(key: &str, default: &str) -> String {
+    std::env::var(key).unwrap_or_else(|_| default.to_string())
+}
+
+fn env_num<T: std::str::FromStr>(key: &str, default: T) -> T {
     std::env::var(key)
         .ok()
         .and_then(|v| v.parse().ok())

@@ -11,4 +11,76 @@ body {
   background: var(--page-background);
   color: var(--text-main);
   font-family: system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+a {
+  color: var(--brand-strong);
+}
+
+button {
+  font: inherit;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  cursor: pointer;
+}
+
+button.primary {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--on-brand);
+  font-weight: 600;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+input,
+textarea {
+  font: inherit;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-soft);
+  color: var(--text-main);
+}
+
+label {
+  display: grid;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 0.9rem;
+}
+
+.panel {
+  padding: var(--page-gutter);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-lg);
+}
+
+.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.muted {
+  color: var(--text-soft);
+}
+
+.error {
+  color: var(--need-strong);
 }

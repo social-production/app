@@ -8,7 +8,7 @@ use sp_governance::standing::{
 };
 
 use crate::guest_error;
-use crate::records::{action_targets, decode, links, live};
+use crate::records::{action_targets, decode, links, live, own_latest};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StandingView {
@@ -93,6 +93,11 @@ pub fn claim() -> ExternResult<ActionHash> {
 }
 
 fn grant_of(agent: &AgentPubKey) -> ExternResult<Option<ActionHash>> {
+    if agent == &agent_info()?.agent_initial_pubkey {
+        if let Some(record) = own_latest(UnitEntryTypes::StandingGrant)? {
+            return Ok(Some(record.action_address().clone()));
+        }
+    }
     for hash in action_targets(links(agent.clone(), LinkTypes::AgentToGrants)?) {
         if let Some(record) = live(hash.clone())? {
             if decode::<StandingGrant>(&record)?.is_some() {

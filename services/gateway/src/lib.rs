@@ -1,34 +1,45 @@
-//! Gateway (docs/IDENTITY.md): the HTTP face of a seed/community node, run by `main.rs`.
-//! Kept as a library so tests and future node tooling can start it in-process.
-//! M0: health, `/session` for a shared demo agent, `/ws` proxy.
-//! M1 adds passkey login and one hosted agent per user.
+//! Seed-node gateway (docs/IDENTITY.md): an embedded Holochain conductor plus the HTTP API
+//! that lets browsers sign up, sign in and talk to their hosted agent. `main.rs` runs it.
 
-mod conductor;
+mod auth;
 mod config;
+mod hex;
+mod node;
 mod routes;
-mod session;
-mod ws_proxy;
+mod store;
 
 use std::future::Future;
 use std::net::SocketAddr;
+use std::sync::Arc;
 
-pub use config::Config;
+pub use config::{keystore_passphrase, Config};
 
-/// Provision the local conductor, bind `config.bind_addr`, and serve until `shutdown`
-/// resolves. `on_bound` receives the actual address (useful with port 0).
+/// Boot the node and serve until `shutdown` resolves. `on_bound` gets the bound address.
 pub async fn serve(
     config: Config,
+    passphrase: Vec<u8>,
     on_bound: impl FnOnce(SocketAddr),
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
-    let conductor = conductor::Conductor::start(&config).await?;
-    let listener = tokio::net::TcpListener::bind(config.bind_addr).await?;
+    let node = node::Node::start(&config, passphrase).await?;
+    let state = routes::AppState {
+        store: store::Store::open(&config.data_dir).await?,
+        passkeys: Arc::new(auth::passkeys::Passkeys::new(
+            &config.rp_id,
+            &config.rp_origin,
+        )?),
+        pow: Arc::new(auth::pow::Pow::new(config.pow_bits)),
+        signup_limit: Arc::new(auth::ratelimit::SignupLimit::new(
+            config.signups_per_ip_per_day,
+        )),
+        config: Arc::new(config),
+        node,
+    };
+    let listener = tokio::net::TcpListener::bind(state.config.bind_addr).await?;
     let bound = listener.local_addr()?;
     tracing::info!(addr = %bound, "gateway listening");
     on_bound(bound);
-
-    let app = routes::router(routes::AppState { config, conductor });
-    axum::serve(listener, app)
+    axum::serve(listener, routes::router(state))
         .with_graceful_shutdown(shutdown)
         .await?;
     Ok(())

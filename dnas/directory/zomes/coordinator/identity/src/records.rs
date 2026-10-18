@@ -49,3 +49,14 @@ pub fn decode<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
         .to_app_option::<T>()
         .map_err(|e| wasm_error!(e))
 }
+
+/// The newest record of `unit` on the caller's own source chain (creates and updates).
+/// Own writes are visible here immediately, before the network has integrated them.
+pub fn own_latest(unit: identity_integrity::UnitEntryTypes) -> ExternResult<Option<Record>> {
+    let filter = ChainQueryFilter::new()
+        .entry_type(EntryType::App(unit.try_into()?))
+        .include_entries(true);
+    Ok(query(filter)?
+        .into_iter()
+        .max_by_key(|r| r.action().action_seq()))
+}
