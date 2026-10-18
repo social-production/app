@@ -38,5 +38,9 @@ Push `main`, CI runs `scripts/check-all.sh`, Railway rebuilds the services, and 
   new hApp version, and data moves by **genesis roll-up**: the new DNA's genesis cites the
   final state of the old network (the design sheet's "schema evolution"). Coordinator-only changes
   hot-swap without a new network. Prefer them.
+- **Reproducible DNAs.** A DNA hash is a hash of its WASM, and nodes only meet if their hashes
+  match. `scripts/build-zomes.sh` strips machine paths (`--remap-path-prefix`), and Docker
+  pins the exact Rust of the Nix shell (`rust:1.95.0`). Verified in M0: identical hashes from
+  the Nix build and the seed-node Docker build. Bump both together.
 - **Breaking-change rule.** Bump `happ.yaml`'s DNA network seed only on a deliberate network reset,
   never by accident.

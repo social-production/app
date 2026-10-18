@@ -1,6 +1,8 @@
 # Bootstrap + iroh relay (kitsune2_bootstrap_srv, default features include iroh-relay).
 # Railway terminates TLS, so the server listens on plain $PORT.
-FROM rust:1-bookworm AS build
+# Match the Nix toolchain (holonix main-0.7 ships Rust 1.95); newer rustc stops
+# allowing the undefined host imports zome WASM relies on.
+FROM rust:1.95.0-bookworm AS build
 RUN cargo install kitsune2_bootstrap_srv --version 0.5.2 --locked
 
 FROM debian:bookworm-slim

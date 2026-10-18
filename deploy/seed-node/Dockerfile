@@ -3,7 +3,9 @@
 #   docker build -f deploy/seed-node/Dockerfile .
 ARG HOLOCHAIN_VERSION=0.7.1
 
-FROM rust:1-bookworm AS build
+# Match the Nix toolchain (holonix main-0.7 ships Rust 1.95); newer rustc stops
+# allowing the undefined host imports zome WASM relies on.
+FROM rust:1.95.0-bookworm AS build
 WORKDIR /src
 RUN rustup target add wasm32-unknown-unknown
 COPY . .
