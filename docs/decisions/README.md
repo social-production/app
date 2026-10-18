@@ -18,7 +18,8 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0014](./0014-railway-p2p-project.md) Separate Railway project social-production-p2p
 - [0015](./0015-nix-toolchain.md) Nix flake (holonix main-0.7) for the toolchain
 - [0016](./0016-enforced-cleanliness.md) Cleanliness is enforced by CI
-- [0017](./0017-own-tauri-shell.md) Own Tauri 2 shell embedding the holochain crate
+- [0017](./0017-own-tauri-shell.md) ~~Own Tauri 2 shell embedding the holochain crate~~ (superseded by 0021)
 - [0018](./0018-sweettest-scenarios.md) Scenario tests use Holochain sweettest (Rust), not Tryorama
 - [0019](./0019-sveltekit-3.md) SvelteKit 3 with #lib imports
 - [0020](./0020-mobile-platform-findings.md) Mobile platform findings (M0 platform check)
+- [0021](./0021-holochain-runtime-tauri.md) Use Holochain's official runtime-tauri for the native app (supersedes 0017)

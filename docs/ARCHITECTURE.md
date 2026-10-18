@@ -10,7 +10,7 @@ Decisions and their reasons are in [`decisions/`](decisions/).
 ```
  phone PWA / browser             desktop app (Tauri)           phone app (Tauri, M7)
  ───────────────────             ───────────────────           ─────────────────────
- ui/ (static SPA)                ui/ + conductor + gateway     ui/ + conductor + gateway
+ ui/ (static SPA)                ui/ + conductor (IPC)         ui/ + conductor (IPC)
    │ thin client                   │ full node (full arc)        │ light node (small arc)
    │ wss + app token               │                             │
    ▼                               │                             │
@@ -54,7 +54,7 @@ zomes/*/coordinator  zome API (reads/writes)          ▼
 dnas/*/zomes/coordinator                           ui/src/lib/holo/      ONLY Holochain client code
    ▲                                                  ▼
 services/gateway   seed-node HTTP + admin API      @holochain/client → node
-native/            Tauri shell: in-process conductor + local gateway
+native/            Tauri + Holochain runtime-tauri (conductor in-process, IPC)
 ```
 
 Arrows point toward dependencies, and nothing may skip a layer. `scripts/check-boundaries.sh`

@@ -6,13 +6,12 @@ import {
 } from '@holochain/client';
 
 /**
- * A node's gateway, which hands out app-websocket sessions. The native app runs its own
- * gateway on localhost (injected as `__SP_LOCAL_GATEWAY__`), so every client — browser
- * or app — reaches every node the same way (ADR 0013, ADR 0017).
+ * A seed/community node's gateway, which hands out app-websocket sessions (ADR 0013).
+ * Inside the native app none of this is used: the device's own node is reached over
+ * Tauri IPC instead (ADR 0021).
  */
 export interface NodeEndpoint {
   url: string;
-  local: boolean;
 }
 
 export interface NodeSession {
@@ -31,11 +30,14 @@ const configured: string[] = String(import.meta.env.VITE_SP_GATEWAYS ?? '')
   .map((url) => url.trim())
   .filter(Boolean);
 
-/** The device's own node first, then configured gateways in order. */
+/** True inside the native app, where Holochain's Tauri runtime injects its connection. */
+export function inNativeApp(): boolean {
+  return window.__HC_TAURI_HOLOCHAIN__ !== undefined;
+}
+
+/** Configured gateways, in preference order. */
 export function knownEndpoints(): NodeEndpoint[] {
-  const local = window.__SP_LOCAL_GATEWAY__;
-  const own: NodeEndpoint[] = local ? [{ url: local, local: true }] : [];
-  return [...own, ...configured.map((url) => ({ url, local: false }))];
+  return configured.map((url) => ({ url }));
 }
 
 /**
@@ -62,5 +64,5 @@ export async function openSession({ url }: NodeEndpoint): Promise<NodeSession> {
 }
 
 export function describe(endpoint: NodeEndpoint): string {
-  return endpoint.local ? 'this device' : new URL(endpoint.url).host;
+  return new URL(endpoint.url).host;
 }

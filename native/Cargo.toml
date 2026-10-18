@@ -1,10 +1,15 @@
 [package]
 name = "native"
-description = "Desktop (later mobile) app: Tauri 2 shell + in-process conductor + local gateway."
+description = "Desktop + mobile app: Tauri 2 with Holochain's official runtime (tauri-plugin-hc)."
 edition.workspace = true
 license.workspace = true
 version.workspace = true
 publish = false
+
+# Mobile targets load the app as a library; desktop runs src/main.rs.
+[lib]
+name = "native_lib"
+crate-type = ["lib", "cdylib", "staticlib"]
 
 [[bin]]
 name = "social-production"
@@ -14,16 +19,15 @@ path = "src/main.rs"
 tauri-build = { version = "2.7", features = [] }
 
 [dependencies]
-anyhow = "1"
-gateway = { path = "../services/gateway" }
-holochain = { workspace = true, features = ["wasmer-sys-cranelift"] }
-holochain_types = "=0.7.1"
+# The conductor's WASM engine (cranelift JIT, or wasmi on iOS) is chosen by the
+# runtime crate per target; nothing to select here.
+holochain = { workspace = true, features = ["encryption", "schema"] }
+log = "0.4"
 rand = "0.8"
-serde_json = "1"
 tauri = { version = "2.12", features = [] }
-tokio = { workspace = true, features = ["net", "sync"] }
-tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tauri-plugin-hc = "=0.1.0"
+tauri-plugin-log = "2"
+serde_json = "1"
 url2 = "0.0.6"
 
 [lints]

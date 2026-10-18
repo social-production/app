@@ -9,10 +9,15 @@ ADR 0011 requires phones to become nodes. M0 cross-compiles the embedded conduct
 ## Findings
 - **Desktop (Linux)**: works end to end. The Tauri app's embedded conductor synced with a seed node in M0.
 - **Android**: the conductor's encrypted database (SQLCipher) links OpenSSL, which Android
-  doesn't provide. Fixed by building vendored OpenSSL for mobile targets.
+  doesn't provide. Fixed by building vendored OpenSSL for mobile targets. **The Android build check passes in CI.**
 - **iOS**: blocked upstream. `lair_keystore 0.7.1` and `human-panic` depend on `sysinfo ^0.38`,
   which fails to compile for iOS (`proc_pidinfo`, `RTM_IFINFO2` are macOS-only in `libc`).
   `sysinfo 0.39` has iOS fixes, but it's semver-incompatible, so we can't bump it ourselves.
+
+- **Update (same day):** Holochain's `runtime-tauri` runs the conductor on a real iPhone using a
+  keystore patch that stops the in-process lair binding a unix socket ([holochain#5977](https://github.com/holochain/holochain/issues/5977)).
+  That keystore path is also what pulls in `sysinfo`, so the same change is the likely route past
+  the compile failure. Adopted in ADR 0021.
 
 ## Decision
 - Keep both checks in CI. iOS runs with `continue-on-error` so its status stays visible.

@@ -9,11 +9,19 @@
   },
   "app": {
     "windows": [],
-    "security": { "csp": null }
+    "security": {
+      "csp": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' ipc: http://ipc.localhost https: wss:; frame-src 'none'; object-src 'none'; base-uri 'self'"
+    },
+    "withGlobalTauri": false
   },
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": ["icons/icon.png"]
+    "icon": [
+      "icons/icon.png"
+    ],
+    "iOS": {
+      "minimumSystemVersion": "13.0"
+    }
   }
 }

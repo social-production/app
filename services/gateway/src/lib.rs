@@ -1,6 +1,6 @@
-//! Gateway (docs/IDENTITY.md): the HTTP face of a node. The seed node runs it as a
-//! binary (`main.rs`); the native app embeds it on localhost so the UI talks to every
-//! node the same way. M0: health, `/session` for a shared demo agent, `/ws` proxy.
+//! Gateway (docs/IDENTITY.md): the HTTP face of a seed/community node, run by `main.rs`.
+//! Kept as a library so tests and future node tooling can start it in-process.
+//! M0: health, `/session` for a shared demo agent, `/ws` proxy.
 //! M1 adds passkey login and one hosted agent per user.
 
 mod conductor;

@@ -1,6 +1,6 @@
 # 0017. Own Tauri 2 shell embedding the holochain crate
 
-Status: accepted (2026-10-18)
+Status: superseded by [0021](./0021-holochain-runtime-tauri.md) (2026-10-18)
 
 ## Context
 tauri-plugin-holochain is source-available (no open licence) and supports only up to Holochain 0.6. kangaroo-electron is desktop-only.

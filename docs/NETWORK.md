@@ -33,7 +33,7 @@ How the platform keeps running when any one machine, including Railway, disappea
 
 `ui/src/lib/holo/nodes.ts` builds the endpoint list:
 
-1. The device's own gateway, if running inside the native app (`__SP_LOCAL_GATEWAY__`).
+1. Inside the native app: the device's own conductor over Tauri IPC (ADR 0021).
 2. Gateways from `VITE_SP_GATEWAYS`, in order (Railway first, then community nodes).
 3. M1+: an updatable list fetched from the directory DNA (community nodes announce themselves).
 
@@ -42,9 +42,13 @@ hosted users restore their recovery phrase into a desktop/phone app and carry on
 
 ## Observed timings (M0, local)
 
-- A heartbeat written on one node appeared on a freshly started second node after ~60 s
-  (first gossip round), while an already-connected desktop node had it within 0.1 s.
-  Tune gossip/publish before M2 if first-contact latency matters for UX.
+- Local network: a freshly started node received a heartbeat after ~60 s (first gossip
+  round); an already-connected node had it within 0.1 s.
+- Over the internet via the Railway relay: two nodes that had already met synced in 2.5 s.
+  **First contact between the Railway seed node and a new home node took more than 4 minutes**
+  (gossip rounds timed out over the relay before converging). All nodes did converge.
+  This needs tuning before real users (M1): gossip initiate interval, timeouts, and whether
+  Railway can expose the relay's QUIC/UDP port for direct paths.
 
 ## Storage growth and sharding
 

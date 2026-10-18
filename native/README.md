@@ -1,16 +1,17 @@
-# native — Tauri 2 shell (ADR 0017)
+# native — desktop + mobile app (ADR 0021)
 
-The desktop app (Linux, macOS, Windows now; Android/iOS targets later) is a full node:
+Built on Holochain's official [runtime-tauri](https://github.com/holochain/runtime-tauri)
+(`tauri-plugin-hc`). The device runs its own node:
 
-1. `src/node.rs` starts a Holochain conductor **in-process** (`holochain` crate), with data and keystore
-   in the OS app-data dir and a random per-device keystore passphrase (OS keychain in M7).
-2. It runs the **same gateway** as the seed node (`services/gateway`, as a library) on a random
-   localhost port, so the UI reaches its own node exactly as a browser reaches a seed node.
-3. `src/main.rs` opens the window on `ui/build` and injects `window.__SP_LOCAL_GATEWAY__`.
-   `ui/src/lib/holo/nodes.ts` tries that first, then the configured gateways.
+1. `src/lib.rs` registers the plugin, which boots the conductor in-process with data in the OS
+   app-data dir. The keystore passphrase is random per device (`src/keystore.rs`; OS keychain in M7).
+2. When the conductor is ready, the bundled hApp (`include_bytes!`) is installed for this device's
+   agent on first run, and the main window opens on `ui/build`.
+3. The plugin injects `__HC_TAURI_HOLOCHAIN__`. The UI connects with `AppWebsocket.connect()` over
+   Tauri IPC and the plugin signs zome calls. No websocket or admin port is opened.
 
-The hApp is compiled into the binary (`include_bytes!`), so build order is: `npm run build -w ui`,
-then `bash scripts/build-happ.sh`, then `cargo build -p native`.
+Network: the Railway bootstrap/relay by default (`src/network.rs`). Override with
+`SP_BOOTSTRAP_URL` (an `http://` URL enables plaintext relay, for local dev only).
 
-Run against a local seed node: `SP_BOOTSTRAP_URL=http://127.0.0.1:4433 cargo run -p native`
-(an `http://` URL turns on plaintext relay, for dev only).
+Build order: `npm run build -w ui`, then `bash scripts/build-happ.sh`, then `cargo run -p native`.
+Mobile (M7): the same crate builds as a library for Android and iOS (`tauri android|ios init`).

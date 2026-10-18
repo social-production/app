@@ -38,20 +38,20 @@ while accounts created after a proposal opens cannot swing it.
 
 ## Standing (ADR 0007)
 
-Levels: `New → Warm → Full`, or `Paused` (bot review). Only **Full** votes count. Warm is a visible
-progress step. This differs from FastAPI, where warm votes counted half.
+Levels: `New → Full`, or `Paused` (bot review). Only **Full** votes count. (FastAPI's "warm" step
+is dropped: M1 plan, docs/plans/M1-identity.md.)
 
 There is no live counting. A level is held through a **`StandingGrant`** that **cites its evidence**:
 
-- vouches from distinct full-standing agents (each `Vouch` is its own record), and/or
-- completed service requests marked done by the other party, and/or
-- steady activity (chain age and active days, provable from the agent's own chain).
+- **2 vouches** from distinct full-standing agents (each `Vouch` is its own record), or
+- **steady activity**: chain 30+ days old with activity on 10 distinct days, provable from the agent's own chain.
 
 Validators fetch exactly the cited records and check them, so every node reaches the same verdict.
-A `BotReview` proposal kind (3 marks open it; full members decide) produces an Outcome that
-pauses a standing. Vouchers are limited per period to slow sybil farms.
+Each voucher may vouch **5 times per 30 days**. If someone you vouched for is paused by a
+`BotReview` Outcome (3 marks open it; full members decide), you lose the right to vouch for
+**90 days**. You keep your own standing.
 
-**Bootstrap.** The first N agents (a DNA property set at genesis) start Full so that someone can vouch.
+**Bootstrap.** A named founder list of agent keys (directory DNA property) starts Full so that someone can vouch.
 
 ## Quorum and thresholds
 

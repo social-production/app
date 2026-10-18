@@ -1,6 +1,6 @@
 import { AppWebsocket } from '@holochain/client';
 
-import { describe, knownEndpoints, openSession, type NodeEndpoint } from './nodes.ts';
+import { describe, inNativeApp, knownEndpoints, openSession, type NodeEndpoint } from './nodes.ts';
 
 export type Role = 'directory' | 'project' | 'conversation';
 
@@ -29,9 +29,16 @@ async function connectTo(endpoint: NodeEndpoint): Promise<AppWebsocket> {
   return AppWebsocket.connect({ url: new URL(session.appWsUrl), token: session.token });
 }
 
-/** Try every known node in order until one accepts us (ADR 0013 failover). */
+/** The device's own node if we are the native app, else every known gateway in order
+ *  until one accepts us (ADR 0013 failover). */
 async function connectAny(): Promise<AppWebsocket> {
   emit({ status: 'connecting' });
+  if (inNativeApp()) {
+    // Holochain's Tauri runtime injected the connection and signs our zome calls.
+    const ws = await AppWebsocket.connect();
+    emit({ status: 'connected', node: 'this device' });
+    return ws;
+  }
   const errors: string[] = [];
   for (const endpoint of knownEndpoints()) {
     try {

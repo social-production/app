@@ -11,7 +11,7 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - `happ/`: `happ.yaml` (roles; project/conversation are cloned) + `web-happ.yaml`.
 - `services/gateway`: seed-node HTTP (axum): `/healthz`, `/readyz`; later passkeys, hosted agents, `/session`, `/ws` proxy.
 - `ui/`: SvelteKit 3 static SPA. Layers: `routes → lib/features → lib/services → lib/holo`. Only `lib/holo` imports `@holochain/client`.
-- `native/`: Tauri 2 shell embedding the conductor (ADR 0017).
+- `native/`: Tauri 2 + Holochain's `tauri-plugin-hc` (ADR 0021). The UI talks to the device's conductor over IPC; browsers use gateways.
 - `deploy/`: seed-node + bootstrap Dockerfiles, Railway configs. `tests/scenarios`: sweettest multi-agent tests.
 
 ## Rules

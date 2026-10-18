@@ -1,7 +1,7 @@
 declare global {
   interface Window {
-    /** Injected by the native (Tauri) shell: URL of its embedded gateway on localhost. */
-    __SP_LOCAL_GATEWAY__?: string;
+    /** Injected by Holochain's Tauri runtime when running inside the native app. */
+    __HC_TAURI_HOLOCHAIN__?: unknown;
   }
 }
 
