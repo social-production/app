@@ -42,4 +42,8 @@ jobs:
           export CC_aarch64_linux_android="$bin/aarch64-linux-android26-clang"
           export CXX_aarch64_linux_android="$bin/aarch64-linux-android26-clang++"
           export AR_aarch64_linux_android="$bin/llvm-ar"
+          # Vendored OpenSSL's makefile calls <triple>-ranlib; the NDK only ships llvm-ranlib.
+          mkdir -p "$RUNNER_TEMP/ndk-shims"
+          ln -sf "$bin/llvm-ranlib" "$RUNNER_TEMP/ndk-shims/aarch64-linux-android-ranlib"
+          export PATH="$RUNNER_TEMP/ndk-shims:$PATH"
           cargo build --release -p mobile-conductor --features jit --target aarch64-linux-android
