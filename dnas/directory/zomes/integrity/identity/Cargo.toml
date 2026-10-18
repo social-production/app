@@ -1,0 +1,22 @@
+[package]
+name = "identity_integrity"
+description = "Directory DNA rules for people: profiles, vouches, standing grants, device links."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdi = { workspace = true }
+# Founder keys are written in base64 ("uhCAk…") in dna.yaml.
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+holochain_serialized_bytes = { workspace = true }
+serde = { workspace = true }
+serde_bytes = "0.11"
+sp_core = { workspace = true }
+sp_governance = { workspace = true }
+
+[lints]
+workspace = true

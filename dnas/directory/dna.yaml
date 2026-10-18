@@ -4,15 +4,26 @@ manifest_version: "0"
 name: sp_directory
 integrity:
   network_seed: ~
-  # Part of the DNA hash: keeps the three networks distinct while they share zomes.
+  # Part of the DNA hash: changing anything here starts a new network.
   properties:
     kind: directory
+    # Founders start with Full standing so the vouch chain can begin
+    # (docs/GOVERNANCE.md#standing). Filled in when founders have signed up:
+    #   - name: Johan
+    #     agent: uhCAk...
+    founders: []
   zomes:
     - name: health_integrity
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
+    - name: identity_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/identity_integrity.wasm
 coordinator:
   zomes:
     - name: health
       path: ../../target/wasm32-unknown-unknown/zome/health.wasm
       dependencies:
         - name: health_integrity
+    - name: identity
+      path: ../../target/wasm32-unknown-unknown/zome/identity.wasm
+      dependencies:
+        - name: identity_integrity

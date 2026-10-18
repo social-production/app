@@ -9,7 +9,11 @@ publish = false
 [dependencies]
 
 [dev-dependencies]
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+identity_integrity = { workspace = true }
+sp_governance = { workspace = true }
 holochain = { workspace = true, features = ["wasmer-sys-cranelift", "test_utils"] }
+serde = { workspace = true }
 tokio = { workspace = true }
 
 [lints]

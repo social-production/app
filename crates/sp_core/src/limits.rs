@@ -8,6 +8,20 @@ pub const NOTE_MAX: usize = 280;
 /// Long free text (descriptions, posts).
 pub const LONG_TEXT_MAX: usize = 20_000;
 
+/// Profiles (M1).
+pub const DISPLAY_NAME_MAX: usize = 60;
+pub const BIO_MAX: usize = 1_000;
+pub const HOME_AREA_MAX: usize = 100;
+/// Avatars are resized in the browser before upload; this is the hard cap.
+pub const AVATAR_MAX_BYTES: usize = 256 * 1024;
+pub const AVATAR_MIME_TYPES: [&str; 3] = ["image/jpeg", "image/png", "image/webp"];
+
+/// True when `text` is at most `max` characters (may be empty).
+#[must_use]
+pub fn optional_text_ok(text: &str, max: usize) -> bool {
+    text.chars().count() <= max
+}
+
 /// True when `text` is non-empty after trimming and at most `max` characters.
 #[must_use]
 pub fn text_ok(text: &str, max: usize) -> bool {

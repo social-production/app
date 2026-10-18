@@ -4,8 +4,8 @@ members = [
   "crates/*",
   "zomes/*/integrity",
   "zomes/*/coordinator",
-  # DNA-specific zomes land in M1+ as dnas/<dna>/zomes/{integrity,coordinator}/<name>;
-  # add those globs then (cargo rejects globs that match nothing).
+  "dnas/*/zomes/integrity/*",
+  "dnas/*/zomes/coordinator/*",
   "services/gateway",
   "native",
   "tests/scenarios",
@@ -33,6 +33,7 @@ sp_core = { path = "crates/sp_core" }
 sp_governance = { path = "crates/sp_governance" }
 sp_index = { path = "crates/sp_index" }
 health_integrity = { path = "zomes/health/integrity" }
+identity_integrity = { path = "dnas/directory/zomes/integrity/identity" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"
@@ -47,6 +48,7 @@ module_name_repetitions = "allow"
 needless_pass_by_value = "allow" # hdk_extern inputs are taken by value
 missing_errors_doc = "allow"    # every hdk_extern returns ExternResult
 unnecessary_wraps = "allow"     # validation helpers share the ExternResult signature
+similar_names = "allow"         # domain pairs like voucher/vouchee
 
 # Zome WASM is built with `--profile zome` (scripts/build-zomes.sh): small binaries
 # without forcing size optimisation on the gateway and native app.

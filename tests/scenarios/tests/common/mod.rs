@@ -1,14 +1,65 @@
+#![allow(dead_code)] // each test binary uses a different subset
+
 use std::path::PathBuf;
 
-use holochain::sweettest::SweetDnaFile;
+use holo_hash::AgentPubKeyB64;
+use holochain::prelude::*;
+use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
+use identity_integrity::{DirectoryProperties, Founder};
 
-/// Load a packed DNA from `dnas/<name>/sp_<name>.dna` (built by scripts/build-happ.sh).
-pub async fn load_dna(name: &str) -> holochain::prelude::DnaFile {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+fn dna_path(name: &str) -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../dnas")
         .join(name)
-        .join(format!("sp_{name}.dna"));
+        .join(format!("sp_{name}.dna"))
+}
+
+/// Load a packed DNA from `dnas/<name>/sp_<name>.dna` (built by scripts/build-happ.sh).
+pub async fn load_dna(name: &str) -> DnaFile {
+    let path = dna_path(name);
     SweetDnaFile::from_bundle(&path)
         .await
         .unwrap_or_else(|e| panic!("load {}: {e} — run scripts/build-happ.sh", path.display()))
+}
+
+/// The directory DNA with the given agents as founders (a different network per list).
+pub async fn directory_with_founders(founders: &[AgentPubKey]) -> DnaFile {
+    let props = DirectoryProperties {
+        kind: "directory".into(),
+        founders: founders
+            .iter()
+            .enumerate()
+            .map(|(i, agent)| Founder {
+                name: format!("founder {i}"),
+                agent: AgentPubKeyB64::from(agent.clone()).to_string(),
+            })
+            .collect(),
+    };
+    let modifiers = DnaModifiersOpt::none().with_properties(props);
+    SweetDnaFile::from_bundle_with_overrides(&dna_path("directory"), modifiers)
+        .await
+        .expect("load directory dna")
+}
+
+/// One agent per conductor; the first `founders` agents are founders. Returns the
+/// directory cells in conductor order.
+pub async fn directory_network(
+    conductors: &mut SweetConductorBatch,
+    founders: usize,
+) -> Vec<SweetCell> {
+    let mut agents = Vec::new();
+    for i in 0..conductors.len() {
+        agents.push(SweetAgents::one(conductors[i].keystore()).await);
+    }
+    let dna = directory_with_founders(&agents[..founders]).await;
+    let mut cells = Vec::new();
+    for (i, agent) in agents.into_iter().enumerate() {
+        let app = conductors[i]
+            .setup_app_for_agent("sp", agent, std::slice::from_ref(&dna))
+            .await
+            .expect("install app");
+        cells.push(app.into_cells().remove(0));
+    }
+    conductors.exchange_peer_info().await;
+    cells
 }

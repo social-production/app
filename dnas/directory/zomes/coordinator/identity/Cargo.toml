@@ -1,0 +1,18 @@
+[package]
+name = "identity"
+description = "Directory DNA API for people: profiles, vouching, standing, device links."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+identity_integrity = { workspace = true }
+sp_governance = { workspace = true }
+
+[lints]
+workspace = true
