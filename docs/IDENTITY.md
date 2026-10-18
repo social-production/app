@@ -15,14 +15,16 @@ agent key (`ui/src/lib/domain/people.ts`).
 The seed node hosts an agent for each person who signs up in a browser. Everything happens in
 `services/gateway` (one process with the conductor embedded and no admin port):
 
-| Step | Browser | Gateway |
+The **recovery phrase is always enough** to sign in (ADR 0027). Passkeys are an optional shortcut,
+offered only on devices with their own passkey store, and never as a USB security key.
+
+| Step | Browser | Gateway (`/account/*`) |
 |---|---|---|
-| Sign up | makes 24 words, shows them, asks for 3 back; solves a proof-of-work; sends the 32-byte seed | checks the proof-of-work and per-IP limit; imports the seed into lair (idempotent); starts passkey registration |
-| Passkey | creates a discoverable passkey for the UI's domain | stores the passkey against the agent (`gateway.sqlite`), installs the person's app (`person-<agent>`) |
-| Session | makes its own **signing key pair** and keeps it in IndexedDB | grants that key an assigned capability on every cell, issues a single-use app-websocket token |
-| Reload | sends its signing public key to `/session/resume` | issues a new token (no passkey prompt) |
-| Sign in elsewhere | uses the passkey (username-less) | finds the agent from the credential id, grants a new device key |
-| Restore | enters the 24 words on any device | imports the seed (same agent), binds a new passkey, rebuilds the chain from the DHT |
+| Sign up | makes 24 words, shows them, asks for 3 back; solves a proof-of-work; sends the 32-byte seed with its own new signing key | `open` (signup): checks proof-of-work + per-IP limit, imports the seed, installs the person's app (`person-<agent>`), grants the device key, returns a session + **device secret** |
+| Sign in (phrase) | 24 words → seed | `open` (signin): person must exist on this node; if not, the browser retries as **restore** (same agent, rebuilt from the DHT) |
+| Save a passkey (optional) | after sign-in, only if the device can store one | `passkey/start` needs the device secret; the passkey is then bound to the agent |
+| Sign in (passkey) | device passkey or phone (QR); never a USB key | `login/*`: credential id → agent, grants a new device key |
+| Reload | sends its signing public key | `/session/resume` issues a new token (no prompt) |
 
 The gateway database holds only agent keys, passkey public data and device signing keys.
 There are no names, emails or passwords.

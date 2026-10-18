@@ -51,8 +51,8 @@
 {:else if step === 'phrase'}
   <h2>Your recovery phrase</h2>
   <p>
-    These 24 words <strong>are</strong> your account. Write them down on paper and keep them safe. Anyone
-    with them can act as you; without them, a lost device means a lost account.
+    These 24 words <strong>are</strong> your account — you sign in with them. Write them down on paper
+    and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
   </p>
   <PhraseGrid {words} />
   <button class="primary" onclick={() => (step = 'confirm')}>I've written them down</button>

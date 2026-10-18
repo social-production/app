@@ -53,6 +53,9 @@ impl Passkeys {
         let selection = &mut json["publicKey"]["authenticatorSelection"];
         selection["residentKey"] = "required".into();
         selection["requireResidentKey"] = true.into();
+        // The device's own passkey store only: never prompt for a USB security key.
+        selection["authenticatorAttachment"] = "platform".into();
+        json["publicKey"]["hints"] = serde_json::json!(["client-device"]);
         let id = Uuid::new_v4();
         insert(&self.registrations, id, (agent.to_string(), state));
         Ok((id, json))
@@ -72,11 +75,15 @@ impl Passkeys {
         Ok((agent, cred_id, serde_json::to_string(&passkey)?))
     }
 
-    pub fn start_login(&self) -> anyhow::Result<(Uuid, RequestChallengeResponse)> {
+    /// Options prefer this device's passkey, then one on the person's phone (QR), never
+    /// a USB security key.
+    pub fn start_login(&self) -> anyhow::Result<(Uuid, serde_json::Value)> {
         let (options, state) = self.webauthn.start_discoverable_authentication()?;
+        let mut json = serde_json::to_value(options)?;
+        json["publicKey"]["hints"] = serde_json::json!(["client-device", "hybrid"]);
         let id = Uuid::new_v4();
         insert(&self.logins, id, state);
-        Ok((id, options))
+        Ok((id, json))
     }
 
     /// The credential id the browser answered with, to look up the stored passkey.

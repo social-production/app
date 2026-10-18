@@ -2,6 +2,7 @@
 //! the browser uses to open its app websocket (docs/IDENTITY.md).
 
 pub mod account;
+pub mod passkey;
 pub mod session;
 pub mod ws_proxy;
 
@@ -24,6 +25,7 @@ pub struct AppState {
     pub passkeys: Arc<Passkeys>,
     pub pow: Arc<Pow>,
     pub signup_limit: Arc<SignupLimit>,
+    pub signin_limit: Arc<SignupLimit>,
 }
 
 pub fn router(state: AppState) -> Router {
@@ -31,9 +33,9 @@ pub fn router(state: AppState) -> Router {
         .route("/healthz", get(|| async { "ok" }))
         .route("/readyz", get(readyz))
         .route("/account/pow", post(account::pow))
-        .route("/account/signup", post(account::signup))
-        .route("/account/restore", post(account::restore))
-        .route("/account/register", post(account::register))
+        .route("/account/open", post(account::open))
+        .route("/account/passkey/start", post(passkey::add_start))
+        .route("/account/passkey/finish", post(passkey::add_finish))
         .route("/account/login/start", post(account::login_start))
         .route("/account/login/finish", post(account::login_finish))
         .route("/session/resume", post(session::resume))

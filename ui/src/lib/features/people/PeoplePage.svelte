@@ -5,6 +5,8 @@
   import { getPerson, listPeople, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import PasskeyOffer from '#lib/features/account/PasskeyOffer.svelte';
+
   import StandingPanel from './StandingPanel.svelte';
 
   let people = $state<Person[]>([]);
@@ -46,6 +48,7 @@
 </script>
 
 <div class="stack">
+  {#if me}<PasskeyOffer name={me.profile?.name ?? 'Social Production'} />{/if}
   {#if me}<StandingPanel person={me} onChange={load} />{/if}
   <section class="panel stack">
     <h2>People</h2>

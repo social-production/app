@@ -10,6 +10,7 @@ export interface GatewaySession {
   appWsUrl: string;
   token: number[];
   capSecret: number[];
+  deviceSecret: number[];
   cells: { dna: string; agent: string }[];
 }
 
@@ -43,33 +44,25 @@ async function post<T>(gateway: string, path: string, body: unknown = {}): Promi
   return json as T;
 }
 
+export type OpenMode = 'signup' | 'restore' | 'signin';
+
+export interface OpenBody {
+  mode: OpenMode;
+  challenge?: string;
+  nonce?: string;
+  seed: number[];
+  signingKey: number[];
+}
+
 export const gatewayApi = {
   pow: (g: string) => post<{ challenge: string; bits: number }>(g, '/account/pow'),
-  signup: (g: string, body: SeedBody) => post<Ceremony>(g, '/account/signup', body),
-  restore: (g: string, body: SeedBody) => post<Ceremony>(g, '/account/restore', body),
-  register: (g: string, body: RegisterBody) => post<GatewaySession>(g, '/account/register', body),
+  open: (g: string, body: OpenBody) => post<GatewaySession>(g, '/account/open', body),
   loginStart: (g: string) => post<Ceremony>(g, '/account/login/start'),
-  loginFinish: (g: string, body: LoginBody) =>
+  loginFinish: (g: string, body: { ceremony: string; credential: unknown; signingKey: number[] }) =>
     post<GatewaySession>(g, '/account/login/finish', body),
+  passkeyStart: (g: string, body: { signingKey: number[]; deviceSecret: number[]; name: string }) =>
+    post<Ceremony>(g, '/account/passkey/start', body),
+  passkeyFinish: (g: string, body: { ceremony: string; credential: unknown }) =>
+    post<{ saved: boolean }>(g, '/account/passkey/finish', body),
   resume: (g: string, signingKey: number[]) => post<Resumed>(g, '/session/resume', { signingKey }),
 };
-
-export interface SeedBody {
-  challenge: string;
-  nonce: string;
-  seed: number[];
-  name: string;
-}
-
-interface RegisterBody {
-  ceremony: string;
-  credential: unknown;
-  signingKey: number[];
-  restore: boolean;
-}
-
-interface LoginBody {
-  ceremony: string;
-  credential: unknown;
-  signingKey: number[];
-}

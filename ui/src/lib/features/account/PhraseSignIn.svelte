@@ -2,7 +2,7 @@
   import {
     explain,
     phraseIsValid,
-    restore,
+    signInWithPhrase,
     splitWords,
     type AccountStep,
   } from '#lib/services/account.ts';
@@ -13,7 +13,7 @@
 
   let text = $state('');
   let working = $state(false);
-  let progress = $state<AccountStep>('checking');
+  let progress = $state<AccountStep>('connecting');
   let error = $state<string>();
 
   const words = $derived(splitWords(text));
@@ -23,7 +23,7 @@
     working = true;
     error = undefined;
     try {
-      await restore(words, (s) => (progress = s));
+      await signInWithPhrase(words, (s) => (progress = s));
     } catch (e) {
       error = explain(e);
       working = false;
@@ -34,9 +34,10 @@
 {#if working}
   <ProgressSteps current={progress} />
 {:else}
-  <h2>Restore your account</h2>
+  <h2>Sign in with your recovery phrase</h2>
   <p class="muted">
-    Enter your 24 words. This device gets a new passkey; your identity and history stay the same.
+    Type or paste your 24 words. This device stays signed in until you sign out. If your account
+    lives on another site or app, it is brought here — same identity.
   </p>
   <label>
     Recovery phrase
@@ -47,7 +48,7 @@
   </p>
   {#if error}<p class="error">{error}</p>{/if}
   <div class="row">
-    <button class="primary" disabled={!valid} onclick={go}>Restore</button>
+    <button class="primary" disabled={!valid} onclick={go}>Sign in</button>
     <button onclick={onCancel}>Back</button>
   </div>
 {/if}

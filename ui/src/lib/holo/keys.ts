@@ -14,6 +14,8 @@ export interface DeviceSession {
   keyPair: KeyPair;
   signingKey: Uint8Array;
   capSecret: Uint8Array;
+  /** Proves this device to the gateway (adding a passkey). */
+  deviceSecret: Uint8Array;
   cells: { dna: string; agent: string }[];
 }
 

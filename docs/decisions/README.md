@@ -28,3 +28,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0024](./0024-pair-devices-not-keys.md) Pair devices instead of sharing a key
 - [0025](./0025-small-network-gossip.md) Gossip tuned for a small network
 - [0026](./0026-signup-protection.md) Signup protection: proof-of-work, per-IP limit, New level
+- [0027](./0027-phrase-first-signin.md) The recovery phrase is the sign-in; passkeys are optional

@@ -1,17 +1,19 @@
-/** Account flows for features: sign up, sign in, restore, sign out (docs/IDENTITY.md). */
+/** Account flows for features (docs/IDENTITY.md): the recovery phrase always works;
+ *  passkeys are an optional shortcut on devices that can store them. */
 import { signUp, type AccountStep } from '#lib/holo/index.ts';
 
 import { saveProfile } from './people.ts';
 
 export {
+  addPasskey,
   confirmationPositions,
   connect,
+  devicePasskeysAvailable,
   GatewayError,
   newPhrase,
-  passkeysSupported,
   phraseIsValid,
-  restore,
-  signIn,
+  signInWithPasskey,
+  signInWithPhrase,
   signOut,
   splitWords,
   type AccountStep,
@@ -23,7 +25,7 @@ export async function createAccount(
   words: string[],
   progress: (step: AccountStep) => void,
 ): Promise<void> {
-  await signUp(name, words, progress, () => firstProfile(name));
+  await signUp(words, progress, () => firstProfile(name));
 }
 
 /** The new person's profile, written before the app appears; retried while the cell warms up. */
@@ -43,7 +45,7 @@ async function firstProfile(name: string): Promise<void> {
 /** A message fit to show a person, from any error an account flow throws. */
 export function explain(error: unknown): string {
   if (error instanceof DOMException && error.name === 'NotAllowedError') {
-    return 'The passkey step was cancelled. Try again when you are ready.';
+    return 'The passkey step was cancelled or timed out.';
   }
   return error instanceof Error ? error.message : String(error);
 }

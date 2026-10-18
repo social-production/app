@@ -1,4 +1,10 @@
-export { restore, signIn, signUp, type AccountStep } from './account.ts';
+export {
+  addPasskey,
+  signInWithPasskey,
+  signInWithPhrase,
+  signUp,
+  type AccountStep,
+} from './account.ts';
 export {
   callZome,
   connect,
@@ -8,7 +14,7 @@ export {
   type Role,
 } from './connection.ts';
 export { GatewayError } from './gateway.ts';
-export { passkeysSupported } from './passkeys.ts';
+export { devicePasskeysAvailable, passkeysSupported } from './passkeys.ts';
 export { confirmationPositions, newPhrase, phraseIsValid, splitWords } from './phrase.ts';
 export {
   decodeHashFromBase64 as stringToHash,

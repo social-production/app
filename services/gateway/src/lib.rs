@@ -32,6 +32,8 @@ pub async fn serve(
         signup_limit: Arc::new(auth::ratelimit::SignupLimit::new(
             config.signups_per_ip_per_day,
         )),
+        // Phrase sign-ins: generous, just enough to stop hammering.
+        signin_limit: Arc::new(auth::ratelimit::SignupLimit::new(200)),
         config: Arc::new(config),
         node,
     };

@@ -11,6 +11,16 @@ export function passkeysSupported(): boolean {
   );
 }
 
+/** True when this device has its own passkey store (Windows Hello, Touch ID, Android…). */
+export async function devicePasskeysAvailable(): Promise<boolean> {
+  if (!passkeysSupported()) return false;
+  try {
+    return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+  } catch {
+    return false;
+  }
+}
+
 export async function createPasskey(options: JsonOptions): Promise<unknown> {
   const publicKey = PublicKeyCredential.parseCreationOptionsFromJSON(
     options.publicKey as PublicKeyCredentialCreationOptionsJSON,

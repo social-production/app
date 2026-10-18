@@ -37,6 +37,10 @@ impl Store {
             .create_if_missing(true);
         let pool = SqlitePool::connect_with(options).await?;
         sqlx::raw_sql(SCHEMA).execute(&pool).await?;
+        // M1.1: device secrets. Older databases lack the column; adding it twice fails harmlessly.
+        let _ = sqlx::query("alter table signing_keys add column secret_hash text")
+            .execute(&pool)
+            .await;
         Ok(Self { pool })
     }
 
@@ -89,16 +93,39 @@ impl Store {
         Ok(row.map(|r| (r.get("agent"), r.get("passkey"))))
     }
 
-    pub async fn save_signing_key(&self, signing_key: &str, agent: &str) -> anyhow::Result<()> {
+    /// Remember a device's signing key and (hashed) device secret for its person.
+    pub async fn save_signing_key(
+        &self,
+        signing_key: &str,
+        agent: &str,
+        device_secret: &[u8],
+    ) -> anyhow::Result<()> {
         sqlx::query(
-            "insert or replace into signing_keys (signing_key, agent, created_at) values (?, ?, ?)",
+            "insert or replace into signing_keys (signing_key, agent, created_at, secret_hash)
+             values (?, ?, ?, ?)",
         )
         .bind(signing_key)
         .bind(agent)
         .bind(now())
+        .bind(secret_hash(device_secret))
         .execute(&self.pool)
         .await?;
         Ok(())
+    }
+
+    /// The person behind a device, if the device secret matches.
+    pub async fn agent_for_device(
+        &self,
+        signing_key: &str,
+        device_secret: &[u8],
+    ) -> anyhow::Result<Option<String>> {
+        let row =
+            sqlx::query("select agent from signing_keys where signing_key = ? and secret_hash = ?")
+                .bind(signing_key)
+                .bind(secret_hash(device_secret))
+                .fetch_optional(&self.pool)
+                .await?;
+        Ok(row.map(|r| r.get("agent")))
     }
 
     pub async fn agent_for_signing_key(&self, signing_key: &str) -> anyhow::Result<Option<String>> {
@@ -108,6 +135,11 @@ impl Store {
             .await?;
         Ok(row.map(|r| r.get("agent")))
     }
+}
+
+fn secret_hash(secret: &[u8]) -> String {
+    use sha2::Digest;
+    crate::hex::encode(&sha2::Sha256::digest(secret))
 }
 
 fn now() -> i64 {
