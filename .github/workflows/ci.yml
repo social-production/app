@@ -21,6 +21,11 @@ jobs:
         with:
           name: holochain-ci
       - uses: Swatinem/rust-cache@v2
+      # tauri-plugin-hc's build script writes permission files into its registry source,
+      # which the cache doesn't keep; rerun it so its cached output never points at
+      # missing files.
+      - name: Refresh Tauri plugin build output
+        run: nix develop --accept-flake-config --command cargo clean -p tauri-plugin-hc
       - name: Install npm dependencies
         run: nix develop --accept-flake-config --command npm ci
       - name: Everything (scripts/check-all.sh)
