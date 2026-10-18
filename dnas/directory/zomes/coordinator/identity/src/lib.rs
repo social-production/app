@@ -67,6 +67,12 @@ pub fn get_devices(agent: AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
     devices::confirmed(&agent)
 }
 
+/// Pairings other devices started with me, waiting for my confirmation.
+#[hdk_extern]
+pub fn device_requests(_: ()) -> ExternResult<Vec<identity_integrity::DeviceLink>> {
+    devices::requests()
+}
+
 /// Write a vouch exactly as given, skipping the friendly checks in `vouch`. The rules are
 /// enforced by integrity validation, not here; tests use this to prove forged vouches fail.
 #[hdk_extern]

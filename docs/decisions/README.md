@@ -23,3 +23,8 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0019](./0019-sveltekit-3.md) SvelteKit 3 with #lib imports
 - [0020](./0020-mobile-platform-findings.md) Mobile platform findings (M0 platform check)
 - [0021](./0021-holochain-runtime-tauri.md) Use Holochain's official runtime-tauri for the native app (supersedes 0017)
+- [0022](./0022-phrase-is-seed.md) The 24-word phrase is the agent seed
+- [0023](./0023-gateway-embeds-conductor.md) The seed node is one process: the gateway embeds the conductor
+- [0024](./0024-pair-devices-not-keys.md) Pair devices instead of sharing a key
+- [0025](./0025-small-network-gossip.md) Gossip tuned for a small network
+- [0026](./0026-signup-protection.md) Signup protection: proof-of-work, per-IP limit, New level

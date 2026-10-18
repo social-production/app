@@ -39,7 +39,11 @@ Each decision below becomes an ADR when it ships.
    validated on another node; forged grant rejected; cap enforced); Playwright signup/login/restore.
 8. Deploy to `social-production-p2p`, then the Grokbot retest sheet.
 
-## Open, decide during build
-- Seed derivation: Holochain seed bundle vs. BIP-39 → seed, then agent key (must match what the runtime
-  plugin's seed import expects, so a phrase restores the same agent everywhere).
-- Prune window for inactive hosted agents (proposal: 60 days with no session).
+## Resolved during build
+- Seed derivation: the 24 words are the raw 32-byte seed (ADR 0022), matching runtime-tauri's seed import.
+- The seed node embeds the conductor (ADR 0023). Devices pair instead of sharing keys (ADR 0024).
+- Gossip tuned for a small network (ADR 0025).
+
+## Still open
+- Prune window for inactive hosted agents (proposal: 60 days with no session). The gateway records `last_seen`.
+- Bot-review driven vouch suspension lands with bot reviews (M6).

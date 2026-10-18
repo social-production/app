@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ProfileEditor from '#lib/features/people/ProfileEditor.svelte';
+  import ProfilePage from '#lib/features/people/ProfilePage.svelte';
 </script>
 
-<ProfileEditor />
+<ProfilePage />

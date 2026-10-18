@@ -7,7 +7,7 @@ Separate from the live FastAPI project `social-production`, so nothing is shared
 | Service | Source | Volume | Public URL used by |
 |---|---|---|---|
 | `bootstrap` | `deploy/bootstrap/Dockerfile` (`deploy/railway/bootstrap.json`) | none | every conductor (bootstrap + relay) |
-| `seed-node` | `deploy/seed-node/Dockerfile` (`deploy/railway/seed-node.json`) | `/data` (conductor DB + lair keystore) | UI (`/session`, `/ws`) |
+| `seed-node` | `deploy/seed-node/Dockerfile` (`deploy/railway/seed-node.json`) | `/data` (conductor DB, lair keystore, `gateway.sqlite`) | UI (`/account/*`, `/session/resume`, `/ws`) |
 | `ui` | `ui/build` served statically | none | people |
 
 ### seed-node environment
@@ -17,11 +17,13 @@ Separate from the live FastAPI project `social-production`, so nothing is shared
 | `LAIR_PASSPHRASE` | unlocks the keystore. **Losing it loses every hosted agent's key.** Store it in a password manager too |
 | `BOOTSTRAP_URL` | `https://<bootstrap service domain>` |
 | `RELAY_URL` | defaults to `BOOTSTRAP_URL` (same server) |
-| `ADMIN_PORT` | conductor admin port, localhost only (default 4444) |
+| `RP_ID` / `RP_ORIGIN` | the UI's domain and origin; passkeys are bound to them (e.g. `ui-production-333c.up.railway.app`, `https://ui-production-333c.up.railway.app`) |
+| `POW_BITS` | signup proof-of-work difficulty (default 20) |
+| `SIGNUPS_PER_IP_PER_DAY` | default 5 |
 | `PORT` | set by Railway. The gateway listens here and proxies the app websocket on `/ws` |
 
-Railway exposes a single port per service, so the gateway proxies the conductor's app websocket.
-The admin websocket is never exposed.
+The seed node is one process (ADR 0023). The conductor is embedded in the gateway, there is no
+admin websocket, and the app interface listens on localhost only behind `/ws`.
 
 ### Deploy loop
 

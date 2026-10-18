@@ -61,3 +61,27 @@ export async function founders(): Promise<{ name: string; agent: string }[]> {
 function toStanding(wire: StandingWire): Standing {
   return { level: wire.level, founder: wire.founder, vouchers: wire.vouchers.map(hashToString) };
 }
+
+export interface DeviceLink {
+  primary: string;
+  device: string;
+}
+
+/** Devices paired with `agent` (both halves written). */
+export async function devicesOf(agent: string): Promise<string[]> {
+  return (await identity<AgentPubKey[]>('get_devices', stringToHash(agent))).map(hashToString);
+}
+
+/** Pairings another device started with me, waiting for my confirmation. */
+export async function deviceRequests(): Promise<DeviceLink[]> {
+  const links = await identity<{ primary: AgentPubKey; device: AgentPubKey }[]>('device_requests');
+  return links.map((l) => ({ primary: hashToString(l.primary), device: hashToString(l.device) }));
+}
+
+/** Write my half of a pairing (to start it, or to confirm one sent to me). */
+export async function writeDeviceLink(link: DeviceLink): Promise<void> {
+  await identity<ActionHash>('link_device', {
+    primary: stringToHash(link.primary),
+    device: stringToHash(link.device),
+  });
+}

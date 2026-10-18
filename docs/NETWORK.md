@@ -47,8 +47,8 @@ hosted users restore their recovery phrase into a desktop/phone app and carry on
 - Over the internet via the Railway relay: two nodes that had already met synced in 2.5 s.
   **First contact between the Railway seed node and a new home node took more than 4 minutes**
   (gossip rounds timed out over the relay before converging). All nodes did converge.
-  This needs tuning before real users (M1): gossip initiate interval, timeouts, and whether
-  Railway can expose the relay's QUIC/UDP port for direct paths.
+  Cause: Kitsune2 defaults (15 s round timeout, 5 min before retrying a peer). M1 tunes all
+  nodes for a small network (ADR 0025, `sp_core::network`). Re-measure after each deploy.
 
 ## Storage growth and sharding
 

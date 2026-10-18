@@ -8,14 +8,16 @@ const DEFAULT_BOOTSTRAP: &str = "https://bootstrap-production-f978.up.railway.ap
 
 pub fn config() -> NetworkConfig {
     let url = std::env::var("SP_BOOTSTRAP_URL").unwrap_or_else(|_| DEFAULT_BOOTSTRAP.into());
-    // Local dev only: production relays are always https.
-    let advanced = url
-        .starts_with("http://")
-        .then(|| serde_json::json!({ "irohTransport": { "relayAllowPlainText": true } }));
+    let mut advanced: serde_json::Value =
+        serde_json::from_str(sp_core::network::GOSSIP_TUNING_JSON).unwrap_or_default();
+    if url.starts_with("http://") {
+        // Local dev only: production relays are always https.
+        advanced["irohTransport"] = serde_json::json!({ "relayAllowPlainText": true });
+    }
     NetworkConfig {
         bootstrap_url: url2::Url2::parse(&url),
         relay_url: url2::Url2::parse(&url),
-        advanced,
+        advanced: Some(advanced),
         ..NetworkConfig::default()
     }
 }

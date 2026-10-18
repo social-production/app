@@ -18,8 +18,8 @@ Decisions and their reasons are in [`decisions/`](decisions/).
  ┌──────────────────────────────┐  │                             │
  │ gateway  (services/gateway)  │  │                             │
  │  passkeys, hosted agents,    │  │                             │
- │  app tokens, /ws proxy, index│  │                             │
- │ conductor (holochain 0.7)    │◄─┴──── gossip (kitsune2/iroh) ─┘
+ │  app tokens, /ws proxy       │  │                             │
+ │  + embedded conductor 0.7    │◄─┴──── gossip (kitsune2/iroh) ─┘
  │  hosted agents' cells        │
  └──────────────────────────────┘
         ▲  peer discovery + relay

@@ -2,3 +2,4 @@
 //! behaviour belongs in a domain crate (`sp_governance`, `sp_index`).
 
 pub mod limits;
+pub mod network;

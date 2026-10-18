@@ -2,7 +2,9 @@
   "name": "social-production",
   "private": true,
   "license": "AGPL-3.0-or-later",
-  "workspaces": ["ui"],
+  "workspaces": [
+    "ui"
+  ],
   "scripts": {
     "build:zomes": "bash scripts/build-zomes.sh",
     "build:happ": "bash scripts/build-happ.sh",
@@ -12,5 +14,8 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
   }
 }

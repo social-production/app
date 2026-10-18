@@ -105,11 +105,12 @@ impl Node {
 }
 
 fn conductor_config(data_root: &Path, config: &Config) -> ConductorConfig {
+    let mut advanced: serde_json::Value =
+        serde_json::from_str(sp_core::network::GOSSIP_TUNING_JSON).unwrap_or_default();
     // An http:// relay only happens in local dev (scripts/dev-seed.sh); production is https.
-    let advanced = config
-        .relay_url
-        .starts_with("http://")
-        .then(|| serde_json::json!({ "irohTransport": { "relayAllowPlainText": true } }));
+    if config.relay_url.starts_with("http://") {
+        advanced["irohTransport"] = serde_json::json!({ "relayAllowPlainText": true });
+    }
     ConductorConfig {
         data_root_path: Some(data_root.to_path_buf().into()),
         keystore: KeystoreConfig::LairServerInProc { lair_root: None },
@@ -118,7 +119,7 @@ fn conductor_config(data_root: &Path, config: &Config) -> ConductorConfig {
             relay_url: url2::Url2::parse(&config.relay_url),
             // Full arc: the seed node holds everything (docs/NETWORK.md).
             target_arc_factor: 1,
-            advanced,
+            advanced: Some(advanced),
             ..NetworkConfig::default()
         },
         ..ConductorConfig::default()

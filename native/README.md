@@ -15,3 +15,6 @@ Network: the Railway bootstrap/relay by default (`src/network.rs`). Override wit
 
 Build order: `npm run build -w ui`, then `bash scripts/build-happ.sh`, then `cargo run -p native`.
 Mobile (M7): the same crate builds as a library for Android and iOS (`tauri android|ios init`).
+
+Identity: the app has its **own** agent. Pair it with your account under Profile → Devices
+(ADR 0024). Importing a recovery phrase here is reserved for moving off a hosted node (M7).

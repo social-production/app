@@ -47,3 +47,22 @@ pub fn confirmed(agent: &AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
     }
     Ok(paired)
 }
+
+/// Pairings someone else started with `me` that I have not confirmed yet.
+pub fn requests() -> ExternResult<Vec<DeviceLink>> {
+    let me = agent_info()?.agent_initial_pubkey;
+    let mut mine: Vec<DeviceLink> = Vec::new();
+    let mut theirs: Vec<DeviceLink> = Vec::new();
+    for hash in action_targets(links(me.clone(), LinkTypes::AgentToDeviceLinks)?) {
+        let Some(record) = live(hash)? else { continue };
+        let Some(link) = decode::<DeviceLink>(&record)? else {
+            continue;
+        };
+        if record.action().author() == &me {
+            mine.push(link);
+        } else if !theirs.contains(&link) {
+            theirs.push(link);
+        }
+    }
+    Ok(theirs.into_iter().filter(|l| !mine.contains(l)).collect())
+}
