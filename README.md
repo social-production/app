@@ -26,7 +26,8 @@ Measured on the live site: signup ≈ 9 s, a new person visible to others ≈ 3 
 first-signup-after-deploy delay removed (zomes are compiled at startup).
 
 Known gaps:
-- The UI is temporary scaffolding; the real screens will be ported from `web/` (its design is done).
+- The UI is temporary scaffolding. From M2 on, screens are ported from `web/` (its design is done):
+  the app shell and design system first, then each milestone's screens.
 - iOS phone nodes wait on an upstream Holochain keystore fix (ADR 0020/0021). Android builds.
 - Vouching has scenario tests but no browser test yet; bot reviews and vouch suspension come in M6.
 
@@ -56,7 +57,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 |---|---|---|---|
 | **M0** | Foundation | repo, docs, CI, `health` zome in 3 DNAs, gateway, UI shell, desktop app, Railway seed + bootstrap, platform check | ✅ done |
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
-| M2 | Projects | project clones, membership, project index, feeds/search (`sp_index`) | next |
+| M2 | Projects | **first: port `web/`'s design system + app shell and redo the M1 screens with it**; then project clones, membership, project index, feeds/search (`sp_index`), project screens ported from `web/` | next |
 | M3 | Governance | Proposal/Vote/Outcome, kinds: edits, phases, updates, links, plans | |
 | M4 | Talk | discussion, project chat, DMs (conversation DNA), in-app notifications | |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |

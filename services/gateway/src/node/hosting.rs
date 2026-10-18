@@ -175,7 +175,7 @@ impl Node {
         Ok(removed)
     }
 
-    async fn find_app(&self, id: &str) -> anyhow::Result<Option<AppInfo>> {
+    pub async fn find_app(&self, id: &str) -> anyhow::Result<Option<AppInfo>> {
         match self
             .admin(AdminRequest::ListApps {
                 status_filter: None,

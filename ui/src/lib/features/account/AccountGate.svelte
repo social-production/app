@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { connect } from '#lib/services/account.ts';
+  import { connect, signOut } from '#lib/services/account.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import Welcome from './Welcome.svelte';
@@ -21,7 +21,10 @@
   <section class="panel stack narrow">
     <h2>Can't reach the network</h2>
     <p class="error">{connection.current.reason}</p>
-    <button onclick={() => connect()}>Try again</button>
+    <div class="row">
+      <button onclick={() => connect()}>Try again</button>
+      <button onclick={() => signOut()}>Sign in again</button>
+    </div>
   </section>
 {:else}
   <p class="muted narrow">Connecting…</p>

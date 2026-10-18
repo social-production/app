@@ -42,11 +42,13 @@ pub async fn resume(
     let agent_key: AgentPubKey = HoloHashB64::from_b64_str(&agent)
         .map(Into::into)
         .map_err(|e| anyhow::anyhow!("stored agent key: {e}"))?;
-    let token = state
-        .node
-        .app_token(&app_id(&agent_key, &state.node.happ_version))
-        .await
-        .map_err(|_| gone())?;
+    // After a network reset (ADR 0028) the person's app for this hApp version doesn't exist
+    // yet: send them to sign in (which installs it) instead of issuing a useless token.
+    let id = app_id(&agent_key, &state.node.happ_version);
+    if state.node.find_app(&id).await?.is_none() {
+        return Err(gone());
+    }
+    let token = state.node.app_token(&id).await.map_err(|_| gone())?;
     state.store.upsert_person(&agent).await?;
     Ok(Json(Resumed {
         agent,
