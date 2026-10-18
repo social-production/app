@@ -1,0 +1,23 @@
+name: platforms
+
+# M0 platform check (ADR 0011): can the conductor be built for phones?
+# iOS forbids JIT, so the conductor must use the wasmer-wasmi interpreter.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: [Cargo.toml, Cargo.lock, native/**, .github/workflows/platforms.yml]
+
+jobs:
+  ios-conductor:
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+      - name: Rust with iOS targets
+        run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+      - uses: Swatinem/rust-cache@v2
+      - name: Build conductor for iOS (interpreter, no JIT)
+        run: >
+          cargo build --release -p holochain --target aarch64-apple-ios
+          --no-default-features --features wasmer-wasmi
