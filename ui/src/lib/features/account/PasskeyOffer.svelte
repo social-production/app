@@ -45,16 +45,20 @@
 </script>
 
 {#if visible}
-  <section class="panel stack">
+  <section class="empty-card passkey-offer">
     <strong>Sign in faster on this device</strong>
-    <p class="muted">
+    <p>
       Save a passkey here (fingerprint, face or screen lock) so you don't need your 24 words next
       time. Optional — your words always work.
     </p>
-    {#if error}<p class="error">{error}</p>{/if}
-    <div class="row">
-      <button class="primary" onclick={save} disabled={busy}>Save a passkey</button>
-      <button onclick={() => close('dismissed')}>Not now</button>
+    {#if error}<p class="warning-card">{error}</p>{/if}
+    <div class="button-row">
+      <button class="button-primary" type="button" onclick={save} disabled={busy}
+        >Save a passkey</button
+      >
+      <button class="button-secondary" type="button" onclick={() => close('dismissed')}
+        >Not now</button
+      >
     </div>
   </section>
 {/if}

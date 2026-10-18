@@ -31,10 +31,12 @@ async function device({ passkeys }) {
   return page;
 }
 
-const signedIn = (page) => page.getByRole('button', { name: 'Sign out' }).waitFor({ timeout: 120_000 });
+// Desktop viewport: the top bar's gear link only exists when signed in.
+const signedIn = (page) => page.getByRole('link', { name: 'Settings' }).waitFor({ timeout: 120_000 });
+const open = (page, name) => page.getByRole('link', { name, exact: true }).first().click();
 
 async function signUp(page, name) {
-  await page.getByRole('button', { name: 'Create an account' }).click();
+  await page.getByRole('tab', { name: 'Sign up' }).click();
   await page.getByLabel('Your name').fill(name);
   await page.getByRole('button', { name: 'Next' }).click();
   const words = (await page.locator('ol.grid li').allInnerTexts()).map((t) => t.split(/\s+/).pop());
@@ -49,28 +51,35 @@ async function signUp(page, name) {
 }
 
 async function phraseSignIn(page, words) {
-  await page.getByRole('button', { name: 'Sign in with recovery phrase' }).click();
+  await page.getByRole('tab', { name: 'Log in' }).click();
   await page.getByLabel('Recovery phrase').fill(words.join(' '));
-  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await page.getByRole('button', { name: 'Log in', exact: true }).click();
   await signedIn(page);
 }
 
+async function signOut(page) {
+  await open(page, 'Settings');
+  await page.getByRole('button', { name: 'Sign out' }).click();
+}
+
 async function keyOf(page) {
-  await page.getByRole('link', { name: 'People' }).click();
-  return (await page.locator('.key').innerText()).trim();
+  await open(page, 'Settings');
+  const key = page.locator('#settings-account .key');
+  await key.waitFor({ timeout: 60_000 });
+  return (await key.innerText()).trim();
 }
 
 // 1. A device with no passkey store: everything works with the phrase, no passkey prompts.
 const a = await device({ passkeys: false });
-assert.equal(await a.getByRole('button', { name: 'Sign in with a passkey' }).count(), 0);
+await a.getByRole('tab', { name: 'Log in' }).click();
+assert.equal(await a.getByRole('button', { name: 'Log in with a passkey' }).count(), 0);
 const t0 = Date.now();
 const words = await signUp(a, 'Ann Tester');
 log(`signed up in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
-await a.locator('.key').waitFor({ timeout: 60_000 });
 assert.equal(await a.getByText('Save a passkey').count(), 0, 'no passkey offer without a store');
 const annKey = await keyOf(a);
 
-await a.getByRole('link', { name: 'Profile' }).click();
+await open(a, 'Settings');
 await a.getByLabel('Home area').fill('Brisbane, QLD');
 await a.getByRole('button', { name: 'Save profile' }).click();
 await a.getByText('Saved.').waitFor({ timeout: 60_000 });
@@ -78,11 +87,10 @@ await a.reload();
 await signedIn(a);
 log('profile saved; reload kept the session');
 
-await a.getByRole('button', { name: 'Sign out' }).click();
-await a.getByRole('button', { name: 'Sign in with recovery phrase' }).click();
+await signOut(a);
+await a.getByRole('tab', { name: 'Log in' }).click();
 await a.getByLabel('Recovery phrase').fill([...words.slice(0, 6), 'appel', ...words.slice(7)].join(' '));
 await a.getByText(/Word 7 .appel. isn't in the word list/).waitFor({ timeout: 5000 });
-await a.getByRole('button', { name: 'Back' }).click();
 log('typo in the phrase is named');
 await phraseSignIn(a, words);
 assert.equal(await keyOf(a), annKey);
@@ -92,10 +100,12 @@ log('signed back in with the phrase (no passkey)');
 const b = await device({ passkeys: true });
 await phraseSignIn(b, words);
 assert.equal(await keyOf(b), annKey, 'same identity on a second device');
+await open(b, 'Home');
 await b.getByRole('button', { name: 'Save a passkey' }).click();
 await b.getByText('Sign in faster on this device').waitFor({ state: 'detached', timeout: 60_000 });
-await b.getByRole('button', { name: 'Sign out' }).click();
-await b.getByRole('button', { name: 'Sign in with a passkey' }).click();
+await signOut(b);
+await b.getByRole('tab', { name: 'Log in' }).click();
+await b.getByRole('button', { name: 'Log in with a passkey' }).click();
 await signedIn(b);
 assert.equal(await keyOf(b), annKey);
 log('saved a passkey and signed in with it');
@@ -103,22 +113,22 @@ log('saved a passkey and signed in with it');
 // 3. Pairing: another person's device asks to pair with Ann; Ann confirms.
 const c = await device({ passkeys: false });
 await signUp(c, 'Ann Laptop');
-await c.getByRole('link', { name: 'Profile' }).click();
+await open(c, 'Settings');
 await c.getByPlaceholder('uhCAk…').fill(annKey);
 await c.getByRole('button', { name: 'Send pairing request' }).click();
 await c.getByText('Request sent').waitFor({ timeout: 60_000 });
-await a.getByRole('link', { name: 'Profile' }).click();
+await open(a, 'Settings');
 for (let i = 0; i < 20 && !(await a.getByRole('button', { name: 'Confirm' }).count()); i++) {
   await a.reload();
   await signedIn(a);
-  await a.getByRole('link', { name: 'Profile' }).click();
+  await open(a, 'Settings');
   await a.waitForTimeout(3000);
 }
 await a.getByRole('button', { name: 'Confirm' }).click();
-await a.getByText(/^Paired:/).first().waitFor({ timeout: 60_000 });
-await a.getByRole('link', { name: 'People' }).click();
+await a.locator('#settings-devices', { hasText: 'Ann Laptop' }).waitFor({ timeout: 60_000 });
+await open(a, 'Home');
 await a.getByText('2 devices').first().waitFor({ timeout: 60_000 });
-assert.equal(await a.locator('section.panel .chip', { hasText: 'Ann Laptop' }).count(), 0, 'paired device folded into its person');
+assert.equal(await a.locator('.person-row', { hasText: 'Ann Laptop' }).count(), 0, 'paired device folded into its person');
 log('devices paired and shown as one person');
 
 assert.deepEqual(errors, [], 'no page errors');

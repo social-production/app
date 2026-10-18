@@ -1,0 +1,530 @@
+/* Ported from web/src/lib/features/settings/SettingsPage.svelte, scoped to .settings-scope */
+.settings-scope .accent-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.settings-scope .swatch {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--swatch);
+  box-shadow: 0 0 0 1px var(--panel-border);
+  cursor: pointer;
+}
+
+.settings-scope .swatch:hover:not(:disabled) {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--swatch) 55%, var(--panel-border));
+}
+
+.settings-scope .swatch.chosen {
+  box-shadow: 0 0 0 3px var(--swatch);
+}
+
+/* Three equal segments, so "System" isn't wider than the others. */
+.settings-scope .theme-choice {
+  display: inline-grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  width: 240px;
+  max-width: 100%;
+  flex: 0 0 auto;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+@media (max-width: 760px) {
+  .settings-scope .theme-choice {
+    width: 100%;
+  }
+}
+
+.settings-scope .theme-choice button {
+  min-height: 40px;
+  padding: 0 6px;
+  border: 0;
+  border-right: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-scope .theme-choice button:last-child {
+  border-right: 0;
+}
+
+.settings-scope .theme-choice button.chosen {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.settings-scope .settings-layout {
+  display: grid;
+  gap: 24px;
+  align-items: start;
+  width: 100%;
+  max-width: 1024px;
+  padding: 12px var(--page-gutter) 24px;
+}
+
+.settings-scope .settings-nav {
+  display: none;
+}
+
+.settings-scope .settings-nav-label {
+  margin: 0 0 8px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.settings-scope .nav-item {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.settings-scope .nav-item:hover {
+  background: var(--panel-soft);
+  color: var(--text-main);
+}
+
+.settings-scope .settings-page {
+  display: grid;
+  gap: 22px;
+  max-width: 760px;
+  min-width: 0;
+}
+
+.settings-scope .page-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  color: var(--brand-strong);
+}
+
+.settings-scope .page-header p {
+  margin: 6px 0 0;
+  color: var(--text-soft);
+}
+
+.settings-scope .settings-section {
+  display: grid;
+  gap: 12px;
+  scroll-margin-top: 1.5rem;
+}
+
+.settings-scope .settings-section h2 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.settings-scope .section-intro {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.settings-scope .card {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.settings-scope .card.stack {
+  display: grid;
+  gap: 12px;
+}
+
+.settings-scope .card.stack.flush {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.settings-scope .card.stack.flush .setting-item {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.settings-scope .card.stack.flush .setting-item:last-child,
+.settings-scope .card.stack.flush .status {
+  border-bottom: none;
+}
+
+.settings-scope .card.stack.flush .status {
+  padding: 0 16px 14px;
+}
+
+.settings-scope .profile-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin-bottom: 14px;
+}
+
+.settings-scope .avatar-wrap {
+  position: relative;
+  flex: 0 0 auto;
+  width: 42px;
+  height: 42px;
+}
+
+.settings-scope .avatar-picker {
+  position: relative;
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 999px;
+}
+
+.settings-scope .avatar-remove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--danger, #c0392b);
+  color: white;
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.settings-scope .avatar-remove:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.settings-scope .avatar-picker:hover,
+.settings-scope .avatar-picker:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.settings-scope .avatar-hint {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--page-background);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.settings-scope .profile-copy {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-scope .profile-copy textarea {
+  width: 100%;
+  min-height: 64px;
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.settings-scope .field {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.settings-scope .label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.settings-scope .profile-image-error {
+  margin: 0;
+  color: var(--danger, #c0392b);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.settings-scope .bio-saved {
+  margin: 6px 0 0;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-scope .bio-counter {
+  justify-self: end;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.settings-scope textarea,
+.settings-scope input[type='file'] {
+  width: 100%;
+}
+
+.settings-scope textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  resize: vertical;
+}
+
+.settings-scope .actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.settings-scope .actions .button-danger {
+  margin-left: auto;
+}
+
+.settings-scope .setting-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.settings-scope .account-form {
+  display: grid;
+  justify-content: stretch;
+  align-items: stretch;
+  gap: 10px;
+  width: 100%;
+}
+
+.settings-scope .account-form label {
+  display: grid;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.settings-scope .account-form input {
+  width: 100%;
+  min-height: 44px;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.settings-scope .setting-item p {
+  margin: 4px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+  max-width: 46ch;
+}
+
+.settings-scope .language-note {
+  margin-top: 6px;
+}
+
+.settings-scope .language-field {
+  flex-shrink: 0;
+}
+
+.settings-scope .language-select {
+  min-width: 180px;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.settings-scope .language-select:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.settings-scope .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.settings-scope .follow-request-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.settings-scope .follow-request-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-scope .button-primary,
+.settings-scope .button-secondary,
+.settings-scope .button-danger {
+  border-radius: var(--radius-sm);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-scope .button-primary {
+  padding: 8px 14px;
+  border: 0;
+  background: var(--accent-strong);
+  color: white;
+}
+
+.settings-scope .button-secondary,
+.settings-scope .button-danger {
+  padding: 8px 14px;
+  border: 1px solid var(--panel-border);
+  background: var(--panel-soft);
+  color: var(--text-main);
+}
+
+.settings-scope .button-danger {
+  border-color: color-mix(in srgb, #b91c1c 50%, var(--panel-border));
+  background: color-mix(in srgb, #b91c1c 10%, var(--panel-soft));
+  color: #b91c1c;
+}
+
+.settings-scope .switch {
+  position: relative;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: var(--panel-border);
+  cursor: pointer;
+  transition: background-color 0.18s ease;
+}
+
+.settings-scope .switch.on {
+  background: var(--brand);
+}
+
+.settings-scope .switch:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.settings-scope .switch:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+.settings-scope .switch-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--page-background);
+  box-shadow: 0 1px 2px color-mix(in srgb, var(--text-main) 25%, transparent);
+  transition: transform 0.18s ease;
+}
+
+.settings-scope .switch.on .switch-thumb {
+  transform: translateX(20px);
+}
+
+@media (min-width: 900px) {
+  .settings-scope .settings-layout {
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: 32px;
+  }
+
+  .settings-scope .settings-nav {
+    position: sticky;
+    top: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .settings-scope .page-header {
+    display: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .settings-scope .setting-item {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .settings-scope .actions {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+
+  .settings-scope .actions .button-primary,
+  .settings-scope .actions .button-danger {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 0;
+    padding: 10px 4px;
+    font-size: 13px;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+  }
+}

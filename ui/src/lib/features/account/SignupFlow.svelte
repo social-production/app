@@ -11,8 +11,6 @@
 
   import ProgressSteps from './ProgressSteps.svelte';
 
-  let { onCancel }: { onCancel: () => void } = $props();
-
   const words = newPhrase();
   const positions = confirmationPositions();
 
@@ -39,36 +37,51 @@
 </script>
 
 {#if step === 'name'}
-  <h2>Create your account</h2>
-  <label>
-    Your name (shown to others)
-    <input bind:value={name} maxlength={NAME_MAX} autocomplete="name" />
-  </label>
-  <div class="row">
-    <button class="primary" disabled={!name.trim()} onclick={() => (step = 'phrase')}>Next</button>
-    <button onclick={onCancel}>Back</button>
-  </div>
-{:else if step === 'phrase'}
-  <h2>Your recovery phrase</h2>
-  <p>
-    These 24 words <strong>are</strong> your account — you sign in with them. Write them down on paper
-    and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
-  </p>
-  <PhraseGrid {words} />
-  <button class="primary" onclick={() => (step = 'confirm')}>I've written them down</button>
-{:else if step === 'confirm'}
-  <h2>Check your phrase</h2>
-  {#each positions as position, i (position)}
+  <form class="stack" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
-      Word #{position + 1}
-      <input bind:value={answers[i]} autocapitalize="none" autocomplete="off" spellcheck="false" />
+      <span class="field-label">Your name (shown to others)</span>
+      <input bind:value={name} maxlength={NAME_MAX} autocomplete="name" />
     </label>
-  {/each}
-  {#if error}<p class="error">{error}</p>{/if}
-  <div class="row">
-    <button class="primary" disabled={!confirmed} onclick={finish}>Create account</button>
-    <button onclick={() => (step = 'phrase')}>Show the words again</button>
+    <div class="button-row">
+      <button class="button-primary" disabled={!name.trim()} type="submit">Next</button>
+    </div>
+  </form>
+{:else if step === 'phrase'}
+  <div class="stack">
+    <p class="field-label">Your recovery phrase</p>
+    <p>
+      These 24 words <strong>are</strong> your account — you log in with them. Write them down on paper
+      and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
+    </p>
+    <PhraseGrid {words} />
+    <div class="button-row">
+      <button class="button-primary" type="button" onclick={() => (step = 'confirm')}
+        >I've written them down</button
+      >
+    </div>
   </div>
+{:else if step === 'confirm'}
+  <form class="stack" onsubmit={(e) => (e.preventDefault(), void finish())}>
+    <p class="field-label">Check your phrase</p>
+    {#each positions as position, i (position)}
+      <label>
+        <span class="field-label">Word #{position + 1}</span>
+        <input
+          bind:value={answers[i]}
+          autocapitalize="none"
+          autocomplete="off"
+          spellcheck="false"
+        />
+      </label>
+    {/each}
+    {#if error}<p class="status-note">{error}</p>{/if}
+    <div class="button-row">
+      <button class="button-primary" disabled={!confirmed} type="submit">Create account</button>
+      <button class="button-secondary" type="button" onclick={() => (step = 'phrase')}
+        >Show the words again</button
+      >
+    </div>
+  </form>
 {:else}
   <ProgressSteps current={progress} />
 {/if}

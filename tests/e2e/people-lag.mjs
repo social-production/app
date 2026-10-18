@@ -8,7 +8,7 @@ const browser = await chromium.launch();
 async function signUp(name) {
   const page = await (await browser.newContext()).newPage();
   await page.goto(BASE);
-  await page.getByRole('button', { name: 'Create an account' }).click();
+  await page.getByRole('tab', { name: 'Sign up' }).click();
   await page.getByLabel('Your name').fill(name);
   await page.getByRole('button', { name: 'Next' }).click();
   const words = (await page.locator('ol.grid li').allInnerTexts()).map((t) => t.split(/\s+/).pop());
@@ -18,7 +18,7 @@ async function signUp(name) {
     if (n) await page.getByLabel(`Word #${n}`, { exact: true }).fill(words[n - 1]);
   }
   await page.getByRole('button', { name: 'Create account' }).click();
-  await page.getByRole('button', { name: 'Sign out' }).waitFor({ timeout: 120_000 });
+  await page.getByRole('link', { name: 'Settings' }).waitFor({ timeout: 120_000 });
   return page;
 }
 

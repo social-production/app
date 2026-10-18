@@ -1,0 +1,695 @@
+/* Shell layout, ported verbatim from web/src/lib/app/shell/AppShell.svelte (same class names). */
+.shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--page-background);
+  color: var(--text-main);
+  overscroll-behavior: none;
+  overflow-x: clip;
+  overflow-y: clip;
+  max-width: 100%;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 8px;
+  height: var(--topbar-natural-height, var(--topbar-height, 53px));
+  min-height: var(--topbar-natural-height, var(--topbar-height, 53px));
+  max-height: var(--topbar-natural-height, var(--topbar-height, 53px));
+  padding: calc(8px + var(--shell-safe-top)) 12px 8px;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--toolbar-background);
+  overflow: visible;
+  transition:
+    transform 0.22s ease,
+    visibility 0s;
+  will-change: transform;
+}
+
+.topbar.chrome-collapsed {
+  transform: translateY(-100%);
+  pointer-events: none;
+  visibility: hidden;
+  transition:
+    transform 0.22s ease,
+    visibility 0s linear 0.22s;
+}
+
+/* A tapped link fades the old page a little until the new one is ready. */
+.main-content-navigating .main-frame {
+  opacity: 0.55;
+  transition: opacity 160ms ease 120ms;
+  pointer-events: none;
+}
+
+.nav-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -3px;
+  height: 3px;
+  overflow: hidden;
+  z-index: 61;
+  pointer-events: none;
+}
+
+.nav-progress-bar {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: var(--brand-strong);
+  transform-origin: left;
+  animation: nav-progress-slide 0.9s ease-in-out infinite;
+}
+
+@keyframes nav-progress-slide {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
+}
+
+.detail-open-skeleton {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  padding: 32px 16px 16px;
+  background: var(--page-background);
+}
+
+.skeleton-tabs,
+.skeleton-title,
+.skeleton-meta,
+.skeleton-body {
+  border-radius: 6px;
+  background: var(--panel-soft);
+}
+
+.skeleton-tabs {
+  height: 28px;
+  width: 220px;
+}
+
+.skeleton-title {
+  height: 28px;
+  width: min(70%, 420px);
+}
+
+.skeleton-meta {
+  height: 16px;
+  width: min(50%, 280px);
+}
+
+.skeleton-body {
+  height: 160px;
+  width: 100%;
+}
+
+.topbar.topbar-map-pinned {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  transform: none;
+  margin-top: 0;
+  pointer-events: auto;
+  z-index: var(--z-topbar-pinned);
+}
+
+.topbar-flow-spacer {
+  flex-shrink: 0;
+  width: 100%;
+  pointer-events: none;
+}
+
+.topbar.search-expanded {
+  height: auto;
+  min-height: var(--shell-touch-min);
+  max-height: none;
+  align-items: stretch;
+}
+
+.brand,
+.panel-controls,
+.toolbar-center,
+.primary-nav,
+.utility-nav {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.brand {
+  gap: 10px;
+  min-width: fit-content;
+}
+
+.brand strong {
+  display: block;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+.brand-icon {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+}
+
+.panel-controls {
+  flex-wrap: wrap;
+}
+
+.panel-toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--shell-touch-min);
+  min-height: var(--shell-touch-min);
+  padding: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-soft);
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease,
+    color 0.16s ease;
+}
+
+.panel-toggle-icon,
+.panel-toggle .panel-toggle-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.panel-toggle-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  pointer-events: none;
+}
+
+.panel-toggle-badge .count-badge {
+  min-width: 16px;
+  padding: 1px 5px;
+  font-size: 10px;
+}
+
+/*
+    Phones keep :hover after a tap, and the global button hover is the same green
+    as the open state. Only a real pointer should show that hover.
+  */
+button.panel-toggle:hover:not(:disabled) {
+  border-color: var(--panel-border);
+  background: transparent;
+  color: var(--text-soft);
+  filter: none;
+  transform: none;
+}
+
+button.panel-toggle[data-active='true'],
+button.panel-toggle[data-active='true']:hover {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 65%, var(--panel-strong));
+  color: var(--brand-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button.panel-toggle:hover:not(:disabled) {
+    border-color: var(--brand);
+    color: var(--brand-strong);
+    background: var(--brand-soft);
+  }
+}
+
+.map-overlay {
+  position: fixed;
+  inset: var(--topbar-height) 0 var(--shell-bottom-nav-offset, 0px) 0;
+  z-index: var(--z-map);
+  padding: 12px;
+  background: var(--page-background);
+  overflow: hidden;
+  overscroll-behavior: none;
+  display: none;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.map-overlay--open {
+  display: flex;
+}
+
+.map-overlay .map-panel {
+  flex: 1;
+  min-height: 0;
+}
+
+@media (max-width: 760px) {
+  .map-overlay {
+    padding: 0;
+  }
+}
+
+.toolbar-center {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.toolbar-search {
+  display: flex;
+  align-items: stretch;
+  flex: 1 1 280px;
+  max-width: 420px;
+  min-width: 160px;
+  min-height: 38px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  transition:
+    border-color 0.16s ease,
+    box-shadow 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.toolbar-search-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+}
+
+.toolbar-search:hover,
+.toolbar-search:focus-within {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 50%, var(--panel-soft));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.toolbar-search-input {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  padding: 0 12px;
+  min-height: 36px;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.toolbar-search-input:focus {
+  border: none;
+}
+
+.toolbar-search-expanded {
+  flex: 1 1 auto;
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  gap: 8px;
+  min-height: var(--shell-touch-min);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  padding: 4px 8px 4px 4px;
+}
+
+/* 16px stops iOS from zooming the field on focus and aborting the keyboard. */
+.toolbar-search-expanded .toolbar-search-input {
+  font-size: 16px;
+}
+
+.search-open-button,
+.search-close-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--shell-touch-min);
+  height: var(--shell-touch-min);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  flex-shrink: 0;
+}
+
+.search-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.topbar-compact .toolbar-center {
+  margin-left: auto;
+}
+
+.primary-nav {
+  flex: 1 1 260px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.primary-nav::-webkit-scrollbar,
+.utility-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.nav-link,
+.utility-link {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+
+.nav-link-icon {
+  position: relative;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+}
+
+.nav-link-icon .toolbar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.nav-link-icon .count-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+}
+
+.active-link,
+.nav-link:hover,
+.utility-link:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.utility-nav {
+  margin-left: auto;
+  flex-shrink: 0;
+  overflow: visible;
+}
+
+.gear-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.gear-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.gear-button:hover,
+.gear-button.active-link {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.settings-wrap {
+  position: relative;
+}
+
+.rail-backdrop {
+  position: fixed;
+  inset: var(--topbar-height) 0 var(--shell-bottom-nav-offset, 0px) 0;
+  z-index: 45;
+  background: var(--shell-scrim);
+  border: none;
+  padding: 0;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: var(--left-width) minmax(0, 1fr) var(--right-width);
+  min-height: calc(100vh - var(--topbar-height));
+}
+
+.shell.shell-map-open .content-grid {
+  min-height: calc(100dvh - var(--topbar-height) - var(--shell-bottom-nav-offset, 0px));
+  height: calc(100dvh - var(--topbar-height) - var(--shell-bottom-nav-offset, 0px));
+  max-height: calc(100dvh - var(--topbar-height) - var(--shell-bottom-nav-offset, 0px));
+}
+
+.content-grid--map-open {
+  overflow: hidden;
+}
+
+.shell.shell-map-page .main-content {
+  padding: 0;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shell.shell-map-page .main-frame {
+  height: 100%;
+  max-width: none;
+  overflow: hidden;
+}
+
+.rail {
+  min-width: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 8px;
+  background: var(--side-panel-background);
+}
+
+.left-rail {
+  border-right: 1px solid var(--panel-border);
+}
+
+.right-rail {
+  border-left: 1px solid var(--panel-border);
+}
+
+.rail[data-open='false'] {
+  padding: 0;
+  opacity: 0;
+  pointer-events: none;
+  border: none;
+}
+
+.main-content {
+  position: relative;
+  min-width: 0;
+  overflow-x: clip;
+  overflow-y: clip;
+  overflow-anchor: none;
+  padding: 8px 8px calc(16px + var(--install-banner-offset, 0px));
+  background: var(--page-background);
+}
+
+.main-content-compact {
+  padding: 0 0 var(--shell-scroll-pad, 0px);
+}
+
+.main-frame {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+  max-width: var(--main-frame-max-width);
+  margin: 0 auto;
+  overflow-x: clip;
+  overflow-y: clip;
+}
+
+@media (min-width: 1081px) {
+  .shell {
+    height: 100dvh;
+    max-height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .content-grid {
+    flex: 1;
+    min-height: 0;
+    height: auto;
+    overflow: hidden;
+  }
+
+  .rail,
+  .main-content {
+    height: 100%;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    position: static;
+  }
+}
+
+@media (max-width: 1080px) {
+  .topbar {
+    padding: calc(6px + var(--shell-safe-top)) 8px 6px;
+    gap: 6px;
+  }
+
+  .topbar-compact:not(.search-expanded) {
+    height: calc(52px + var(--shell-safe-top));
+    min-height: calc(52px + var(--shell-safe-top));
+    max-height: calc(52px + var(--shell-safe-top));
+    padding-top: var(--shell-safe-top);
+    padding-bottom: 0;
+    overflow: hidden;
+  }
+
+  .topbar-compact .panel-controls {
+    flex-wrap: nowrap;
+  }
+
+  .topbar-compact .utility-nav {
+    display: none;
+  }
+
+  .brand > span:not(.brand-mark) {
+    display: none;
+  }
+
+  .brand-mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .brand-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .toolbar-center {
+    flex: 0 0 auto;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .utility-nav {
+    margin-left: 0;
+    flex-shrink: 0;
+  }
+
+  .content-grid {
+    grid-template-columns: 1fr;
+    padding-top: 0;
+    /* Let short pages stay short; don't force a full-viewport empty slab
+         behind the fixed bottom nav (reads as a blank second footer). */
+    min-height: 0;
+  }
+
+  .shell {
+    /* Compact mobile: never invent an empty viewport-tall slab above the nav. */
+    min-height: 0;
+  }
+
+  .rail {
+    position: fixed;
+    top: var(--topbar-height);
+    bottom: var(--shell-bottom-nav-offset);
+    z-index: 50;
+    width: min(86vw, 320px);
+    padding: 12px;
+    overflow-y: auto;
+    opacity: 1;
+    pointer-events: auto;
+    transition: transform 0.2s ease;
+  }
+
+  .rail[data-open='false'] {
+    padding: 12px;
+    opacity: 1;
+  }
+
+  .left-rail {
+    left: 0;
+    transform: translateX(-100%);
+    border-right: 1px solid var(--panel-border);
+  }
+
+  .right-rail {
+    right: 0;
+    transform: translateX(100%);
+    border-left: 1px solid var(--panel-border);
+  }
+
+  .left-rail[data-open='true'],
+  .right-rail[data-open='true'] {
+    transform: translateX(0);
+    pointer-events: auto;
+  }
+
+  .left-rail[data-open='false'],
+  .right-rail[data-open='false'] {
+    pointer-events: none;
+  }
+
+  .main-content-compact {
+    padding: 0 0 var(--shell-scroll-pad, 0px);
+    min-width: 0;
+    overflow-x: clip;
+    overflow-y: clip;
+  }
+
+  .main-content-compact .main-frame {
+    min-width: 0;
+    overflow-x: clip;
+    overflow-y: clip;
+    padding-bottom: 4px;
+  }
+
+  html:has(.page-chat),
+  html:has(.page-chat) body {
+    overflow: hidden;
+  }
+}

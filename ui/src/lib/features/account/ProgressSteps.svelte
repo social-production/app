@@ -10,7 +10,7 @@
   };
 </script>
 
-<p class="active">{labels[current]}</p>
+<p class="active helper-text" role="status">{labels[current]}</p>
 
 <style>
   .active {

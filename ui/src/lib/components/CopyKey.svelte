@@ -14,15 +14,23 @@
   }
 </script>
 
-<div class="row">
-  <button onclick={copy}>{copied ? 'Copied!' : label}</button>
-  <span class="muted key">{value}</span>
+<div class="copy-key">
+  <button class="button-secondary" type="button" onclick={copy}>{copied ? 'Copied!' : label}</button
+  >
+  <code class="key">{value}</code>
 </div>
 
 <style>
+  .copy-key {
+    display: grid;
+    gap: 6px;
+    justify-items: start;
+    min-width: 0;
+  }
   .key {
-    font-family: ui-monospace, monospace;
-    font-size: 0.8rem;
+    max-width: 100%;
+    color: var(--text-soft);
+    font-size: 12px;
     word-break: break-all;
   }
 </style>

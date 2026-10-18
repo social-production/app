@@ -4,10 +4,27 @@
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
 
-  let mode = $state<'choose' | 'signup' | 'phrase'>('choose');
+  import '#lib/components/styles/onboarding.css';
+
+  /** web's onboarding page: Sign up / Log in chips over one panel. */
+  let mode = $state<'signup' | 'login'>('signup');
   let busy = $state(false);
   let error = $state<string>();
   let passkeys = $state(false);
+
+  const modes = [
+    {
+      value: 'signup',
+      label: 'Sign up',
+      description: 'New here? You get 24 words that are your account.',
+    },
+    {
+      value: 'login',
+      label: 'Log in',
+      description: 'Type your 24 words, or use a passkey saved on this device.',
+    },
+  ] as const;
+  const active = $derived(modes.find((m) => m.value === mode));
 
   $effect(() => {
     void devicePasskeysAvailable().then((available) => (passkeys = available));
@@ -26,28 +43,45 @@
   }
 </script>
 
-<section class="panel stack welcome">
-  {#if mode === 'signup'}
-    <SignupFlow onCancel={() => (mode = 'choose')} />
-  {:else if mode === 'phrase'}
-    <PhraseSignIn onCancel={() => (mode = 'choose')} />
-  {:else}
-    <h1>Social Production</h1>
-    <p class="muted">Organise projects and share the means of production — no central owner.</p>
-    <button class="primary" onclick={() => (mode = 'signup')}>Create an account</button>
-    <button onclick={() => (mode = 'phrase')}>Sign in with recovery phrase</button>
-    {#if passkeys}
-      <button onclick={passkeyLogin} disabled={busy}>
-        {busy ? 'Waiting for your passkey…' : 'Sign in with a passkey'}
-      </button>
-    {/if}
-    {#if error}<p class="error">{error}</p>{/if}
-  {/if}
-</section>
+<div class="onboarding">
+  <section class="page">
+    <section class="hero-card">
+      <h1>Join Social Production</h1>
+      <p>Organise projects and share the means of production — no central owner.</p>
+    </section>
 
-<style>
-  .welcome {
-    max-width: 560px;
-    margin: 24px auto;
-  }
-</style>
+    <section class="panel">
+      <p class="mode-hint">
+        Choose <strong>Sign up</strong> for a new account, or <strong>Log in</strong> if you already have
+        one.
+      </p>
+      <div class="choice-row" role="tablist" aria-label="Account mode">
+        {#each modes as option (option.value)}
+          <button
+            class:active={mode === option.value}
+            class="toggle-chip"
+            type="button"
+            role="tab"
+            aria-selected={mode === option.value}
+            onclick={() => (mode = option.value)}>{option.label}</button
+          >
+        {/each}
+      </div>
+      <p class="helper-text">{active?.description}</p>
+
+      {#if mode === 'signup'}
+        <SignupFlow />
+      {:else}
+        {#if passkeys}
+          <div class="button-row">
+            <button class="button-secondary" type="button" onclick={passkeyLogin} disabled={busy}>
+              {busy ? 'Waiting for your passkey…' : 'Log in with a passkey'}
+            </button>
+          </div>
+        {/if}
+        {#if error}<p class="status-note">{error}</p>{/if}
+        <PhraseSignIn />
+      {/if}
+    </section>
+  </section>
+</div>

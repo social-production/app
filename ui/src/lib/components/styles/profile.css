@@ -1,0 +1,453 @@
+/* Ported from web/src/lib/features/profile/ProfilePage.svelte, scoped to .profile-page */
+.profile-page .name-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  min-width: 0;
+}
+
+.profile-page .name-row h1 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.profile-page .standing-chip {
+  flex: 0 0 auto;
+  padding: 2px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-page .standing-chip.paused {
+  border-color: transparent;
+  background: color-mix(in srgb, #d97706 16%, transparent);
+  color: #b45309;
+}
+
+.profile-page .count-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 6px;
+}
+
+.profile-page .count-row button {
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.profile-page .count-row button strong {
+  color: var(--text-main);
+}
+
+.profile-page .count-row button:hover {
+  color: var(--brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.profile-page .count-row button.active {
+  color: var(--brand-strong);
+}
+
+.profile-page .action-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+  grid-auto-flow: column;
+  gap: 8px;
+  margin-top: 12px;
+  width: 100%;
+  max-width: 520px;
+}
+
+.profile-page .action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 8px;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.profile-page .action .toolbar-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.profile-page .action:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.profile-page .action.primary:hover:not(:disabled) {
+  background: var(--brand-strong);
+  color: var(--page-bg);
+}
+
+.profile-page .action.bot:hover:not(:disabled) {
+  border-color: color-mix(in srgb, #b91c1c 45%, var(--panel-border));
+  background: color-mix(in srgb, #b91c1c 10%, var(--panel));
+  color: #b91c1c;
+}
+
+/* Phones: symbols only; each button keeps its name as its label and tooltip. */
+@media (max-width: 600px) {
+  .profile-page .action-text {
+    display: none;
+  }
+}
+
+.profile-page .action:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.profile-page .action.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.profile-page .action.primary.on {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.profile-page .action.vouch.on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.profile-page .action.bot.on {
+  border-color: color-mix(in srgb, #b91c1c 50%, var(--panel-border));
+  background: color-mix(in srgb, #b91c1c 12%, var(--panel));
+  color: #b91c1c;
+}
+
+/* Inset by the page gutter like the header above, so its border isn't cut at the screen edge. */
+.profile-page .bot-review-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  margin: 12px var(--page-gutter);
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--status-yellow) 55%, var(--panel-border));
+  border-radius: var(--radius-sm, 10px);
+  background: var(--status-yellow-soft);
+}
+
+.profile-page .bot-review-card.upheld {
+  border-color: color-mix(in srgb, var(--need-strong) 50%, var(--panel-border));
+  background: var(--need-soft);
+}
+
+.profile-page .bot-review-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.profile-page .bot-review-copy p {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.profile-page .bot-review-copy .bot-review-tally {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.profile-page .bot-review-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.profile-page .bot-review-actions button,
+.profile-page .re-review {
+  flex: 1 1 0;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-page .re-review {
+  justify-self: start;
+  flex: 0 0 auto;
+  margin-top: 6px;
+}
+
+.profile-page .bot-review-actions button.chosen {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.profile-page .bot-review-actions button.bot.chosen {
+  border-color: var(--need-strong);
+  background: var(--need-soft);
+  color: var(--need-strong);
+}
+
+.profile-page .bot-review-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.profile-page .page,
+.profile-page .feed-stack,
+.profile-page .people-list {
+  display: grid;
+}
+
+.profile-page .page {
+  gap: 0;
+}
+
+.profile-page .people-list {
+  gap: 12px;
+}
+
+.profile-page .feed-stack {
+  gap: 0;
+  min-width: 0;
+  overflow-x: clip;
+  overflow-y: clip;
+}
+
+.profile-page .feed-stack .surface:last-child {
+  border-bottom: none;
+}
+
+.profile-page .end-copy {
+  margin: 0;
+  padding: 12px 4px 4px;
+  color: var(--text-soft);
+  font-size: 13px;
+  text-align: center;
+}
+
+.profile-page .hero-section {
+  display: grid;
+  gap: 12px;
+  padding: 12px var(--page-gutter) 16px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.profile-page .requests-card,
+.profile-page .empty-card {
+  padding: 14px var(--page-gutter);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.profile-page .warning-card {
+  padding: 14px 0;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.profile-page .toolbar-card {
+  padding: 12px var(--page-gutter);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.profile-page .controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  width: 100%;
+  overflow-x: auto;
+}
+
+.profile-page .empty-card {
+  padding: 20px var(--page-gutter);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.profile-page .hero-topline {
+  position: relative;
+  display: block;
+}
+
+.profile-page .hero-main {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  gap: 10px;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.profile-page .hero-identity {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.profile-page .avatar-open {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+.profile-page .hero-copy {
+  display: grid;
+  gap: 8px;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.profile-page .hero-copy > * {
+  min-width: 0;
+}
+
+.profile-page .hero-copy h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.profile-page .profile-bio {
+  min-width: 0;
+  margin: 0;
+  padding-left: 10px;
+  border-left: 2px solid var(--brand);
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.profile-page .requests-card h2 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--brand-strong);
+}
+
+.profile-page .requests-copy {
+  margin: 0 0 12px;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.profile-page .request-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-page .accept-button,
+.profile-page .reject-button {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-page .accept-button {
+  border: 0;
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.profile-page .reject-button {
+  border: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+}
+
+.profile-page .person-row {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+}
+
+.profile-page .person-link {
+  display: grid;
+  gap: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.profile-page .warning-card {
+  margin-top: 12px;
+  border-color: color-mix(in srgb, var(--status-yellow) 50%, var(--panel-border));
+  background: color-mix(in srgb, var(--status-yellow) 14%, var(--panel));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.profile-page .person-row strong {
+  font-size: 14px;
+}
+
+.profile-page .person-row span {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}

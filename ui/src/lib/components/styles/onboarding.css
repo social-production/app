@@ -1,0 +1,123 @@
+/* Ported from web/src/lib/features/onboarding/OnboardingPage.svelte, scoped to .onboarding */
+.onboarding .handle-line {
+  min-height: 20px;
+}
+
+.onboarding .handle-line p {
+  margin: 0;
+}
+
+.onboarding .page,
+.onboarding .stack {
+  display: grid;
+  gap: 12px;
+  max-width: 480px;
+}
+
+.onboarding .page {
+  padding: 12px var(--page-gutter) 24px;
+}
+
+.onboarding .hero-card,
+.onboarding .panel {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.onboarding h1 {
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: var(--brand-strong);
+}
+
+.onboarding p {
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.onboarding .hero-card p {
+  margin-top: 8px;
+}
+
+.onboarding .mode-hint {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.onboarding .choice-row,
+.onboarding .button-row,
+.onboarding .signed-in-note {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.onboarding .choice-row {
+  margin-bottom: 8px;
+}
+
+.onboarding .toggle-chip {
+  min-width: 96px;
+  padding: 10px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.onboarding .toggle-chip.active {
+  border-color: var(--brand-strong);
+  background: color-mix(in srgb, var(--brand-strong) 14%, var(--panel));
+  color: var(--brand-strong);
+}
+
+.onboarding .signed-in-note {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+}
+
+.onboarding .field-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.onboarding input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text);
+}
+
+.onboarding .helper-text,
+.onboarding .status-note {
+  margin: 0;
+  font-size: 13px;
+}
+
+.onboarding .status-note {
+  color: var(--danger, #b91c1c);
+}
+
+/* P2P additions: the phrase box and confirm inputs share web's input look. */
+.onboarding textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
