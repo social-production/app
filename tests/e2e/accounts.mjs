@@ -79,6 +79,11 @@ await signedIn(a);
 log('profile saved; reload kept the session');
 
 await a.getByRole('button', { name: 'Sign out' }).click();
+await a.getByRole('button', { name: 'Sign in with recovery phrase' }).click();
+await a.getByLabel('Recovery phrase').fill([...words.slice(0, 6), 'appel', ...words.slice(7)].join(' '));
+await a.getByText(/Word 7 .appel. isn't in the word list/).waitFor({ timeout: 5000 });
+await a.getByRole('button', { name: 'Back' }).click();
+log('typo in the phrase is named');
 await phraseSignIn(a, words);
 assert.equal(await keyOf(a), annKey);
 log('signed back in with the phrase (no passkey)');
@@ -111,7 +116,10 @@ for (let i = 0; i < 20 && !(await a.getByRole('button', { name: 'Confirm' }).cou
 }
 await a.getByRole('button', { name: 'Confirm' }).click();
 await a.getByText(/^Paired:/).first().waitFor({ timeout: 60_000 });
-log('devices paired');
+await a.getByRole('link', { name: 'People' }).click();
+await a.getByText('2 devices').first().waitFor({ timeout: 60_000 });
+assert.equal(await a.locator('section.panel .chip', { hasText: 'Ann Laptop' }).count(), 0, 'paired device folded into its person');
+log('devices paired and shown as one person');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all M1 account checks passed');

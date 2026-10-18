@@ -85,3 +85,20 @@ export async function writeDeviceLink(link: DeviceLink): Promise<void> {
     device: stringToHash(link.device),
   });
 }
+
+export interface Pairing {
+  /** Set when `agent` is a paired device of another person's main account. */
+  primary: string | null;
+  devices: string[];
+}
+
+export async function pairingOf(agent: string): Promise<Pairing> {
+  const wire = await identity<{ primary: AgentPubKey | null; devices: AgentPubKey[] }>(
+    'get_pairing',
+    stringToHash(agent),
+  );
+  return {
+    primary: wire.primary ? hashToString(wire.primary) : null,
+    devices: wire.devices.map(hashToString),
+  };
+}

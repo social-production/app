@@ -153,6 +153,48 @@ async fn vouch_cap_profiles_and_device_pairing() {
     assert!(half.is_empty(), "a pairing needs both halves");
     let _: ActionHash = conductors[1].call(&bea, "link_device", link).await;
     await_consistency(&cells).await.expect("consistency");
-    let paired: Vec<AgentPubKey> = conductors[0].call(&ann, "get_devices", ann_key).await;
-    assert_eq!(paired, vec![bea_key]);
+    let paired: Vec<AgentPubKey> = conductors[0]
+        .call(&ann, "get_devices", ann_key.clone())
+        .await;
+    assert_eq!(paired, vec![bea_key.clone()]);
+    let primary: Pairing = conductors[0]
+        .call(&ann, "get_pairing", ann_key.clone())
+        .await;
+    assert_eq!(primary.devices, vec![bea_key.clone()]);
+    let device: Pairing = conductors[0].call(&ann, "get_pairing", bea_key).await;
+    assert_eq!(device.primary, Some(ann_key), "the device knows its person");
+}
+
+#[derive(Deserialize, Debug)]
+struct Pairing {
+    primary: Option<AgentPubKey>,
+    devices: Vec<AgentPubKey>,
+}
+
+/// The founder keys written in dnas/directory/dna.yaml parse and count as Full. A malformed
+/// key there would make every validation that reads the founders fail.
+#[tokio::test(flavor = "multi_thread")]
+async fn manifest_founders_are_valid_and_full() {
+    let dna = common::load_dna("directory").await;
+    let mut conductors = SweetConductorBatch::standard(1).await;
+    let apps = conductors
+        .setup_app("sp", &[dna])
+        .await
+        .expect("install app");
+    let zome = apps.cells_flattened()[0].zome("identity");
+
+    let founders: Vec<identity_integrity::Founder> =
+        conductors[0].call(&zome, "founders", ()).await;
+    assert_eq!(founders.len(), 2);
+    for founder in founders {
+        let key: AgentPubKey = holo_hash::AgentPubKeyB64::from_b64_str(&founder.agent)
+            .expect("valid founder key")
+            .into();
+        let standing: StandingView = conductors[0].call(&zome, "get_standing", key).await;
+        assert!(
+            standing.founder && standing.level == StandingLevel::Full,
+            "{}",
+            founder.name
+        );
+    }
 }

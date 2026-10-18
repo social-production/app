@@ -8,10 +8,13 @@ integrity:
   properties:
     kind: directory
     # Founders start with Full standing so the vouch chain can begin
-    # (docs/GOVERNANCE.md#standing). Filled in when founders have signed up:
-    #   - name: Johan
-    #     agent: uhCAk...
-    founders: []
+    # (docs/GOVERNANCE.md#standing). Test network founders (2026-10-18); the real
+    # launch uses fresh keys for a fresh network.
+    founders:
+      - name: thebestdamn
+        agent: uhCAkVzM3E-2KG_M2homDJ0A3w3W18KADL0GzdimGmGTAFaHrqspy
+      - name: BigBird
+        agent: uhCAkMGeYLUjiwSGs0yzl9qIDA_VMyJxEH4qCtxv4YAcF4gIkqWRS
   zomes:
     - name: health_integrity
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm

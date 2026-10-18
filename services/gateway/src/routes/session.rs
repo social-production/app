@@ -44,7 +44,7 @@ pub async fn resume(
         .map_err(|e| anyhow::anyhow!("stored agent key: {e}"))?;
     let token = state
         .node
-        .app_token(&app_id(&agent_key))
+        .app_token(&app_id(&agent_key, &state.node.happ_version))
         .await
         .map_err(|_| gone())?;
     state.store.upsert_person(&agent).await?;

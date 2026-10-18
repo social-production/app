@@ -15,6 +15,7 @@ use holochain_keystore::MetaLairClient;
 use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
+use hosting::happ_version;
 
 use crate::config::Config;
 
@@ -22,6 +23,8 @@ use crate::config::Config;
 pub struct Node {
     conductor: ConductorHandle,
     keystore: MetaLairClient,
+    /// Version of the hosted hApp bundle (part of every hosted app id).
+    pub happ_version: String,
 }
 
 impl std::fmt::Debug for Node {
@@ -53,11 +56,15 @@ impl Node {
             .build()
             .await
             .map_err(|e| anyhow!("start conductor: {e:?}"))?;
+        let bundle = std::fs::read(&config.happ_path).context("read HAPP_PATH")?;
         let node = Self {
             conductor,
             keystore,
+            happ_version: happ_version(&bundle),
         };
         node.ensure_app_interface(config.app_ws_port).await?;
+        let removed = Box::pin(node.remove_stale_apps()).await?;
+        tracing::info!(version = %node.happ_version, removed, "hosting hApp version");
         Ok(node)
     }
 

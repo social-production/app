@@ -18,7 +18,7 @@ Separate from the live FastAPI project `social-production`, so nothing is shared
 | `BOOTSTRAP_URL` | `https://<bootstrap service domain>` |
 | `RELAY_URL` | defaults to `BOOTSTRAP_URL` (same server) |
 | `RP_ID` / `RP_ORIGIN` | the UI's domain and origin; passkeys are bound to them (e.g. `ui-production-333c.up.railway.app`, `https://ui-production-333c.up.railway.app`) |
-| `POW_BITS` | signup proof-of-work difficulty (default 20) |
+| `POW_BITS` | signup proof-of-work difficulty (default 20; the test network uses 18) |
 | `SIGNUPS_PER_IP_PER_DAY` | default 5 |
 | `PORT` | set by Railway. The gateway listens here and proxies the app websocket on `/ws` |
 

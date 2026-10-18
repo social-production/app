@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CopyKey from '#lib/components/CopyKey.svelte';
   import PersonChip from '#lib/components/PersonChip.svelte';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/account.ts';
@@ -25,10 +26,6 @@
       busy = false;
     }
   }
-
-  function copyKey(): void {
-    void navigator.clipboard.writeText(person.agent);
-  }
 </script>
 
 <section class="panel stack">
@@ -45,16 +42,5 @@
     {/if}
   {/if}
   {#if error}<p class="error">{error}</p>{/if}
-  <div class="row">
-    <button onclick={copyKey}>Copy my key</button>
-    <span class="muted key">{person.agent}</span>
-  </div>
+  <CopyKey value={person.agent} />
 </section>
-
-<style>
-  .key {
-    font-family: ui-monospace, monospace;
-    font-size: 0.8rem;
-    word-break: break-all;
-  }
-</style>

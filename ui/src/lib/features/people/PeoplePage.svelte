@@ -1,16 +1,17 @@
 <script lang="ts">
   import PersonChip from '#lib/components/PersonChip.svelte';
   import type { Person } from '#lib/domain/people.ts';
+  import PasskeyOffer from '#lib/features/account/PasskeyOffer.svelte';
   import { explain } from '#lib/services/account.ts';
-  import { getPerson, listPeople, vouchFor } from '#lib/services/people.ts';
+  import { getPerson, listPeople, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
-  import PasskeyOffer from '#lib/features/account/PasskeyOffer.svelte';
-
+  import { personRows, type PersonRow } from './rows.ts';
   import StandingPanel from './StandingPanel.svelte';
 
-  let people = $state<Person[]>([]);
+  let rows = $state<PersonRow[]>([]);
   let me = $state<Person>();
+  let loaded = $state(false);
   let error = $state<string>();
   let busy = $state<string>();
 
@@ -22,11 +23,32 @@
   async function load(): Promise<void> {
     try {
       const agents = await listPeople();
-      people = await Promise.all(agents.map(getPerson));
-      me = myAgent ? await getPerson(myAgent) : undefined;
+      const [entries, mine] = await Promise.all([
+        Promise.all(
+          agents.map(async (agent) => ({
+            person: await getPerson(agent),
+            pairing: await pairingOf(agent),
+          })),
+        ),
+        myAgent ? getPerson(myAgent) : Promise.resolve(undefined),
+      ]);
+      // Set everything at once so the page doesn't jump while it fills in.
+      rows = personRows(entries);
+      me = mine;
     } catch (e) {
       error = explain(e);
+    } finally {
+      loaded = true;
     }
+  }
+
+  function vouchable(person: Person): boolean {
+    return (
+      canVouch &&
+      person.agent !== myAgent &&
+      person.standing.level === 'New' &&
+      !person.standing.vouchers.includes(myAgent)
+    );
   }
 
   async function vouch(person: Person): Promise<void> {
@@ -47,22 +69,30 @@
   });
 </script>
 
-<div class="stack">
-  {#if me}<PasskeyOffer name={me.profile?.name ?? 'Social Production'} />{/if}
-  {#if me}<StandingPanel person={me} onChange={load} />{/if}
-  <section class="panel stack">
-    <h2>People</h2>
-    {#if error}<p class="error">{error}</p>{/if}
-    {#each people as person (person.agent)}
-      <PersonChip {person}>
-        {#snippet actions()}
-          {#if canVouch && person.agent !== myAgent && !person.standing.vouchers.includes(myAgent) && person.standing.level === 'New'}
-            <button onclick={() => vouch(person)} disabled={busy === person.agent}>Vouch</button>
-          {/if}
-        {/snippet}
-      </PersonChip>
-    {:else}
-      <p class="muted">Nobody here yet. Set up your profile to appear in this list.</p>
-    {/each}
-  </section>
-</div>
+{#if !loaded}
+  <p class="muted">Loading people…</p>
+{:else}
+  <div class="stack">
+    {#if me}
+      <PasskeyOffer name={me.profile?.name ?? 'Social Production'} />
+      <StandingPanel person={me} onChange={load} />
+    {/if}
+    <section class="panel stack">
+      <h2>People</h2>
+      {#if error}<p class="error">{error}</p>{/if}
+      {#each rows as row (row.person.agent)}
+        <PersonChip person={row.person} devices={row.devices}>
+          {#snippet actions()}
+            {#if vouchable(row.person)}
+              <button onclick={() => vouch(row.person)} disabled={busy === row.person.agent}
+                >Vouch</button
+              >
+            {/if}
+          {/snippet}
+        </PersonChip>
+      {:else}
+        <p class="muted">Nobody has set up a profile yet.</p>
+      {/each}
+    </section>
+  </div>
+{/if}

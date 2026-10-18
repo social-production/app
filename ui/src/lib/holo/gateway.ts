@@ -38,7 +38,12 @@ async function post<T>(gateway: string, path: string, body: unknown = {}): Promi
   });
   const json: unknown = await response.json().catch(() => ({}));
   if (!response.ok) {
-    const message = (json as { error?: string }).error ?? `The server answered ${response.status}.`;
+    // A bare 404 means this page is newer than the node it talks to (mid-deploy).
+    const fallback =
+      response.status === 404
+        ? 'The site is updating. Please try again in a minute.'
+        : `The server answered ${response.status}.`;
+    const message = (json as { error?: string }).error ?? fallback;
     throw new GatewayError(message, response.status);
   }
   return json as T;

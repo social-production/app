@@ -9,6 +9,7 @@ export {
   confirmationPositions,
   connect,
   devicePasskeysAvailable,
+  firstInvalidWord,
   GatewayError,
   newPhrase,
   phraseIsValid,

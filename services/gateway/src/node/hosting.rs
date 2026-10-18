@@ -13,9 +13,20 @@ use rand::RngCore;
 
 use super::Node;
 
-/// Installed-app id for a person's hosted agent.
-pub fn app_id(agent: &AgentPubKey) -> String {
-    format!("person-{}", AgentPubKeyB64::from(agent.clone()))
+/// Installed-app id for a person's hosted agent on this hApp version. A new hApp (e.g. new
+/// founders: a new directory DNA, so a new network) gets new app ids; old ones are removed at
+/// start and people sign in again with their words (ADR 0028).
+pub fn app_id(agent: &AgentPubKey, happ_version: &str) -> String {
+    format!(
+        "person-{}-{happ_version}",
+        AgentPubKeyB64::from(agent.clone())
+    )
+}
+
+/// Short, stable version of a hApp bundle: the first 8 hex chars of its sha256.
+pub fn happ_version(bundle: &[u8]) -> String {
+    use sha2::Digest;
+    crate::hex::encode(&sha2::Sha256::digest(bundle)[..4])
 }
 
 #[derive(Debug)]
@@ -34,7 +45,7 @@ impl Node {
         happ: &Path,
         restore: bool,
     ) -> anyhow::Result<AppInfo> {
-        let id = app_id(agent);
+        let id = app_id(agent, &self.happ_version);
         if let Some(app) = self.find_app(&id).await? {
             return Ok(app);
         }
@@ -109,6 +120,61 @@ impl Node {
         }
     }
 
+    /// Install and remove a throwaway app once, in the background, so the conductor has
+    /// compiled the zome WASM before the first real signup (otherwise ~1 min after a deploy).
+    pub async fn warm_up(&self, happ: &Path) -> anyhow::Result<()> {
+        let AdminResponse::AgentPubKeyGenerated(agent) =
+            self.admin(AdminRequest::GenerateAgentPubKey).await?
+        else {
+            return Err(anyhow!("unexpected key response"));
+        };
+        let id = format!("warmup-{}", self.happ_version);
+        let payload = InstallAppPayload {
+            source: AppBundleSource::Path(happ.to_path_buf()),
+            agent_key: Some(agent),
+            installed_app_id: Some(id.clone()),
+            network_seed: None,
+            roles_settings: None,
+            ignore_genesis_failure: false,
+            restore_from_dht: false,
+        };
+        self.admin(AdminRequest::InstallApp(Box::new(payload)))
+            .await?;
+        self.admin(AdminRequest::UninstallApp {
+            installed_app_id: id,
+            force: true,
+        })
+        .await?;
+        Ok(())
+    }
+
+    /// Remove hosted apps of other hApp versions (old networks) so their cells stop running.
+    pub async fn remove_stale_apps(&self) -> anyhow::Result<usize> {
+        let AdminResponse::AppsListed(apps) = self
+            .admin(AdminRequest::ListApps {
+                status_filter: None,
+            })
+            .await?
+        else {
+            return Ok(0);
+        };
+        let suffix = format!("-{}", self.happ_version);
+        let mut removed = 0;
+        for app in apps {
+            let id = app.installed_app_id;
+            let stale = id.starts_with("person-") && !id.ends_with(&suffix);
+            if stale || id == "sp-demo" || id.starts_with("warmup-") {
+                self.admin(AdminRequest::UninstallApp {
+                    installed_app_id: id,
+                    force: true,
+                })
+                .await?;
+                removed += 1;
+            }
+        }
+        Ok(removed)
+    }
+
     async fn find_app(&self, id: &str) -> anyhow::Result<Option<AppInfo>> {
         match self
             .admin(AdminRequest::ListApps {
@@ -134,4 +200,19 @@ fn cell_ids(app: &AppInfo) -> Vec<CellId> {
             CellInfo::Stem(_) => None, // not yet materialised (deferred memproofs)
         })
         .collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{app_id, happ_version};
+    use holochain::prelude::AgentPubKey;
+
+    #[test]
+    fn app_ids_change_with_the_happ() {
+        let agent = AgentPubKey::from_raw_32(vec![7; 32]);
+        let (v1, v2) = (happ_version(b"one"), happ_version(b"two"));
+        assert_eq!(v1.len(), 8);
+        assert_ne!(app_id(&agent, &v1), app_id(&agent, &v2));
+        assert!(app_id(&agent, &v1).starts_with("person-uhCAk"));
+    }
 }

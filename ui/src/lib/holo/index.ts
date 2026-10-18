@@ -15,7 +15,13 @@ export {
 } from './connection.ts';
 export { GatewayError } from './gateway.ts';
 export { devicePasskeysAvailable, passkeysSupported } from './passkeys.ts';
-export { confirmationPositions, newPhrase, phraseIsValid, splitWords } from './phrase.ts';
+export {
+  confirmationPositions,
+  firstInvalidWord,
+  newPhrase,
+  phraseIsValid,
+  splitWords,
+} from './phrase.ts';
 export {
   decodeHashFromBase64 as stringToHash,
   encodeHashToBase64 as hashToString,

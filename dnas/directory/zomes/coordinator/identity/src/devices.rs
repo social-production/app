@@ -22,8 +22,8 @@ pub fn link(link: DeviceLink) -> ExternResult<ActionHash> {
     Ok(hash)
 }
 
-/// Agents paired with `agent` where both sides have written their half.
-pub fn confirmed(agent: &AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
+/// Both halves of every pairing involving `agent` (written by different agents).
+fn confirmed_links(agent: &AgentPubKey) -> ExternResult<Vec<DeviceLink>> {
     let mut halves: Vec<(AgentPubKey, DeviceLink)> = Vec::new();
     for hash in action_targets(links(agent.clone(), LinkTypes::AgentToDeviceLinks)?) {
         let Some(record) = live(hash)? else { continue };
@@ -31,21 +31,50 @@ pub fn confirmed(agent: &AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
             halves.push((record.action().author().clone(), link));
         }
     }
-    let mut paired = Vec::new();
+    let mut confirmed: Vec<DeviceLink> = Vec::new();
     for (author, link) in &halves {
-        let other = if &link.primary == agent {
-            &link.device
-        } else {
-            &link.primary
-        };
-        let mirrored = halves
-            .iter()
-            .any(|(a, l)| a != author && l.primary == link.primary && l.device == link.device);
-        if mirrored && !paired.contains(other) && other != agent {
-            paired.push(other.clone());
+        let mirrored = halves.iter().any(|(a, l)| a != author && l == link);
+        if mirrored && !confirmed.contains(link) {
+            confirmed.push(link.clone());
         }
     }
-    Ok(paired)
+    Ok(confirmed)
+}
+
+/// Agents paired with `agent` (either direction).
+pub fn confirmed(agent: &AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
+    Ok(confirmed_links(agent)?
+        .into_iter()
+        .map(|l| {
+            if &l.primary == agent {
+                l.device
+            } else {
+                l.primary
+            }
+        })
+        .filter(|other| other != agent)
+        .collect())
+}
+
+/// Which person `agent` belongs to: its primary (if it is a paired device) and its devices.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Pairing {
+    pub primary: Option<AgentPubKey>,
+    pub devices: Vec<AgentPubKey>,
+}
+
+pub fn pairing(agent: &AgentPubKey) -> ExternResult<Pairing> {
+    let links = confirmed_links(agent)?;
+    let primary = links
+        .iter()
+        .find(|l| &l.device == agent)
+        .map(|l| l.primary.clone());
+    let devices = links
+        .into_iter()
+        .filter(|l| &l.primary == agent)
+        .map(|l| l.device)
+        .collect();
+    Ok(Pairing { primary, devices })
 }
 
 /// Pairings someone else started with `me` that I have not confirmed yet.

@@ -7,10 +7,12 @@
 
   interface Props {
     person: Person;
+    /** Devices this person uses; shown when more than one. */
+    devices?: number;
     actions?: Snippet;
   }
 
-  let { person, actions }: Props = $props();
+  let { person, devices = 1, actions }: Props = $props();
 
   const standing = $derived(
     person.standing.founder
@@ -30,6 +32,7 @@
   <AvatarImage avatar={person.profile?.avatar ?? null} name={person.profile?.name ?? ''} />
   <div class="text">
     <strong>{displayName(person)}</strong>
+    {#if devices > 1}<span class="muted">{devices} devices</span>{/if}
     {#if person.profile?.home_area}<span class="muted">{person.profile.home_area}</span>{/if}
   </div>
   <StatusPill tone={standing.tone} label={standing.label} />

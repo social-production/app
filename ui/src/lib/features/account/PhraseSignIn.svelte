@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     explain,
+    firstInvalidWord,
     phraseIsValid,
     signInWithPhrase,
     splitWords,
@@ -18,6 +19,15 @@
 
   const words = $derived(splitWords(text));
   const valid = $derived(phraseIsValid(words));
+  const hint = $derived.by(() => {
+    const unknown = firstInvalidWord(words);
+    if (unknown) return `${unknown} isn't in the word list — check its spelling.`;
+    if (words.length < 24)
+      return `${24 - words.length} more word${words.length === 23 ? '' : 's'} needed.`;
+    if (words.length > 24) return `That's ${words.length} words; a phrase has 24.`;
+    if (!valid) return 'All words are real, but they are not a valid phrase — check their order.';
+    return 'Looks right.';
+  });
 
   async function go(): Promise<void> {
     working = true;
@@ -43,9 +53,7 @@
     Recovery phrase
     <textarea bind:value={text} rows="5" autocapitalize="none" spellcheck="false"></textarea>
   </label>
-  <p class="muted">
-    {words.length}/24 words{words.length === 24 && !valid ? ' — check the spelling' : ''}
-  </p>
+  <p class="muted">{words.length}/24 words · {hint}</p>
   {#if error}<p class="error">{error}</p>{/if}
   <div class="row">
     <button class="primary" disabled={!valid} onclick={go}>Sign in</button>

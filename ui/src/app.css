@@ -84,3 +84,17 @@ label {
 .error {
   color: var(--need-strong);
 }
+
+/* Comfortable tap targets on touch screens. */
+@media (pointer: coarse) {
+  button,
+  input[type='file'],
+  nav a {
+    min-height: 44px;
+  }
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 8px;
+  }
+}

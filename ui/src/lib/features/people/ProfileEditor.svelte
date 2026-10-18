@@ -33,6 +33,7 @@
     if (!file) return;
     try {
       avatar = await toAvatar(file);
+      status = `Picture resized to 256×256 (${Math.ceil(avatar.bytes.length / 1024)} KB). Save to keep it.`;
     } catch (e) {
       error = explain(e);
     }
@@ -75,8 +76,9 @@
       /></label
     >
     <label>About you <textarea bind:value={bio} maxlength={BIO_MAX} rows="4"></textarea></label>
-    {#if error}<p class="error">{error}</p>{/if}
-    {#if status}<p class="muted">{status}</p>{/if}
+    <p class="status" class:error={!!error}>
+      {error ?? status ?? (name.trim() ? '' : 'Add your name to save.')}
+    </p>
     <button class="primary" onclick={save} disabled={saving || !name.trim()}>Save profile</button>
   {/if}
 </section>
@@ -84,5 +86,11 @@
 <style>
   .editor {
     max-width: 640px;
+  }
+  /* Reserved height: messages appear without pushing the page down. */
+  .status {
+    min-height: 1.5em;
+    margin: 0;
+    color: var(--text-soft);
   }
 </style>

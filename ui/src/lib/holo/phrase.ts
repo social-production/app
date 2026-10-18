@@ -20,6 +20,12 @@ export function phraseToSeed(words: string[]): Uint8Array {
   return mnemonicToEntropy(normalise(words), wordlist);
 }
 
+/** The first word that isn't in the word list, as "Word 7 'appel'" (for a helpful hint). */
+export function firstInvalidWord(words: string[]): string | undefined {
+  const index = words.findIndex((w) => !wordlist.includes(w.trim().toLowerCase()));
+  return index < 0 ? undefined : `Word ${index + 1} “${words[index]}”`;
+}
+
 /** Three distinct random word positions (0-based) the person must re-enter. */
 export function confirmationPositions(): number[] {
   const picks = new Set<number>();

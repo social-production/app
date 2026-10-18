@@ -44,6 +44,11 @@ Each decision below becomes an ADR when it ships.
 - The seed node embeds the conductor (ADR 0023). Devices pair instead of sharing keys (ADR 0024).
 - Gossip tuned for a small network (ADR 0025).
 
+## M1.1 (after the first Grokbot pass)
+Founders added (ADR 0028 handles the network switch); paired accounts shown as one person; phrase hints
+name the bad word; profile hints and no layout jump; copy-key confirmation; 44 px tap targets on phones;
+warm-up so the first signup after a deploy isn't slow; PoW 18 bits.
+
 ## Still open
 - Prune window for inactive hosted agents (proposal: 60 days with no session). The gateway records `last_seen`.
 - Bot-review driven vouch suspension lands with bot reviews (M6).

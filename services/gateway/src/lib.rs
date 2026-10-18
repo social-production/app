@@ -21,7 +21,19 @@ pub async fn serve(
     on_bound: impl FnOnce(SocketAddr),
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
-    let node = node::Node::start(&config, passphrase).await?;
+    let node = Box::pin(node::Node::start(&config, passphrase)).await?;
+    let warming = node.clone();
+    let happ = config.happ_path.clone();
+    tokio::spawn(async move {
+        let started = std::time::Instant::now();
+        match Box::pin(warming.warm_up(&happ)).await {
+            Ok(()) => tracing::info!(
+                secs = started.elapsed().as_secs(),
+                "zomes compiled (warm-up)"
+            ),
+            Err(e) => tracing::warn!(error = %e, "warm-up failed; first signup will be slower"),
+        }
+    });
     let state = routes::AppState {
         store: store::Store::open(&config.data_dir).await?,
         passkeys: Arc::new(auth::passkeys::Passkeys::new(

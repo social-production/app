@@ -67,6 +67,12 @@ pub fn get_devices(agent: AgentPubKey) -> ExternResult<Vec<AgentPubKey>> {
     devices::confirmed(&agent)
 }
 
+/// Whose device `agent` is, and which devices it has (for showing one person per row).
+#[hdk_extern]
+pub fn get_pairing(agent: AgentPubKey) -> ExternResult<devices::Pairing> {
+    devices::pairing(&agent)
+}
+
 /// Pairings other devices started with me, waiting for my confirmation.
 #[hdk_extern]
 pub fn device_requests(_: ()) -> ExternResult<Vec<identity_integrity::DeviceLink>> {

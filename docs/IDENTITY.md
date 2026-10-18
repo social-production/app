@@ -52,6 +52,16 @@ device. One agent must never run on two conductors at once, because its chain wo
 - Importing the phrase into the app is reserved for **moving off** a hosted node (M7), at which
   point the hosted copy is retired.
 
+## Founders (test network)
+
+`dnas/directory/dna.yaml` lists the founders who start Full: **thebestdamn** and **BigBird** (keys in the
+file). Changing the list is a new network (ADR 0028). The real launch uses fresh keys and a fresh network.
+
+## How pairing looks
+
+People shows one row per person: a paired device whose main account is listed is folded into that
+row, which says "N devices" (`ui/src/lib/features/people/rows.ts`, coordinator `get_pairing`).
+
 ## Signup protection (ADR 0026)
 
 Proof-of-work (`POW_BITS`, about a few seconds) plus a per-IP daily limit (`SIGNUPS_PER_IP_PER_DAY`).
