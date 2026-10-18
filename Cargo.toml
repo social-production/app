@@ -9,6 +9,7 @@ members = [
   "services/gateway",
   "native",
   "tests/scenarios",
+  "tests/mobile-conductor",
 ]
 
 [workspace.package]

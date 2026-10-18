@@ -1,0 +1,20 @@
+[package]
+name = "mobile-conductor"
+description = "Platform check (ADR 0011): the conductor compiles for phones with the right WASM engine."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[features]
+# iOS forbids JIT: interpreter only.
+wasmi = ["holochain/wasmer-wasmi"]
+# Android allows JIT.
+jit = ["holochain/wasmer-sys-cranelift"]
+
+[dependencies]
+anyhow = "1"
+holochain = { workspace = true, features = ["encryption", "schema"] }
+
+[lints]
+workspace = true

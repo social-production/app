@@ -1,23 +1,42 @@
 name: platforms
 
-# M0 platform check (ADR 0011): can the conductor be built for phones?
-# iOS forbids JIT, so the conductor must use the wasmer-wasmi interpreter.
+# M0 platform check (ADR 0011): does the embedded conductor build for phones?
+# iOS forbids JIT, so it must use the wasmer-wasmi interpreter; Android may JIT.
 on:
   workflow_dispatch:
   push:
     branches: [main]
-    paths: [Cargo.toml, Cargo.lock, native/**, .github/workflows/platforms.yml]
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - native/**
+      - tests/mobile-conductor/**
+      - .github/workflows/platforms.yml
 
 jobs:
-  ios-conductor:
+  ios:
     runs-on: macos-latest
-    timeout-minutes: 90
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
-      - name: Rust with iOS targets
-        run: rustup target add aarch64-apple-ios aarch64-apple-ios-sim
+      - run: rustup target add aarch64-apple-ios
       - uses: Swatinem/rust-cache@v2
-      - name: Build conductor for iOS (interpreter, no JIT)
-        run: >
-          cargo build --release -p holochain --target aarch64-apple-ios
-          --no-default-features --features wasmer-wasmi
+      - name: Conductor for iOS (interpreter, no JIT)
+        run: cargo build --release -p mobile-conductor --features wasmi --target aarch64-apple-ios
+
+  android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v7
+      - run: rustup target add aarch64-linux-android
+      - uses: Swatinem/rust-cache@v2
+      - name: Conductor for Android (JIT)
+        run: |
+          # GitHub's Ubuntu image ships the Android NDK.
+          bin="$ANDROID_NDK_LATEST_HOME/toolchains/llvm/prebuilt/linux-x86_64/bin"
+          export CARGO_TARGET_AARCH64_LINUX_ANDROID_LINKER="$bin/aarch64-linux-android26-clang"
+          export CC_aarch64_linux_android="$bin/aarch64-linux-android26-clang"
+          export CXX_aarch64_linux_android="$bin/aarch64-linux-android26-clang++"
+          export AR_aarch64_linux_android="$bin/llvm-ar"
+          cargo build --release -p mobile-conductor --features jit --target aarch64-linux-android
