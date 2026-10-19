@@ -6,6 +6,7 @@ mod bundle;
 mod hosting;
 mod index;
 mod release;
+mod restore;
 mod seeds;
 
 use std::collections::BTreeMap;

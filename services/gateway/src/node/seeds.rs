@@ -4,6 +4,10 @@
 //!
 //! The import follows lair's `import_seed` contract as implemented in Holochain's
 //! runtime-tauri (`holochain-conductor-runtime`, MIT OR Apache-2.0).
+//!
+//! Every lair entry counts against a hard ceiling (ADR 0034): lair can't delete entries and the
+//! conductor lists them all in one 8 KiB message. So the node keeps exactly one entry per
+//! person plus a few fixed ones (`node_key`), with short tags.
 
 use anyhow::{anyhow, Context};
 use holochain::prelude::AgentPubKey;
@@ -32,10 +36,10 @@ impl Node {
         let mut sender_pk = [0_u8; XSALSA_PUBLICKEYBYTES];
         let mut sender_sk = sodoken::SizedLockedArray::new()?;
         xsalsa_keypair(&mut sender_pk, &mut sender_sk.lock())?;
-        let recipient = client
-            .new_seed(uuid::Uuid::new_v4().to_string().into(), None, false)
+        let recipient = self
+            .node_seed(IMPORT_RECIPIENT)
             .await
-            .context("create import recipient")?;
+            .context("import recipient")?;
 
         let mut nonce = [0_u8; XSALSA_NONCEBYTES];
         sodoken::random::randombytes_buf(&mut nonce)?;
@@ -64,8 +68,30 @@ impl Node {
     }
 }
 
-/// Stable keystore tag for a seed, without storing the seed itself in the name.
+impl Node {
+    /// A node-owned key that lives as long as the keystore (created on first use).
+    pub async fn node_key(&self, tag: &str) -> anyhow::Result<AgentPubKey> {
+        let info = self.node_seed(tag).await?;
+        Ok(AgentPubKey::from_raw_32(info.ed25519_pub_key.0.to_vec()))
+    }
+
+    async fn node_seed(&self, tag: &str) -> anyhow::Result<lair_keystore_api::prelude::SeedInfo> {
+        let client = self.keystore().lair_client();
+        if let Ok(LairEntryInfo::Seed { seed_info, .. }) = client.get_entry(tag.into()).await {
+            return Ok(seed_info);
+        }
+        client
+            .new_seed(tag.into(), None, false)
+            .await
+            .map_err(|e| anyhow!("new key {tag}: {e}"))
+    }
+}
+
+/// The one key that receives every phrase import (encrypted to it, then stored by lair).
+const IMPORT_RECIPIENT: &str = "n-import";
+
+/// Stable, short keystore tag for a person's seed (short tags keep the entry list small).
 fn seed_tag(seed: &[u8; 32]) -> String {
     let digest = Sha256::digest(seed);
-    format!("person-seed-{}", crate::hex::encode(&digest[..16]))
+    format!("p-{}", crate::hex::encode(&digest[..12]))
 }

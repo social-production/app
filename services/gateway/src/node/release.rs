@@ -1,49 +1,15 @@
 //! What happens when a new hApp is deployed (ADR 0028, ADR 0029): apps of other integrity
-//! versions are removed (a new network), the zomes are compiled ahead of the first signup,
-//! and coordinator-only changes are swapped into running cells. Reinstalling instead would
-//! re-run genesis on an existing chain.
+//! versions are removed (a new network), and coordinator-only changes are swapped into running
+//! cells. Reinstalling instead would re-run genesis on an existing chain.
 
 use std::collections::BTreeSet;
-use std::path::Path;
-
-use anyhow::anyhow;
 
 use holochain::conductor::api::{AdminRequest, AdminResponse, CellInfo};
-use holochain_types::app::{
-    AppBundleSource, CoordinatorSource, InstallAppPayload, UpdateCoordinatorsPayload,
-};
+use holochain_types::app::{CoordinatorSource, UpdateCoordinatorsPayload};
 
 use super::Node;
 
 impl Node {
-    /// Install and remove a throwaway app once, in the background, so the conductor has
-    /// compiled the zome WASM before the first real signup (otherwise ~1 min after a deploy).
-    pub async fn warm_up(&self, happ: &Path) -> anyhow::Result<()> {
-        let AdminResponse::AgentPubKeyGenerated(agent) =
-            self.admin(AdminRequest::GenerateAgentPubKey).await?
-        else {
-            return Err(anyhow!("unexpected key response"));
-        };
-        let id = format!("warmup-{}", self.happ_version);
-        let payload = InstallAppPayload {
-            source: AppBundleSource::Path(happ.to_path_buf()),
-            agent_key: Some(agent),
-            installed_app_id: Some(id.clone()),
-            network_seed: None,
-            roles_settings: None,
-            ignore_genesis_failure: false,
-            restore_from_dht: false,
-        };
-        self.admin(AdminRequest::InstallApp(Box::new(payload)))
-            .await?;
-        self.admin(AdminRequest::UninstallApp {
-            installed_app_id: id,
-            force: true,
-        })
-        .await?;
-        Ok(())
-    }
-
     /// Remove hosted apps of other hApp versions (old networks) so their cells stop running.
     pub async fn remove_stale_apps(&self) -> anyhow::Result<usize> {
         let AdminResponse::AppsListed(apps) = self

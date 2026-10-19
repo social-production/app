@@ -17,7 +17,7 @@ while IFS= read -r file; do
     echo "! $file: $lines lines (approaching $max)"
   fi
 done < <(git ls-files --cached --others --exclude-standard -- '*.rs' '*.ts' '*.svelte' '*.sh' |
-  grep -vE '(^|/)(generated|paraglide)/')
+  grep -vE '(^|/)(generated|paraglide)/|^vendor/')
 
 if ((failures > 0)); then
   echo "$failures file(s) over $max lines — split them by responsibility"

@@ -8,7 +8,6 @@ use anyhow::anyhow;
 use holo_hash::AgentPubKeyB64;
 use holochain::conductor::api::{AdminRequest, AdminResponse, AppInfo, CellInfo};
 use holochain::prelude::*;
-use holochain_types::app::{AppBundleSource, InstallAppPayload};
 use rand::RngCore;
 
 use super::Node;
@@ -46,27 +45,7 @@ impl Node {
         restore: bool,
     ) -> anyhow::Result<AppInfo> {
         let id = app_id(agent, &self.happ_version);
-        if let Some(app) = self.find_app(&id).await? {
-            return Ok(app);
-        }
-        let payload = InstallAppPayload {
-            source: AppBundleSource::Path(happ.to_path_buf()),
-            agent_key: Some(agent.clone()),
-            installed_app_id: Some(id.clone()),
-            network_seed: None,
-            roles_settings: None,
-            ignore_genesis_failure: false,
-            restore_from_dht: restore,
-        };
-        self.admin(AdminRequest::InstallApp(Box::new(payload)))
-            .await?;
-        self.admin(AdminRequest::EnableApp {
-            installed_app_id: id.clone(),
-        })
-        .await?;
-        self.find_app(&id)
-            .await?
-            .ok_or_else(|| anyhow!("app {id} missing after install"))
+        Box::pin(self.install_and_enable(&id, agent, happ, restore)).await
     }
 
     /// Grant `signing_key` every zome function on every cell of the person's app.

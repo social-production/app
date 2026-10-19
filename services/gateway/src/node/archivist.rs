@@ -7,7 +7,7 @@ use std::path::Path;
 
 use anyhow::anyhow;
 use holo_hash::{ActionHashB64, AgentPubKeyB64};
-use holochain::conductor::api::{AdminRequest, AdminResponse, AppInfo, CellInfo};
+use holochain::conductor::api::{AdminRequest, AppInfo, CellInfo};
 use holochain::prelude::*;
 use holochain_types::app::{AppBundleSource, CreateCloneCellPayload, InstallAppPayload};
 use serde::Deserialize;
@@ -95,11 +95,8 @@ impl Node {
         if let Some(app) = self.find_app(&id).await? {
             return Ok(app);
         }
-        let AdminResponse::AgentPubKeyGenerated(agent) =
-            self.admin(AdminRequest::GenerateAgentPubKey).await?
-        else {
-            return Err(anyhow!("unexpected key response"));
-        };
+        // One archivist key for the life of the node, across hApp versions (ADR 0034).
+        let agent = self.node_key("n-archivist").await?;
         let payload = InstallAppPayload {
             source: AppBundleSource::Path(happ.to_path_buf()),
             agent_key: Some(agent),
@@ -119,6 +116,32 @@ impl Node {
         self.find_app(&id)
             .await?
             .ok_or_else(|| anyhow!("archivist missing after install"))
+    }
+
+    /// Call one function in each role's base cell, so the conductor compiles every zome
+    /// before the first signup or project needs it (a cold compile takes about a minute).
+    pub async fn warm_up(&self, happ: &Path) -> anyhow::Result<()> {
+        let app = self.archivist_app(happ).await?;
+        let agent = app.agent_pub_key.clone();
+        let _: Vec<serde::de::IgnoredAny> = self
+            .call(
+                &agent,
+                provisioned(&app, "directory")?,
+                "identity",
+                "founders",
+                (),
+            )
+            .await?;
+        let _: Option<serde::de::IgnoredAny> = self
+            .call(
+                &agent,
+                provisioned(&app, "project")?,
+                "project",
+                "get_project",
+                (),
+            )
+            .await?;
+        Ok(())
     }
 
     /// A zome call as the cell's own agent (author grant; no capability secret needed).

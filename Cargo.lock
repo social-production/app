@@ -4997,8 +4997,6 @@ dependencies = [
 [[package]]
 name = "lair_keystore_api"
 version = "0.7.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad5c2a6ab008de723eab991d548a6823b8a51371ecec26910721e987b7ece1de"
 dependencies = [
  "base64 0.22.1",
  "dunce",

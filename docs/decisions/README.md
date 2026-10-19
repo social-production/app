@@ -34,3 +34,5 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0030](./0030-project-clones-and-creator-seed.md) Each project is a clone; its network seed names the creator
 - [0031](./0031-archivist-and-node-index.md) Seed nodes archive every project and serve the project feed
 - [0032](./0032-ported-styles.md) Styles ported from web/ live in global stylesheets scoped by a root class
+- [0034](./0034-lair-frame-limit.md) Keep keystore entries few, and patch lair's 8 KiB message limit
+- [0035](./0035-restore-falls-back-to-fresh.md) A phrase restore waits for the chain, then starts fresh if there is none
