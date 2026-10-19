@@ -69,7 +69,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). Next: M3b plans, challenges, reverts, links | in progress |
-| M4 | Talk | discussion, project chat, DMs (conversation DNA), in-app notifications | |
+| M4 | Talk | M4a (built, not yet deployed): project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). Next: M4b discussion threads, M4c DMs (conversation DNA), M4d in-app notifications | in progress |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |

@@ -1,0 +1,18 @@
+[package]
+name = "discussion_integrity"
+description = "Project DNA rules for talk: project chat messages and replies (ADR 0038)."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdi = { workspace = true }
+holochain_serialized_bytes = { workspace = true }
+serde = { workspace = true }
+sp_core = { workspace = true }
+
+[lints]
+workspace = true
