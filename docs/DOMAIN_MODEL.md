@@ -26,7 +26,7 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 | `Signals` link | M2 ✅ | "signals" anchor → the agent's key, tag = demand or opposition; one live per agent |
 | `Proposal`, `Vote`, `Outcome`, `Challenge` | M3 | generic governance |
 | `Thread`, `Post`, `Comment`, `Reaction` | M4 | discussion |
-| `ChatMessage` | M4 | project chat |
+| `ChatMessage` | M4a ✅ | project chat, `discussion` zome: body + optional `reply_to`; anyone may post, only the author deletes, never edited (ADR 0038) |
 | `Activity`, `Role`, `Assignment`, `Rating` | M5 | activities + scheduling |
 | `ServiceRequest`, `AvailabilityRule`, `SlotHold` | M5 | service projects |
 | `ExecutionReceipt` | M6 | board actions citing Outcomes |

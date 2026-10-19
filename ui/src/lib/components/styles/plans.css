@@ -1,0 +1,519 @@
+/* Ported from web/src/lib/features/projects/detail/lifecycle/productive/phases/ProjectLifecyclePlanPhaseContent.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-surface {
+  display: grid;
+  gap: 12px;
+}
+
+/* Ported from web/src/lib/components/shared/PhaseEmptyState.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-empty {
+  display: grid;
+  gap: 4px;
+  max-width: 62ch;
+  padding: 4px 0 8px;
+}
+
+.phase-empty strong {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.phase-empty p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+/* Ported from web/src/lib/components/cards/project-detail/CollapsiblePlanCard.svelte (ADR 0032, scripts/port-styles.py) */
+.plan-scope .plan-card {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: color-mix(in srgb, var(--panel) 55%, var(--panel-strong));
+  display: grid;
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transition:
+    background-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.plan-scope .plan-card:hover,
+.plan-scope .plan-card.open {
+  background: color-mix(in srgb, var(--brand-soft) 22%, var(--panel-strong));
+}
+
+.plan-scope .plan-card.tied {
+  background: color-mix(in srgb, var(--accent-warm, #e8b86d) 16%, var(--panel-strong));
+}
+
+.plan-scope .plan-card.leading {
+  background: color-mix(in srgb, var(--brand-soft) 48%, var(--panel-strong));
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.plan-scope .plan-card.needs-action {
+  border-color: color-mix(in srgb, var(--brand) 28%, transparent);
+}
+
+.plan-scope .plan-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.plan-scope .plan-when {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.plan-scope .plan-title {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 800;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.plan-scope .plan-chips {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  margin-left: auto;
+}
+
+.plan-scope .plan-lede,
+.plan-scope .approval-summary,
+.plan-scope .sheet-author,
+.plan-scope .rating-progress,
+.plan-scope .assess-helper,
+.plan-scope .note-card p,
+.plan-scope .stage-copy p,
+.plan-scope .stage-meta,
+.plan-scope .fact dd {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.plan-scope .collapsed-copy {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+}
+
+.plan-scope .plan-stage-list {
+  display: grid;
+  gap: 2px;
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.plan-scope .phase-badge,
+.plan-scope .assess-chip {
+  flex: 0 0 auto;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 75%, var(--panel));
+  color: var(--brand-strong);
+}
+
+.plan-scope .assess-chip {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--page-bg, #fff);
+}
+
+.plan-scope .phase-badge.tied-badge {
+  border-color: color-mix(in srgb, var(--accent-warm, #e8b86d) 50%, var(--panel-border));
+  background: color-mix(in srgb, var(--accent-warm, #e8b86d) 22%, var(--panel));
+  color: var(--accent-warm-strong, var(--text-main));
+}
+
+.plan-scope .plan-footer-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.plan-scope .plan-sheet {
+  display: grid;
+  gap: 22px;
+  padding: 16px 20px 20px;
+}
+
+.plan-scope .sheet-kicker,
+.plan-scope .sheet-author {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.plan-scope .sheet-author {
+  font-weight: 600;
+}
+
+.plan-scope .plan-section {
+  display: grid;
+  gap: 10px;
+}
+
+.plan-scope .plan-section h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.plan-scope .plan-body {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.plan-scope .plan-facts {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 2px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--panel-strong) 70%, var(--panel));
+}
+
+.plan-scope .fact {
+  display: grid;
+  gap: 3px;
+  padding: 12px 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+}
+
+.plan-scope .fact:last-child {
+  border-bottom: 0;
+}
+
+.plan-scope .fact dt,
+.plan-scope .note-label,
+.plan-scope .meta-label {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.plan-scope .fact dd {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.plan-scope .note-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border-left: 3px solid color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 18%, var(--panel-strong));
+}
+
+.plan-scope .note-card p,
+.plan-scope .stage-copy p,
+.plan-scope .rating-progress,
+.plan-scope .assess-blocked,
+.plan-scope .threshold-note {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.plan-scope .assess-blocked {
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.plan-scope .assess-helper {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.plan-scope .stage-list {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.plan-scope .stage-item {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 0 0 16px;
+}
+
+.plan-scope .stage-item:last-child {
+  padding-bottom: 0;
+}
+
+.plan-scope .stage-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.plan-scope .stage-copy {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding-bottom: 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+}
+
+.plan-scope .stage-item:last-child .stage-copy {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.plan-scope .stage-copy strong {
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.plan-scope .stage-copy p {
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.plan-scope .stage-meta {
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.plan-scope .assess-panel {
+  display: grid;
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand-soft) 22%, var(--panel-strong));
+}
+
+.plan-scope .assess-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.plan-scope .assess-heading h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.plan-scope .criterion-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.plan-scope .overall-row {
+  display: grid;
+  gap: 8px;
+}
+
+.plan-scope .criterion-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.plan-scope .overall-row strong {
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.plan-scope .overall-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.plan-scope .vote-chip {
+  min-height: 36px;
+  min-width: 72px;
+  padding: 6px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.plan-scope .vote-chip.selected {
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 55%, var(--panel));
+  color: var(--brand-strong);
+}
+
+.plan-scope .vote-chip.negative.selected {
+  border-color: color-mix(in srgb, var(--tablet-community-bg, #b42318) 45%, var(--panel-border));
+  color: var(--tablet-community-text, var(--text-main));
+}
+
+.plan-scope .vote-chip:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.plan-scope .text-button {
+  border: none;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+
+.plan-scope .assessment-comment {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+}
+
+.plan-scope .assessment-comment textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.plan-scope .save-comment {
+  justify-self: start;
+}
+
+/* Ported from web/src/lib/components/shared/PlanCriterionRatingRow.svelte (ADR 0032, scripts/port-styles.py) */
+.criterion-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--panel-strong) 82%, var(--panel));
+}
+
+.criterion-row .criterion-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.criterion-row .criterion-kind {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-strong);
+}
+
+.criterion-row strong {
+  color: var(--text-main);
+  font-size: 14px;
+  line-height: 1.35;
+}
+
+.criterion-row .criterion-meta {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.criterion-row .rating-row {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+}
+
+.criterion-row .rating-chip {
+  flex: 1 1 0;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 8px 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  cursor: pointer;
+}
+
+.criterion-row .rating-chip:disabled {
+  cursor: default;
+  opacity: 0.72;
+}
+
+.criterion-row .rating-chip.selected {
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 55%, var(--panel));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 18%, transparent);
+}
+
+.criterion-row .rating-value {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.criterion-row .rating-label {
+  font-size: 9px;
+  line-height: 1.2;
+  text-align: center;
+  color: var(--text-soft);
+}
+
+@media (max-width: 760px) {
+  .criterion-row .rating-chip {
+    padding: 8px 2px;
+  }
+
+  .criterion-row .rating-label {
+    display: none;
+  }
+}

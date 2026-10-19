@@ -32,7 +32,11 @@
   $effect(() => {
     const dock = node;
     if (!dock) return;
-    const home = dock.parentElement;
+    // A marker holds the dock's place. Svelte removes a block's DOM before running its
+    // cleanups, so a dock moved into the shell must be dropped, not re-homed, once the
+    // marker is gone (otherwise it outlives the block, e.g. on the Chat tab).
+    const marker = document.createComment('detail-action-dock');
+    dock.before(marker);
     const shell = document.querySelector('.shell');
     if (active && shell instanceof HTMLElement) shell.appendChild(dock);
     sync(dock);
@@ -43,7 +47,8 @@
     return () => {
       observer.disconnect();
       window.removeEventListener('resize', onResize);
-      if (home && dock.parentElement !== home) home.appendChild(dock);
+      if (marker.isConnected) marker.replaceWith(dock);
+      else dock.remove();
       document.documentElement.style.setProperty('--detail-action-dock-height', '0px');
     };
   });

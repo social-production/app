@@ -4,6 +4,9 @@ use std::path::PathBuf;
 
 use holo_hash::AgentPubKeyB64;
 use holochain::prelude::*;
+
+pub mod net;
+pub mod plans;
 use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
 use identity_integrity::{DirectoryProperties, Founder};
 

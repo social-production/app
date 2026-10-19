@@ -4,15 +4,17 @@
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
   import type { DetailTabId } from '#lib/domain/projects.ts';
+  import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
   import ParticipationPanel from './ParticipationPanel.svelte';
+  import ProjectChat from './ProjectChat.svelte';
   import ProjectDock from './ProjectDock.svelte';
 
   import '#lib/components/styles/detail.css';
 
-  /** web's ProjectDetailPage: Details and Participation tabs (chat, links, history: M4–M5). */
+  /** web's ProjectDetailPage: Details, Participation and Chat tabs (links, history: M4–M5). */
   let { id }: { id: string } = $props();
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
@@ -20,9 +22,31 @@
   const detail = new DetailState(id);
   let tab = $state<DetailTabId>('context');
   let sheet = $state<'members' | 'edit' | 'update' | null>(null);
+  let compact = $state(false);
+  // As on web, the chat mounts (and starts polling) the first time its tab opens.
+  let chatOpened = $state(false);
+  const chatFull = $derived(tab === 'chat' && compact);
 
   $effect(() => {
     void detail.open();
+  });
+
+  $effect(() => {
+    const media = window.matchMedia('(max-width: 1080px)');
+    const apply = (): void => {
+      compact = media.matches;
+    };
+    apply();
+    media.addEventListener('change', apply);
+    return () => media.removeEventListener('change', apply);
+  });
+
+  $effect(() => {
+    if (tab === 'chat') chatOpened = true;
+    chatChrome.immersive = chatFull;
+    return () => {
+      chatChrome.immersive = false;
+    };
   });
 
   async function filed(ok: Promise<boolean>): Promise<void> {
@@ -31,7 +55,7 @@
 </script>
 
 <div class="project-detail">
-  <section class="page">
+  <section class="page" class:page-chat={chatFull}>
     {#if detail.error && !detail.project}
       <section class="hero-card"><p class="tab-loading">{detail.error}</p></section>
     {:else if !detail.project?.charter}
@@ -39,10 +63,10 @@
     {:else}
       {@const project = detail.project}
       {@const charter = detail.project.charter}
-      <section class="hero-card">
+      <section class="hero-card" class:chat-tab-active={chatFull}>
         <DetailTopTabs
           active={tab}
-          available={['context', 'participation']}
+          available={['context', 'participation', 'chat']}
           ariaLabel="Project detail tabs"
           onSelect={(t) => (tab = t)}
         />
@@ -68,12 +92,29 @@
         >
           <ParticipationPanel {detail} />
         </div>
-        <ProjectDock
-          {detail}
-          membersOpen={sheet === 'members'}
-          onOpenMembers={() => (sheet = 'members')}
-          onEdit={() => (sheet = 'edit')}
-        />
+        {#if chatOpened}
+          <div
+            class="tab-panel chat-tab"
+            class:tab-panel-hidden={tab !== 'chat'}
+            hidden={tab !== 'chat'}
+            inert={tab !== 'chat'}
+          >
+            <ProjectChat
+              projectId={id}
+              names={detail.names}
+              fullscreen={compact}
+              active={tab === 'chat'}
+            />
+          </div>
+        {/if}
+        {#if tab !== 'chat'}
+          <ProjectDock
+            {detail}
+            membersOpen={sheet === 'members'}
+            onOpenMembers={() => (sheet = 'members')}
+            onEdit={() => (sheet = 'edit')}
+          />
+        {/if}
       </section>
 
       <PeopleSheet

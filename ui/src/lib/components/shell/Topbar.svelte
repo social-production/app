@@ -9,6 +9,8 @@
   /** Top bar ported from web/src/lib/app/shell/AppShell.svelte; styles live in shell.css. */
   interface Props {
     compact: boolean;
+    /** Slid away (web's chrome-collapsed), e.g. while a chat fills the phone screen. */
+    collapsed?: boolean;
     signedIn: boolean;
     viewerName: string;
     leftOpen: boolean;
@@ -35,6 +37,7 @@
   class="topbar"
   class:search-expanded={p.compact && searchExpanded}
   class:topbar-compact={p.compact}
+  class:chrome-collapsed={p.collapsed}
 >
   {#if p.compact && searchExpanded}
     <form class="toolbar-search toolbar-search-expanded" role="search" onsubmit={submit}>

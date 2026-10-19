@@ -1983,6 +1983,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "discussion"
+version = "0.0.1"
+dependencies = [
+ "discussion_integrity",
+ "hdk",
+ "serde",
+ "sp_core",
+]
+
+[[package]]
+name = "discussion_integrity"
+version = "0.0.1"
+dependencies = [
+ "hdi",
+ "holochain_serialized_bytes",
+ "serde",
+ "sp_core",
+]
+
+[[package]]
 name = "dispatch2"
 version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"

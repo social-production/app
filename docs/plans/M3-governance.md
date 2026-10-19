@@ -55,3 +55,28 @@ Production/distribution/operations/access plans with criteria and assessments (w
 - Also in this batch: usernames follow web's handle rules (`sp_core::handle`), the lair message
   limit (ADR 0034), phrase restore fallback (ADR 0035), full arc on desktop nodes (ADR 0036), and
   ported styles regenerated from `styles/PORTS`.
+
+## M3b plans, as built (2026-10-19)
+- `project_integrity`: `ProposalKind::Plan(Plan)` (web's wizard fields: kind, title, description,
+  demand note, subtype, repository, location, recipients, 1–30 stages), `ProposalKind::Phase`
+  gains `plan: Option<ActionHash>`, a `Rating` entry and the `ProposalToRatings` link (ADR 0039).
+  Field limits in `sp_core::plan`.
+- `sp_governance::plans` (ported from web-backend `projects_plans.py`, `plan_criteria.py`,
+  `phases/gates.py`): plan kinds per mode and phase, the rubric, the required plan kind for leaving
+  a phase, and `pick_leader` with exact fractions. Tests in `plans_tests.rs`.
+- Governance coordinator: `propose` takes plans (only in the matching phase and mode) and fills in
+  the leading plan on phase moves; `rate`; `list_plans` returns the plan board (plans with their
+  rubric averages, your own ratings, the leader per kind and the current gate). The fold in
+  `apply.rs` applies a move only with an approved cited plan of the right kind, and takes its
+  subtype.
+- UI from web: ProjectLifecyclePlanPhaseContent, PhaseEmptyState, CollapsiblePlanCard,
+  PlanCriterionRatingRow, PlanWizardShell, PlanCreationWizard (with the direct-use and software
+  licence notices), in `components/plans/` and `features/projects/PlanPhase.svelte`, shown in the
+  Participation tab for the selected phase. Styles: `styles/plans.css`, `styles/wizard.css`.
+- Tests: `tests/scenarios/tests/plans.rs` (an approved plan lets the project leave its plan phase;
+  ratings pick the leader and its subtype shapes the phases); `tests/e2e/governance.mjs` files a
+  production plan in the wizard, both founders rate and approve it, and the project moves on.
+- The plan sheet updates at once and queues its writes (`DetailState.inTurn`): concurrent writes
+  to one source chain are refused by the conductor.
+- Not yet: the challenge window for under-counted populations, phase reverts, links between
+  projects, value criteria (with project values), showing refused rating/vote writes in the sheet.

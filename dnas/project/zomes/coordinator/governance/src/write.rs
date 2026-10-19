@@ -4,10 +4,12 @@
 use hdk::prelude::*;
 use project_integrity::{EntryTypes, LinkTypes, Outcome, Proposal, ProposalKind, Vote, VoteChoice};
 use sp_governance::phases::{next_phase, signal_gate_met, Phase, Shape};
+use sp_governance::plans::{required_plan_kind, Leader};
 use sp_governance::{tally, Choice, Tally, Threshold, Verdict};
 
+use crate::apply::{self, Standing, State};
 use crate::reads::{self, Found};
-use crate::{apply, calls};
+use crate::{calls, plan_write, plans};
 
 pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
@@ -21,9 +23,19 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     if charter.mode == "personal-service" {
         return Err(guest("Personal services don't take proposals."));
     }
-    if let ProposalKind::Phase { to } = &kind {
-        check_phase_move(&charter.mode, &charter.subtype, to)?;
-    }
+    let kind = match kind {
+        ProposalKind::Phase { to, .. } => {
+            let state = apply::state(&mut Standing::default())?;
+            let plan = check_phase_move(&state, &to)?;
+            ProposalKind::Phase { to, plan }
+        }
+        ProposalKind::Plan(plan) => {
+            let state = apply::state(&mut Standing::default())?;
+            ProposalKind::Plan(plan_write::prepare(&state, plan)?)
+        }
+        other => other,
+    };
+    let is_plan = matches!(kind, ProposalKind::Plan(_));
     let members = calls::member_snapshot()?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         kind,
@@ -31,23 +43,23 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         members,
     }))?;
     create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;
-    // The proposer's own Yes comes with the proposal (web's proposer vote).
-    vote(hash.clone(), VoteChoice::Yes)?;
+    // The proposer's own Yes comes with the proposal (web's proposer vote). Plans are
+    // assessed first, and their authors vote like everyone else (web's plan flow).
+    if !is_plan {
+        vote(hash.clone(), VoteChoice::Yes)?;
+    }
     Ok(hash)
 }
 
-/// A phase move must be the next phase, and leaving Proposal needs ≥ 66% demand (ADR 0033).
-fn check_phase_move(mode: &str, subtype: &str, to: &str) -> ExternResult<()> {
+/// A phase move must be the next phase; leaving Proposal needs ≥ 66% demand (ADR 0033), and
+/// leaving a plan phase needs an approved leading plan, which the move cites (ADR 0039).
+fn check_phase_move(state: &State, to: &str) -> ExternResult<Option<ActionHash>> {
     let shape = Shape {
-        mode,
-        subtype,
+        mode: state.mode(),
+        subtype: state.subtype(),
         include_access: false,
     };
-    let current = apply::applied()?
-        .phase
-        .as_deref()
-        .and_then(Phase::parse)
-        .unwrap_or(Phase::P1);
+    let current = state.phase();
     if next_phase(shape, current).map(Phase::id) != Some(to) {
         return Err(guest("A project can only move to its next phase."));
     }
@@ -59,7 +71,15 @@ fn check_phase_move(mode: &str, subtype: &str, to: &str) -> ExternResult<()> {
             ));
         }
     }
-    Ok(())
+    let Some(kind) = required_plan_kind(shape, current) else {
+        return Ok(None);
+    };
+    match plans::leader(&state.approved, kind) {
+        Leader::One(plan) => Ok(Some(plan)),
+        _ => Err(guest(
+            "An approved plan is required before advancing this project phase.",
+        )),
+    }
 }
 
 pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash> {

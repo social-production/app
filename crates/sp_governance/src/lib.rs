@@ -3,6 +3,7 @@
 //! reaches the same verdict. See docs/GOVERNANCE.md.
 
 pub mod phases;
+pub mod plans;
 pub mod projects;
 pub mod quorum;
 pub mod standing;

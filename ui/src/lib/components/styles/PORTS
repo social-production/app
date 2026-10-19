@@ -41,3 +41,14 @@ governance.css    .update-sheet   web/src/lib/components/shared/AddUpdateSheet.s
 governance.css    .phase-bar      web/src/lib/features/detail/DetailPhaseStepper.svelte
 governance.css    .updates-shell  web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte
 governance.css    .update-card    web/src/lib/components/cards/details/DetailUpdateCard.svelte
+chat.css          .chat-panel     web/src/lib/components/chat/LiveChatPanel.svelte
+chat.css          .chat-shell     web/src/lib/features/projects/detail/ProjectChatTab.svelte
+confirm.css       .confirm-root   web/src/lib/components/shared/ConfirmHost.svelte
+plans.css         .phase-surface  web/src/lib/features/projects/detail/lifecycle/productive/phases/ProjectLifecyclePlanPhaseContent.svelte
+plans.css         .phase-empty    web/src/lib/components/shared/PhaseEmptyState.svelte
+plans.css         .plan-scope     web/src/lib/components/cards/project-detail/CollapsiblePlanCard.svelte
+plans.css         .criterion-row  web/src/lib/components/shared/PlanCriterionRatingRow.svelte
+wizard.css        .wizard-backdrop web/src/lib/components/shared/PlanWizardShell.svelte
+wizard.css        .plan-wizard    web/src/lib/components/shared/PlanCreationWizard.svelte
+wizard.css        .plan-wizard    web/src/lib/components/shared/DirectUsePolicyNotice.svelte
+wizard.css        .plan-wizard    web/src/lib/components/shared/SoftwareLicenseNotice.svelte

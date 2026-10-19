@@ -14,6 +14,7 @@
   import Topbar from '#lib/components/shell/Topbar.svelte';
   import { connect } from '#lib/services/account.ts';
   import { getPerson } from '#lib/services/people.ts';
+  import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
@@ -30,8 +31,11 @@
   const signedIn = $derived(connection.current.status === 'connected');
   // "Sign in / Sign up" hides the intro banner; the sign-in card below it stays.
   const topbarHeight = $derived(compact ? 52 : 53);
+  // web's immersiveChat: on phones an open detail chat hides the top bar and bottom nav.
+  const immersive = $derived(compact && chatChrome.immersive);
+  const shellTopbarHeight = $derived(immersive ? 0 : topbarHeight);
   const frameMaxWidth = $derived(!compact && !leftOpen && !rightOpen ? 'min(80%, 1200px)' : 'none');
-  const bottomNav = $derived(compact ? 'var(--shell-bottom-nav-height)' : '0px');
+  const bottomNav = $derived(compact && !immersive ? 'var(--shell-bottom-nav-height)' : '0px');
   const tabs: { href: ResolvedPathname; label: string; icon: string }[] = [
     { href: resolve('/'), label: 'Home', icon: 'home' },
     { href: resolve('/notifications'), label: 'Notifications', icon: 'bell' },
@@ -98,10 +102,12 @@
   class="shell"
   data-signed-in={signedIn}
   class:shell-compact={compact}
-  style={`--left-width: ${leftOpen && !compact ? '262px' : '0px'}; --right-width: ${rightOpen && !compact ? '292px' : '0px'}; --topbar-height: ${topbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${compact ? '0px' : 'var(--shell-safe-bottom)'}; --main-frame-max-width: ${frameMaxWidth};`}
+  class:feed-chrome-collapsed={immersive}
+  style={`--left-width: ${leftOpen && !compact ? '262px' : '0px'}; --right-width: ${rightOpen && !compact ? '292px' : '0px'}; --topbar-height: ${shellTopbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${bottomNav === '0px' ? 'var(--shell-safe-bottom)' : '0px'}; --main-frame-max-width: ${frameMaxWidth};`}
 >
   <Topbar
     {compact}
+    collapsed={immersive}
     {signedIn}
     viewerName={viewer.name}
     {leftOpen}
@@ -151,7 +157,7 @@
     </aside>
   </div>
 
-  {#if compact}
+  {#if compact && !immersive}
     <MobileBottomNav
       {tabs}
       {isActive}
