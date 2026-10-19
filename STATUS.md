@@ -8,6 +8,24 @@ below is on GitHub; nothing important lives only on the owner's PC.
 To start a cloud session, open claude.ai/code on `social-production/app` and say: "Read STATUS.md
 and continue from the first unfinished step."
 
+## Owner decisions (2026-10-19, cloud handoff)
+- **Port only from web.** Never invent screens, tabs or features that web doesn't have on that
+  page. web's old site is the public repo github.com/social-production/web
+  (`git clone --depth 1 https://github.com/social-production/web ../web`); compare with live web
+  (read-only) at https://web-production-885ec.up.railway.app, at 390px first.
+- **No discussion threads on project or event pages.** Do NOT merge `claude/m4b-threads` (it adds
+  an invented Threads tab after Chat). It is parked; its `discussion` zome may be reused later for
+  web's channels/communities, but only when those screens are ported from web.
+- Cloud sessions may merge a PR to `main` once its CI is green. Merging deploys. Never push
+  straight to `main`.
+- Cloud work order: (1) PR #1 → merge → smoke → README/STATUS docs PR; (2) Take part layout
+  (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
+  (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
+  window), open a PR.
+
+## In flight (cloud session 2026-10-19)
+- 11:34 UTC: PR #1 CI (`check`) running since 11:21; waiting for green to merge.
+
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
 - Deployed `main`: `65b5cfd`. Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
@@ -64,7 +82,7 @@ after this was written; `git log origin/main..origin/<branch>`.
   for return/challenge, weekly-active counting. Note: `scripts/port-styles.py` finds `web/`
   relative to the checkout, so it doesn't work from a worktree. Before merging, run scenarios
   `reverts.rs`, `challenges.rs`, `governance.rs`, `plans.rs` (outcome/vote/close changed).
-- `claude/m4b-threads`: discussion threads/posts/comments/votes in the `discussion` zome + web's
+- `claude/m4b-threads` (**parked, do not merge**, see Owner decisions): discussion threads/posts/comments/votes in the `discussion` zome + web's
   screens (ADR 0041, "M4b as built" in `docs/plans/M4-talk.md`).
 - To finish each, after PR #1 is merged: rebase or merge `main` into it, read the diff (look out
   for hand-written layout where web has a component, as in Step 2), run the checks, add a browser
