@@ -200,7 +200,10 @@ async fn leaving_proposal_needs_demand_then_a_vote() {
             },
         )
         .await;
-    assert!(blank.is_err(), "web asks for a reason for every phase change");
+    assert!(
+        blank.is_err(),
+        "web asks for a reason for every phase change"
+    );
 
     net.demand_all().await;
     let id: ActionHash = net.call(0, "governance", "propose", to_plan).await;
