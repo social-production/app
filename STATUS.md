@@ -24,7 +24,9 @@ and continue from the first unfinished step."
   window), open a PR.
 
 ## In flight (cloud session 2026-10-19)
-- 11:34 UTC: PR #1 CI (`check`) running since 11:21; waiting for green to merge.
+- PR #1's first CI run was cancelled at its 60-minute job timeout while the scenarios were
+  still passing (governance ~21 min, health ~10). The timeout is now 150 min (`ci.yml`); waiting
+  for green to merge. Next: `claude/take-part-layout` (Step 2), started locally, not pushed yet.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
