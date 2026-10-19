@@ -50,7 +50,8 @@ and continue from the first unfinished step."
   restoring `ChallengeList.svelte` from `a0ce970`.
 
 ## Cloud environment notes
-- The proxy blocks GitHub tarball downloads for repos outside the session, which `nix develop`
+- `scripts/cloud-nix.sh <cmd>` runs a command in the dev shell when the proxy blocks GitHub
+  tarball downloads for repos outside the session, which `nix develop`
   needs for flake inputs. Workaround: fetch them over git with `--override-input <path>
   'git+https://github.com/<owner>/<repo>?rev=<locked rev>&shallow=1'` for every GitHub node in
   `flake.lock` (plus `--no-write-lock-file`); the Holochain cachix cache is reachable once
