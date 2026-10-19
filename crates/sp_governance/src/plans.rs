@@ -86,8 +86,8 @@ pub fn required_plan_kind(shape: Shape<'_>, current: Phase) -> Option<PlanKind> 
     }
 }
 
-/// One rubric question. Value criteria (web's "How well does this plan satisfy …") arrive with
-/// project values.
+/// One rubric question. Value criteria (web's "How well does this plan satisfy …") come from
+/// project values (`values`).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Criterion {
     pub id: &'static str,

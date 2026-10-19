@@ -42,3 +42,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0038](./0038-project-chat.md) Project chat: anyone may post, authors delete, and the chat is polled
 - [0039](./0039-project-plans.md) Plans are proposals; ratings pick the leader; phase moves cite it
 - [0040](./0040-phase-returns-and-count-challenges.md) Phase returns are proposals; challenges reopen under-counted decisions
+- [0041](./0041-project-values.md) Project values are records; prominent ones become plan criteria

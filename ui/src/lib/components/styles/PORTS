@@ -58,3 +58,7 @@ wizard.css        .wizard-backdrop web/src/lib/components/shared/PlanWizardShell
 wizard.css        .plan-wizard    web/src/lib/components/shared/PlanCreationWizard.svelte
 wizard.css        .plan-wizard    web/src/lib/components/shared/DirectUsePolicyNotice.svelte
 wizard.css        .plan-wizard    web/src/lib/components/shared/SoftwareLicenseNotice.svelte
+values.css        .value-phase    web/src/lib/features/projects/detail/lifecycle/productive/phases/ProductiveLifecyclePhaseOne.svelte
+values.css        .scale          web/src/lib/components/shared/DiscreteScale.svelte
+values.css        .value-card     web/src/lib/components/cards/project-detail/ProjectValueCard.svelte
+values.css        .value-sheet    web/src/lib/components/shared/AddValueSheet.svelte

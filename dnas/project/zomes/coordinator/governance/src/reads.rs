@@ -1,4 +1,4 @@
-//! Reading proposals, votes and outcomes off the DHT, plus the caller's own fresh writes.
+//! Reading proposals, votes, outcomes and values off the DHT, plus the caller's own fresh writes.
 
 use std::collections::BTreeMap;
 
@@ -106,7 +106,7 @@ pub fn outcomes(proposal: &ActionHash) -> ExternResult<Vec<Found<Outcome>>> {
 /// Every rating on `proposal`: the network's, plus the caller's own (fresh writes lag).
 pub fn ratings(proposal: &ActionHash) -> ExternResult<Vec<Found<Rating>>> {
     let all = linked::<Rating>(
-        proposal,
+        proposal.clone(),
         LinkTypes::ProposalToRatings,
         UnitEntryTypes::Rating,
     )?;
@@ -119,7 +119,7 @@ pub fn ratings(proposal: &ActionHash) -> ExternResult<Vec<Found<Rating>>> {
 /// Every challenge to `proposal`'s count, the caller's own included.
 pub fn challenges(proposal: &ActionHash) -> ExternResult<Vec<Found<Challenge>>> {
     let all = linked::<Challenge>(
-        proposal,
+        proposal.clone(),
         LinkTypes::ProposalToChallenges,
         UnitEntryTypes::Challenge,
     )?;
@@ -129,13 +129,13 @@ pub fn challenges(proposal: &ActionHash) -> ExternResult<Vec<Found<Challenge>>> 
         .collect())
 }
 
-/// Records linked from `proposal`, plus the caller's own records of that type.
-fn linked<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
-    proposal: &ActionHash,
+/// Records linked from `base`, plus the caller's own records of that type.
+pub fn linked<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
+    base: impl Into<AnyLinkableHash>,
     link_type: LinkTypes,
     entry_type: UnitEntryTypes,
 ) -> ExternResult<Vec<Found<T>>> {
-    let mut hashes: Vec<ActionHash> = targets(proposal.clone(), link_type)?
+    let mut hashes: Vec<ActionHash> = targets(base, link_type)?
         .into_iter()
         .map(|(_, h)| h)
         .collect();

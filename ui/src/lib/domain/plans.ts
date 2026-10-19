@@ -33,6 +33,8 @@ export interface Plan {
 export interface PlanCriterion {
   id: string;
   label: string;
+  /** A rubric question, or one of the project's prominent values (ADR 0041). */
+  kind: 'Rubric' | 'Value';
   mine: PlanRating | null;
   count: number;
   /** 0 when unrated. */

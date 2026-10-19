@@ -33,3 +33,15 @@
 .phase-menu-scope {
   display: contents;
 }
+
+/* app/ui: web's AddValueSheet shows no errors (its page refreshes); here a refused value (already
+   listed, Proposal phase over) shows in the sheet, styled like AddUpdateSheet's warning. */
+.value-sheet .warning-card {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--status-yellow) 50%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--status-yellow) 14%, var(--panel-strong));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}

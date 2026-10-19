@@ -26,12 +26,12 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - Commit messages: one plain sentence describing the user-visible effect.
 
 ## Checks (inside `nix develop --accept-flake-config`)
-- Everything CI runs: `bash scripts/check-all.sh`.
+- Everything CI runs: `bash scripts/check-all.sh` (= `check-fast.sh` + `check-scenarios.sh`; CI runs the scenarios as 4 parallel shards, `check-scenarios.sh <shard> 4`).
 - Fast loop: `cargo test -p sp_governance`, `npm run check -w ui`, `bash scripts/check-boundaries.sh`.
 - Pack: `bash scripts/build-happ.sh` (zomes → 3 DNAs → hApp). Scenarios: `npm run test:scenarios`.
 - Local seed node (bootstrap + conductor + gateway on :8080, dev founders from `tests/e2e/fixtures/dev-founders.json`): `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`.
 - Browser tests against it: `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`.
-- Ported styles: add to `ui/src/lib/components/styles/PORTS`, run `python3 scripts/port-styles.py` (never hand-edit the CSS).
+- Ported styles: add to `ui/src/lib/components/styles/PORTS`, run `python3 scripts/port-styles.py` (never hand-edit the CSS), then `npx prettier --write` the new file. Regenerating rewrites every file from today's web: keep only the files you meant to port unless you are reviewing web's drift.
 - UI dev: `npm run dev:ui` (set `VITE_SP_GATEWAYS`, see `ui/.env.example`).
 
 ## Deploy

@@ -57,6 +57,8 @@ pub struct Tally {
 #[derive(Deserialize, Debug)]
 pub struct Criterion {
     pub id: String,
+    pub label: String,
+    pub kind: String,
     pub mine: Option<u8>,
     pub count: u32,
 }

@@ -2,19 +2,22 @@
 //! The creator is named in the clone's network seed (`<creator key>.<nonce>`), so every member
 //! agrees who it is and every node derives the same DNA hash from one plain string.
 //! Membership and signals are links whose target is their author, so they need no entries.
-//! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033).
+//! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
+//! importance votes are records too (ADR 0041).
 
 mod challenge;
 mod charter;
 mod governance;
 mod links;
 mod plan;
+mod value;
 
 use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
 
 pub use governance::SNAPSHOT_MAX;
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
+pub use value::{Importance, Value};
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
@@ -122,6 +125,8 @@ pub enum EntryTypes {
     Outcome(Outcome),
     Rating(Rating),
     Challenge(Challenge),
+    Value(Value),
+    Importance(Importance),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -141,6 +146,10 @@ pub enum LinkTypes {
     ProposalToRatings,
     /// Proposal → a challenge to its count.
     ProposalToChallenges,
+    /// "values" anchor → value.
+    Values,
+    /// Value → a member's importance vote.
+    ValueToImportance,
 }
 
 /// The project's creator, from the network seed; `None` in the (unused) base cell.
@@ -174,6 +183,8 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::Outcome(o) => governance::validate_outcome(&o, &action),
             EntryTypes::Rating(r) => plan::validate_rating(&r, &action),
             EntryTypes::Challenge(c) => challenge::validate(&c, &action),
+            EntryTypes::Value(v) => value::validate_value(&v, &action),
+            EntryTypes::Importance(i) => value::validate_importance(&i, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })

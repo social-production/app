@@ -3,10 +3,12 @@
 use hdk::prelude::*;
 use project_integrity::{check_plan, EntryTypes, LinkTypes, Plan, ProposalKind, Rating};
 use sp_governance::plans::{criteria, rating_ok};
+use sp_governance::values::parse_criterion;
 
 use crate::apply::State;
 use crate::calls;
 use crate::reads;
+use crate::values;
 use crate::write::guest;
 
 /// web's `_assert_plan_type_allowed` and `_assert_plan_phase_is_current`. Production and
@@ -48,10 +50,15 @@ pub fn rate(input: RateInput) -> ExternResult<ActionHash> {
     let ProposalKind::Plan(plan) = found.entry.kind else {
         return Err(guest("Only plans are rated."));
     };
-    if !criteria(plan.kind, plan.subtype_or_standard())
-        .iter()
-        .any(|c| c.id == input.criterion)
-    {
+    let known = match parse_criterion(&input.criterion) {
+        Some(_) => values::listed()?
+            .iter()
+            .any(|v| values::criterion_of(&v.hash) == input.criterion),
+        None => criteria(plan.kind, plan.subtype_or_standard())
+            .iter()
+            .any(|c| c.id == input.criterion),
+    };
+    if !known {
         return Err(guest("Unknown plan criterion."));
     }
     if input.rating.is_some_and(|r| !rating_ok(r)) {

@@ -10,6 +10,7 @@ pub mod quorum;
 pub mod returns;
 pub mod standing;
 pub mod tally;
+pub mod values;
 
 pub use quorum::required_votes;
 pub use standing::StandingLevel;

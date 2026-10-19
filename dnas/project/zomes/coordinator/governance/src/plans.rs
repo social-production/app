@@ -5,10 +5,8 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{Plan, ProposalKind, Rating};
-use sp_governance::plans::{
-    criteria, pick_leader, summarize, Candidate, Leader, PlanKind, Ratings, Score,
-};
+use project_integrity::{ProposalKind, Rating};
+use sp_governance::plans::{pick_leader, summarize, Candidate, Leader, PlanKind, Ratings, Score};
 
 use crate::decide::{Decision, Standing};
 use crate::reads::{self, Found};
@@ -39,7 +37,7 @@ pub fn approved(
         if !plan.kind.allowed(mode) {
             continue;
         }
-        let ratings = rated(&d.proposal.hash, d.proposal.at, plan, standing)?;
+        let ratings = rated(&d.proposal.hash, d.proposal.at, standing)?;
         out.push(Approved {
             hash: d.proposal.hash.clone(),
             kind: plan.kind,
@@ -47,7 +45,7 @@ pub fn approved(
             yes: d.yes,
             no: d.no,
             at: d.at,
-            score: Score::of(&ratings.iter().map(|(_, r)| *r).collect::<Vec<_>>()),
+            score: score(&ratings),
         });
     }
     Ok(out)
@@ -81,14 +79,13 @@ pub fn live_subtype(approved: &[Approved]) -> Option<String> {
         })
 }
 
-/// Each rubric criterion's ratings from members with Full standing before the plan, latest
-/// rating per member (ADR 0039).
+/// Every rated criterion's ratings (rubric or value; integrity checked the criterion) from
+/// members with Full standing before the plan, latest rating per member (ADR 0039, 0041).
 pub fn rated(
     proposal: &ActionHash,
     proposed_at: Timestamp,
-    plan: &Plan,
     standing: &mut Standing,
-) -> ExternResult<Vec<(&'static str, Ratings)>> {
+) -> ExternResult<BTreeMap<String, Ratings>> {
     let mut values: BTreeMap<String, Vec<u8>> = BTreeMap::new();
     for r in latest_ratings(proposal)? {
         if let Some(value) = r.entry.rating {
@@ -97,16 +94,15 @@ pub fn rated(
             }
         }
     }
-    let rubric = criteria(plan.kind, plan.subtype_or_standard());
-    Ok(rubric
+    Ok(values
         .into_iter()
-        .map(|c| {
-            (
-                c.id,
-                summarize(values.get(c.id).map_or(&[][..], Vec::as_slice)),
-            )
-        })
+        .map(|(id, v)| (id, summarize(&v)))
         .collect())
+}
+
+/// web's `plan_average_rating`: the mean over every rated criterion.
+pub fn score(rated: &BTreeMap<String, Ratings>) -> Score {
+    Score::of(&rated.values().copied().collect::<Vec<_>>())
 }
 
 /// Each member's latest rating per criterion, from the network and the caller's own chain.

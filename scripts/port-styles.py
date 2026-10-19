@@ -9,6 +9,7 @@ usage: scripts/port-styles.py                 regenerate everything listed in PO
 """
 import re
 import sys
+import textwrap
 from pathlib import Path
 
 
@@ -72,7 +73,8 @@ def port(css: str, root: str) -> str:
 
 def ported_block(src: str, root: str) -> str:
     text = Path(src).read_text()
-    css = text[text.index("<style>") + 7 : text.rindex("</style>")]
+    # Some web checkouts indent <style> contents; output is always flush left.
+    css = textwrap.dedent(text[text.index("<style>") + 7 : text.rindex("</style>")])
     web_path = src[src.index("web/") :] if "web/" in src else src
     return f"/* Ported from {web_path} (ADR 0032, scripts/port-styles.py) */\n{port(css, root)}\n"
 
