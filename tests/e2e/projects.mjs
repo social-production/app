@@ -33,6 +33,8 @@ async function waitInFeed(page, text, path = '/') {
     await page.goto(`${BASE}${path}`);
     await page.locator('.feed-page').waitFor();
     await page.locator('.empty-card, .project-card').first().waitFor({ timeout: 60_000 });
+    // "Loading feed..." is an .empty-card too; count only once the feed has loaded.
+    await page.getByText('Loading feed...').waitFor({ state: 'detached', timeout: 60_000 });
     if (await page.locator('.project-card', { hasText: text }).count()) return (Date.now() - t0) / 1000;
     if (Date.now() - t0 > 180_000) throw new Error(`${text} not in the feed after 3 min`);
     await page.waitForTimeout(3000);
