@@ -219,7 +219,7 @@
       {/if}
       <button type="button" role="menuitem" onclick={() => copy(target)}>Copy</button>
       {#if target.own && !target.pending}
-        <button type="button" role="menuitem" onclick={() => ((menu = null), (confirming = target))}
+        <button type="button" role="menuitem" onclick={() => ((confirming = target), (menu = null))}
           >Delete</button
         >
       {/if}

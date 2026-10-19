@@ -9,7 +9,8 @@ port=4174
 curl -sf -o /dev/null http://localhost:8080/readyz || { echo "local seed node isn't running"; exit 1; }
 VITE_SP_GATEWAYS=http://localhost:8080 npm run build -w ui >/dev/null
 
-(cd ui && exec npx vite preview --port "$port" --strictPort) >/dev/null 2>&1 &
+# vite itself, not npx: killing npx on exit would leave vite holding the port for the next run.
+(cd ui && exec ../node_modules/.bin/vite preview --port "$port" --strictPort) >/dev/null 2>&1 &
 preview=$!
 trap 'kill "$preview" 2>/dev/null || true' EXIT
 until curl -sf -o /dev/null "http://localhost:$port"; do sleep 0.5; done

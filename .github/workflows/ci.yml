@@ -12,7 +12,8 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The scenarios alone take ~60 min on a hosted runner (governance ~21 min, health ~10).
+    timeout-minutes: 150
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23

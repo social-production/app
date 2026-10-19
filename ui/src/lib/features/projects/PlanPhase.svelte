@@ -1,6 +1,7 @@
 <script lang="ts">
   import PlanCard from '#lib/components/plans/PlanCard.svelte';
   import PlanWizard from '#lib/components/plans/PlanWizard.svelte';
+  import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { PlanKind, Plan } from '#lib/domain/plans.ts';
 
@@ -78,15 +79,15 @@
       {/if}
     </div>
 
-    {#if canSubmit}
-      <div class="plan-toolbar">
+    <PhaseWorkToolbar>
+      {#if canSubmit}
         <RoundPlusButton
           standout
           active={composing}
           label="Add plan"
           onclick={() => (composing = !composing)}
         />
-      </div>
-    {/if}
+      {/if}
+    </PhaseWorkToolbar>
   </section>
 {/if}

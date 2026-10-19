@@ -74,9 +74,12 @@ Production/distribution/operations/access plans with criteria and assessments (w
   licence notices), in `components/plans/` and `features/projects/PlanPhase.svelte`, shown in the
   Participation tab for the selected phase. Styles: `styles/plans.css`, `styles/wizard.css`.
 - Tests: `tests/scenarios/tests/plans.rs` (an approved plan lets the project leave its plan phase;
-  ratings pick the leader and its subtype shapes the phases).
+  ratings pick the leader and its subtype shapes the phases); `tests/e2e/governance.mjs` files a
+  production plan in the wizard, both founders rate and approve it, and the project moves on.
+- The plan sheet updates at once and queues its writes (`DetailState.inTurn`): concurrent writes
+  to one source chain are refused by the conductor.
 - Not yet: the challenge window for under-counted populations, phase reverts, links between
-  projects, value criteria (with project values), a browser test for the plan wizard.
+  projects, value criteria (with project values), showing refused rating/vote writes in the sheet.
 
 ## M3c as built (2026-10-19)
 Phase returns from web, and the challenge window for under-counted populations (ADR 0040).
@@ -96,15 +99,15 @@ Phase returns from web, and the challenge window for under-counted populations (
   views carry `added`, `missing`, `challenge_until` and `can_challenge`; the project view carries
   `returns`.
 - **UI**: web's return composer (`ReturnSheet`, styles ported from
-  `ProjectPhaseChangeSection.svelte` into `governance.css` as `.return-sheet`) behind a "Return to
-  an earlier phase" button in the Participation tab, with web's lock reason while a phase vote is
-  open. The vote sheet shows a return's "Why" and notes a challenged or incomplete count.
-  `ChallengeList` (app-only, styled in `additions.css`) lists decisions members can still
-  challenge.
+  `ProjectPhaseChangeSection.svelte` into `governance.css` as `.return-sheet`), opened from the
+  "Return to an earlier phase" item of web's Phase ▾ menu (`PhaseChangeSection`), with web's lock
+  reason while a phase vote is open. The vote sheet shows a return's "Why" and notes a challenged
+  or incomplete count.
 - **Differences from web**:
-  - web groups advance and return under its Phase ▾ menu (`PhaseMenu`) in the phase toolbar.
-    Here the M3a advance button stays and Return is a second button, until the toolbar is ported.
   - web has no challenges at all. They exist here because no server counts the population.
+    There is no screen for them yet: an app-only `ChallengeList` was built, then dropped to keep
+    to "port only from web" (owner to decide; restore it from `a0ce970`). Challenges are reachable
+    through the zome (`challenge`) and the scenarios.
   - Decisions apply at once and stay challengeable for 48 hours, rather than waiting out the
     window as GOVERNANCE.md first proposed.
 - **Tests**:

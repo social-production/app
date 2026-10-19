@@ -8,6 +8,7 @@
 
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
+  import ParticipationDock from './ParticipationDock.svelte';
   import ParticipationPanel from './ParticipationPanel.svelte';
   import ProjectChat from './ProjectChat.svelte';
   import ProjectDock from './ProjectDock.svelte';
@@ -90,6 +91,12 @@
           hidden={tab !== 'participation'}
           inert={tab !== 'participation'}
         >
+          <ParticipationDock
+            {detail}
+            active={tab === 'participation'}
+            membersOpen={sheet === 'members'}
+            onOpenMembers={() => (sheet = 'members')}
+          />
           <ParticipationPanel {detail} />
         </div>
         {#if chatOpened}
@@ -107,7 +114,7 @@
             />
           </div>
         {/if}
-        {#if tab !== 'chat'}
+        {#if tab === 'context'}
           <ProjectDock
             {detail}
             membersOpen={sheet === 'members'}
