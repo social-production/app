@@ -24,6 +24,9 @@ export const toolbarIcons: Record<string, string> = {
   wifi: '<path d="M5 9.5a11 11 0 0 1 14 0M8 13a6.5 6.5 0 0 1 8 0M10.5 16.5a2.5 2.5 0 0 1 3 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /> <circle cx="12" cy="19" r="1.2" fill="currentColor" />',
   map: '<path d="M5 6.5 9 4.5l5 2.5 5-2.5v13l-5 2.5-5-2.5-4 2V6.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M9 4.5v13M14 7v13" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" fill="none" />',
   list: '<path d="M5 7h14M5 12h14M5 17h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
+  // web's SurfaceIcon "thread" glyph, for the project's Threads tab.
+  thread:
+    '<path d="M5 6h14M5 12h10M5 18h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
   expand:
     '<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   compress:

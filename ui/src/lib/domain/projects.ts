@@ -137,4 +137,4 @@ export const PROJECT_TYPES: ProjectTypeOption[] = [
 export type LocationChoice = 'physical' | 'online' | 'later';
 
 /** A detail page's tabs (web's detailTabs.ts); each appears once its milestone lands. */
-export type DetailTabId = 'context' | 'participation' | 'chat' | 'links' | 'history';
+export type DetailTabId = 'context' | 'participation' | 'chat' | 'threads' | 'links' | 'history';

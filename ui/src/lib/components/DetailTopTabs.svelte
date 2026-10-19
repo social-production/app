@@ -18,6 +18,7 @@
     { id: 'context', label: 'Details', icon: 'list' },
     { id: 'participation', label: 'Participation', short: 'Take part', icon: 'people' },
     { id: 'chat', label: 'Chat', icon: 'message' },
+    { id: 'threads', label: 'Threads', icon: 'thread' },
     { id: 'links', label: 'Links', icon: 'link' },
     { id: 'history', label: 'History', icon: 'clock' },
   ];

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
@@ -14,8 +16,12 @@
 
   import '#lib/components/styles/detail.css';
 
-  /** web's ProjectDetailPage: Details, Participation and Chat tabs (links, history: M4–M5). */
-  let { id }: { id: string } = $props();
+  /**
+   * web's ProjectDetailPage: Details, Participation and Chat tabs, plus Threads (ADR 0041; web
+   * keeps threads in channels). The route passes the Threads tab in, as features don't import
+   * each other. Links and history arrive in M5.
+   */
+  let { id, threads }: { id: string; threads?: Snippet } = $props();
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
@@ -25,6 +31,7 @@
   let compact = $state(false);
   // As on web, the chat mounts (and starts polling) the first time its tab opens.
   let chatOpened = $state(false);
+  let threadsOpened = $state(false);
   const chatFull = $derived(tab === 'chat' && compact);
 
   $effect(() => {
@@ -43,6 +50,7 @@
 
   $effect(() => {
     if (tab === 'chat') chatOpened = true;
+    if (tab === 'threads') threadsOpened = true;
     chatChrome.immersive = chatFull;
     return () => {
       chatChrome.immersive = false;
@@ -66,7 +74,9 @@
       <section class="hero-card" class:chat-tab-active={chatFull}>
         <DetailTopTabs
           active={tab}
-          available={['context', 'participation', 'chat']}
+          available={threads
+            ? ['context', 'participation', 'chat', 'threads']
+            : ['context', 'participation', 'chat']}
           ariaLabel="Project detail tabs"
           onSelect={(t) => (tab = t)}
         />
@@ -105,6 +115,16 @@
               fullscreen={compact}
               active={tab === 'chat'}
             />
+          </div>
+        {/if}
+        {#if threads && threadsOpened}
+          <div
+            class="tab-panel threads-tab"
+            class:tab-panel-hidden={tab !== 'threads'}
+            hidden={tab !== 'threads'}
+            inert={tab !== 'threads'}
+          >
+            {@render threads()}
           </div>
         {/if}
         {#if tab !== 'chat'}

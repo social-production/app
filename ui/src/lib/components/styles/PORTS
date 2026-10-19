@@ -52,3 +52,10 @@ wizard.css        .wizard-backdrop web/src/lib/components/shared/PlanWizardShell
 wizard.css        .plan-wizard    web/src/lib/components/shared/PlanCreationWizard.svelte
 wizard.css        .plan-wizard    web/src/lib/components/shared/DirectUsePolicyNotice.svelte
 wizard.css        .plan-wizard    web/src/lib/components/shared/SoftwareLicenseNotice.svelte
+discussion.css    .pill           web/src/lib/components/cards/shared/CountPill.svelte
+discussion.css    .thread-card    web/src/lib/components/cards/public-feed/ThreadCard.svelte
+discussion.css    .thread-page    web/src/lib/features/threads/ThreadDetailPage.svelte
+discussion.css    .overview-shell web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte
+discussion.css    .discussion-shell web/src/lib/components/discussion/DiscussionPanel.svelte
+discussion.css    .comment-card   web/src/lib/components/discussion/DiscussionComment.svelte
+discussion.css    .composer-field web/src/lib/components/shared/CommentComposer.svelte

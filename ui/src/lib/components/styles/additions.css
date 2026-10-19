@@ -33,3 +33,23 @@
   display: flex;
   justify-content: flex-start;
 }
+
+/* app/ui: web starts threads from a channel's create menu; a project's Threads tab has its own
+   "New thread" button at the end of the feed toolbar. */
+.project-threads .threads-new {
+  margin-left: auto;
+}
+
+/* app/ui: web toasts a comment that failed to post; here the reason shows above the comments
+   and the draft stays. */
+.discussion-shell .discussion-error {
+  margin: 0;
+  color: var(--danger, #c0392b);
+  font-size: 13px;
+}
+
+/* app/ui: the thread page's loading / not-found line (web's loader shows its error page). */
+.thread-page .thread-status {
+  margin: 0;
+  color: var(--text-soft);
+}
