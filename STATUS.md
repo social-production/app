@@ -38,6 +38,12 @@ and continue from the first unfinished step."
   no reason field (integrity change), so the menu item files at once. M3c's Return already carries
   a reason: when M3c merges, add `reason` to `Phase` in the same integrity bump and port the
   sheet. M3c's "Return to an earlier phase" button should become a PhaseMenu item (web does).
+- `claude/m3c-reverts` (Step 3, reviewed, not merged/PR'd yet; waits for PR #1 and Step 2):
+  `ReturnSheet` is a faithful port of web's revert sheet (target select, reason, web's copy).
+  Two things to fix when merging main into it: its standalone "Return to an earlier phase"
+  button must become the `return` item of `PhaseMenu` (web's `phaseMenuItems`), and
+  `ChallengeList` ("Counts you can challenge") is **app-only** (web-backend has no challenge
+  window): flagged to the owner, who decides whether to keep it.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
