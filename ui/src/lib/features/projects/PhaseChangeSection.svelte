@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
+  import { portal } from '#lib/components/actions/portal.ts';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
   import { kindName } from '#lib/domain/governance.ts';
   import { planGateMessage, signalGateMet } from '#lib/domain/phaseCopy.ts';
@@ -28,6 +31,13 @@
   );
   const gatePasses = $derived(signalGatePasses && !planGate);
   const closing = $derived(project?.nextPhase?.id === 'phase-7');
+
+  // web's embedInToolbar: the menu goes into the phase toolbar's end slot when there is one.
+  let endHost = $state<HTMLElement | null>(null);
+  $effect(() => {
+    void shown;
+    void tick().then(() => (endHost = document.getElementById('phase-nav-end')));
+  });
 
   function lockReason(): string {
     if (phaseVoteOpen) return 'A phase vote is already open. Vote on it in Pending votes first.';
@@ -71,7 +81,15 @@
       </p>
     {/if}
     {#if detail.sheetMessage}<p class="warning-card" role="alert">{detail.sheetMessage}</p>{/if}
-    {#if items.length > 0}
+    {#if items.length > 0 && endHost}
+      <div class="phase-nav-side end" use:portal={endHost}>
+        <PhaseMenu
+          {items}
+          currentPhaseLabel={detail.phaseLabel(project.phase)}
+          labelledById="project-phase-menu"
+        />
+      </div>
+    {:else if items.length > 0}
       <div class="change-action-row">
         <div class="action-group action-group-right">
           <PhaseMenu

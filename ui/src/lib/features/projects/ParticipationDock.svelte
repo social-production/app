@@ -8,7 +8,8 @@
 
   /**
    * web's Take part dock (ProjectDetailPage's participation DetailActionDock): Join for people
-   * who aren't members yet, and the Vote control for everything but edits and updates.
+   * who aren't members yet, the phase's work toolbar (`PhaseWorkToolbar` moves in here), and the
+   * Vote control for everything but edits and updates.
    */
   interface Props {
     detail: DetailState;
@@ -38,6 +39,7 @@
         />
       </div>
     {/if}
+    <div id="detail-participation-actions"></div>
     {#if project.amMember}
       <VoteDock
         proposals={votes}

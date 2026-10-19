@@ -656,6 +656,144 @@
   line-height: 1.35;
 }
 
+/* Ported from web/src/lib/components/shared/PhaseWorkToolbar.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.phase-action-group:not(:has(button)) {
+  display: none;
+}
+
+.phase-action-group .adds,
+.phase-action-group .governance-row,
+.phase-action-group #phase-nav-vote,
+.phase-action-group .phase-nav-side {
+  display: contents;
+}
+
+.phase-action-group .adds:not(:has(button)),
+.phase-action-group .governance-row:not(:has(button)),
+.phase-action-group #phase-nav-vote:empty,
+.phase-action-group .phase-nav-side:empty {
+  display: none;
+}
+
+.phase-action-group .phase-nav-bar {
+  display: contents;
+}
+
+.phase-action-group .phase-menu-trigger.phase-menu-trigger {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  margin: 0;
+  border-width: 0;
+  border-radius: 0;
+}
+
+.phase-action-group .phase-nav-bar:not(:has(button)),
+.phase-action-group .phase-nav-bar .phase-action-slot:not(:has(button)) {
+  display: none;
+}
+
+.phase-action-group .phase-nav-bar .phase-action-slot {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.phase-action-group .phase-nav-bar .phase-action-slot .phase-nav-side.phase-nav-side {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.phase-action-group .phase-nav-bar .phase-shift-button.phase-shift-button {
+  flex: 1 1 0;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 10px;
+  justify-content: center;
+  border-radius: 0;
+  border-width: 0;
+  box-sizing: border-box;
+}
+
+.phase-action-group .phase-nav-bar .phase-shift-button .label {
+  white-space: normal;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.phase-action-group .phase-nav-bar:has(#phase-nav-start button) #phase-nav-end .phase-shift-button {
+  border-left: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+}
+
+.phase-action-group .phase-pack-cell:not(.row-start) {
+  border-left: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell.wrapped.row-start {
+  border-top: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell.round-plus-button.round-plus-button,
+.phase-action-group .phase-pack-cell.phase-shift-button.phase-shift-button {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  justify-content: center;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.phase-action-group .phase-pack-cell.vote-dock {
+  display: flex;
+  align-items: stretch;
+}
+
+.phase-action-group .phase-pack-cell.vote-dock .round-plus-button,
+.phase-action-group .phase-pack-cell.phase-nav-side .phase-shift-button {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.phase-action-group .phase-pack-cell .plus-label,
+.phase-action-group .phase-pack-cell .label {
+  white-space: normal;
+  line-height: 1.15;
+  text-align: center;
+}
+
 /* Ported from web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte (ADR 0032, scripts/port-styles.py) */
 .phase-change-stack .phase-gate-note {
   margin: 0 0 8px;

@@ -1,6 +1,7 @@
 <script lang="ts">
   import DetailPhaseContext from '#lib/components/governance/DetailPhaseContext.svelte';
   import PhaseStepper from '#lib/components/governance/PhaseStepper.svelte';
+  import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import { phaseProgressLabel, phaseSummary } from '#lib/domain/phaseCopy.ts';
   import { planKindFor } from '#lib/domain/plans.ts';
 
@@ -37,6 +38,10 @@
     <section class="phase-panel overview-phase-work">
       {#if planKind}
         <PlanPhase {detail} kind={planKind} />
+      {:else}
+        <!-- Each of web's phase contents carries a toolbar (Proposal's holds "Add value", not
+             ported yet); it gives the Phase menu its place in the dock. -->
+        <PhaseWorkToolbar />
       {/if}
       <PhaseChangeSection {detail} {shown} />
     </section>

@@ -42,7 +42,8 @@
 </script>
 
 {#if items.length > 0}
-  <span class="phase-menu">
+  <!-- A styling scope only (display: contents), so the trigger itself packs into toolbars. -->
+  <span class="phase-menu phase-menu-scope">
     <button
       class="phase-menu-trigger"
       class:muted={!hasChoice}

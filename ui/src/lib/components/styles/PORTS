@@ -42,6 +42,7 @@ governance.css    .update-sheet   web/src/lib/components/shared/AddUpdateSheet.s
 governance.css    .phase-bar      web/src/lib/features/detail/DetailPhaseStepper.svelte
 governance.css    .phase-context  web/src/lib/features/detail/DetailPhaseContext.svelte
 governance.css    .phase-menu     web/src/lib/components/shared/PhaseMenu.svelte
+governance.css    .phase-action-group web/src/lib/components/shared/PhaseWorkToolbar.svelte
 governance.css    .phase-change-stack web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte
 governance.css    .updates-shell  web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte
 governance.css    .update-card    web/src/lib/components/cards/details/DetailUpdateCard.svelte
