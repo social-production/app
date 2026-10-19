@@ -9,6 +9,7 @@ use sp_governance::{phases::Shape, required_votes};
 use crate::apply::{self, Standing, State};
 use crate::plans::{self, latest_ratings};
 use crate::reads::{self, Found};
+use crate::roll::Roll;
 use crate::views::{tally_view, TallyView};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -59,11 +60,12 @@ pub struct PlanBoard {
 pub fn board() -> ExternResult<PlanBoard> {
     let me = agent_info()?.agent_initial_pubkey;
     let mut standing = Standing::default();
-    let state = apply::state(&mut standing)?;
+    let roll = Roll::load()?;
+    let state = apply::state(&mut standing, &roll)?;
     let mut plans = Vec::new();
     for p in reads::proposals()? {
         if let ProposalKind::Plan(plan) = &p.entry.kind {
-            plans.push(view_of(&p, plan, &state, &mut standing, &me)?);
+            plans.push(view_of(&p, plan, &state, &mut standing, &me, &roll)?);
         }
     }
     plans.reverse();
@@ -94,6 +96,7 @@ fn view_of(
     state: &State,
     standing: &mut Standing,
     me: &AgentPubKey,
+    roll: &Roll,
 ) -> ExternResult<PlanView> {
     let rated = plans::rated(&p.hash, p.at, plan, standing)?;
     let mine: Vec<_> = latest_ratings(&p.hash)?
@@ -127,7 +130,7 @@ fn view_of(
         author: p.author.clone(),
         created_at: p.at,
         plan: plan.clone(),
-        tally: tally_view(p, me)?,
+        tally: tally_view(p, me, roll)?,
         approved: state.approved.iter().any(|a| a.hash == p.hash),
         leader,
         criteria,

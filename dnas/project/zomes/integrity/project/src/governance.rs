@@ -81,6 +81,15 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
         ProposalKind::Phase { to, .. } if Phase::parse(to).is_some() => Ok(()),
         ProposalKind::Phase { .. } => Err("unknown phase".into()),
         ProposalKind::Plan(plan) => crate::plan::check(plan),
+        ProposalKind::Return { to, reason } => {
+            if Phase::parse(to).is_none() {
+                return Err("unknown phase".into());
+            }
+            if reason.trim().is_empty() || reason.chars().count() > LONG_TEXT_MAX {
+                return Err("a return needs a reason".into());
+            }
+            Ok(())
+        }
     }
 }
 
@@ -100,7 +109,7 @@ pub fn validate_vote(
 }
 
 /// The claimed result must be what the cited votes (one per voter, neutrals not counted) give
-/// against the proposal's snapshot.
+/// against the proposal's snapshot, enlarged by the members its cited challenges add (ADR 0040).
 pub fn validate_outcome(
     o: &Outcome,
     action: &TypedAction<CreateData>,
@@ -126,7 +135,11 @@ pub fn validate_outcome(
             VoteChoice::Neutral => {}
         }
     }
-    let population = u32::try_from(proposal.members.len()).unwrap_or(u32::MAX);
+    let added = match crate::challenge::added(&o.proposal, &o.challenges, action.timestamp())? {
+        Ok(added) => added,
+        Err(reason) => return invalid(reason),
+    };
+    let population = u32::try_from(proposal.members.len() + added).unwrap_or(u32::MAX);
     let verdict = tally(&choices, population, Threshold::DEFAULT).verdict();
     let claimed = if o.passed {
         Verdict::Passed

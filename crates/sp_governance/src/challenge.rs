@@ -61,7 +61,10 @@ mod tests {
 
     #[test]
     fn the_window_is_48_hours_after_the_first_outcome() {
-        assert!(in_time(None, 1_000 * HOUR), "open proposals take challenges");
+        assert!(
+            in_time(None, 1_000 * HOUR),
+            "open proposals take challenges"
+        );
         assert!(in_time(Some(10 * HOUR), 58 * HOUR));
         assert!(!in_time(Some(10 * HOUR), 58 * HOUR + 1));
         assert_eq!(window_end(i64::MAX), i64::MAX, "no overflow");

@@ -1,42 +1,16 @@
-//! The applied state: what passed decisions changed (ADR 0033). For each closed proposal every
-//! visible vote cast before its first Outcome is recounted, keeping only voters with Full
-//! standing from before the proposal; it applies only if that recount passes.
-
-use std::collections::BTreeMap;
+//! The applied state: what passed decisions changed (ADR 0033), folded in the order they were
+//! decided (`decide`). Returns go back to an earlier planning phase (ADR 0040).
 
 use hdk::prelude::*;
-use project_integrity::{Applied, AppliedUpdate, Charter, Proposal, ProposalKind, VoteChoice};
+use project_integrity::{Applied, AppliedUpdate, Charter, ProposalKind};
 use sp_governance::phases::{next_phase, Phase, Shape};
 use sp_governance::plans::required_plan_kind;
-use sp_governance::Verdict;
+use sp_governance::returns::{can_return, reopens_subtype};
 
+pub use crate::decide::{Decision, Standing};
 use crate::plans::{self, Approved};
-use crate::reads::{self, Found};
-use crate::{calls, write};
-
-/// A passed proposal, with its recounted (eligible) votes.
-pub struct Decision {
-    pub at: Timestamp,
-    pub proposal: Found<Proposal>,
-    pub yes: u32,
-    pub no: u32,
-}
-
-/// Full-standing answers from the directory cell, asked once per (agent, proposal time).
-#[derive(Default)]
-pub struct Standing(BTreeMap<(AgentPubKey, Timestamp), bool>);
-
-impl Standing {
-    pub fn full(&mut self, agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
-        let key = (agent.clone(), at);
-        if let Some(full) = self.0.get(&key) {
-            return Ok(*full);
-        }
-        let full = calls::full_before(agent, at)?;
-        self.0.insert(key, full);
-        Ok(full)
-    }
-}
+use crate::roll::Roll;
+use crate::{calls, decide};
 
 /// Everything the decisions add up to, for the views and for the next proposal's checks.
 pub struct State {
@@ -68,14 +42,18 @@ impl State {
             .as_ref()
             .map_or("productive", |c| c.mode.as_str())
     }
+
+    pub fn shape(&self) -> Shape<'_> {
+        shape(self.mode(), self.subtype())
+    }
 }
 
 pub fn applied() -> ExternResult<Applied> {
-    Ok(state(&mut Standing::default())?.applied)
+    Ok(state(&mut Standing::default(), &Roll::load()?)?.applied)
 }
 
-pub fn state(standing: &mut Standing) -> ExternResult<State> {
-    let decisions = passed(standing)?;
+pub fn state(standing: &mut Standing, roll: &Roll) -> ExternResult<State> {
+    let decisions = decide::passed(standing, roll)?;
     let charter = calls::base_charter()?;
     let mode = charter.as_ref().map_or("", |c| c.mode.as_str());
     let approved = plans::approved(&decisions, mode, standing)?;
@@ -92,42 +70,7 @@ pub fn state(standing: &mut Standing) -> ExternResult<State> {
     })
 }
 
-/// Passed proposals whose recount passes too, in the order they closed.
-fn passed(standing: &mut Standing) -> ExternResult<Vec<Decision>> {
-    let mut passed = Vec::new();
-    for proposal in reads::proposals()? {
-        let Some(outcome) = reads::outcome(&proposal.hash)? else {
-            continue;
-        };
-        if !outcome.entry.passed {
-            continue;
-        }
-        let mut eligible = Vec::new();
-        for vote in reads::votes(&proposal.hash)?
-            .into_iter()
-            .filter(|v| v.at <= outcome.at)
-        {
-            if standing.full(&vote.author, proposal.at)? {
-                eligible.push(vote);
-            }
-        }
-        if write::tally_of(&proposal.entry, &eligible).verdict() == Verdict::Passed {
-            let count = |c: VoteChoice| {
-                u32::try_from(eligible.iter().filter(|v| v.entry.choice == c).count()).unwrap_or(0)
-            };
-            passed.push(Decision {
-                at: outcome.at,
-                yes: count(VoteChoice::Yes),
-                no: count(VoteChoice::No),
-                proposal,
-            });
-        }
-    }
-    passed.sort_by_key(|d| d.at);
-    Ok(passed)
-}
-
-/// Apply passed decisions in the order they closed.
+/// Apply passed decisions in the order they were decided.
 fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approved]) -> Applied {
     let mut out = Applied::default();
     let mut phase = Phase::P1;
@@ -156,6 +99,16 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     phase = next;
                     out.phase = Some(next.id().to_string());
                     out.subtype = subtype.or(out.subtype);
+                }
+            }
+            ProposalKind::Return { to, .. } => {
+                let Some(c) = charter else { continue };
+                if let Some(back) = phase_return(c, &out, phase, &to) {
+                    phase = back;
+                    out.phase = Some(back.id().to_string());
+                    if reopens_subtype(back) {
+                        out.subtype = None;
+                    }
                 }
             }
             // An approved plan changes nothing by itself; phase moves cite it.
@@ -196,6 +149,13 @@ fn phase_move(
     next_phase(shape(&charter.mode, &subtype), phase)
         .filter(|n| n.id() == to)
         .map(|n| (n, chosen))
+}
+
+/// A return applies only to an earlier planning phase the project shows from where it is now
+/// (web's `revertablePhaseIds`), so a return decided after another move may no longer apply.
+fn phase_return(charter: &Charter, so_far: &Applied, phase: Phase, to: &str) -> Option<Phase> {
+    let subtype = so_far.subtype.as_deref().unwrap_or(&charter.subtype);
+    Phase::parse(to).filter(|t| can_return(shape(&charter.mode, subtype), phase, *t))
 }
 
 fn shape<'a>(mode: &'a str, subtype: &'a str) -> Shape<'a> {

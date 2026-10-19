@@ -18,7 +18,7 @@ pub fn returnable(shape: Shape<'_>, current: Phase) -> Vec<Phase> {
         .collect()
 }
 
-/// web's "target_phase_id must be earlier than current_phase_id for revert", narrowed to the
+/// web refuses a target that is not earlier than the current phase; this narrows it to the
 /// phases the Return sheet offers.
 #[must_use]
 pub fn can_return(shape: Shape<'_>, current: Phase, to: Phase) -> bool {
@@ -80,7 +80,10 @@ mod tests {
         assert!(can_return(productive, P5, P2));
         assert!(!can_return(productive, P2, P2), "not the current phase");
         assert!(!can_return(productive, P2, P3), "not forward");
-        assert!(!can_return(productive, P7, P5), "Activity is not a planning phase");
+        assert!(
+            !can_return(productive, P7, P5),
+            "Activity is not a planning phase"
+        );
     }
 
     #[test]

@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{LinkTypes, Outcome, Proposal, Rating, UnitEntryTypes, Vote};
+use project_integrity::{Challenge, LinkTypes, Outcome, Proposal, Rating, UnitEntryTypes, Vote};
 
 pub const PROPOSALS: &str = "proposals";
 
@@ -87,38 +87,68 @@ pub fn votes(proposal: &ActionHash) -> ExternResult<Vec<Found<Vote>>> {
     Ok(first.into_values().collect())
 }
 
-/// The earliest outcome written for `proposal`.
-pub fn outcome(proposal: &ActionHash) -> ExternResult<Option<Found<Outcome>>> {
-    let mut found_outcomes = Vec::new();
+/// Every outcome written for `proposal`, earliest first. Which one decides it depends on its
+/// challenges (`count`, ADR 0040).
+pub fn outcomes(proposal: &ActionHash) -> ExternResult<Vec<Found<Outcome>>> {
+    let mut out = Vec::new();
     for (_, hash) in targets(proposal.clone(), LinkTypes::ProposalToOutcomes)? {
         if let Some(o) = found::<Outcome>(hash)? {
-            found_outcomes.push(o);
+            if o.entry.proposal == *proposal {
+                out.push(o);
+            }
         }
     }
-    Ok(found_outcomes.into_iter().min_by_key(|o| o.at))
+    out.sort_by(|a, b| (a.at, &a.hash).cmp(&(b.at, &b.hash)));
+    out.dedup_by(|a, b| a.hash == b.hash);
+    Ok(out)
 }
 
 /// Every rating on `proposal`: the network's, plus the caller's own (fresh writes lag).
 pub fn ratings(proposal: &ActionHash) -> ExternResult<Vec<Found<Rating>>> {
-    let mut hashes: Vec<ActionHash> = targets(proposal.clone(), LinkTypes::ProposalToRatings)?
+    let all = linked::<Rating>(
+        proposal,
+        LinkTypes::ProposalToRatings,
+        UnitEntryTypes::Rating,
+    )?;
+    Ok(all
+        .into_iter()
+        .filter(|r| r.entry.proposal == *proposal)
+        .collect())
+}
+
+/// Every challenge to `proposal`'s count, the caller's own included.
+pub fn challenges(proposal: &ActionHash) -> ExternResult<Vec<Found<Challenge>>> {
+    let all = linked::<Challenge>(
+        proposal,
+        LinkTypes::ProposalToChallenges,
+        UnitEntryTypes::Challenge,
+    )?;
+    Ok(all
+        .into_iter()
+        .filter(|c| c.entry.proposal == *proposal)
+        .collect())
+}
+
+/// Records linked from `proposal`, plus the caller's own records of that type.
+fn linked<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
+    proposal: &ActionHash,
+    link_type: LinkTypes,
+    entry_type: UnitEntryTypes,
+) -> ExternResult<Vec<Found<T>>> {
+    let mut hashes: Vec<ActionHash> = targets(proposal.clone(), link_type)?
         .into_iter()
         .map(|(_, h)| h)
         .collect();
     let mine = query(
         ChainQueryFilter::new()
-            .entry_type(EntryType::App(UnitEntryTypes::Rating.try_into()?))
+            .entry_type(EntryType::App(entry_type.try_into()?))
             .include_entries(true),
     )?;
     hashes.extend(mine.iter().map(|r| r.action_address().clone()));
     hashes.sort();
     hashes.dedup();
-    let mut out = Vec::new();
-    for hash in hashes {
-        if let Some(r) = found::<Rating>(hash)? {
-            if r.entry.proposal == *proposal {
-                out.push(r);
-            }
-        }
-    }
-    Ok(out)
+    hashes
+        .into_iter()
+        .filter_map(|h| found::<T>(h).transpose())
+        .collect()
 }
