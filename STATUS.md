@@ -4,8 +4,9 @@ Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** sec
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
 **The owner is travelling on 2026-10-20/21 and will work from cloud sessions only.** Everything
 below is on GitHub; nothing important lives only on the owner's PC.
-**Merging:** CLAUDE.md says cloud sessions don't merge to `main` (it deploys). While the owner is
-away, ask them at the start of the session whether you may merge a PR once its CI is green.
+**Merging:** the owner approved cloud sessions merging a PR once its CI is green (CLAUDE.md).
+To start a cloud session, open claude.ai/code on `social-production/app` and say: "Read STATUS.md
+and continue from the first unfinished step."
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
@@ -22,7 +23,7 @@ https://github.com/social-production/app/pull/1. This is local `main` (`2a2b749`
   `javascript:` plan links, lost quick ratings/votes).
 - Checked locally: everything except the scenarios, which were stopped for CPU. PR CI runs them
   (`gh pr checks 1`; ~60 min).
-- **To finish:** CI green → (with the owner's OK, see Merging above) `gh pr merge 1 --merge` (this deploys; project data resets again,
+- **To finish:** CI green → `gh pr merge 1 --merge` (the 2026-10-19 local session may have armed a watcher that merges it automatically when CI passes; check `gh pr view 1`) (this deploys; project data resets again,
   people stay) → wait for `/readyz` 200 and the UI → smoke (see Live smoke below) → update
   README Status + roadmap (M3: plans live; M4: chat live) and this file. If CI fails, fix on the
   branch, push, and wait again.
