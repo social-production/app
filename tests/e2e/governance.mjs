@@ -152,6 +152,22 @@ const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: 'Pro
 await until(bob, pastPlan, 'the move past the plan');
 log('the approved plan let the project leave Production Plan');
 
+// M3c: web's Phase menu → Return to an earlier phase; the other founder's vote sends it back.
+await ann.reload();
+await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByRole('button', { name: 'Phase', exact: true }).click();
+await ann.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Return to an earlier phase/ }).click();
+const returning = ann.getByRole('dialog', { name: /^Return to / });
+await returning.getByPlaceholder(/return to an earlier planning phase/).fill('The plan needs another look.');
+await returning.getByRole('button', { name: 'Return', exact: true }).click();
+await returning.waitFor({ state: 'hidden', timeout: 60_000 });
+// Proposing a return is not a Yes (as on web), so both founders vote.
+await voteYes(bob, 'Participation');
+await voteYes(ann, 'Participation');
+const backToPlan = () => bob.locator('.feed-card-stage', { hasText: 'Production Plan' });
+await until(bob, backToPlan, 'the return to Production Plan');
+log('a return to Production Plan passed');
+
 assert.deepEqual(errors, [], 'no page errors');
-log('all M3a + M3b governance checks passed');
+log('all M3a + M3b + M3c governance checks passed');
 await browser.close();

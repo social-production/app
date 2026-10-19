@@ -3,7 +3,7 @@
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
-  import { kindName } from '#lib/domain/governance.ts';
+  import { isPhaseChange } from '#lib/domain/governance.ts';
   import { takesSignals } from '#lib/domain/projects.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
@@ -47,7 +47,7 @@
           />
           {#if project.amMember}
             <VoteDock
-              proposals={detail.openProposals.filter((p) => kindName(p.kind) !== 'phase')}
+              proposals={detail.openProposals.filter((p) => !isPhaseChange(p.kind))}
               names={detail.names}
               {charter}
               stage={project.stage}

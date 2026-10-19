@@ -2,7 +2,7 @@
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
-  import { kindName } from '#lib/domain/governance.ts';
+  import { isPhaseChange } from '#lib/domain/governance.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
@@ -20,7 +20,7 @@
 
   let { detail, active, membersOpen, onOpenMembers }: Props = $props();
 
-  const votes = $derived(detail.openProposals.filter((p) => kindName(p.kind) === 'phase'));
+  const votes = $derived(detail.openProposals.filter((p) => isPhaseChange(p.kind)));
 </script>
 
 {#if detail.project?.charter}
