@@ -2,85 +2,13 @@
 //! leaving a plan phase and chooses the subtype (ADR 0039).
 
 use holochain::prelude::*;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use sp_governance::plans::PlanKind;
 
 mod common;
 
 use common::net::{Charter, Net};
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-struct PlanStage {
-    title: String,
-    details: String,
-    start_date: Option<String>,
-    end_date: Option<String>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-struct Plan {
-    kind: PlanKind,
-    title: String,
-    description: String,
-    demand_note: String,
-    subtype: Option<String>,
-    repository_url: Option<String>,
-    location: Option<String>,
-    recipients: Option<String>,
-    stages: Vec<PlanStage>,
-}
-
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
-enum ProposalKind {
-    Phase {
-        to: String,
-        plan: Option<ActionHash>,
-    },
-    Plan(Plan),
-}
-
-#[derive(Serialize, Debug)]
-struct VoteInput {
-    proposal: ActionHash,
-    choice: &'static str,
-}
-
-#[derive(Serialize, Debug)]
-struct RateInput {
-    proposal: ActionHash,
-    criterion: String,
-    rating: Option<u8>,
-}
-
-#[derive(Deserialize, Debug)]
-struct Tally {
-    yes: u32,
-    status: String,
-}
-
-#[derive(Deserialize, Debug)]
-struct Criterion {
-    id: String,
-    mine: Option<u8>,
-    count: u32,
-}
-
-#[derive(Deserialize, Debug)]
-struct PlanView {
-    id: ActionHash,
-    tally: Tally,
-    approved: bool,
-    leader: Option<String>,
-    criteria: Vec<Criterion>,
-}
-
-#[derive(Deserialize, Debug)]
-struct PlanBoard {
-    plans: Vec<PlanView>,
-    open_kind: Option<PlanKind>,
-    gate: Option<PlanKind>,
-    gate_leader: Option<ActionHash>,
-}
+use common::plans::{Plan, PlanBoard, PlanStage, ProposalKind, RateInput, VoteInput};
 
 #[derive(Deserialize, Debug)]
 struct Step {
@@ -174,9 +102,8 @@ async fn into_planning(seed: &str) -> Net {
     net
 }
 
-#[tokio::test(flavor = "multi_thread")]
-async fn an_approved_plan_lets_the_project_leave_its_plan_phase() {
-    let net = into_planning("plan-gate").await;
+/// Before any plan: moving on and filing a later phase's plan are both refused.
+async fn refused_before_a_plan(net: &Net) {
     let early = net
         .try_call::<_, ActionHash>(0, "governance", "propose", move_to("phase-3"))
         .await;
@@ -186,7 +113,11 @@ async fn an_approved_plan_lets_the_project_leave_its_plan_phase() {
         .try_call::<_, ActionHash>(1, "governance", "propose", wrong_phase)
         .await;
     assert!(refused.is_err(), "distribution plans wait for phase-3");
+}
 
+/// The second founder files a production plan; it waits for ratings and votes, off the
+/// proposals list, and takes only its rubric's criteria.
+async fn filed_plan(net: &Net) -> ActionHash {
     let id: ActionHash = net
         .call(1, "governance", "propose", plan("Beds", "standard"))
         .await;
@@ -213,6 +144,14 @@ async fn an_approved_plan_lets_the_project_leave_its_plan_phase() {
         .try_call::<_, ActionHash>(0, "governance", "rate", bad)
         .await
         .is_err());
+    id
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn an_approved_plan_lets_the_project_leave_its_plan_phase() {
+    let net = into_planning("plan-gate").await;
+    refused_before_a_plan(&net).await;
+    let id = filed_plan(&net).await;
 
     for i in 0..2 {
         rate_all(&net, i, &id, 4).await;

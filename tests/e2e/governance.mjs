@@ -74,6 +74,53 @@ await voteYes(bob);
 await until(bob, () => bob.locator('.feed-card-stage', { hasText: 'Production Plan' }), 'the phase move');
 log('the project moved to Production Plan');
 
+// M3b: a production plan, rated and approved by both, lets the project leave Production Plan.
+const planTitle = `Saturday workshop ${stamp}`;
+await ann.reload();
+await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByRole('button', { name: 'Add plan' }).click();
+const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
+await wizard.getByPlaceholder('Plan title').fill(planTitle);
+await wizard.getByPlaceholder('Describe the plan').fill('Open the workshop every Saturday morning.');
+await wizard.getByRole('button', { name: 'Next' }).click(); // overview → plan type
+await wizard.getByRole('button', { name: 'Next' }).click(); // → location
+await wizard.getByLabel('Location').fill('Community hall');
+await wizard.getByRole('button', { name: 'Next' }).click();
+await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both supporters can come.');
+await wizard.getByRole('button', { name: 'Next' }).click();
+await wizard.getByPlaceholder('Stage title').fill('Set up benches');
+await wizard.getByPlaceholder('What happens in this stage?').fill('Borrow tools and benches.');
+await wizard.getByRole('button', { name: 'Next' }).click(); // → review
+await wizard.getByRole('button', { name: 'Submit Production Plan' }).click();
+await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
+log('founder one filed a production plan');
+
+/** Open the plan, rate every criterion "Support", then vote Yes. */
+async function assess(page) {
+  await page.getByRole('tab', { name: 'Participation' }).click();
+  await page.locator('.plan-card', { hasText: planTitle }).click();
+  const sheet = page.locator('.plan-sheet');
+  for (const row of await sheet.locator('.criterion-row').all()) {
+    await row.getByRole('button', { name: /^4\s*Support$/ }).click();
+    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
+  }
+  await sheet.getByRole('button', { name: 'Yes', exact: true }).click();
+  await sheet.getByText('Your vote is final once cast.').waitFor({ timeout: 30_000 });
+}
+
+await assess(ann);
+await until(bob, () => bob.locator('.plan-card', { hasText: planTitle }), 'the plan');
+await assess(bob);
+await until(bob, () => bob.locator('.plan-card.leading', { hasText: planTitle }), 'the plan to lead');
+log('both rated and approved the plan; it leads');
+
+await ann.reload();
+await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByRole('button', { name: /^Propose moving to / }).click();
+await voteYes(bob);
+await until(bob, () => bob.locator('.feed-card-stage:not(:has-text("Production Plan"))'), 'the move past the plan');
+log('the approved plan let the project leave Production Plan');
+
 assert.deepEqual(errors, [], 'no page errors');
-log('all M3a governance checks passed');
+log('all M3a + M3b governance checks passed');
 await browser.close();
