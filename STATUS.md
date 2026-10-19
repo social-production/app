@@ -32,7 +32,8 @@ and continue from the first unfinished step."
   web-backend's `lifecycle_copy.py`, in `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work`
   with the plans and `PhaseChangeSection` (web's gate note + `PhaseMenu`). Styles ported via PORTS.
   Checked: `npm run check/lint -w ui`, boundaries, sizes. **Not yet done:** a 390px screenshot
-  against web (needs the local seed node, i.e. Nix); web's own Take part dock (join + votes, no
+  against web (needs the local seed node, i.e. Nix; this cloud environment's network policy
+  blocks holochain-ci.cachix.org, GitHub tarballs and the live web site, so it couldn't run here); web's own Take part dock (join + votes, no
   Edit). **Gap vs web:** web's Advance opens a sheet asking for a reason; our phase proposals have
   no reason field (integrity change), so the menu item files at once. M3c's Return already carries
   a reason: when M3c merges, add `reason` to `Phase` in the same integrity bump and port the
