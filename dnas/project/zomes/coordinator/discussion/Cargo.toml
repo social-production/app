@@ -1,0 +1,18 @@
+[package]
+name = "discussion"
+description = "Project DNA API for talk: post, delete and read the project chat (ADR 0038)."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+discussion_integrity = { workspace = true }
+sp_core = { workspace = true }
+
+[lints]
+workspace = true

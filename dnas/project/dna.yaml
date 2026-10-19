@@ -12,6 +12,8 @@ integrity:
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
     - name: project_integrity
       path: ../../target/wasm32-unknown-unknown/zome/project_integrity.wasm
+    - name: discussion_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/discussion_integrity.wasm
 coordinator:
   zomes:
     - name: health
@@ -26,3 +28,7 @@ coordinator:
       path: ../../target/wasm32-unknown-unknown/zome/governance.wasm
       dependencies:
         - name: project_integrity
+    - name: discussion
+      path: ../../target/wasm32-unknown-unknown/zome/discussion.wasm
+      dependencies:
+        - name: discussion_integrity

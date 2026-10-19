@@ -1,0 +1,89 @@
+<script lang="ts">
+  import { resolve } from '$app/paths';
+  import type { ChatLine } from '#lib/domain/chat.ts';
+
+  import { bodyParts, formatMessageTime } from './chatFormat.ts';
+
+  /**
+   * One message of web's LiveChatPanel (text, reply quote, time, hover reply). Photos, files,
+   * reports and read receipts arrive with their milestones.
+   */
+  interface Props {
+    message: ChatLine;
+    showAuthor: boolean;
+    flashed: boolean;
+    canReply: boolean;
+    onOpenMenu: (message: ChatLine, event: MouseEvent) => void;
+    onReply: (message: ChatLine) => void;
+    onJump: (id: string | null) => void;
+    register: (node: HTMLElement, id: string) => { destroy: () => void };
+  }
+
+  let { message, showAuthor, flashed, canReply, onOpenMenu, onReply, onJump, register }: Props =
+    $props();
+</script>
+
+<!-- web's bubble opens its menu on click or right-click; the menu's items are buttons. -->
+<!-- svelte-ignore a11y_click_events_have_key_events, a11y_no_noninteractive_element_interactions -->
+<article
+  id={`comment-${message.id}`}
+  class:flash={flashed}
+  class:own={message.own}
+  class="chat-message"
+  use:register={message.id}
+  onclick={(event) => onOpenMenu(message, event)}
+  oncontextmenu={(event) => {
+    event.preventDefault();
+    onOpenMenu(message, event);
+  }}
+>
+  <div class="message-copy">
+    {#if showAuthor}
+      <a class="author-link" href={resolve('/profile/[agent]', { agent: message.author })}
+        >{message.authorName}</a
+      >
+    {/if}
+    {#if message.replyAuthor || message.replyPreview}
+      <button
+        class="reply-quote"
+        type="button"
+        title="Show the original message"
+        disabled={!message.replyToId}
+        onclick={(event) => {
+          event.stopPropagation();
+          onJump(message.replyToId);
+        }}
+      >
+        <strong>{message.replyAuthor || 'Message'}</strong>
+        <span>{message.replyPreview || ''}</span>
+      </button>
+    {/if}
+    <div class="caption-block">
+      <p>
+        {#each bodyParts(message.body) as part, i (i)}
+          {#if part.href}
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
+            <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
+          {:else}{part.text}{/if}
+        {/each}
+        <span class="message-footer">
+          <span class="message-time"
+            >{message.pending ? 'Sending…' : formatMessageTime(message.createdAt)}</span
+          >
+        </span>
+      </p>
+    </div>
+    {#if canReply && !message.own}
+      <button
+        class="hover-reply"
+        type="button"
+        aria-label="Reply"
+        title="Reply"
+        onclick={(event) => {
+          event.stopPropagation();
+          onReply(message);
+        }}>↩</button
+      >
+    {/if}
+  </div>
+</article>
