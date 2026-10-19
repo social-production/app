@@ -45,6 +45,17 @@ pub fn validate_comment(c: &Comment) -> ExternResult<ValidateCallbackResult> {
     Ok(ValidateCallbackResult::Valid)
 }
 
+/// The thread a record holds, if it creates one.
+pub fn decode_thread(record: &Record) -> ExternResult<Option<Thread>> {
+    if !is_thread(record.action())? {
+        return Ok(None);
+    }
+    record
+        .entry()
+        .to_app_option::<Thread>()
+        .map_err(|e| wasm_error!(e))
+}
+
 /// The comment a record holds, if it creates one.
 pub fn decode_comment(record: &Record) -> ExternResult<Option<Comment>> {
     if !is_comment(record.action())? {

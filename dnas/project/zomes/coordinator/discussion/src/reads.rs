@@ -25,7 +25,7 @@ fn batch(hashes: &[ActionHash], options: &GetOptions) -> ExternResult<Vec<Option
 }
 
 /// Many records in two host calls at most: whatever is held here, then the rest.
-fn records(hashes: &[ActionHash]) -> ExternResult<Vec<Option<Record>>> {
+pub fn records(hashes: &[ActionHash]) -> ExternResult<Vec<Option<Record>>> {
     let mut out = batch(hashes, &GetOptions::local())?;
     let missing: Vec<usize> = (0..out.len()).filter(|&i| out[i].is_none()).collect();
     if missing.is_empty() {

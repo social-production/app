@@ -1,22 +1,27 @@
-//! The caller's own chat writes, read from its source chain (visible before gossip).
+//! The caller's own talk, read from its source chain (visible before gossip).
 
 use std::collections::BTreeSet;
 
 use discussion_integrity::{LinkTypes, UnitEntryTypes};
 use hdk::prelude::*;
 
-/// Every chat message the caller wrote, deleted or not.
-pub fn messages() -> ExternResult<Vec<Record>> {
-    let messages = EntryType::App(UnitEntryTypes::ChatMessage.try_into()?);
+/// Every entry of `kind` the caller wrote, deleted or not.
+pub fn entries(kind: UnitEntryTypes) -> ExternResult<Vec<Record>> {
+    let wanted = EntryType::App(kind.try_into()?);
     query(
         ChainQueryFilter::new()
-            .entry_type(messages)
+            .entry_type(wanted)
             .action_type(ActionType::Create)
             .include_entries(true),
     )
 }
 
-/// The caller's messages it has deleted.
+/// Every chat message the caller wrote, deleted or not.
+pub fn messages() -> ExternResult<Vec<Record>> {
+    entries(UnitEntryTypes::ChatMessage)
+}
+
+/// The caller's entries it has deleted.
 pub fn deleted() -> ExternResult<BTreeSet<ActionHash>> {
     let deletes = query(ChainQueryFilter::new().action_type(ActionType::Delete))?;
     Ok(deletes
@@ -28,9 +33,18 @@ pub fn deleted() -> ExternResult<BTreeSet<ActionHash>> {
         .collect())
 }
 
-/// The caller's live chat links pointing at `target`.
-pub fn live_links_to(target: &ActionHash) -> ExternResult<Vec<ActionHash>> {
-    let scoped: ScopedLinkType = LinkTypes::ChatMessages.try_into()?;
+/// One of the caller's live links: the create-link action and what it says.
+#[derive(Debug, Clone)]
+pub struct OwnLink {
+    pub hash: ActionHash,
+    pub base: AnyLinkableHash,
+    pub target: AnyLinkableHash,
+    pub tag: LinkTag,
+}
+
+/// The caller's links of `link_type` it hasn't removed, oldest first.
+pub fn live_links(link_type: LinkTypes) -> ExternResult<Vec<OwnLink>> {
+    let scoped: ScopedLinkType = link_type.try_into()?;
     let creates = query(ChainQueryFilter::new().action_type(ActionType::CreateLink))?;
     let removed: BTreeSet<ActionHash> =
         query(ChainQueryFilter::new().action_type(ActionType::DeleteLink))?
@@ -40,18 +54,31 @@ pub fn live_links_to(target: &ActionHash) -> ExternResult<Vec<ActionHash>> {
                 _ => None,
             })
             .collect();
-    let wanted = AnyLinkableHash::from(target.clone());
     Ok(creates
         .iter()
-        .filter(|r| match &r.action().data {
-            ActionData::CreateLink(c) => {
-                c.zome_index == scoped.zome_index
-                    && c.link_type == scoped.zome_type
-                    && c.target_address == wanted
+        .filter_map(|r| match &r.action().data {
+            ActionData::CreateLink(c)
+                if c.zome_index == scoped.zome_index && c.link_type == scoped.zome_type =>
+            {
+                Some(OwnLink {
+                    hash: r.action_address().clone(),
+                    base: c.base_address.clone(),
+                    target: c.target_address.clone(),
+                    tag: c.tag.clone(),
+                })
             }
-            _ => false,
+            _ => None,
         })
-        .map(|r| r.action_address().clone())
-        .filter(|hash| !removed.contains(hash))
+        .filter(|l| !removed.contains(&l.hash))
+        .collect())
+}
+
+/// The caller's live chat links pointing at `target`.
+pub fn live_links_to(target: &ActionHash) -> ExternResult<Vec<ActionHash>> {
+    let wanted = AnyLinkableHash::from(target.clone());
+    Ok(live_links(LinkTypes::ChatMessages)?
+        .into_iter()
+        .filter(|l| l.target == wanted)
+        .map(|l| l.hash)
         .collect())
 }

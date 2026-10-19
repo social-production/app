@@ -1,9 +1,13 @@
-//! Project chat API (docs/plans/M4-talk.md, ADR 0038): post, delete your own, and read the
-//! newest page. Reads merge the network's view with the caller's own chain, so your own
-//! message (or deletion) shows at once. The UI polls `list_messages` while the chat is open.
+//! Project talk API (docs/plans/M4-talk.md). The chat (ADR 0038): post, delete your own, and
+//! read the newest page; the UI polls `list_messages` while the chat is open. Threads,
+//! comments and votes (ADR 0041) live in `threads`, `comments` and `votes`. Reads merge the
+//! network's view with the caller's own chain, so your own writes show at once.
 
+mod comments;
 mod own;
 mod reads;
+mod threads;
+mod votes;
 
 use discussion_integrity::{ChatMessage, EntryTypes, LinkTypes};
 use hdk::prelude::*;
@@ -42,7 +46,7 @@ pub(crate) fn anchor() -> ExternResult<EntryHash> {
     Path::from(CHAT).path_entry_hash()
 }
 
-fn guest(reason: &str) -> WasmError {
+pub(crate) fn guest(reason: &str) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(reason.into()))
 }
 

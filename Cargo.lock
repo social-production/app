@@ -1990,6 +1990,7 @@ dependencies = [
  "hdk",
  "serde",
  "sp_core",
+ "sp_index",
 ]
 
 [[package]]

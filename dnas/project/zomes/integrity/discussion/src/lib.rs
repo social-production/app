@@ -6,6 +6,7 @@
 mod rules;
 
 use hdi::prelude::*;
+pub use rules::{decode_comment, decode_thread};
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
