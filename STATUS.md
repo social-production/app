@@ -1,11 +1,11 @@
-# Status: where the P2P app stands (handoff, 2026-10-19 evening)
+# Status: where the P2P app stands (handoff, 2026-10-19 night)
 
-Read this first in a new chat, then `CLAUDE.md`, `README.md` (roadmap) and `docs/CODE_RULES.md`.
-The workspace-level `../STATUS.md` covers web/web-backend; its last section summarises this repo.
+Read this first in a new chat, then `CLAUDE.md` (it has a section for cloud sessions), `README.md`
+(roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- `main` at `4efd63d`; pushing `main` redeploys bootstrap, seed-node and ui. CI: `gh run list --workflow ci`.
+- Deployed `main`: `65b5cfd` (CI green). Pushing `main` redeploys bootstrap, seed-node and ui. CI: `gh run list --workflow ci`.
 - Live features:
   - M1 identity (phrase = account, passkeys, pairing, vouches/standing, founders thebestdamn + BigBird);
   - M2 projects (create, feed/search with web's sorts, join, demand/oppose, members sheet);
@@ -13,24 +13,24 @@ The workspace-level `../STATUS.md` covers web/web-backend; its last section summ
   - guests can browse the feed signed out;
   - usernames follow web's handle rules (no spaces).
 - The M3 deploy reset the network: everyone signs in with their 24 words and re-enters a profile; founders vouch again.
-- `7961d27`/`4efd63d` (guest browsing, `close_proposal` rename) were waiting on CI and the redeploy when this was written. Check that CI is green and the live feed loads signed out.
 
-## In flight (session of 2026-10-19 late)
-CI was green on `65b5cfd`; live UI and seed node answered 200 (index empty after the M3 reset).
-Neither subagent had committed. Their work was committed on their branches and is being merged:
-
-| Branch | Work | State |
-|---|---|---|
-| `worktree-agent-a17e01b4838e77b67` (`f7af627`) | **M4a project chat**: `discussion` zome pair in the project DNA, web's Chat tab, ADR 0038, `docs/plans/M4-talk.md` | complete; merged into local `main` (`2f90e49`), checks running |
-| `worktree-agent-a6444a03833c35003` (`2596c7a`, "Work in progress") | **M3b plans**: Plan proposals with criteria ratings, leader per kind, approved-leader gate on phase moves, plan wizard in the participation tab, `tests/scenarios/tests/plans.rs` | code + UI + scenarios written; no docs yet (no "M3b as built", README, ADR). Revert its incidental `package-lock.json` change. Not merged yet |
-
-Both change the project DNA, so the deploy resets project data again (directory/people stay).
-Once both are merged, pushed and smoked: `git worktree remove --force <path>`, `git branch -D <branch>`.
+## In flight: M3b plans + M4a chat, merged locally, not pushed
+Neither subagent had committed; their work was committed on its branch and merged into local
+`main` (`6771230`). The M3b branch is also on GitHub as `claude/m3b-plans`.
+- **M4a project chat** (ADR 0038, `docs/plans/M4-talk.md`): complete. Fixed a lint error
+  (`ChatPanel.svelte` dynamic delete) and rustfmt.
+- **M3b plans** (ADR 0039, "M3b plans, as built" in `docs/plans/M3-governance.md`): the agent left
+  no docs. The ADR and the as-built notes were written from the code; plan code references were
+  renumbered from 0038 to 0039 (0038 is chat).
+- Being checked now: full CI suite including all scenarios on `6771230`. Then browser tests,
+  a push, and a live smoke. The deploy resets project data again (directory/people stay).
+- Afterwards: `git worktree remove --force .claude/worktrees/agent-*`, delete the two
+  `worktree-agent-*` branches and `origin/claude/m3b-plans`.
 
 ## Next (roadmap order)
-1. Merge M3b + M4a (above), deploy, smoke live.
-2. M3b remainder if missing: challenge window for under-counted populations, phase revert, links (`docs/plans/M3-governance.md`).
-3. M4: DMs (conversation DNA), threads/posts, in-app notifications (`docs/plans/M4-talk.md` if the agent created it).
+1. Finish the push above, deploy, smoke live; update README Status.
+2. M3b remainder: challenge window for under-counted populations, phase revert, links (`docs/plans/M3-governance.md`).
+3. M4: DMs (conversation DNA), threads/posts, in-app notifications (`docs/plans/M4-talk.md`: M4b threads, M4c DMs, M4d notifications).
 4. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 5. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
 

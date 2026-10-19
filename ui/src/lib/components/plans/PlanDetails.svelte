@@ -22,10 +22,11 @@
     return start && end ? `${start} – ${end}` : start || end;
   }
 
-  /** web's `normalizeExternalUrl`. */
+  /** web's `normalizeExternalUrl`, http(s) only: plans come from other people, so a
+   * `javascript:` repository must never become a live link. */
   function external(url: string): string {
     const trimmed = url.trim();
-    return /^[a-zA-Z][a-zA-Z\d+.-]*:/.test(trimmed) ? trimmed : `https://${trimmed}`;
+    return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   }
 </script>
 
@@ -66,6 +67,7 @@
         <div class="fact">
           <dt>Repository</dt>
           <dd>
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
             <a href={external(plan.repository_url)} rel="noreferrer" target="_blank"
               >{plan.repository_url}</a
             >
