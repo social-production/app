@@ -18,3 +18,18 @@
 .project-overview {
   display: contents;
 }
+
+/* app/ui: Svelte scoped web's PlanWizardShell footer buttons to the shell; as global CSS its
+   .secondary-button rule also reaches the wizard's own "Add stage" button. Undo the footer-only
+   parts there. */
+.plan-wizard .secondary-button {
+  flex: none;
+  box-shadow: none;
+  font-size: inherit;
+}
+
+/* app/ui: web docks "Add plan" through PhaseWorkToolbar; here it sits under the plan list. */
+.plan-toolbar {
+  display: flex;
+  justify-content: flex-start;
+}

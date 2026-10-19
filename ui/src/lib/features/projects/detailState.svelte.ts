@@ -1,9 +1,11 @@
 import type { Proposal, ProposalKind, VoteChoice } from '#lib/domain/governance.ts';
 import type { Person } from '#lib/domain/people.ts';
+import type { Plan, PlanBoard, PlanRating } from '#lib/domain/plans.ts';
 import type { CharterDraft, Project, Stance } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
 import { castVote, closeProposal, listProposals, propose } from '#lib/services/governance.ts';
 import { getPerson } from '#lib/services/people.ts';
+import { listPlans, ratePlan as rate, submitPlan as submit } from '#lib/services/plans.ts';
 import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
@@ -11,6 +13,7 @@ export class DetailState {
   project = $state<Project>();
   members = $state<Person[]>([]);
   proposals = $state<Proposal[]>([]);
+  plans = $state<PlanBoard>();
   /** Display names by agent key (creator, members, proposers, update authors). */
   names = $state<Record<string, string>>({});
   error = $state<string>();
@@ -58,23 +61,34 @@ export class DetailState {
     }
   }
 
+  private read() {
+    return Promise.all([getProject(this.id), listProposals(this.id), listPlans(this.id)]);
+  }
+
   private async fetch(): Promise<void> {
-    let [project, proposals] = await Promise.all([getProject(this.id), listProposals(this.id)]);
+    let [project, proposals, plans] = await this.read();
     // A vote that decided a proposal may have been cast before the voter saw every other vote;
     // whoever loads the page next writes the Outcome (ADR 0033).
-    const settled = project.amMember ? proposals.filter((p) => p.settled) : [];
+    const settled = project.amMember
+      ? [
+          ...proposals.filter((p) => p.settled).map((p) => p.id),
+          ...plans.plans.filter((p) => p.tally.settled).map((p) => p.id),
+        ]
+      : [];
     if (settled.length > 0) {
-      await Promise.all(settled.map((p) => closeProposal(this.id, p.id)));
-      [project, proposals] = await Promise.all([getProject(this.id), listProposals(this.id)]);
+      await Promise.all(settled.map((id) => closeProposal(this.id, id)));
+      [project, proposals, plans] = await this.read();
     }
     const members = await Promise.all(project.members.map(getPerson));
     this.project = project;
     this.members = members;
     this.proposals = proposals;
+    this.plans = plans;
     this.error = undefined;
     const keys = [
       project.creator,
       ...proposals.map((p) => p.author),
+      ...plans.plans.map((p) => p.author),
       ...project.updates.map((u) => u.author),
     ];
     await this.loadNames([...members.map((m) => m.agent), ...keys], members);
@@ -135,7 +149,42 @@ export class DetailState {
 
   proposeNextPhase(): Promise<boolean> {
     const next = this.project?.nextPhase;
-    return next ? this.file({ Phase: { to: next.id } }) : Promise.resolve(false);
+    return next ? this.file({ Phase: { to: next.id, plan: null } }) : Promise.resolve(false);
+  }
+
+  /** web's plan wizard submit. Returns true when filed. */
+  async submitPlan(plan: Plan): Promise<boolean> {
+    this.saving = true;
+    this.sheetMessage = undefined;
+    try {
+      await submit(this.id, plan);
+      await this.load();
+      return true;
+    } catch (e) {
+      this.sheetMessage = explain(e);
+      return false;
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  /** Ratings change the leader only, so the page refreshes quietly behind them. */
+  async ratePlan(plan: string, criterion: string, rating: PlanRating | null): Promise<void> {
+    try {
+      await rate(this.id, plan, criterion, rating);
+      await this.load();
+    } catch (e) {
+      this.error = explain(e);
+    }
+  }
+
+  async votePlan(plan: string, choice: VoteChoice): Promise<void> {
+    try {
+      await castVote(this.id, plan, choice);
+      await this.load();
+    } catch (e) {
+      this.error = explain(e);
+    }
   }
 
   private async file(kind: ProposalKind): Promise<boolean> {

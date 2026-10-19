@@ -3,7 +3,7 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{LinkTypes, Outcome, Proposal, Vote};
+use project_integrity::{LinkTypes, Outcome, Proposal, Rating, UnitEntryTypes, Vote};
 
 pub const PROPOSALS: &str = "proposals";
 
@@ -96,4 +96,29 @@ pub fn outcome(proposal: &ActionHash) -> ExternResult<Option<Found<Outcome>>> {
         }
     }
     Ok(found_outcomes.into_iter().min_by_key(|o| o.at))
+}
+
+/// Every rating on `proposal`: the network's, plus the caller's own (fresh writes lag).
+pub fn ratings(proposal: &ActionHash) -> ExternResult<Vec<Found<Rating>>> {
+    let mut hashes: Vec<ActionHash> = targets(proposal.clone(), LinkTypes::ProposalToRatings)?
+        .into_iter()
+        .map(|(_, h)| h)
+        .collect();
+    let mine = query(
+        ChainQueryFilter::new()
+            .entry_type(EntryType::App(UnitEntryTypes::Rating.try_into()?))
+            .include_entries(true),
+    )?;
+    hashes.extend(mine.iter().map(|r| r.action_address().clone()));
+    hashes.sort();
+    hashes.dedup();
+    let mut out = Vec::new();
+    for hash in hashes {
+        if let Some(r) = found::<Rating>(hash)? {
+            if r.entry.proposal == *proposal {
+                out.push(r);
+            }
+        }
+    }
+    Ok(out)
 }

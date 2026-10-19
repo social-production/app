@@ -6,7 +6,8 @@ export type ProposalStatus = 'Open' | 'Passed' | 'Rejected';
 export type ProposalKind =
   | { Edit: { title: string | null; description: string | null; location: string | null } }
   | { Update: { body: string } }
-  | { Phase: { to: string } };
+  /** `plan`: the approved plan a move out of a plan phase goes ahead with (ADR 0038). */
+  | { Phase: { to: string; plan: string | null } };
 
 export interface Proposal {
   id: string;
