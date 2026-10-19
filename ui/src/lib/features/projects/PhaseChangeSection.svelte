@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
 
   import { portal } from '#lib/components/actions/portal.ts';
+  import AdvanceSheet from '#lib/components/governance/AdvanceSheet.svelte';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
   import ReturnSheet from '#lib/components/governance/ReturnSheet.svelte';
   import { planGateMessage, signalGateMet } from '#lib/domain/phaseCopy.ts';
@@ -10,8 +11,7 @@
 
   /**
    * web's ProjectPhaseChangeSection: the gate note, the Phase ▾ menu (advance or close, and
-   * return to an earlier phase) and the return sheet, on the current phase. web asks for a reason
-   * before advancing too; our advance proposals carry none yet, so that item files directly.
+   * return to an earlier phase) and the sheets that ask why, on the current phase.
    */
   let { detail, shown }: { detail: DetailState; shown: string } = $props();
 
@@ -19,6 +19,7 @@
   const currentVisible = $derived(shown === project?.phase);
   const phaseVoteOpen = $derived(detail.phaseVoteOpen);
   let returning = $state(false);
+  let advancing = $state(false);
   const signalGatePasses = $derived(
     project?.phase !== 'phase-1' || signalGateMet(project.demand, project.opposition),
   );
@@ -44,6 +45,10 @@
     return planGate;
   }
 
+  async function fileAdvance(reason: string): Promise<void> {
+    if (await detail.proposeNextPhase(reason)) advancing = false;
+  }
+
   async function fileReturn(to: string, reason: string): Promise<void> {
     if (await detail.proposeReturn(to, reason)) returning = false;
   }
@@ -55,7 +60,10 @@
     const next = project?.nextPhase;
     const allowed = gatePasses && !phaseVoteOpen && !detail.saving;
     const locked = allowed ? '' : lockReason();
-    const onSelect = (): void => void detail.proposeNextPhase();
+    const onSelect = (): void => {
+      detail.sheetMessage = undefined;
+      advancing = true;
+    };
     if (next)
       items.push(
         closing
@@ -99,7 +107,7 @@
         {signalGatePasses ? planGate : 'Advance unlocks after this project gets a Support signal.'}
       </p>
     {/if}
-    {#if detail.sheetMessage && !returning}
+    {#if detail.sheetMessage && !returning && !advancing}
       <p class="warning-card" role="alert">{detail.sheetMessage}</p>
     {/if}
     {#if items.length > 0 && endHost}
@@ -122,6 +130,15 @@
       </div>
     {/if}
   </div>
+  <AdvanceSheet
+    open={advancing}
+    title={closing ? 'Close project' : `Advance to ${project.nextPhase?.label ?? 'the next phase'}`}
+    {closing}
+    pending={detail.saving}
+    message={detail.sheetMessage}
+    onSubmit={(reason) => void fileAdvance(reason)}
+    onClose={() => (advancing = false)}
+  />
   <ReturnSheet
     open={returning}
     phases={project.returns}

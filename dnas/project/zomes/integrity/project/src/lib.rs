@@ -41,10 +41,12 @@ pub enum ProposalKind {
     Update {
         body: String,
     },
-    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039).
+    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039). web asks
+    /// for a reason for every phase change (ADR 0040).
     Phase {
         to: String,
         plan: Option<ActionHash>,
+        reason: String,
     },
     /// A production, distribution, operations or access plan; its approval is the vote.
     Plan(Plan),

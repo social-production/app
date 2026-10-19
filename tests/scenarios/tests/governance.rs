@@ -21,6 +21,7 @@ enum ProposalKind {
     Phase {
         to: String,
         plan: Option<ActionHash>,
+        reason: String,
     },
 }
 
@@ -168,6 +169,7 @@ async fn leaving_proposal_needs_demand_then_a_vote() {
     let to_plan = ProposalKind::Phase {
         to: "phase-2".into(),
         plan: None,
+        reason: "The plan is ready.".into(),
     };
     let early: Result<ActionHash, String> = net
         .try_call(0, "governance", "propose", to_plan.clone())
@@ -181,10 +183,24 @@ async fn leaving_proposal_needs_demand_then_a_vote() {
             ProposalKind::Phase {
                 to: "phase-5".into(),
                 plan: None,
+                reason: "The plan is ready.".into(),
             },
         )
         .await;
     assert!(skip.is_err(), "phases move one step at a time");
+    let blank: Result<ActionHash, String> = net
+        .try_call(
+            0,
+            "governance",
+            "propose",
+            ProposalKind::Phase {
+                to: "phase-2".into(),
+                plan: None,
+                reason: " ".into(),
+            },
+        )
+        .await;
+    assert!(blank.is_err(), "web asks for a reason for every phase change");
 
     net.demand_all().await;
     let id: ActionHash = net.call(0, "governance", "propose", to_plan).await;

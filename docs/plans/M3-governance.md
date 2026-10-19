@@ -87,7 +87,8 @@ Phase returns from web, and the challenge window for under-counted populations (
   the second plan phase that the project shows; returning to Proposal or the first plan phase
   reopens the subtype) and `challenge` (the 48-hour window after a proposal's first Outcome, the
   members challenges add, and which Outcome decides a challenged proposal). Unit tests in both.
-- **`project_integrity`**: `ProposalKind::Return { to, reason }`, a `Challenge` entry
+- **`project_integrity`**: `ProposalKind::Phase` gains web's required `reason` (web's advance and
+  close sheets ask "why"; the vote sheet shows it), `ProposalKind::Return { to, reason }`, a `Challenge` entry
   (proposal, challenger's membership, omitted `Members` links) with the `ProposalToChallenges`
   link, and `Outcome.challenges`: integrity counts N as the snapshot plus the members the cited
   challenges add.

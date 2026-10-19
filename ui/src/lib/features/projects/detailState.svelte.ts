@@ -168,9 +168,11 @@ export class DetailState {
     return this.file({ Update: { body } });
   }
 
-  proposeNextPhase(): Promise<boolean> {
+  proposeNextPhase(reason: string): Promise<boolean> {
     const next = this.project?.nextPhase;
-    return next ? this.file({ Phase: { to: next.id, plan: null } }) : Promise.resolve(false);
+    return next
+      ? this.file({ Phase: { to: next.id, plan: null, reason } })
+      : Promise.resolve(false);
   }
 
   /** web's return request (`revert-requests`). Returns true when filed. */

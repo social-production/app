@@ -92,7 +92,7 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                 body,
                 at: d.at,
             }),
-            ProposalKind::Phase { to, plan } => {
+            ProposalKind::Phase { to, plan, .. } => {
                 let Some(c) = charter else { continue };
                 if let Some((next, subtype)) = phase_move(c, &out, phase, &to, plan, d.at, approved)
                 {

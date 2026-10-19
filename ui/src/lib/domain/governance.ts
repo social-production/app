@@ -6,8 +6,9 @@ export type ProposalStatus = 'Open' | 'Passed' | 'Rejected';
 export type ProposalKind =
   | { Edit: { title: string | null; description: string | null; location: string | null } }
   | { Update: { body: string } }
-  /** `plan`: the approved plan a move out of a plan phase goes ahead with (ADR 0039). */
-  | { Phase: { to: string; plan: string | null } }
+  /** `plan`: the approved plan a move out of a plan phase goes ahead with (ADR 0039);
+   * `reason`: web's required "why" for a phase change. */
+  | { Phase: { to: string; plan: string | null; reason: string } }
   /** web's revert request: back to an earlier planning phase, with a reason (ADR 0040). */
   | { Return: { to: string; reason: string } };
 

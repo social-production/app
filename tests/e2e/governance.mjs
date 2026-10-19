@@ -65,10 +65,14 @@ async function voteYes(page, tab) {
   await page.locator('.choice-bar .choice.yes').click();
 }
 
-/** web's Phase ▾ menu: open it and choose "Advance to …". */
+/** web's Phase ▾ menu: choose "Advance to …", then say why in its sheet. */
 async function advance(page) {
   await page.getByRole('button', { name: 'Phase', exact: true }).click();
   await page.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / }).click();
+  const sheet = page.getByRole('dialog', { name: /^Advance to / });
+  await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
+  await sheet.getByRole('button', { name: /^Advance to / }).click();
+  await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 }
 
 await ann.reload();

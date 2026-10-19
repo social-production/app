@@ -27,10 +27,13 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     }
     let roll = Roll::load()?;
     let kind = match kind {
-        ProposalKind::Phase { to, .. } => {
+        ProposalKind::Phase { to, reason, .. } => {
+            if reason.trim().is_empty() {
+                return Err(guest("Add a reason before submitting this phase change."));
+            }
             let state = apply::state(&mut Standing::default(), &roll)?;
             let plan = moves::check_phase_move(&state, &to)?;
-            ProposalKind::Phase { to, plan }
+            ProposalKind::Phase { to, plan, reason }
         }
         ProposalKind::Plan(plan) => {
             let state = apply::state(&mut Standing::default(), &roll)?;

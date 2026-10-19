@@ -10,7 +10,8 @@ import {
 import { cellOf } from './projects.ts';
 
 type KindWire =
-  Exclude<ProposalKind, { Phase: unknown }> | { Phase: { to: string; plan: ActionHash | null } };
+  | Exclude<ProposalKind, { Phase: unknown }>
+  | { Phase: { to: string; plan: ActionHash | null; reason: string } };
 
 interface ProposalWire {
   id: ActionHash;
@@ -39,8 +40,8 @@ const governance = async <T>(projectId: string, fn: string, payload?: unknown): 
 
 function kindOf(kind: KindWire): ProposalKind {
   if (!('Phase' in kind)) return kind;
-  const { to, plan } = kind.Phase;
-  return { Phase: { to, plan: plan ? hashToString(plan) : null } };
+  const { to, plan, reason } = kind.Phase;
+  return { Phase: { to, plan: plan ? hashToString(plan) : null, reason } };
 }
 
 /** Every proposal in a project except plans (they have their own board), newest first. */
@@ -70,7 +71,10 @@ export async function listProposals(projectId: string): Promise<Proposal[]> {
 /** Propose a change; the proposer's Yes comes with it (not for returns, as on web). A phase
  * move's plan is filled in by the zome (the current leading plan). */
 export async function propose(projectId: string, kind: ProposalKind): Promise<void> {
-  const wire: KindWire = 'Phase' in kind ? { Phase: { to: kind.Phase.to, plan: null } } : kind;
+  const wire: KindWire =
+    'Phase' in kind
+      ? { Phase: { to: kind.Phase.to, plan: null, reason: kind.Phase.reason } }
+      : kind;
   await governance<ActionHash>(projectId, 'propose', wire);
 }
 

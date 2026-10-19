@@ -78,8 +78,15 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             Ok(())
         }
         ProposalKind::Update { .. } => Err("an update needs text".into()),
-        ProposalKind::Phase { to, .. } if Phase::parse(to).is_some() => Ok(()),
-        ProposalKind::Phase { .. } => Err("unknown phase".into()),
+        ProposalKind::Phase { to, reason, .. } => {
+            if Phase::parse(to).is_none() {
+                return Err("unknown phase".into());
+            }
+            if reason.trim().is_empty() || reason.chars().count() > LONG_TEXT_MAX {
+                return Err("a phase change needs a reason".into());
+            }
+            Ok(())
+        }
         ProposalKind::Plan(plan) => crate::plan::check(plan),
         ProposalKind::Return { to, reason } => {
             if Phase::parse(to).is_none() {

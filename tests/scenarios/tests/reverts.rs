@@ -15,6 +15,7 @@ enum ProposalKind {
     Phase {
         to: String,
         plan: Option<ActionHash>,
+        reason: String,
     },
     Return {
         to: String,
@@ -52,6 +53,7 @@ fn move_to(to: &str) -> ProposalKind {
     ProposalKind::Phase {
         to: to.into(),
         plan: None,
+        reason: "The plan is ready.".into(),
     }
 }
 

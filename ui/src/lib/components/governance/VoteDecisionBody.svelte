@@ -30,11 +30,11 @@
       <h3>Proposed update</h3>
       <p class="proposed-copy">{kind.Update.body}</p>
     </section>
-  {:else if 'Return' in kind}
+  {:else if 'Return' in kind || 'Phase' in kind}
     <!-- web shows a phase change's reason as "Why". -->
     <section class="change-card">
       <h3>Why</h3>
-      <p>{kind.Return.reason}</p>
+      <p>{'Return' in kind ? kind.Return.reason : kind.Phase.reason}</p>
     </section>
   {:else if 'Edit' in kind}
     {#each [{ name: 'Title', now: charter.title, next: kind.Edit.title }, { name: 'Description', now: charter.description, next: kind.Edit.description }] as field (field.name)}
