@@ -39,6 +39,18 @@ pub fn view(agent: &AgentPubKey, founders: &[AgentPubKey]) -> ExternResult<Stand
     })
 }
 
+/// Whether `agent` held Full standing before `at` (founders always have). Projects use this to
+/// filter voters when applying outcomes (ADR 0033).
+pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
+    if founder_agents()?.contains(agent) {
+        return Ok(true);
+    }
+    let Some(grant) = grant_of(agent)? else {
+        return Ok(false);
+    };
+    Ok(get(grant, GetOptions::default())?.is_some_and(|r| r.action().timestamp() < at))
+}
+
 /// Vouch for `vouchee`. Fails early with a readable reason when validation would reject it.
 pub fn vouch(vouchee: AgentPubKey) -> ExternResult<ActionHash> {
     let me = agent_info()?.agent_initial_pubkey;

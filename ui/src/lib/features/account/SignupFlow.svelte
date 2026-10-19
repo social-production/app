@@ -1,6 +1,6 @@
 <script lang="ts">
   import PhraseGrid from '#lib/components/PhraseGrid.svelte';
-  import { NAME_MAX } from '#lib/domain/people.ts';
+  import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
   import {
     confirmationPositions,
     createAccount,
@@ -16,6 +16,7 @@
 
   let step = $state<'name' | 'phrase' | 'confirm' | 'working'>('name');
   let name = $state('');
+  const problem = $derived(handleProblem(name));
   let answers = $state(['', '', '']);
   let progress = $state<AccountStep>('checking');
   let error = $state<string>();
@@ -39,11 +40,20 @@
 {#if step === 'name'}
   <form class="stack" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
-      <span class="field-label">Your name (shown to others)</span>
-      <input bind:value={name} maxlength={NAME_MAX} autocomplete="name" />
+      <span class="field-label">Username</span>
+      <input
+        bind:value={name}
+        maxlength={HANDLE_MAX}
+        autocomplete="username"
+        autocapitalize="none"
+      />
     </label>
+    <!-- One reserved line (as on web), so typing doesn't push the button down. -->
+    <div class="handle-line">
+      {#if problem && name.trim().length >= 3}<p class="status-note">{problem}</p>{/if}
+    </div>
     <div class="button-row">
-      <button class="button-primary" disabled={!name.trim()} type="submit">Next</button>
+      <button class="button-primary" disabled={!!problem} type="submit">Next</button>
     </div>
   </form>
 {:else if step === 'phrase'}

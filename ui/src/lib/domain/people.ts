@@ -28,7 +28,6 @@ export interface Person {
 }
 
 // Limits mirror sp_core::limits (validation enforces them; the UI just helps).
-export const NAME_MAX = 60;
 export const BIO_MAX = 1000;
 export const HOME_AREA_MAX = 100;
 export const AVATAR_MAX_BYTES = 256 * 1024;

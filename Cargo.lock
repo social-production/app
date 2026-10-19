@@ -2988,6 +2988,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "governance"
+version = "0.0.1"
+dependencies = [
+ "hdk",
+ "project_integrity",
+ "serde",
+ "sp_governance",
+]
+
+[[package]]
 name = "gtk"
 version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7102,6 +7112,7 @@ dependencies = [
  "hdk",
  "project_integrity",
  "serde",
+ "sp_governance",
 ]
 
 [[package]]
@@ -7113,6 +7124,7 @@ dependencies = [
  "holochain_serialized_bytes",
  "serde",
  "sp_core",
+ "sp_governance",
 ]
 
 [[package]]

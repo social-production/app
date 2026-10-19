@@ -1,5 +1,5 @@
 // M2 projects end to end against a local seed node (run it as described in accounts.mjs):
-// create through the "+" menu, find in the feed (archivist + index), join, support, edit,
+// create through the "+" menu, find in the feed (archivist + index), join, support,
 // search by tag, and the New-member limit of 2 projects a week.
 //   node tests/e2e/projects.mjs http://localhost:4174
 import assert from 'node:assert/strict';
@@ -40,7 +40,7 @@ async function waitInFeed(page, text, path = '/') {
 }
 
 const ann = await device();
-await signUp(ann, `Ann ${stamp}`);
+await signUp(ann, `ann_${stamp}`);
 await createProject(ann, title, 'seeds');
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await ann.getByRole('button', { name: 'Leave project' }).waitFor();
@@ -48,7 +48,7 @@ assert.equal((await ann.getByRole('button', { name: '1 members' }).count()), 1, 
 log('created; the creator is a member');
 
 const bob = await device();
-await signUp(bob, `Bob ${stamp}`);
+await signUp(bob, `bob_${stamp}`);
 log(`project in Bob's feed after ${(await waitInFeed(bob, title)).toFixed(0)}s`);
 await bob.locator('.project-card', { hasText: title }).locator('a.title').click();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
@@ -64,19 +64,13 @@ for (let i = 0; i < 20 && !(await ann.getByRole('button', { name: '2 members' })
   await ann.reload();
 }
 await ann.getByRole('button', { name: '2 members' }).click();
-await ann.locator('.people-sheet .person-row', { hasText: `Bob ${stamp}` }).waitFor();
+await ann.locator('.people-sheet .person-row', { hasText: `bob_${stamp}` }).waitFor();
 await ann.getByRole('button', { name: 'Close' }).last().click();
 log('Ann sees Bob in the members sheet');
 
-await ann.getByRole('button', { name: 'Edit', exact: true }).click();
-await ann.locator('.edit-sheet').getByLabel('Title').fill(`${title} (edited)`);
-await ann.getByRole('button', { name: 'Save' }).click();
-await ann.getByRole('heading', { name: `${title} (edited)` }).waitFor({ timeout: 60_000 });
-assert.equal(await bob.getByRole('button', { name: 'Edit', exact: true }).count(), 0, 'only the creator edits');
-log('creator edited the charter');
-
-await waitInFeed(bob, `${title} (edited)`, `/search?q=seeds`);
-log('search by tag finds the edited project');
+// Edits are proposals since M3: tests/e2e/governance.mjs covers them.
+await waitInFeed(bob, title, `/search?q=seeds`);
+log('search by tag finds the project');
 
 await createProject(ann, `Second ${stamp}`, 'x');
 await ann.getByRole('heading', { name: `Second ${stamp}` }).waitFor({ timeout: 120_000 });

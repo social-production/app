@@ -44,6 +44,17 @@ pub fn get_standing(agent: AgentPubKey) -> ExternResult<StandingView> {
     standing::view(&agent, &founder_agents()?)
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct StandingAt {
+    pub agent: AgentPubKey,
+    pub at: Timestamp,
+}
+
+#[hdk_extern]
+pub fn full_standing_before(query: StandingAt) -> ExternResult<bool> {
+    standing::full_before(&query.agent, query.at)
+}
+
 #[hdk_extern]
 pub fn vouch(vouchee: AgentPubKey) -> ExternResult<ActionHash> {
     standing::vouch(vouchee)

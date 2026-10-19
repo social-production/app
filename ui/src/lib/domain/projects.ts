@@ -1,5 +1,7 @@
 /** Mirrors the project DNA's zome and the gateway's project index. */
 
+import type { ProjectUpdate } from './governance.ts';
+
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
@@ -48,6 +50,18 @@ export interface Project {
   /** Holochain micros. */
   createdAt: number;
   lastActivityAt: number | null;
+  /** web's phase id ("phase-1"…) and its label for this mode ("Production Plan"). */
+  phase: string;
+  stage: string;
+  /** The phases this project shows, and the one a proposal may move it to next. */
+  phases: PhaseStep[];
+  nextPhase: PhaseStep | null;
+  updates: ProjectUpdate[];
+}
+
+export interface PhaseStep {
+  id: string;
+  label: string;
 }
 
 // Limits mirror sp_core::project (validation enforces them; the UI just helps).

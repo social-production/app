@@ -360,19 +360,11 @@
     padding: 0;
   }
 
-  .overlay-root
-    .overlay-footer.has-actions:not(
-      :has(.sheet-actions, .overlay-root .choice-bar, .overlay-root .vote-footer)
-    ) {
+  .overlay-root .overlay-footer.has-actions:not(:has(.sheet-actions, .choice-bar, .vote-footer)) {
     padding-bottom: var(--shell-safe-bottom, 0px);
   }
 
-  .overlay-root
-    .overlay-footer.has-actions:has(
-      .sheet-actions,
-      .overlay-root .choice-bar,
-      .overlay-root .vote-footer
-    ) {
+  .overlay-root .overlay-footer.has-actions:has(.sheet-actions, .choice-bar, .vote-footer) {
     padding-bottom: 0 !important;
   }
 

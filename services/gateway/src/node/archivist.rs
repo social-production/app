@@ -38,10 +38,20 @@ struct Listing {
 /// Mirrors the project zome's `ProjectView` (the fields the index needs).
 #[derive(Debug, Deserialize)]
 struct ProjectView {
+    charter: Option<Charter>,
+    stage: String,
     members: Vec<AgentPubKey>,
     demand: u32,
     opposition: u32,
     last_activity_at: Option<Timestamp>,
+}
+
+/// The current charter fields the feed shows (passed edits applied).
+#[derive(Debug, Deserialize)]
+struct Charter {
+    title: String,
+    description: String,
+    location_label: String,
 }
 
 impl Node {
@@ -190,7 +200,16 @@ fn clones_by_seed(app: &AppInfo) -> BTreeMap<String, CellId> {
 
 fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
     let created_at = view.created_at.as_micros();
-    let l = view.listing;
+    let mut l = view.listing;
+    // The project's own network is the source of truth once decisions change it (ADR 0033).
+    if let Some(p) = &project {
+        if let Some(c) = &p.charter {
+            l.title.clone_from(&c.title);
+            l.summary = sp_core::project::summary_of(&c.description);
+            l.location_label.clone_from(&c.location_label);
+        }
+        l.phase.clone_from(&p.stage);
+    }
     ProjectCard {
         id: ActionHashB64::from(view.id).to_string(),
         network_seed: l.network_seed,

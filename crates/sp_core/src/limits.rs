@@ -9,7 +9,6 @@ pub const NOTE_MAX: usize = 280;
 pub const LONG_TEXT_MAX: usize = 20_000;
 
 /// Profiles (M1).
-pub const DISPLAY_NAME_MAX: usize = 60;
 pub const BIO_MAX: usize = 1_000;
 pub const HOME_AREA_MAX: usize = 100;
 /// Avatars are resized in the browser before upload; this is the hard cap.

@@ -1,4 +1,4 @@
-/* Ported from web/src/lib/features/profile/ProfilePage.svelte, scoped to .profile-page */
+/* Ported from web/src/lib/features/profile/ProfilePage.svelte (ADR 0032, scripts/port-styles.py) */
 .profile-page .name-row {
   display: flex;
   align-items: center;
@@ -115,7 +115,6 @@
   color: #b91c1c;
 }
 
-/* Phones: symbols only; each button keeps its name as its label and tooltip. */
 @media (max-width: 600px) {
   .profile-page .action-text {
     display: none;
@@ -150,7 +149,6 @@
   color: #b91c1c;
 }
 
-/* Inset by the page gutter like the header above, so its border isn't cut at the screen edge. */
 .profile-page .bot-review-card {
   display: grid;
   gap: 10px;

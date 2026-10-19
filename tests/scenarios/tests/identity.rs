@@ -125,11 +125,15 @@ async fn vouch_cap_profiles_and_device_pairing() {
         .call_fallible(&bea, "set_profile", profile("  "))
         .await;
     assert!(r.is_err(), "blank names are rejected");
+    let r: Result<ActionHash, _> = conductors[1]
+        .call_fallible(&bea, "set_profile", profile("Bea Smith"))
+        .await;
+    assert!(r.is_err(), "usernames have no spaces (web's handle rules)");
     let _: ActionHash = conductors[1]
         .call(&bea, "set_profile", profile("Bea"))
         .await;
     let _: ActionHash = conductors[1]
-        .call(&bea, "set_profile", profile("Bea Smith"))
+        .call(&bea, "set_profile", profile("bea_smith"))
         .await;
     await_consistency(&cells).await.expect("consistency");
     let seen: Option<Profile> = conductors[0]
@@ -137,7 +141,7 @@ async fn vouch_cap_profiles_and_device_pairing() {
         .await;
     assert_eq!(
         seen.map(|p| p.name).as_deref(),
-        Some("Bea Smith"),
+        Some("bea_smith"),
         "latest update wins"
     );
 

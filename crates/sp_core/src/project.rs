@@ -14,6 +14,19 @@ pub const TAG_MAX: usize = 40;
 pub const MODES: [&str; 3] = ["productive", "collective-service", "personal-service"];
 pub const SUBTYPES: [&str; 3] = ["standard", "software", "asset-management"];
 
+/// A feed summary: the description's first paragraph, cut to `SUMMARY_MAX` characters
+/// (ui/src/lib/domain/projects.ts `summaryOf` does the same).
+#[must_use]
+pub fn summary_of(description: &str) -> String {
+    let first = description.trim().split("\n\n").next().unwrap_or("").trim();
+    if first.chars().count() > SUMMARY_MAX {
+        let cut: String = first.chars().take(SUMMARY_MAX - 1).collect();
+        format!("{cut}…")
+    } else {
+        first.to_string()
+    }
+}
+
 /// The fields every charter and listing share.
 #[derive(Clone, Copy, Debug)]
 pub struct CharterFields<'a> {
@@ -66,6 +79,12 @@ mod tests {
             phase: "",
             tags,
         }
+    }
+
+    #[test]
+    fn summary_is_the_first_paragraph() {
+        assert_eq!(summary_of("  One.\n\nTwo."), "One.");
+        assert_eq!(summary_of(&"x".repeat(600)).chars().count(), SUMMARY_MAX);
     }
 
     #[test]

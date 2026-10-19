@@ -33,7 +33,7 @@ export const open = (page, name) => page.getByRole('link', { name, exact: true }
 
 export async function signUp(page, name) {
   await page.getByRole('tab', { name: 'Sign up' }).click();
-  await page.getByLabel('Your name').fill(name);
+  await page.getByLabel('Username').fill(name);
   await page.getByRole('button', { name: 'Next' }).click();
   const words = (await page.locator('ol.grid li').allInnerTexts()).map((t) => t.split(/\s+/).pop());
   await page.getByRole('button', { name: "I've written them down" }).click();

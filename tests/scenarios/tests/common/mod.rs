@@ -89,3 +89,45 @@ pub async fn project_network(conductors: &mut SweetConductorBatch, seed: &str) -
     conductors.exchange_peer_info().await;
     cells
 }
+
+/// Each agent gets one app with both roles, named as in happ.yaml ("directory", "project"):
+/// the directory with the first `founders` agents as founders, and one project clone created by
+/// the first agent. Returns `(directory, project)` cells per conductor.
+pub async fn project_with_directory(
+    conductors: &mut SweetConductorBatch,
+    founders: usize,
+    seed: &str,
+) -> Vec<(SweetCell, SweetCell)> {
+    let mut agents = Vec::new();
+    for i in 0..conductors.len() {
+        agents.push(SweetAgents::one(conductors[i].keystore()).await);
+    }
+    let directory = directory_with_founders(&agents[..founders]).await;
+    let creator = AgentPubKeyB64::from(agents[0].clone());
+    let modifiers =
+        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(format!("{creator}.{seed}"));
+    let project = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
+        .await
+        .expect("load project dna");
+    let mut out = Vec::new();
+    for (i, agent) in agents.into_iter().enumerate() {
+        let roles = [
+            ("directory".to_string(), directory.clone()),
+            ("project".to_string(), project.clone()),
+        ];
+        let app = conductors[i]
+            .setup_app_for_agent("sp", agent, &roles)
+            .await
+            .expect("install app");
+        let (dir, proj): (Vec<SweetCell>, Vec<SweetCell>) = app
+            .into_cells()
+            .into_iter()
+            .partition(|c| c.cell_id().dna_hash() == directory.dna_hash());
+        let (Some(d), Some(p)) = (dir.into_iter().next(), proj.into_iter().next()) else {
+            panic!("app has both roles");
+        };
+        out.push((d, p));
+    }
+    conductors.exchange_peer_info().await;
+    out
+}

@@ -12,7 +12,7 @@ const a = await device({ passkeys: false });
 await a.getByRole('tab', { name: 'Log in' }).click();
 assert.equal(await a.getByRole('button', { name: 'Log in with a passkey' }).count(), 0);
 const t0 = Date.now();
-const words = await signUp(a, 'Ann Tester');
+const words = await signUp(a, 'AnnTester');
 log(`signed up in ${((Date.now() - t0) / 1000).toFixed(1)}s`);
 assert.equal(await a.getByText('Save a passkey').count(), 0, 'no passkey offer without a store');
 const annKey = await keyOf(a);
@@ -51,7 +51,7 @@ log('saved a passkey and signed in with it');
 
 // 3. Pairing: another person's device asks to pair with Ann; Ann confirms.
 const c = await device({ passkeys: false });
-await signUp(c, 'Ann Laptop');
+await signUp(c, 'AnnLaptop');
 await open(c, 'Settings');
 await c.getByPlaceholder('uhCAk…').fill(annKey);
 await c.getByRole('button', { name: 'Send pairing request' }).click();
@@ -64,10 +64,10 @@ for (let i = 0; i < 20 && !(await a.getByRole('button', { name: 'Confirm' }).cou
   await a.waitForTimeout(3000);
 }
 await a.getByRole('button', { name: 'Confirm' }).click();
-await a.locator('#settings-devices', { hasText: 'Ann Laptop' }).waitFor({ timeout: 60_000 });
+await a.locator('#settings-devices', { hasText: 'AnnLaptop' }).waitFor({ timeout: 60_000 });
 await a.goto(`${BASE}/people`);
 await a.getByText('2 devices').first().waitFor({ timeout: 60_000 });
-assert.equal(await a.locator('.person-row', { hasText: 'Ann Laptop' }).count(), 0, 'paired device folded into its person');
+assert.equal(await a.locator('.person-row', { hasText: 'AnnLaptop' }).count(), 0, 'paired device folded into its person');
 log('devices paired and shown as one person');
 
 assert.deepEqual(errors, [], 'no page errors');

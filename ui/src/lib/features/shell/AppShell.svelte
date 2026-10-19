@@ -17,6 +17,7 @@
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   import '#lib/components/shell/shell.css';
+  import '#lib/components/styles/additions.css';
 
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
   let { children }: { children: Snippet } = $props();

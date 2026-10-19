@@ -3,10 +3,7 @@
 
   import OverlaySheet from './OverlaySheet.svelte';
 
-  /**
-   * web's ProposeEditSheet: title, description, location label. Until M3 (proposals) the
-   * creator's edit applies directly; from M3 the same sheet files a proposal.
-   */
+  /** web's ProposeEditSheet: title, description, location label, filed as a proposal (M3). */
   interface Props {
     open: boolean;
     draft: CharterDraft;
@@ -35,7 +32,7 @@
 
 <OverlaySheet
   {open}
-  title="Edit project"
+  title="Propose edit"
   labelledById="project-edit-sheet"
   rootClass="edit-sheet"
   {onClose}
@@ -67,7 +64,7 @@
         class="sheet-submit"
         disabled={pending || !title.trim() || !description.trim()}
         form="project-edit-sheet-form"
-        type="submit">{pending ? 'Working...' : 'Save'}</button
+        type="submit">{pending ? 'Working...' : 'Propose edit'}</button
       >
     </div>
   {/snippet}

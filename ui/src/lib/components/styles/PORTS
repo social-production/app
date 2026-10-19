@@ -1,0 +1,43 @@
+# Which web/ component styles each stylesheet holds (ADR 0032). Regenerate all with
+#   python3 scripts/port-styles.py
+# Columns: <file in styles/, or path under components/>  <root class, or - for none>  <web path>
+# App-specific CSS never goes in these files; it lives in additions.css.
+shell/shell.css   -               web/src/lib/app/shell/AppShell.svelte
+onboarding.css    .onboarding     web/src/lib/features/onboarding/OnboardingPage.svelte
+profile.css       .profile-page   web/src/lib/features/profile/ProfilePage.svelte
+settings.css      .settings-scope web/src/lib/features/settings/SettingsPage.svelte
+cards.css         .surface        web/src/lib/components/cards/shared/FeedSurface.svelte
+cards.css         .feed-card-top  web/src/lib/components/cards/shared/FeedCardTop.svelte
+cards.css         .vote-strip     web/src/lib/components/cards/shared/VoteStrip.svelte
+cards.css         .content-meta-row web/src/lib/components/shared/ContentMetaRow.svelte
+cards.css         .project-card   web/src/lib/components/cards/public-feed/ProjectCard.svelte
+cards.css         .tag-list       web/src/lib/components/cards/shared/TagList.svelte
+feed.css          .feed-page      web/src/lib/features/public-feed/PublicFeed.svelte
+icon-menu.css     .icon-menu-shell web/src/lib/components/shared/IconMenuButton.svelte
+fab.css           .create-fab     web/src/lib/app/shell/CreateFab.svelte
+fab.css           .create-fab     web/src/lib/app/shell/CreateMenuIcon.svelte
+sheets.css        .overlay-root   web/src/lib/components/shared/OverlaySheet.svelte
+sheets.css        .people-sheet   web/src/lib/components/shared/PeopleSheet.svelte
+sheets.css        .edit-sheet     web/src/lib/components/shared/ProposeEditSheet.svelte
+detail.css        .membership-split web/src/lib/components/shared/MembershipSplitButton.svelte
+detail.css        .detail-action-dock web/src/lib/features/detail/DetailActionDock.svelte
+detail.css        .project-overview web/src/lib/features/projects/detail/ProjectOverviewHeader.svelte
+detail.css        .project-detail web/src/lib/features/projects/ProjectDetailPage.svelte
+detail.css        .top-tab-row    web/src/lib/features/detail/DetailTopTabs.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreateFlowLayout.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreateWizard.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreatePanel.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreateTypeSelector.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreateLocationIntent.svelte
+create.css        .create-sheet   web/src/lib/features/create/shared/CreateScopeTagSelector.svelte
+create.css        .create-sheet   web/src/lib/components/shared/RequiredFieldLabel.svelte
+create.css        .create-sheet   web/src/lib/components/shared/DirectUsePolicyNotice.svelte
+create.css        .create-sheet   web/src/lib/features/create/project/CreateProjectPage.svelte
+governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
+governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
+governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte
+governance.css    .vote-dock-root web/src/lib/components/shared/VoteDockControl.svelte
+governance.css    .update-sheet   web/src/lib/components/shared/AddUpdateSheet.svelte
+governance.css    .phase-bar      web/src/lib/features/detail/DetailPhaseStepper.svelte
+governance.css    .updates-shell  web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte
+governance.css    .update-card    web/src/lib/components/cards/details/DetailUpdateCard.svelte

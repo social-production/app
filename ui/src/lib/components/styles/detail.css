@@ -658,7 +658,7 @@
 .project-overview
   .signal-row
   :global(
-    .signal-strip.labeled:is(:has(.active-support), .project-overview :has(.active-oppose))
+    .signal-strip.labeled:is(:has(.active-support), :has(.active-oppose))
       .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled)
   ) {
   background: var(--brand-soft);
@@ -1078,10 +1078,4 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-}
-
-/* app/ui: .project-overview only scopes the header's ported styles (it wraps the panel and the
-   dock content); it must not add a box between web's flex parents and children. */
-.project-overview {
-  display: contents;
 }

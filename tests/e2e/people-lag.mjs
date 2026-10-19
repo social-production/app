@@ -9,7 +9,7 @@ async function signUp(name) {
   const page = await (await browser.newContext()).newPage();
   await page.goto(BASE);
   await page.getByRole('tab', { name: 'Sign up' }).click();
-  await page.getByLabel('Your name').fill(name);
+  await page.getByLabel("Username").fill(name);
   await page.getByRole('button', { name: 'Next' }).click();
   const words = (await page.locator('ol.grid li').allInnerTexts()).map((t) => t.split(/\s+/).pop());
   await page.getByRole('button', { name: "I've written them down" }).click();
@@ -23,13 +23,13 @@ async function signUp(name) {
 }
 
 const stamp = Date.now().toString(36).slice(-4);
-const watcher = await signUp(`Lag watcher ${stamp}`);
-await signUp(`Lag newcomer ${stamp}`);
+const watcher = await signUp(`lag_watcher_${stamp}`);
+await signUp(`lag_newcomer_${stamp}`);
 const t0 = Date.now();
 for (;;) {
   await watcher.reload();
   await watcher.getByRole('heading', { name: 'People' }).waitFor({ timeout: 60_000 });
-  if (await watcher.getByText(`Lag newcomer ${stamp}`).count()) break;
+  if (await watcher.getByText(`lag_newcomer_${stamp}`).count()) break;
   if (Date.now() - t0 > 15 * 60_000) {
     console.log('newcomer not visible after 15 min');
     process.exit(1);

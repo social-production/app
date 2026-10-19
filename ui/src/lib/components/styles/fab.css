@@ -220,7 +220,7 @@
   }
 }
 
-/* Ported from web/src/lib/app/shell/CreateMenuIcon.svelte (ADR 0032) */
+/* Ported from web/src/lib/app/shell/CreateMenuIcon.svelte (ADR 0032, scripts/port-styles.py) */
 .create-fab .create-menu-icon-wrap {
   display: inline-flex;
   align-items: center;

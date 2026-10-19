@@ -17,6 +17,9 @@ pub fn config() -> NetworkConfig {
     NetworkConfig {
         bootstrap_url: url2::Url2::parse(&url),
         relay_url: url2::Url2::parse(&url),
+        // Full arc while the network is small: every desktop node holds the whole directory, so
+        // losing the seed node loses nothing (ADR 0036). Revisit once there are many full nodes.
+        target_arc_factor: 1,
         advanced: Some(advanced),
         ..NetworkConfig::default()
     }

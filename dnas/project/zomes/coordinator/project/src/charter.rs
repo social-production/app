@@ -1,4 +1,4 @@
-//! The charter: one original (linked from the "charter" anchor) plus the creator's updates.
+//! The charter as created (linked from the "charter" anchor); passed edits apply on top (ADR 0033).
 
 use hdk::prelude::*;
 use project_integrity::{Charter, EntryTypes, LinkTypes, UnitEntryTypes};
@@ -18,46 +18,23 @@ pub fn create(charter: Charter) -> ExternResult<ActionHash> {
         LinkTypes::ProjectCharter,
         (),
     )?;
-    crate::join(())?;
+    crate::people::join()?;
     Ok(hash)
 }
 
-pub fn update(charter: Charter) -> ExternResult<ActionHash> {
+/// The charter as created, and when.
+pub fn base() -> ExternResult<Option<(Charter, Timestamp)>> {
     let Some(original) = original()? else {
-        return Err(wasm_error!(WasmErrorInner::Guest(
-            "this project has no charter yet".into()
-        )));
+        return Ok(None);
     };
-    update_entry(original, EntryTypes::Charter(charter))
-}
-
-/// The current charter and the times it was written (original first), newest version wins.
-pub fn current() -> ExternResult<(Option<Charter>, Vec<Timestamp>)> {
-    let Some(original) = original()? else {
-        return Ok((None, Vec::new()));
+    let Some(record) = get(original, GetOptions::default())? else {
+        return Ok(None);
     };
-    let Some(Details::Record(details)) = get_details(original, GetOptions::default())? else {
-        return Ok((None, Vec::new()));
-    };
-    let mut versions: Vec<Record> = details
-        .updates
-        .iter()
-        .filter_map(|u| {
-            get(u.action_address().clone(), GetOptions::default())
-                .ok()
-                .flatten()
-        })
-        .collect();
-    versions.push(details.record);
-    versions.sort_by_key(|r| r.action().timestamp());
-    let times = versions.iter().map(|r| r.action().timestamp()).collect();
-    let newest = versions
-        .last()
-        .map(|r| r.entry().to_app_option::<Charter>())
-        .transpose()
-        .map_err(|e| wasm_error!(e))?
-        .flatten();
-    Ok((newest, times))
+    let charter = record
+        .entry()
+        .to_app_option::<Charter>()
+        .map_err(|e| wasm_error!(e))?;
+    Ok(charter.map(|c| (c, record.action().timestamp())))
 }
 
 /// The first charter: own chain first (fresh writes), then the network.

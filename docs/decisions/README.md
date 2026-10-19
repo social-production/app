@@ -34,5 +34,8 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0030](./0030-project-clones-and-creator-seed.md) Each project is a clone; its network seed names the creator
 - [0031](./0031-archivist-and-node-index.md) Seed nodes archive every project and serve the project feed
 - [0032](./0032-ported-styles.md) Styles ported from web/ live in global stylesheets scoped by a root class
+- [0033](./0033-project-governance-checks.md) Project governance: what integrity checks, what is checked when applying
 - [0034](./0034-lair-frame-limit.md) Keep keystore entries few, and patch lair's 8 KiB message limit
 - [0035](./0035-restore-falls-back-to-fresh.md) A phrase restore waits for the chain, then starts fresh if there is none
+- [0036](./0036-every-full-node-keeps-the-network.md) Every full node keeps the network, not just the seed node
+- [0037](./0037-sharding-policy.md) Sharding policy: full copies while small, sharded by default later, archivers by choice

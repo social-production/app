@@ -59,6 +59,28 @@ pub fn tally(choices: &[Choice], population: u32, threshold: Threshold) -> Tally
     }
 }
 
+/// Where a proposal stands. An Outcome may only be written for `Passed` or `Rejected`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
+pub enum Verdict {
+    Passed,
+    /// Can no longer pass, even if every remaining member voted Yes.
+    Rejected,
+    Open,
+}
+
+impl Tally {
+    #[must_use]
+    pub fn verdict(&self) -> Verdict {
+        if self.passes {
+            Verdict::Passed
+        } else if self.can_still_pass {
+            Verdict::Open
+        } else {
+            Verdict::Rejected
+        }
+    }
+}
+
 fn count(choices: &[Choice], wanted: Choice) -> u32 {
     let n = choices.iter().filter(|c| **c == wanted).count();
     u32::try_from(n).unwrap_or(u32::MAX)
@@ -71,6 +93,23 @@ mod tests {
         Choice::{No, Yes},
         Threshold,
     };
+
+    #[test]
+    fn verdicts() {
+        use super::Verdict;
+        assert_eq!(
+            tally(&[Yes], 1, Threshold::DEFAULT).verdict(),
+            Verdict::Passed
+        );
+        assert_eq!(
+            tally(&[Yes], 3, Threshold::DEFAULT).verdict(),
+            Verdict::Open
+        );
+        assert_eq!(
+            tally(&[No, No], 3, Threshold::DEFAULT).verdict(),
+            Verdict::Rejected
+        );
+    }
 
     #[test]
     fn passes_with_quorum_and_two_thirds() {

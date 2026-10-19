@@ -37,6 +37,11 @@ interface ProjectWire {
   my_signal: Stance | null;
   created_at: number | null;
   last_activity_at: number | null;
+  phase: string;
+  stage: string;
+  phases: { id: string; label: string }[];
+  next_phase: { id: string; label: string } | null;
+  updates: { proposal: ActionHash; author: AgentPubKey; body: string; at: number }[];
 }
 
 const directory = <T>(fn: string, payload?: unknown) =>
@@ -77,7 +82,8 @@ async function listing(id: string): Promise<ListingWire> {
   return found;
 }
 
-async function cellOf(id: string) {
+/** A project's cell on this node (cloned on first use, which joins its network). */
+export async function cellOf(id: string) {
   const l = await listing(id);
   return {
     cell: await projectCell(l.listing.network_seed, l.listing.title),
@@ -101,6 +107,16 @@ export async function getProject(id: string): Promise<Project> {
     mySignal: p.my_signal,
     createdAt: p.created_at ?? 0,
     lastActivityAt: p.last_activity_at,
+    phase: p.phase,
+    stage: p.stage,
+    phases: p.phases,
+    nextPhase: p.next_phase,
+    updates: p.updates.map((u) => ({
+      proposal: hashToString(u.proposal),
+      author: hashToString(u.author),
+      body: u.body,
+      at: u.at,
+    })),
   };
 }
 
@@ -112,16 +128,6 @@ export async function joinProject(id: string, join: boolean): Promise<void> {
 export async function setSignal(id: string, stance: Stance | null): Promise<void> {
   const { cell } = await cellOf(id);
   await callCell<null>(cell, 'project', 'set_signal', stance);
-}
-
-/** Creator only (until M3 proposals): the charter, and the listing kept in step. */
-export async function updateCharter(id: string, charter: Charter): Promise<void> {
-  const { cell, seed } = await cellOf(id);
-  await callCell<ActionHash>(cell, 'project', 'update_charter', charter);
-  await directory<ActionHash>('update_listing', {
-    id: stringToHash(id),
-    listing: listingOf(seed, charter),
-  });
 }
 
 function listingOf(seed: string, c: Charter) {

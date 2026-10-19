@@ -33,6 +33,12 @@ There are no names, emails or passwords.
 `LAIR_PASSPHRASE`). The recovery phrase is the way out, because the person can take their identity
 to any node or app.
 
+## Usernames
+A profile's name is a username with web's rules: 3–32 letters, numbers, hyphens or underscores,
+no spaces, and no leading, trailing or repeated separators (`sp_core::handle`, enforced by the
+directory DNA). A P2P network can't keep names unique. Two people may pick the same one, and the key
+tag shown next to it (`ann · 7NFm`) tells them apart.
+
 ## Zome-call signing
 
 Holochain 0.7 requires every app-websocket zome call to be signed. A browser signs with its

@@ -1,6 +1,7 @@
 <script lang="ts">
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
-  import { BIO_MAX, HOME_AREA_MAX, NAME_MAX, type Avatar } from '#lib/domain/people.ts';
+  import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
+  import { BIO_MAX, HOME_AREA_MAX, type Avatar } from '#lib/domain/people.ts';
   import { toAvatar } from '#lib/components/people/avatar.ts';
   import { explain } from '#lib/services/errors.ts';
   import { getPerson, saveProfile } from '#lib/services/people.ts';
@@ -9,6 +10,7 @@
   let { me }: { me: string } = $props();
 
   let name = $state('');
+  const problem = $derived(handleProblem(name));
   let bio = $state('');
   let homeArea = $state('');
   let avatar = $state<Avatar | null>(null);
@@ -92,9 +94,9 @@
         <div class="profile-copy">
           <input
             bind:value={name}
-            maxlength={NAME_MAX}
-            aria-label="Name"
-            placeholder="Your name"
+            maxlength={HANDLE_MAX}
+            aria-label="Username"
+            placeholder="Username"
             autocomplete="name"
           />
           <input
@@ -114,15 +116,10 @@
       </div>
       <!-- Reserved height: messages appear without pushing the page down. -->
       <p class:profile-image-error={!!error} class:bio-saved={!error} class="status-line">
-        {error ?? status ?? (name.trim() ? '' : 'Add your name to save.')}
+        {error ?? status ?? problem ?? ''}
       </p>
       <div class="actions">
-        <button
-          class="button-primary"
-          disabled={saving || !name.trim()}
-          type="button"
-          onclick={save}
-        >
+        <button class="button-primary" disabled={saving || !!problem} type="button" onclick={save}>
           {saving ? 'Saving…' : 'Save profile'}
         </button>
       </div>

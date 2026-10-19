@@ -1,0 +1,20 @@
+/* App-specific CSS (not from web/; ADR 0032). Everything in the other files here is generated
+   by scripts/port-styles.py from PORTS. Keep this file short; each rule says why. */
+
+/* P2P additions: the phrase box and confirm inputs share web's input look. */
+.onboarding textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text);
+  font: inherit;
+  resize: vertical;
+}
+
+/* app/ui: .project-overview only scopes the header's ported styles (it wraps the panel and the
+   dock content); it must not add a box between web's flex parents and children. */
+.project-overview {
+  display: contents;
+}

@@ -1,0 +1,623 @@
+/* Ported from web/src/lib/components/shared/VoteDecisionBody.svelte (ADR 0032, scripts/port-styles.py) */
+.vote-sheet {
+  display: grid;
+  gap: 14px;
+}
+
+.vote-sheet .vote-label {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 800;
+}
+
+.vote-sheet .outcome {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+.vote-sheet .proposer,
+.vote-sheet .tally-note,
+.vote-sheet .clear-hint,
+.vote-sheet .field-kicker {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.vote-sheet .proposer {
+  margin-top: -8px;
+}
+
+.vote-sheet .change-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.vote-sheet .change-card h3 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.vote-sheet .change-card p,
+.vote-sheet .tally p {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.vote-sheet .change-card p.field-kicker,
+.vote-sheet .tally p.tally-note {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.vote-sheet .change-card p.field-kicker {
+  font-weight: 700;
+}
+
+.vote-sheet .pair {
+  display: grid;
+  gap: 12px;
+}
+
+.vote-sheet .proposed {
+  padding-left: 10px;
+  border-left: 3px solid #2f9e44;
+}
+
+.vote-sheet .proposed-copy {
+  padding-left: 10px;
+  border-left: 3px solid #2f9e44;
+}
+
+.vote-sheet .field-kicker {
+  font-weight: 700;
+}
+
+.vote-sheet .tally {
+  display: grid;
+  gap: 4px;
+}
+
+.vote-sheet .sheet-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.vote-sheet .approve-button,
+.vote-sheet .choice-button {
+  flex: 1 1 0;
+  min-height: 64px;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 18px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.vote-sheet .approve-button {
+  border: 1px solid #2f9e44;
+  background: #2f9e44;
+  color: #fff;
+}
+
+.vote-sheet .yes-choice {
+  border: 1px solid #2f9e44;
+  background: color-mix(in srgb, #2f9e44 18%, var(--panel));
+  color: #1b7a32;
+}
+
+.vote-sheet .yes-choice.selected {
+  background: #2f9e44;
+  color: #fff;
+}
+
+.vote-sheet .no-choice {
+  border: 1px solid #e03131;
+  background: color-mix(in srgb, #e03131 16%, var(--panel));
+  color: #c22525;
+}
+
+.vote-sheet .no-choice.selected {
+  background: #e03131;
+  color: #fff;
+}
+
+@media (min-width: 640px) {
+  .vote-sheet .pair {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* Ported from web/src/lib/components/shared/VoteChoiceBar.svelte (ADR 0032, scripts/port-styles.py) */
+.choice-bar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+}
+
+.choice-bar .choice {
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.choice-bar:not(.chosen) .yes {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.choice-bar:not(.chosen) .yes:hover {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.choice-bar:not(.chosen) .no {
+  background: var(--danger);
+  color: white;
+}
+
+.choice-bar:not(.chosen) .no:hover {
+  background: color-mix(in srgb, var(--danger) 78%, white);
+  color: white;
+  filter: none;
+  transform: none;
+}
+
+.choice-bar.chosen .choice {
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.choice-bar.chosen .choice:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.choice-bar.chosen .yes.selected {
+  color: #22c55e;
+}
+
+.choice-bar.chosen .yes.selected:hover {
+  background: color-mix(in srgb, #22c55e 18%, var(--panel-strong));
+  color: #22c55e;
+  filter: none;
+  transform: none;
+}
+
+.choice-bar.chosen .no.selected {
+  color: #ef4444;
+}
+
+.choice-bar.chosen .no.selected:hover {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-strong));
+  color: #ef4444;
+  filter: none;
+  transform: none;
+}
+
+.choice-bar .no {
+  box-shadow: inset 1px 0 0 var(--panel-border);
+}
+
+.choice-bar .overlay-footer:has(.choice-bar) {
+  gap: 0;
+}
+
+/* Ported from web/src/lib/components/shared/RoundPlusButton.svelte (ADR 0032, scripts/port-styles.py) */
+.round-plus-button {
+  height: 40px;
+  min-width: 40px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.round-plus-button.with-label {
+  padding: 0 14px 0 10px;
+}
+
+.round-plus-button .plus-glyph {
+  font-size: 24px;
+  line-height: 1;
+}
+
+.round-plus-button .plus-label {
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.round-plus-button:hover,
+.round-plus-button:focus-visible,
+.round-plus-button.active {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.round-plus-button.standout {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.round-plus-button.standout.active {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.round-plus-button.standout:hover:not(:disabled),
+.round-plus-button.standout:focus-visible {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  box-shadow: none;
+  filter: none;
+  transform: none;
+}
+
+/* Ported from web/src/lib/components/shared/VoteDockControl.svelte (ADR 0032, scripts/port-styles.py) */
+.vote-dock-root .vote-dock {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  min-width: 72px;
+  min-height: 44px;
+}
+
+.vote-dock-root .vote-dock .round-plus-button {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.vote-dock-root .vote-list {
+  display: grid;
+  padding: 4px 16px 20px;
+}
+
+.vote-dock-root .overlay-footer:has(.vote-footer) {
+  flex-direction: column;
+  gap: 0;
+}
+
+.vote-dock-root .vote-footer {
+  display: grid;
+  width: 100%;
+}
+
+.vote-dock-root .vote-progress {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.vote-dock-root .vote-next {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 48px;
+  border: 0;
+  border-radius: 0;
+  background: #111;
+  color: #fff;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.vote-dock-root .vote-next svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Ported from web/src/lib/components/shared/AddUpdateSheet.svelte (ADR 0032, scripts/port-styles.py) */
+.update-sheet .sheet-lead {
+  margin: 6px 0 0;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.update-sheet .update-form {
+  display: grid;
+  gap: 16px;
+  padding: 8px 20px 20px;
+}
+
+.update-sheet .field {
+  display: grid;
+}
+
+.update-sheet .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.update-sheet textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+  font-size: 16px;
+  resize: vertical;
+  min-height: 180px;
+}
+
+.update-sheet .warning-card {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--status-yellow) 50%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--status-yellow) 14%, var(--panel-strong));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.update-sheet .sheet-actions {
+  display: flex;
+  width: 100%;
+}
+
+.update-sheet .sheet-cancel,
+.update-sheet .sheet-submit {
+  flex: 1 1 0;
+  min-height: 52px;
+  border: 0;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.update-sheet .sheet-cancel {
+  border-right: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.update-sheet .sheet-submit {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.update-sheet .sheet-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Ported from web/src/lib/features/detail/DetailPhaseStepper.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-bar {
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-soft);
+}
+
+.phase-bar .segment {
+  position: relative;
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 8px;
+  border: 0;
+  border-right: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  background: transparent;
+  color: var(--text-soft);
+  font-size: clamp(10px, 1.5vw, 13px);
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.phase-bar .segment:last-child {
+  border-right: 0;
+}
+
+.phase-bar .label {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-align: center;
+  line-height: 1.15;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .phase-bar .label {
+    font-size: 11px;
+  }
+}
+
+.phase-bar .segment.complete {
+  background: color-mix(in srgb, var(--brand) 22%, var(--panel));
+  color: var(--text-main);
+}
+
+.phase-bar .segment.current {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.phase-bar .segment.future,
+.phase-bar .segment.locked:not(.active) {
+  color: color-mix(in srgb, var(--text-soft) 80%, transparent);
+}
+
+.phase-bar .segment.active:not(.current) {
+  box-shadow: inset 0 -3px 0 var(--brand);
+  color: var(--text-main);
+}
+
+.phase-bar .segment:hover,
+.phase-bar .segment:focus-visible {
+  color: var(--text-main);
+}
+
+.phase-bar .segment.current:hover,
+.phase-bar .segment.current:focus-visible {
+  color: white;
+}
+
+/* Ported from web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte (ADR 0032, scripts/port-styles.py) */
+.updates-shell,
+.updates-shell .stack {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
+}
+
+.updates-shell .updates-list {
+  gap: 0;
+}
+
+.updates-shell .updates-list .update-card {
+  border-radius: 0;
+}
+
+.updates-shell .updates-list .update-card + .update-card {
+  border-top: none;
+}
+
+.updates-shell .updates-list .update-card:first-child {
+  border-top-left-radius: var(--radius-sm);
+  border-top-right-radius: var(--radius-sm);
+}
+
+.updates-shell .updates-list .update-card:last-child {
+  border-bottom-left-radius: var(--radius-sm);
+  border-bottom-right-radius: var(--radius-sm);
+}
+
+.updates-shell {
+  padding: 24px 0 22px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.updates-shell .updates-title-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.updates-shell h2 {
+  margin: 0;
+  font-size: 18px;
+  text-align: center;
+  color: var(--text-main);
+}
+
+.updates-shell p {
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.updates-shell .empty-card {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  min-width: 0;
+}
+
+.updates-shell .updates-list.scrollable {
+  overflow: visible;
+  overflow-y: auto;
+  padding-right: 6px;
+  scrollbar-gutter: stable;
+}
+
+/* Ported from web/src/lib/components/cards/details/DetailUpdateCard.svelte (ADR 0032, scripts/port-styles.py) */
+.update-card {
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  scroll-margin-top: 84px;
+  display: grid;
+  gap: 10px;
+  transition:
+    border-color 140ms ease,
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.update-card.highlighted {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1px var(--brand);
+}
+
+.update-card .update-body {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.update-card .update-meta {
+  display: flex;
+  justify-self: end;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+  text-align: right;
+  font-size: 12px;
+}

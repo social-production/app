@@ -1,4 +1,4 @@
-/* Ported from web/src/lib/features/onboarding/OnboardingPage.svelte, scoped to .onboarding */
+/* Ported from web/src/lib/features/onboarding/OnboardingPage.svelte (ADR 0032, scripts/port-styles.py) */
 .onboarding .handle-line {
   min-height: 20px;
 }
@@ -108,16 +108,4 @@
 
 .onboarding .status-note {
   color: var(--danger, #b91c1c);
-}
-
-/* P2P additions: the phrase box and confirm inputs share web's input look. */
-.onboarding textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius-sm);
-  background: var(--panel-soft);
-  color: var(--text);
-  font: inherit;
-  resize: vertical;
 }

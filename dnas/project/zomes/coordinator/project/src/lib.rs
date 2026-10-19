@@ -1,13 +1,13 @@
-//! Project DNA API (docs/plans/M2-projects.md). Reads merge the network's view with the
-//! caller's own chain, so your own join/leave/signal shows at once.
+//! Project DNA API (docs/plans/M2-projects.md, M3-governance.md): charter, membership,
+//! signals, and the project view with passed decisions applied (ADR 0033).
 
 mod charter;
 mod own;
-
-use std::collections::BTreeMap;
+mod people;
 
 use hdk::prelude::*;
-use project_integrity::{creator, Charter, LinkTypes, DEMAND, OPPOSE};
+use project_integrity::{creator, Applied, AppliedUpdate, Charter, LinkTypes};
+use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 
 pub(crate) const CHARTER: &str = "charter";
 pub(crate) const MEMBERS: &str = "members";
@@ -22,7 +22,15 @@ pub enum Stance {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProjectView {
     pub creator: AgentPubKey,
+    /// The charter with every passed edit applied.
     pub charter: Option<Charter>,
+    /// web's phase id ("phase-1"…) and its label for this project's mode ("Production Plan").
+    pub phase: String,
+    pub stage: String,
+    /// The phases this project shows, and the one a proposal may move it to next.
+    pub phases: Vec<PhaseStep>,
+    pub next_phase: Option<PhaseStep>,
+    pub updates: Vec<AppliedUpdate>,
     pub members: Vec<AgentPubKey>,
     pub demand: u32,
     pub opposition: u32,
@@ -32,53 +40,61 @@ pub struct ProjectView {
     pub last_activity_at: Option<Timestamp>,
 }
 
+/// One phase as the stepper shows it (ids and labels from `sp_governance::phases`).
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct PhaseStep {
+    pub id: String,
+    pub label: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SignalCounts {
+    pub demand: u32,
+    pub opposition: u32,
+}
+
 #[hdk_extern]
 pub fn create_charter(charter: Charter) -> ExternResult<ActionHash> {
     charter::create(charter)
 }
 
 #[hdk_extern]
-pub fn update_charter(charter: Charter) -> ExternResult<ActionHash> {
-    charter::update(charter)
+pub fn base_charter() -> ExternResult<Option<Charter>> {
+    Ok(charter::base()?.map(|(c, _)| c))
 }
 
 #[hdk_extern]
 pub fn join() -> ExternResult<()> {
-    if own::live_links(LinkTypes::Members)?.is_empty() {
-        let me = agent_info()?.agent_initial_pubkey;
-        create_link(anchor(MEMBERS)?, me, LinkTypes::Members, ())?;
-    }
-    Ok(())
+    people::join()
 }
 
 #[hdk_extern]
 pub fn leave() -> ExternResult<()> {
-    for (hash, _) in own::live_links(LinkTypes::Members)? {
-        delete_link(hash, GetOptions::default())?;
-    }
-    Ok(())
+    people::leave()
 }
 
-/// One live signal per agent: replaces any earlier one; `None` withdraws it.
 #[hdk_extern]
 pub fn set_signal(stance: Option<Stance>) -> ExternResult<()> {
-    for (hash, _) in own::live_links(LinkTypes::Signals)? {
-        delete_link(hash, GetOptions::default())?;
-    }
-    if let Some(stance) = stance {
-        let me = agent_info()?.agent_initial_pubkey;
-        let tag = match stance {
-            Stance::Demand => DEMAND,
-            Stance::Oppose => OPPOSE,
-        };
-        create_link(
-            anchor(SIGNALS)?,
-            me,
-            LinkTypes::Signals,
-            LinkTag::new([tag]),
-        )?;
-    }
-    Ok(())
+    people::set_signal(stance)
+}
+
+#[hdk_extern]
+pub fn my_membership() -> ExternResult<Option<ActionHash>> {
+    people::my_membership()
+}
+
+#[hdk_extern]
+pub fn member_snapshot() -> ExternResult<Vec<ActionHash>> {
+    people::snapshot()
+}
+
+#[hdk_extern]
+pub fn signal_counts() -> ExternResult<SignalCounts> {
+    let p = people::read()?;
+    Ok(SignalCounts {
+        demand: p.demand,
+        opposition: p.opposition,
+    })
 }
 
 #[hdk_extern]
@@ -86,60 +102,85 @@ pub fn get_project() -> ExternResult<Option<ProjectView>> {
     let Some(creator) = creator()? else {
         return Ok(None);
     };
-    let me = agent_info()?.agent_initial_pubkey;
-    let (charter, charter_times) = charter::current()?;
-    let member_links = links(MEMBERS, LinkTypes::Members)?;
-    let signal_links = links(SIGNALS, LinkTypes::Signals)?;
+    let base = charter::base()?;
+    let applied = applied()?;
+    let people = people::read()?;
+    let created_at = base.as_ref().map(|(_, at)| *at);
+    let charter = base.map(|(c, _)| merge(c, &applied));
 
-    let mut members: Vec<AgentPubKey> = member_links.iter().map(|l| l.author.clone()).collect();
-    let am_member = !own::live_links(LinkTypes::Members)?.is_empty();
-    members.retain(|a| a != &me);
-    members.sort();
-    members.dedup();
-    if am_member {
-        members.push(me.clone());
-    }
+    let current = applied
+        .phase
+        .as_deref()
+        .and_then(Phase::parse)
+        .unwrap_or(Phase::P1);
+    let (mode, subtype) = charter.as_ref().map_or(("productive", "standard"), |c| {
+        (c.mode.as_str(), c.subtype.as_str())
+    });
+    let shape = Shape {
+        mode,
+        subtype,
+        include_access: false,
+    };
+    let step = |p: Phase| PhaseStep {
+        id: p.id().to_string(),
+        label: stage_label(shape, p).to_string(),
+    };
+    let phases = visible_phases(shape, current)
+        .into_iter()
+        .map(step)
+        .collect();
+    let next = next_phase(shape, current).map(step);
+    let stage = stage_label(shape, current).to_string();
 
-    let mut stances: BTreeMap<AgentPubKey, (Timestamp, u8)> = BTreeMap::new();
-    for l in &signal_links {
-        let entry = stances
-            .entry(l.author.clone())
-            .or_insert((l.timestamp, l.tag.0[0]));
-        if l.timestamp >= entry.0 {
-            *entry = (l.timestamp, l.tag.0[0]);
-        }
-    }
-    let my_signal = own::live_links(LinkTypes::Signals)?
-        .first()
-        .map(|(_, tag)| stance_of(*tag));
-    stances.remove(&me);
-    let count = |want: u8| stances.values().filter(|(_, t)| *t == want).count();
-    let mine = |want: Stance| usize::from(my_signal == Some(want));
-
-    let times = member_links
-        .iter()
-        .chain(&signal_links)
-        .map(|l| l.timestamp);
-    let last_activity_at = charter_times.iter().copied().chain(times).max();
+    let last_activity_at = [created_at, people.last_at, applied.last_decision_at]
+        .into_iter()
+        .flatten()
+        .max();
     Ok(Some(ProjectView {
         creator,
         charter,
-        members,
-        demand: u32::try_from(count(DEMAND) + mine(Stance::Demand)).unwrap_or(u32::MAX),
-        opposition: u32::try_from(count(OPPOSE) + mine(Stance::Oppose)).unwrap_or(u32::MAX),
-        am_member,
-        my_signal,
-        created_at: charter_times.first().copied(),
+        phase: current.id().to_string(),
+        stage,
+        phases,
+        next_phase: next,
+        updates: applied.updates,
+        members: people.members,
+        demand: people.demand,
+        opposition: people.opposition,
+        am_member: people.am_member,
+        my_signal: people.my_signal,
+        created_at,
         last_activity_at,
     }))
 }
 
-fn stance_of(tag: u8) -> Stance {
-    if tag == OPPOSE {
-        Stance::Oppose
-    } else {
-        Stance::Demand
+/// Passed decisions, from the governance zome of this cell.
+fn applied() -> ExternResult<Applied> {
+    match call(
+        CallTargetCell::Local,
+        ZomeName::from("governance"),
+        "applied".into(),
+        None,
+        (),
+    )? {
+        ZomeCallResponse::Ok(io) => io.decode().map_err(|e| wasm_error!(e)),
+        other => Err(wasm_error!(WasmErrorInner::Guest(format!(
+            "governance/applied: {other:?}"
+        )))),
     }
+}
+
+fn merge(mut c: Charter, a: &Applied) -> Charter {
+    if let Some(t) = &a.title {
+        c.title.clone_from(t);
+    }
+    if let Some(d) = &a.description {
+        c.description.clone_from(d);
+    }
+    if let Some(l) = &a.location {
+        c.location_label.clone_from(l);
+    }
+    c
 }
 
 pub(crate) fn anchor(name: &str) -> ExternResult<EntryHash> {

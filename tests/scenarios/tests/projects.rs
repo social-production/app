@@ -132,13 +132,17 @@ async fn members_join_signal_and_leave() {
     assert_eq!((mine.demand, mine.opposition), (0, 1));
 
     let _: () = conductors[1].call(&bob, "leave", ()).await;
-    let _: ActionHash = conductors[0]
-        .call(&ann, "update_charter", charter("Garden 2"))
+    let edit: Result<ActionHash, _> = conductors[0]
+        .call_fallible(&ann, "update_charter", charter("Garden 2"))
         .await;
+    assert!(
+        edit.is_err(),
+        "from M3 the charter changes only through proposals"
+    );
     await_consistency(&cells).await.expect("consistency");
     let after: ProjectView = conductors[0].call(&ann, "get_project", ()).await;
     assert_eq!(after.members, vec![cells[0].agent_pubkey().clone()]);
-    assert_eq!(after.charter.map(|c| c.title), Some("Garden 2".into()));
+    assert_eq!(after.charter.map(|c| c.title), Some("Garden".into()));
     assert_eq!((after.demand, after.opposition), (0, 1));
 }
 

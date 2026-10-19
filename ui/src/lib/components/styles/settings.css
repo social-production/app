@@ -1,4 +1,4 @@
-/* Ported from web/src/lib/features/settings/SettingsPage.svelte, scoped to .settings-scope */
+/* Ported from web/src/lib/features/settings/SettingsPage.svelte (ADR 0032, scripts/port-styles.py) */
 .settings-scope .accent-choice {
   display: flex;
   flex-wrap: wrap;
@@ -24,7 +24,6 @@
   box-shadow: 0 0 0 3px var(--swatch);
 }
 
-/* Three equal segments, so "System" isn't wider than the others. */
 .settings-scope .theme-choice {
   display: inline-grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

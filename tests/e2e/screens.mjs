@@ -17,7 +17,7 @@ const shot = async (page, name) => {
 for (const [tag, viewport] of Object.entries(sizes)) {
   const page = await device({ viewport });
   await shot(page, `${tag}-welcome`);
-  await signUp(page, `Screens ${tag}`);
+  await signUp(page, `screens_${tag}`);
   await page.goto(`${BASE}/create/project`);
   await shot(page, `${tag}-create-type`);
   await page.getByRole('button', { name: 'Continue' }).click();

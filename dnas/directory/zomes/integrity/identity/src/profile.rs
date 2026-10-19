@@ -1,14 +1,15 @@
 use hdi::prelude::*;
+use sp_core::handle::check_handle;
 use sp_core::limits::{
-    optional_text_ok, text_ok, AVATAR_MAX_BYTES, AVATAR_MIME_TYPES, BIO_MAX, DISPLAY_NAME_MAX,
-    HOME_AREA_MAX,
+    optional_text_ok, AVATAR_MAX_BYTES, AVATAR_MIME_TYPES, BIO_MAX, HOME_AREA_MAX,
 };
 
 use crate::{invalid, Profile};
 
 pub fn validate_fields(p: &Profile) -> ExternResult<ValidateCallbackResult> {
-    if !text_ok(&p.name, DISPLAY_NAME_MAX) {
-        return invalid("name must be 1-60 characters");
+    // The profile name is the username (web's handle rules, no spaces).
+    if let Err(reason) = check_handle(&p.name) {
+        return invalid(&reason);
     }
     if !optional_text_ok(&p.bio, BIO_MAX) {
         return invalid("bio must be at most 1000 characters");

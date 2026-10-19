@@ -22,3 +22,7 @@ coordinator:
       path: ../../target/wasm32-unknown-unknown/zome/project.wasm
       dependencies:
         - name: project_integrity
+    - name: governance
+      path: ../../target/wasm32-unknown-unknown/zome/governance.wasm
+      dependencies:
+        - name: project_integrity

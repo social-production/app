@@ -1,4 +1,4 @@
-/* Shell layout, ported verbatim from web/src/lib/app/shell/AppShell.svelte (same class names). */
+/* Ported from web/src/lib/app/shell/AppShell.svelte (ADR 0032, scripts/port-styles.py) */
 .shell {
   min-height: 100vh;
   min-height: 100dvh;
@@ -40,7 +40,6 @@
     visibility 0s linear 0.22s;
 }
 
-/* A tapped link fades the old page a little until the new one is ready. */
 .main-content-navigating .main-frame {
   opacity: 0.55;
   transition: opacity 160ms ease 120ms;
@@ -216,10 +215,6 @@
   font-size: 10px;
 }
 
-/*
-    Phones keep :hover after a tap, and the global button hover is the same green
-    as the open state. Only a real pointer should show that hover.
-  */
 button.panel-toggle:hover:not(:disabled) {
   border-color: var(--panel-border);
   background: transparent;
@@ -335,7 +330,6 @@ button.panel-toggle[data-active='true']:hover {
   padding: 4px 8px 4px 4px;
 }
 
-/* 16px stops iOS from zooming the field on focus and aborting the keyboard. */
 .toolbar-search-expanded .toolbar-search-input {
   font-size: 16px;
 }
@@ -623,13 +617,11 @@ button.panel-toggle[data-active='true']:hover {
   .content-grid {
     grid-template-columns: 1fr;
     padding-top: 0;
-    /* Let short pages stay short; don't force a full-viewport empty slab
-         behind the fixed bottom nav (reads as a blank second footer). */
+
     min-height: 0;
   }
 
   .shell {
-    /* Compact mobile: never invent an empty viewport-tall slab above the nav. */
     min-height: 0;
   }
 
