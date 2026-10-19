@@ -25,7 +25,8 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 | `Members` link | M2 ✅ | "members" anchor → the member's own key; leaving deletes the link (ADR 0030) |
 | `Signals` link | M2 ✅ | "signals" anchor → the agent's key, tag = demand or opposition; one live per agent |
 | `Proposal`, `Vote`, `Outcome`, `Challenge` | M3 | generic governance |
-| `Thread`, `Post`, `Comment`, `Reaction` | M4 | discussion |
+| `Thread`, `Comment`, `Votes` link | M4b ✅ | `discussion` zome: threads, nested comments, up/down votes as links (the planned `Reaction`); never edited (ADR 0041) |
+| `Post` | later | web's posts are personal (followers/public), so not in a project clone (ADR 0041) |
 | `ChatMessage` | M4a ✅ | project chat, `discussion` zome: body + optional `reply_to`; anyone may post, only the author deletes, never edited (ADR 0038) |
 | `Activity`, `Role`, `Assignment`, `Rating` | M5 | activities + scheduling |
 | `ServiceRequest`, `AvailabilityRule`, `SlotHold` | M5 | service projects |

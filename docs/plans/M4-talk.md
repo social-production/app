@@ -56,3 +56,42 @@ chat mentions and replies.
   internal-path and mention links come with those features. A deleted message with replies leaves
   no "Deleted message" bubble; its replies quote "Deleted message" instead (ADR 0038). Paused
   accounts get the read-only composer, but the network doesn't enforce it yet.
+
+## M4b as built (2026-10-19)
+ADR 0041. web keeps threads in channels and communities; here they live in the project clone,
+which is the thread's scope.
+- **Integrity** (`discussion_integrity`): `Thread { title, body }`, `Comment { thread, parent,
+  body }`; links `Threads` (anchor → thread), `ThreadComments` (thread → comment), `Votes`
+  (thread/comment → voter key, tag up/down). Limits in `sp_core::discussion` (title 200, opening
+  post 20,000, comment 4,000). A comment must cite a thread, a reply a comment of the same thread,
+  a comment link must sit under its own thread, a vote is cast only as yourself on a thread or
+  comment. Nothing is edited; only authors delete (no delete offered, as on web).
+  `rules.rs` holds the checks; `lib.rs` the types and dispatch.
+- **API** (`discussion` coordinator, `threads.rs`, `comments.rs`, `votes.rs`): `create_thread
+  { title, body }`, `list_threads { sort, window, utc_offset_minutes }` (newest 200, ordered by
+  `sp_index` like web's channel feed), `get_thread(id)` (thread + first 200 comments oldest first,
+  flat with `parent`), `add_comment { thread, parent, body }`, `cast_vote { target, direction }`
+  (1 / -1 / 0). Vote and comment links for many targets are read in one batched `get_links`;
+  own threads, comments and votes come from the chain (`own::entries`, `own::live_links`).
+- **UI:** a Threads tab on the project page (`features/threads/ProjectThreads.svelte`, composed
+  by the route because features don't import each other), `CreateThread.svelte` (web's
+  CreateThreadPage basics step in `CreateSheet`), `/projects/[id]/threads/[thread]`
+  (`ThreadPage.svelte`). Components ported from web: `cards/{ThreadCard,VoteStrip,CountPill}`,
+  `discussion/{ThreadOverview,DiscussionPanel,DiscussionComment,CommentComposer}`. Styles:
+  `styles/discussion.css` from PORTS; three app-only rules in `additions.css`. `FeedSurface`
+  takes an optional `href` (the thread page's surface isn't a link).
+- **Tests:** `sp_core::discussion` units; scenarios `tests/scenarios/tests/threads.rs` (a
+  non-member starts a thread, comments and replies show at once and to others, bad input rejected,
+  votes count once per person and can change or be withdrawn, top/oldest sorts); browser test
+  `tests/e2e/threads.mjs`. Layout checked at 360, 390 and 1280 px with mock data.
+- **Differences from web, for now:**
+  - no channel/community tags (the project is the scope);
+  - no share menu (DMs, M4c), reports (M5) or @mentions (M4d);
+  - comment links are plain http(s) URL links;
+  - the thread page doesn't poll;
+  - paused accounts get the read-only composer and no "New thread", but the network doesn't
+    enforce it (ADR 0038);
+  - web's posts are personal, so they aren't here (ADR 0041).
+- **Left:** the seed node's feed index doesn't list threads (the archivist would read every clone's
+  thread links, plus a mixed card type in `/index/projects` and the home feed), so threads show only
+  in their project.
