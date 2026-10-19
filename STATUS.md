@@ -31,10 +31,11 @@ and continue from the first unfinished step."
   follows web's ProjectLifecyclePanel: stepper → `DetailPhaseContext` (kicker, title, summary from
   web-backend's `lifecycle_copy.py`, in `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work`
   with the plans and `PhaseChangeSection` (web's gate note + `PhaseMenu`). Styles ported via PORTS.
+  Then web's own Take part dock (`ParticipationDock`: Join for non-members, Vote for phase
+  proposals; the Details dock now only votes on edits/updates).
   Checked: `npm run check/lint -w ui`, boundaries, sizes. **Not yet done:** a 390px screenshot
   against web (needs the local seed node, i.e. Nix; this cloud environment's network policy
-  blocks holochain-ci.cachix.org, GitHub tarballs and the live web site, so it couldn't run here); web's own Take part dock (join + votes, no
-  Edit). **Gap vs web:** web's Advance opens a sheet asking for a reason; our phase proposals have
+  blocks holochain-ci.cachix.org, GitHub tarballs and the live web site, so it couldn't run here); **Gap vs web:** web's Advance opens a sheet asking for a reason; our phase proposals have
   no reason field (integrity change), so the menu item files at once. M3c's Return already carries
   a reason: when M3c merges, add `reason` to `Phase` in the same integrity bump and port the
   sheet. M3c's "Return to an earlier phase" button should become a PhaseMenu item (web does).
@@ -43,7 +44,17 @@ and continue from the first unfinished step."
   Two things to fix when merging main into it: its standalone "Return to an earlier phase"
   button must become the `return` item of `PhaseMenu` (web's `phaseMenuItems`), and
   `ChallengeList` ("Counts you can challenge") is **app-only** (web-backend has no challenge
-  window): flagged to the owner, who decides whether to keep it.
+  window). **Choice made (owner to review):** following "port only from web", the M3c PR drops
+  the ChallengeList UI and keeps the challenge rules (zome, `sp_governance`, scenarios, ADR 0040),
+  so the mechanism is ready when a challenge screen is designed or found in web. Undo by
+  restoring `ChallengeList.svelte` from `a0ce970`.
+
+## Cloud environment notes
+- The proxy blocks GitHub tarball downloads for repos outside the session, which `nix develop`
+  needs for flake inputs. Workaround: fetch them over git with `--override-input <path>
+  'git+https://github.com/<owner>/<repo>?rev=<locked rev>&shallow=1'` for every GitHub node in
+  `flake.lock` (plus `--no-write-lock-file`); the Holochain cachix cache is reachable once
+  holochain-ci.cachix.org is in the environment's allowed domains.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
