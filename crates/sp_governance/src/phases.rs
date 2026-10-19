@@ -66,7 +66,7 @@ pub struct Shape<'a> {
 }
 
 impl Shape<'_> {
-    fn skips_distribution(self) -> bool {
+    pub(crate) fn skips_distribution(self) -> bool {
         self.subtype == "software"
     }
 }

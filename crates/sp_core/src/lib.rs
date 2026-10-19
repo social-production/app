@@ -5,4 +5,5 @@ pub mod chat;
 pub mod handle;
 pub mod limits;
 pub mod network;
+pub mod plan;
 pub mod project;

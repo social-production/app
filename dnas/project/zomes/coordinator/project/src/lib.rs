@@ -22,7 +22,7 @@ pub enum Stance {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ProjectView {
     pub creator: AgentPubKey,
-    /// The charter with every passed edit applied.
+    /// The charter with every passed edit applied (and the subtype a plan chose).
     pub charter: Option<Charter>,
     /// web's phase id ("phase-1"…) and its label for this project's mode ("Production Plan").
     pub phase: String,
@@ -179,6 +179,10 @@ fn merge(mut c: Charter, a: &Applied) -> Charter {
     }
     if let Some(l) = &a.location {
         c.location_label.clone_from(l);
+    }
+    // The production or operations plan chooses the subtype (ADR 0039).
+    if let Some(s) = &a.subtype {
+        c.subtype.clone_from(s);
     }
     c
 }

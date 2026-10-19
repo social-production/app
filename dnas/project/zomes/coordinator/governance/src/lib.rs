@@ -1,14 +1,22 @@
-//! Project governance API (docs/plans/M3-governance.md, ADR 0033): propose, vote, read
-//! proposals with their tallies, and the applied state the project view is built from.
+//! Project governance API (docs/plans/M3-governance.md, ADR 0033, ADR 0039): propose, vote,
+//! rate plans, read proposals and plans with their tallies, and the applied state the project
+//! view is built from.
 
 mod apply;
 mod calls;
+mod plan_view;
+mod plan_write;
+mod plans;
 mod reads;
+mod views;
 mod write;
 
 use hdk::prelude::*;
 use project_integrity::{Applied, ProposalKind, VoteChoice};
-use sp_governance::Verdict;
+
+pub use plan_view::{CriterionView, LeaderStatus, PlanBoard, PlanView};
+pub use plan_write::RateInput;
+pub use views::{ProposalView, TallyView};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VoteInput {
@@ -16,27 +24,8 @@ pub struct VoteInput {
     pub choice: VoteChoice,
 }
 
-/// One proposal as the UI shows it (web's request cards: counts, quorum, the viewer's vote).
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ProposalView {
-    pub id: ActionHash,
-    pub author: AgentPubKey,
-    pub kind: ProposalKind,
-    pub created_at: Timestamp,
-    pub yes: u32,
-    pub no: u32,
-    pub neutral: u32,
-    pub population: u32,
-    pub required: u32,
-    /// "Open", "Passed" or "Rejected"; closed once an Outcome exists.
-    pub status: Verdict,
-    pub closed_at: Option<Timestamp>,
-    pub my_vote: Option<VoteChoice>,
-    /// The votes already decide it but no Outcome exists yet (a voter didn't see every vote
-    /// when they cast theirs). Any member's app then calls `close`.
-    pub settled: bool,
-}
-
+/// File a proposal. A phase move's cited plan is filled in here (the current leader); a plan
+/// comes without its author's vote.
 #[hdk_extern]
 pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     write::propose(kind)
@@ -45,6 +34,12 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn vote(input: VoteInput) -> ExternResult<ActionHash> {
     write::vote(input.proposal, input.choice)
+}
+
+/// Rate one rubric criterion of a plan (1–5, or clear it). The latest rating counts.
+#[hdk_extern]
+pub fn rate(input: RateInput) -> ExternResult<ActionHash> {
+    plan_write::rate(input)
 }
 
 /// Write the Outcome for a settled proposal (anyone may; validators recompute it). Not named
@@ -59,44 +54,14 @@ pub fn applied() -> ExternResult<Applied> {
     apply::applied()
 }
 
-/// Every proposal, newest first.
+/// Every proposal except plans, newest first.
 #[hdk_extern]
 pub fn list_proposals() -> ExternResult<Vec<ProposalView>> {
-    let me = agent_info()?.agent_initial_pubkey;
-    let mut out = Vec::new();
-    for p in reads::proposals()? {
-        let votes = reads::votes(&p.hash)?;
-        let tally = write::tally_of(&p.entry, &votes);
-        let outcome = reads::outcome(&p.hash)?;
-        let settled = outcome.is_none() && tally.verdict() != Verdict::Open;
-        let count = |c: VoteChoice| {
-            u32::try_from(votes.iter().filter(|v| v.entry.choice == c).count()).unwrap_or(0)
-        };
-        out.push(ProposalView {
-            id: p.hash.clone(),
-            author: p.author.clone(),
-            kind: p.entry.kind.clone(),
-            created_at: p.at,
-            yes: count(VoteChoice::Yes),
-            no: count(VoteChoice::No),
-            neutral: count(VoteChoice::Neutral),
-            population: tally.population,
-            required: tally.required,
-            status: outcome.as_ref().map_or(Verdict::Open, |o| {
-                if o.entry.passed {
-                    Verdict::Passed
-                } else {
-                    Verdict::Rejected
-                }
-            }),
-            closed_at: outcome.map(|o| o.at),
-            my_vote: votes
-                .iter()
-                .find(|v| v.author == me)
-                .map(|v| v.entry.choice),
-            settled,
-        });
-    }
-    out.reverse();
-    Ok(out)
+    views::list_proposals()
+}
+
+/// Every plan with its assessment, and what the current phase needs.
+#[hdk_extern]
+pub fn list_plans() -> ExternResult<PlanBoard> {
+    plan_view::board()
 }

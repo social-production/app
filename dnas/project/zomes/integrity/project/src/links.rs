@@ -22,9 +22,10 @@ pub fn validate_create(
         LinkTypes::Members | LinkTypes::Signals => {
             invalid("agents can only join or signal as themselves")
         }
-        LinkTypes::Proposals | LinkTypes::ProposalToVotes | LinkTypes::ProposalToOutcomes => {
-            Ok(ValidateCallbackResult::Valid)
-        }
+        LinkTypes::Proposals
+        | LinkTypes::ProposalToVotes
+        | LinkTypes::ProposalToOutcomes
+        | LinkTypes::ProposalToRatings => Ok(ValidateCallbackResult::Valid),
     }
 }
 

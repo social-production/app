@@ -23,6 +23,14 @@ pub fn validate_proposal(
     if let Err(reason) = check_kind(&p.kind) {
         return invalid(&reason);
     }
+    if let ProposalKind::Phase {
+        plan: Some(plan), ..
+    } = &p.kind
+    {
+        if crate::plan::plan_of(plan)?.is_none() {
+            return invalid("a phase move cites a plan proposal");
+        }
+    }
     let at = Some(action.timestamp());
     if !is_membership(&p.membership, action.author(), at)? {
         return invalid("only members can propose");
@@ -70,8 +78,9 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             Ok(())
         }
         ProposalKind::Update { .. } => Err("an update needs text".into()),
-        ProposalKind::Phase { to } if Phase::parse(to).is_some() => Ok(()),
+        ProposalKind::Phase { to, .. } if Phase::parse(to).is_some() => Ok(()),
         ProposalKind::Phase { .. } => Err("unknown phase".into()),
+        ProposalKind::Plan(plan) => crate::plan::check(plan),
     }
 }
 

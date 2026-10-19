@@ -1,0 +1,523 @@
+/* Ported from web/src/lib/components/shared/PlanWizardShell.svelte (ADR 0032, scripts/port-styles.py) */
+.wizard-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: color-mix(in srgb, var(--backdrop, #0f172a) 48%, transparent);
+  isolation: isolate;
+}
+
+.wizard-backdrop.compact {
+  z-index: 100;
+  padding: 0;
+  place-items: stretch;
+  background: var(--panel);
+}
+
+.wizard-backdrop .wizard-shell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(760px, 100%);
+  max-height: min(88dvh, 920px);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+  box-shadow: 0 24px 80px color-mix(in srgb, #000 24%, transparent);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.wizard-backdrop .wizard-shell.compact {
+  width: 100%;
+  max-height: none;
+  height: 100dvh;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  position: fixed;
+  inset: 0;
+}
+
+.wizard-backdrop .wizard-header {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid var(--panel-border);
+  background: color-mix(in srgb, var(--panel-strong) 72%, var(--panel));
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    'title cancel'
+    'progress progress';
+}
+
+.wizard-backdrop .wizard-header.compact {
+  padding: 12px 16px 8px;
+  gap: 8px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    'title'
+    'progress';
+}
+
+.wizard-backdrop .wizard-header-main {
+  grid-area: title;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+.wizard-backdrop .cancel-button {
+  grid-area: cancel;
+  align-self: center;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 22px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wizard-backdrop .cancel-button:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.wizard-backdrop .wizard-close {
+  flex: 0 0 56px;
+  width: 56px;
+  min-width: 56px;
+  max-width: 56px;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.wizard-backdrop .wizard-header.compact .cancel-button {
+  display: none;
+}
+
+.wizard-backdrop .wizard-step-number {
+  flex: 0 0 auto;
+  min-width: 2.25rem;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.wizard-backdrop .wizard-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.wizard-backdrop .wizard-header.compact .wizard-title {
+  font-size: clamp(12px, 3.4vw, 14px);
+}
+
+@container (max-width: 180px) {
+  .wizard-backdrop .wizard-title {
+    display: none;
+  }
+}
+
+.wizard-backdrop .progress-track {
+  grid-area: progress;
+  height: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel-border) 80%, transparent);
+  overflow: hidden;
+}
+
+.wizard-backdrop .progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--brand), color-mix(in srgb, var(--brand) 70%, #fff));
+  transition: width 0.18s ease;
+}
+
+.wizard-backdrop .wizard-body {
+  overflow-y: auto;
+  padding: 16px;
+  scroll-padding-top: 8px;
+}
+
+.wizard-backdrop .wizard-shell.compact .wizard-body {
+  padding: 12px;
+}
+
+.wizard-backdrop .wizard-footer {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-top: 1px solid var(--panel-border);
+  background: var(--panel);
+}
+
+.wizard-backdrop .secondary-button,
+.wizard-backdrop .primary-button {
+  flex: 1 1 0;
+  min-height: calc(56px + var(--shell-safe-bottom, 0px));
+  margin: 0;
+  padding: 8px 12px calc(8px + var(--shell-safe-bottom, 0px));
+  border: 0;
+  border-radius: 0;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.wizard-backdrop .secondary-button {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset -1px 0 0 var(--panel-border);
+}
+
+.wizard-backdrop .primary-button {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.wizard-backdrop .secondary-button:disabled,
+.wizard-backdrop .primary-button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Ported from web/src/lib/components/shared/PlanCreationWizard.svelte (ADR 0032, scripts/port-styles.py) */
+.plan-wizard .policy-notice-wrap {
+  margin-bottom: 36px;
+}
+
+.plan-wizard .question-block {
+  display: grid;
+  gap: 14px;
+}
+
+.plan-wizard .location-step {
+  display: grid;
+  gap: 12px;
+  min-height: 0;
+}
+
+.plan-wizard h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.plan-wizard .helper-copy {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.plan-wizard .signal-card {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand-soft) 40%, var(--panel-strong));
+}
+
+.plan-wizard .signal-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--brand-strong);
+}
+
+.plan-wizard .signal-card strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.plan-wizard input,
+.plan-wizard textarea,
+.plan-wizard select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.plan-wizard .field-grid,
+.plan-wizard .settings-stack,
+.plan-wizard .materials-stack,
+.plan-wizard .overview-stack,
+.plan-wizard .review-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.plan-wizard .field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.plan-wizard label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.plan-wizard .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-wizard .material-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+}
+
+.plan-wizard .review-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.plan-wizard .review-copy {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  flex: 1;
+}
+
+.plan-wizard .review-copy span,
+.plan-wizard .materials-copy {
+  color: var(--text-soft);
+  line-height: 1.45;
+  white-space: pre-wrap;
+}
+
+.plan-wizard .materials-copy {
+  font-size: 12px;
+}
+
+.plan-wizard .review-stage {
+  display: grid;
+  gap: 0;
+}
+
+.plan-wizard .value-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.plan-wizard .value-chip {
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--brand) 30%, var(--panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 45%, var(--panel-strong));
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.plan-wizard .stages-stack {
+  display: grid;
+  gap: 14px;
+}
+
+.plan-wizard .stage-editor {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--panel-strong) 60%, var(--panel));
+}
+
+.plan-wizard .stage-editor-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.plan-wizard .stage-editor-head strong {
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.plan-wizard .stage-editor-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.plan-wizard .icon-button {
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.plan-wizard .icon-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.plan-wizard .text-button.danger {
+  color: var(--tablet-community-text, #b91c1c);
+}
+
+.plan-wizard .text-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.plan-wizard .text-button {
+  border: none;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0;
+}
+
+.plan-wizard .warning-card {
+  margin-bottom: 14px;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--warning, #d97706) 35%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--warning, #d97706) 10%, var(--panel));
+}
+
+.plan-wizard .warning-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.plan-wizard .secondary-button {
+  justify-self: start;
+  min-height: 36px;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .plan-wizard .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-wizard .stage-dates {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.plan-wizard .recipients-field,
+.plan-wizard .stage-dates label {
+  display: grid;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+/* Ported from web/src/lib/components/shared/DirectUsePolicyNotice.svelte (ADR 0032, scripts/port-styles.py) */
+.plan-wizard .policy-notice {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand-soft) 45%, var(--panel));
+}
+
+.plan-wizard .policy-notice strong {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.plan-wizard .policy-notice p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.plan-wizard .policy-core {
+  font-size: 11px;
+}
+
+/* Ported from web/src/lib/components/shared/SoftwareLicenseNotice.svelte (ADR 0032, scripts/port-styles.py) */
+.plan-wizard .license-notice {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand-soft) 45%, var(--panel));
+}
+
+.plan-wizard .license-notice strong {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.plan-wizard .license-notice p,
+.plan-wizard .license-notice li {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.plan-wizard .license-notice ul {
+  margin: 0;
+  padding-left: 18px;
+  display: grid;
+  gap: 4px;
+}

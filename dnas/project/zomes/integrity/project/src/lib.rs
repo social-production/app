@@ -7,11 +7,13 @@
 mod charter;
 mod governance;
 mod links;
+mod plan;
 
 use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
 
 pub use governance::SNAPSHOT_MAX;
+pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
@@ -38,9 +40,13 @@ pub enum ProposalKind {
     Update {
         body: String,
     },
+    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039).
     Phase {
         to: String,
+        plan: Option<ActionHash>,
     },
+    /// A production, distribution, operations or access plan; its approval is the vote.
+    Plan(Plan),
 }
 
 #[hdk_entry_helper]
@@ -92,6 +98,7 @@ pub enum EntryTypes {
     Proposal(Proposal),
     Vote(Vote),
     Outcome(Outcome),
+    Rating(Rating),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -107,6 +114,8 @@ pub enum LinkTypes {
     Proposals,
     ProposalToVotes,
     ProposalToOutcomes,
+    /// Plan proposal → a member's criterion rating.
+    ProposalToRatings,
 }
 
 /// The project's creator, from the network seed; `None` in the (unused) base cell.
@@ -138,6 +147,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::Proposal(p) => governance::validate_proposal(&p, &action),
             EntryTypes::Vote(v) => governance::validate_vote(&v, &action),
             EntryTypes::Outcome(o) => governance::validate_outcome(&o, &action),
+            EntryTypes::Rating(r) => plan::validate_rating(&r, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })
@@ -191,6 +201,8 @@ pub struct Applied {
     pub location: Option<String>,
     /// The phase reached through passed `Phase` proposals, if any.
     pub phase: Option<String>,
+    /// The subtype chosen by the production or operations plan (ADR 0039), if any.
+    pub subtype: Option<String>,
     pub updates: Vec<AppliedUpdate>,
     pub last_decision_at: Option<Timestamp>,
 }
