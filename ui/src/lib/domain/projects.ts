@@ -58,6 +58,8 @@ export interface Project {
   /** The phases this project shows, and the one a proposal may move it to next. */
   phases: PhaseStep[];
   nextPhase: PhaseStep | null;
+  /** Earlier phases a return may go back to (web's `revertablePhaseIds`). */
+  returns: PhaseStep[];
   updates: ProjectUpdate[];
 }
 

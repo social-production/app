@@ -30,6 +30,7 @@ pub enum ProposalKind {
     Phase {
         to: String,
         plan: Option<ActionHash>,
+        reason: String,
     },
     Plan(Plan),
 }

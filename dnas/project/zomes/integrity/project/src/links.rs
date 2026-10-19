@@ -25,7 +25,8 @@ pub fn validate_create(
         LinkTypes::Proposals
         | LinkTypes::ProposalToVotes
         | LinkTypes::ProposalToOutcomes
-        | LinkTypes::ProposalToRatings => Ok(ValidateCallbackResult::Valid),
+        | LinkTypes::ProposalToRatings
+        | LinkTypes::ProposalToChallenges => Ok(ValidateCallbackResult::Valid),
     }
 }
 

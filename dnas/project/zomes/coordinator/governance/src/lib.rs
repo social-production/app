@@ -1,13 +1,17 @@
-//! Project governance API (docs/plans/M3-governance.md, ADR 0033, ADR 0039): propose, vote,
-//! rate plans, read proposals and plans with their tallies, and the applied state the project
-//! view is built from.
+//! Project governance API (docs/plans/M3-governance.md, ADR 0033, 0039, 0040): propose, vote,
+//! rate plans, challenge a count, read proposals and plans with their tallies, and the applied
+//! state the project view is built from.
 
 mod apply;
 mod calls;
+mod count;
+mod decide;
+mod moves;
 mod plan_view;
 mod plan_write;
 mod plans;
 mod reads;
+mod roll;
 mod views;
 mod write;
 
@@ -24,8 +28,8 @@ pub struct VoteInput {
     pub choice: VoteChoice,
 }
 
-/// File a proposal. A phase move's cited plan is filled in here (the current leader); a plan
-/// comes without its author's vote.
+/// File a proposal. A phase move's cited plan is filled in here (the current leader); plans
+/// and returns come without their author's vote.
 #[hdk_extern]
 pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     write::propose(kind)
@@ -47,6 +51,12 @@ pub fn rate(input: RateInput) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn close_proposal(proposal: ActionHash) -> ExternResult<Option<ActionHash>> {
     write::close(&proposal, None)
+}
+
+/// Cite the members a proposal's count left out (ADR 0040); the proposal reopens with them.
+#[hdk_extern]
+pub fn challenge(proposal: ActionHash) -> ExternResult<ActionHash> {
+    write::challenge(proposal)
 }
 
 #[hdk_extern]

@@ -1009,3 +1009,112 @@
   text-align: right;
   font-size: 12px;
 }
+
+/* Ported from web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte (ADR 0032, scripts/port-styles.py) */
+.return-sheet .phase-gate-note {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.return-sheet .phase-change-stack,
+.return-sheet .sheet-form {
+  display: grid;
+  gap: 12px;
+}
+
+.return-sheet .change-action-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+.return-sheet .phase-nav-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.return-sheet .phase-nav-side.end {
+  justify-content: flex-end;
+}
+
+.return-sheet .action-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.return-sheet .action-group-right {
+  justify-content: flex-end;
+}
+
+.return-sheet .sheet-form {
+  padding: 8px 16px 4px;
+}
+
+.return-sheet .inline-alert {
+  padding: 10px 12px;
+  border-left: 3px solid color-mix(in srgb, var(--status-yellow) 70%, var(--panel-border));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.return-sheet .inline-note,
+.return-sheet .conversion-note p {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.return-sheet .conversion-note {
+  display: grid;
+  gap: 6px;
+}
+
+.return-sheet strong,
+.return-sheet .field-inline-label {
+  color: var(--text-main);
+}
+
+.return-sheet p,
+.return-sheet span,
+.return-sheet .inline-note {
+  color: var(--text-soft);
+}
+
+.return-sheet textarea,
+.return-sheet select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.return-sheet textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.return-sheet .field-inline-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .return-sheet .change-action-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .return-sheet .action-group-right {
+    justify-content: flex-end;
+  }
+}

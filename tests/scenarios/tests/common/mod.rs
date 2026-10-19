@@ -101,6 +101,18 @@ pub async fn project_with_directory(
     founders: usize,
     seed: &str,
 ) -> Vec<(SweetCell, SweetCell)> {
+    let cells = install_project_with_directory(conductors, founders, seed).await;
+    conductors.exchange_peer_info().await;
+    cells
+}
+
+/// `project_with_directory` without introducing the peers, for tests that keep someone offline
+/// (with bootstrap disabled, peers meet only through `exchange_peer_info`).
+pub async fn install_project_with_directory(
+    conductors: &mut SweetConductorBatch,
+    founders: usize,
+    seed: &str,
+) -> Vec<(SweetCell, SweetCell)> {
     let mut agents = Vec::new();
     for i in 0..conductors.len() {
         agents.push(SweetAgents::one(conductors[i].keystore()).await);
@@ -131,6 +143,5 @@ pub async fn project_with_directory(
         };
         out.push((d, p));
     }
-    conductors.exchange_peer_info().await;
     out
 }

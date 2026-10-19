@@ -4,6 +4,7 @@
 //! Membership and signals are links whose target is their author, so they need no entries.
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033).
 
+mod challenge;
 mod charter;
 mod governance;
 mod links;
@@ -40,13 +41,21 @@ pub enum ProposalKind {
     Update {
         body: String,
     },
-    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039).
+    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039). web asks
+    /// for a reason for every phase change (ADR 0040).
     Phase {
         to: String,
         plan: Option<ActionHash>,
+        reason: String,
     },
     /// A production, distribution, operations or access plan; its approval is the vote.
     Plan(Plan),
+    /// Back to an earlier planning phase, with web's required reason (ADR 0040). Whether `to`
+    /// is earlier depends on the phase reached, so the fold checks it when applying.
+    Return {
+        to: String,
+        reason: String,
+    },
 }
 
 #[hdk_entry_helper]
@@ -76,13 +85,26 @@ pub struct Vote {
     pub choice: VoteChoice,
 }
 
-/// Closes a proposal. Validators recompute the result from the cited votes.
+/// Closes a proposal. Validators recompute the result from the cited votes, against the
+/// snapshot plus the members the cited challenges add (ADR 0040).
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
 pub struct Outcome {
     pub proposal: ActionHash,
     pub votes: Vec<ActionHash>,
     pub passed: bool,
+    #[serde(default)]
+    pub challenges: Vec<ActionHash>,
+}
+
+/// Memberships from before a proposal that its snapshot left out (ADR 0040).
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Challenge {
+    pub proposal: ActionHash,
+    /// The challenger's own `Members` link.
+    pub membership: ActionHash,
+    pub omitted: Vec<ActionHash>,
 }
 
 /// The tag byte of a `Signals` link.
@@ -99,6 +121,7 @@ pub enum EntryTypes {
     Vote(Vote),
     Outcome(Outcome),
     Rating(Rating),
+    Challenge(Challenge),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -116,6 +139,8 @@ pub enum LinkTypes {
     ProposalToOutcomes,
     /// Plan proposal → a member's criterion rating.
     ProposalToRatings,
+    /// Proposal → a challenge to its count.
+    ProposalToChallenges,
 }
 
 /// The project's creator, from the network seed; `None` in the (unused) base cell.
@@ -148,6 +173,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::Vote(v) => governance::validate_vote(&v, &action),
             EntryTypes::Outcome(o) => governance::validate_outcome(&o, &action),
             EntryTypes::Rating(r) => plan::validate_rating(&r, &action),
+            EntryTypes::Challenge(c) => challenge::validate(&c, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })

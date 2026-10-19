@@ -10,7 +10,7 @@ use sp_governance::plans::{
     criteria, pick_leader, summarize, Candidate, Leader, PlanKind, Ratings, Score,
 };
 
-use crate::apply::{Decision, Standing};
+use crate::decide::{Decision, Standing};
 use crate::reads::{self, Found};
 
 /// A plan members approved (its recount passed).

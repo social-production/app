@@ -8,6 +8,7 @@ mod people;
 use hdk::prelude::*;
 use project_integrity::{creator, Applied, AppliedUpdate, Charter, LinkTypes};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
+use sp_governance::returns::returnable;
 
 pub(crate) const CHARTER: &str = "charter";
 pub(crate) const MEMBERS: &str = "members";
@@ -30,6 +31,8 @@ pub struct ProjectView {
     /// The phases this project shows, and the one a proposal may move it to next.
     pub phases: Vec<PhaseStep>,
     pub next_phase: Option<PhaseStep>,
+    /// Earlier phases a return may go back to (web's `revertablePhaseIds`, ADR 0040).
+    pub returns: Vec<PhaseStep>,
     pub updates: Vec<AppliedUpdate>,
     pub members: Vec<AgentPubKey>,
     pub demand: u32,
@@ -130,6 +133,7 @@ pub fn get_project() -> ExternResult<Option<ProjectView>> {
         .map(step)
         .collect();
     let next = next_phase(shape, current).map(step);
+    let returns = returnable(shape, current).into_iter().map(step).collect();
     let stage = stage_label(shape, current).to_string();
 
     let last_activity_at = [created_at, people.last_at, applied.last_decision_at]
@@ -143,6 +147,7 @@ pub fn get_project() -> ExternResult<Option<ProjectView>> {
         stage,
         phases,
         next_phase: next,
+        returns,
         updates: applied.updates,
         members: people.members,
         demand: people.demand,

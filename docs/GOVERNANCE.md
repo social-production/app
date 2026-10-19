@@ -58,16 +58,16 @@ Each voucher may vouch **5 times per 30 days**. If someone you vouched for is pa
 - `Threshold::DEFAULT` = 66%, integer basis points, so every validator agrees exactly.
 - `required_votes(population)` is ported 1:1 from `web-backend/app/utils/votes.py` and tested against it.
 
-### Open design item (M3): the population N
+### The population N (settled by ADR 0033 and ADR 0040)
 
-FastAPI uses "weekly active members". That is a live count no validator can reproduce.
-Proposed rule, to be decided before M3:
+FastAPI uses "weekly active members". That is a live count no validator can reproduce. Instead:
 
-- **Snapshot at creation.** The proposal cites the membership/standing set it was created against
-  (count + Merkle root over member action hashes).
-- **Challenge window.** An Outcome takes effect after a window (e.g. 48 h). During it, anyone
-  can publish a `Challenge` citing members that were omitted, or invalid voters. A valid
-  challenge voids the Outcome, which is then rewritten with the larger population.
+- **Snapshot at creation.** The proposal lists the `Members` links it counts (ADR 0033).
+- **Challenge window.** Decisions apply at once, as on web. While a proposal is open, and for
+  48 h after its first Outcome, any member can publish a `Challenge` citing members the snapshot
+  omitted. A counted challenge voids the Outcome: the proposal reopens with the larger population
+  until an Outcome citing the challenge is written (ADR 0040). Invalid voters need no challenge;
+  every node drops them when it recounts (ADR 0033).
 
 This keeps validation deterministic and leaderless while stopping "under-count the population" attacks.
 

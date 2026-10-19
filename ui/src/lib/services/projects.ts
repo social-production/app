@@ -41,6 +41,7 @@ interface ProjectWire {
   stage: string;
   phases: { id: string; label: string }[];
   next_phase: { id: string; label: string } | null;
+  returns: { id: string; label: string }[];
   updates: { proposal: ActionHash; author: AgentPubKey; body: string; at: number }[];
 }
 
@@ -111,6 +112,7 @@ export async function getProject(id: string): Promise<Project> {
     stage: p.stage,
     phases: p.phases,
     nextPhase: p.next_phase,
+    returns: p.returns,
     updates: p.updates.map((u) => ({
       proposal: hashToString(u.proposal),
       author: hashToString(u.author),
