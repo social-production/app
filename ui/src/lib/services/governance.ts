@@ -26,6 +26,10 @@ interface ProposalWire {
   closed_at: number | null;
   my_vote: VoteChoice | null;
   settled: boolean;
+  added: number;
+  missing: number;
+  challenge_until: number | null;
+  can_challenge: boolean;
 }
 
 const governance = async <T>(projectId: string, fn: string, payload?: unknown): Promise<T> => {
@@ -56,11 +60,15 @@ export async function listProposals(projectId: string): Promise<Proposal[]> {
     closedAt: p.closed_at,
     myVote: p.my_vote,
     settled: p.settled,
+    added: p.added,
+    missing: p.missing,
+    challengeUntil: p.challenge_until,
+    canChallenge: p.can_challenge,
   }));
 }
 
-/** Propose a change; the proposer's Yes comes with it. A phase move's plan is filled in by
- * the zome (the current leading plan). */
+/** Propose a change; the proposer's Yes comes with it (not for returns, as on web). A phase
+ * move's plan is filled in by the zome (the current leading plan). */
 export async function propose(projectId: string, kind: ProposalKind): Promise<void> {
   const wire: KindWire = 'Phase' in kind ? { Phase: { to: kind.Phase.to, plan: null } } : kind;
   await governance<ActionHash>(projectId, 'propose', wire);
@@ -73,6 +81,11 @@ export async function castVote(
   choice: VoteChoice,
 ): Promise<void> {
   await governance<ActionHash>(projectId, 'vote', { proposal: stringToHash(proposal), choice });
+}
+
+/** Count the members a proposal's snapshot left out; it reopens with them (ADR 0040). */
+export async function challengeCount(projectId: string, proposal: string): Promise<void> {
+  await governance<ActionHash>(projectId, 'challenge', stringToHash(proposal));
 }
 
 /** Write the Outcome of a proposal its votes already decide (anyone may; validators recheck). */

@@ -30,6 +30,12 @@
       <h3>Proposed update</h3>
       <p class="proposed-copy">{kind.Update.body}</p>
     </section>
+  {:else if 'Return' in kind}
+    <!-- web shows a phase change's reason as "Why". -->
+    <section class="change-card">
+      <h3>Why</h3>
+      <p>{kind.Return.reason}</p>
+    </section>
   {:else if 'Edit' in kind}
     {#each [{ name: 'Title', now: charter.title, next: kind.Edit.title }, { name: 'Description', now: charter.description, next: kind.Edit.description }] as field (field.name)}
       {#if field.next !== null}
@@ -62,6 +68,21 @@
       Needs {APPROVAL_PERCENT}% yes to pass, from at least {proposal.required} of {proposal.population}
       members.
     </p>
+    <!-- App-only (ADR 0040): challenged counts and members still left out. -->
+    {#if proposal.added > 0}
+      <p class="tally-note">
+        Reopened: a challenge added {proposal.added}
+        {proposal.added === 1 ? 'member' : 'members'} the first count left out.
+      </p>
+    {/if}
+    {#if proposal.canChallenge}
+      <p class="tally-note">
+        {proposal.missing}
+        {proposal.missing === 1 ? 'member who joined' : 'members who joined'} before this was proposed
+        {proposal.missing === 1 ? "isn't" : "aren't"} counted. Challenge the count in the Participation
+        tab.
+      </p>
+    {/if}
   </section>
   {#if proposal.myVote}<p class="clear-hint">
       You voted {proposal.myVote.toLowerCase()}. Votes are final.

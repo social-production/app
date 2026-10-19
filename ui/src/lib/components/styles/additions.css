@@ -33,3 +33,33 @@
   display: flex;
   justify-content: flex-start;
 }
+
+/* app/ui: web has no challenge window (ADR 0040). The list of challengeable counts in the
+   Participation tab reuses web's card look (panel border, soft copy). */
+.challenge-list {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.challenge-list h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.challenge-list p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.challenge-card {
+  display: grid;
+  gap: 6px;
+  justify-items: start;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}

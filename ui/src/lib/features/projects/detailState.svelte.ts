@@ -1,9 +1,20 @@
-import type { Proposal, ProposalKind, VoteChoice } from '#lib/domain/governance.ts';
+import {
+  isPhaseChange,
+  type Proposal,
+  type ProposalKind,
+  type VoteChoice,
+} from '#lib/domain/governance.ts';
 import type { Person } from '#lib/domain/people.ts';
 import type { Plan, PlanBoard, PlanRating } from '#lib/domain/plans.ts';
 import type { CharterDraft, Project, Stance } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
-import { castVote, closeProposal, listProposals, propose } from '#lib/services/governance.ts';
+import {
+  castVote,
+  challengeCount,
+  closeProposal,
+  listProposals,
+  propose,
+} from '#lib/services/governance.ts';
 import { getPerson } from '#lib/services/people.ts';
 import { listPlans, ratePlan as rate, submitPlan as submit } from '#lib/services/plans.ts';
 import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
@@ -32,6 +43,16 @@ export class DetailState {
     return this.proposals
       .filter((p) => p.status === 'Open')
       .sort((a, b) => Number(!!a.myVote) - Number(!!b.myVote));
+  }
+
+  /** web's `hasOpenPhaseChangeVotes`: a move or return is still being decided. */
+  get phaseVoteOpen(): boolean {
+    return this.proposals.some((p) => p.status === 'Open' && isPhaseChange(p.kind));
+  }
+
+  /** Decisions whose count left members out, while a challenge still counts (ADR 0040). */
+  get challengeable(): Proposal[] {
+    return this.proposals.filter((p) => p.canChallenge);
   }
 
   phaseLabel = (id: string): string => this.project?.phases.find((p) => p.id === id)?.label ?? id;
@@ -150,6 +171,20 @@ export class DetailState {
   proposeNextPhase(): Promise<boolean> {
     const next = this.project?.nextPhase;
     return next ? this.file({ Phase: { to: next.id, plan: null } }) : Promise.resolve(false);
+  }
+
+  /** web's return request (`revert-requests`). Returns true when filed. */
+  proposeReturn(to: string, reason: string): Promise<boolean> {
+    return this.file({ Return: { to, reason } });
+  }
+
+  async challenge(proposal: string): Promise<void> {
+    try {
+      await challengeCount(this.id, proposal);
+      await this.load();
+    } catch (e) {
+      this.error = explain(e);
+    }
   }
 
   /** web's plan wizard submit. Returns true when filed. */

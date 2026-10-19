@@ -41,6 +41,7 @@ governance.css    .update-sheet   web/src/lib/components/shared/AddUpdateSheet.s
 governance.css    .phase-bar      web/src/lib/features/detail/DetailPhaseStepper.svelte
 governance.css    .updates-shell  web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte
 governance.css    .update-card    web/src/lib/components/cards/details/DetailUpdateCard.svelte
+governance.css    .return-sheet   web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte
 chat.css          .chat-panel     web/src/lib/components/chat/LiveChatPanel.svelte
 chat.css          .chat-shell     web/src/lib/features/projects/detail/ProjectChatTab.svelte
 confirm.css       .confirm-root   web/src/lib/components/shared/ConfirmHost.svelte
