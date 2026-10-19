@@ -24,6 +24,7 @@ detail.css        .detail-action-dock web/src/lib/features/detail/DetailActionDo
 detail.css        .project-overview web/src/lib/features/projects/detail/ProjectOverviewHeader.svelte
 detail.css        .project-detail web/src/lib/features/projects/ProjectDetailPage.svelte
 detail.css        .top-tab-row    web/src/lib/features/detail/DetailTopTabs.svelte
+detail.css        .project-detail web/src/lib/features/projects/detail/ProjectLifecyclePanel.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateFlowLayout.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateWizard.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreatePanel.svelte
@@ -39,6 +40,9 @@ governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButt
 governance.css    .vote-dock-root web/src/lib/components/shared/VoteDockControl.svelte
 governance.css    .update-sheet   web/src/lib/components/shared/AddUpdateSheet.svelte
 governance.css    .phase-bar      web/src/lib/features/detail/DetailPhaseStepper.svelte
+governance.css    .phase-context  web/src/lib/features/detail/DetailPhaseContext.svelte
+governance.css    .phase-menu     web/src/lib/components/shared/PhaseMenu.svelte
+governance.css    .phase-change-stack web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte
 governance.css    .updates-shell  web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte
 governance.css    .update-card    web/src/lib/components/cards/details/DetailUpdateCard.svelte
 chat.css          .chat-panel     web/src/lib/components/chat/LiveChatPanel.svelte

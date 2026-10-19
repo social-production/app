@@ -1079,3 +1079,17 @@
     white-space: nowrap;
   }
 }
+
+/* Ported from web/src/lib/features/projects/detail/ProjectLifecyclePanel.svelte (ADR 0032, scripts/port-styles.py) */
+.project-detail .lifecycle-shell {
+  display: contents;
+}
+
+.project-detail .phase-panel {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
