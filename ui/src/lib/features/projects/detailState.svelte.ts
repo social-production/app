@@ -169,22 +169,28 @@ export class DetailState {
   }
 
   /** Ratings change the leader only, so the page refreshes quietly behind them. */
-  async ratePlan(plan: string, criterion: string, rating: PlanRating | null): Promise<void> {
-    try {
-      await rate(this.id, plan, criterion, rating);
-      await this.load();
-    } catch (e) {
-      this.error = explain(e);
-    }
+  ratePlan(plan: string, criterion: string, rating: PlanRating | null): Promise<void> {
+    return this.inTurn(() => rate(this.id, plan, criterion, rating));
   }
 
-  async votePlan(plan: string, choice: VoteChoice): Promise<void> {
-    try {
-      await castVote(this.id, plan, choice);
-      await this.load();
-    } catch (e) {
-      this.error = explain(e);
-    }
+  votePlan(plan: string, choice: VoteChoice): Promise<void> {
+    return this.inTurn(() => castVote(this.id, plan, choice));
+  }
+
+  // Quick taps (three ratings, then Yes) must not write to the chain at the same time: the
+  // conductor refuses a write whose chain head moved underneath it. One write at a time.
+  private writes: Promise<void> = Promise.resolve();
+
+  private inTurn(write: () => Promise<unknown>): Promise<void> {
+    this.writes = this.writes.then(async () => {
+      try {
+        await write();
+        await this.load();
+      } catch (e) {
+        this.error = explain(e);
+      }
+    });
+    return this.writes;
   }
 
   private async file(kind: ProposalKind): Promise<boolean> {
