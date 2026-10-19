@@ -25,35 +25,25 @@ and continue from the first unfinished step."
 
 ## In flight (cloud session 2026-10-19, updated ~16:00 UTC)
 Choices made in this session are marked **Choice** for the owner to review.
-- **PR #1** (`claude/m3b-m4a`): the first CI run was cancelled by the job's 60-minute timeout
-  while the scenarios were still passing (governance ~21 min, health ~10). The timeout is now
-  150 min (`ci.yml`; splitting the scenarios into parallel jobs was blocked by the session's
-  safety check as a "skip scenarios" switch). Second run started 14:34. Next: merge when green →
-  `/readyz` + UI smoke → README Status/roadmap.
-- **`claude/take-part-layout`** (Step 2, pushed; PR once PR #1 merges). Done, matching web:
-  - ParticipationPanel follows web's ProjectLifecyclePanel: stepper → `DetailPhaseContext`
-    (kicker, title, first sentence of web-backend's `lifecycle_copy.py` summary, in
-    `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work` (plans) → `PhaseChangeSection`
-    (web's gate note in web's words + `PhaseMenu`).
-  - `PhaseWorkToolbar` ported (packs "Add plan" + "Phase ▾" into the dock's
-    `#detail-participation-actions`); `portal` takes a target like web's.
-  - The Take part tab's own dock (`ParticipationDock`): Join for non-members, the toolbar, Vote
-    for phase proposals. The Details dock now only shows the Details tab and votes on
-    edits/updates.
-  - Verified: `tests/e2e/governance.mjs` passes end to end against a local seed node, with
-    founder one at 390px (it now drives the Phase menu and the Take part Vote, and asserts the
-    Take part tab is selected); screenshots looked right against live web's 390px page.
-    Also `npm run check/lint -w ui`, boundaries, sizes.
-  - **Gap vs web:** web's Advance asks for a reason in a sheet; our phase proposals have no
-    reason field (an integrity change), so the item files at once. Fold it into the next
-    integrity bump (M3c is one).
-- **`claude/m3c-reverts`** (Step 3): `claude/take-part-layout` merged in (so it also carries
-  PR #1). Its "Return to an earlier phase" button is now the `return` item of the Phase menu
-  (web's `phaseMenuItems`), opening its `ReturnSheet` (a faithful port of web's revert sheet).
-  **Choice:** following "port only from web", the app-only `ChallengeList` ("Counts you can
-  challenge") is removed; the challenge rules stay (zome, `sp_governance`, scenarios, ADR 0040)
-  for when a screen exists. Undo by restoring `ChallengeList.svelte` + its `additions.css` block
-  from `a0ce970`. Local checks and scenarios `reverts`/`challenges` in progress; PR after PR #1.
+- **PR #1** merged 16:35 UTC (CI green after the timeout was raised to 150 min); deployed. Docs
+  PR #2 updates README Status/roadmap + the live smoke findings (a new account's project sometimes
+  takes >3 min to reach the index; see Known gaps on that branch).
+- **PR #3** (`claude/take-part-layout`, Step 2): web's Take part layout and action bar. UI only.
+- **PR #4** (`claude/m3c-reverts`, Step 3, on top of PR #3): phase returns + challenge window
+  (ADR 0040). Changes since its agent finished:
+  - "Return to an earlier phase" is the `return` item of web's Phase menu (`PhaseChangeSection`),
+    opening the ported `ReturnSheet`; returns are voted on in the Take part dock, as on web.
+  - **Choice:** web asks "why" for every phase change, so `ProposalKind::Phase` gained a required
+    `reason` (in the same integrity bump as M3c), with web's advance/close sheet (`AdvanceSheet`)
+    and the vote sheet's "Why".
+  - **Choice:** the app-only `ChallengeList` was removed ("port only from web"); the challenge
+    rules stay (zome, `sp_governance`, scenarios, ADR 0040). Restore from `a0ce970` if wanted.
+  - Verified locally: fmt, clippy, unit tests (without `native`/`mobile-conductor`, for disk),
+    hApp build, scenarios `reverts`, `challenges`, `governance` (with the reason), and
+    `tests/e2e/governance.mjs` end to end (advance with a reason, plans, and a return voted
+    through by both founders). Not run locally: scenarios `plans`, `projects`, `identity`,
+    `health`, `discussion` (CI runs them).
+  - Merging resets project data again (integrity change).
 - **`claude/m4b-threads`**: parked (owner decision), untouched.
 
 ## Cloud environment notes
