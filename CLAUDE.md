@@ -38,6 +38,13 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 Railway project `social-production-p2p` (services `bootstrap`, `seed-node` with a `/data` volume, `ui`): `docs/DEPLOYMENT.md`.
 Never lose `LAIR_PASSPHRASE`. Grokbot is paused until ~2026-10-25: Claude tests (scenarios, `scripts/e2e-local.sh`, live smoke); write Grokbot sheets only on request.
 
+## Cloud sessions (claude.ai/code, a fresh clone of this repo)
+The owner's machine has the workspace (`../web`, `../web-backend`, Railway login, agent worktrees); a cloud session has only this repo. So:
+- **Get web/ for porting:** `git clone --depth 1 https://github.com/social-production/web ../web` (public). `scripts/port-styles.py` and the PORTS file expect it as a sibling of `app/`.
+- **Toolchain:** try Nix (`curl -fsSL https://install.determinate.systems/nix | sh -s -- install linux --init none --no-confirm`, add the Holochain cachix lines from README, then `nix develop --accept-flake-config`). If Nix won't install, you can still run `npm ci && npm run check -w ui && npm run lint -w ui`, `bash scripts/check-boundaries.sh`, `bash scripts/check-sizes.sh` and `cargo test -p sp_core -p sp_governance -p sp_index` with a stock Rust toolchain; zomes, scenarios and the seed node need Nix. Say in STATUS.md which checks you could not run.
+- **Never push `main` from a cloud session**: it deploys. Work on a `claude/<topic>` branch and open a PR; CI runs on PRs (~60 min with scenarios). The owner's local session merges, deploys and smokes it.
+- No Railway access: you cannot deploy, read seed-node logs or touch `LAIR_PASSPHRASE`. Read-only live checks (`curl` the URLs in STATUS.md) are fine.
+- Before finishing, update `STATUS.md` ("In flight" + what you checked) on your branch so the next session knows.
+
 ## Status
-**Start with `STATUS.md`**: what's live, work in flight (agent worktrees to merge), next steps and hard-won lessons. Update it at the end of every session.
-M0, M1 (identity), M2 (projects) and M3a (governance: edits, updates, phases) are live; M3b (plans) and M4a (project chat) are in flight. Roadmap: `README.md` (keep its Status section current after every deploy).
+**Start with `STATUS.md`**: what's live, work in flight, next steps and hard-won lessons. Update it as you go and at the end of every session; keep `README.md` Status + roadmap current after every deploy.

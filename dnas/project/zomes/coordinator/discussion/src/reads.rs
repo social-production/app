@@ -10,7 +10,10 @@ use crate::{anchor, own, MessageView, ReplyRef};
 
 /// One record: the local copy first (messages never change once written), then the network.
 pub fn record(hash: &ActionHash) -> ExternResult<Option<Record>> {
-    Ok(records(std::slice::from_ref(hash))?.into_iter().flatten().next())
+    Ok(records(std::slice::from_ref(hash))?
+        .into_iter()
+        .flatten()
+        .next())
 }
 
 fn batch(hashes: &[ActionHash], options: &GetOptions) -> ExternResult<Vec<Option<Record>>> {
@@ -29,7 +32,10 @@ fn records(hashes: &[ActionHash]) -> ExternResult<Vec<Option<Record>>> {
         return Ok(out);
     }
     let wanted: Vec<ActionHash> = missing.iter().map(|&i| hashes[i].clone()).collect();
-    for (i, found) in missing.into_iter().zip(batch(&wanted, &GetOptions::network())?) {
+    for (i, found) in missing
+        .into_iter()
+        .zip(batch(&wanted, &GetOptions::network())?)
+    {
         out[i] = found;
     }
     Ok(out)
@@ -61,7 +67,10 @@ pub fn list() -> ExternResult<Vec<MessageView>> {
     links.sort_by_key(|l| std::cmp::Reverse(l.timestamp));
     let mut wanted = Vec::new();
     let mut seen = BTreeSet::new();
-    for hash in links.into_iter().filter_map(|l| l.target.into_action_hash()) {
+    for hash in links
+        .into_iter()
+        .filter_map(|l| l.target.into_action_hash())
+    {
         if wanted.len() >= PAGE_MAX {
             break;
         }
@@ -131,8 +140,7 @@ fn quote_of(parent: &ActionHash, deleted: &BTreeSet<ActionHash>) -> ExternResult
         preview: String::new(),
         deleted: deleted.contains(parent),
     };
-    let Some(Details::Record(details)) = get_details(parent.clone(), GetOptions::default())?
-    else {
+    let Some(Details::Record(details)) = get_details(parent.clone(), GetOptions::default())? else {
         return Ok(quote);
     };
     quote.author = Some(details.record.action().author().clone());

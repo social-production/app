@@ -44,7 +44,7 @@
   let flashed = $state<string | null>(null);
   let flashTimer: ReturnType<typeof setTimeout> | undefined;
   // Bubbles by message id, for reply jumps (not reactive state).
-  const elements: Record<string, HTMLElement> = {};
+  const elements: Record<string, HTMLElement | undefined> = {};
 
   function sync(): void {
     if (panel) keyboardOpen = syncPanelHeight(panel, p);
@@ -83,7 +83,7 @@
 
   function register(node: HTMLElement, id: string): { destroy: () => void } {
     elements[id] = node;
-    return { destroy: () => delete elements[id] };
+    return { destroy: () => (elements[id] = undefined) };
   }
 
   function openMenu(message: ChatLine, event: MouseEvent): void {

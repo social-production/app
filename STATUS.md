@@ -15,23 +15,17 @@ The workspace-level `../STATUS.md` covers web/web-backend; its last section summ
 - The M3 deploy reset the network: everyone signs in with their 24 words and re-enters a profile; founders vouch again.
 - `7961d27`/`4efd63d` (guest browsing, `close_proposal` rename) were waiting on CI and the redeploy when this was written. Check that CI is green and the live feed loads signed out.
 
-## In flight: two subagent worktrees (not pushed, not merged)
-Started from `f236bcc` (M3a), under `.claude/worktrees/` (git-ignored):
+## In flight (session of 2026-10-19 late)
+CI was green on `65b5cfd`; live UI and seed node answered 200 (index empty after the M3 reset).
+Neither subagent had committed. Their work was committed on their branches and is being merged:
 
-| Worktree branch | Work | Notes |
+| Branch | Work | State |
 |---|---|---|
-| `worktree-agent-a6444a03833c35003` | **M3b plans**: web's production/distribution/operations/access plans, criteria, assessments, approved-leading-plan gate for phase moves | touches `project_integrity` + governance coordinator; told to rename extern `close` → `close_proposal` like main |
-| `worktree-agent-a17e01b4838e77b67` | **M4a project chat**: `discussion` zome pair in the project DNA + web's Chat tab | stays out of `project_integrity`/governance |
+| `worktree-agent-a17e01b4838e77b67` (`f7af627`) | **M4a project chat**: `discussion` zome pair in the project DNA, web's Chat tab, ADR 0038, `docs/plans/M4-talk.md` | complete; merged into local `main` (`2f90e49`), checks running |
+| `worktree-agent-a6444a03833c35003` (`2596c7a`, "Work in progress") | **M3b plans**: Plan proposals with criteria ratings, leader per kind, approved-leader gate on phase moves, plan wizard in the participation tab, `tests/scenarios/tests/plans.rs` | code + UI + scenarios written; no docs yet (no "M3b as built", README, ADR). Revert its incidental `package-lock.json` change. Not merged yet |
 
-**To finish them:**
-1. In each worktree, `git log` shows whether the agent committed.
-2. Review the diff and run the checks below.
-3. Merge into `main`. Conflicts are expected only in `dnas/project/dna.yaml`, `ProjectDetail.svelte` (tabs list), `docs/decisions/README.md`, `README.md` and `Cargo.toml`.
-4. Rebuild (`bash scripts/build-happ.sh`), run all scenarios and the browser tests, then push.
-5. Remove the worktrees: `git worktree remove --force <path>`, then `git branch -D <branch>`.
-
-If a worktree has no commit, the agent was cut off. Read its diff and either finish it or redo it.
-Both change the project DNA, so the merge deploy resets project data again (directory/people stay).
+Both change the project DNA, so the deploy resets project data again (directory/people stay).
+Once both are merged, pushed and smoked: `git worktree remove --force <path>`, `git branch -D <branch>`.
 
 ## Next (roadmap order)
 1. Merge M3b + M4a (above), deploy, smoke live.

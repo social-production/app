@@ -72,7 +72,10 @@ async fn anyone_posts_replies_and_reads() {
     let ids: Vec<&ActionHash> = seen.iter().map(|m| &m.id).collect();
     assert_eq!(ids, vec![&hello, &reply], "oldest first");
     assert_eq!(&seen[1].author, cells[0].agent_pubkey());
-    let quote = seen[1].reply_to.as_ref().expect("a reply carries its quote");
+    let quote = seen[1]
+        .reply_to
+        .as_ref()
+        .expect("a reply carries its quote");
     assert_eq!(quote.id, hello);
     assert_eq!(quote.author.as_ref(), Some(cells[1].agent_pubkey()));
     assert_eq!(quote.preview, "Hello all");
@@ -108,7 +111,11 @@ async fn bad_messages_are_rejected() {
         .call(&cells[0].zome("project"), "create_charter", charter)
         .await;
     let odd: Result<ActionHash, _> = conductors[0]
-        .call_fallible(&ann, "post_message", post("Re: the charter", Some(&not_a_message)))
+        .call_fallible(
+            &ann,
+            "post_message",
+            post("Re: the charter", Some(&not_a_message)),
+        )
         .await;
     assert!(odd.is_err(), "validation rejects a reply to a non-message");
 }
@@ -132,7 +139,9 @@ async fn only_the_author_deletes() {
         .await;
     assert!(other.is_err(), "you can't delete someone else's message");
 
-    let (): () = conductors[1].call(&bob, "delete_message", first.clone()).await;
+    let (): () = conductors[1]
+        .call(&bob, "delete_message", first.clone())
+        .await;
     let mine: Vec<MessageView> = conductors[1].call(&bob, "list_messages", ()).await;
     assert!(
         mine.iter().all(|m| m.id != first),
@@ -142,7 +151,10 @@ async fn only_the_author_deletes() {
 
     let seen: Vec<MessageView> = conductors[0].call(&ann, "list_messages", ()).await;
     assert_eq!(seen.len(), 1, "the deleted message is gone for everyone");
-    let quote = seen[0].reply_to.as_ref().expect("the reply keeps its quote");
+    let quote = seen[0]
+        .reply_to
+        .as_ref()
+        .expect("the reply keeps its quote");
     assert!(quote.deleted, "and the quote reads as a deleted message");
     assert!(quote.preview.is_empty());
 }
