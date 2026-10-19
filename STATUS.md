@@ -25,10 +25,11 @@ and continue from the first unfinished step."
 
 ## In flight (cloud session 2026-10-19, updated ~16:00 UTC)
 Choices made in this session are marked **Choice** for the owner to review.
-- **PR #1** merged 16:35 UTC (CI green after the timeout was raised to 150 min); deployed. Docs
-  PR #2 updates README Status/roadmap + the live smoke findings (a new account's project sometimes
-  takes >3 min to reach the index; see Known gaps on that branch).
-- **PR #3** (`claude/take-part-layout`, Step 2): web's Take part layout and action bar. UI only.
+- **PR #1** merged 16:35 UTC (CI green after the timeout was raised to 150 min); deployed. The README
+  Status/roadmap update and the live smoke result (all good; `projects.mjs` had a test race, fixed)
+  were folded into PR #3 to save a CI run; PR #2 closed.
+- **PR #3** (`claude/take-part-layout`, Step 2): web's Take part layout and action bar, plus the
+  docs above. UI only. Merge first, then merge main into PR #4.
 - **PR #4** (`claude/m3c-reverts`, Step 3, on top of PR #3): phase returns + challenge window
   (ADR 0040). Changes since its agent finished:
   - "Return to an earlier phase" is the `return` item of web's Phase menu (`PhaseChangeSection`),
