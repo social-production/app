@@ -515,6 +515,394 @@
   color: white;
 }
 
+/* Ported from web/src/lib/features/detail/DetailPhaseContext.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-context {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  max-width: 68ch;
+}
+
+.phase-context .kicker {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.phase-context h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.2;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 760px) {
+  .phase-context h2 {
+    font-size: clamp(16px, 4.6vw, 20px);
+  }
+}
+
+.phase-context .summary {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+/* Ported from web/src/lib/components/shared/PhaseMenu.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-menu-trigger {
+  height: 40px;
+  min-width: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--text-main);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.phase-menu-trigger:hover,
+.phase-menu-trigger:focus-visible,
+.phase-menu-trigger[aria-expanded='true'] {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.phase-menu-trigger.muted {
+  color: var(--text-muted, var(--text-main));
+}
+
+.phase-menu .caret {
+  font-size: 11px;
+}
+
+.phase-menu-body {
+  padding: 16px 20px 24px;
+}
+
+.phase-menu-current {
+  margin: 0 0 10px;
+  color: var(--text-muted, var(--text-main));
+  font-size: 14px;
+}
+
+.phase-menu-list {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.phase-menu-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.phase-menu-item:hover:not(:disabled),
+.phase-menu-item:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: var(--brand-soft);
+}
+
+.phase-menu-item:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.phase-menu .glyph {
+  font-size: 20px;
+  line-height: 1.1;
+  text-align: center;
+}
+
+.phase-menu .text {
+  display: grid;
+  gap: 2px;
+}
+
+.phase-menu .text strong {
+  font-size: 15px;
+}
+
+.phase-menu .text span {
+  color: var(--text-muted, var(--text-main));
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+/* Ported from web/src/lib/components/shared/PhaseWorkToolbar.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-action-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  min-width: 0;
+}
+
+.phase-action-group:not(:has(button)) {
+  display: none;
+}
+
+.phase-action-group .adds,
+.phase-action-group .governance-row,
+.phase-action-group #phase-nav-vote,
+.phase-action-group .phase-nav-side {
+  display: contents;
+}
+
+.phase-action-group .adds:not(:has(button)),
+.phase-action-group .governance-row:not(:has(button)),
+.phase-action-group #phase-nav-vote:empty,
+.phase-action-group .phase-nav-side:empty {
+  display: none;
+}
+
+.phase-action-group .phase-nav-bar {
+  display: contents;
+}
+
+.phase-action-group .phase-menu-trigger.phase-menu-trigger {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  margin: 0;
+  border-width: 0;
+  border-radius: 0;
+}
+
+.phase-action-group .phase-nav-bar:not(:has(button)),
+.phase-action-group .phase-nav-bar .phase-action-slot:not(:has(button)) {
+  display: none;
+}
+
+.phase-action-group .phase-nav-bar .phase-action-slot {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  min-width: 0;
+}
+
+.phase-action-group .phase-nav-bar .phase-action-slot .phase-nav-side.phase-nav-side {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+}
+
+.phase-action-group .phase-nav-bar .phase-shift-button.phase-shift-button {
+  flex: 1 1 0;
+  align-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  height: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 8px 10px;
+  justify-content: center;
+  border-radius: 0;
+  border-width: 0;
+  box-sizing: border-box;
+}
+
+.phase-action-group .phase-nav-bar .phase-shift-button .label {
+  white-space: normal;
+  line-height: 1.15;
+  text-align: center;
+}
+
+.phase-action-group .phase-nav-bar:has(#phase-nav-start button) #phase-nav-end .phase-shift-button {
+  border-left: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: 44px;
+  margin: 0;
+}
+
+.phase-action-group .phase-pack-cell:not(.row-start) {
+  border-left: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell.wrapped.row-start {
+  border-top: 1px solid var(--panel-border);
+}
+
+.phase-action-group .phase-pack-cell.round-plus-button.round-plus-button,
+.phase-action-group .phase-pack-cell.phase-shift-button.phase-shift-button {
+  width: 100%;
+  min-width: 0;
+  height: auto;
+  min-height: 44px;
+  justify-content: center;
+  border-radius: 0;
+  box-sizing: border-box;
+}
+
+.phase-action-group .phase-pack-cell.vote-dock {
+  display: flex;
+  align-items: stretch;
+}
+
+.phase-action-group .phase-pack-cell.vote-dock .round-plus-button,
+.phase-action-group .phase-pack-cell.phase-nav-side .phase-shift-button {
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 44px;
+  margin: 0;
+  justify-content: center;
+  border-radius: 0;
+}
+
+.phase-action-group .phase-pack-cell .plus-label,
+.phase-action-group .phase-pack-cell .label {
+  white-space: normal;
+  line-height: 1.15;
+  text-align: center;
+}
+
+/* Ported from web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte (ADR 0032, scripts/port-styles.py) */
+.phase-change-stack .phase-gate-note {
+  margin: 0 0 8px;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.phase-change-stack,
+.phase-change-stack .sheet-form {
+  display: grid;
+  gap: 12px;
+}
+
+.phase-change-stack .change-action-row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: center;
+}
+
+.phase-change-stack .phase-nav-side {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.phase-change-stack .phase-nav-side.end {
+  justify-content: flex-end;
+}
+
+.phase-change-stack .action-group {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.phase-change-stack .action-group-right {
+  justify-content: flex-end;
+}
+
+.phase-change-stack .sheet-form {
+  padding: 8px 16px 4px;
+}
+
+.phase-change-stack .inline-alert {
+  padding: 10px 12px;
+  border-left: 3px solid color-mix(in srgb, var(--status-yellow) 70%, var(--panel-border));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.phase-change-stack .inline-note,
+.phase-change-stack .conversion-note p {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.phase-change-stack .conversion-note {
+  display: grid;
+  gap: 6px;
+}
+
+.phase-change-stack strong,
+.phase-change-stack .field-inline-label {
+  color: var(--text-main);
+}
+
+.phase-change-stack p,
+.phase-change-stack span,
+.phase-change-stack .inline-note {
+  color: var(--text-soft);
+}
+
+.phase-change-stack textarea,
+.phase-change-stack select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.phase-change-stack textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.phase-change-stack .field-inline-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .phase-change-stack .change-action-row {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .phase-change-stack .action-group-right {
+    justify-content: flex-end;
+  }
+}
+
 /* Ported from web/src/lib/features/projects/detail/ProjectUpdatesSection.svelte (ADR 0032, scripts/port-styles.py) */
 .updates-shell,
 .updates-shell .stack {

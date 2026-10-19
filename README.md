@@ -10,10 +10,15 @@ network of desktops, Raspberry Pis and phones.
 
 ## Status (2026-10-19)
 
-**M3a (governance) is live** on the test network: https://ui-production-333c.up.railway.app
+**M3b (plans) and M4a (project chat) are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Plans (M3b):** in a plan phase, members add a production, distribution, operations or access
+  plan through web's plan wizard, rate it on web's criteria and vote on it; the leading approved
+  plan lets the project move on (ADR 0039).
+- **Project chat (M4a):** every project has a Chat tab with replies and author deletes, polled
+  live (ADR 0038).
 - **Governance (M3a):** members propose edits, updates and moving to the next phase; others vote in
   the Vote sheet (web's VoteDockControl); a decision applies once 66% of a quorum of members say
   yes. Every node checks the maths, and only full members' votes count (ADR 0033). Leaving the
@@ -34,11 +39,12 @@ Measured locally: a new project shows in another person's feed within one archiv
 signup ≈ 7 s.
 
 Known gaps:
-- The M3 deploy changed both DNAs, so the test network was reset again: sign in with your 24 words
-  and re-enter your profile (a username without spaces); founders vouch again.
-- Plans, the challenge window and phase reverts come in M3b; personal-service updates in M5.
-- Guests can't browse the feed signed out yet; feed cards don't show your own signal; no comments
-  until M4 (see docs/plans/M2-projects.md#as-built-2026-10-19).
+- The M3b/M4a deploy changed the project DNA, so projects were reset again (people and profiles
+  stay).
+- Phase returns and the challenge window come with M3c (in review); personal-service updates in M5.
+- Guests browse the feed signed out but can't open project pages yet; feed cards don't show your
+  own signal (see docs/plans/M2-projects.md#as-built-2026-10-19).
+- A refused plan rating or vote isn't shown yet (STATUS.md, Known gaps).
 - iOS phone nodes wait on an upstream Holochain keystore fix (ADR 0020/0021). Android builds.
 
 ## Getting started
@@ -68,8 +74,8 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M0** | Foundation | repo, docs, CI, `health` zome in 3 DNAs, gateway, UI shell, desktop app, Railway seed + bootstrap, platform check | ✅ done |
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
-| **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). Next: M3b plans, challenges, reverts, links | in progress |
-| M4 | Talk | M4a (built, not yet deployed): project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). Next: M4b discussion threads, M4c DMs (conversation DNA), M4d in-app notifications | in progress |
+| **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. Next: M3c returns + challenges (in review), links | in progress |
+| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). Next: M4b discussion threads, M4c DMs (conversation DNA), M4d in-app notifications | in progress |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |

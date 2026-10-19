@@ -23,18 +23,49 @@ and continue from the first unfinished step."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight (cloud session 2026-10-19)
-- PR #1's first CI run was cancelled at its 60-minute job timeout while the scenarios were
-  still passing (governance ~21 min, health ~10). The timeout is now 150 min (`ci.yml`); waiting
-  for green to merge. Next: `claude/take-part-layout` (Step 2), started locally, not pushed yet.
+## In flight (cloud session 2026-10-19, updated ~16:00 UTC)
+Choices made in this session are marked **Choice** for the owner to review.
+- **PR #1** merged 16:35 UTC (CI green after the timeout was raised to 150 min); deployed. The README
+  Status/roadmap update and the live smoke result (all good; `projects.mjs` had a test race, fixed)
+  were folded into PR #3 to save a CI run; PR #2 closed.
+- **PR #3** (`claude/take-part-layout`, Step 2): web's Take part layout and action bar, plus the
+  docs above. UI only. Merge first, then merge main into PR #4.
+- **PR #4** (`claude/m3c-reverts`, Step 3, on top of PR #3): phase returns + challenge window
+  (ADR 0040). Changes since its agent finished:
+  - "Return to an earlier phase" is the `return` item of web's Phase menu (`PhaseChangeSection`),
+    opening the ported `ReturnSheet`; returns are voted on in the Take part dock, as on web.
+  - **Choice:** web asks "why" for every phase change, so `ProposalKind::Phase` gained a required
+    `reason` (in the same integrity bump as M3c), with web's advance/close sheet (`AdvanceSheet`)
+    and the vote sheet's "Why".
+  - **Choice:** the app-only `ChallengeList` was removed ("port only from web"); the challenge
+    rules stay (zome, `sp_governance`, scenarios, ADR 0040). Restore from `a0ce970` if wanted.
+  - Verified locally: fmt, clippy, unit tests (without `native`/`mobile-conductor`, for disk),
+    hApp build, scenarios `reverts`, `challenges`, `governance` (with the reason), and
+    `tests/e2e/governance.mjs` end to end (advance with a reason, plans, and a return voted
+    through by both founders). Not run locally: scenarios `plans`, `projects`, `identity`,
+    `health`, `discussion` (CI runs them).
+  - Merging resets project data again (integrity change).
+- **`claude/m4b-threads`**: parked (owner decision), untouched.
+
+## Cloud environment notes
+- Nix is preinstalled. `bash scripts/cloud-nix.sh <cmd>` runs a command in the dev shell: the
+  proxy blocks GitHub tarball downloads for other repos, so it fetches the flake inputs over git
+  at their locked revisions. holochain-ci.cachix.org must be in the environment's allowed
+  domains (the owner added it on 2026-10-19).
+- `bash scripts/cloud-seed.sh` starts the local seed node: the container has no IPv6 and
+  Holochain's interfaces refuse to start without it, so it preloads `scripts/cloud/noipv6.c`.
+  Browser tests: `CHROMIUM_PATH=/opt/pw-browsers/chromium bash scripts/e2e-local.sh tests/e2e/<t>.mjs`
+  (first sign-in after start can take >2 min; rerun if it times out).
+- The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `65b5cfd`. Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
-- Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), guests
-  browse the feed signed out, usernames without spaces. Founders thebestdamn + BigBird.
+- Deployed `main`: `3cf9093` (PR #1 merged 2026-10-19 ~16:35 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
+  plans, M4a project chat, guests browse the feed signed out, usernames without spaces. Founders
+  thebestdamn + BigBird.
 
-## Step 1: PR #1 (`claude/m3b-m4a`), M3b plans + M4a project chat
+## Step 1 (done 2026-10-19): PR #1 (`claude/m3b-m4a`), M3b plans + M4a project chat
 https://github.com/social-production/app/pull/1. This is local `main` (`2a2b749`), not yet on
 `origin/main`.
 - Contents: plans (ADR 0039, "M3b plans, as built" in `docs/plans/M3-governance.md`); project
@@ -91,6 +122,12 @@ after this was written; `git log origin/main..origin/<branch>`.
   test, open a PR, and merge when CI is green. Check whether the as-built section lists what is left.
 
 ## Known gaps
+- **Live smoke after the PR #1 deploy (2026-10-19 ~16:35–17:20 UTC):** `/readyz` 200, the UI
+  serves the new build (plans, chat), sign-up, creating a project and the feeds work, and new
+  projects reach the index within ~10 s. `tests/e2e/projects.mjs` first failed at "not in Bob's
+  feed after 3 min": a test race. Its feed wait accepted the "Loading feed..." card (also an
+  `.empty-card`) and counted before the list loaded, which only shows on live, where the feed is
+  slower. Fixed in the test.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.

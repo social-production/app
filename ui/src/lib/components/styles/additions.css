@@ -28,8 +28,8 @@
   font-size: inherit;
 }
 
-/* app/ui: web docks "Add plan" through PhaseWorkToolbar; here it sits under the plan list. */
-.plan-toolbar {
-  display: flex;
-  justify-content: flex-start;
+/* app/ui: PhaseMenu wraps its trigger in a scope span for the ported .phase-menu styles; web's
+   trigger is a direct child, so the span must not become a box (PhaseWorkToolbar packs it). */
+.phase-menu-scope {
+  display: contents;
 }
