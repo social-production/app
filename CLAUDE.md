@@ -30,7 +30,7 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - Fast loop: `cargo test -p sp_governance`, `npm run check -w ui`, `bash scripts/check-boundaries.sh`.
 - Pack: `bash scripts/build-happ.sh` (zomes → 3 DNAs → hApp). Scenarios: `npm run test:scenarios`.
 - Local seed node (bootstrap + conductor + gateway on :8080, dev founders from `tests/e2e/fixtures/dev-founders.json`): `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`.
-- Browser tests against it: `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,governance}.mjs`.
+- Browser tests against it: `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`.
 - Ported styles: add to `ui/src/lib/components/styles/PORTS`, run `python3 scripts/port-styles.py` (never hand-edit the CSS).
 - UI dev: `npm run dev:ui` (set `VITE_SP_GATEWAYS`, see `ui/.env.example`).
 

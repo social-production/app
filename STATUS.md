@@ -22,11 +22,20 @@ Neither subagent had committed; their work was committed on its branch and merge
 - **M3b plans** (ADR 0039, "M3b plans, as built" in `docs/plans/M3-governance.md`): the agent left
   no docs. The ADR and the as-built notes were written from the code; plan code references were
   renumbered from 0038 to 0039 (0038 is chat).
-- Being checked now: full CI suite including all scenarios on `6771230`. Then browser tests,
-  a push, and a live smoke. The deploy resets project data again (directory/people stay).
-- Found while testing at 390px: the action dock stayed over the chat after switching tabs
-  (`DetailActionDock` re-homed itself after Svelte had removed its block). Fixed in `67b54f0`.
-  Also fixed: plan repository links accepted `javascript:` URLs (`0ebce95`).
+- **Checked on local `main` (`6de0ba0`):** boundaries, sizes, UI check/lint/build, fmt, clippy,
+  unit tests; browser tests `accounts`, `projects`, `chat` (new, 390px) and `governance` (now
+  also files, rates and approves a plan and leaves Production Plan) all pass; plan screens
+  reviewed at 390px. Scenarios (all files, `--test-threads=1`) are running; then push + smoke.
+- **Bugs found and fixed while testing:**
+  - the action dock stayed over the chat on phones after switching tabs (`DetailActionDock`
+    re-homed itself after Svelte had removed its block);
+  - Delete in the chat bubble menu crashed before the confirm dialog (cleared menu, then read it);
+  - plan repository links accepted `javascript:` URLs;
+  - quick plan ratings + vote wrote to the chain concurrently and all but one were refused
+    silently; plan writes now run one at a time (`DetailState.inTurn`).
+- **Known gaps (not fixed):** plan rating/vote errors land in `detail.error`, which the page only
+  shows when the project fails to load, so a refused write is invisible; the optimistic plan
+  sheet doesn't roll back, and leaving the page before the queued writes finish cancels them.
 - Afterwards: `git worktree remove --force .claude/worktrees/agent-a17e…` and `agent-a644…`,
   delete those two `worktree-agent-*` branches and `origin/claude/m3b-plans`.
 
@@ -57,9 +66,11 @@ then push once.
 - **Browser tests:**
   - Start the local seed node: `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`. It builds a dev hApp whose founders are `tests/e2e/fixtures/dev-founders.json`, so governance can be tested.
   - Wait for "zomes compiled" in its log.
-  - Run `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,governance}.mjs`. Signed out, the home page is the feed; sign-up is at `/onboarding`.
+  - Run `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`. Signed out, the home page is the feed; sign-up is at `/onboarding`.
 - **Live smoke:** `node tests/e2e/projects.mjs https://ui-production-333c.up.railway.app` is allowed on this test network (it creates two test accounts). Never create accounts on the FastAPI site.
 - **Styles:** never hand-edit `ui/src/lib/components/styles/*.css`. Add rows to `styles/PORTS` and run `python3 scripts/port-styles.py`. App-only CSS goes in `styles/additions.css` (ADR 0032).
+- **One write at a time per person:** two zome calls that write to the same source chain at once are refused (the chain head moved). Optimistic UI that fires several writes (ratings, votes) must queue them, as `DetailState.inTurn` does.
+- **Debugging the UI:** errors caught into `detail.error` are not shown once the project has loaded; log them temporarily, or find them with a Playwright script that listens to `console`. When stopping a preview server, kill it by port (`ss -ltnp | grep :4174`). `pkill -f "<its command>"` also matches your own shell and kills it.
 - **hdk externs** are unmangled C symbols: never name one after a libc function (`close`, `read`, `write`, `send`…), or native test binaries crash.
 - **Keystore:** lair is vendored with a 64 KiB message limit (ADR 0034). Keep one lair entry per person.
 - **Seed-node logs:** `railway logs --service seed-node`. `RUST_LOG` is back to `info,holochain=warn,kitsune2=warn`. Never print `LAIR_PASSPHRASE`.

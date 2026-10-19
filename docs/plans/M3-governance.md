@@ -74,6 +74,9 @@ Production/distribution/operations/access plans with criteria and assessments (w
   licence notices), in `components/plans/` and `features/projects/PlanPhase.svelte`, shown in the
   Participation tab for the selected phase. Styles: `styles/plans.css`, `styles/wizard.css`.
 - Tests: `tests/scenarios/tests/plans.rs` (an approved plan lets the project leave its plan phase;
-  ratings pick the leader and its subtype shapes the phases).
+  ratings pick the leader and its subtype shapes the phases); `tests/e2e/governance.mjs` files a
+  production plan in the wizard, both founders rate and approve it, and the project moves on.
+- The plan sheet updates at once and queues its writes (`DetailState.inTurn`): concurrent writes
+  to one source chain are refused by the conductor.
 - Not yet: the challenge window for under-counted populations, phase reverts, links between
-  projects, value criteria (with project values), a browser test for the plan wizard.
+  projects, value criteria (with project values), showing refused rating/vote writes in the sheet.
