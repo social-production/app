@@ -45,12 +45,8 @@ pub fn vouch(vouchee: AgentPubKey) -> ExternResult<ActionHash> {
     if vouchee == me {
         return Err(guest_error("You can't vouch for yourself."));
     }
-    let voucher_standing = if founder_agents()?.contains(&me) {
-        StandingProof::Founder
-    } else {
-        let grant = grant_of(&me)?.ok_or_else(|| guest_error("Only full members can vouch."))?;
-        StandingProof::Grant(grant)
-    };
+    let voucher_standing =
+        own_proof()?.ok_or_else(|| guest_error("Only full members can vouch."))?;
     let earlier = own_entry_times(UnitEntryTypes::Vouch)?;
     check_vouch_cap(&earlier, sys_time()?.as_micros()).map_err(|e| guest_error(e.to_string()))?;
 
@@ -92,6 +88,15 @@ pub fn claim() -> ExternResult<ActionHash> {
     Ok(hash)
 }
 
+/// How the caller proves Full standing, or `None` while it is New.
+pub(crate) fn own_proof() -> ExternResult<Option<StandingProof>> {
+    let me = agent_info()?.agent_initial_pubkey;
+    if founder_agents()?.contains(&me) {
+        return Ok(Some(StandingProof::Founder));
+    }
+    Ok(grant_of(&me)?.map(StandingProof::Grant))
+}
+
 fn grant_of(agent: &AgentPubKey) -> ExternResult<Option<ActionHash>> {
     if agent == &agent_info()?.agent_initial_pubkey {
         if let Some(record) = own_latest(UnitEntryTypes::StandingGrant)? {
@@ -128,7 +133,7 @@ fn vouches_for(agent: &AgentPubKey) -> ExternResult<Vec<(ActionHash, AgentPubKey
     Ok(out)
 }
 
-fn own_entry_times(unit: UnitEntryTypes) -> ExternResult<Vec<i64>> {
+pub(crate) fn own_entry_times(unit: UnitEntryTypes) -> ExternResult<Vec<i64>> {
     let entry_type = EntryType::App(unit.try_into()?);
     let filter = ChainQueryFilter::new()
         .entry_type(entry_type)

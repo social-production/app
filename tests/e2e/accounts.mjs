@@ -5,69 +5,7 @@
 //   node tests/e2e/accounts.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 
-import { chromium } from 'playwright';
-
-const BASE = process.argv[2] ?? 'http://localhost:5173';
-const browser = await chromium.launch();
-const log = (...a) => console.log(...a);
-const errors = [];
-
-/** A fresh browser profile; `passkeys` adds a device passkey store (virtual authenticator). */
-async function device({ passkeys }) {
-  const context = await browser.newContext();
-  const page = await context.newPage();
-  const cdp = await context.newCDPSession(page);
-  await cdp.send('WebAuthn.enable');
-  if (passkeys) {
-    await cdp.send('WebAuthn.addVirtualAuthenticator', {
-      options: {
-        protocol: 'ctap2', transport: 'internal', hasResidentKey: true,
-        hasUserVerification: true, isUserVerified: true, automaticPresenceSimulation: true,
-      },
-    });
-  }
-  page.on('pageerror', (e) => errors.push(String(e)));
-  await page.goto(BASE);
-  return page;
-}
-
-// Desktop viewport: the top bar's gear link only exists when signed in.
-const signedIn = (page) => page.getByRole('link', { name: 'Settings' }).waitFor({ timeout: 120_000 });
-const open = (page, name) => page.getByRole('link', { name, exact: true }).first().click();
-
-async function signUp(page, name) {
-  await page.getByRole('tab', { name: 'Sign up' }).click();
-  await page.getByLabel('Your name').fill(name);
-  await page.getByRole('button', { name: 'Next' }).click();
-  const words = (await page.locator('ol.grid li').allInnerTexts()).map((t) => t.split(/\s+/).pop());
-  await page.getByRole('button', { name: "I've written them down" }).click();
-  for (const label of await page.locator('label').allInnerTexts()) {
-    const n = Number(label.match(/Word #(\d+)/)?.[1]);
-    if (n) await page.getByLabel(`Word #${n}`, { exact: true }).fill(words[n - 1]);
-  }
-  await page.getByRole('button', { name: 'Create account' }).click();
-  await signedIn(page);
-  return words;
-}
-
-async function phraseSignIn(page, words) {
-  await page.getByRole('tab', { name: 'Log in' }).click();
-  await page.getByLabel('Recovery phrase').fill(words.join(' '));
-  await page.getByRole('button', { name: 'Log in', exact: true }).click();
-  await signedIn(page);
-}
-
-async function signOut(page) {
-  await open(page, 'Settings');
-  await page.getByRole('button', { name: 'Sign out' }).click();
-}
-
-async function keyOf(page) {
-  await open(page, 'Settings');
-  const key = page.locator('#settings-account .key');
-  await key.waitFor({ timeout: 60_000 });
-  return (await key.innerText()).trim();
-}
+import { BASE, browser, device, errors, keyOf, log, open, phraseSignIn, signedIn, signOut, signUp } from './lib.mjs';
 
 // 1. A device with no passkey store: everything works with the phrase, no passkey prompts.
 const a = await device({ passkeys: false });
@@ -100,7 +38,8 @@ log('signed back in with the phrase (no passkey)');
 const b = await device({ passkeys: true });
 await phraseSignIn(b, words);
 assert.equal(await keyOf(b), annKey, 'same identity on a second device');
-await open(b, 'Home');
+await b.goto(BASE);
+await signedIn(b);
 await b.getByRole('button', { name: 'Save a passkey' }).click();
 await b.getByText('Sign in faster on this device').waitFor({ state: 'detached', timeout: 60_000 });
 await signOut(b);
@@ -126,7 +65,7 @@ for (let i = 0; i < 20 && !(await a.getByRole('button', { name: 'Confirm' }).cou
 }
 await a.getByRole('button', { name: 'Confirm' }).click();
 await a.locator('#settings-devices', { hasText: 'Ann Laptop' }).waitFor({ timeout: 60_000 });
-await open(a, 'Home');
+await a.goto(`${BASE}/people`);
 await a.getByText('2 devices').first().waitFor({ timeout: 60_000 });
 assert.equal(await a.locator('.person-row', { hasText: 'Ann Laptop' }).count(), 0, 'paired device folded into its person');
 log('devices paired and shown as one person');

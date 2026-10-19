@@ -2,6 +2,7 @@
 //! the browser uses to open its app websocket (docs/IDENTITY.md).
 
 pub mod account;
+pub mod index;
 pub mod passkey;
 pub mod session;
 pub mod ws_proxy;
@@ -39,6 +40,8 @@ pub fn router(state: AppState) -> Router {
         .route("/account/login/start", post(account::login_start))
         .route("/account/login/finish", post(account::login_finish))
         .route("/session/resume", post(session::resume))
+        .route("/session/cells", post(session::cells))
+        .route("/index/projects", get(index::projects))
         .route("/ws", get(ws_proxy::upgrade))
         // The UI is served from another origin (ui service, dev server).
         .layer(CorsLayer::permissive())

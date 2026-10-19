@@ -1,5 +1,7 @@
 <script lang="ts">
-  import RouteStub from '#lib/components/shell/RouteStub.svelte';
+  import ProjectFeed from '#lib/features/projects/ProjectFeed.svelte';
+
+  import { page } from '$app/state';
 </script>
 
-<RouteStub title="Search" body="Project search arrives with the project feed in M2." />
+<ProjectFeed search={page.url.searchParams.get('q') ?? ''} />

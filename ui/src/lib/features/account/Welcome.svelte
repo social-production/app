@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { devicePasskeysAvailable, explain, signInWithPasskey } from '#lib/services/account.ts';
+  import { devicePasskeysAvailable, signInWithPasskey } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
 
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';

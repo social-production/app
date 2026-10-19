@@ -1,0 +1,17 @@
+[package]
+name = "project"
+description = "Project DNA API: charter, join/leave, demand/opposition signals, project summary."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+project_integrity = { workspace = true }
+
+[lints]
+workspace = true

@@ -30,3 +30,7 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0026](./0026-signup-protection.md) Signup protection: proof-of-work, per-IP limit, New level
 - [0027](./0027-phrase-first-signin.md) The recovery phrase is the sign-in; passkeys are optional
 - [0028](./0028-happ-versions-and-network-resets.md) Hosted apps are versioned by hApp; network resets move people over
+- [0029](./0029-integrity-version-and-coordinator-updates.md) Hosted apps are versioned by integrity; coordinators are swapped in place (amends 0028)
+- [0030](./0030-project-clones-and-creator-seed.md) Each project is a clone; its network seed names the creator
+- [0031](./0031-archivist-and-node-index.md) Seed nodes archive every project and serve the project feed
+- [0032](./0032-ported-styles.md) Styles ported from web/ live in global stylesheets scoped by a root class

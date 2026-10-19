@@ -15,11 +15,13 @@ holochain = { workspace = true, features = ["wasmer-sys-cranelift", "encryption"
 holochain_keystore = "=0.7.1"
 holochain_types = "=0.7.1"
 lair_keystore_api = "=0.7.1"
+mr_bundle = "=0.7.1"
 rand = "0.8"
 rustls = "0.23"
 serde = { workspace = true }
 serde_json = "1"
 sp_core = { workspace = true }
+sp_index = { workspace = true }
 sha2 = "0.10"
 sodoken = "0.1"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }

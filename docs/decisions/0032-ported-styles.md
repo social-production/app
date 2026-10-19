@@ -1,0 +1,19 @@
+# 0032. Styles ported from web/ live in global stylesheets scoped by a root class
+
+Status: accepted (2026-10-19). See [0004](./0004-fresh-ui.md) and docs/CODE_RULES.md.
+
+## Context
+The UI is ported from `web/`, not redesigned. web's components carry large `<style>` blocks:
+`FeedSurface` and `VoteStrip` alone are over 500 lines. Copying them into Svelte files would break the
+300-line limit, and rewriting them would drift from web's look.
+
+## Decision
+- A component's styles are copied verbatim (by `scripts/port-styles.py`) into `ui/src/lib/components/styles/<area>.css`, with
+  `:global()` unwrapped and every selector prefixed by the component's root class (`.surface`,
+  `.vote-strip`, `.settings-scope`…). Each file starts with a comment naming its web source.
+- Components keep markup and logic only, under the size limits, and import their stylesheet.
+- These CSS files are exempt from the line limit. They are copies, not code we design.
+
+## Consequences
+- web and app/ui look identical, and a style fix in web can be re-copied without merge work.
+- Root classes must stay unique. A new ported area gets its own root class.

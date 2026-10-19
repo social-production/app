@@ -1,12 +1,12 @@
 <script lang="ts">
   import {
-    explain,
     firstInvalidWord,
     phraseIsValid,
     signInWithPhrase,
     splitWords,
     type AccountStep,
   } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
 
   import ProgressSteps from './ProgressSteps.svelte';
 

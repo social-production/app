@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { addPasskey, devicePasskeysAvailable, explain } from '#lib/services/account.ts';
-
-  let { name }: { name: string } = $props();
+  import { viewer } from '#lib/stores/viewer.svelte.ts';
+  import { addPasskey, devicePasskeysAvailable } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
 
   const KEY = 'sp-passkey-offer';
   let visible = $state(false);
@@ -34,7 +34,7 @@
     busy = true;
     error = undefined;
     try {
-      await addPasskey(name);
+      await addPasskey(viewer.name || 'Social Production');
       close('saved');
     } catch (e) {
       error = explain(e);

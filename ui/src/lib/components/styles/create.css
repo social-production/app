@@ -1,0 +1,415 @@
+/* Ported from web/src/lib/features/create/shared/CreateFlowLayout.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .sheet-description {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.create-sheet .step-rail {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 0 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 75%, transparent);
+  background: var(--panel);
+}
+
+.create-sheet .step-chip {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 10px 12px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.create-sheet .step-chip.active {
+  border-bottom-color: var(--brand);
+  color: var(--text-main);
+}
+
+.create-sheet .step-chip.complete {
+  color: var(--text-main);
+}
+
+.create-sheet .sheet-form {
+  display: grid;
+  gap: 14px;
+  padding: 8px 16px 16px;
+}
+
+.create-sheet .sheet-fields {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+
+.create-sheet .sheet-form .panel {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.create-sheet .sheet-form .panel h2 {
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.create-sheet .sheet-form .panel .description {
+  margin-top: 4px;
+  font-size: 13px;
+}
+
+.create-sheet .sheet-form .panel .body {
+  margin-top: 8px;
+}
+
+.create-sheet .sheet-form .panel.bare .body {
+  margin-top: 0;
+}
+
+/* Ported from web/src/lib/features/create/shared/CreateWizard.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .missing-note {
+  margin: 12px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .wizard,
+.create-sheet .step-body {
+  min-width: 0;
+}
+
+/* Ported from web/src/lib/features/create/shared/CreatePanel.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .panel {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.create-sheet .transparent,
+.create-sheet .bare {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.create-sheet h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.create-sheet .description {
+  margin-top: 8px;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.create-sheet .body {
+  display: grid;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.create-sheet .transparent .body,
+.create-sheet .bare .body {
+  margin-top: 0;
+}
+
+/* Ported from web/src/lib/features/create/shared/CreateTypeSelector.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .type-selector {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .type-selector-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.create-sheet .type-options {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.create-sheet .type-option {
+  display: grid;
+  gap: 6px;
+  min-height: 44px;
+  width: 100%;
+  padding: 14px;
+  text-align: left;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease;
+}
+
+.create-sheet .type-option:hover {
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+}
+
+.create-sheet .type-option.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.create-sheet .type-option-title {
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.create-sheet .type-option-summary {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.create-sheet .type-detail-panel {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.create-sheet .type-detail-summary,
+.create-sheet .type-detail-lifecycle {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.create-sheet .type-detail-block {
+  display: grid;
+  gap: 6px;
+}
+
+.create-sheet .type-detail-heading {
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.create-sheet .type-detail-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+@media (max-width: 980px) {
+  .create-sheet .type-options {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ported from web/src/lib/features/create/shared/CreateLocationIntent.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .location-intent {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .helper {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+  font-size: 13px;
+}
+
+.create-sheet .intent-row {
+  display: grid;
+  gap: 8px;
+}
+
+.create-sheet .intent-option {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 10px;
+  align-items: start;
+}
+
+.create-sheet .hint {
+  display: block;
+  margin-top: 2px;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+/* Ported from web/src/lib/features/create/shared/CreateScopeTagSelector.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-sheet .token-input-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.create-sheet .token-input-stack input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+}
+
+.create-sheet .selected-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.create-sheet .selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 8px 4px 10px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.create-sheet .chip-remove {
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.create-sheet .helper-text {
+  margin: 8px 0 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+/* Ported from web/src/lib/components/shared/RequiredFieldLabel.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .field-label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.create-sheet .required-marker {
+  color: var(--accent-warm-strong);
+  font-weight: 800;
+}
+
+.create-sheet .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Ported from web/src/lib/components/shared/DirectUsePolicyNotice.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .policy-notice {
+  display: grid;
+  gap: 6px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 28%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--brand-soft) 45%, var(--panel));
+}
+
+.create-sheet .policy-notice strong {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-sheet .policy-notice p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.create-sheet .policy-core {
+  font-size: 11px;
+}
+
+/* Ported from web/src/lib/features/create/project/CreateProjectPage.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .form-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .overview-row {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.create-sheet .overview-row span {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .status-note {
+  margin: 0;
+  color: var(--danger, #c0392b);
+}
+
+.create-sheet .scope-more-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.create-sheet .scope-more-toggle input {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}

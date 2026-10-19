@@ -23,10 +23,10 @@ pub fn app_id(agent: &AgentPubKey, happ_version: &str) -> String {
     )
 }
 
-/// Short, stable version of a hApp bundle: the first 8 hex chars of its sha256.
-pub fn happ_version(bundle: &[u8]) -> String {
+/// Short, stable version: the first 8 hex chars of the sha256 of `bytes` (see `bundle::read`).
+pub fn happ_version(bytes: &[u8]) -> String {
     use sha2::Digest;
-    crate::hex::encode(&sha2::Sha256::digest(bundle)[..4])
+    crate::hex::encode(&sha2::Sha256::digest(bytes)[..4])
 }
 
 #[derive(Debug)]
@@ -77,9 +77,41 @@ impl Node {
     ) -> anyhow::Result<Session> {
         let mut secret_bytes = [0_u8; CAP_SECRET_BYTES];
         rand::thread_rng().fill_bytes(&mut secret_bytes);
-        let secret: CapSecret = secret_bytes.into();
         let cells = cell_ids(app);
-        for cell_id in &cells {
+        self.grant(&cells, &signing_key, secret_bytes.into())
+            .await?;
+        let token = self.app_token(&app.installed_app_id).await?;
+        Ok(Session {
+            token,
+            cap_secret: secret_bytes.to_vec(),
+            cells,
+        })
+    }
+
+    /// Extend a device's session to cells created since (joined or created projects).
+    /// Only cells of the person's own app whose DNA is listed are granted.
+    pub async fn grant_new_cells(
+        &self,
+        app: &AppInfo,
+        signing_key: &AgentPubKey,
+        cap_secret: CapSecret,
+        dna_hashes: &[DnaHash],
+    ) -> anyhow::Result<usize> {
+        let cells: Vec<CellId> = cell_ids(app)
+            .into_iter()
+            .filter(|c| dna_hashes.contains(c.dna_hash()))
+            .collect();
+        self.grant(&cells, signing_key, cap_secret).await?;
+        Ok(cells.len())
+    }
+
+    async fn grant(
+        &self,
+        cells: &[CellId],
+        signing_key: &AgentPubKey,
+        secret: CapSecret,
+    ) -> anyhow::Result<()> {
+        for cell_id in cells {
             let cap_grant = GrantZomeCallCapabilityGrant {
                 tag: "device-session".into(),
                 constraint: GrantConstraint::Assigned {
@@ -97,12 +129,7 @@ impl Node {
             self.admin(AdminRequest::GrantZomeCallCapability(Box::new(payload)))
                 .await?;
         }
-        let token = self.app_token(&app.installed_app_id).await?;
-        Ok(Session {
-            token,
-            cap_secret: secret_bytes.to_vec(),
-            cells,
-        })
+        Ok(())
     }
 
     /// Single-use, short-lived token to open an app websocket for this app.
@@ -118,61 +145,6 @@ impl Node {
             AdminResponse::AppAuthenticationTokenIssued(issued) => Ok(issued.token),
             other => Err(anyhow!("unexpected token response: {other:?}")),
         }
-    }
-
-    /// Install and remove a throwaway app once, in the background, so the conductor has
-    /// compiled the zome WASM before the first real signup (otherwise ~1 min after a deploy).
-    pub async fn warm_up(&self, happ: &Path) -> anyhow::Result<()> {
-        let AdminResponse::AgentPubKeyGenerated(agent) =
-            self.admin(AdminRequest::GenerateAgentPubKey).await?
-        else {
-            return Err(anyhow!("unexpected key response"));
-        };
-        let id = format!("warmup-{}", self.happ_version);
-        let payload = InstallAppPayload {
-            source: AppBundleSource::Path(happ.to_path_buf()),
-            agent_key: Some(agent),
-            installed_app_id: Some(id.clone()),
-            network_seed: None,
-            roles_settings: None,
-            ignore_genesis_failure: false,
-            restore_from_dht: false,
-        };
-        self.admin(AdminRequest::InstallApp(Box::new(payload)))
-            .await?;
-        self.admin(AdminRequest::UninstallApp {
-            installed_app_id: id,
-            force: true,
-        })
-        .await?;
-        Ok(())
-    }
-
-    /// Remove hosted apps of other hApp versions (old networks) so their cells stop running.
-    pub async fn remove_stale_apps(&self) -> anyhow::Result<usize> {
-        let AdminResponse::AppsListed(apps) = self
-            .admin(AdminRequest::ListApps {
-                status_filter: None,
-            })
-            .await?
-        else {
-            return Ok(0);
-        };
-        let suffix = format!("-{}", self.happ_version);
-        let mut removed = 0;
-        for app in apps {
-            let id = app.installed_app_id;
-            let stale = id.starts_with("person-") && !id.ends_with(&suffix);
-            if stale || id == "sp-demo" || id.starts_with("warmup-") {
-                self.admin(AdminRequest::UninstallApp {
-                    installed_app_id: id,
-                    force: true,
-                })
-                .await?;
-                removed += 1;
-            }
-        }
-        Ok(removed)
     }
 
     pub async fn find_app(&self, id: &str) -> anyhow::Result<Option<AppInfo>> {

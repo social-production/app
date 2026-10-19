@@ -22,18 +22,7 @@ pub async fn serve(
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
     let node = Box::pin(node::Node::start(&config, passphrase)).await?;
-    let warming = node.clone();
-    let happ = config.happ_path.clone();
-    tokio::spawn(async move {
-        let started = std::time::Instant::now();
-        match Box::pin(warming.warm_up(&happ)).await {
-            Ok(()) => tracing::info!(
-                secs = started.elapsed().as_secs(),
-                "zomes compiled (warm-up)"
-            ),
-            Err(e) => tracing::warn!(error = %e, "warm-up failed; first signup will be slower"),
-        }
-    });
+    tokio::spawn(background(node.clone(), config.happ_path.clone()));
     let state = routes::AppState {
         store: store::Store::open(&config.data_dir).await?,
         passkeys: Arc::new(auth::passkeys::Passkeys::new(
@@ -58,3 +47,34 @@ pub async fn serve(
         .await?;
     Ok(())
 }
+
+/// After start: compile the zomes, swap in new coordinators, then keep the archivist
+/// joining new projects and refreshing the feed index.
+async fn background(node: node::Node, happ: std::path::PathBuf) {
+    let started = std::time::Instant::now();
+    match Box::pin(node.warm_up(&happ)).await {
+        Ok(()) => tracing::info!(
+            secs = started.elapsed().as_secs(),
+            "zomes compiled (warm-up)"
+        ),
+        Err(e) => tracing::warn!(error = %e, "warm-up failed; first signup will be slower"),
+    }
+    match node.update_coordinators().await {
+        Ok(dnas) => tracing::info!(dnas, "coordinators up to date"),
+        Err(e) => tracing::warn!(error = %e, "coordinator update failed"),
+    }
+    let mut last = usize::MAX;
+    loop {
+        match Box::pin(node.archive_round(&happ)).await {
+            Ok(count) if count != last => {
+                tracing::info!(projects = count, "project index refreshed");
+                last = count;
+            }
+            Ok(_) => {}
+            Err(e) => tracing::warn!(error = %e, "archivist round failed"),
+        }
+        tokio::time::sleep(ARCHIVE_EVERY).await;
+    }
+}
+
+const ARCHIVE_EVERY: std::time::Duration = std::time::Duration::from_secs(15);

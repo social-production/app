@@ -10,7 +10,7 @@ UI, top to bottom. A layer may import only from layers below it:
 | Layer | May import | Must not import |
 |---|---|---|
 | `ui/src/routes/` | features, components | holo, services, stores, domain |
-| `ui/src/lib/features/<f>/` | services, stores, components, domain | holo |
+| `ui/src/lib/features/<f>/` | services, stores, components, domain | holo, other features (routes compose them) |
 | `ui/src/lib/stores/` | holo (connection state only), domain | features, components |
 | `ui/src/lib/services/` | holo, domain | features, components, stores |
 | `ui/src/lib/components/` | domain (types) | holo, services, stores |
@@ -32,6 +32,8 @@ Rust:
 ## Size
 
 - Files: ≤ 300 lines (warning at 240) for `.rs .ts .svelte .sh`. Split by responsibility.
+- Styles ported from `web/` go in `ui/src/lib/components/styles/*.css`, scoped by a root class
+  (ADR 0032). Components hold markup and logic only.
 - Functions: ≤ 60 lines (clippy `too_many_lines`, eslint `max-lines-per-function`).
 - One feature = one folder. A zome = one domain concept.
 

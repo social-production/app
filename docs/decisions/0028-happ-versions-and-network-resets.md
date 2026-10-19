@@ -1,4 +1,4 @@
-# 0028. Hosted apps are versioned by hApp; network resets move people over
+# 0028. Hosted apps are versioned by hApp; network resets move people over (versioning amended by 0029)
 
 Status: accepted (2026-10-18)
 

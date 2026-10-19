@@ -1,10 +1,43 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <meta name="theme-color" content="#181a1b" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, interactive-widget=resizes-content"
+    />
+    <link rel="icon" type="image/png" href="%sveltekit.assets%/favicon.png?v=4" />
+    <link rel="apple-touch-icon" href="%sveltekit.assets%/apple-touch-icon.png?v=4" />
     <link rel="manifest" href="%sveltekit.assets%/manifest.webmanifest" />
+    <meta name="theme-color" content="#181a1b" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Social Production" />
+    <!-- As on web/src/app.html: apply the saved theme, accent and font before first paint. -->
+    <script>
+      (function () {
+        try {
+          var theme = localStorage.getItem('sp_theme');
+          if (theme === 'system') {
+            theme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          }
+          if (theme === 'dark' || theme === 'light') {
+            document.documentElement.dataset.theme = theme;
+            document.body && (document.body.dataset.theme = theme);
+            var themeMeta = document.querySelector('meta[name="theme-color"]');
+            if (themeMeta) {
+              themeMeta.setAttribute('content', theme === 'light' ? '#ffffff' : '#181a1b');
+            }
+          }
+          // Accent and font too, so the first paint isn't green Inter for everyone.
+          var accent = localStorage.getItem('sp_accent');
+          var font = localStorage.getItem('sp_font');
+          if (accent) document.documentElement.dataset.accent = accent;
+          if (font) document.documentElement.dataset.font = font;
+        } catch (e) {}
+      })();
+    </script>
     <title>Social Production</title>
     %sveltekit.head%
   </head>

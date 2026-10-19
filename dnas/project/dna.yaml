@@ -10,9 +10,15 @@ integrity:
   zomes:
     - name: health_integrity
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
+    - name: project_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/project_integrity.wasm
 coordinator:
   zomes:
     - name: health
       path: ../../target/wasm32-unknown-unknown/zome/health.wasm
       dependencies:
         - name: health_integrity
+    - name: project
+      path: ../../target/wasm32-unknown-unknown/zome/project.wasm
+      dependencies:
+        - name: project_integrity

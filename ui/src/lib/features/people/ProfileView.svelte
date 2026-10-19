@@ -2,7 +2,7 @@
   import CopyKey from '#lib/components/CopyKey.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
-  import { explain } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 

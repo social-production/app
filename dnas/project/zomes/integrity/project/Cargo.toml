@@ -1,0 +1,19 @@
+[package]
+name = "project_integrity"
+description = "Project DNA rules: the charter, membership and demand/opposition signals."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdi = { workspace = true }
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+holochain_serialized_bytes = { workspace = true }
+serde = { workspace = true }
+sp_core = { workspace = true }
+
+[lints]
+workspace = true

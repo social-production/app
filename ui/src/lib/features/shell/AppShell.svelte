@@ -7,11 +7,11 @@
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
+  import CreateFab, { type CreateLink } from '#lib/components/shell/CreateFab.svelte';
   import LeftRail from '#lib/components/shell/LeftRail.svelte';
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
   import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
-  import AccountGate from '#lib/features/account/AccountGate.svelte';
   import { getPerson } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
@@ -57,6 +57,17 @@
     });
   });
 
+  // As on web: the "+" sits on feed pages only (web's isFeedDiscoveryPath).
+  const showCreateFab = $derived(['/', '/search'].includes(page.url.pathname));
+  const createLinks: CreateLink[] = [
+    {
+      href: resolve('/create/project'),
+      label: 'Project',
+      description: 'Start a productive or service project',
+      icon: 'project',
+    },
+  ];
+
   function isActive(href: string): boolean {
     const path = page.url.pathname;
     return href === '/' ? path === '/' : path.startsWith(href);
@@ -79,6 +90,7 @@
 
 <div
   class="shell"
+  data-signed-in={signedIn}
   class:shell-compact={compact}
   style={`--left-width: ${leftOpen && !compact ? '262px' : '0px'}; --right-width: ${rightOpen && !compact ? '292px' : '0px'}; --topbar-height: ${topbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${compact ? '0px' : 'var(--shell-safe-bottom)'}; --main-frame-max-width: ${frameMaxWidth};`}
 >
@@ -114,8 +126,11 @@
         {#if !showWelcome && connection.current.status === 'signed-out'}
           <SignedOutIntro onSignup={() => (showWelcome = true)} aboutHref={resolve('/about')} />
         {/if}
-        <AccountGate>{@render children()}</AccountGate>
+        {@render children()}
       </div>
+      {#if showCreateFab}
+        <CreateFab {signedIn} links={createLinks} signInHref={resolve('/')} />
+      {/if}
     </main>
 
     <aside class="rail right-rail" data-open={rightOpen}>

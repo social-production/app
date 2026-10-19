@@ -5,7 +5,10 @@ export {
   signUp,
   type AccountStep,
 } from './account.ts';
+export { newProjectSeed, projectCell } from './cells.ts';
+export { projectFeed } from './feed.ts';
 export {
+  callCell,
   callZome,
   connect,
   onConnectionChange,
@@ -27,4 +30,5 @@ export {
   encodeHashToBase64 as hashToString,
   type ActionHash,
   type AgentPubKey,
+  type CellId,
 } from '@holochain/client';

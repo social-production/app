@@ -1,0 +1,96 @@
+/* Ported from web/src/lib/components/shared/IconMenuButton.svelte (ADR 0032, scripts/port-styles.py) */
+.icon-menu-shell {
+  display: inline-flex;
+}
+
+.icon-menu-shell .icon-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-soft);
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.icon-menu-shell .icon-menu-trigger.has-label {
+  width: auto;
+  min-height: 32px;
+  padding: 4px 8px;
+  gap: 6px;
+}
+
+.icon-menu-shell .trigger-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.icon-menu-shell .icon-menu-trigger:hover,
+.icon-menu-shell .icon-menu-trigger.menu-open {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.icon-menu-shell .icon-menu-trigger.menu-active {
+  box-shadow: inset 0 -2px 0 var(--text-soft);
+}
+
+.icon-menu-shell .icon-menu {
+  position: fixed;
+  z-index: 80;
+  min-width: 168px;
+  padding: 4px;
+  display: grid;
+  gap: 2px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--text-main) 10%, transparent);
+}
+
+.icon-menu-shell .icon-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 7px 8px;
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+  background: transparent;
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 600;
+  text-align: left;
+  transition: background-color 120ms ease;
+}
+
+.icon-menu-shell .icon-menu-item:hover,
+.icon-menu-shell .icon-menu-item.selected {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.icon-menu-shell .item-label {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.icon-menu-shell .check {
+  flex: 0 0 auto;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 800;
+}

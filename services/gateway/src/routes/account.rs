@@ -180,7 +180,7 @@ async fn session(
         .node
         .ensure_hosted(&agent_key, &state.config.happ_path, restore)
         .await?;
-    let opened = state.node.open_session(&app, signing_key.clone()).await?;
+    let opened = Box::pin(state.node.open_session(&app, signing_key.clone())).await?;
     let mut device_secret = vec![0_u8; 32];
     rand::thread_rng().fill_bytes(&mut device_secret);
     state.store.upsert_person(agent).await?;

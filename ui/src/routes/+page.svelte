@@ -1,5 +1,7 @@
 <script lang="ts">
-  import PeoplePage from '#lib/features/people/PeoplePage.svelte';
+  import PasskeyOffer from '#lib/features/account/PasskeyOffer.svelte';
+  import ProjectFeed from '#lib/features/projects/ProjectFeed.svelte';
 </script>
 
-<PeoplePage />
+<PasskeyOffer />
+<ProjectFeed />

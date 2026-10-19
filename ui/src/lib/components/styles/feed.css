@@ -1,0 +1,155 @@
+/* Ported from web/src/lib/features/public-feed/PublicFeed.svelte (ADR 0032, scripts/port-styles.py) */
+.feed-page,
+.feed-page .stack {
+  display: grid;
+}
+
+.feed-page {
+  gap: 0;
+  min-width: 0;
+  width: 100%;
+  overflow-x: clip;
+}
+
+.feed-page .stack {
+  gap: 0;
+  min-width: 0;
+  overflow-x: clip;
+  overflow-y: clip;
+}
+
+.feed-page .stack .surface:last-child {
+  border-bottom: none;
+}
+
+.feed-page .end-copy {
+  margin: 0;
+  padding: 12px 4px 4px;
+  color: var(--text-soft);
+  font-size: 13px;
+  text-align: center;
+}
+
+.feed-page .toolbar-card {
+  position: relative;
+  padding: 12px var(--page-gutter);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.feed-page .toolbar-card-region {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.feed-page .controls-row {
+  display: flex;
+  flex: 1 1 100%;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  min-height: 32px;
+  overflow: visible;
+  padding-bottom: 2px;
+}
+
+.feed-page .place-search {
+  position: relative;
+  flex: 1 1 72px;
+  min-width: 56px;
+  max-width: 112px;
+}
+
+.feed-page .place-search.expanded {
+  position: absolute;
+  z-index: 6;
+  top: 12px;
+  left: var(--page-gutter);
+  right: var(--page-gutter);
+  max-width: none;
+  min-width: 0;
+}
+
+.feed-page .place-search input {
+  width: 100%;
+  height: 32px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-main);
+  padding: 4px 8px;
+  font: inherit;
+  font-size: 13px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feed-page .place-search.expanded input {
+  background: var(--panel-strong);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--page-bg) 55%, transparent);
+}
+
+.feed-page .icon-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+
+.feed-page .icon-button.active {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+}
+
+.feed-page .inline-alert {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--danger, #c0392b);
+  flex: 1 1 100%;
+}
+
+.feed-page .suggestions {
+  flex: 1 1 100%;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 4px;
+}
+
+.feed-page .suggestions button {
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text-main);
+  padding: 8px 10px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.feed-page .empty-card {
+  padding: 20px var(--page-gutter);
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-soft);
+}

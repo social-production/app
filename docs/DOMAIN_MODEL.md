@@ -11,7 +11,7 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 | `Profile` | M1 | name, bio, avatar ref. Latest update wins |
 | `Follow` link | M1 | agent → agent |
 | `Vouch`, `StandingGrant` | M1 | see GOVERNANCE.md#standing |
-| `ProjectListing` | M2 | pointer to a project clone (network seed + DNA hash) + public summary |
+| `ProjectListing` | M2 ✅ | the project's network seed `<creator>.<nonce>` (ADR 0030) + title, summary, mode, tags, location, phase; the creator's Full-standing proof, or the New-member limit (2 per 7 days) |
 | `Place` | M6 | locations for map/discovery |
 | `NodeAnnouncement` | M1 | community seed/gateway URLs for failover |
 | `Feedback` | M5 | platform feedback |
@@ -21,8 +21,9 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 
 | Entry / link | Milestone | Notes |
 |---|---|---|
-| `Charter` | M2 | title, description, mode/subtype, phase. Changed only by Outcomes |
-| `Membership` | M2 | join/leave are the member's own records |
+| `Charter` | M2 ✅ | title, description, mode/subtype, location, phase, tags. The creator edits it until M3; then only Outcomes |
+| `Members` link | M2 ✅ | "members" anchor → the member's own key; leaving deletes the link (ADR 0030) |
+| `Signals` link | M2 ✅ | "signals" anchor → the agent's key, tag = demand or opposition; one live per agent |
 | `Proposal`, `Vote`, `Outcome`, `Challenge` | M3 | generic governance |
 | `Thread`, `Post`, `Comment`, `Reaction` | M4 | discussion |
 | `ChatMessage` | M4 | project chat |

@@ -1,9 +1,14 @@
 //! The seed node's conductor, embedded in this process. There is no admin websocket:
 //! admin calls go straight to the conductor (as Holochain's runtime-tauri does).
 
+mod archivist;
+mod bundle;
 mod hosting;
+mod index;
+mod release;
 mod seeds;
 
+use std::collections::BTreeMap;
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 
@@ -12,10 +17,11 @@ use holochain::conductor::api::{AdminInterfaceApi, AdminRequest, AdminResponse};
 use holochain::conductor::config::{ConductorConfig, KeystoreConfig, NetworkConfig};
 use holochain::conductor::{ConductorBuilder, ConductorHandle};
 use holochain_keystore::MetaLairClient;
+use holochain_types::prelude::CoordinatorBundle;
 use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
-use hosting::happ_version;
+pub use index::{ProjectCard, ProjectIndex};
 
 use crate::config::Config;
 
@@ -23,8 +29,12 @@ use crate::config::Config;
 pub struct Node {
     conductor: ConductorHandle,
     keystore: MetaLairClient,
-    /// Version of the hosted hApp bundle (part of every hosted app id).
+    /// Integrity version of the hosted hApp (part of every hosted app id, ADR 0028).
     pub happ_version: String,
+    /// Each role's coordinator zomes from the bundle, for in-place updates.
+    coordinators: Arc<BTreeMap<String, CoordinatorBundle>>,
+    /// Feed index over every project the archivist holds (refreshed in the background).
+    pub index: ProjectIndex,
 }
 
 impl std::fmt::Debug for Node {
@@ -57,10 +67,13 @@ impl Node {
             .await
             .map_err(|e| anyhow!("start conductor: {e:?}"))?;
         let bundle = std::fs::read(&config.happ_path).context("read HAPP_PATH")?;
+        let info = bundle::read(&bundle).await?;
         let node = Self {
             conductor,
             keystore,
-            happ_version: happ_version(&bundle),
+            happ_version: info.version,
+            coordinators: Arc::new(info.coordinators),
+            index: ProjectIndex::default(),
         };
         node.ensure_app_interface(config.app_ws_port).await?;
         let removed = Box::pin(node.remove_stale_apps()).await?;

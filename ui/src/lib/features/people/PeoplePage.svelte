@@ -1,9 +1,7 @@
 <script lang="ts">
   import PersonChip from '#lib/components/PersonChip.svelte';
-  import PasskeyOffer from '#lib/features/account/PasskeyOffer.svelte';
-  import { explain } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
   import { getPerson, listPeople, pairingOf } from '#lib/services/people.ts';
-  import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   import { personRows, type PersonRow } from './rows.ts';
 
@@ -38,7 +36,6 @@
 
 <div class="profile-page">
   <section class="page">
-    <PasskeyOffer name={viewer.name || 'Social Production'} />
     <section class="hero-section">
       <h1>People</h1>
       <p class="profile-bio">Open someone's profile to vouch for them.</p>

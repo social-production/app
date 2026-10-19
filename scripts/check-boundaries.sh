@@ -40,6 +40,21 @@ forbid "services must not import features, components or stores" \
 forbid "components must not import services, stores or holo" \
   "from ['\"]#lib/(holo|services|stores)" "$ui/lib/components"
 
+# UI: a feature never reaches into another feature; routes compose features instead.
+for feature in "$ui"/lib/features/*/; do
+  name=$(basename "$feature")
+  hits=$(grep -rnE "from ['\"]#lib/features/" "$feature" | grep -v "#lib/features/$name/")
+  if [[ -n "$hits" ]]; then
+    echo "✗ features must not import other features (compose them in a route)"
+    echo "$hits" | sed 's/^/    /'
+    failures=$((failures + 1))
+  fi
+done
+
+# UI: stores hold state over the connection only.
+forbid "stores may import only holo and domain" \
+  "from ['\"]#lib/(features|components|services)" "$ui/lib/stores"
+
 # UI: domain types are leaf modules.
 forbid "domain types must not import other layers" \
   "from ['\"]#lib/(holo|services|stores|features|components)" "$ui/lib/domain"

@@ -34,6 +34,7 @@ sp_governance = { path = "crates/sp_governance" }
 sp_index = { path = "crates/sp_index" }
 health_integrity = { path = "zomes/health/integrity" }
 identity_integrity = { path = "dnas/directory/zomes/integrity/identity" }
+project_integrity = { path = "dnas/project/zomes/integrity/project" }
 
 [workspace.lints.rust]
 unsafe_code = "forbid"

@@ -1,4 +1,4 @@
-# M2 — Projects (plan, decided 2026-10-18)
+# M2 — Projects (plan, decided 2026-10-18; built 2026-10-19)
 
 Three steps, each tested and deployed on its own.
 
@@ -34,3 +34,15 @@ Three steps, each tested and deployed on its own.
 ## M2c — project screens from `web/`
 Public project feed with filters, project detail (header, about, members, signals, join/leave), the
 create-project flow, and editing the charter (creator).
+
+## As built (2026-10-19)
+- M2a, M2b and M2c are done; tests: `cargo test -p sp_index` (ranking, windows, search),
+  `tests/scenarios/tests/projects.rs` (charter, join/leave, signals, New-member limit, forged creator,
+  listing updates), `tests/e2e/projects.mjs` (create → feed → join → support → edit → search → limit).
+- Changes from the plan: the creator is named in the network seed, not in DNA properties (ADR 0030);
+  membership and signals are links, not entries; the feed shows web's Trending and Most recent sorts
+  (top/oldest exist in `sp_index` and the API); detail pages show the Details tab only until M3–M5.
+- Hosted apps are now versioned by integrity, and coordinator changes are swapped in place (ADR 0029).
+- Known gaps, by milestone: feed cards don't show your own signal (needs a per-viewer read, M3); the
+  comment count arrives with discussion (M4); scope (home/region) needs follows and the map (M5/M6);
+  guests can't browse the feed signed out yet (the account gate wraps every route; next).

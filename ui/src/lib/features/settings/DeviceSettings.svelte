@@ -1,7 +1,7 @@
 <script lang="ts">
   import CopyKey from '#lib/components/CopyKey.svelte';
   import { displayName, type Person } from '#lib/domain/people.ts';
-  import { explain } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
   import {
     deviceRequests,
     devicesOf,

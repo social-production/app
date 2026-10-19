@@ -63,3 +63,29 @@ pub async fn directory_network(
     conductors.exchange_peer_info().await;
     cells
 }
+
+/// One project clone (seed `<first agent>.<seed>`) installed for each conductor's agent,
+/// as the gateway and UI do with `createCloneCell`. Returns the cells in conductor order.
+pub async fn project_network(conductors: &mut SweetConductorBatch, seed: &str) -> Vec<SweetCell> {
+    let mut agents = Vec::new();
+    for i in 0..conductors.len() {
+        agents.push(SweetAgents::one(conductors[i].keystore()).await);
+    }
+    // The creator is named in the seed (project_integrity::creator_in_seed).
+    let creator = AgentPubKeyB64::from(agents[0].clone());
+    let modifiers =
+        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(format!("{creator}.{seed}"));
+    let dna = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
+        .await
+        .expect("load project dna");
+    let mut cells = Vec::new();
+    for (i, agent) in agents.into_iter().enumerate() {
+        let app = conductors[i]
+            .setup_app_for_agent("sp", agent, std::slice::from_ref(&dna))
+            .await
+            .expect("install app");
+        cells.push(app.into_cells().remove(0));
+    }
+    conductors.exchange_peer_info().await;
+    cells
+}

@@ -14,6 +14,8 @@
   }
 
   let { person, devices = 1, actions }: Props = $props();
+
+  import '#lib/components/styles/profile.css';
 </script>
 
 <section class="hero-section">

@@ -1,14 +1,18 @@
 //! Identity rules for the directory DNA (docs/GOVERNANCE.md#standing, docs/plans/M1-identity.md).
 //! Every rule here is re-checked by every validator. Pure maths lives in `sp_governance`.
 
+mod chain;
 mod device;
 mod founders;
+mod listing;
 mod profile;
 mod standing;
 mod vouch;
 
 use hdi::prelude::*;
 
+use chain::same_author;
+pub(crate) use chain::{earlier_creates, invalid, prev_action, typed_entry};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
 
 #[hdk_entry_helper]
@@ -64,6 +68,23 @@ pub struct DeviceLink {
     pub device: AgentPubKey,
 }
 
+/// A project in the directory (docs/plans/M2-projects.md). The project itself lives in its
+/// own clone of the project DNA, joined with `network_seed` and the author as creator.
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct ProjectListing {
+    pub network_seed: String,
+    pub title: String,
+    pub summary: String,
+    pub mode: String,
+    pub subtype: String,
+    pub location_label: String,
+    pub phase: String,
+    pub tags: Vec<String>,
+    /// Full members cite their standing and skip the New-member limit.
+    pub creator_standing: Option<StandingProof>,
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[hdk_entry_types]
@@ -73,6 +94,7 @@ pub enum EntryTypes {
     Vouch(Vouch),
     StandingGrant(StandingGrant),
     DeviceLink(DeviceLink),
+    ProjectListing(ProjectListing),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -83,6 +105,8 @@ pub enum LinkTypes {
     VoucheeToVouches,
     AgentToGrants,
     AgentToDeviceLinks,
+    AllProjects,
+    AgentToListings,
 }
 
 #[hdk_extern]
@@ -105,7 +129,8 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             app_entry, action, ..
         }) => match app_entry {
             EntryTypes::Profile(p) => profile::validate_update(&p, &action),
-            _ => invalid("only profiles can be updated"),
+            EntryTypes::ProjectListing(l) => listing::validate_update(&l, &action),
+            _ => invalid("only profiles and project listings can be updated"),
         },
         FlatOp::CreateRecord(OpRecord::DeleteEntry { action, .. }) => validate_delete(&action),
         FlatOp::Link(OpLink::CreateLink { link_type, action })
@@ -134,6 +159,7 @@ fn validate_create(
         EntryTypes::Vouch(v) => vouch::validate_create(v, action),
         EntryTypes::StandingGrant(g) => standing::validate_create(g, action),
         EntryTypes::DeviceLink(d) => device::validate_create(d, action),
+        EntryTypes::ProjectListing(l) => listing::validate_create(l, action),
     }
 }
 
@@ -160,53 +186,14 @@ fn validate_create_link(
     action: &TypedAction<CreateLinkData>,
 ) -> ExternResult<ValidateCallbackResult> {
     match link_type {
-        LinkTypes::AgentToProfile | LinkTypes::AgentToGrants => {
+        LinkTypes::AgentToProfile | LinkTypes::AgentToGrants | LinkTypes::AgentToListings => {
             let base = action.base_address.clone().into_agent_pub_key();
             if base.as_ref() == Some(action.author()) {
                 Ok(ValidateCallbackResult::Valid)
             } else {
-                invalid("agents can only link their own profile and grants")
+                invalid("agents can only link their own profile, grants and listings")
             }
         }
         _ => Ok(ValidateCallbackResult::Valid),
     }
-}
-
-fn same_author(
-    a: &AgentPubKey,
-    b: &AgentPubKey,
-    reason: &str,
-) -> ExternResult<ValidateCallbackResult> {
-    if a == b {
-        Ok(ValidateCallbackResult::Valid)
-    } else {
-        invalid(reason)
-    }
-}
-
-pub(crate) fn invalid(reason: &str) -> ExternResult<ValidateCallbackResult> {
-    Ok(ValidateCallbackResult::Invalid(reason.to_string()))
-}
-
-/// Decode a record's entry using its declared entry type (never by guessing from bytes).
-pub(crate) fn typed_entry(record: &Record) -> ExternResult<Option<EntryTypes>> {
-    let Some(entry) = record.entry().as_option() else {
-        return Ok(None);
-    };
-    let Some(def) = record.action().entry_type().and_then(|t| match t {
-        EntryType::App(def) => Some(def.clone()),
-        _ => None,
-    }) else {
-        return Ok(None);
-    };
-    EntryTypes::deserialize_from_type(def.zome_index, def.entry_index, entry)
-}
-
-/// The action before a create (every create has one: genesis comes first).
-pub(crate) fn prev_action(action: &TypedAction<CreateData>) -> ExternResult<ActionHash> {
-    action.prev_action().cloned().ok_or_else(|| {
-        wasm_error!(WasmErrorInner::Guest(
-            "create without a previous action".into()
-        ))
-    })
 }

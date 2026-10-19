@@ -1,8 +1,8 @@
 <script lang="ts">
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import { BIO_MAX, HOME_AREA_MAX, NAME_MAX, type Avatar } from '#lib/domain/people.ts';
-  import { toAvatar } from '#lib/features/people/avatar.ts';
-  import { explain } from '#lib/services/account.ts';
+  import { toAvatar } from '#lib/components/people/avatar.ts';
+  import { explain } from '#lib/services/errors.ts';
   import { getPerson, saveProfile } from '#lib/services/people.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 

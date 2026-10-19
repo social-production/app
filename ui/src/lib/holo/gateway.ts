@@ -59,6 +59,22 @@ export interface OpenBody {
   signingKey: number[];
 }
 
+async function get<T>(gateway: string, path: string, query: Record<string, string>): Promise<T> {
+  const url = new URL(path, gateway);
+  for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
+  const response = await fetch(url);
+  if (!response.ok)
+    throw new GatewayError(`The server answered ${response.status}.`, response.status);
+  return (await response.json()) as T;
+}
+
+export interface CellsBody {
+  signingKey: number[];
+  deviceSecret: number[];
+  capSecret: number[];
+  dnaHashes: number[][];
+}
+
 export const gatewayApi = {
   pow: (g: string) => post<{ challenge: string; bits: number }>(g, '/account/pow'),
   open: (g: string, body: OpenBody) => post<GatewaySession>(g, '/account/open', body),
@@ -70,4 +86,6 @@ export const gatewayApi = {
   passkeyFinish: (g: string, body: { ceremony: string; credential: unknown }) =>
     post<{ saved: boolean }>(g, '/account/passkey/finish', body),
   resume: (g: string, signingKey: number[]) => post<Resumed>(g, '/session/resume', { signingKey }),
+  cells: (g: string, body: CellsBody) => post<{ granted: number }>(g, '/session/cells', body),
+  projects: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/projects', query),
 };

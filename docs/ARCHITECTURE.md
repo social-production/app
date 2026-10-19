@@ -78,6 +78,8 @@ enforces this. Full rules are in [CODE_RULES.md](CODE_RULES.md).
 | change how the UI finds nodes | `ui/src/lib/holo/nodes.ts` |
 | change governance maths | `crates/sp_governance` (+ tests), see [GOVERNANCE.md](GOVERNANCE.md) |
 | change seed-node hosting/login | `services/gateway`, see [IDENTITY.md](IDENTITY.md) |
+| change the project feed (ranking, windows, search) | `crates/sp_index`; served by the gateway's archivist index (ADR 0031) |
+| port a screen's styles from `web/` | `scripts/port-styles.py` → `ui/src/lib/components/styles/` (ADR 0032) |
 | change Railway setup | `deploy/`, see [DEPLOYMENT.md](DEPLOYMENT.md) |
 | test several agents together | `tests/scenarios` (Holochain sweettest) |
 
@@ -90,6 +92,14 @@ enforces this. Full rules are in [CODE_RULES.md](CODE_RULES.md).
    `validate`, then publishes. Peers validate again before storing.
 5. Another node's `list_heartbeats` sees the link after gossip.
 
+## Projects (M2)
+
+Each project is its own network: a clone of the `project` DNA whose seed names its creator
+(ADR 0030). The directory lists it (`ProjectListing`). Every seed node runs an archivist agent that
+joins every listed project, so projects stay available, and builds the feed index served at
+`GET /index/projects` (ADR 0031). Opening a project clones it on the person's node; in a browser,
+the gateway then grants the device's key on the new cell (`POST /session/cells`).
+
 ## Status
 
-M0 and M1 are live; see the Status section and roadmap in [../README.md](../README.md).
+M0, M1 and M2 are live; see the Status section and roadmap in [../README.md](../README.md).

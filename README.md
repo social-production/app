@@ -8,30 +8,32 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-18)
+## Status (2026-10-19)
 
-**M1 (identity) is live** on the test network: https://ui-production-333c.up.railway.app
+**M2 (projects) is live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
-- Sign up with a 24-word recovery phrase (it *is* the identity), sign in with it on any device,
-  optionally save a passkey on devices that can store one. There are no passwords or emails.
-- **The interface is `web/`'s** (M2a): same app shell, top bar, left rail, phone bottom nav, onboarding,
-  profile header with the Vouch button, and settings (profile, devices, passkey, your key, sign out).
-- Profiles (name, picture, home area, bio), the People list, and device pairing (shown as one person).
-- Standing: founders (**thebestdamn**, **BigBird**) start Full; 2 vouches or 30 days of steady
-  activity make someone Full; 5 vouches per 30 days; every node validates the rules.
-- Seed node on Railway (one process: gateway + embedded conductor), bootstrap/relay, and a desktop
-  app on Holochain's official runtime-tauri. Desktop nodes sync with the seed node over the internet.
+- **Projects:** start one through the "+" menu (type → basics → location → tags → overview), and
+  find it in the feed (Trending / Most recent, Today / This week / This month / All time) and in
+  search. Join and leave, support or oppose, open the member list; the creator edits the charter
+  (until M3 proposals). New members can start 2 projects a week; full members have no limit.
+- Each project is its own network; the seed node's archivist keeps every project available and
+  serves the feed (ADR 0030, 0031). Code-only releases no longer reset anything (ADR 0029).
+- **The interface is `web/`'s**: app shell, onboarding, feed cards, project page, create flow,
+  sheets, profile header with Vouch, settings (profile, devices, passkey, your key, sign out).
+- **Identity (M1):** a 24-word recovery phrase *is* the account, optional passkeys, device pairing
+  shown as one person, standing with founders (**thebestdamn**, **BigBird**), 2 vouches → Full.
 
-Measured on the live site: signup ≈ 9 s, a new person visible to others ≈ 3 s,
-first-signup-after-deploy delay removed (zomes are compiled at startup).
+Measured locally: a new project shows in another person's feed within one archivist round (≤15 s);
+signup ≈ 7 s.
 
 Known gaps:
-- Projects aren't here yet (M2b/M2c). Until then Home lists people, and the shell's other links
-  (notifications, messages, platform, search) are placeholders naming the milestone that fills them.
+- The M2 deploy changed the directory DNA, so the test network was reset again: sign in with your
+  24 words and re-enter your profile; founders vouch again.
+- Guests can't browse the feed signed out yet; feed cards don't show your own signal; no comments
+  until M4 (see docs/plans/M2-projects.md#as-built-2026-10-19).
 - iOS phone nodes wait on an upstream Holochain keystore fix (ADR 0020/0021). Android builds.
-- Vouching has scenario tests but no browser test yet; bot reviews and vouch suspension come in M6.
 
 ## Getting started
 
@@ -47,7 +49,7 @@ bash scripts/build-happ.sh  # zomes → DNAs → hApp
 cargo test --workspace      # pure rules + scenario tests
 bash scripts/dev-seed.sh    # local seed node on :8080 (another terminal)
 npm run dev:ui              # VITE_SP_GATEWAYS=http://localhost:8080
-node tests/e2e/accounts.mjs http://localhost:5173   # browser test (see the file header)
+bash scripts/e2e-local.sh tests/e2e/accounts.mjs tests/e2e/projects.mjs   # browser tests (seed node from dev-seed with RP_ORIGIN=http://localhost:4174)
 ```
 
 ## Roadmap
@@ -59,8 +61,8 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 |---|---|---|---|
 | **M0** | Foundation | repo, docs, CI, `health` zome in 3 DNAs, gateway, UI shell, desktop app, Railway seed + bootstrap, platform check | ✅ done |
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
-| **M2** | Projects | ✅ M2a: `web/`'s design system + app shell, M1 screens redone with it. Next: M2b project clones, membership, signals, archivist, feeds/search (`sp_index`); M2c project screens from `web/` ([plan](docs/plans/M2-projects.md)) | in progress |
-| M3 | Governance | Proposal/Vote/Outcome, kinds: edits, phases, updates, links, plans | |
+| **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
+| M3 | Governance | Proposal/Vote/Outcome, kinds: edits, phases, updates, links, plans | next |
 | M4 | Talk | discussion, project chat, DMs (conversation DNA), in-app notifications | |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |

@@ -2666,6 +2666,7 @@ dependencies = [
  "holochain_keystore",
  "holochain_types",
  "lair_keystore_api",
+ "mr_bundle",
  "rand 0.8.8",
  "rustls",
  "serde",
@@ -2673,6 +2674,7 @@ dependencies = [
  "sha2 0.10.9",
  "sodoken",
  "sp_core",
+ "sp_index",
  "sqlx",
  "tokio",
  "tokio-tungstenite 0.28.0",
@@ -7093,6 +7095,26 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "985e7ec9bb745e6ce6535b544d84d6cd6f7ad8bd711c398938ae983b91a766d9"
 dependencies = [
  "unicode-ident",
+]
+
+[[package]]
+name = "project"
+version = "0.0.1"
+dependencies = [
+ "hdk",
+ "project_integrity",
+ "serde",
+]
+
+[[package]]
+name = "project_integrity"
+version = "0.0.1"
+dependencies = [
+ "hdi",
+ "holo_hash",
+ "holochain_serialized_bytes",
+ "serde",
+ "sp_core",
 ]
 
 [[package]]

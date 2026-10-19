@@ -2,6 +2,7 @@
 //! tests. Reads are best-effort views; integrity validation is what enforces the rules.
 
 mod devices;
+mod listings;
 mod profile;
 mod records;
 mod standing;
@@ -9,6 +10,7 @@ mod standing;
 use hdk::prelude::*;
 use identity_integrity::{founder_agents, DirectoryProperties, Founder};
 
+pub use listings::{Allowance, ListingInput, ListingView};
 pub use profile::ProfileInput;
 pub use standing::StandingView;
 
@@ -50,6 +52,37 @@ pub fn vouch(vouchee: AgentPubKey) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn withdraw_vouch(vouch: ActionHash) -> ExternResult<ActionHash> {
     delete_entry(vouch)
+}
+
+#[hdk_extern]
+pub fn create_listing(input: ListingInput) -> ExternResult<ActionHash> {
+    listings::create(input)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ListingUpdate {
+    pub id: ActionHash,
+    pub listing: ListingInput,
+}
+
+#[hdk_extern]
+pub fn update_listing(input: ListingUpdate) -> ExternResult<ActionHash> {
+    listings::update(input.id, input.listing)
+}
+
+#[hdk_extern]
+pub fn list_projects(_: ()) -> ExternResult<Vec<ListingView>> {
+    listings::list()
+}
+
+#[hdk_extern]
+pub fn get_listing(id: ActionHash) -> ExternResult<Option<ListingView>> {
+    listings::get(id)
+}
+
+#[hdk_extern]
+pub fn project_allowance(_: ()) -> ExternResult<Allowance> {
+    listings::allowance()
 }
 
 #[hdk_extern]

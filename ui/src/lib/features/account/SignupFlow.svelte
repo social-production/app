@@ -4,10 +4,10 @@
   import {
     confirmationPositions,
     createAccount,
-    explain,
     newPhrase,
     type AccountStep,
   } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
 
   import ProgressSteps from './ProgressSteps.svelte';
 

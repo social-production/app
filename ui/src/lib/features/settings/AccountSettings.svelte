@@ -1,6 +1,7 @@
 <script lang="ts">
   import CopyKey from '#lib/components/CopyKey.svelte';
-  import { addPasskey, devicePasskeysAvailable, explain, signOut } from '#lib/services/account.ts';
+  import { addPasskey, devicePasskeysAvailable, signOut } from '#lib/services/account.ts';
+  import { explain } from '#lib/services/errors.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   let { me }: { me: string } = $props();

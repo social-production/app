@@ -1,0 +1,1087 @@
+/* Ported from web/src/lib/components/shared/MembershipSplitButton.svelte (ADR 0032, scripts/port-styles.py) */
+.membership-split {
+  display: inline-flex;
+  align-items: stretch;
+  min-height: 40px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-border);
+  overflow: hidden;
+  flex: 0 0 auto;
+  gap: 1px;
+}
+
+.membership-split:has(.participation-action-highlight) {
+  overflow: visible;
+}
+
+.membership-split.joined {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand) 55%, var(--panel-border));
+}
+
+.membership-split.pending {
+  border-color: color-mix(in srgb, var(--status-yellow, var(--brand)) 55%, var(--panel-border));
+}
+
+.membership-split.members-open {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+}
+
+.membership-split .membership-join,
+.membership-split .membership-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  border: 0;
+  background: var(--panel);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.membership-split .membership-join {
+  gap: 6px;
+  min-width: 40px;
+  padding: 0 12px 0 10px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.membership-split .membership-join .toolbar-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.membership-split .membership-join.joined,
+.membership-split.joined .membership-count {
+  color: var(--brand-strong);
+}
+
+.membership-split .membership-join.pending,
+.membership-split.pending .membership-count {
+  color: var(--text-main);
+}
+
+.membership-split .membership-join:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.membership-split .membership-count {
+  min-width: 32px;
+  padding: 0 10px;
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.membership-split .membership-count.solo {
+  border-left: 0;
+}
+
+.membership-split .membership-count.static {
+  cursor: default;
+}
+
+.membership-split .membership-join:hover:not(:disabled),
+.membership-split .membership-count:hover:not(.static) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.membership-split .member-count {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/features/detail/DetailActionDock.svelte (ADR 0032, scripts/port-styles.py) */
+.detail-action-dock {
+  position: fixed;
+  z-index: var(--z-dock);
+  left: var(--left-width, 0px);
+  right: var(--right-width, 0px);
+  bottom: var(--shell-bottom-nav-offset, 0px);
+  display: flex;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.22s ease;
+  will-change: transform;
+  flex-direction: column;
+  gap: 8px;
+  box-sizing: border-box;
+  padding: 10px 16px calc(10px + var(--shell-dock-safe-bottom, 0px));
+  border-top: 1px solid var(--panel-border);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 -10px 24px color-mix(in srgb, var(--page-bg) 55%, transparent);
+}
+
+.detail-action-dock:not(:has(button)) {
+  display: none;
+}
+
+.detail-action-dock:has(.phase-action-group),
+.detail-action-dock:has(.context-dock) {
+  gap: 0;
+  padding: 0;
+  padding-bottom: var(--shell-dock-safe-bottom, 0px);
+}
+
+.detail-action-dock .participation-membership {
+  display: flex;
+  width: 100%;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.detail-action-dock .participation-membership .membership-split {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 44px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.detail-action-dock .participation-membership .membership-join,
+.detail-action-dock .participation-membership .membership-count {
+  flex: 1 1 50%;
+  box-sizing: border-box;
+  width: 50%;
+  max-width: 50%;
+  min-width: 0;
+  padding: 0;
+  min-height: 44px;
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.detail-action-dock .participation-membership .membership-join:not(.joined) {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.detail-action-dock .participation-membership .membership-join:not(.joined):hover:not(:disabled),
+.detail-action-dock .participation-membership .membership-join:not(.joined):focus-visible {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.detail-action-dock .participation-membership .membership-count:hover:not(.static) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.detail-action-dock:has(.participation-membership) {
+  background: var(--panel);
+}
+
+.detail-action-dock:has(.participation-membership):not(.is-pad) {
+  border-top: 0;
+  box-shadow: none;
+}
+
+.detail-action-dock .participation-membership .membership-count {
+  border-left: 0;
+  box-shadow: inset 1px 0 0 var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+@media (max-width: 1080px) {
+  .detail-action-dock {
+    bottom: var(--shell-bottom-nav-height);
+  }
+
+  .detail-action-dock .feed-chrome-collapsed .detail-action-dock {
+    transform: translate3d(0, var(--shell-bottom-nav-height), 0);
+  }
+}
+
+@media (min-width: 1081px) {
+  .detail-action-dock {
+    --detail-dock-span: calc(100vw - var(--left-width, 0px) - var(--right-width, 0px));
+    width: min(720px, var(--detail-dock-span));
+    left: calc(
+      var(--left-width, 0px) + (var(--detail-dock-span) - min(720px, var(--detail-dock-span))) / 2
+    );
+    right: auto;
+  }
+
+  .detail-action-dock.is-pad {
+    bottom: calc(var(--shell-bottom-nav-offset, 0px) + 12px);
+    border: 1px solid var(--panel-border);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--page-background) 55%, transparent);
+  }
+}
+
+/* Ported from web/src/lib/features/projects/detail/ProjectOverviewHeader.svelte (ADR 0032, scripts/port-styles.py) */
+.project-overview .context-meta {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.project-overview .context-meta .content-meta-row {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.project-overview .context-meta .content-meta-row .inline-link {
+  min-width: auto;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.project-overview .control-actions .membership-count:hover:not(.static),
+.project-overview .control-actions .membership-join.joined:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  cursor: pointer;
+}
+
+.project-overview .context-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.project-overview .heading {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  margin-top: 4px;
+  padding-bottom: 12px;
+}
+
+.project-overview .identity-row {
+  display: grid;
+  min-width: 0;
+}
+
+.project-overview .identity-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.project-overview .report-control {
+  flex: 0 0 auto;
+}
+
+.project-overview h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+}
+
+@media (max-width: 760px) {
+  .project-overview h1 {
+    font-size: clamp(18px, 5.4vw, 24px);
+  }
+}
+
+.project-overview .live-fact {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.project-overview .context-dock {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+}
+
+.project-overview .control-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+}
+
+.project-overview .control-actions > .guest-signin,
+.project-overview .control-actions > .quiet-control,
+.project-overview .control-actions > .membership-split,
+.project-overview .control-actions > .share-shell,
+.project-overview .control-actions > .vote-dock {
+  display: flex;
+  flex: 1 1 0;
+  align-items: stretch;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 0;
+  min-width: 72px;
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid var(--panel-border);
+}
+
+.project-overview .control-actions > :last-child {
+  border-right: 0;
+}
+
+.project-overview .control-actions > .quiet-control {
+  align-items: center;
+  height: 44px;
+  line-height: 1;
+}
+
+.project-overview .quiet-control,
+.project-overview .control-actions .share-button,
+.project-overview .control-actions .membership-join,
+.project-overview .control-actions .membership-count {
+  width: auto;
+  min-width: 0;
+  min-height: 44px;
+  flex: 1 1 auto;
+  border: 0;
+  border-radius: 0;
+}
+
+.project-overview .signal-row + .control-actions {
+  border-top: 1px solid var(--panel-border);
+}
+
+.project-overview .quiet-control {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 0;
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.project-overview .quiet-control.open,
+.project-overview .quiet-control:hover,
+.project-overview .quiet-control:focus-visible {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.project-overview .control-actions .membership-split,
+.project-overview .control-actions .share-shell {
+  display: flex;
+  overflow: hidden;
+  border-radius: 0;
+}
+
+.project-overview .control-actions > .guest-signin {
+  align-items: center;
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.project-overview .control-actions .membership-join {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+.project-overview .control-actions .membership-join,
+.project-overview .control-actions .membership-count {
+  min-height: 44px;
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.project-overview .control-actions .membership-join:not(.joined) {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.project-overview .control-actions .membership-join:not(.joined):hover:not(:disabled),
+.project-overview .control-actions .membership-join:not(.joined):focus-visible {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.project-overview .control-actions .share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 0;
+  font-size: 13px;
+}
+
+.project-overview .signal-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.project-overview .signal-row .signal-strip.labeled {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  width: 100%;
+  height: 100%;
+  gap: 0;
+  border-radius: 0;
+}
+
+.project-overview .signal-row .signal-strip.labeled .vote-button {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 44px;
+  align-self: stretch;
+  border: 0;
+  border-radius: 0;
+  font-size: 14px;
+}
+
+.project-overview
+  .signal-row
+  :global(.signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose)) .vote-button),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:hover:not(:disabled)
+  ),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose)) .vote-button:focus
+  ),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:focus-visible
+  ) {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:last-child
+  ),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:last-child:hover:not(:disabled)
+  ),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:last-child:focus
+  ),
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:last-child:focus-visible
+  ) {
+  background: var(--danger);
+  color: white;
+}
+
+.project-overview .signal-row .signal-strip.labeled:has(.active-support) .vote-button,
+.project-overview .signal-row .signal-strip.labeled:has(.active-oppose) .vote-button,
+.project-overview
+  .signal-row
+  .signal-strip.labeled:has(.active-support)
+  .vote-button:hover:not(:disabled),
+.project-overview
+  .signal-row
+  .signal-strip.labeled:has(.active-oppose)
+  .vote-button:hover:not(:disabled),
+.project-overview .signal-row .signal-strip.labeled:has(.active-support) .vote-button:focus,
+.project-overview .signal-row .signal-strip.labeled:has(.active-oppose) .vote-button:focus,
+.project-overview .signal-row .signal-strip.labeled:has(.active-support) .vote-button:focus-visible,
+.project-overview .signal-row .signal-strip.labeled:has(.active-oppose) .vote-button:focus-visible {
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose)
+  .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose)
+  .signal-count,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled)
+  .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled)
+  .signal-count,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose):focus
+  .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button:not(.active-support):not(.active-oppose):focus
+  .signal-count {
+  color: inherit;
+}
+
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-support:hover:not(:disabled),
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support:focus,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support:focus-visible {
+  background: var(--panel-strong);
+  color: #22c55e;
+}
+
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support .signal-label,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support .signal-count,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-support:hover:not(:disabled)
+  .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-support:hover:not(:disabled)
+  .signal-count,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-support:focus .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-support:focus
+  .signal-count {
+  color: #22c55e;
+}
+
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose:hover:not(:disabled),
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose:focus,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose:focus-visible {
+  background: var(--panel-strong);
+  color: #ef4444;
+}
+
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose .signal-label,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose .signal-count,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-oppose:hover:not(:disabled)
+  .signal-label,
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-oppose:hover:not(:disabled)
+  .signal-count,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose:focus .signal-label,
+.project-overview .signal-row .signal-strip.labeled .vote-button.active-oppose:focus .signal-count {
+  color: #ef4444;
+}
+
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:first-child:hover:not(:disabled)
+  ) {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+      .vote-button:last-child:hover:not(:disabled)
+  ) {
+  background: color-mix(in srgb, var(--danger) 78%, white);
+  color: white;
+  filter: none;
+  transform: none;
+}
+
+.project-overview
+  .signal-row
+  :global(
+    .signal-strip.labeled:is(:has(.active-support), .project-overview :has(.active-oppose))
+      .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled)
+  ) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-support:hover:not(:disabled) {
+  background: color-mix(in srgb, #22c55e 18%, var(--panel-strong));
+  color: #22c55e;
+  filter: none;
+  transform: none;
+}
+
+.project-overview
+  .signal-row
+  .signal-strip.labeled
+  .vote-button.active-oppose:hover:not(:disabled) {
+  background: color-mix(in srgb, #ef4444 18%, var(--panel-strong));
+  color: #ef4444;
+  filter: none;
+  transform: none;
+}
+
+.project-overview .signal-row .signal-strip.labeled .signal-percent {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  height: 100%;
+  min-width: 72px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-right: 1px solid var(--panel-border);
+  border-left: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  cursor: default;
+  user-select: none;
+}
+
+.project-overview .overview-copy {
+  margin: 0;
+  max-width: 78ch;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.project-overview .overview-update {
+  margin: 0;
+  max-width: 78ch;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.project-overview #participation-join,
+.project-overview #participation-signals {
+  scroll-margin-top: 120px;
+}
+
+.project-overview .requests-off-note {
+  margin: 0;
+  color: var(--status-yellow-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/features/projects/ProjectDetailPage.svelte (ADR 0032, scripts/port-styles.py) */
+.project-detail .page {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.project-detail .tab-loading {
+  margin: 16px 4px;
+  color: var(--text-muted);
+}
+
+.project-detail .tab-panel {
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.project-detail .tab-panel.context-tab,
+.project-detail .tab-panel.participation-tab,
+.project-detail .context-tab,
+.project-detail .participation-tab {
+  display: flex;
+  flex-direction: column;
+  overflow: visible;
+  padding-bottom: calc(var(--detail-action-dock-height, 0px) + 12px);
+}
+
+.project-detail .hero-card:has(> .context-tab:not(.tab-panel-hidden)),
+.project-detail .hero-card:has(> .participation-tab:not(.tab-panel-hidden)) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(
+    100dvh - var(--topbar-height, 56px) - var(--shell-bottom-nav-offset, 0px) - 32px
+  );
+  margin-bottom: -16px;
+  padding-bottom: var(--detail-action-dock-height, 0px);
+}
+
+.project-detail .tab-panel.context-tab,
+.project-detail .tab-panel.participation-tab {
+  flex: 1 1 auto;
+  padding-bottom: 0;
+}
+
+.project-detail .participation-tab > * {
+  order: 50;
+}
+
+.project-detail .participation-tab .detail-action-dock {
+  order: 0;
+}
+
+.project-detail .participation-tab .overview-governance {
+  display: contents;
+}
+
+.project-detail .participation-tab .overview-phase-tabs {
+  order: 1;
+  margin: 0;
+}
+
+.project-detail .participation-tab .pending-votes-panel.phase-title {
+  order: 2;
+  margin-top: 12px;
+}
+
+.project-detail .participation-tab .overview-phase-context {
+  order: 3;
+  margin-top: 16px;
+}
+
+.project-detail .participation-tab .pending-votes-panel {
+  order: 4;
+}
+
+.project-detail .participation-tab .overview-phase-work {
+  order: 5;
+  margin-top: 16px;
+}
+
+.project-detail .participation-tab .overview-composer,
+.project-detail .participation-tab .overview-edit-votes {
+  order: 5;
+}
+
+.project-detail .tab-panel-hidden {
+  display: none !important;
+}
+
+.project-detail .hero-card {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: 32px 16px 16px;
+  margin-top: 24px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  min-width: 0;
+  overflow: visible;
+}
+
+@media (min-width: 1081px) {
+  .project-detail .hero-card:has(> .chat-tab:not(.tab-panel-hidden)) {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    height: calc(100dvh - var(--topbar-height, 56px) - var(--shell-bottom-nav-offset, 0px) - 32px);
+    min-height: 0;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .project-detail .chat-tab:not(.tab-panel-hidden) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .project-detail .chat-tab .chat-shell {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .project-detail .chat-tab .chat-panel {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+    max-height: none;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .project-detail .chat-tab .chat-header {
+    min-height: 72px;
+    padding: 30px 16px 14px;
+    align-content: end;
+  }
+}
+
+@media (max-width: 1080px) {
+  .project-detail .page {
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .project-detail .page-chat {
+    position: fixed;
+    z-index: 2;
+    top: var(--topbar-height, 0px);
+    right: 0;
+    bottom: var(--shell-bottom-nav-offset, 0px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--page-background);
+  }
+
+  .project-detail .hero-card {
+    min-width: 0;
+    overflow: visible;
+    padding-top: 0;
+    margin-top: 0;
+    border-radius: 0;
+  }
+
+  .project-detail .hero-card:has(> .context-tab:not(.tab-panel-hidden)),
+  .project-detail .hero-card:has(> .participation-tab:not(.tab-panel-hidden)) {
+    min-height: calc(100dvh - var(--topbar-height, 56px) - var(--shell-scroll-pad, 0px));
+    margin-bottom: -4px;
+  }
+
+  .project-detail .hero-card.chat-tab-active {
+    overflow: hidden;
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    margin-top: 0;
+    padding: 8px 0 0;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .project-detail .chat-tab-active .top-tab-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 8px 8px;
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+
+  .project-detail .chat-tab-active > .tab-panel:not([hidden]) {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .project-detail .chat-tab-active > .tab-panel:not([hidden]) .chat-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .project-detail .chat-tab-active .chat-panel {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+  }
+}
+
+/* Ported from web/src/lib/features/detail/DetailTopTabs.svelte (ADR 0032, scripts/port-styles.py) */
+.top-tab-row {
+  display: inline-flex;
+  gap: 8px;
+  padding: 2px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  width: fit-content;
+  position: absolute;
+  top: 0;
+  left: 16px;
+  transform: translateY(-44%);
+  z-index: 1;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--page-bg) 82%, transparent);
+}
+
+.top-tab-row .top-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 9px 12px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.top-tab-row .tab-label-short {
+  display: none;
+}
+
+.top-tab-row .tab-icon {
+  display: none;
+  width: 18px;
+  height: 18px;
+}
+
+.top-tab-row .tab-icon .toolbar-icon {
+  width: 18px;
+  height: 18px;
+}
+
+@media (max-width: 1080px) {
+  .top-tab-row {
+    position: sticky;
+    top: var(--topbar-height, 0px);
+    z-index: var(--z-detail-tabs);
+    width: auto;
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0 -16px 12px;
+    padding: 8px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--panel-border);
+    border-radius: 0;
+    background: var(--toolbar-background, var(--panel));
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--page-bg) 55%, transparent);
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.22s ease;
+    will-change: transform;
+  }
+
+  .top-tab-row.chat-immersive {
+    padding-top: calc(8px + var(--shell-safe-top, 0px));
+  }
+
+  .top-tab-row .feed-chrome-collapsed .top-tab-row:not(.chat-immersive) {
+    padding-top: calc(8px + var(--shell-safe-top, 0px));
+    margin-bottom: calc(12px - var(--shell-safe-top, 0px));
+    transform: translate3d(0, calc(-1 * var(--topbar-height, 0px)), 0);
+  }
+
+  .top-tab-row .top-tab {
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+    padding: 6px 2px 5px;
+    font-size: 11px;
+  }
+
+  .top-tab-row .top-tab.active-tab {
+    border-color: transparent;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 -2px 0 var(--brand);
+  }
+
+  .top-tab-row .tab-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .top-tab-row .top-tab:has(.tab-label-short) .tab-label {
+    display: none;
+  }
+
+  .top-tab-row .tab-label-short,
+  .top-tab-row .tab-label {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+/* app/ui: .project-overview only scopes the header's ported styles (it wraps the panel and the
+   dock content); it must not add a box between web's flex parents and children. */
+.project-overview {
+  display: contents;
+}
