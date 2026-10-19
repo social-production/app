@@ -26,7 +26,17 @@ and continue from the first unfinished step."
 ## In flight (cloud session 2026-10-19)
 - PR #1's first CI run was cancelled at its 60-minute job timeout while the scenarios were
   still passing (governance ~21 min, health ~10). The timeout is now 150 min (`ci.yml`); waiting
-  for green to merge. Next: `claude/take-part-layout` (Step 2), started locally, not pushed yet.
+  for green to merge.
+- `claude/take-part-layout` (Step 2, pushed, no PR until PR #1 merges): ParticipationPanel now
+  follows web's ProjectLifecyclePanel: stepper → `DetailPhaseContext` (kicker, title, summary from
+  web-backend's `lifecycle_copy.py`, in `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work`
+  with the plans and `PhaseChangeSection` (web's gate note + `PhaseMenu`). Styles ported via PORTS.
+  Checked: `npm run check/lint -w ui`, boundaries, sizes. **Not yet done:** a 390px screenshot
+  against web (needs the local seed node, i.e. Nix); web's own Take part dock (join + votes, no
+  Edit). **Gap vs web:** web's Advance opens a sheet asking for a reason; our phase proposals have
+  no reason field (integrity change), so the menu item files at once. M3c's Return already carries
+  a reason: when M3c merges, add `reason` to `Phase` in the same integrity bump and port the
+  sheet. M3c's "Return to an earlier phase" button should become a PhaseMenu item (web does).
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
