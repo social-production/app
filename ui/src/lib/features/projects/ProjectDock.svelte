@@ -3,11 +3,12 @@
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
+  import { kindName } from '#lib/domain/governance.ts';
   import { takesSignals } from '#lib/domain/projects.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
-  /** web's detail action dock: signals, join/members, Vote, and Edit for members. */
+  /** web's Details dock: signals, join/members, Vote on edits and updates, and Edit for members. */
   interface Props {
     detail: DetailState;
     membersOpen: boolean;
@@ -46,7 +47,7 @@
           />
           {#if project.amMember}
             <VoteDock
-              proposals={detail.openProposals}
+              proposals={detail.openProposals.filter((p) => kindName(p.kind) !== 'phase')}
               names={detail.names}
               {charter}
               stage={project.stage}
