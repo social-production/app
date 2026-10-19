@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-19 ~19:45 UTC by a cloud session)
+# Status: where the P2P app stands (updated 2026-10-19 by a cloud session; see "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,34 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## Done on 2026-10-19 (cloud session)
+## In flight (2026-10-19, cloud session `claude/social-production-handoff-dsam61`)
+**M3d project values** (ADR 0041, `docs/plans/M3-governance.md` "M3d"), ported from web's
+ProductiveLifecyclePhaseOne / ProjectValueCard / DiscreteScale / AddValueSheet:
+- In the Proposal phase members add values ("What should this achieve?") and rate them 1–10;
+  duplicates (case/spacing ignored) are refused; only Full members' latest votes count. Values
+  averaging ≥5 become plan criteria ("Shared value" rows in the plan sheet), and a plan's score
+  now averages every rated criterion, as web's does.
+- **Integrity change** (new `Value`/`Importance` entries, two link types, value criteria in
+  `Rating`): merging resets projects again (people stay).
+- **CI split**: `scripts/check-fast.sh` (everything but scenarios) + `scripts/check-scenarios.sh
+  [<shard> <shards>]`; CI runs the scenarios as 4 parallel shards (`ci.yml` job `scenarios`).
+  `check-all.sh` still runs everything. New scenario files are picked up automatically.
+- `scripts/port-styles.py` now dedents web's `<style>` blocks. Regenerating everything today
+  also pulls ~500 lines of web's newer styles into the other stylesheets; that drift was left
+  out of this PR (review it separately: run the script and read the diff).
+- New `scripts/cloud-scenarios.sh`: scenarios in a cloud container (no-IPv6 shim, no debug info).
+- Verified in the cloud session before pushing: `cargo fmt --check`, `cargo clippy --workspace
+  --all-targets -D warnings`, `cargo test --workspace --exclude scenarios`, `npm run check`/`lint`,
+  sizes, boundaries, hApp build; scenarios `values` and `plans` (scoring changed); the whole of
+  `tests/e2e/governance.mjs` at 390px against the local seed node (now with the values step:
+  add, both founders rate 8/10, the plan sheet shows it as "Shared value"). Compared with live
+  web's Proposal tab at 390px: same layout. Not run here: the other scenario files (CI runs them)
+  and `projects.mjs`/`chat.mjs`.
+- Next for whoever picks this up: watch the PR's CI (first run of the sharded job), merge when
+  green, smoke live (`projects.mjs` against the live UI), then update README Status and move this
+  section to "Done".
+
+## Done on 2026-10-19 (earlier cloud session)
 All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the live UI) passes.
 - **PR #1** M3b plans + M4a project chat. Its CI first hit the 60-minute job timeout while the
   scenarios were still passing; the timeout is now 150 min (`ci.yml`). M3c's run took 132 min,
@@ -75,25 +102,23 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
 - Guests can't open project pages yet (only the feed). No @mentions, photos or unread markers in chat.
-- The Proposal phase has no "Add value" yet (web's project values and their importance ratings),
-  so its toolbar only holds the Phase menu.
 - Challenges have no screen (see "For the owner to review").
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M3 remainder: project values ("Add value" in the Proposal phase, web's
-   `ProductiveLifecyclePhaseOne`) and links between items (web's Links tab;
-   `docs/plans/M3-governance.md`).
+1. M3 remainder: links between items (web's Links tab; `docs/plans/M3-governance.md`). Values
+   are in flight (above).
 2. M4: DMs (conversation DNA, web's `MessagesPage`), in-app notifications
    (`docs/plans/M4-talk.md`: M4c, M4d). Threads stay parked (Owner decisions).
 3. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 4. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
-5. CI: split the scenarios into parallel jobs before the job outgrows 150 min.
+5. CI: scenarios are split into 4 shards (in flight); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
 - **Fast checks:** `bash scripts/check-boundaries.sh`, `bash scripts/check-sizes.sh`, `npm run check -w ui`, `npm run lint -w ui`, `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace --exclude scenarios`. Look for `error: test failed`, not just `FAILED`.
-- **Scenarios:** `bash scripts/build-happ.sh`, then `cargo test -p scenarios -- --test-threads=1` (slow: ~10–15 min per file).
+- **Scenarios:** `bash scripts/build-happ.sh`, then `bash scripts/check-scenarios.sh` (slow: ~10–15 min per file; `cargo test -p scenarios --test <file> -- --test-threads=1` for one). In a cloud session use `bash scripts/cloud-scenarios.sh`: without its no-IPv6 shim every conductor fails with "Address family not supported by protocol".
+  - **Disk:** a debug build of the whole workspace is ~24 GB and fills a cloud session's disk. Build with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (the cloud scripts do), and never mix the stock `cargo` with the Nix one in one `target/` (two full builds); `rm -rf target/debug` if `df` shows the disk filling.
   - Settle each DNA's cells separately with `await_consistency`.
   - Never depend on two integrity crates in one test binary; mirror types with serde instead.
 - **Browser tests:**

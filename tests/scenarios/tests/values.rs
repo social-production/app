@@ -59,6 +59,7 @@ async fn vote_yes(net: &Net, i: usize, proposal: &ActionHash) {
 /// Values and their votes: duplicates refused, the latest vote counts, New members' don't.
 async fn rated_values(net: &Net) -> ActionHash {
     let space = add(net, 0, "Use unused space").await.expect("added");
+    net.settle().await;
     assert!(
         add(net, 1, "  use UNUSED  space ").await.is_err(),
         "already listed"
@@ -80,6 +81,7 @@ async fn rated_values(net: &Net) -> ActionHash {
     let seen = values(net, 2).await;
     let labels: Vec<&str> = seen.iter().map(|v| v.label.as_str()).collect();
     assert_eq!(labels, ["Use unused space", "Quiet at night"]);
+    assert_eq!((&seen[0].id, &seen[1].id), (&space, &quiet));
     let v = &seen[0];
     assert_eq!(
         (v.count, v.average_x100, v.mine),
@@ -92,6 +94,9 @@ async fn rated_values(net: &Net) -> ActionHash {
 
 /// Leaving Proposal closes values; the prominent one becomes a plan criterion.
 async fn criteria_on_a_plan(net: &Net, space: &ActionHash) {
+    // A New member's vote never counts, so with them in, 3 of 3 could never be reached.
+    let _: () = net.call(2, "project", "leave", ()).await;
+    net.settle().await;
     let to_plans = ProposalKind::Phase {
         to: "phase-2".into(),
         plan: None,
