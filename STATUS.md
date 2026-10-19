@@ -59,11 +59,12 @@ Choices made in this session are marked **Choice** for the owner to review.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `65b5cfd`. Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
-- Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), guests
-  browse the feed signed out, usernames without spaces. Founders thebestdamn + BigBird.
+- Deployed `main`: `3cf9093` (PR #1 merged 2026-10-19 ~16:35 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
+  plans, M4a project chat, guests browse the feed signed out, usernames without spaces. Founders
+  thebestdamn + BigBird.
 
-## Step 1: PR #1 (`claude/m3b-m4a`), M3b plans + M4a project chat
+## Step 1 (done 2026-10-19): PR #1 (`claude/m3b-m4a`), M3b plans + M4a project chat
 https://github.com/social-production/app/pull/1. This is local `main` (`2a2b749`), not yet on
 `origin/main`.
 - Contents: plans (ADR 0039, "M3b plans, as built" in `docs/plans/M3-governance.md`); project
@@ -120,6 +121,12 @@ after this was written; `git log origin/main..origin/<branch>`.
   test, open a PR, and merge when CI is green. Check whether the as-built section lists what is left.
 
 ## Known gaps
+- **Live smoke after the PR #1 deploy (2026-10-19 ~16:35–17:20 UTC):** `/readyz` 200, the UI
+  serves the new build (plans, chat), sign-up, creating a project and the feeds work, and new
+  projects reach the index within ~10 s. `tests/e2e/projects.mjs` first failed at "not in Bob's
+  feed after 3 min": a test race. Its feed wait accepted the "Loading feed..." card (also an
+  `.empty-card`) and counted before the list loaded, which only shows on live, where the feed is
+  slower. Fixed in the test.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
