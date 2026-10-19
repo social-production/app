@@ -23,39 +23,49 @@ and continue from the first unfinished step."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight (cloud session 2026-10-19)
-- PR #1's first CI run was cancelled at its 60-minute job timeout while the scenarios were
-  still passing (governance ~21 min, health ~10). The timeout is now 150 min (`ci.yml`); waiting
-  for green to merge.
-- `claude/take-part-layout` (Step 2, pushed, no PR until PR #1 merges): ParticipationPanel now
-  follows web's ProjectLifecyclePanel: stepper → `DetailPhaseContext` (kicker, title, summary from
-  web-backend's `lifecycle_copy.py`, in `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work`
-  with the plans and `PhaseChangeSection` (web's gate note + `PhaseMenu`). Styles ported via PORTS.
-  Then web's own Take part dock (`ParticipationDock`: Join for non-members, Vote for phase
-  proposals; the Details dock now only votes on edits/updates).
-  Checked: `npm run check/lint -w ui`, boundaries, sizes. **Not yet done:** a 390px screenshot
-  against web (needs the local seed node, i.e. Nix; this cloud environment's network policy
-  blocks holochain-ci.cachix.org, GitHub tarballs and the live web site, so it couldn't run here); **Gap vs web:** web's Advance opens a sheet asking for a reason; our phase proposals have
-  no reason field (integrity change), so the menu item files at once. M3c's Return already carries
-  a reason: when M3c merges, add `reason` to `Phase` in the same integrity bump and port the
-  sheet. M3c's "Return to an earlier phase" button should become a PhaseMenu item (web does).
-- `claude/m3c-reverts` (Step 3, reviewed, not merged/PR'd yet; waits for PR #1 and Step 2):
-  `ReturnSheet` is a faithful port of web's revert sheet (target select, reason, web's copy).
-  Two things to fix when merging main into it: its standalone "Return to an earlier phase"
-  button must become the `return` item of `PhaseMenu` (web's `phaseMenuItems`), and
-  `ChallengeList` ("Counts you can challenge") is **app-only** (web-backend has no challenge
-  window). **Choice made (owner to review):** following "port only from web", the M3c PR drops
-  the ChallengeList UI and keeps the challenge rules (zome, `sp_governance`, scenarios, ADR 0040),
-  so the mechanism is ready when a challenge screen is designed or found in web. Undo by
-  restoring `ChallengeList.svelte` from `a0ce970`.
+## In flight (cloud session 2026-10-19, updated ~16:00 UTC)
+Choices made in this session are marked **Choice** for the owner to review.
+- **PR #1** (`claude/m3b-m4a`): the first CI run was cancelled by the job's 60-minute timeout
+  while the scenarios were still passing (governance ~21 min, health ~10). The timeout is now
+  150 min (`ci.yml`; splitting the scenarios into parallel jobs was blocked by the session's
+  safety check as a "skip scenarios" switch). Second run started 14:34. Next: merge when green →
+  `/readyz` + UI smoke → README Status/roadmap.
+- **`claude/take-part-layout`** (Step 2, pushed; PR once PR #1 merges). Done, matching web:
+  - ParticipationPanel follows web's ProjectLifecyclePanel: stepper → `DetailPhaseContext`
+    (kicker, title, first sentence of web-backend's `lifecycle_copy.py` summary, in
+    `domain/phaseCopy.ts`) → `.phase-panel.overview-phase-work` (plans) → `PhaseChangeSection`
+    (web's gate note in web's words + `PhaseMenu`).
+  - `PhaseWorkToolbar` ported (packs "Add plan" + "Phase ▾" into the dock's
+    `#detail-participation-actions`); `portal` takes a target like web's.
+  - The Take part tab's own dock (`ParticipationDock`): Join for non-members, the toolbar, Vote
+    for phase proposals. The Details dock now only shows the Details tab and votes on
+    edits/updates.
+  - Verified: `tests/e2e/governance.mjs` passes end to end against a local seed node, with
+    founder one at 390px (it now drives the Phase menu and the Take part Vote, and asserts the
+    Take part tab is selected); screenshots looked right against live web's 390px page.
+    Also `npm run check/lint -w ui`, boundaries, sizes.
+  - **Gap vs web:** web's Advance asks for a reason in a sheet; our phase proposals have no
+    reason field (an integrity change), so the item files at once. Fold it into the next
+    integrity bump (M3c is one).
+- **`claude/m3c-reverts`** (Step 3): `claude/take-part-layout` merged in (so it also carries
+  PR #1). Its "Return to an earlier phase" button is now the `return` item of the Phase menu
+  (web's `phaseMenuItems`), opening its `ReturnSheet` (a faithful port of web's revert sheet).
+  **Choice:** following "port only from web", the app-only `ChallengeList` ("Counts you can
+  challenge") is removed; the challenge rules stay (zome, `sp_governance`, scenarios, ADR 0040)
+  for when a screen exists. Undo by restoring `ChallengeList.svelte` + its `additions.css` block
+  from `a0ce970`. Local checks and scenarios `reverts`/`challenges` in progress; PR after PR #1.
+- **`claude/m4b-threads`**: parked (owner decision), untouched.
 
 ## Cloud environment notes
-- `scripts/cloud-nix.sh <cmd>` runs a command in the dev shell when the proxy blocks GitHub
-  tarball downloads for repos outside the session, which `nix develop`
-  needs for flake inputs. Workaround: fetch them over git with `--override-input <path>
-  'git+https://github.com/<owner>/<repo>?rev=<locked rev>&shallow=1'` for every GitHub node in
-  `flake.lock` (plus `--no-write-lock-file`); the Holochain cachix cache is reachable once
-  holochain-ci.cachix.org is in the environment's allowed domains.
+- Nix is preinstalled. `bash scripts/cloud-nix.sh <cmd>` runs a command in the dev shell: the
+  proxy blocks GitHub tarball downloads for other repos, so it fetches the flake inputs over git
+  at their locked revisions. holochain-ci.cachix.org must be in the environment's allowed
+  domains (the owner added it on 2026-10-19).
+- `bash scripts/cloud-seed.sh` starts the local seed node: the container has no IPv6 and
+  Holochain's interfaces refuse to start without it, so it preloads `scripts/cloud/noipv6.c`.
+  Browser tests: `CHROMIUM_PATH=/opt/pw-browsers/chromium bash scripts/e2e-local.sh tests/e2e/<t>.mjs`
+  (first sign-in after start can take >2 min; rerun if it times out).
+- The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
