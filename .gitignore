@@ -15,3 +15,6 @@ test-results/
 playwright-report/
 .direnv/
 result
+
+# Agent worktrees (local only)
+.claude/worktrees/
