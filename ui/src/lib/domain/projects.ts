@@ -23,6 +23,8 @@ export interface ProjectCard {
   id: string;
   networkSeed: string;
   creator: string;
+  /** The creator's username, from the node's index (empty if they have no profile yet). */
+  creatorName: string;
   title: string;
   summary: string;
   mode: ProjectMode;

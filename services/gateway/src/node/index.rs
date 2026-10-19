@@ -15,6 +15,8 @@ pub struct ProjectCard {
     pub id: String,
     pub network_seed: String,
     pub creator: String,
+    /// The creator's username (empty if they have no profile yet).
+    pub creator_name: String,
     pub title: String,
     pub summary: String,
     pub mode: String,
@@ -94,6 +96,7 @@ mod tests {
             id: title.into(),
             network_seed: String::new(),
             creator: String::new(),
+            creator_name: String::new(),
             title: title.into(),
             summary: String::new(),
             mode: "productive".into(),

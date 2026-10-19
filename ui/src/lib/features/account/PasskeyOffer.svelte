@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { connection } from '#lib/stores/connection.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { addPasskey, devicePasskeysAvailable } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
@@ -44,7 +45,7 @@
   }
 </script>
 
-{#if visible}
+{#if visible && connection.current.status === 'connected'}
   <section class="empty-card passkey-offer">
     <strong>Sign in faster on this device</strong>
     <p>

@@ -7,7 +7,7 @@ const browser = await chromium.launch();
 
 async function signUp(name) {
   const page = await (await browser.newContext()).newPage();
-  await page.goto(BASE);
+  await page.goto(`${BASE}/onboarding`);
   await page.getByRole('tab', { name: 'Sign up' }).click();
   await page.getByLabel("Username").fill(name);
   await page.getByRole('button', { name: 'Next' }).click();

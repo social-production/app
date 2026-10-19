@@ -10,9 +10,7 @@
 
   let { children }: { children: Snippet } = $props();
 
-  $effect(() => {
-    void connect();
-  });
+  // The shell connects on every page; this only decides what an account-only page shows.
 </script>
 
 {#if connection.current.status === 'connected'}

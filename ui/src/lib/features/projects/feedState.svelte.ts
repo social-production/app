@@ -1,11 +1,14 @@
 import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
-import { getPerson } from '#lib/services/people.ts';
 import { feed, setSignal } from '#lib/services/projects.ts';
+import { connection } from '#lib/stores/connection.svelte.ts';
+
+import { goto } from '$app/navigation';
+import { resolve } from '$app/paths';
 
 const PAGE = 20;
 
-/** The project feed: query, loaded pages and creator names (one lookup per creator). */
+/** The project feed: query and loaded pages (cards carry their creator's username). */
 export class FeedState {
   sort = $state<FeedSort>('trending');
   window = $state<FeedWindow>('all');
@@ -13,7 +16,6 @@ export class FeedState {
   total = $state(0);
   loading = $state(true);
   error = $state<string>();
-  names = $state<Record<string, string>>({});
 
   readonly hasMore = $derived(this.items.length < this.total);
 
@@ -37,7 +39,6 @@ export class FeedState {
       });
       this.items = [...this.items, ...page.items.slice(0, PAGE)];
       this.total = page.total;
-      void this.loadNames(page.items);
     } catch (e) {
       this.error = explain(e);
     } finally {
@@ -45,19 +46,12 @@ export class FeedState {
     }
   }
 
-  signal(card: ProjectCard, next: Stance | null): Promise<void> {
-    return setSignal(card.id, next);
-  }
-
-  private async loadNames(cards: ProjectCard[]): Promise<void> {
-    const missing = cards
-      .map((c) => c.creator)
-      .filter((a, i, all) => all.indexOf(a) === i && !(a in this.names));
-    const found = await Promise.all(
-      missing.map(
-        async (agent) => [agent, (await getPerson(agent)).profile?.name ?? 'Unnamed'] as const,
-      ),
-    );
-    this.names = { ...this.names, ...Object.fromEntries(found) };
+  /** Guests are sent to sign in (web's requireViewer); the strip rolls back. */
+  async signal(card: ProjectCard, next: Stance | null): Promise<void> {
+    if (connection.current.status !== 'connected') {
+      await goto(resolve('/onboarding'));
+      throw new Error('Sign in to support this project.');
+    }
+    await setSignal(card.id, next);
   }
 }

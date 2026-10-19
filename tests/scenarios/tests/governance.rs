@@ -205,7 +205,9 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
     net.vote(2, &rejected, VoteChoice::No).await.expect("vote");
     net.settle().await;
     // The last voter may not have seen every vote; anyone closes a settled proposal.
-    let _: Option<ActionHash> = net.call(0, "governance", "close", rejected.clone()).await;
+    let _: Option<ActionHash> = net
+        .call(0, "governance", "close_proposal", rejected.clone())
+        .await;
     net.settle().await;
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
     let closed = list.iter().find(|p| p.id == rejected).expect("listed");
@@ -217,7 +219,9 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
     net.vote(0, &sneaky, VoteChoice::Yes).await.expect("vote");
     net.vote(1, &sneaky, VoteChoice::Yes).await.ok();
     net.settle().await;
-    let _: Option<ActionHash> = net.call(0, "governance", "close", sneaky.clone()).await;
+    let _: Option<ActionHash> = net
+        .call(0, "governance", "close_proposal", sneaky.clone())
+        .await;
     net.settle().await;
     // 3 Yes votes close it as passed, but only 2 come from Full members; N = 3 needs 3.
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;

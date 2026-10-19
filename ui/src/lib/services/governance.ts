@@ -66,5 +66,5 @@ export async function castVote(
 
 /** Write the Outcome of a proposal its votes already decide (anyone may; validators recheck). */
 export async function closeProposal(projectId: string, proposal: string): Promise<void> {
-  await governance<ActionHash | null>(projectId, 'close', stringToHash(proposal));
+  await governance<ActionHash | null>(projectId, 'close_proposal', stringToHash(proposal));
 }

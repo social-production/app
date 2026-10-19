@@ -91,7 +91,7 @@
       {#each feed.items as card (card.id)}
         <ProjectCard
           {card}
-          authorName={feed.names[card.creator] ?? '…'}
+          authorName={card.creatorName || 'Unnamed'}
           onSignal={(next) => feed.signal(card, next)}
         />
       {/each}

@@ -47,9 +47,10 @@ pub fn vote(input: VoteInput) -> ExternResult<ActionHash> {
     write::vote(input.proposal, input.choice)
 }
 
-/// Write the Outcome for a settled proposal (anyone may; validators recompute it).
+/// Write the Outcome for a settled proposal (anyone may; validators recompute it). Not named
+/// `close`: hdk externs are unmangled symbols, and `close` would replace libc's on native builds.
 #[hdk_extern]
-pub fn close(proposal: ActionHash) -> ExternResult<Option<ActionHash>> {
+pub fn close_proposal(proposal: ActionHash) -> ExternResult<Option<ActionHash>> {
     write::close(&proposal, None)
 }
 

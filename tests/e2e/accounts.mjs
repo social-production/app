@@ -5,10 +5,11 @@
 //   node tests/e2e/accounts.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 
-import { BASE, browser, device, errors, keyOf, log, open, phraseSignIn, signedIn, signOut, signUp } from './lib.mjs';
+import { BASE, browser, device, onboarding, errors, keyOf, log, open, phraseSignIn, signedIn, signOut, signUp } from './lib.mjs';
 
 // 1. A device with no passkey store: everything works with the phrase, no passkey prompts.
 const a = await device({ passkeys: false });
+await onboarding(a);
 await a.getByRole('tab', { name: 'Log in' }).click();
 assert.equal(await a.getByRole('button', { name: 'Log in with a passkey' }).count(), 0);
 const t0 = Date.now();
@@ -26,6 +27,7 @@ await signedIn(a);
 log('profile saved; reload kept the session');
 
 await signOut(a);
+await onboarding(a);
 await a.getByRole('tab', { name: 'Log in' }).click();
 await a.getByLabel('Recovery phrase').fill([...words.slice(0, 6), 'appel', ...words.slice(7)].join(' '));
 await a.getByText(/Word 7 .appel. isn't in the word list/).waitFor({ timeout: 5000 });
@@ -43,6 +45,7 @@ await signedIn(b);
 await b.getByRole('button', { name: 'Save a passkey' }).click();
 await b.getByText('Sign in faster on this device').waitFor({ state: 'detached', timeout: 60_000 });
 await signOut(b);
+await onboarding(b);
 await b.getByRole('tab', { name: 'Log in' }).click();
 await b.getByRole('button', { name: 'Log in with a passkey' }).click();
 await signedIn(b);

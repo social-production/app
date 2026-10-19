@@ -46,6 +46,12 @@ struct ProjectView {
     last_activity_at: Option<Timestamp>,
 }
 
+/// The profile field the feed shows (mirrors the identity zome's `Profile`).
+#[derive(Debug, Deserialize)]
+struct Profile {
+    name: String,
+}
+
 /// The current charter fields the feed shows (passed edits applied).
 #[derive(Debug, Deserialize)]
 struct Charter {
@@ -61,7 +67,7 @@ impl Node {
         let agent = app.agent_pub_key.clone();
         let directory = provisioned(&app, "directory")?;
         let listings: Vec<ListingView> = self
-            .call(&agent, directory, "identity", "list_projects", ())
+            .call(&agent, directory.clone(), "identity", "list_projects", ())
             .await?;
 
         let mut joined = clones_by_seed(&app);
@@ -93,7 +99,20 @@ impl Node {
                 .call(&agent, cell.clone(), "project", "get_project", ())
                 .await
                 .unwrap_or(None);
-            cards.push(card(view, project));
+            // The username comes with the card, so guests see it without a session.
+            let profile: Option<Profile> = self
+                .call(
+                    &agent,
+                    directory.clone(),
+                    "identity",
+                    "get_profile",
+                    view.creator.clone(),
+                )
+                .await
+                .unwrap_or(None);
+            let mut card = card(view, project);
+            card.creator_name = profile.map(|p| p.name).unwrap_or_default();
+            cards.push(card);
         }
         let count = cards.len();
         self.index.replace(cards).await;
@@ -214,6 +233,7 @@ fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         id: ActionHashB64::from(view.id).to_string(),
         network_seed: l.network_seed,
         creator: AgentPubKeyB64::from(view.creator).to_string(),
+        creator_name: String::new(),
         title: l.title,
         summary: l.summary,
         mode: l.mode,

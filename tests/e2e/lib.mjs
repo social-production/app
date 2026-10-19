@@ -31,7 +31,13 @@ export async function device({ passkeys = false, viewport } = {}) {
 export const signedIn = (page) => page.locator('.shell[data-signed-in="true"]').waitFor({ timeout: 120_000 });
 export const open = (page, name) => page.getByRole('link', { name, exact: true }).first().click();
 
+/** Signed out, the home page is the public feed; sign-up and log-in live at /onboarding. */
+export async function onboarding(page) {
+  await page.goto(`${BASE}/onboarding`);
+}
+
 export async function signUp(page, name) {
+  await onboarding(page);
   await page.getByRole('tab', { name: 'Sign up' }).click();
   await page.getByLabel('Username').fill(name);
   await page.getByRole('button', { name: 'Next' }).click();
@@ -47,6 +53,7 @@ export async function signUp(page, name) {
 }
 
 export async function phraseSignIn(page, words) {
+  await onboarding(page);
   await page.getByRole('tab', { name: 'Log in' }).click();
   await page.getByLabel('Recovery phrase').fill(words.join(' '));
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
@@ -56,6 +63,9 @@ export async function phraseSignIn(page, words) {
 export async function signOut(page) {
   await open(page, 'Settings');
   await page.getByRole('button', { name: 'Sign out' }).click();
+  // Signing out reloads the page; wait until it has, before navigating anywhere.
+  await page.locator('.shell[data-signed-in="false"]').waitFor({ timeout: 60_000 });
+  await page.waitForLoadState('load');
 }
 
 export async function keyOf(page) {

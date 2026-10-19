@@ -58,6 +58,15 @@ await bob.getByRole('button', { name: /^Support/ }).click();
 await bob.getByText('100%').first().waitFor();
 log('Bob joined and supported');
 
+// A guest (signed out) browses the feed, as on web; supporting asks them to sign in.
+const guest = await device();
+await waitInFeed(guest, title);
+const guestCard = guest.locator('.project-card', { hasText: title });
+await guestCard.getByText(`ann_${stamp}`).waitFor();
+await guestCard.getByRole('button', { name: /^Support/ }).click();
+await guest.waitForURL(/\/onboarding$/);
+log('a guest sees the feed with names, and Support asks them to sign in');
+
 await ann.reload();
 for (let i = 0; i < 20 && !(await ann.getByRole('button', { name: '2 members' }).count()); i++) {
   await ann.waitForTimeout(3000);

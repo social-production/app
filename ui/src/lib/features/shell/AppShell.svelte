@@ -12,6 +12,7 @@
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
   import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
+  import { connect } from '#lib/services/account.ts';
   import { getPerson } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
@@ -25,7 +26,6 @@
   let compact = $state(true);
   let leftOpen = $state(false);
   let rightOpen = $state(false);
-  let showWelcome = $state(false);
 
   const signedIn = $derived(connection.current.status === 'connected');
   // "Sign in / Sign up" hides the intro banner; the sign-in card below it stays.
@@ -48,6 +48,11 @@
     apply();
     media.addEventListener('change', apply);
     return () => media.removeEventListener('change', apply);
+  });
+
+  // Connect in the background on every page; public pages work signed out (as on web).
+  $effect(() => {
+    void connect();
   });
 
   $effect(() => {
@@ -105,7 +110,7 @@
     {toggleLeft}
     {toggleRight}
     onSearch={(q) => goto(resolve(`/search?q=${encodeURIComponent(q)}`))}
-    onSignIn={() => (showWelcome = true)}
+    onSignIn={() => goto(resolve('/onboarding'))}
   />
 
   {#if compact && (leftOpen || rightOpen)}
@@ -124,13 +129,16 @@
 
     <main class="main-content" class:main-content-compact={compact}>
       <div class="main-frame">
-        {#if !showWelcome && connection.current.status === 'signed-out'}
-          <SignedOutIntro onSignup={() => (showWelcome = true)} aboutHref={resolve('/about')} />
+        {#if connection.current.status === 'signed-out' && page.url.pathname !== '/onboarding'}
+          <SignedOutIntro
+            onSignup={() => goto(resolve('/onboarding'))}
+            aboutHref={resolve('/about')}
+          />
         {/if}
         {@render children()}
       </div>
       {#if showCreateFab}
-        <CreateFab {signedIn} links={createLinks} signInHref={resolve('/')} />
+        <CreateFab {signedIn} links={createLinks} signInHref={resolve('/onboarding')} />
       {/if}
     </main>
 
