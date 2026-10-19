@@ -29,7 +29,9 @@ const projectUrl = ann.url();
 log('ann created the project');
 
 const composer = (page) => page.getByRole('textbox', { name: 'Message the project...' });
-const bubble = (page, text) => page.locator('.chat-log').getByText(text, { exact: true });
+// A bubble's paragraph also holds its time, and a reply's quote repeats the original: match
+// a substring and take the first (the original comes before its replies).
+const bubble = (page, text) => page.locator('.chat-log').getByText(text).first();
 
 /** Open the Chat tab, then wait (polls run every 5 s while it's open) until `text` shows. */
 async function chatShows(page, text, what) {
@@ -53,7 +55,7 @@ await bob.getByRole('tab', { name: 'Chat' }).click();
 await composer(bob).fill(hello);
 await bob.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(bob, hello).waitFor({ timeout: 30_000 });
-assert.equal(await bob.getByRole('button', { name: 'Join project' }).count() > 0, true, 'bob never joined');
+assert.equal(await bob.locator('.detail-action-dock').count(), 0, 'no action dock over the chat');
 log('bob posted without joining');
 
 await ann.reload();
