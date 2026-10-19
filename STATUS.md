@@ -92,14 +92,12 @@ after this was written; `git log origin/main..origin/<branch>`.
   test, open a PR, and merge when CI is green. Check whether the as-built section lists what is left.
 
 ## Known gaps
-- **Live smoke after the PR #1 deploy (2026-10-19 ~16:35–17:05 UTC):** `/readyz` 200, the UI
-  serves the new build (plans, chat), sign-up and creating a project work, and signed-in and
-  signed-out feeds list projects. But `tests/e2e/projects.mjs` failed 4 times at "not in Bob's feed
-  after 3 min": a project made by a brand-new account sometimes takes more than 3 minutes to reach
-  the index, although a separate probe was indexed 10 s after publishing. Not yet known whether
-  PR #1 made this slower (the earlier measure was ≤15 s, locally). Next: run `projects.mjs`
-  against a local seed node on `main`, and read the archivist round in
-  `services/gateway` (no Railway log access from cloud sessions).
+- **Live smoke after the PR #1 deploy (2026-10-19 ~16:35–17:20 UTC):** `/readyz` 200, the UI
+  serves the new build (plans, chat), sign-up, creating a project and the feeds work, and new
+  projects reach the index within ~10 s. `tests/e2e/projects.mjs` first failed at "not in Bob's
+  feed after 3 min": a test race. Its feed wait accepted the "Loading feed..." card (also an
+  `.empty-card`) and counted before the list loaded, which only shows on live, where the feed is
+  slower. Fixed in the test.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
