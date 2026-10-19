@@ -24,8 +24,22 @@ Neither subagent had committed; their work was committed on its branch and merge
   renumbered from 0038 to 0039 (0038 is chat).
 - Being checked now: full CI suite including all scenarios on `6771230`. Then browser tests,
   a push, and a live smoke. The deploy resets project data again (directory/people stay).
-- Afterwards: `git worktree remove --force .claude/worktrees/agent-*`, delete the two
-  `worktree-agent-*` branches and `origin/claude/m3b-plans`.
+- Found while testing at 390px: the action dock stayed over the chat after switching tabs
+  (`DetailActionDock` re-homed itself after Svelte had removed its block). Fixed in `67b54f0`.
+  Also fixed: plan repository links accepted `javascript:` URLs (`0ebce95`).
+- Afterwards: `git worktree remove --force .claude/worktrees/agent-a17e…` and `agent-a644…`,
+  delete those two `worktree-agent-*` branches and `origin/claude/m3b-plans`.
+
+### Next batch: two subagents started from `67b54f0` (worktrees under `.claude/worktrees/`)
+They were told to commit often, not to push, and not to run scenarios, dev-seed or e2e (to
+avoid port and CPU clashes). The merging session runs those.
+- **M3c**: phase reverts + the challenge window for under-counted populations (ADR 0040,
+  "M3c as built" in `docs/plans/M3-governance.md`).
+- **M4b**: discussion threads/posts/comments/votes in the `discussion` zome + web's screens
+  (ADR 0041, "M4b as built" in `docs/plans/M4-talk.md`).
+If this chat ended before they reported: `git worktree list`, then `git log main..<branch>` in
+each. Review, merge, run `cargo test -p scenarios -- --test-threads=1` and the browser tests,
+then push once.
 
 ## Next (roadmap order)
 1. Finish the push above, deploy, smoke live; update README Status.
