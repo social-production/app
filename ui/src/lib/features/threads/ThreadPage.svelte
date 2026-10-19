@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
   import DiscussionPanel from '#lib/components/discussion/DiscussionPanel.svelte';
   import ThreadOverview from '#lib/components/discussion/ThreadOverview.svelte';
@@ -17,7 +19,7 @@
   const page = new ThreadState(projectId, threadId);
 
   $effect(() => {
-    void page.open();
+    untrack(() => void page.open());
   });
 </script>
 

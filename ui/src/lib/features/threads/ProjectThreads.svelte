@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
   import ThreadCard from '#lib/components/cards/ThreadCard.svelte';
@@ -38,8 +39,9 @@
     { value: 'all', label: 'All time' },
   ];
 
+  // Load once on mount; the load reads the sort and window, which must not re-trigger it.
   $effect(() => {
-    void threads.open();
+    untrack(() => void threads.open());
   });
 
   async function publish(title: string, body: string): Promise<void> {
