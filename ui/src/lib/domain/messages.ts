@@ -12,13 +12,37 @@ export interface ChatSummary {
   id: string;
   kind: ChatKind;
   creator: string;
-  /** Everyone in the chat, the creator first. */
+  /** Who manages a group now (web's `createdBy`, which moves when the manager leaves). */
+  manager: string | null;
+  /** Everyone in the chat now, longest-standing first. */
   members: string[];
   title: string | null;
-  last: { author: string; preview: string; createdAt: number } | null;
+  /** `system` is a leave: "<name> left the group." */
+  last: { author: string; preview: string; createdAt: number; kind: 'text' | 'system' } | null;
   unread: number;
   /** When the invitation arrived (orders chats with no messages yet). */
   invitedAt: number;
+  /** You're still in it (not removed, not left). */
+  member: boolean;
+  /** web's `can_pin`: either person in a direct chat, the manager in a group. */
+  canPin: boolean;
+  /** Your own list settings (web's chat menu). */
+  pinned: boolean;
+  muted: boolean;
+  hidden: boolean;
+}
+
+/** One pinned message, as web's pin bar shows it. */
+export interface ChatPin {
+  messageId: string;
+  preview: string;
+}
+
+/** web's chat menu settings; only the given ones change. */
+export interface ListPrefs {
+  pinned?: boolean;
+  muted?: boolean;
+  hidden?: boolean;
 }
 
 /** Someone to message, as the compose sheet suggests them. */
@@ -45,4 +69,7 @@ export interface PublicChat {
   unread: number;
   /** The last message, else the project's last activity (orders the list). */
   activeAt: number;
+  /** Your own list settings, kept on this device (ADR 0044). */
+  pinned: boolean;
+  muted: boolean;
 }

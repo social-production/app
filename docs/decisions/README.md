@@ -46,3 +46,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0042](./0042-project-links.md) Links between projects are a pair of proposals, one in each project
 - [0043](./0043-direct-messages.md) Direct and group chats: a clone per chat, invitations through an encrypted inbox
 - [0044](./0044-public-chats-list.md) The Public tab lists your projects' chats from this node, with read marks kept on the device
+- [0045](./0045-group-options-edits-pins.md) Group options, edits and pins: cited authority, replayed membership

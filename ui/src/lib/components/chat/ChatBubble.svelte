@@ -70,6 +70,7 @@
           <span class="message-time"
             >{message.pending ? 'Sending…' : formatMessageTime(message.createdAt)}</span
           >
+          {#if message.edited}<span class="edited-mark">edited</span>{/if}
         </span>
       </p>
     </div>

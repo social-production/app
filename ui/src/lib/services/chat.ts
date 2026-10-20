@@ -21,6 +21,9 @@ export interface MessageWire {
     preview: string;
     deleted: boolean;
   } | null;
+  kind?: 'text' | 'system';
+  edited?: boolean;
+  pinned?: boolean;
 }
 
 /** A project by its listing id (project pages), or by its network seed (Messages' Public tab
@@ -54,6 +57,9 @@ export function toChatMessage(m: MessageWire): ChatMessage {
       preview: m.reply_to.preview,
       deleted: m.reply_to.deleted,
     },
+    kind: m.kind ?? 'text',
+    edited: m.edited ?? false,
+    pinned: m.pinned ?? false,
   };
 }
 

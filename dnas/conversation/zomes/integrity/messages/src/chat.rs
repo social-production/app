@@ -4,7 +4,10 @@ use hdi::prelude::*;
 use sp_core::chat::check_message;
 use sp_core::conversation::{check_title, ChatKind, INBOX_TAG_MAX};
 
-use crate::{invalid, network, EntryTypes, Invite, LinkTypes, Message, Network, UnitEntryTypes};
+use crate::rights::{manages, member, message_author};
+use crate::{
+    invalid, network, Edit, EntryTypes, Leave, LinkTypes, Message, Network, UnitEntryTypes,
+};
 
 /// The chat's creator and kind, or why this write doesn't belong in the inbox.
 fn chat() -> ExternResult<Result<(AgentPubKey, ChatKind), String>> {
@@ -22,27 +25,82 @@ pub fn validate_entry(
         Ok(chat) => chat,
         Err(reason) => return invalid(&reason),
     };
+    let group = kind == ChatKind::Group;
+    let manager = |by: Option<&ActionHash>| manages(author, by, &creator);
     match entry {
-        EntryTypes::Invite(_) if author != &creator => invalid("only the chat's creator invites"),
-        EntryTypes::Invite(i) if i.agent == creator => invalid("the creator is already in"),
-        EntryTypes::Invite(_) => Ok(ValidateCallbackResult::Valid),
+        EntryTypes::Invite(i) if &i.agent == author => invalid("people don't invite themselves"),
+        EntryTypes::Invite(i) => allow(manager(i.by.as_ref())?, "only the chat's manager invites"),
         EntryTypes::Message(m) => validate_message(m, author, &creator),
-        EntryTypes::Title(_) if kind != ChatKind::Group => invalid("only groups have a name"),
-        EntryTypes::Title(_) if author != &creator => invalid("only the creator names a group"),
+        EntryTypes::Title(_) if !group => invalid("only groups have a name"),
         EntryTypes::Title(t) => match check_title(&t.title) {
-            Ok(()) => Ok(ValidateCallbackResult::Valid),
+            Ok(()) => allow(manager(t.by.as_ref())?, "only the manager names a group"),
             Err(reason) => invalid(&reason),
         },
-        EntryTypes::ReadMark(_) => validate_private(author),
+        EntryTypes::Removal(_) if !group => invalid("only groups remove people"),
+        EntryTypes::Removal(r) if &r.agent == author => {
+            invalid("leave instead of removing yourself")
+        }
+        EntryTypes::Removal(r) => allow(manager(r.by.as_ref())?, "only the manager removes people"),
+        EntryTypes::Leave(_) if !group => invalid("only groups can be left"),
+        EntryTypes::Leave(l) => validate_leave(l, author, &creator),
+        EntryTypes::Edit(e) => validate_edit(e, author),
+        EntryTypes::Pin(p) => {
+            if message_author(&p.message)?.is_none() {
+                return invalid("only messages are pinned");
+            }
+            let allowed = if group {
+                manager(p.by.as_ref())?
+            } else {
+                member(author, p.by.as_ref(), &creator)?
+            };
+            allow(allowed, "in a group only the manager pins")
+        }
+        EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
     }
 }
 
-/// Read marks stay on their author's chain; they only have to be in a chat.
-pub fn validate_private(_author: &AgentPubKey) -> ExternResult<ValidateCallbackResult> {
+fn allow(ok: bool, reason: &str) -> ExternResult<ValidateCallbackResult> {
+    if ok {
+        Ok(ValidateCallbackResult::Valid)
+    } else {
+        invalid(reason)
+    }
+}
+
+/// Read marks and list settings stay on their author's chain; they only have to be in a chat.
+pub fn validate_private() -> ExternResult<ValidateCallbackResult> {
     match chat()? {
         Ok(_) => Ok(ValidateCallbackResult::Valid),
         Err(reason) => invalid(&reason),
     }
+}
+
+fn validate_leave(
+    l: &Leave,
+    author: &AgentPubKey,
+    creator: &AgentPubKey,
+) -> ExternResult<ValidateCallbackResult> {
+    if !member(author, l.invite.as_ref(), creator)? {
+        return invalid("only people in the group leave it");
+    }
+    match &l.successor {
+        None => Ok(ValidateCallbackResult::Valid),
+        Some(next) if next == author => invalid("a leaving manager hands over to someone else"),
+        Some(_) => allow(
+            manages(author, l.by.as_ref(), creator)?,
+            "only the manager hands the group over",
+        ),
+    }
+}
+
+fn validate_edit(e: &Edit, author: &AgentPubKey) -> ExternResult<ValidateCallbackResult> {
+    if let Err(reason) = check_message(&e.body) {
+        return invalid(&reason);
+    }
+    allow(
+        message_author(&e.message)?.as_ref() == Some(author),
+        "people edit only their own messages",
+    )
 }
 
 fn validate_message(
@@ -53,31 +111,15 @@ fn validate_message(
     if let Err(reason) = check_message(&m.body) {
         return invalid(&reason);
     }
-    if author != creator {
-        let Some(invite) = &m.invite else {
-            return invalid("only people invited to the chat write in it");
-        };
-        if !invites(invite, author, creator)? {
-            return invalid("that invitation isn't for the message's author");
-        }
+    if !member(author, m.invite.as_ref(), creator)? {
+        return invalid("only people invited to the chat write in it");
     }
     if let Some(parent) = &m.reply_to {
-        let record = must_get_valid_record(parent.clone())?;
-        if !is_type(record.action(), UnitEntryTypes::Message)? {
+        if message_author(parent)?.is_none() {
             return invalid("a reply answers a message");
         }
     }
     Ok(ValidateCallbackResult::Valid)
-}
-
-/// `invite` is the creator's invitation of `agent`.
-fn invites(invite: &ActionHash, agent: &AgentPubKey, creator: &AgentPubKey) -> ExternResult<bool> {
-    let record = must_get_valid_record(invite.clone())?;
-    if record.action().author() != creator || !is_type(record.action(), UnitEntryTypes::Invite)? {
-        return Ok(false);
-    }
-    let invite: Option<Invite> = record.entry().to_app_option().map_err(|e| wasm_error!(e))?;
-    Ok(invite.is_some_and(|i| &i.agent == agent))
 }
 
 pub fn validate_link(
@@ -87,32 +129,28 @@ pub fn validate_link(
     if matches!(link_type, LinkTypes::Inbox) {
         return validate_inbox(action);
     }
-    let (creator, _) = match chat()? {
-        Ok(chat) => chat,
-        Err(reason) => return invalid(&reason),
-    };
+    if let Err(reason) = chat()? {
+        return invalid(&reason);
+    }
     let Some(target) = action.target_address.clone().into_action_hash() else {
         return invalid("a chat link points at an entry's action");
     };
     let signed = must_get_action(target)?;
-    let (want, by_creator) = match link_type {
-        LinkTypes::Invites => (UnitEntryTypes::Invite, true),
-        LinkTypes::Titles => (UnitEntryTypes::Title, true),
-        LinkTypes::Messages => (UnitEntryTypes::Message, false),
+    let want = match link_type {
+        LinkTypes::Invites => UnitEntryTypes::Invite,
+        LinkTypes::Titles => UnitEntryTypes::Title,
+        LinkTypes::Messages => UnitEntryTypes::Message,
+        LinkTypes::Removals => UnitEntryTypes::Removal,
+        LinkTypes::Leaves => UnitEntryTypes::Leave,
+        LinkTypes::Edits => UnitEntryTypes::Edit,
+        LinkTypes::Pins => UnitEntryTypes::Pin,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
-    let linker_ok = if by_creator {
-        action.author() == &creator
-    } else {
-        true
-    };
-    if is_type(signed.action(), want)? && signed.action().author() == action.author() && linker_ok {
-        Ok(ValidateCallbackResult::Valid)
-    } else {
-        invalid(
-            "people list only their own entries, and only the creator lists invitations and names",
-        )
-    }
+    // Whether the entry itself was allowed is the entry's own validation.
+    allow(
+        is_type(signed.action(), want)? && signed.action().author() == action.author(),
+        "people list only their own entries, each under its own link",
+    )
 }
 
 /// An invitation sits on the invited person's key, comes from the sender's key, and is small.

@@ -90,3 +90,22 @@ chat mentions and replies.
   members"); `ChatRow` takes web's `chat-kind` label ("Project").
 - Tests: `tests/e2e/public-chats.mjs` (two new accounts, so it can run live).
 - Not yet: the members panel behind the count, the chat menu (pin/mute/hide), events.
+
+## M4c as built (2026-10-20, third part: group options, edits, pins; ADR 0045)
+- **Integrity change** (conversation DNA): `Invite`/`Title` gain `by` (the author's manager
+  citation); new `Removal`, `Leave`, `Edit`, `Pin` entries and links, and a private `Prefs`.
+  Rules in `dnas/conversation/zomes/integrity/messages/src/{chat,rights}.rs`; who counts when
+  in `sp_core::roster` (unit-tested).
+- Coordinator: `people.rs` (replays the roster, finds the caller's citations), `group.rs`
+  (`start_chat`, `rename_group`, `add_member`, `remove_member`, `leave`), `pins.rs` (`pin_message`,
+  `pins`), `summary.rs` (`summary` now with manager, member, can_pin, pinned, muted, hidden;
+  `mark_read`, `set_prefs`), `edit_message` in `lib.rs`; `list_messages` adds `kind`
+  ("system" rows for leaves), `edited`, `pinned`.
+- UI: `components/messages/{ChatMenu,ChatMarks,GroupInfoSheet,PinBar}.svelte`, `ChatRow`
+  (right-click / 450 ms long press), `components/chat/BubbleMenu.svelte` (Pin, Edit), the
+  composer's edit mode, "left the group" lines; `features/messages/ChatMenus.svelte` (web's
+  chat menu + the leave confirm); project-chat pin/mute/delete in `services/publicChats.ts`
+  (browser storage, like their read marks).
+- Tests: `sp_core::roster` units; scenario `tests/scenarios/tests/groups.rs`; browser
+  `tests/e2e/group-options.mjs` (three new accounts, can run live).
+- Not yet: attachments, calls, "seen" receipts, the project members panel, toasts, events.

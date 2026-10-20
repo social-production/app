@@ -2,12 +2,13 @@
 //! reach them encrypted through the inbox, only invited people write, and read marks are
 //! private.
 
-use holo_hash::AgentPubKeyB64;
 use holochain::prelude::*;
-use holochain::sweettest::{await_consistency, SweetAgents, SweetCell, SweetConductorBatch};
+use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
 use serde::{Deserialize, Serialize};
 
 mod common;
+
+use common::chats::chat_network;
 
 /// Mirrors the messages zome's inputs and views (integrity crates can't share one binary).
 #[derive(Serialize, Debug)]
@@ -69,34 +70,6 @@ fn post(body: &str, reply_to: Option<&ActionHash>) -> PostInput {
         body: body.into(),
         reply_to: reply_to.cloned(),
     }
-}
-
-/// Each conductor's agent gets the inbox (the base conversation cell) and the chat clone seeded
-/// `<first agent>.<kind>.<nonce>`. Returns `(inbox, chat)` per conductor, and the seed.
-async fn chat_network(
-    conductors: &mut SweetConductorBatch,
-    kind: &str,
-) -> (Vec<(SweetCell, SweetCell)>, String) {
-    let mut agents = Vec::new();
-    for i in 0..conductors.len() {
-        agents.push(SweetAgents::one(conductors[i].keystore()).await);
-    }
-    let creator = AgentPubKeyB64::from(agents[0].clone());
-    let seed = format!("{creator}.{kind}.abcdefghijklmnopqrstuv");
-    let inbox = common::load_dna("conversation").await;
-    let chat = common::dna_with("conversation", seed.clone()).await;
-    let mut cells = Vec::new();
-    for (i, agent) in agents.into_iter().enumerate() {
-        let app = conductors[i]
-            .setup_app_for_agent("sp", agent, &[inbox.clone(), chat.clone()])
-            .await
-            .expect("install app");
-        let mut both = app.into_cells();
-        let chat_cell = both.remove(1);
-        cells.push((both.remove(0), chat_cell));
-    }
-    conductors.exchange_peer_info().await;
-    (cells, seed)
 }
 
 #[tokio::test(flavor = "multi_thread")]

@@ -7,6 +7,10 @@ export interface ChatSource {
   list: () => Promise<ChatMessage[]>;
   post: (body: string, replyTo: string | null) => Promise<unknown>;
   remove: (id: string) => Promise<void>;
+  /** Direct and group chats only (web's conversationActions): edit your own, pin. */
+  edit?: (id: string, body: string) => Promise<void>;
+  /** Set a message pinned or not. */
+  pin?: (id: string, pinned: boolean) => Promise<void>;
   /** The viewer: their key, name, and whether their account is paused. */
   viewer: () => Promise<{ agent: string; name: string; paused: boolean }>;
   /** Display names for these agents. */
@@ -71,6 +75,9 @@ export class ChatState {
       replyAuthor: quote ? this.nameOf(quote.author) : null,
       // web keeps a deleted original's place as "Deleted message".
       replyPreview: quote ? (quote.deleted ? 'Deleted message' : quote.preview) : null,
+      kind: m.kind ?? 'text',
+      edited: m.edited ?? false,
+      pinned: m.pinned ?? false,
     };
   }
 
@@ -86,6 +93,9 @@ export class ChatState {
       replyToId: p.replyTo?.id ?? null,
       replyAuthor: p.replyTo?.authorName ?? null,
       replyPreview: p.replyTo ? p.replyTo.body.slice(0, 120) : null,
+      kind: 'text',
+      edited: false,
+      pinned: false,
     };
   }
 
@@ -154,6 +164,29 @@ export class ChatState {
     } finally {
       this.pending = this.pending.filter((p) => p.id !== copy.id);
     }
+  }
+
+  /** web's editConversationMessage: throws (keeping the draft) when it fails. */
+  async edit(id: string, body: string): Promise<void> {
+    this.error = '';
+    try {
+      await this.source.edit?.(id, body);
+    } catch (e) {
+      this.error = this.source.explain(e) || 'Could not edit message';
+      throw e;
+    }
+    await this.refresh();
+  }
+
+  /** web's toggleConversationPin: `pinned` is the message's current state, so this flips it. */
+  async pin(id: string, pinned: boolean): Promise<void> {
+    this.error = '';
+    try {
+      await this.source.pin?.(id, !pinned);
+    } catch (e) {
+      this.error = this.source.explain(e) || 'Could not update the pin';
+    }
+    await this.refresh();
   }
 
   async remove(id: string): Promise<void> {

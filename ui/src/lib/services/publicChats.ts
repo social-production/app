@@ -1,5 +1,5 @@
 import type { ChatMessage } from '#lib/domain/chat.ts';
-import type { PublicChat } from '#lib/domain/messages.ts';
+import type { ListPrefs, PublicChat } from '#lib/domain/messages.ts';
 import { callCell, clonedSeeds, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { listMessages } from './chat.ts';
@@ -39,6 +39,8 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
   if (!project?.charter) return null;
   if (!project.am_member && !messages.some((m) => m.author === me)) return null;
   const last = messages.at(-1);
+  const prefs = prefsOf(me, seed);
+  if (prefs.hiddenAt !== null && (last?.createdAt ?? 0) <= prefs.hiddenAt) return null;
   return {
     id: seed,
     title: project.charter.title,
@@ -48,6 +50,8 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
       : null,
     unread: unreadAfter(messages, readAt(me, seed), me),
     activeAt: last?.createdAt ?? project.last_activity_at ?? project.created_at ?? 0,
+    pinned: prefs.pinned,
+    muted: prefs.muted,
   };
 }
 
@@ -77,5 +81,44 @@ export async function markProjectChatRead(seed: string, at: number): Promise<voi
     localStorage.setItem(readKey(me, seed), String(at));
   } catch {
     // Private windows may refuse storage; the chat just stays unread here.
+  }
+}
+
+interface StoredPrefs {
+  pinned: boolean;
+  muted: boolean;
+  /** Hidden until a message newer than this (Holochain micros) arrives. */
+  hiddenAt: number | null;
+}
+
+/** web's chat menu on a project chat (subject_chat_reads' pin/mute/hide), kept in the browser
+ * like the read marks above until project chats get private entries (ADR 0044, 0045). */
+const prefsKey = (me: string, seed: string): string => `sp.projectChatPrefs.${me}.${seed}`;
+
+function prefsOf(me: string, seed: string): StoredPrefs {
+  const none: StoredPrefs = { pinned: false, muted: false, hiddenAt: null };
+  try {
+    const raw = localStorage.getItem(prefsKey(me, seed));
+    return raw ? { ...none, ...(JSON.parse(raw) as Partial<StoredPrefs>) } : none;
+  } catch {
+    return none;
+  }
+}
+
+/** Pin, mute or delete (hide until something new arrives) a project chat on this device. */
+export async function setProjectChatPrefs(
+  seed: string,
+  prefs: ListPrefs,
+  newestAt: number,
+): Promise<void> {
+  const me = await myAgent();
+  const next = prefsOf(me, seed);
+  if (prefs.pinned !== undefined) next.pinned = prefs.pinned;
+  if (prefs.muted !== undefined) next.muted = prefs.muted;
+  if (prefs.hidden !== undefined) next.hiddenAt = prefs.hidden ? newestAt : null;
+  try {
+    localStorage.setItem(prefsKey(me, seed), JSON.stringify(next));
+  } catch {
+    // Private windows may refuse storage; the setting just doesn't stick.
   }
 }

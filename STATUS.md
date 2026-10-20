@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-20 ~14:30 UTC by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-20 ~23:30 UTC by a cloud session; see "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,33 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-20: M4c group options, edits and pins (branch `claude/social-production-handoff-dsam61`)
+web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`
+"M4c as built, third part"). Next step: wait for its PR's CI, merge when green, smoke live
+(`tests/e2e/group-options.mjs` can run live: it signs up three test accounts), then the
+README/STATUS docs PR.
+- **Integrity change** (conversation DNA only): hApp version changes, hosted apps reinstall;
+  existing direct/group chats are left on the old network (test chats only). Projects and
+  people are untouched.
+- Groups: the manager (the creator, until they leave and hand over to the longest-standing
+  member) renames, adds and removes; anyone leaves ("… left the group." line). Writes cite
+  their authority (`by`: `None` for the creator, else the handover `Leave`); who counts when is
+  replayed by `sp_core::roster`. Edits are `Edit` entries (newest shows, "edited"); pins are
+  `Pin` entries (either person in a direct chat, the manager in a group, at most 5); pin, mute,
+  delete are a private `Prefs` entry (project chats: browser storage).
+- UI: row right-click / long press and the chat header open web's chat menu (View profile,
+  Pin, Mute, Chat info, Delete, Leave group); Chat info sheet; pin bar; Edit and Pin in the
+  message menu with the composer's edit mode.
+- Checked in the cloud session: fmt, clippy (workspace, `-D warnings`), unit tests, `npm run
+  check`/`lint`, sizes, boundaries, hApp build, scenarios `groups` (new, 2 tests) and
+  `messages`; against the local seed node at 390px: `group-options.mjs` (new), `messages.mjs`,
+  `public-chats.mjs`, `chat.mjs`. Not run here: the other scenario files (CI runs them),
+  `projects.mjs`, `governance.mjs`, `links.mjs` (no project code changed).
+- Lessons: web's `onTogglePin(id, pinned)` passes the message's *current* state (toggle), the
+  zome takes the wanted one; `ChatState.pin` flips it. `scripts/dev-seed.sh` only builds the
+  hApp when none exists: after a zome change run `bash scripts/build-happ.sh` before restarting
+  the seed node, or it serves the old coordinator. Don't name an extern `rename` (libc).
 
 ## Done 2026-10-20: M4c Public tab, PR #12 merged (~14:48 UTC), deployed
 web's Messages → Public tab (ADR 0044, `docs/plans/M4-talk.md` "M4c as built, second part").
@@ -161,10 +188,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 6. **Public tab read marks are per device** (ADR 0044): project chats have no private read
    marks in the DNA yet, so "unread" is kept in the browser until an integrity change adds them.
    The members count in a project chat's header is text (web opens a members panel).
+7. **Group "Delete" leaves the group** (ADR 0045), with the "left the group" line and a
+   handover; web's Delete drops the membership silently and can leave a group without its
+   manager. Removed people can still read what the chat gossips (they know its seed).
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `c598c26` (PR #12 merged 2026-10-20 ~14:48 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `41f116f` (PR #13, docs after PR #12, 2026-10-20). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
   plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c direct and group chats + the Public tab (Messages page), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
@@ -189,10 +219,10 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: finish M4c from web (group options: rename, add/remove members, leave; the chat
-   menu: pin/mute/hide; message edits and pins; these need a conversation-DNA integrity change,
-   so batch them, and move project-chat read marks into private entries then), then in-app notifications (`docs/plans/M4-talk.md`: M4d). Threads stay
-   parked (Owner decisions).
+1. M4: land the in-flight group options PR, then in-app notifications (`docs/plans/M4-talk.md`:
+   M4d). Still from web later: attachments, calls, "seen" receipts, the project members panel.
+   Project-chat read marks and list settings move into private entries with the next
+   project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
 4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
