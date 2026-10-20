@@ -111,6 +111,7 @@
           >
             <ProjectChat
               projectId={id}
+              seed={project.networkSeed}
               names={detail.names}
               fullscreen={compact}
               active={tab === 'chat'}

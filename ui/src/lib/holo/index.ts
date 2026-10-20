@@ -5,7 +5,13 @@ export {
   signUp,
   type AccountStep,
 } from './account.ts';
-export { conversationCell, newChatSeed, newProjectSeed, projectCell } from './cells.ts';
+export {
+  clonedSeeds,
+  conversationCell,
+  newChatSeed,
+  newProjectSeed,
+  projectCell,
+} from './cells.ts';
 export { projectFeed } from './feed.ts';
 export {
   callCell,

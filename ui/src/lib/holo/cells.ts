@@ -25,6 +25,16 @@ export function conversationCell(networkSeed: string): Promise<CellId> {
   return cloneOf('conversation', networkSeed, 'chat');
 }
 
+/** The network seeds of every clone of `role` on this node: the projects this person has
+ * opened here, or their chats. */
+export async function clonedSeeds(role: CloneRole): Promise<string[]> {
+  const { ws } = await connection();
+  const cells = (await ws.appInfo())?.cell_info[role] ?? [];
+  return cells.flatMap((c) =>
+    c.type === CellType.Cloned ? [c.value.dna_modifiers.network_seed] : [],
+  );
+}
+
 function cloneOf(role: CloneRole, networkSeed: string, name: string): Promise<CellId> {
   const cached = known.get(networkSeed);
   if (cached) return cached;

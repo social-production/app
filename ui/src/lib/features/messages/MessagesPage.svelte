@@ -13,36 +13,59 @@
 
   import ConversationView from './ConversationView.svelte';
   import { InboxState } from './inboxState.svelte.ts';
+  import PublicChatView from './PublicChatView.svelte';
+  import { PublicState } from './publicState.svelte.ts';
 
   import '#lib/components/styles/messages.css';
 
   /**
    * web's MessagesPage: the Personal list (direct and group chats, newest first) with the
-   * New message button, and a conversation opened from it (`?conversation=<id>`). Project
-   * chats (web's Public tab) stay on their project pages for now.
+   * New message button, the Public list (your projects' chats), and a chat opened from either
+   * (`?conversation=<id>` or `?project=<id>`).
    */
   const inbox = new InboxState();
+  const publicChats = new PublicState();
   let composing = $state(false);
+  let tab = $state<'personal' | 'public'>('personal');
 
   const openId = $derived(page.url.searchParams.get('conversation'));
+  const openProject = $derived(page.url.searchParams.get('project'));
   const active = $derived(inbox.chats.find((c) => c.id === openId) ?? null);
+  const activeProject = $derived(publicChats.chats.find((c) => c.id === openProject) ?? null);
+  const chatOpen = $derived(!!active || !!activeProject);
 
-  // untrack: a refresh reads inbox state, which must not re-run (and so stop) this effect.
+  // untrack: a refresh reads list state, which must not re-run (and so stop) this effect.
   $effect(() => {
-    untrack(() => inbox.start());
-    return () => inbox.dispose();
+    untrack(() => {
+      inbox.start();
+      publicChats.start();
+    });
+    return () => {
+      inbox.dispose();
+      publicChats.dispose();
+    };
   });
 
   $effect(() => {
-    chatChrome.immersive = !!active;
+    if (openProject) tab = 'public';
+  });
+
+  $effect(() => {
+    chatChrome.immersive = chatOpen;
     return () => {
       chatChrome.immersive = false;
     };
   });
 
-  function open(id: string | null): void {
-    const href = id ? `/messages?conversation=${encodeURIComponent(id)}` : '/messages';
+  function open(id: string | null, param = 'conversation'): void {
+    const href = id ? `/messages?${param}=${encodeURIComponent(id)}` : '/messages';
     void goto(resolve(href as '/messages'));
+  }
+
+  /** web's handleComposeTrigger: New message always starts a personal chat. */
+  function compose(): void {
+    tab = 'personal';
+    composing = true;
   }
 
   async function send(chat: NewChat): Promise<void> {
@@ -53,8 +76,8 @@
 </script>
 
 <div class="messages-page">
-  <section class:conversation-page={!!active} class="page">
-    {#if !active}
+  <section class:conversation-page={chatOpen} class="page">
+    {#if !chatOpen}
       <div class="desktop-only-header">
         <header class="page-header">
           <div class="copy">
@@ -68,7 +91,7 @@
       </div>
     {/if}
 
-    <section class:conversation-view={!!active} class:list-view={!active} class="messages-shell">
+    <section class:conversation-view={chatOpen} class:list-view={!chatOpen} class="messages-shell">
       {#if active}
         {#key active.id}
           <ConversationView
@@ -79,18 +102,26 @@
             onRead={() => void inbox.refresh()}
           />
         {/key}
+      {:else if activeProject}
+        {#key activeProject.id}
+          <PublicChatView
+            chat={activeProject}
+            onBack={() => open(null)}
+            onRead={() => publicChats.cleared(activeProject.id)}
+          />
+        {/key}
       {:else}
         <div class="surface-tabs" role="tablist" aria-label="Messages tabs">
           <div class="surface-tab-list">
-            <button class="surface-tab active" role="tab" type="button" aria-selected="true">
-              <span class="surface-tab-label">Personal</span>
-              {#if inbox.unreadTotal > 0}<CountBadge count={inbox.unreadTotal} />{/if}
-            </button>
+            {@render tabButton('personal', 'Personal', inbox.unreadTotal)}
+            {@render tabButton('public', 'Public', publicChats.unreadTotal)}
           </div>
         </div>
 
         <div class="conversation-list">
-          {#if openId && !inbox.loaded}
+          {#if tab === 'public'}
+            {@render publicList()}
+          {:else if openId && !inbox.loaded}
             <div class="empty-state">Loading chats…</div>
           {:else if inbox.error && inbox.chats.length === 0}
             <div class="empty-state">{inbox.error}</div>
@@ -116,7 +147,7 @@
           type="button"
           aria-label="New message"
           title="New message"
-          onclick={() => (composing = true)}
+          onclick={compose}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path
@@ -132,6 +163,44 @@
     </section>
   </section>
 </div>
+
+{#snippet tabButton(id: 'personal' | 'public', label: string, unread: number)}
+  <button
+    class:active={tab === id}
+    class="surface-tab"
+    role="tab"
+    type="button"
+    aria-selected={tab === id}
+    aria-label={unread > 0 ? `${label}, ${unread} unread` : label}
+    onclick={() => (tab = id)}
+  >
+    <span class="surface-tab-label">{label}</span>
+    {#if unread > 0}<CountBadge count={unread} />{/if}
+  </button>
+{/snippet}
+
+{#snippet publicList()}
+  {#if openProject && !publicChats.loaded}
+    <div class="empty-state">Loading chats…</div>
+  {:else if publicChats.error && publicChats.chats.length === 0}
+    <div class="empty-state">{publicChats.error}</div>
+  {:else if publicChats.chats.length === 0}
+    <div class="empty-state">
+      {publicChats.loaded ? 'No public chats yet.' : 'Loading chats…'}
+    </div>
+  {:else}
+    {#each publicChats.chats as chat (chat.id)}
+      <ChatRow
+        title={chat.title}
+        preview={chat.last?.preview ?? ''}
+        time={relativeCompact(chat.activeAt)}
+        unread={chat.unread}
+        kind="Project"
+        onOpen={() => open(chat.id, 'project')}
+      />
+    {/each}
+  {/if}
+{/snippet}
 
 <ComposeMessageSheet
   open={composing}

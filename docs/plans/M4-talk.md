@@ -73,6 +73,20 @@ chat mentions and replies.
   Styles: `styles/messages.css` (PORTS: MessagesPage, ComposeMessageSheet, SuggestionList,
   PageHeader).
 - Tests: `sp_core::conversation` units; scenario `tests/scenarios/tests/messages.rs`.
-- Not yet (next M4c parts, from web): the Public tab (project chats in the list), group options
+- Not yet (next M4c parts, from web): group options
   (rename, add/remove members, leave), the chat menu (pin/mute/delete chat), message edits,
   pins, attachments, calls, "seen" receipts.
+
+## M4c as built (2026-10-20, second part: the Public tab; ADR 0044)
+- No zome changes. `services/publicChats.ts` `myProjectChats()`: project clones on this node
+  (`holo/cells.ts` `clonedSeeds`), read by seed (`services/chat.ts` `ProjectRef`), kept when
+  you're a member or wrote there;
+  title and member count from `get_project`, last message and unread from `list_messages`.
+- Read marks for project chats are per person and project in `localStorage`
+  (`markProjectChatRead`), written from Messages and from the project's Chat tab
+  (`features/projects/ProjectChat.svelte`, web's `LinkedChatReadMarker`).
+- UI: Personal/Public tabs in `features/messages/MessagesPage.svelte` (unread badges on both),
+  `publicState.svelte.ts`, `PublicChatView.svelte` (`?project=<seed>`, header "Project chat · N
+  members"); `ChatRow` takes web's `chat-kind` label ("Project").
+- Tests: `tests/e2e/public-chats.mjs` (two new accounts, so it can run live).
+- Not yet: the members panel behind the count, the chat menu (pin/mute/hide), events.
