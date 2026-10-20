@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight (2026-10-20): M4c Public tab, branch `claude/social-production-handoff-dsam61`
+## In flight (2026-10-20): M4c Public tab, PR #12 (branch `claude/social-production-handoff-dsam61`)
 web's Messages → Public tab (ADR 0044, `docs/plans/M4-talk.md` "M4c as built, second part").
 **UI only, no zome or integrity change**, so merging resets nothing.
 - Personal/Public tabs with unread badges; Public lists the chats of projects you're a member of
@@ -38,7 +38,7 @@ web's Messages → Public tab (ADR 0044, `docs/plans/M4-talk.md` "M4c as built, 
   runs them).
 - Lesson: an e2e test that leaves the page while a chat copy still says "Sending…" cancels the
   write (the websocket goes with the page); wait for "Sending…" to go first.
-- Next after merge: smoke live (`node tests/e2e/public-chats.mjs https://ui-production-333c.up.railway.app`),
+- When CI on PR #12 is green: merge it (`gh pr merge 12 --merge`), then smoke live (`node tests/e2e/public-chats.mjs https://ui-production-333c.up.railway.app`),
   update README Status + this file.
 
 ## Done 2026-10-20: M4c direct and group chats (first part), PR #10 merged (~08:04 UTC), deployed
