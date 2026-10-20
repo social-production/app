@@ -1,0 +1,18 @@
+[package]
+name = "messages"
+description = "Conversation DNA API: start a chat, invite, post, read, mark read, and the inbox (ADR 0043)."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+messages_integrity = { workspace = true }
+sp_core = { workspace = true }
+
+[lints]
+workspace = true

@@ -68,3 +68,7 @@ links.css         .link-card      web/src/lib/features/detail-links/LinkCard.sve
 links.css         .request-stack  web/src/lib/features/detail-links/DetailLinkRequestsSection.svelte
 links.css         .link-composer  web/src/lib/features/detail-links/DetailLinkRequestsSection.svelte
 links.css         .vote-archive   web/src/lib/features/detail-links/DetailLinkVoteHistorySection.svelte
+messages.css      .page-header    web/src/lib/components/shared/PageHeader.svelte
+messages.css      .messages-page  web/src/lib/features/messages/MessagesPage.svelte
+messages.css      .compose-sheet  web/src/lib/components/shared/ComposeMessageSheet.svelte
+messages.css      .compose-sheet  web/src/lib/components/shared/SuggestionList.svelte

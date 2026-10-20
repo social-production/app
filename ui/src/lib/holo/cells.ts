@@ -14,17 +14,31 @@ const known = new Map<string, Promise<CellId>>();
  * its network (not its membership); in a browser the gateway then grants this device.
  */
 export function projectCell(networkSeed: string, title: string): Promise<CellId> {
+  return cloneOf('project', networkSeed, title);
+}
+
+/**
+ * The person's cell for one direct or group chat (a clone of the conversation DNA, seeded
+ * `<creator key>.<direct|group>.<nonce>`, ADR 0043). Only the seed's holders can find it.
+ */
+export function conversationCell(networkSeed: string): Promise<CellId> {
+  return cloneOf('conversation', networkSeed, 'chat');
+}
+
+function cloneOf(role: CloneRole, networkSeed: string, name: string): Promise<CellId> {
   const cached = known.get(networkSeed);
   if (cached) return cached;
-  const resolving = resolveCell(networkSeed, title);
+  const resolving = resolveCell(role, networkSeed, name);
   known.set(networkSeed, resolving);
   resolving.catch(() => known.delete(networkSeed));
   return resolving;
 }
 
-async function resolveCell(networkSeed: string, title: string): Promise<CellId> {
+type CloneRole = 'project' | 'conversation';
+
+async function resolveCell(role: CloneRole, networkSeed: string, title: string): Promise<CellId> {
   const { ws, session } = await connection();
-  const existing = (await ws.appInfo())?.cell_info['project']?.find(
+  const existing = (await ws.appInfo())?.cell_info[role]?.find(
     (c) => c.type === CellType.Cloned && c.value.dna_modifiers.network_seed === networkSeed,
   );
   let cellId: CellId;
@@ -32,7 +46,7 @@ async function resolveCell(networkSeed: string, title: string): Promise<CellId> 
     cellId = existing.value.cell_id;
   } else {
     const created = await ws.createCloneCell({
-      role_name: 'project',
+      role_name: role,
       modifiers: { network_seed: networkSeed },
       name: title.slice(0, 100),
     });
@@ -50,8 +64,18 @@ async function resolveCell(networkSeed: string, title: string): Promise<CellId> 
   return cellId;
 }
 
+function nonce(bytes: number): string {
+  const random = crypto.getRandomValues(new Uint8Array(bytes));
+  return btoa(String.fromCharCode(...random)).replace(/[+/=]/g, '');
+}
+
 /** A fresh network seed naming `creator` (see project_integrity::creator_in_seed). */
 export function newProjectSeed(creator: string): string {
-  const nonce = crypto.getRandomValues(new Uint8Array(9));
-  return `${creator}.${btoa(String.fromCharCode(...nonce)).replace(/[+/=]/g, '')}`;
+  return `${creator}.${nonce(9)}`;
+}
+
+/** A fresh chat seed (sp_core::conversation::chat_seed): whoever knows it can find the chat,
+ * so the random part is long. */
+export function newChatSeed(creator: string, kind: 'direct' | 'group'): string {
+  return `${creator}.${kind}.${nonce(24)}`;
 }

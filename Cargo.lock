@@ -5414,6 +5414,26 @@ dependencies = [
 ]
 
 [[package]]
+name = "messages"
+version = "0.0.1"
+dependencies = [
+ "hdk",
+ "messages_integrity",
+ "serde",
+ "sp_core",
+]
+
+[[package]]
+name = "messages_integrity"
+version = "0.0.1"
+dependencies = [
+ "hdi",
+ "holochain_serialized_bytes",
+ "serde",
+ "sp_core",
+]
+
+[[package]]
 name = "mime"
 version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"

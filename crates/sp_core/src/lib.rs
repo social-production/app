@@ -2,6 +2,7 @@
 //! behaviour belongs in a domain crate (`sp_governance`, `sp_index`).
 
 pub mod chat;
+pub mod conversation;
 pub mod handle;
 pub mod limits;
 pub mod network;

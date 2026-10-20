@@ -30,6 +30,24 @@ export async function getPerson(agent: string): Promise<Person> {
   return { agent, profile, standing: toStanding(standing) };
 }
 
+/** The signed-in person as chats show them. */
+export async function viewer(): Promise<{ agent: string; name: string; paused: boolean }> {
+  const person = await getPerson(await myAgent());
+  return {
+    agent: person.agent,
+    name: person.profile?.name ?? 'Unnamed',
+    paused: person.standing.level === 'Paused',
+  };
+}
+
+/** Display names by agent key. */
+export async function namesOf(agents: string[]): Promise<Record<string, string>> {
+  const profiles = await Promise.all(
+    agents.map((a) => identity<Profile | null>('get_profile', stringToHash(a))),
+  );
+  return Object.fromEntries(agents.map((a, i) => [a, profiles[i]?.name ?? 'Unnamed']));
+}
+
 export async function listPeople(): Promise<string[]> {
   return (await identity<AgentPubKey[]>('list_people')).map(hashToString);
 }

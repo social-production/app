@@ -27,6 +27,10 @@
     fitViewport: boolean;
     paused: boolean;
     error: string;
+    /** web's `showHeader`: the Messages page has its own chat header. */
+    showHeader?: boolean;
+    /** A direct chat names nobody above bubbles: there is only the other person. */
+    hideAuthors?: boolean;
     onSend: (body: string, replyToId: string | null) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
   }
@@ -173,11 +177,14 @@
   class:embedded={p.embedded}
   class:fit-viewport={p.fitViewport && !p.embedded}
   class:keyboard-open={keyboardOpen}
+  class:headerless={!(p.showHeader ?? true)}
   class="chat-panel message-variant"
 >
-  <div class="chat-header">
-    <div><h2>{p.title}</h2></div>
-  </div>
+  {#if p.showHeader ?? true}
+    <div class="chat-header">
+      <div><h2>{p.title}</h2></div>
+    </div>
+  {/if}
 
   <div bind:this={log} class="chat-log">
     <div class="chat-log-stack">
@@ -193,7 +200,7 @@
           {/if}
           <ChatBubble
             {message}
-            showAuthor={showsAuthor(message, previous)}
+            showAuthor={!p.hideAuthors && showsAuthor(message, previous)}
             flashed={flashed === message.id}
             canReply={!p.paused && !message.pending}
             onOpenMenu={openMenu}

@@ -31,7 +31,8 @@ their comments and votes), with the feed index picking up threads.
 
 ## M4c — direct messages
 The conversation DNA (clone per chat, listed participants only), `Message` and attachment refs,
-private read markers and pins (DOMAIN_MODEL.md), web's MessagesPage.
+private read markers and pins (DOMAIN_MODEL.md), web's MessagesPage. First part as built below
+("M4c as built").
 
 ## M4d — notifications
 Derived on each device from signals and new links (DOMAIN_MODEL.md "Not on the DHT"), including
@@ -56,3 +57,22 @@ chat mentions and replies.
   internal-path and mention links come with those features. A deleted message with replies leaves
   no "Deleted message" bubble; its replies quote "Deleted message" instead (ADR 0038). Paused
   accounts get the read-only composer, but the network doesn't enforce it yet.
+
+## M4c as built (2026-10-20, first part; ADR 0043)
+- `dnas/conversation/zomes/{integrity,coordinator}/messages`, registered in
+  `dnas/conversation/dna.yaml`; seed and limit rules in `sp_core::conversation`.
+- Chat clone API: `start_chat { members, title }` (creator only), `post_message`,
+  `delete_message`, `list_messages` (the project chat's shape), `summary` (kind, creator,
+  members, group name, last message, unread), `mark_read`. Inbox (base cell): `send_invite
+  { to, seed }`, `inbox()`.
+- UI: `features/messages/{MessagesPage,ConversationView}.svelte` + `inboxState.svelte.ts`;
+  `components/messages/{ComposeMessageSheet,SuggestionList,ChatRow}.svelte`; the profile's
+  Message button (`features/people/MessageButton.svelte`); `services/messages.ts`;
+  `holo/cells.ts` `conversationCell`/`newChatSeed`. The chat state moved to
+  `components/chat/chatState.svelte.ts` with a `ChatSource`, shared with the project chat.
+  Styles: `styles/messages.css` (PORTS: MessagesPage, ComposeMessageSheet, SuggestionList,
+  PageHeader).
+- Tests: `sp_core::conversation` units; scenario `tests/scenarios/tests/messages.rs`.
+- Not yet (next M4c parts, from web): the Public tab (project chats in the list), group options
+  (rename, add/remove members, leave), the chat menu (pin/mute/delete chat), message edits,
+  pins, attachments, calls, "seen" receipts.

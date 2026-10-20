@@ -1,4 +1,5 @@
-# Cloned once per DM or group chat; only participants may join (membrane lands in M4).
+# Cloned once per DM or group chat (seed `<creator>.<direct|group>.<nonce>`); only the creator
+# and the people they invited write there. The base cell is everyone's inbox (ADR 0043).
 # Zome WASM comes from scripts/build-zomes.sh (cargo --profile zome).
 manifest_version: "0"
 name: sp_conversation
@@ -10,9 +11,15 @@ integrity:
   zomes:
     - name: health_integrity
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm
+    - name: messages_integrity
+      path: ../../target/wasm32-unknown-unknown/zome/messages_integrity.wasm
 coordinator:
   zomes:
     - name: health
       path: ../../target/wasm32-unknown-unknown/zome/health.wasm
       dependencies:
         - name: health_integrity
+    - name: messages
+      path: ../../target/wasm32-unknown-unknown/zome/messages.wasm
+      dependencies:
+        - name: messages_integrity

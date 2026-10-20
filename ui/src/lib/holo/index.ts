@@ -5,7 +5,7 @@ export {
   signUp,
   type AccountStep,
 } from './account.ts';
-export { newProjectSeed, projectCell } from './cells.ts';
+export { conversationCell, newChatSeed, newProjectSeed, projectCell } from './cells.ts';
 export { projectFeed } from './feed.ts';
 export {
   callCell,
