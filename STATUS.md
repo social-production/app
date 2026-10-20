@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight (2026-10-20): M3e links between projects, branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-20: M3e links between projects, PR #8 merged (~03:56 UTC), deployed
 web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web's
 `features/detail-links/*` and web-backend `detail_links.py`:
 - A link request is two `Link` proposals, one in each project: the proposer files it in their
@@ -42,8 +42,10 @@ web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web
   seed node at 390px: `tests/e2e/links.mjs` (propose → both approve → sever), `projects.mjs`,
   `governance.mjs`. Compared with live web's Links tab at 390px: same layout. Not run here: the
   other scenario files (CI runs them) and `chat.mjs`.
-- PR #8 is open. Next: wait for CI (~55 min), merge, smoke the live site (projects
-  reset), update README Status.
+- CI: `check` 6 min, shards 23–45 min. After deploy: projects reset (index 0), `projects.mjs`
+  passed against the live UI, and the live Links tab at 390px shows web's sections (Active
+  links, Pending link requests with "Propose a new link", Historical links). `links.mjs` needs
+  the dev founders, so it only runs locally.
 
 ## Done 2026-10-20: PR #6 merged (~00:48 UTC), deployed, live smoke passed
 **M3d project values** (ADR 0041, `docs/plans/M3-governance.md` "M3d"), ported from web's
@@ -103,9 +105,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `08cd0b9` (PR #6 merged 2026-10-20 ~00:48 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `dd00ed2` (PR #8 merged 2026-10-20 ~03:56 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M4a project chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -128,12 +130,11 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M3e links (in flight above): merge once CI is green, smoke, update README Status.
-2. M4: DMs (conversation DNA, web's `MessagesPage`), in-app notifications
+1. M4: DMs (conversation DNA, web's `MessagesPage`), in-app notifications
    (`docs/plans/M4-talk.md`: M4c, M4d). Threads stay parked (Owner decisions).
-3. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
-4. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
-5. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
+2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
+3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
+4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
