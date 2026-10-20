@@ -20,6 +20,8 @@ export class LinksState {
   pendingId = $state<string | null>(null);
   saving = $state(false);
   composerMessage = $state<string>();
+  /** Votes cast here; the network shows them a little later (reads lag right after a write). */
+  private cast: Record<string, VoteChoice> = {};
 
   constructor(private readonly project: () => Project | undefined) {}
 
@@ -36,7 +38,7 @@ export class LinksState {
       const names = { ...this.names };
       for (const p of people) names[p.agent] = p.profile?.name ?? 'Unnamed';
       this.names = names;
-      this.frame = frame;
+      this.frame = this.withCast(frame);
       this.error = undefined;
     } catch (e) {
       this.error = explain(e);
@@ -78,9 +80,24 @@ export class LinksState {
 
   vote(requestId: string, side: LinkSide, choice: VoteChoice): Promise<void> {
     const half = side.half;
-    return half
-      ? this.run(requestId, () => voteLink(side.projectId, half.id, choice))
-      : Promise.resolve();
+    if (!half) return Promise.resolve();
+    return this.run(requestId, async () => {
+      await voteLink(side.projectId, half.id, choice);
+      this.cast[half.id] = choice;
+    });
+  }
+
+  private withCast(frame: LinksFrame): LinksFrame {
+    const mark = (side: LinkSide): void => {
+      const vote = side.half && !side.half.myVote ? this.cast[side.half.id] : undefined;
+      if (side.half && vote) {
+        side.half.myVote = vote;
+        side.canVote = false;
+      }
+    };
+    const requests = [...frame.pending, ...frame.active.flatMap((l) => (l.sever ? [l.sever] : []))];
+    for (const r of requests) [r.thisSide, r.otherSide].forEach(mark);
+    return frame;
   }
 
   private async run(id: string, action: () => Promise<void>): Promise<void> {

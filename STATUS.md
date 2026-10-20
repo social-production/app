@@ -34,8 +34,16 @@ web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web
   `sp_governance::links`. UI: `features/projects/LinksTab.svelte`, `components/links/*`,
   `services/links.ts`, `styles/links.css` (PORTS).
 - **Integrity change**: merging resets projects again (people stay).
+- Also fixed: two reads of a project not opened before (the Links tab reads a linked project's
+  page and its link halves together) cloned it twice and failed with `DnaDefMissing`;
+  `holo/cells.ts` now shares one lookup per seed.
 - Checked in the cloud session: fmt, clippy (workspace, `-D warnings`), unit tests, `npm run
-  check`/`lint`, sizes, boundaries, hApp build, scenario `links`. See below for the browser test.
+  check`/`lint`, sizes, boundaries, hApp build, scenario `links` (6 min), and against the local
+  seed node at 390px: `tests/e2e/links.mjs` (propose → both approve → sever), `projects.mjs`,
+  `governance.mjs`. Compared with live web's Links tab at 390px: same layout. Not run here: the
+  other scenario files (CI runs them) and `chat.mjs`.
+- Next for this branch: open the PR, wait for CI (~55 min), merge, smoke the live site (projects
+  reset), update README Status.
 
 ## Done 2026-10-20: PR #6 merged (~00:48 UTC), deployed, live smoke passed
 **M3d project values** (ADR 0041, `docs/plans/M3-governance.md` "M3d"), ported from web's
@@ -141,6 +149,8 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **Live smoke:** `curl` `/readyz` and `/index/projects`, then `node tests/e2e/projects.mjs https://ui-production-333c.up.railway.app` (allowed on this test network: it creates two test accounts; in a cloud session run `npx playwright install --with-deps chromium` first). `chat.mjs`/`governance.mjs` need the dev founders, so they only run locally. Never create accounts on the FastAPI site; the live web site may be browsed read-only to compare layouts.
 - **Styles:** never hand-edit `ui/src/lib/components/styles/*.css`. Add rows to `styles/PORTS` and run `python3 scripts/port-styles.py`. App-only CSS goes in `styles/additions.css` (ADR 0032).
 - **One write at a time per person:** two zome calls that write to the same source chain at once are refused (the chain head moved). Optimistic UI that fires several writes (ratings, votes) must queue them, as `DetailState.inTurn` does.
+- **A write isn't in your own network reads at once:** after a vote, `tally.my_vote` can still be
+  empty for a while; UI flows keep what they just wrote (as `LinksState.cast` does).
 - **Debugging the UI:** errors caught into `detail.error` are not shown once the project has loaded; log them temporarily, or find them with a Playwright script that listens to `console`. When stopping a preview server, kill it by port (`ss -ltnp | grep :4174`). `pkill -f "<its command>"` also matches your own shell and kills it.
 - **hdk externs** are unmangled C symbols: never name one after a libc function (`close`, `read`, `write`, `send`…), or native test binaries crash.
 - **Keystore:** lair is vendored with a 64 KiB message limit (ADR 0034). Keep one lair entry per person.

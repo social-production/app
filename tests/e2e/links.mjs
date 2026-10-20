@@ -30,25 +30,42 @@ async function linksUntil(page, url, locator, what) {
     await page.goto(url);
     await page.locator('.project-detail h1').waitFor({ state: 'attached', timeout: 60_000 });
     await page.getByRole('tab', { name: 'Links' }).click();
-    await page.locator('.links-tab .network-stack').first().waitFor({ timeout: 120_000 });
+    await page
+      .locator('.links-tab .network-stack')
+      .first()
+      .waitFor({ timeout: 180_000 })
+      .catch(async (e) => {
+        log(await page.locator('.links-tab').innerText().catch(() => 'no links tab'));
+        throw e;
+      });
     if (await locator().count()) return;
     await page.waitForTimeout(3000);
   }
   throw new Error(`timed out waiting for ${what}`);
 }
 
-/** Expand the first card in `section` and press `button` on this project's (enabled) side. */
-async function voteOn(page, section, button) {
-  const card = page.locator(`${section} .link-card`).first();
+/** Expand the card for `title` in the first `section` and press `button` on the viewer's own
+ * side. A vote that decides the request moves the card out of the section; otherwise the
+ * pressed button stays marked (votes are final). */
+async function voteOn(page, section, title, button, decides = false) {
+  const card = page.locator(section).first().locator('.link-card', { hasText: title });
   if ((await card.getAttribute('class'))?.includes('expanded') !== true) await card.locator('.toggle-button').click();
   await card.locator('.vote-button:not([disabled])', { hasText: button }).first().click();
-  await card.locator('.vote-button.active', { hasText: button }).waitFor({ timeout: 120_000 });
+  const done = decides
+    ? card.waitFor({ state: 'detached', timeout: 120_000 })
+    : card.locator('.vote-button.active', { hasText: button }).waitFor({ timeout: 120_000 });
+  await done.catch(async (e) => {
+    await page.screenshot({ path: `${shots}/links-vote-failed.png`, fullPage: true });
+    log(await page.locator('.links-tab').innerText());
+    throw e;
+  });
 }
 
 const ann = await device({ viewport: { width: 390, height: 844 } });
 await phraseSignIn(ann, one.phrase.split(' '));
 const urlA = await create(ann, titles[0]);
 const bob = await device();
+bob.on('console', (m) => m.type() === 'error' && log('bob console:', m.text().slice(0, 300)));
 await phraseSignIn(bob, two.phrase.split(' '));
 const urlB = await create(bob, titles[1]);
 log('each founder created a project');
@@ -72,22 +89,22 @@ await composer.getByLabel('Why are these linked?').fill('The cafe borrows the sh
 await composer.getByRole('button', { name: 'Create link vote' }).click();
 await composer.waitFor({ state: 'hidden', timeout: 120_000 });
 await ann.locator('.request-stack .link-card', { hasText: titles[1] }).waitFor({ timeout: 60_000 });
-await voteOn(ann, '.request-stack', 'Approve');
+await voteOn(ann, '.request-stack', titles[1], 'Approve');
 await ann.screenshot({ path: `${shots}/links-pending-390.png` });
 log('founder one proposed the link and approved it for project A');
 
 await linksUntil(bob, urlB, () => bob.locator('.request-stack .link-card', { hasText: titles[0] }), 'the request in B');
-await voteOn(bob, '.request-stack', 'Approve');
+await voteOn(bob, '.request-stack', titles[0], 'Approve', true);
 await linksUntil(bob, urlB, () => bob.locator('.network-stack .link-card', { hasText: titles[0] }), 'the active link');
 log('founder two approved it for project B: the link is active');
 
 await linksUntil(ann, urlA, () => ann.locator('.network-stack .link-card', { hasText: titles[1] }), 'the link in A');
 await ann.screenshot({ path: `${shots}/links-active-390.png` });
-await ann.locator('.network-stack .link-card .toggle-button').first().click();
+await ann.locator('.network-stack').first().locator('.link-card .toggle-button').click();
 await ann.getByRole('button', { name: 'Start sever vote' }).click();
-await voteOn(ann, '.network-stack', 'Remove link');
-await linksUntil(bob, urlB, () => bob.locator('.network-stack .vote-block'), 'the sever vote in B');
-await voteOn(bob, '.network-stack', 'Remove link');
+await voteOn(ann, '.network-stack', titles[1], 'Remove link');
+await linksUntil(bob, urlB, () => bob.locator('.network-stack .link-card .side-vote-line'), 'the sever vote in B');
+await voteOn(bob, '.network-stack', titles[0], 'Remove link', true);
 await linksUntil(bob, urlB, () => bob.getByText('No active links yet.'), 'the link to end');
 await bob.getByRole('button', { name: /^Show past link votes/ }).click();
 log('both projects voted to sever: the link is historical');
