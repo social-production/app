@@ -8,6 +8,7 @@
 
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
+  import LinksTab from './LinksTab.svelte';
   import ParticipationDock from './ParticipationDock.svelte';
   import ParticipationPanel from './ParticipationPanel.svelte';
   import ProjectChat from './ProjectChat.svelte';
@@ -15,7 +16,7 @@
 
   import '#lib/components/styles/detail.css';
 
-  /** web's ProjectDetailPage: Details, Participation and Chat tabs (links, history: M4–M5). */
+  /** web's ProjectDetailPage: Details, Participation, Chat and Links tabs (history: M5). */
   let { id }: { id: string } = $props();
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
@@ -26,6 +27,7 @@
   let compact = $state(false);
   // As on web, the chat mounts (and starts polling) the first time its tab opens.
   let chatOpened = $state(false);
+  let linksOpened = $state(false);
   const chatFull = $derived(tab === 'chat' && compact);
 
   $effect(() => {
@@ -44,6 +46,7 @@
 
   $effect(() => {
     if (tab === 'chat') chatOpened = true;
+    if (tab === 'links') linksOpened = true;
     chatChrome.immersive = chatFull;
     return () => {
       chatChrome.immersive = false;
@@ -67,7 +70,7 @@
       <section class="hero-card" class:chat-tab-active={chatFull}>
         <DetailTopTabs
           active={tab}
-          available={['context', 'participation', 'chat']}
+          available={['context', 'participation', 'chat', 'links']}
           ariaLabel="Project detail tabs"
           onSelect={(t) => (tab = t)}
         />
@@ -112,6 +115,16 @@
               fullscreen={compact}
               active={tab === 'chat'}
             />
+          </div>
+        {/if}
+        {#if linksOpened}
+          <div
+            class="tab-panel"
+            class:tab-panel-hidden={tab !== 'links'}
+            hidden={tab !== 'links'}
+            inert={tab !== 'links'}
+          >
+            <LinksTab {detail} />
           </div>
         {/if}
         {#if tab === 'context'}

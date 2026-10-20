@@ -1,11 +1,14 @@
 //! Project governance API (docs/plans/M3-governance.md, ADR 0033, 0039, 0040): propose, vote,
 //! rate plans, challenge a count, add and rate project values (ADR 0041), read proposals and
-//! plans with their tallies, and the applied state the project view is built from.
+//! plans with their tallies, links between projects (ADR 0042), and the applied state the
+//! project view is built from.
 
 mod apply;
 mod calls;
 mod count;
 mod decide;
+mod link_view;
+mod link_write;
 mod moves;
 mod plan_view;
 mod plan_write;
@@ -19,6 +22,7 @@ mod write;
 use hdk::prelude::*;
 use project_integrity::{Applied, ProposalKind, VoteChoice};
 
+pub use link_view::{HalfView, LinkSides, LinkView, LinksView, RequestView};
 pub use plan_view::{CriterionKind, CriterionView, LeaderStatus, PlanBoard, PlanView};
 pub use plan_write::RateInput;
 pub use values::{ImportanceInput, ValueView};
@@ -30,8 +34,9 @@ pub struct VoteInput {
     pub choice: VoteChoice,
 }
 
-/// File a proposal. A phase move's cited plan is filled in here (the current leader); plans
-/// and returns come without their author's vote.
+/// File a proposal. A phase move's cited plan is filled in here (the current leader); plans,
+/// returns and links come without their author's vote. A link request mirrored from another
+/// project may be filed by someone who isn't a member here (ADR 0042).
 #[hdk_extern]
 pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     write::propose(kind)
@@ -88,6 +93,18 @@ pub fn list_values() -> ExternResult<Vec<ValueView>> {
 #[hdk_extern]
 pub fn list_proposals() -> ExternResult<Vec<ProposalView>> {
     views::list_proposals()
+}
+
+/// This project's halves of link requests, for the other projects' Links tabs (ADR 0042).
+#[hdk_extern]
+pub fn link_sides() -> ExternResult<LinkSides> {
+    link_view::sides()
+}
+
+/// The Links tab: this project's halves paired with the other projects' `link_sides`.
+#[hdk_extern]
+pub fn list_links(others: Vec<LinkSides>) -> ExternResult<LinksView> {
+    link_view::view(&others)
 }
 
 /// Every plan with its assessment, and what the current phase needs.

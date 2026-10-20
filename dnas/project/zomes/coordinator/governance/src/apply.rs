@@ -111,8 +111,9 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     }
                 }
             }
-            // An approved plan changes nothing by itself; phase moves cite it.
-            ProposalKind::Plan(_) => {}
+            // An approved plan changes nothing by itself; phase moves cite it. A link needs
+            // both projects' approval, which the Links tab pairs (ADR 0042).
+            ProposalKind::Plan(_) | ProposalKind::Link(_) => {}
         }
     }
     out.updates.reverse(); // newest first, as web lists them

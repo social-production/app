@@ -31,11 +31,22 @@ pub fn validate_proposal(
             return invalid("a phase move cites a plan proposal");
         }
     }
-    let at = Some(action.timestamp());
-    if !is_membership(&p.membership, action.author(), at)? {
-        return invalid("only members can propose");
+    if let ProposalKind::Link(link) = &p.kind {
+        if let Err(reason) = crate::link::check(link)? {
+            return invalid(&reason);
+        }
     }
-    if p.members.len() > SNAPSHOT_MAX || !p.members.contains(&p.membership) {
+    let at = Some(action.timestamp());
+    let mirrored = matches!(&p.kind, ProposalKind::Link(l) if l.source.is_some());
+    match &p.membership {
+        Some(m) if !is_membership(m, action.author(), at)? => {
+            return invalid("only members can propose");
+        }
+        None if !mirrored => return invalid("only members can propose"),
+        _ => {}
+    }
+    let includes_proposer = p.membership.as_ref().is_none_or(|m| p.members.contains(m));
+    if p.members.len() > SNAPSHOT_MAX || !includes_proposer {
         return invalid("the member snapshot must include the proposer");
     }
     let mut seen = BTreeSet::new();
@@ -97,6 +108,8 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             }
             Ok(())
         }
+        // Needs the DNA's seed and the cited create half: `link::check`.
+        ProposalKind::Link(_) => Ok(()),
     }
 }
 

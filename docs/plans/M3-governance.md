@@ -153,3 +153,35 @@ web's Proposal-phase values (ADR 0041).
   refused).
 - **Left**: personal services' Proposal content (availability, requests) is M5; links between
   items.
+
+## M3e links between projects, as built (2026-10-20)
+web's Links tab (ADR 0042), ported from web-backend `detail_links.py` and web's
+`features/detail-links/*`.
+- **Rules** (`sp_governance::links`): pairing the two projects' halves of a request (each names
+  the other as source, same label and reason; severs pair only across paired links; the earliest
+  mirror wins) and the request status (approved when both halves pass, rejected once either
+  can't). Unit tests in the module.
+- **`project_integrity`**: `ProposalKind::Link(LinkRequest { other, relationship, summary, sever,
+  source })`; `Proposal.membership` is optional, and only a mirrored half (`source: Some`) may
+  lack it. Integrity checks the texts, that `other` is another project's seed, and that a sever
+  cites a create half linking to the same project.
+- **Governance coordinator**: `propose` files a link half (web's checks and messages: members
+  only for the source half, not to itself, a reason required, "Linked" as the default label, a
+  sever reuses the one already open, a mirror is filed once); `link_sides` reports this
+  project's halves with their tallies; `list_links(others)` pairs them with the other projects'
+  `link_sides` and returns web's sections (active with any open sever vote, historical, pending,
+  past votes). Link halves are left out of `list_proposals` and of the applied state.
+- **UI from web**: DetailLinksTab (`features/projects/LinksTab.svelte`, with web's Venue link),
+  DetailLinksSection, LinkCard, DetailLinkRequestsSection and its composer, and
+  DetailLinkVoteHistorySection (`components/links/*`), styles in `styles/links.css` (PORTS).
+  `services/links.ts` reads each linked project's side (cloning its cell), files the source half
+  and then the mirror, and votes in whichever project a side belongs to.
+- **Differences from web**: votes are final (web lets voters change them); the composer finds
+  projects through the node's index (no events yet); a refused proposal shows a line in the
+  composer; a half the other project hasn't received shows "Waiting for this project to receive
+  the request."
+- **Tests**: `cargo test -p sp_governance links`; `tests/scenarios/tests/links.rs` (refusals,
+  mirror, both sides approve, a rejected sever keeps the link, a passed sever ends it);
+  `tests/e2e/links.mjs` (two founders, 390px).
+- **Left**: links to events (when events are ported); re-sending a mirror that failed to write;
+  notifications for link votes (M4).

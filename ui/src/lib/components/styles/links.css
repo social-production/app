@@ -1,0 +1,719 @@
+/* Ported from web/src/lib/features/detail-links/DetailLinksTab.svelte (ADR 0032, scripts/port-styles.py) */
+.links-tab,
+.links-tab .intro {
+  display: grid;
+  gap: 18px;
+}
+
+.links-tab .intro {
+  gap: 6px;
+  padding: 0 2px 4px;
+}
+
+.links-tab h1,
+.links-tab p {
+  margin: 0;
+}
+
+.links-tab h1 {
+  font-size: 20px;
+}
+
+.links-tab p {
+  color: var(--text-soft);
+  line-height: 1.55;
+}
+
+.links-tab .external-links {
+  display: grid;
+  gap: 8px;
+}
+
+.links-tab .external-link {
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.links-tab .external-link span {
+  color: var(--brand-strong);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+/* Ported from web/src/lib/features/detail-links/DetailLinksSection.svelte (ADR 0032, scripts/port-styles.py) */
+.network-stack,
+.network-stack .link-list,
+.network-stack .target-detail,
+.network-stack .vote-block,
+.network-stack .vote-grid,
+.network-stack .vote-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.network-stack .section-heading {
+  display: grid;
+  gap: 4px;
+}
+
+.network-stack .empty-row {
+  padding: 12px 14px;
+  border: 1px dashed var(--panel-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.network-stack h2,
+.network-stack h3,
+.network-stack strong,
+.network-stack p {
+  margin: 0;
+}
+
+.network-stack h2 {
+  font-size: 15px;
+}
+
+.network-stack h3 {
+  font-size: 13px;
+}
+
+.network-stack p,
+.network-stack .detail-meta,
+.network-stack .vote-note,
+.network-stack .vote-requirement {
+  color: var(--text-soft);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.network-stack .detail-meta {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.network-stack .vote-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.network-stack .vote-panel {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.network-stack .vote-head,
+.network-stack .vote-buttons,
+.network-stack .sever-action {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.network-stack .vote-button,
+.network-stack .danger-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.network-stack .vote-button.danger,
+.network-stack .danger-button {
+  border-color: color-mix(in srgb, var(--accent-warm-strong) 45%, var(--panel-border));
+  background: color-mix(in srgb, var(--accent-warm-soft) 70%, var(--panel));
+  color: var(--accent-warm-strong);
+}
+
+.network-stack .vote-button.active {
+  opacity: 0.75;
+}
+
+/* Ported from web/src/lib/features/detail-links/LinkCard.svelte (ADR 0032, scripts/port-styles.py) */
+.link-card {
+  padding: 12px 14px 12px 12px;
+  border: 1px solid var(--panel-border);
+  border-left: 3px solid var(--row-accent, var(--type-accent-neutral));
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  display: grid;
+  gap: 12px;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.link-card:hover,
+.link-card.expanded,
+.link-card.highlighted,
+.link-card.request-highlight {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+  border-left-color: var(--row-accent, var(--type-accent-neutral));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+.link-card.highlighted,
+.link-card.request-highlight {
+  background: color-mix(in srgb, var(--brand-soft) 35%, var(--panel-strong));
+}
+
+.link-card .card-header {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.link-card .toggle-button {
+  display: grid;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.link-card .header-top {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+
+.link-card .identity {
+  display: inline-flex;
+  color: var(--row-accent, var(--text-soft));
+  flex-shrink: 0;
+}
+
+.link-card .card-title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.35;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.link-card .header-meta {
+  display: grid;
+  gap: 6px;
+  padding-left: 26px;
+}
+
+.link-card .row-meta,
+.link-card .side-vote-line {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.link-card .side-votes {
+  display: grid;
+  gap: 2px;
+}
+
+.link-card .outcome-label {
+  flex-shrink: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.link-card .outcome-label.approved {
+  color: var(--brand-strong);
+}
+
+.link-card .outcome-label.blocked {
+  color: var(--accent-warm-strong);
+}
+
+.link-card .open-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  padding: 6px 12px;
+  border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease,
+    box-shadow 0.12s ease,
+    color 0.12s ease;
+}
+
+.link-card .open-button:hover,
+.link-card .open-button:focus-visible {
+  background: color-mix(in srgb, var(--brand) 18%, var(--panel));
+  border-color: color-mix(in srgb, var(--brand) 55%, var(--panel-border));
+  color: var(--brand-strong);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 22%, transparent);
+}
+
+.link-card .card-body {
+  display: grid;
+  gap: 12px;
+  padding-top: 2px;
+}
+
+@media (max-width: 640px) {
+  .link-card .header-meta {
+    padding-left: 0;
+  }
+}
+
+/* Ported from web/src/lib/features/detail-links/DetailLinkRequestsSection.svelte (ADR 0032, scripts/port-styles.py) */
+.request-stack,
+.request-stack .request-list,
+.request-stack .heading-copy,
+.request-stack .field-stack,
+.request-stack .vote-grid,
+.request-stack .vote-panel,
+.request-stack .target-detail {
+  display: grid;
+  gap: 12px;
+}
+
+.request-stack .section-heading,
+.request-stack .composer-head,
+.request-stack .vote-head,
+.request-stack .vote-buttons,
+.request-stack .composer-actions,
+.request-stack .selected-chip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.request-stack .empty-row,
+.request-stack .search-status {
+  padding: 12px 14px;
+  border: 1px dashed var(--panel-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.request-stack h2,
+.request-stack h3,
+.request-stack strong,
+.request-stack p {
+  margin: 0;
+}
+
+.request-stack h2 {
+  font-size: 15px;
+}
+
+.request-stack p,
+.request-stack .row-meta,
+.request-stack .detail-meta,
+.request-stack .vote-note,
+.request-stack .vote-requirement {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.request-stack .detail-meta {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.request-stack .vote-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.request-stack .vote-panel {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.request-stack .vote-button,
+.request-stack .primary-button,
+.request-stack .text-action,
+.request-stack .search-result,
+.request-stack .propose-link-button {
+  border: 0;
+  background: transparent;
+  color: var(--brand-strong);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.request-stack .vote-button,
+.request-stack .primary-button,
+.request-stack .propose-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, transparent);
+  text-decoration: none;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.request-stack .propose-link-button {
+  border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  font-size: 13px;
+  padding: 9px 14px;
+}
+
+.request-stack .vote-button.active,
+.request-stack .primary-button:disabled {
+  opacity: 0.7;
+}
+
+.request-stack .text-action {
+  font-size: 13px;
+}
+
+.request-stack .composer-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(8 10 18 / 55%);
+  z-index: 30;
+}
+
+.request-stack .composer-modal {
+  width: min(28rem, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 18%);
+}
+
+.request-stack input,
+.request-stack textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: 12px;
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.request-stack .field-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.request-stack .search-results {
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.request-stack .search-result {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  color: inherit;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+}
+
+.request-stack .search-result:hover {
+  background: color-mix(in srgb, var(--brand-soft) 45%, transparent);
+}
+
+.request-stack .selected-chip {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand-soft) 45%, transparent);
+}
+
+/* Ported from web/src/lib/features/detail-links/DetailLinkRequestsSection.svelte (ADR 0032, scripts/port-styles.py) */
+.link-composer .request-stack,
+.link-composer .request-list,
+.link-composer .heading-copy,
+.link-composer .field-stack,
+.link-composer .vote-grid,
+.link-composer .vote-panel,
+.link-composer .target-detail {
+  display: grid;
+  gap: 12px;
+}
+
+.link-composer .section-heading,
+.link-composer .composer-head,
+.link-composer .vote-head,
+.link-composer .vote-buttons,
+.link-composer .composer-actions,
+.link-composer .selected-chip {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.link-composer .empty-row,
+.link-composer .search-status {
+  padding: 12px 14px;
+  border: 1px dashed var(--panel-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.link-composer h2,
+.link-composer h3,
+.link-composer strong,
+.link-composer p {
+  margin: 0;
+}
+
+.link-composer h2 {
+  font-size: 15px;
+}
+
+.link-composer p,
+.link-composer .row-meta,
+.link-composer .detail-meta,
+.link-composer .vote-note,
+.link-composer .vote-requirement {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.link-composer .detail-meta {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.link-composer .vote-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.link-composer .vote-panel {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.link-composer .vote-button,
+.link-composer .primary-button,
+.link-composer .text-action,
+.link-composer .search-result,
+.link-composer .propose-link-button {
+  border: 0;
+  background: transparent;
+  color: var(--brand-strong);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.link-composer .vote-button,
+.link-composer .primary-button,
+.link-composer .propose-link-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, transparent);
+  text-decoration: none;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.link-composer .propose-link-button {
+  border: 1px solid color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  font-size: 13px;
+  padding: 9px 14px;
+}
+
+.link-composer .vote-button.active,
+.link-composer .primary-button:disabled {
+  opacity: 0.7;
+}
+
+.link-composer .text-action {
+  font-size: 13px;
+}
+
+.link-composer .composer-backdrop {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgb(8 10 18 / 55%);
+  z-index: 30;
+}
+
+.link-composer .composer-modal {
+  width: min(28rem, 100%);
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 18%);
+}
+
+.link-composer input,
+.link-composer textarea {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: 12px;
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.link-composer .field-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.link-composer .search-results {
+  display: grid;
+  gap: 4px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.link-composer .search-result {
+  width: 100%;
+  padding: 8px;
+  border-radius: 10px;
+  color: inherit;
+  text-align: left;
+  display: grid;
+  gap: 2px;
+}
+
+.link-composer .search-result:hover {
+  background: color-mix(in srgb, var(--brand-soft) 45%, transparent);
+}
+
+.link-composer .selected-chip {
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--brand-soft) 45%, transparent);
+}
+
+/* Ported from web/src/lib/features/detail-links/DetailLinkVoteHistorySection.svelte (ADR 0032, scripts/port-styles.py) */
+.vote-archive,
+.vote-archive .request-list,
+.vote-archive .heading-copy,
+.vote-archive .vote-grid,
+.vote-archive .vote-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.vote-archive .archive-heading {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.vote-archive .archive-toggle {
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.vote-archive h2,
+.vote-archive strong,
+.vote-archive p {
+  margin: 0;
+}
+
+.vote-archive h2 {
+  font-size: 15px;
+}
+
+.vote-archive p,
+.vote-archive .detail-meta,
+.vote-archive .vote-note {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.vote-archive .detail-meta {
+  display: grid;
+  gap: 4px;
+  font-size: 12px;
+}
+
+.vote-archive .vote-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.vote-archive .vote-panel {
+  padding: 10px 12px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.vote-archive .vote-head {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
