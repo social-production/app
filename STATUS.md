@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-20: M4c direct and group chats (branch `claude/social-production-handoff-dsam61`)
+## In flight 2026-10-20: M4c direct and group chats, PR #10 (branch `claude/social-production-handoff-dsam61`)
 web's Messages page, first part (ADR 0043, `docs/plans/M4-talk.md` "M4c as built"):
 - Conversation DNA gets the `messages` zome pair. Each chat is a clone seeded
   `<creator>.<direct|group>.<nonce>`; the creator invites, messages cite their author's
