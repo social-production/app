@@ -30,6 +30,7 @@ interface PlanViewWire {
   criteria: {
     id: string;
     label: string;
+    kind: 'Rubric' | 'Value';
     mine: PlanRating | null;
     count: number;
     average_x100: number;
@@ -75,6 +76,7 @@ export async function listPlans(projectId: string): Promise<PlanBoard> {
       criteria: p.criteria.map((c) => ({
         id: c.id,
         label: c.label,
+        kind: c.kind,
         mine: c.mine,
         count: c.count,
         average: c.average_x100 / 100,

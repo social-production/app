@@ -1,13 +1,16 @@
 //! Plans (M3b, ADR 0039): a plan is a `Proposal` whose yes/no votes approve it through the
 //! usual Outcome; members also rate it against web's rubric. Ratings only break ties between
 //! approved plans, so they can change (the latest per criterion counts) and stay out of
-//! Outcome validation.
+//! Outcome validation. Criteria are web's rubric plus the project's values (ADR 0041).
 
 use hdi::prelude::*;
+use holo_hash::ActionHashB64;
 use sp_core::plan::{check_plan, PlanFields, StageFields};
 use sp_governance::plans::{criteria, rating_ok, PlanKind};
+use sp_governance::values::parse_criterion;
 
 use crate::links::is_membership;
+use crate::value::is_value;
 use crate::{invalid, EntryTypes, ProposalKind};
 
 /// web's plan wizard fields (web-backend `submit_project_plan`).
@@ -92,10 +95,7 @@ pub fn validate_rating(
     let Some(plan) = plan_of(&r.proposal)? else {
         return invalid("a rating must be on a plan");
     };
-    if !criteria(plan.kind, plan.subtype_or_standard())
-        .iter()
-        .any(|c| c.id == r.criterion)
-    {
+    if !criterion_ok(&plan, &r.criterion)? {
         return invalid("unknown plan criterion");
     }
     if r.rating.is_some_and(|v| !rating_ok(v)) {
@@ -105,4 +105,18 @@ pub fn validate_rating(
         return invalid("only members can rate plans");
     }
     Ok(ValidateCallbackResult::Valid)
+}
+
+/// A rubric question of the plan's kind, or any of the project's values (web accepts a rating
+/// on every value; only prominent ones are shown).
+fn criterion_ok(plan: &Plan, criterion: &str) -> ExternResult<bool> {
+    if let Some(id) = parse_criterion(criterion) {
+        return match ActionHashB64::from_b64_str(id) {
+            Ok(hash) => is_value(&hash.into()),
+            Err(_) => Ok(false),
+        };
+    }
+    Ok(criteria(plan.kind, plan.subtype_or_standard())
+        .iter()
+        .any(|c| c.id == criterion))
 }

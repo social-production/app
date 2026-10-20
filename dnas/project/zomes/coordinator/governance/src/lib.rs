@@ -1,6 +1,6 @@
 //! Project governance API (docs/plans/M3-governance.md, ADR 0033, 0039, 0040): propose, vote,
-//! rate plans, challenge a count, read proposals and plans with their tallies, and the applied
-//! state the project view is built from.
+//! rate plans, challenge a count, add and rate project values (ADR 0041), read proposals and
+//! plans with their tallies, and the applied state the project view is built from.
 
 mod apply;
 mod calls;
@@ -12,14 +12,16 @@ mod plan_write;
 mod plans;
 mod reads;
 mod roll;
+mod values;
 mod views;
 mod write;
 
 use hdk::prelude::*;
 use project_integrity::{Applied, ProposalKind, VoteChoice};
 
-pub use plan_view::{CriterionView, LeaderStatus, PlanBoard, PlanView};
+pub use plan_view::{CriterionKind, CriterionView, LeaderStatus, PlanBoard, PlanView};
 pub use plan_write::RateInput;
+pub use values::{ImportanceInput, ValueView};
 pub use views::{ProposalView, TallyView};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -62,6 +64,24 @@ pub fn challenge(proposal: ActionHash) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn applied() -> ExternResult<Applied> {
     apply::applied()
+}
+
+/// web's "Add value" (Proposal phase only; a label already listed is refused).
+#[hdk_extern]
+pub fn add_value(label: String) -> ExternResult<ActionHash> {
+    values::add(label)
+}
+
+/// Rate a value's importance (1–10; Proposal phase only). The latest vote counts.
+#[hdk_extern]
+pub fn rate_value(input: ImportanceInput) -> ExternResult<ActionHash> {
+    values::rate(input)
+}
+
+/// Every value with its importance, oldest first.
+#[hdk_extern]
+pub fn list_values() -> ExternResult<Vec<ValueView>> {
+    values::views(&mut apply::Standing::default())
 }
 
 /// Every proposal except plans, newest first.

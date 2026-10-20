@@ -12,8 +12,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # The scenarios alone take ~60 min on a hosted runner (governance ~21 min, health ~10).
-    timeout-minutes: 150
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
@@ -29,5 +28,29 @@ jobs:
         run: nix develop --accept-flake-config --command cargo clean -p tauri-plugin-hc
       - name: Install npm dependencies
         run: nix develop --accept-flake-config --command npm ci
-      - name: Everything (scripts/check-all.sh)
-        run: nix develop --accept-flake-config --command bash scripts/check-all.sh
+      - name: Everything but the scenarios (scripts/check-fast.sh)
+        run: nix develop --accept-flake-config --command bash scripts/check-fast.sh
+
+  # The multi-conductor scenarios took ~130 min in one job; each shard runs a quarter of the
+  # files (scripts/check-scenarios.sh picks them, so new files need no change here).
+  scenarios:
+    name: scenarios (${{ matrix.shard }}/4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+      - uses: cachix/cachix-action@v17
+        with:
+          name: holochain-ci
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: scenarios
+      - name: Pack the hApp (scripts/build-happ.sh)
+        run: nix develop --accept-flake-config --command bash scripts/build-happ.sh
+      - name: Scenarios, shard ${{ matrix.shard }} of 4
+        run: nix develop --accept-flake-config --command bash scripts/check-scenarios.sh ${{ matrix.shard }} 4

@@ -1,15 +1,17 @@
 //! The plan board for the participation tab (web's lifecycle `phaseTwo` / `phaseThree`
-//! plans, with `criterionAssessments`, `overallApproval` and `leaderStatus`).
+//! plans, with `criterionAssessments`, `overallApproval` and `leaderStatus`). Criteria are the
+//! rubric plus the project's prominent values (ADR 0041).
 
 use hdk::prelude::*;
 use project_integrity::{Plan, Proposal, ProposalKind};
-use sp_governance::plans::{criteria, required_plan_kind, Leader, PlanKind, Score};
+use sp_governance::plans::{criteria, required_plan_kind, Leader, PlanKind};
 use sp_governance::{phases::Shape, required_votes};
 
 use crate::apply::{self, Standing, State};
 use crate::plans::{self, latest_ratings};
 use crate::reads::{self, Found};
 use crate::roll::Roll;
+use crate::values;
 use crate::views::{tally_view, TallyView};
 
 #[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
@@ -18,10 +20,18 @@ pub enum LeaderStatus {
     Tied,
 }
 
+/// web's `criterion.kind`: a rubric question or a shared value.
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq)]
+pub enum CriterionKind {
+    Rubric,
+    Value,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CriterionView {
     pub id: String,
     pub label: String,
+    pub kind: CriterionKind,
     pub mine: Option<u8>,
     pub count: u32,
     pub average_x100: u32,
@@ -62,10 +72,17 @@ pub fn board() -> ExternResult<PlanBoard> {
     let mut standing = Standing::default();
     let roll = Roll::load()?;
     let state = apply::state(&mut standing, &roll)?;
+    let prominent = values::prominent(&values::views(&mut standing)?);
     let mut plans = Vec::new();
     for p in reads::proposals()? {
         if let ProposalKind::Plan(plan) = &p.entry.kind {
-            plans.push(view_of(&p, plan, &state, &mut standing, &me, &roll)?);
+            let ctx = Context {
+                state: &state,
+                prominent: &prominent,
+                me: &me,
+                roll: &roll,
+            };
+            plans.push(view_of(&p, plan, &ctx, &mut standing)?);
         }
     }
     plans.reverse();
@@ -90,36 +107,58 @@ pub fn board() -> ExternResult<PlanBoard> {
     })
 }
 
+/// What every plan's view is built against.
+struct Context<'a> {
+    state: &'a State,
+    /// Prominent values as (criterion id, question).
+    prominent: &'a [(String, String)],
+    me: &'a AgentPubKey,
+    roll: &'a Roll,
+}
+
 fn view_of(
     p: &Found<Proposal>,
     plan: &Plan,
-    state: &State,
+    ctx: &Context<'_>,
     standing: &mut Standing,
-    me: &AgentPubKey,
-    roll: &Roll,
 ) -> ExternResult<PlanView> {
-    let rated = plans::rated(&p.hash, p.at, plan, standing)?;
+    let Context {
+        state,
+        prominent,
+        me,
+        roll,
+    } = *ctx;
+    let rated = plans::rated(&p.hash, p.at, standing)?;
     let mine: Vec<_> = latest_ratings(&p.hash)?
         .into_iter()
         .filter(|r| &r.author == me)
         .collect();
-    let labels = criteria(plan.kind, plan.subtype_or_standard());
-    let criteria = rated
+    // web's `assessment_criteria_for_plan`: the rubric, then the prominent values.
+    let rubric = criteria(plan.kind, plan.subtype_or_standard())
+        .into_iter()
+        .map(|c| (c.id.to_string(), c.label.to_string(), CriterionKind::Rubric));
+    let values = prominent
         .iter()
-        .zip(labels)
-        .map(|((id, r), c)| CriterionView {
-            id: (*id).to_string(),
-            label: c.label.to_string(),
-            mine: mine
-                .iter()
-                .find(|m| m.entry.criterion == *id)
-                .and_then(|m| m.entry.rating),
-            count: r.count,
-            average_x100: r.average_x100(),
-            distribution: r.distribution,
+        .map(|(id, label)| (id.clone(), label.clone(), CriterionKind::Value));
+    let criteria = rubric
+        .chain(values)
+        .map(|(id, label, kind)| {
+            let r = rated.get(&id).copied().unwrap_or_default();
+            CriterionView {
+                mine: mine
+                    .iter()
+                    .find(|m| m.entry.criterion == id)
+                    .and_then(|m| m.entry.rating),
+                id,
+                label,
+                kind,
+                count: r.count,
+                average_x100: r.average_x100(),
+                distribution: r.distribution,
+            }
         })
         .collect();
-    let score = Score::of(&rated.iter().map(|(_, r)| *r).collect::<Vec<_>>());
+    let score = plans::score(&rated);
     let leader = match plans::leader(&state.approved, plan.kind) {
         Leader::One(h) if h == p.hash => Some(LeaderStatus::Leading),
         Leader::Tied(hs) if hs.contains(&p.hash) => Some(LeaderStatus::Tied),

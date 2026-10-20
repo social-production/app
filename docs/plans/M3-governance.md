@@ -128,3 +128,28 @@ Phase returns from web, and the challenge window for under-counted populations (
   - irreversible M5 actions must wait for `challenge_until`;
   - browser tests for the return sheet and the challenge list;
   - links between projects and value criteria (from M3b's list).
+
+## M3d values, as built (2026-10-19)
+web's Proposal-phase values (ADR 0041).
+- **Rules** (`sp_governance::values`): importance 1–10, averages in hundredths, prominence
+  (average ≥ 5), value criterion ids (`value:<hash>`) and web's question, `label_key` for
+  duplicates. Unit tests in the module.
+- **`project_integrity`**: `Value { label, membership }` (from the "values" anchor, `Values`
+  link) and `Importance { value, membership, importance }` (`ValueToImportance` link). A plan
+  `Rating` may name any of the project's values as its criterion.
+- **Governance coordinator** (`values.rs`): `add_value`, `rate_value` (Proposal phase only,
+  web's messages; a label already listed is refused) and `list_values` (latest vote per member,
+  counted from members with Full standing when they voted). `list_plans` adds the prominent
+  values to each plan's criteria (`CriterionView.kind`: `Rubric` | `Value`); `rate` accepts
+  them; a plan's score averages every rated criterion (web's `plan_average_rating`).
+- **UI from web**: ProductiveLifecyclePhaseOne (`features/projects/ValuePhase.svelte`, shown for
+  the Proposal phase of productive and collective-service projects), ProjectValueCard
+  (`components/values/ValueCard.svelte`), DiscreteScale, AddValueSheet (with a warning line for
+  refusals, an app addition), and web's "Shared value" label on value criteria in the plan sheet.
+  Styles: `styles/values.css` (PORTS).
+- **Tests**: `cargo test -p sp_governance values`; `tests/scenarios/tests/values.rs`
+  (duplicates and blanks refused, latest vote counts, a New member's vote doesn't, Proposal
+  phase only, a prominent value becomes a plan criterion and is rated, a non-value criterion is
+  refused).
+- **Left**: personal services' Proposal content (availability, requests) is M5; links between
+  items.

@@ -8,10 +8,11 @@
   import type { DetailState } from './detailState.svelte.ts';
   import PhaseChangeSection from './PhaseChangeSection.svelte';
   import PlanPhase from './PlanPhase.svelte';
+  import ValuePhase from './ValuePhase.svelte';
 
   /**
    * web's ProjectLifecyclePanel: the phase stepper, the selected phase's context (kicker, title,
-   * summary), then its work (plans, M3b) and the phase-change menu. Roles and activities join
+   * summary), then its work (values in Proposal, plans, M3b) and the phase-change menu. Roles and activities join
    * the work in M5.
    */
   let { detail }: { detail: DetailState } = $props();
@@ -38,9 +39,11 @@
     <section class="phase-panel overview-phase-work">
       {#if planKind}
         <PlanPhase {detail} kind={planKind} />
+      {:else if shown === 'phase-1' && project.charter?.mode !== 'personal-service'}
+        <ValuePhase {detail} />
       {:else}
-        <!-- Each of web's phase contents carries a toolbar (Proposal's holds "Add value", not
-             ported yet); it gives the Phase menu its place in the dock. -->
+        <!-- Each of web's phase contents carries a toolbar; it gives the Phase menu its place
+             in the dock. -->
         <PhaseWorkToolbar />
       {/if}
       <PhaseChangeSection {detail} {shown} />

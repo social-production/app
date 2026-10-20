@@ -20,7 +20,7 @@
 
 <div class="criterion-row">
   <div class="criterion-copy">
-    <span class="criterion-kind">Criterion</span>
+    <span class="criterion-kind">{criterion.kind === 'Value' ? 'Shared value' : 'Criterion'}</span>
     <strong>{criterion.label}</strong>
     <span class="criterion-meta">
       Your rating: {ratingLabel(criterion.mine)}

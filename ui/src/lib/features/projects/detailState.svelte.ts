@@ -7,6 +7,7 @@ import {
 import type { Person } from '#lib/domain/people.ts';
 import type { Plan, PlanBoard, PlanRating } from '#lib/domain/plans.ts';
 import type { CharterDraft, Project, Stance } from '#lib/domain/projects.ts';
+import type { Importance, ProjectValue } from '#lib/domain/values.ts';
 import { explain } from '#lib/services/errors.ts';
 import {
   castVote,
@@ -18,6 +19,7 @@ import {
 import { getPerson } from '#lib/services/people.ts';
 import { listPlans, ratePlan as rate, submitPlan as submit } from '#lib/services/plans.ts';
 import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
+import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
 export class DetailState {
@@ -25,6 +27,7 @@ export class DetailState {
   members = $state<Person[]>([]);
   proposals = $state<Proposal[]>([]);
   plans = $state<PlanBoard>();
+  values = $state<ProjectValue[]>([]);
   /** Display names by agent key (creator, members, proposers, update authors). */
   names = $state<Record<string, string>>({});
   error = $state<string>();
@@ -83,11 +86,16 @@ export class DetailState {
   }
 
   private read() {
-    return Promise.all([getProject(this.id), listProposals(this.id), listPlans(this.id)]);
+    return Promise.all([
+      getProject(this.id),
+      listProposals(this.id),
+      listPlans(this.id),
+      listValues(this.id),
+    ]);
   }
 
   private async fetch(): Promise<void> {
-    let [project, proposals, plans] = await this.read();
+    let [project, proposals, plans, values] = await this.read();
     // A vote that decided a proposal may have been cast before the voter saw every other vote;
     // whoever loads the page next writes the Outcome (ADR 0033).
     const settled = project.amMember
@@ -98,18 +106,20 @@ export class DetailState {
       : [];
     if (settled.length > 0) {
       await Promise.all(settled.map((id) => closeProposal(this.id, id)));
-      [project, proposals, plans] = await this.read();
+      [project, proposals, plans, values] = await this.read();
     }
     const members = await Promise.all(project.members.map(getPerson));
     this.project = project;
     this.members = members;
     this.proposals = proposals;
     this.plans = plans;
+    this.values = values;
     this.error = undefined;
     const keys = [
       project.creator,
       ...proposals.map((p) => p.author),
       ...plans.plans.map((p) => p.author),
+      ...values.map((v) => v.author),
       ...project.updates.map((u) => u.author),
     ];
     await this.loadNames([...members.map((m) => m.agent), ...keys], members);
@@ -203,6 +213,26 @@ export class DetailState {
     } finally {
       this.saving = false;
     }
+  }
+
+  /** web's AddValueSheet submit. Returns true when added. */
+  async addValue(label: string): Promise<boolean> {
+    this.saving = true;
+    this.sheetMessage = undefined;
+    try {
+      await addValue(this.id, label);
+      await this.load();
+      return true;
+    } catch (e) {
+      this.sheetMessage = explain(e);
+      return false;
+    } finally {
+      this.saving = false;
+    }
+  }
+
+  rateValue(value: string, importance: Importance): Promise<void> {
+    return this.inTurn(() => rateValue(this.id, value, importance));
   }
 
   /** Ratings change the leader only, so the page refreshes quietly behind them. */

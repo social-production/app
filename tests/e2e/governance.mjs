@@ -96,6 +96,28 @@ await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await ann.screenshot({ path: `${shots}/take-part-proposal-390.png` });
 assert.deepEqual(await ann.locator('[role=tab][aria-selected=true]').allInnerTexts(), ['Take part']);
+
+// M3d: web's "Add value"; both founders rate it 8/10, so plans are judged against it.
+const valueLabel = `Quiet at night ${stamp}`;
+await ann.getByRole('button', { name: 'Add value' }).click();
+const valueSheet = ann.getByRole('dialog', { name: 'Add value' });
+await valueSheet.getByPlaceholder(/^Add a value/).fill(valueLabel);
+await valueSheet.getByRole('button', { name: 'Add value' }).click();
+await valueSheet.waitFor({ state: 'hidden', timeout: 60_000 });
+/** Rate the value 8/10 and wait until the reload carries the vote. */
+async function rateValue(page) {
+  const card = page.locator('.value-card', { hasText: valueLabel });
+  await card.getByRole('button', { name: 'Importance 8 of 10' }).click();
+  await card.getByText('Your vote: 8/10').waitFor({ timeout: 60_000 });
+}
+await rateValue(ann);
+await until(bob, () => bob.locator('.value-card', { hasText: valueLabel }), 'the value');
+await bob.getByRole('tab', { name: 'Participation' }).click();
+await rateValue(bob);
+await bob.locator('.value-card', { hasText: 'Community average: 8/10' }).waitFor({ timeout: 120_000 });
+await ann.screenshot({ path: `${shots}/take-part-values-390.png` });
+log('a value was added and both founders rated it');
+
 await advance(ann);
 await voteYes(bob, 'Participation');
 await until(bob, () => bob.locator('.feed-card-stage', { hasText: 'Production Plan' }), 'the phase move');
@@ -128,6 +150,7 @@ async function assess(page, yes) {
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.locator('.plan-card', { hasText: planTitle }).click();
   const sheet = page.locator('.plan-sheet');
+  await sheet.locator('.criterion-row', { hasText: valueLabel }).getByText('Shared value').waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
     await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
     await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
@@ -169,5 +192,5 @@ await until(bob, backToPlan, 'the return to Production Plan');
 log('a return to Production Plan passed');
 
 assert.deepEqual(errors, [], 'no page errors');
-log('all M3a + M3b + M3c governance checks passed');
+log('all M3a + M3b + M3c + M3d governance checks passed');
 await browser.close();

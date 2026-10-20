@@ -26,12 +26,12 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - Commit messages: one plain sentence describing the user-visible effect.
 
 ## Checks (inside `nix develop --accept-flake-config`)
-- Everything CI runs: `bash scripts/check-all.sh`.
+- Everything CI runs: `bash scripts/check-all.sh` (= `check-fast.sh` + `check-scenarios.sh`; CI runs the scenarios as 4 parallel shards, `check-scenarios.sh <shard> 4`).
 - Fast loop: `cargo test -p sp_governance`, `npm run check -w ui`, `bash scripts/check-boundaries.sh`.
 - Pack: `bash scripts/build-happ.sh` (zomes → 3 DNAs → hApp). Scenarios: `npm run test:scenarios`.
 - Local seed node (bootstrap + conductor + gateway on :8080, dev founders from `tests/e2e/fixtures/dev-founders.json`): `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`.
 - Browser tests against it: `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`.
-- Ported styles: add to `ui/src/lib/components/styles/PORTS`, run `python3 scripts/port-styles.py` (never hand-edit the CSS).
+- Ported styles: add to `ui/src/lib/components/styles/PORTS`, run `python3 scripts/port-styles.py` (never hand-edit the CSS), then `npx prettier --write` the new file. Regenerating rewrites every file from today's web: keep only the files you meant to port unless you are reviewing web's drift.
 - UI dev: `npm run dev:ui` (set `VITE_SP_GATEWAYS`, see `ui/.env.example`).
 
 ## Deploy
@@ -41,7 +41,7 @@ Never lose `LAIR_PASSPHRASE`. Grokbot is paused until ~2026-10-25: Claude tests 
 ## Cloud sessions (claude.ai/code, a fresh clone of this repo)
 The owner's machine has the workspace (`../web`, `../web-backend`, Railway login, agent worktrees); a cloud session has only this repo. So:
 - **Get web/ for porting:** `git clone --depth 1 https://github.com/social-production/web ../web` (public). `scripts/port-styles.py` and the PORTS file expect it as a sibling of `app/`.
-- **Toolchain:** Nix may already be installed; if the proxy blocks GitHub tarballs, run commands through `bash scripts/cloud-nix.sh <cmd>` (fetches flake inputs over git). The local seed node: `bash scripts/cloud-seed.sh` (also works without IPv6); browser tests need `CHROMIUM_PATH=/opt/pw-browsers/chromium`. Otherwise try Nix (`curl -fsSL https://install.determinate.systems/nix | sh -s -- install linux --init none --no-confirm`, add the Holochain cachix lines from README, then `nix develop --accept-flake-config`). If Nix won't install, you can still run `npm ci && npm run check -w ui && npm run lint -w ui`, `bash scripts/check-boundaries.sh`, `bash scripts/check-sizes.sh` and `cargo test -p sp_core -p sp_governance -p sp_index` with a stock Rust toolchain; zomes, scenarios and the seed node need Nix. Say in STATUS.md which checks you could not run.
+- **Toolchain:** Nix may already be installed; if the proxy blocks GitHub tarballs, run commands through `bash scripts/cloud-nix.sh <cmd>` (fetches flake inputs over git). The local seed node: `bash scripts/cloud-seed.sh` (also works without IPv6); scenarios: `bash scripts/cloud-scenarios.sh [<shard> <shards>]` (no-IPv6 shim; builds without debug info, since a full debug build fills the disk); browser tests need `CHROMIUM_PATH=/opt/pw-browsers/chromium`. Otherwise try Nix (`curl -fsSL https://install.determinate.systems/nix | sh -s -- install linux --init none --no-confirm`, add the Holochain cachix lines from README, then `nix develop --accept-flake-config`). If Nix won't install, you can still run `npm ci && npm run check -w ui && npm run lint -w ui`, `bash scripts/check-boundaries.sh`, `bash scripts/check-sizes.sh` and `cargo test -p sp_core -p sp_governance -p sp_index` with a stock Rust toolchain; zomes, scenarios and the seed node need Nix. Say in STATUS.md which checks you could not run.
 - **Don't push straight to `main`**: it deploys at once, before CI. Work on a `claude/<topic>` branch and open a PR; CI runs on PRs (~2 h with scenarios, `gh pr checks <n>`). When CI is green, a cloud session may merge it (`gh pr merge <n> --merge`; the owner approved this on 2026-10-19). Merging deploys, so smoke the live site afterwards and update README Status + STATUS.md. If a deploy breaks the site, revert it in a new PR.
 - No Railway access: you cannot deploy, read seed-node logs or touch `LAIR_PASSPHRASE`. Read-only live checks (`curl` the URLs in STATUS.md) are fine.
 - Before finishing, update `STATUS.md` ("In flight" + what you checked) on your branch so the next session knows.
