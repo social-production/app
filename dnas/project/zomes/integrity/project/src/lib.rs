@@ -3,11 +3,12 @@
 //! agrees who it is and every node derives the same DNA hash from one plain string.
 //! Membership and signals are links whose target is their author, so they need no entries.
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
-//! importance votes are records too (ADR 0041).
+//! importance votes are records too (ADR 0041); links to other projects are proposals (ADR 0042).
 
 mod challenge;
 mod charter;
 mod governance;
+mod link;
 mod links;
 mod plan;
 mod value;
@@ -16,6 +17,7 @@ use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
 
 pub use governance::SNAPSHOT_MAX;
+pub use link::{LinkRequest, ProjectRef};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 pub use value::{Importance, Value};
 
@@ -59,14 +61,17 @@ pub enum ProposalKind {
         to: String,
         reason: String,
     },
+    /// One project's half of a link to another project (ADR 0042).
+    Link(LinkRequest),
 }
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
 pub struct Proposal {
     pub kind: ProposalKind,
-    /// The proposer's own `Members` link.
-    pub membership: ActionHash,
+    /// The proposer's own `Members` link. Only a link request mirrored from another project
+    /// may come from someone who isn't a member here (ADR 0042).
+    pub membership: Option<ActionHash>,
     /// `Members` links counted as the population N (ADR 0033).
     pub members: Vec<ActionHash>,
 }

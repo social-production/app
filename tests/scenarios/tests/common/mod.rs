@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use holo_hash::AgentPubKeyB64;
 use holochain::prelude::*;
 
+pub mod links;
 pub mod net;
 pub mod plans;
 use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
@@ -65,6 +66,13 @@ pub async fn directory_network(
     }
     conductors.exchange_peer_info().await;
     cells
+}
+
+/// The project DNA with `modifiers` (a network seed names its creator).
+pub async fn project_dna_with(modifiers: DnaModifiersOpt<SerializedBytes>) -> DnaFile {
+    SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
+        .await
+        .expect("load project dna")
 }
 
 /// One project clone (seed `<first agent>.<seed>`) installed for each conductor's agent,

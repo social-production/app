@@ -3,6 +3,7 @@
 //! reaches the same verdict. See docs/GOVERNANCE.md.
 
 pub mod challenge;
+pub mod links;
 pub mod phases;
 pub mod plans;
 pub mod projects;

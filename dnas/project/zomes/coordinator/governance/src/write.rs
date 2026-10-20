@@ -11,13 +11,16 @@ use crate::apply::{self, Standing};
 use crate::count::count;
 use crate::reads::{self, Found};
 use crate::roll::Roll;
-use crate::{calls, moves, plan_write};
+use crate::{calls, link_write, moves, plan_write};
 
 pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
 }
 
 pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
+    if let ProposalKind::Link(link) = kind {
+        return link_write::propose(link);
+    }
     let membership =
         calls::my_membership()?.ok_or_else(|| guest("Join the project to propose changes."))?;
     let charter =
@@ -53,7 +56,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     let members = calls::member_snapshot()?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         kind,
-        membership,
+        membership: Some(membership),
         members,
     }))?;
     create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;

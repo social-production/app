@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-19 by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-20 by a cloud session; see "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,20 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight (2026-10-20): M3e links between projects, branch `claude/social-production-handoff-dsam61`
+web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web's
+`features/detail-links/*` and web-backend `detail_links.py`:
+- A link request is two `Link` proposals, one in each project: the proposer files it in their
+  project, the app mirrors it into the other (the mirror may come from a non-member, so
+  `Proposal.membership` is now optional). Each project votes on its half under its own rules;
+  the link is active once both pass. Severing works the same way, from either side.
+- `governance` zome: `propose` (link halves), `link_sides`, `list_links(others)`; pairing rules in
+  `sp_governance::links`. UI: `features/projects/LinksTab.svelte`, `components/links/*`,
+  `services/links.ts`, `styles/links.css` (PORTS).
+- **Integrity change**: merging resets projects again (people stay).
+- Checked in the cloud session: fmt, clippy (workspace, `-D warnings`), unit tests, `npm run
+  check`/`lint`, sizes, boundaries, hApp build, scenario `links`. See below for the browser test.
 
 ## Done 2026-10-20: PR #6 merged (~00:48 UTC), deployed, live smoke passed
 **M3d project values** (ADR 0041, `docs/plans/M3-governance.md` "M3d"), ported from web's
@@ -106,7 +120,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M3 remainder: links between items (web's Links tab; `docs/plans/M3-governance.md`).
+1. M3e links (in flight above): merge once CI is green, smoke, update README Status.
 2. M4: DMs (conversation DNA, web's `MessagesPage`), in-app notifications
    (`docs/plans/M4-talk.md`: M4c, M4d). Threads stay parked (Owner decisions).
 3. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
