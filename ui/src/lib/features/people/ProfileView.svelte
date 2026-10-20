@@ -6,11 +6,12 @@
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import MessageButton from './MessageButton.svelte';
   import VouchButton from './VouchButton.svelte';
 
   import '#lib/components/styles/profile.css';
 
-  /** web's profile page: hero with standing chip, and the Vouch action for others. */
+  /** web's profile page: hero with standing chip, and the Message and Vouch actions for others. */
   let { agent }: { agent: string } = $props();
 
   let person = $state<Person>();
@@ -69,6 +70,12 @@
         {#snippet actions()}
           {#if !own}
             <div class="action-row">
+              {#if me && me.standing.level !== 'Paused'}
+                <MessageButton
+                  person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
+                  viewer={me.agent}
+                />
+              {/if}
               <VouchButton
                 person={shown}
                 viewer={me}

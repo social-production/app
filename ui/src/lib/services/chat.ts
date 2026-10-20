@@ -9,7 +9,7 @@ import {
 
 import { cellOf } from './projects.ts';
 
-interface MessageWire {
+export interface MessageWire {
   id: ActionHash;
   author: AgentPubKey;
   body: string;
@@ -30,7 +30,12 @@ const discussion = async <T>(projectId: string, fn: string, payload?: unknown): 
 /** The project chat's newest messages, oldest first (the zome returns at most 200). */
 export async function listMessages(projectId: string): Promise<ChatMessage[]> {
   const wire = await discussion<MessageWire[]>(projectId, 'list_messages');
-  return wire.map((m) => ({
+  return wire.map(toChatMessage);
+}
+
+/** Project chats and direct/group chats return messages in the same shape. */
+export function toChatMessage(m: MessageWire): ChatMessage {
+  return {
     id: hashToString(m.id),
     author: hashToString(m.author),
     body: m.body,
@@ -41,7 +46,7 @@ export async function listMessages(projectId: string): Promise<ChatMessage[]> {
       preview: m.reply_to.preview,
       deleted: m.reply_to.deleted,
     },
-  }));
+  };
 }
 
 /** Anyone signed in may write in a project's chat, as on web (ADR 0038). */

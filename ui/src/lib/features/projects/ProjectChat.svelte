@@ -1,7 +1,9 @@
 <script lang="ts">
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
-
-  import { ChatState } from './chatState.svelte.ts';
+  import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
+  import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
+  import { explain } from '#lib/services/errors.ts';
+  import { namesOf, viewer } from '#lib/services/people.ts';
 
   /** web's ProjectChatTab: the project's "# project-chat", polled while the tab is open. */
   interface Props {
@@ -16,7 +18,17 @@
 
   // The page mounts this once per project, so the first id and names are the ones to keep.
   // svelte-ignore state_referenced_locally
-  const chat = new ChatState(projectId, names);
+  const chat = new ChatState(
+    {
+      list: () => listMessages(projectId),
+      post: (body, replyTo) => postMessage(projectId, body, replyTo),
+      remove: (id) => deleteMessage(projectId, id),
+      viewer,
+      names: namesOf,
+      explain,
+    },
+    names,
+  );
   let compact = $state(false);
   const embedded = $derived(compact || fullscreen);
 

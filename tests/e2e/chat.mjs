@@ -55,7 +55,8 @@ await bob.getByRole('tab', { name: 'Chat' }).click();
 await composer(bob).fill(hello);
 await bob.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(bob, hello).waitFor({ timeout: 30_000 });
-assert.equal(await bob.locator('.detail-action-dock').count(), 0, 'no action dock over the chat');
+// Other tabs stay mounted (hidden), docks included: only a visible dock would cover the chat.
+assert.equal(await bob.locator('.detail-action-dock:visible').count(), 0, 'no action dock over the chat');
 log('bob posted without joining');
 
 await ann.reload();

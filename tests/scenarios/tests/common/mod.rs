@@ -26,6 +26,14 @@ pub async fn load_dna(name: &str) -> DnaFile {
         .unwrap_or_else(|e| panic!("load {}: {e} — run scripts/build-happ.sh", path.display()))
 }
 
+/// The packed DNA `name` with a network seed (a clone, as `createCloneCell` makes one).
+pub async fn dna_with(name: &str, seed: String) -> DnaFile {
+    let modifiers = DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(seed);
+    SweetDnaFile::from_bundle_with_overrides(&dna_path(name), modifiers)
+        .await
+        .unwrap_or_else(|e| panic!("load {name}: {e}"))
+}
+
 /// The directory DNA with the given agents as founders (a different network per list).
 pub async fn directory_with_founders(founders: &[AgentPubKey]) -> DnaFile {
     let props = DirectoryProperties {

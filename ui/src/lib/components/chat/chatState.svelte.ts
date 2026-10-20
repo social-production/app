@@ -1,8 +1,20 @@
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
 import type { ChatLine, ChatMessage } from '#lib/domain/chat.ts';
-import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
-import { explain } from '#lib/services/errors.ts';
-import { getPerson, myAgent } from '#lib/services/people.ts';
+
+/** Where a chat's messages come from: a project chat, or a direct or group chat. Features
+ * pass services in, since components don't call them. */
+export interface ChatSource {
+  list: () => Promise<ChatMessage[]>;
+  post: (body: string, replyTo: string | null) => Promise<unknown>;
+  remove: (id: string) => Promise<void>;
+  /** The viewer: their key, name, and whether their account is paused. */
+  viewer: () => Promise<{ agent: string; name: string; paused: boolean }>;
+  /** Display names for these agents. */
+  names: (agents: string[]) => Promise<Record<string, string>>;
+  explain: (e: unknown) => string;
+  /** Called after each load that brought something (a direct chat marks itself read). */
+  seen?: () => void;
+}
 
 interface Pending {
   id: string;
@@ -12,8 +24,9 @@ interface Pending {
 }
 
 /**
- * One project's chat (web's ProjectChatTab state): the newest page from the zome, copies of
- * messages being sent, and polling while the tab is open (ADR 0038: 5 s open, 45 s otherwise).
+ * One chat's state (web's ProjectChatTab and MessagesPage threads): the newest page from the
+ * zome, copies of messages being sent, and polling while it is open (ADR 0038: 5 s open,
+ * 45 s otherwise).
  */
 export class ChatState {
   messages = $state<ChatMessage[]>([]);
@@ -25,9 +38,11 @@ export class ChatState {
   loaded = $state(false);
   error = $state('');
   private stop: (() => void) | undefined;
+  /** Who the viewer is: a copy being sent carries their key (and links to their profile). */
+  private ready: Promise<void> = Promise.resolve();
 
   constructor(
-    readonly projectId: string,
+    private readonly source: ChatSource,
     known: Record<string, string>,
   ) {
     this.names = { ...known };
@@ -82,20 +97,21 @@ export class ChatState {
       idleMs: 45_000,
       isActive,
     });
-    void this.whoAmI();
+    this.ready = this.whoAmI();
     void this.refresh();
   }
 
   dispose(): void {
     this.stop?.();
+    this.stop = undefined;
   }
 
   private async whoAmI(): Promise<void> {
     try {
-      this.me = await myAgent();
-      const person = await getPerson(this.me);
-      this.names = { ...this.names, [this.me]: person.profile?.name ?? 'Unnamed' };
-      this.paused = person.standing.level === 'Paused';
+      const viewer = await this.source.viewer();
+      this.me = viewer.agent;
+      this.names = { ...this.names, [this.me]: viewer.name };
+      this.paused = viewer.paused;
     } catch {
       // Names and the paused notice fill in on the next refresh.
     }
@@ -103,8 +119,10 @@ export class ChatState {
 
   async refresh(): Promise<void> {
     try {
-      this.messages = await listMessages(this.projectId);
+      const newest = this.messages.at(-1)?.id;
+      this.messages = await this.source.list();
       this.loaded = true;
+      if (this.messages.at(-1)?.id !== newest) this.source.seen?.();
       await this.loadNames();
     } catch {
       // Keep what is shown until the next successful refresh.
@@ -117,23 +135,21 @@ export class ChatState {
       (a, i): a is string => !!a && agents.indexOf(a) === i && !(a in this.names),
     );
     if (missing.length === 0) return;
-    const people = await Promise.all(missing.map(getPerson));
-    const names = { ...this.names };
-    for (const p of people) names[p.agent] = p.profile?.name ?? 'Unnamed';
-    this.names = names;
+    this.names = { ...this.names, ...(await this.source.names(missing)) };
   }
 
   /** Show a copy at once, write it, then reload; a failure removes the copy and keeps the draft. */
   async send(body: string, replyToId: string | null): Promise<void> {
+    if (!this.me) await this.ready;
     const replyTo = this.lines.find((l) => l.id === replyToId) ?? null;
     const copy: Pending = { id: `pending-${crypto.randomUUID()}`, body, replyTo, at: Date.now() };
     this.pending = [...this.pending, copy];
     this.error = '';
     try {
-      await postMessage(this.projectId, body, replyToId);
+      await this.source.post(body, replyToId);
       await this.refresh();
     } catch (e) {
-      this.error = explain(e);
+      this.error = this.source.explain(e);
       throw e;
     } finally {
       this.pending = this.pending.filter((p) => p.id !== copy.id);
@@ -143,7 +159,7 @@ export class ChatState {
   async remove(id: string): Promise<void> {
     this.error = '';
     try {
-      await deleteMessage(this.projectId, id);
+      await this.source.remove(id);
     } catch {
       this.error = 'Could not delete that message';
     }

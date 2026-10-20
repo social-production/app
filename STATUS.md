@@ -23,6 +23,37 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
+## In flight 2026-10-20: M4c direct and group chats, PR #10 (branch `claude/social-production-handoff-dsam61`)
+web's Messages page, first part (ADR 0043, `docs/plans/M4-talk.md` "M4c as built"):
+- Conversation DNA gets the `messages` zome pair. Each chat is a clone seeded
+  `<creator>.<direct|group>.<nonce>`; the creator invites, messages cite their author's
+  invitation, group names are the creator's `Title`s, read marks are private entries.
+  Invitations reach people through the base conversation cell (the inbox): an `Inbox` link on
+  their key whose tag is the seed encrypted to them.
+- UI: `/messages` (Personal list with unread counts, the New message sheet for direct/group,
+  a conversation with web's header + the shared chat panel), and the profile's Message button.
+  The project chat's state moved to `components/chat/chatState.svelte.ts` (a `ChatSource`).
+- **Integrity change** (conversation DNA only): the hApp version changes, so hosted apps are
+  reinstalled; directory and project DNAs are unchanged.
+- Not yet: the Public tab (project chats in the list), group options (rename, members, leave),
+  the chat row menu, edits, pins, attachments, calls (see ADR 0043 Consequences).
+- Also fixed: `tests/e2e/chat.mjs` counted the Take part tab's hidden dock as "a dock over
+  the chat" (stale since PR #3); it now counts visible docks.
+- Checked in the cloud session: fmt, clippy (workspace, `-D warnings`), unit tests, `npm run
+  check`/`lint`, sizes, boundaries, hApp build, scenario `messages` (2 tests, ~10 min), and
+  against the local seed node at 390px: `tests/e2e/messages.mjs` (profile Message → DM, unread
+  pill, reply, group from New message), `chat.mjs`, `projects.mjs`, `links.mjs`. Compared with
+  web's MessagesPage/ComposeMessageSheet markup and styles (live web's Messages needs an
+  account, so no live 390px comparison). Not run here: the other scenario files (CI runs them),
+  `governance.mjs`.
+- Lessons: a chat's read mark and a message sent at once race on the source chain, so every
+  chat write on the Messages page goes through `features/messages/writes.ts` `inTurn`. An
+  `$effect` that calls `state.start()` must `untrack` it, or the first refresh re-runs the
+  effect, whose cleanup stops the poll.
+- Next after merge: smoke the live site (`messages.mjs` signs up two accounts, so it can run
+  against the live UI), update README Status, then the rest of M4c from web (Public tab, group
+  options, chat menu).
+
 ## Done 2026-10-20: M3e links between projects, PR #8 merged (~03:56 UTC), deployed
 web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web's
 `features/detail-links/*` and web-backend `detail_links.py`:
@@ -102,6 +133,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
    `ProposalKind::Phase.reason` (integrity), so it went into M3c's reset.
 3. **CI timeout 150 min** (see above).
 4. `claude/m4b-threads` untouched and parked, as decided.
+5. **DM privacy trade-offs (ADR 0043).** A chat is private because its seed is secret and
+   validation stops uninvited writers; there is no join-time membrane proof yet. The inbox
+   reveals *who invited whom* (not which chat or what was said). Gateway-hosted people's chats
+   are readable by that node's operator, as on web today. Say if any of these must change
+   before DMs go further.
+6. **Messages ships without web's Public tab** (project chats listed in Messages); project chats
+   stay on their project pages until that part is ported.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
@@ -130,8 +168,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: DMs (conversation DNA, web's `MessagesPage`), in-app notifications
-   (`docs/plans/M4-talk.md`: M4c, M4d). Threads stay parked (Owner decisions).
+1. M4: finish DMs (M4c first part is in flight above: next the Public tab, group options, chat
+   menu, edits/pins), then in-app notifications (`docs/plans/M4-talk.md`: M4d). Threads stay
+   parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
 4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
