@@ -4,17 +4,20 @@
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
+  import { markProjectChatRead } from '#lib/services/publicChats.ts';
 
   /** web's ProjectChatTab: the project's "# project-chat", polled while the tab is open. */
   interface Props {
     projectId: string;
+    /** The project's network seed: its read mark's key (ADR 0044). */
+    seed: string;
     /** Names the project page already knows, by agent key. */
     names: Record<string, string>;
     fullscreen: boolean;
     active: boolean;
   }
 
-  let { projectId, names, fullscreen, active }: Props = $props();
+  let { projectId, seed, names, fullscreen, active }: Props = $props();
 
   // The page mounts this once per project, so the first id and names are the ones to keep.
   // svelte-ignore state_referenced_locally
@@ -47,6 +50,12 @@
   });
 
   $effect(() => () => chat.dispose());
+
+  // web's LinkedChatReadMarker: reading the Chat tab clears the project in Messages' Public tab.
+  $effect(() => {
+    const newest = chat.messages.at(-1)?.createdAt;
+    if (active && newest) void markProjectChatRead(seed, newest);
+  });
 </script>
 
 <section

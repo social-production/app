@@ -2,6 +2,7 @@ import type { ChatMessage } from '#lib/domain/chat.ts';
 import {
   callCell,
   hashToString,
+  projectCell,
   stringToHash,
   type ActionHash,
   type AgentPubKey,
@@ -22,14 +23,21 @@ export interface MessageWire {
   } | null;
 }
 
-const discussion = async <T>(projectId: string, fn: string, payload?: unknown): Promise<T> => {
-  const { cell } = await cellOf(projectId);
+/** A project by its listing id (project pages), or by its network seed (Messages' Public tab
+ * knows only the clones on this node, ADR 0044). */
+export type ProjectRef = string | { seed: string };
+
+const discussion = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> => {
+  const cell =
+    typeof project === 'string'
+      ? (await cellOf(project)).cell
+      : await projectCell(project.seed, 'Project');
   return callCell<T>(cell, 'discussion', fn, payload);
 };
 
 /** The project chat's newest messages, oldest first (the zome returns at most 200). */
-export async function listMessages(projectId: string): Promise<ChatMessage[]> {
-  const wire = await discussion<MessageWire[]>(projectId, 'list_messages');
+export async function listMessages(project: ProjectRef): Promise<ChatMessage[]> {
+  const wire = await discussion<MessageWire[]>(project, 'list_messages');
   return wire.map(toChatMessage);
 }
 
@@ -51,11 +59,11 @@ export function toChatMessage(m: MessageWire): ChatMessage {
 
 /** Anyone signed in may write in a project's chat, as on web (ADR 0038). */
 export async function postMessage(
-  projectId: string,
+  project: ProjectRef,
   body: string,
   replyTo: string | null,
 ): Promise<string> {
-  const id = await discussion<ActionHash>(projectId, 'post_message', {
+  const id = await discussion<ActionHash>(project, 'post_message', {
     body,
     reply_to: replyTo ? stringToHash(replyTo) : null,
   });
@@ -63,6 +71,6 @@ export async function postMessage(
 }
 
 /** Only the author can delete a message; it goes for everyone. */
-export async function deleteMessage(projectId: string, id: string): Promise<void> {
-  await discussion<null>(projectId, 'delete_message', stringToHash(id));
+export async function deleteMessage(project: ProjectRef, id: string): Promise<void> {
+  await discussion<null>(project, 'delete_message', stringToHash(id));
 }

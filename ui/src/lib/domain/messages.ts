@@ -34,3 +34,15 @@ export interface NewChat {
   title: string;
   body: string;
 }
+
+/** A project chat as web's Public tab lists it (web's MessageLinkedChat, projects only). */
+export interface PublicChat {
+  /** The project's network seed (the list knows the clones on this node, not their listings). */
+  id: string;
+  title: string;
+  members: number;
+  last: { author: string; preview: string; createdAt: number } | null;
+  unread: number;
+  /** The last message, else the project's last activity (orders the list). */
+  activeAt: number;
+}

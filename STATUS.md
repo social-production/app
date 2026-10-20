@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-20 by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-20 ~14:30 UTC by a cloud session; see "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,24 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight (2026-10-20): M4c Public tab, PR #12 (branch `claude/social-production-handoff-dsam61`)
+web's Messages → Public tab (ADR 0044, `docs/plans/M4-talk.md` "M4c as built, second part").
+**UI only, no zome or integrity change**, so merging resets nothing.
+- Personal/Public tabs with unread badges; Public lists the chats of projects you're a member of
+  or wrote in, from the project clones on this node (read by seed, not via directory listings),
+  with web's "Project" label, last message and unread pill. A row opens the project chat inside
+  Messages (`?project=<seed>`, header "Project chat · N members").
+- Read marks for project chats live in `localStorage` per person + project seed (no private
+  entries in the project DNA yet); reading on Messages or the project's Chat tab clears them.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; against the local
+  seed node at 390px: new `tests/e2e/public-chats.mjs` (two new accounts, can run live),
+  `messages.mjs`, `chat.mjs`. No Rust changed, so fmt/clippy/scenarios weren't rerun here (CI
+  runs them).
+- Lesson: an e2e test that leaves the page while a chat copy still says "Sending…" cancels the
+  write (the websocket goes with the page); wait for "Sending…" to go first.
+- When CI on PR #12 is green: merge it (`gh pr merge 12 --merge`), then smoke live (`node tests/e2e/public-chats.mjs https://ui-production-333c.up.railway.app`),
+  update README Status + this file.
 
 ## Done 2026-10-20: M4c direct and group chats (first part), PR #10 merged (~08:04 UTC), deployed
 web's Messages page, first part (ADR 0043, `docs/plans/M4-talk.md` "M4c as built"):
@@ -139,8 +157,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
    reveals *who invited whom* (not which chat or what was said). Gateway-hosted people's chats
    are readable by that node's operator, as on web today. Say if any of these must change
    before DMs go further.
-6. **Messages ships without web's Public tab** (project chats listed in Messages); project chats
-   stay on their project pages until that part is ported.
+6. **Public tab read marks are per device** (ADR 0044): project chats have no private read
+   marks in the DNA yet, so "unread" is kept in the browser until an integrity change adds them.
+   The members count in a project chat's header is text (web opens a members panel).
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
@@ -169,8 +188,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: finish M4c from web (the Public tab, group options, chat
-   menu, edits/pins), then in-app notifications (`docs/plans/M4-talk.md`: M4d). Threads stay
+1. M4: finish M4c from web (group options: rename, add/remove members, leave; the chat
+   menu: pin/mute/hide; message edits and pins; these need a conversation-DNA integrity change,
+   so batch them, and move project-chat read marks into private entries then), then in-app notifications (`docs/plans/M4-talk.md`: M4d). Threads stay
    parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
