@@ -42,7 +42,7 @@ web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web
   seed node at 390px: `tests/e2e/links.mjs` (propose → both approve → sever), `projects.mjs`,
   `governance.mjs`. Compared with live web's Links tab at 390px: same layout. Not run here: the
   other scenario files (CI runs them) and `chat.mjs`.
-- Next for this branch: open the PR, wait for CI (~55 min), merge, smoke the live site (projects
+- PR #8 is open. Next: wait for CI (~55 min), merge, smoke the live site (projects
   reset), update README Status.
 
 ## Done 2026-10-20: PR #6 merged (~00:48 UTC), deployed, live smoke passed
