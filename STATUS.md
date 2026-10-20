@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-20: M4c direct and group chats, PR #10 (branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-20: M4c direct and group chats (first part), PR #10 merged (~08:04 UTC), deployed
 web's Messages page, first part (ADR 0043, `docs/plans/M4-talk.md` "M4c as built"):
 - Conversation DNA gets the `messages` zome pair. Each chat is a clone seeded
   `<creator>.<direct|group>.<nonce>`; the creator invites, messages cite their author's
@@ -50,9 +50,10 @@ web's Messages page, first part (ADR 0043, `docs/plans/M4-talk.md` "M4c as built
   chat write on the Messages page goes through `features/messages/writes.ts` `inTurn`. An
   `$effect` that calls `state.start()` must `untrack` it, or the first refresh re-runs the
   effect, whose cleanup stops the poll.
-- Next after merge: smoke the live site (`messages.mjs` signs up two accounts, so it can run
-  against the live UI), update README Status, then the rest of M4c from web (Public tab, group
-  options, chat menu).
+- CI: `check` 7 min, shards 21–63 min. After deploy: `projects.mjs` and `messages.mjs` passed
+  against the live UI. The first `messages.mjs` run right after the seed node restarted timed out
+  at Ann's first send (the first chat clone on a cold node); the rerun passed in full. Watch for
+  slow first sends after deploys.
 
 ## Done 2026-10-20: M3e links between projects, PR #8 merged (~03:56 UTC), deployed
 web's Links tab (ADR 0042, `docs/plans/M3-governance.md` "M3e"), ported from web's
@@ -143,9 +144,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `dd00ed2` (PR #8 merged 2026-10-20 ~03:56 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `b7551a7` (PR #10 merged 2026-10-20 ~08:04 UTC). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c direct and group chats (Messages page), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -168,7 +169,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: finish DMs (M4c first part is in flight above: next the Public tab, group options, chat
+1. M4: finish M4c from web (the Public tab, group options, chat
    menu, edits/pins), then in-app notifications (`docs/plans/M4-talk.md`: M4d). Threads stay
    parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

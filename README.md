@@ -10,10 +10,13 @@ network of desktops, Raspberry Pis and phones.
 
 ## Status (2026-10-20)
 
-**M3 governance (plans, phase returns, project values, links) and M4a (project chat) are live** on the test network: https://ui-production-333c.up.railway.app
+**M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Messages (M4c, first part):** web's Messages page. Message someone from their profile or
+  start a direct or named group chat; chats list newest first with unread counts. Each chat is
+  its own private network; invitations travel encrypted (ADR 0043).
 - **Links (M3e):** web's Links tab. A member proposes a link to another project with a reason;
   each project votes on its own half and the link is active once both pass. Either side can
   vote to sever it (ADR 0042).
@@ -84,7 +87,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
-| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). Next: M4c DMs (conversation DNA), M4d in-app notifications (discussion threads parked: not on web's project pages) | in progress |
+| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c (first part): direct and group chats. Next: the rest of web's Messages page (Public tab, group options), M4d in-app notifications (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
