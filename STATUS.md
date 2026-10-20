@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-20: M4c group options, edits and pins (branch `claude/social-production-handoff-dsam61`)
+## In flight 2026-10-20: M4c group options, edits and pins (PR #14, branch `claude/social-production-handoff-dsam61`)
 web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`
 "M4c as built, third part"). Next step: wait for its PR's CI, merge when green, smoke live
 (`tests/e2e/group-options.mjs` can run live: it signs up three test accounts), then the
