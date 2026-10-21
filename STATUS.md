@@ -43,7 +43,7 @@ web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-t
   `chat.mjs`, `projects.mjs`, `public-chats.mjs`. Not run here: the other scenario files and
   the full workspace clippy/unit tests (no other Rust changed; CI runs them).
 - `notifications.mjs` needs the dev founders (a phase vote must pass), so it runs locally only.
-- PR #16 opened 2026-10-21 ~04:00 UTC (3 pm Melbourne). Next: wait for CI, merge, smoke live (`projects.mjs`), move this
+- PR #16 opened 2026-10-21 ~03:30 UTC (2:30 pm Melbourne). Next: wait for CI, merge, smoke live (`projects.mjs`), move this
   section to "Done" and update README Status.
 
 ## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
