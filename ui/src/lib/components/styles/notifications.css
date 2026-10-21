@@ -1,0 +1,176 @@
+/* Ported from web/src/lib/features/notifications/NotificationsPage.svelte (ADR 0032, scripts/port-styles.py) */
+.notifications-page .page,
+.notifications-page .stack {
+  display: grid;
+  gap: 0;
+}
+
+.notifications-page {
+  padding-bottom: calc(12px + var(--shell-bottom-nav-offset, 0px));
+}
+
+.notifications-page .stack {
+  gap: 0;
+}
+
+.notifications-page .secondary-button {
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/components/cards/inbox/NotificationCard.svelte (ADR 0032, scripts/port-styles.py) */
+.notification-card {
+  display: grid;
+  gap: 6px;
+  cursor: pointer;
+}
+
+.notification-card .identity-row,
+.notification-card .kicker,
+.notification-card .copy-row,
+.notification-card .meta-row,
+.notification-card .meta-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+
+.notification-card .copy-row {
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.notification-card .identity-row {
+  gap: 0.6rem;
+}
+
+.notification-card .subject-label {
+  color: color-mix(in srgb, var(--text-soft) 78%, transparent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.notification-card .kicker {
+  flex-wrap: wrap;
+}
+
+.notification-card .copy {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.notification-card .unread-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--brand);
+  flex: 0 0 auto;
+}
+
+.notification-card .name {
+  min-width: 0;
+  color: var(--text-main);
+  font-weight: 800;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+}
+
+.notification-card .title-text {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.notification-card .action,
+.notification-card .body {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.4;
+}
+
+.notification-card .excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  white-space: pre-wrap;
+}
+
+.notification-card .action {
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.notification-card .meta-row {
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.notification-card .meta-actions {
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+}
+
+.notification-card .footer-meta {
+  margin-left: auto;
+  flex: 0 0 auto;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.notification-card .footer-meta .content-meta-row,
+.notification-card .footer-meta .content-meta-row .inline-link {
+  min-width: auto;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.notification-card .mark-read {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notification-card .mark-read:hover {
+  color: var(--brand-strong);
+}
+
+.notification-card .accept-button,
+.notification-card .decline-button {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.notification-card .accept-button {
+  border: 0;
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.notification-card .decline-button {
+  border: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-main);
+}

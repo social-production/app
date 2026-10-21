@@ -2,13 +2,12 @@ import type { ChatMessage } from '#lib/domain/chat.ts';
 import {
   callCell,
   hashToString,
-  projectCell,
   stringToHash,
   type ActionHash,
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
-import { cellOf } from './projects.ts';
+import { cellFor, type ProjectRef } from './projects.ts';
 
 export interface MessageWire {
   id: ActionHash;
@@ -26,17 +25,10 @@ export interface MessageWire {
   pinned?: boolean;
 }
 
-/** A project by its listing id (project pages), or by its network seed (Messages' Public tab
- * knows only the clones on this node, ADR 0044). */
-export type ProjectRef = string | { seed: string };
+export type { ProjectRef };
 
-const discussion = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> => {
-  const cell =
-    typeof project === 'string'
-      ? (await cellOf(project)).cell
-      : await projectCell(project.seed, 'Project');
-  return callCell<T>(cell, 'discussion', fn, payload);
-};
+const discussion = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> =>
+  callCell<T>(await cellFor(project), 'discussion', fn, payload);
 
 /** The project chat's newest messages, oldest first (the zome returns at most 200). */
 export async function listMessages(project: ProjectRef): Promise<ChatMessage[]> {

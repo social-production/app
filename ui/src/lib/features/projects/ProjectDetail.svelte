@@ -6,6 +6,9 @@
   import type { DetailTabId } from '#lib/domain/projects.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
+  import { goto } from '$app/navigation';
+  import { page } from '$app/state';
+
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
   import LinksTab from './LinksTab.svelte';
@@ -22,7 +25,12 @@
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
   const detail = new DetailState(id);
-  let tab = $state<DetailTabId>('context');
+  // web's links into a project: `?tab=…`, `?comment=…` (the chat) and `?open=vote&voteTarget=…`.
+  const params = page.url.searchParams;
+  const voteLink = params.get('open') === 'vote' ? params.get('voteTarget') : null;
+  let tab = $state<DetailTabId>(
+    params.get('comment') ? 'chat' : voteLink ? 'participation' : tabFromParam(params.get('tab')),
+  );
   let sheet = $state<'members' | 'edit' | 'update' | null>(null);
   let compact = $state(false);
   // As on web, the chat mounts (and starts polling) the first time its tab opens.
@@ -52,6 +60,19 @@
       chatChrome.immersive = false;
     };
   });
+
+  function tabFromParam(value: string | null): DetailTabId {
+    if (value === 'participation' || value === 'chat' || value === 'links') return value;
+    return 'context';
+  }
+
+  /** web's clearVoteLink: a vote opened from a link drops the link once its sheet closes. */
+  function clearVoteLink(): void {
+    const url = new URL(window.location.href);
+    for (const key of ['open', 'voteKind', 'voteTarget']) url.searchParams.delete(key);
+    // eslint-disable-next-line svelte/no-navigation-without-resolve -- the current page's own path
+    void goto(`${url.pathname}${url.search}${url.hash}`, { replace: true, reset: false });
+  }
 
   async function filed(ok: Promise<boolean>): Promise<void> {
     if (await ok) sheet = null;
@@ -99,6 +120,8 @@
             active={tab === 'participation'}
             membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
+            revealVote={voteLink}
+            onRevealDone={clearVoteLink}
           />
           <ParticipationPanel {detail} />
         </div>

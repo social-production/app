@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { untrack, type Snippet } from 'svelte';
 
   import type { ResolvedPathname } from '$app/types';
 
@@ -12,10 +12,13 @@
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
   import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
+  import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
   import { connect } from '#lib/services/account.ts';
+  import { myNotifications } from '#lib/services/notifications.ts';
   import { getPerson } from '#lib/services/people.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
+  import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   import '#lib/components/shell/shell.css';
@@ -36,11 +39,16 @@
   const shellTopbarHeight = $derived(immersive ? 0 : topbarHeight);
   const frameMaxWidth = $derived(!compact && !leftOpen && !rightOpen ? 'min(80%, 1200px)' : 'none');
   const bottomNav = $derived(compact && !immersive ? 'var(--shell-bottom-nav-height)' : '0px');
-  const tabs: { href: ResolvedPathname; label: string; icon: string }[] = [
+  const tabs: { href: ResolvedPathname; label: string; icon: string; badge?: number }[] = $derived([
     { href: resolve('/'), label: 'Home', icon: 'home' },
-    { href: resolve('/notifications'), label: 'Notifications', icon: 'bell' },
+    {
+      href: resolve('/notifications'),
+      label: 'Notifications',
+      icon: 'bell',
+      badge: notifications.unread,
+    },
     { href: resolve('/messages'), label: 'Messages', icon: 'send' },
-  ];
+  ]);
 
   $effect(() => {
     const media = window.matchMedia('(max-width: 1080px)');
@@ -57,6 +65,24 @@
   // Connect in the background on every page; public pages work signed out (as on web).
   $effect(() => {
     void connect();
+  });
+
+  // The bell's count stays fresh while someone is signed in (every 30 s while visible).
+  $effect(() => {
+    if (!signedIn) return;
+    const refresh = async (): Promise<void> => {
+      try {
+        showNotifications((await myNotifications()).items);
+      } catch {
+        // The next round tries again; the Notifications page shows its own errors.
+      }
+    };
+    untrack(() => void refresh());
+    const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
+    return () => {
+      stop();
+      showNotifications([]);
+    };
   });
 
   $effect(() => {
@@ -110,6 +136,7 @@
     collapsed={immersive}
     {signedIn}
     viewerName={viewer.name}
+    notificationCount={notifications.unread}
     {leftOpen}
     {rightOpen}
     {isActive}

@@ -34,7 +34,7 @@ The conversation DNA (clone per chat, listed participants only), `Message` and a
 private read markers and pins (DOMAIN_MODEL.md), web's MessagesPage. First part as built below
 ("M4c as built").
 
-## M4d — notifications
+## M4d — notifications (first part built 2026-10-21, see "M4d as built")
 Derived on each device from signals and new links (DOMAIN_MODEL.md "Not on the DHT"), including
 chat mentions and replies.
 
@@ -109,3 +109,21 @@ chat mentions and replies.
 - Tests: `sp_core::roster` units; scenario `tests/scenarios/tests/groups.rs`; browser
   `tests/e2e/group-options.mjs` (three new accounts, can run live).
 - Not yet: attachments, calls, "seen" receipts, the project members panel, toasts, events.
+
+## M4d as built (2026-10-21, first part: project notifications; ADR 0046)
+- No integrity change. Directory coordinator: `find_listing(seed)` (`listings.rs` `by_seed`),
+  checked in scenario `projects.rs` `only_the_creator_updates_a_listing`.
+- Kinds (web-backend's recipients and wording): `prj-phase-vote`, `prj-phase-done`, `reply`
+  (project chat). Derivation in `ui/src/lib/domain/notifications.ts`; reads and the browser
+  read marks in `services/notifications.ts`; the bell's state in `stores/notifications.svelte.ts`,
+  refreshed by `features/shell/AppShell.svelte` (30 s, visible pages only).
+- UI: `features/notifications/NotificationsPage.svelte` (web's page, "Mark all read"),
+  `components/cards/NotificationCard.svelte` (web's card, project kinds), the count badge on the
+  top bar's and bottom nav's bell, `FeedSurface` gains web's `compact`/`clampExcerpts` and an
+  optional `href`. Project pages take web's `?tab=`, `?comment=` (Chat tab) and
+  `?open=vote&voteTarget=` (opens the Vote sheet; `VoteDock` `reveal`). Styles ported to
+  `styles/notifications.css`.
+- Tests: browser `tests/e2e/notifications.mjs` (dev founders: replies both ways, a vote opened
+  from its card, the phase change card, Mark read / Mark all read and the bell).
+- Not yet: mentions (no @mentions in chat), DM/group activity (web sends none either), web's
+  other kinds, notification settings, scrolling to the linked chat message.

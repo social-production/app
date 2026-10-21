@@ -45,3 +45,10 @@
   font-size: 13px;
   font-weight: 700;
 }
+
+/* Notifications: a list that couldn't be read (web's page has no error state). */
+.notifications-page .error-note {
+  margin: 0;
+  padding: 12px var(--page-gutter);
+  color: var(--text-soft);
+}

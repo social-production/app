@@ -92,6 +92,26 @@ pub fn get(id: ActionHash) -> ExternResult<Option<ListingView>> {
     view(id)
 }
 
+/// The listing of the project whose network seed this is. Seeds name their creator
+/// (`<creator key>.<nonce>`), so only that person's listings are looked at.
+pub fn by_seed(network_seed: String) -> ExternResult<Option<ListingView>> {
+    let Some(creator) = network_seed
+        .split_once('.')
+        .and_then(|(key, _)| AgentPubKeyB64::from_b64_str(key).ok())
+    else {
+        return Ok(None);
+    };
+    let found = links(AgentPubKey::from(creator), LinkTypes::AgentToListings)?;
+    for id in action_targets(found) {
+        if let Some(view) = view(id)? {
+            if view.listing.network_seed == network_seed {
+                return Ok(Some(view));
+            }
+        }
+    }
+    Ok(None)
+}
+
 pub fn allowance() -> ExternResult<Allowance> {
     if own_proof()?.is_some() {
         return Ok(Allowance { remaining: None });

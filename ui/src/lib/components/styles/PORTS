@@ -72,3 +72,5 @@ messages.css      .page-header    web/src/lib/components/shared/PageHeader.svelt
 messages.css      .messages-page  web/src/lib/features/messages/MessagesPage.svelte
 messages.css      .compose-sheet  web/src/lib/components/shared/ComposeMessageSheet.svelte
 messages.css      .compose-sheet  web/src/lib/components/shared/SuggestionList.svelte
+notifications.css .notifications-page web/src/lib/features/notifications/NotificationsPage.svelte
+notifications.css .notification-card web/src/lib/components/cards/inbox/NotificationCard.svelte

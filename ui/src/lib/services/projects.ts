@@ -92,6 +92,22 @@ export async function cellOf(id: string) {
   };
 }
 
+/** A project by its listing id (project pages), or by its network seed (lists built from the
+ * clones on this node: Messages' Public tab, notifications). */
+export type ProjectRef = string | { seed: string };
+
+export async function cellFor(project: ProjectRef) {
+  return typeof project === 'string'
+    ? (await cellOf(project)).cell
+    : projectCell(project.seed, 'Project');
+}
+
+/** A project's listing id from its network seed (`null` while the listing can't be found). */
+export async function listingIdOf(seed: string): Promise<string | null> {
+  const found = await directory<ListingWire | null>('find_listing', seed);
+  return found ? hashToString(found.id) : null;
+}
+
 export async function getProject(id: string): Promise<Project> {
   const { cell, seed } = await cellOf(id);
   const p = await callCell<ProjectWire | null>(cell, 'project', 'get_project');
