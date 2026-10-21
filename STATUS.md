@@ -23,11 +23,12 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-20: M4c group options, edits and pins (PR #14, branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
 web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`
-"M4c as built, third part"). Next step: wait for its PR's CI, merge when green, smoke live
-(`tests/e2e/group-options.mjs` can run live: it signs up three test accounts), then the
-README/STATUS docs PR.
+"M4c as built, third part"). CI: `check` 5 min, shards 38–65 min. After deploy:
+`group-options.mjs` and `projects.mjs` both failed on the first run right after the seed node
+restarted (this deploy reinstalls every hosted app), then both passed in full on the rerun 5 min
+later. After a hApp-version deploy, wait ~5 min before smoking.
 - **Integrity change** (conversation DNA only): hApp version changes, hosted apps reinstall;
   existing direct/group chats are left on the old network (test chats only). Projects and
   people are untouched.
@@ -194,9 +195,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `41f116f` (PR #13, docs after PR #12, 2026-10-20). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `8983a4a` (PR #14 merged 2026-10-21 ~00:17 UTC, 11:17 am Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c direct and group chats + the Public tab (Messages page), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -219,7 +220,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: land the in-flight group options PR, then in-app notifications (`docs/plans/M4-talk.md`:
+1. M4: in-app notifications (`docs/plans/M4-talk.md`:
    M4d). Still from web later: attachments, calls, "seen" receipts, the project members panel.
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
