@@ -1,6 +1,7 @@
 // M4c direct and group chats end to end at phone width (ADR 0043). Two new accounts: Ann
-// messages Bob from his profile, Bob finds the chat (unread) in Messages and replies, then Ann
-// starts a named group with Bob from the New message button.
+// messages Bob from his profile, Bob sees the count on the send icon, finds the chat (unread) in
+// Messages and replies (the count clears), then Ann starts a named group with Bob from the New
+// message button.
 //   node tests/e2e/messages.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -20,6 +21,8 @@ const kickoff = `Welcome to the crew ${stamp}`;
 
 const bubble = (page, text) => page.locator('.chat-log').getByText(text).first();
 const row = (page, name) => page.locator('.conversation-row', { hasText: name }).first();
+const sendBadge = (page) =>
+  page.locator('.mobile-bottom-nav a[aria-label="Messages"] .count-badge');
 
 /** Messages polls every 8 s; reload until a chat row for `name` shows. */
 async function rowShows(page, name) {
@@ -55,6 +58,15 @@ assert.equal(await ann.locator('.identity-title').innerText(), bobName, 'the hea
 await ann.screenshot({ path: `${out}/phone390-dm.png` });
 log('ann messaged bob from his profile');
 
+// The shell counts unread chat messages every 30 s (web's unreadCounts.messages).
+for (let i = 0; i < 12 && !(await sendBadge(bob).count()); i++) {
+  await bob.goto(`${BASE}/`);
+  await bob.waitForTimeout(10_000);
+}
+assert.equal(await sendBadge(bob).innerText(), '1', 'the send icon counts one unread message');
+await bob.screenshot({ path: `${out}/phone390-send-badge.png` });
+log('bob sees the count on the send icon');
+
 const annRow = await rowShows(bob, annName);
 assert.match(await annRow.locator('.unread-pill').innerText(), /^1$/, 'one unread message');
 await bob.screenshot({ path: `${out}/phone390-messages-list.png` });
@@ -64,6 +76,10 @@ await bob.getByRole('textbox', { name: 'Write a message...' }).fill(answer);
 await bob.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(bob, answer).waitFor({ timeout: 30_000 });
 log('bob read it and replied');
+
+await bob.getByRole('button', { name: 'Back to chats' }).click();
+await sendBadge(bob).waitFor({ state: 'detached', timeout: 30_000 });
+log('reading it cleared the count');
 
 await bubble(ann, answer).waitFor({ timeout: 90_000 });
 log('ann sees the reply');

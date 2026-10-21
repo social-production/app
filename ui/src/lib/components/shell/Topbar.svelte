@@ -16,6 +16,8 @@
     viewerName: string;
     /** Unread notifications for the bell (web's unreadCounts.notifications). */
     notificationCount?: number;
+    /** Unread chat messages for the send icon (web's unreadCounts.messages). */
+    messageCount?: number;
     leftOpen: boolean;
     rightOpen: boolean;
     isActive: (href: string) => boolean;
@@ -149,7 +151,10 @@
             title="Messages"
             class:active-link={p.isActive('/messages')}
             class="nav-link nav-link-icon"
-            href={resolve('/messages')}><ToolbarIcon name="send" /></a
+            href={resolve('/messages')}
+            ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
+                count={p.messageCount ?? 0}
+              />{/if}</a
           >
         </nav>
       {/if}
