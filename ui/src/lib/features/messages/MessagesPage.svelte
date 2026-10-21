@@ -10,6 +10,7 @@
   import type { NewChat } from '#lib/domain/messages.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
+  import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
 
   import ChatMenus, { type MenuAt } from './ChatMenus.svelte';
   import ConversationView from './ConversationView.svelte';
@@ -52,6 +53,12 @@
 
   $effect(() => {
     if (openProject) tab = 'public';
+  });
+
+  // While the lists are here, the send icon counts what they show.
+  $effect(() => {
+    if (inbox.loaded && publicChats.loaded)
+      messageBadge.unread = inbox.unreadTotal + publicChats.unreadTotal;
   });
 
   $effect(() => {

@@ -23,6 +23,17 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
+## In flight 2026-10-21: Messages unread badge (branch `claude/social-production-handoff-dsam61`)
+- PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
+- web's `unreadCounts.messages` on the send icon (top bar and phone bottom nav), as on web:
+  unread messages in personal chats you haven't deleted plus your project chats (Public tab).
+  `services/unread.ts` counts it; the shell refreshes it with the bell every 30 s; the Messages
+  page sets it from its own lists, so reading a chat clears it at once (`stores/messageBadge`).
+- Project-chat counts use this device's read marks (ADR 0044), so another device can still
+  show them as unread. Muted chats still count, as on web.
+- `tests/e2e/messages.mjs` now checks that the count appears and clears; it passed against the
+  local seed node (cloud session), with fast checks (svelte-check, lint, boundaries, sizes).
+
 ## Done 2026-10-21: M4d notifications, first part, PR #16 merged (~04:04 UTC / 3:04 pm Melbourne), deployed
 web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-talk.md`
 "M4d as built"). **No integrity change** (one new directory coordinator call,
@@ -249,8 +260,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: the Messages unread badge (web
-   shows unread chats on the send icon), @mentions in chat (+ `mention` notifications), scroll
+1. M4, from web: @mentions in chat (+ `mention` notifications), scroll
    to the linked chat message. Still from web later: attachments, calls, "seen" receipts, the project members panel.
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).

@@ -16,8 +16,10 @@
   import { connect } from '#lib/services/account.ts';
   import { myNotifications } from '#lib/services/notifications.ts';
   import { getPerson } from '#lib/services/people.ts';
+  import { unreadMessageCount } from '#lib/services/unread.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
+  import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
@@ -47,7 +49,7 @@
       icon: 'bell',
       badge: notifications.unread,
     },
-    { href: resolve('/messages'), label: 'Messages', icon: 'send' },
+    { href: resolve('/messages'), label: 'Messages', icon: 'send', badge: messageBadge.unread },
   ]);
 
   $effect(() => {
@@ -67,21 +69,27 @@
     void connect();
   });
 
-  // The bell's count stays fresh while someone is signed in (every 30 s while visible).
+  // The bell's and the send icon's counts stay fresh while someone is signed in (every 30 s
+  // while visible). The Messages page keeps the send icon's count itself, as on web.
   $effect(() => {
     if (!signedIn) return;
     const refresh = async (): Promise<void> => {
-      try {
-        showNotifications((await myNotifications()).items);
-      } catch {
-        // The next round tries again; the Notifications page shows its own errors.
-      }
+      const onMessages = page.url.pathname.startsWith('/messages');
+      const [items, unread] = await Promise.allSettled([
+        myNotifications(),
+        onMessages ? null : unreadMessageCount(),
+      ]);
+      // A failed round keeps the old count; the next round tries again.
+      if (items.status === 'fulfilled') showNotifications(items.value.items);
+      if (unread.status === 'fulfilled' && unread.value !== null)
+        messageBadge.unread = unread.value;
     };
     untrack(() => void refresh());
     const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
     return () => {
       stop();
       showNotifications([]);
+      messageBadge.unread = 0;
     };
   });
 
@@ -137,6 +145,7 @@
     {signedIn}
     viewerName={viewer.name}
     notificationCount={notifications.unread}
+    messageCount={messageBadge.unread}
     {leftOpen}
     {rightOpen}
     {isActive}
