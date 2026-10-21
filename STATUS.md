@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), not yet on the live UI (see Live)
+## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), not yet on the live UI: Railway outage (see Live)
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
 - web's `unreadCounts.messages` on the send icon (top bar and phone bottom nav), as on web:
   unread messages in personal chats you haven't deleted plus your project chats (Public tab).
@@ -235,7 +235,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `dbb1621` (PR #19 merged 2026-10-21 ~07:27 UTC, 6:27 pm Melbourne). Merging to `main` should redeploy bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** on 2026-10-21 PR #19 (`dbb1621`, merged 07:27 UTC, `main` CI green 08:24 UTC) had still not reached the live UI at 09:14 UTC (its `index.html` was last modified 05:46 UTC; the new code's `messageCount` prop was absent from every chunk). GitHub's commit statuses show why: Railway deploys every service straight on merge (PR #18 at 05:46 and PR #17 at 06:19 UTC both have Railway "Success" statuses within 5 min), but `dbb1621` has no Railway deployment or status at all. Railway missed that push. Read the statuses with `curl https://api.github.com/repos/social-production/app/commits/<sha>/status`; no Railway token is needed. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge (concurrency), not a failed deploy. Cloud sessions can't see Railway yet: the owner will add a Railway **project token** as `RAILWAY_TOKEN` in the cloud environment (the API host `backboard.railway.com` is already reachable); Railway's Redeploy rebuilds that deployment's own commit (PR #17's), so it can't help; use "Deploy latest commit" on `ui`, or a fresh merge to `main`. Note that a merge landing while `main`'s CI runs cancels that run (concurrency).
+- Deployed `main`: `7df5310` (PR #17, 2026-10-21 ~06:19 UTC); `main` is at `6504eb4`, waiting for Railway to recover (below). Merging to `main` should redeploy bootstrap, seed-node and ui. **Check that the UI actually changed before smoking** (`curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses; a red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy). **2026-10-21: Railway had a major outage from 07:24 UTC** (builds paused in every region, dashboard/API/CLI down; status.railway.com). So PR #19 (`dbb1621`, merged 07:27 UTC) and PR #20 (`6504eb4`, 10:52 UTC) were not deployed; the live UI stayed on PR #17's build. Once Railway resumes builds, check the latest `main` is live (the send-icon badge: `messageCount` appears in the UI chunks), then run `tests/e2e/messages.mjs` against the live UI once. If deploys are stuck again, check status.railway.com first. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
   plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
@@ -252,7 +252,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Known gaps
-- **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s). Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
+- **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s), during Railway's outage, so the reading may not be reliable. Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
