@@ -7,7 +7,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
-import { cellOf } from './projects.ts';
+import { cellFor, type ProjectRef } from './projects.ts';
 
 type KindWire =
   | Exclude<ProposalKind, { Phase: unknown }>
@@ -33,10 +33,8 @@ interface ProposalWire {
   can_challenge: boolean;
 }
 
-const governance = async <T>(projectId: string, fn: string, payload?: unknown): Promise<T> => {
-  const { cell } = await cellOf(projectId);
-  return callCell<T>(cell, 'governance', fn, payload);
-};
+const governance = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> =>
+  callCell<T>(await cellFor(project), 'governance', fn, payload);
 
 function kindOf(kind: KindWire): ProposalKind {
   if (!('Phase' in kind)) return kind;
@@ -45,8 +43,8 @@ function kindOf(kind: KindWire): ProposalKind {
 }
 
 /** Every proposal in a project except plans (they have their own board), newest first. */
-export async function listProposals(projectId: string): Promise<Proposal[]> {
-  const wire = await governance<ProposalWire[]>(projectId, 'list_proposals');
+export async function listProposals(project: ProjectRef): Promise<Proposal[]> {
+  const wire = await governance<ProposalWire[]>(project, 'list_proposals');
   return wire.map((p) => ({
     id: hashToString(p.id),
     author: hashToString(p.author),

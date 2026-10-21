@@ -7,19 +7,31 @@
 
   /** web's FeedSurface: one feed row; the whole row links to `href`. */
   interface Props {
-    href: ResolvedPathname;
+    /** Left out when the slot handles the click (web's `interactive` rows, e.g. notifications). */
+    href?: ResolvedPathname | null;
     /** CSS colour for the left accent bar (web's surface type accent). */
-    accent: string;
+    accent: string | null;
+    /** Tighter padding for dense rows such as notifications. */
+    compact?: boolean;
+    /** Feed cards clamp body/summary; notifications show it whole. */
+    clampExcerpts?: boolean;
     children: Snippet;
   }
 
-  let { href, accent, children }: Props = $props();
+  let { href = null, accent, compact = false, clampExcerpts = true, children }: Props = $props();
 </script>
 
-<article class="surface tone-public clickable has-accent" style={`--row-accent: ${accent};`}>
-  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
-  <a aria-label="Open item" class="surface-link" {href}></a>
-  <div class="content clamp-excerpts">
+<article
+  class="surface tone-public clickable"
+  class:compact
+  class:has-accent={!!accent}
+  style={accent ? `--row-accent: ${accent};` : undefined}
+>
+  {#if href}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
+    <a aria-label="Open item" class="surface-link" {href}></a>
+  {/if}
+  <div class="content" class:clamp-excerpts={clampExcerpts} class:content-interactive={!href}>
     {@render children()}
   </div>
 </article>

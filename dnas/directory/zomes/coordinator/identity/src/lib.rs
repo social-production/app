@@ -92,6 +92,11 @@ pub fn get_listing(id: ActionHash) -> ExternResult<Option<ListingView>> {
 }
 
 #[hdk_extern]
+pub fn find_listing(network_seed: String) -> ExternResult<Option<ListingView>> {
+    listings::by_seed(network_seed)
+}
+
+#[hdk_extern]
 pub fn project_allowance(_: ()) -> ExternResult<Allowance> {
     listings::allowance()
 }

@@ -20,9 +20,22 @@
     stage: string;
     phaseLabel: (id: string) => string;
     onVote: (proposal: Proposal, choice: VoteChoice) => Promise<void>;
+    /** A proposal a link asks to open (web's `?open=vote&voteTarget=…`). */
+    reveal?: string | null;
+    /** The revealed sheet closed: the link is dropped, so it doesn't reopen. */
+    onRevealDone?: (() => void) | undefined;
   }
 
-  let { proposals, names, charter, stage, phaseLabel, onVote }: Props = $props();
+  let {
+    proposals,
+    names,
+    charter,
+    stage,
+    phaseLabel,
+    onVote,
+    reveal = null,
+    onRevealDone,
+  }: Props = $props();
 
   let open = $state(false);
   let index = $state(0);
@@ -30,6 +43,24 @@
 
   const current = $derived(proposals[index] ?? proposals[0]);
   const remaining = $derived(proposals.filter((p) => !voted.includes(p.id) && !p.myVote).length);
+
+  let revealed = $state<string | null>(null);
+
+  // web's VoteDockControl reveal: open the sheet on the linked proposal once it has loaded.
+  $effect(() => {
+    if (!reveal || revealed === reveal) return;
+    const at = proposals.findIndex((p) => p.id === reveal);
+    if (at < 0) return;
+    voted = [];
+    index = at;
+    open = true;
+    revealed = reveal;
+  });
+
+  function close(): void {
+    open = false;
+    if (revealed) onRevealDone?.();
+  }
 
   function openVotes(): void {
     voted = [];
@@ -42,7 +73,7 @@
     voted = [...voted, p.id];
     const next = proposals.findIndex((q) => !q.myVote && !voted.includes(q.id));
     if (next >= 0) index = next;
-    else open = false;
+    else close();
     void onVote(p, choice);
   }
 </script>
@@ -60,7 +91,7 @@
   title={current ? proposalLabel(current.kind, phaseLabel) : 'Vote'}
   labelledById="project-votes"
   rootClass="vote-dock-root"
-  onClose={() => (open = false)}
+  onClose={close}
 >
   {#if current}
     <div class="vote-list">

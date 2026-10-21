@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-20 ~23:30 UTC by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,21 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-21: M4d notifications, first part (branch `claude/social-production-handoff-dsam61`)
+web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-talk.md`
+"M4d as built"). **No integrity change** (one new directory coordinator call,
+`find_listing(seed)`), so merging resets nothing.
+- Derived on each device from the projects opened on its node (like the Public tab): web's
+  `prj-phase-vote` ("Vote on advancing to …"), `prj-phase-done` ("Project phase change
+  executed") and `reply` on project chats ("Replied to your comment" / "… your project"), with
+  web-backend's recipients. Read marks in browser storage per person; the first look on a
+  device counts older activity as read. The bell (top bar + bottom nav) refreshes every 30 s.
+- Cards open the project: chat replies `?tab=chat&comment=…`, votes `?open=vote&voteTarget=…`
+  (opens the Vote sheet on that proposal, as web's link does).
+- Left out on purpose: web's `prj-plan-lead` (off by default on web; no settings here yet),
+  every kind without an app feature (follows, shares, invites, roles, mentions).
+- See "Checked" below for what this session ran; update it when the PR is open/merged.
 
 ## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
 web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`
@@ -186,7 +201,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
    reveals *who invited whom* (not which chat or what was said). Gateway-hosted people's chats
    are readable by that node's operator, as on web today. Say if any of these must change
    before DMs go further.
-6. **Public tab read marks are per device** (ADR 0044): project chats have no private read
+6. **Public tab and notification read marks are per device** (ADR 0044, 0046): project chats have no private read
    marks in the DNA yet, so "unread" is kept in the browser until an integrity change adds them.
    The members count in a project chat's header is text (web opens a members panel).
 7. **Group "Delete" leaves the group** (ADR 0045), with the "left the group" line and a
@@ -220,8 +235,10 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: in-app notifications (`docs/plans/M4-talk.md`:
-   M4d). Still from web later: attachments, calls, "seen" receipts, the project members panel.
+1. M4: finish M4d (PR for `claude/social-production-handoff-dsam61`: CI, merge, smoke
+   `tests/e2e/notifications.mjs` locally, docs). Then from web: the Messages bell badge (web
+   shows unread chats on the send icon), @mentions in chat (+ `mention` notifications), scroll
+   to the linked chat message. Still from web later: attachments, calls, "seen" receipts, the project members panel.
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

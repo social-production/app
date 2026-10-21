@@ -16,9 +16,18 @@
     active: boolean;
     membersOpen: boolean;
     onOpenMembers: () => void;
+    revealVote?: string | null;
+    onRevealDone?: (() => void) | undefined;
   }
 
-  let { detail, active, membersOpen, onOpenMembers }: Props = $props();
+  let {
+    detail,
+    active,
+    membersOpen,
+    onOpenMembers,
+    revealVote = null,
+    onRevealDone,
+  }: Props = $props();
 
   const votes = $derived(detail.openProposals.filter((p) => isPhaseChange(p.kind)));
 </script>
@@ -48,6 +57,8 @@
         stage={project.stage}
         phaseLabel={detail.phaseLabel}
         onVote={(p, c) => detail.vote(p, c)}
+        reveal={revealVote}
+        {onRevealDone}
       />
     {/if}
   </DetailActionDock>

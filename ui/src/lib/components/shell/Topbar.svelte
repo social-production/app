@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
+  import CountBadge from '#lib/components/icons/CountBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
 
@@ -13,6 +14,8 @@
     collapsed?: boolean;
     signedIn: boolean;
     viewerName: string;
+    /** Unread notifications for the bell (web's unreadCounts.notifications). */
+    notificationCount?: number;
     leftOpen: boolean;
     rightOpen: boolean;
     isActive: (href: string) => boolean;
@@ -136,7 +139,10 @@
             title="Notifications"
             class:active-link={p.isActive('/notifications')}
             class="nav-link nav-link-icon"
-            href={resolve('/notifications')}><ToolbarIcon name="bell" /></a
+            href={resolve('/notifications')}
+            ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
+                count={p.notificationCount ?? 0}
+              />{/if}</a
           >
           <a
             aria-label="Messages"

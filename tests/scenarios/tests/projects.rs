@@ -49,6 +49,7 @@ struct ListingInput {
 
 #[derive(Deserialize, Debug)]
 struct ListingView {
+    id: ActionHash,
     creator: AgentPubKey,
     listing: ListingFields,
 }
@@ -221,6 +222,16 @@ async fn only_the_creator_updates_a_listing() {
     let seen = seen.expect("listing visible to others");
     assert_eq!(seen.listing.title, "Garden co-op");
     assert_eq!(seen.creator, founder_key);
+
+    // Lists built from a node's clones (notifications) find a project's page by its seed.
+    let seed = listing(&founder_key, "g").network_seed;
+    let found: Option<ListingView> = conductors[1].call(&eve, "find_listing", seed).await;
+    assert_eq!(found.map(|l| l.id), Some(id.clone()));
+    let other = listing(&founder_key, "other").network_seed;
+    let none: Option<ListingView> = conductors[1].call(&eve, "find_listing", other).await;
+    assert!(none.is_none(), "another nonce is another project");
+    let bad: Option<ListingView> = conductors[1].call(&eve, "find_listing", "nope").await;
+    assert!(bad.is_none(), "a seed without a creator key finds nothing");
 
     let hijack =
         Box::pin(conductors[1].call_fallible::<_, ActionHash>(&eve, "update_listing", &update))
