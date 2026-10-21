@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), deployed
+## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), not yet on the live UI (see Live)
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
 - web's `unreadCounts.messages` on the send icon (top bar and phone bottom nav), as on web:
   unread messages in personal chats you haven't deleted plus your project chats (Public tab).
@@ -235,7 +235,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `dbb1621` (PR #19 merged 2026-10-21 ~07:27 UTC, 6:27 pm Melbourne). Merging to `main` redeploys bootstrap, seed-node and ui **only after `main`'s own CI run passes** (Railway waits for CI; ~1 h after the merge). Smoke the live site after that run is green, not right after the merge; a merge that lands while `main`'s CI is still running cancels that run (concurrency), so only the newest merge deploys.
+- Deployed `main`: `dbb1621` (PR #19 merged 2026-10-21 ~07:27 UTC, 6:27 pm Melbourne). Merging to `main` should redeploy bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** on 2026-10-21 PR #19 (`dbb1621`, merged 07:27 UTC, `main` CI green 08:24 UTC) had still not reached the live UI at 09:14 UTC (its `index.html` was last modified 05:46 UTC; the new code's `messageCount` prop was absent from every chunk). Cloud sessions can't see Railway; the owner was asked to check the `ui` service's deployments. Note that a merge landing while `main`'s CI runs cancels that run (concurrency).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
   plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
