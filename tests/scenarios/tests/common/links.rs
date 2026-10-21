@@ -103,6 +103,11 @@ pub struct Pair {
 }
 
 impl Pair {
+    /// Stop every conductor and wait for it (see `common::shut_down`).
+    pub async fn shut_down(mut self) {
+        super::shut_down(&mut self.conductors).await;
+    }
+
     pub async fn new() -> Self {
         let mut conductors = SweetConductorBatch::standard(2).await;
         let mut agents = Vec::new();

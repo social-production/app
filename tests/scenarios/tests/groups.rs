@@ -143,6 +143,7 @@ async fn the_manager_runs_the_group_and_hands_it_over() {
     assert!(bobs_pin.is_err(), "in a group only the manager pins");
 
     Box::pin(handover(&conductors, &cells)).await;
+    common::shut_down(&mut conductors).await;
 }
 
 /** Ann (the manager) leaves: Bob takes over, renames, and adds Cat back. */
@@ -219,6 +220,7 @@ async fn edits_pins_and_list_settings() {
     let left: Result<(), _> = conductors[0].call_fallible(&chat(0), "leave", ()).await;
     assert!(left.is_err(), "direct chats are deleted, not left");
     Box::pin(list_settings(&conductors, &cells)).await;
+    common::shut_down(&mut conductors).await;
 }
 
 /** Pin, mute and delete (hide) are your own; a new message brings a hidden chat back. */

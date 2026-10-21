@@ -260,6 +260,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
   - **Disk:** a debug build of the whole workspace is ~24 GB and fills a cloud session's disk. Build with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (the cloud scripts do), and never mix the stock `cargo` with the Nix one in one `target/` (two full builds); `rm -rf target/debug` if `df` shows the disk filling.
   - Settle each DNA's cells separately with `await_consistency`.
   - Never depend on two integrity crates in one test binary; mirror types with serde instead.
+  - **End every test with an awaited shutdown:** `common::shut_down(&mut conductors).await`, or `net.shut_down().await` / `pair.shut_down().await`. sweettest's `Drop` only spawns the shutdown on the test's runtime, so the last test's conductors could still be tearing down when the process exited. In CI the binary then crashed after every test had passed: SIGSEGV after `plans` (PR #13), and `malloc_consolidate(): unaligned fastbin chunk` after `groups` (PR #17).
 - **Browser tests:**
   - Start the local seed node: `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`. It builds a dev hApp whose founders are `tests/e2e/fixtures/dev-founders.json`, so governance can be tested.
   - Wait for "zomes compiled" in its log.

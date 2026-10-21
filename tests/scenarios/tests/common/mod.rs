@@ -12,6 +12,18 @@ pub mod plans;
 use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
 use identity_integrity::{DirectoryProperties, Founder};
 
+/// Shut every conductor down and wait until each has stopped. Call it at the end of each test:
+/// sweettest's `Drop` only spawns the shutdown on the test's runtime, which ends with the test,
+/// so after the last test the process could exit while conductors were still tearing down
+/// (heap-corruption aborts at exit in CI, after every test had passed).
+pub async fn shut_down(conductors: &mut SweetConductorBatch) {
+    for i in 0..conductors.len() {
+        if conductors[i].is_running() {
+            conductors[i].shutdown().await;
+        }
+    }
+}
+
 fn dna_path(name: &str) -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../dnas")
