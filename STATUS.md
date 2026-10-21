@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-21: Messages unread badge (branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), deployed
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
 - web's `unreadCounts.messages` on the send icon (top bar and phone bottom nav), as on web:
   unread messages in personal chats you haven't deleted plus your project chats (Public tab).
@@ -235,7 +235,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `30790ba` (PR #16 merged 2026-10-21 ~04:04 UTC, 3:04 pm Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `dbb1621` (PR #19 merged 2026-10-21 ~07:27 UTC, 6:27 pm Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
   plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.

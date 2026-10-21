@@ -18,7 +18,8 @@ What works today:
   phase votes, phase changes and replies in project chats, worked out on each device from the
   projects it has opened; a card opens the chat or the Vote sheet (ADR 0046).
 - **Messages (M4c):** web's Messages page. Message someone from their profile or start a direct
-  or named group chat; chats list newest first with unread counts. The Public tab lists your
+  or named group chat; chats list newest first with unread counts, and the send icon counts
+  unread messages, as on web. The Public tab lists your
   projects' chats with their unread counts (ADR 0044). Group managers rename and add or remove
   people, anyone can leave; the chat menu pins, mutes or deletes a chat; messages can be edited
   and pinned (ADR 0045). Each chat is
@@ -93,7 +94,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
-| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
+| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
