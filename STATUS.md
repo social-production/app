@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-21: M4d notifications, first part (branch `claude/social-production-handoff-dsam61`)
+## In flight 2026-10-21: M4d notifications, first part (PR #16, branch `claude/social-production-handoff-dsam61`)
 web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-talk.md`
 "M4d as built"). **No integrity change** (one new directory coordinator call,
 `find_listing(seed)`), so merging resets nothing.
@@ -43,7 +43,7 @@ web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-t
   `chat.mjs`, `projects.mjs`, `public-chats.mjs`. Not run here: the other scenario files and
   the full workspace clippy/unit tests (no other Rust changed; CI runs them).
 - `notifications.mjs` needs the dev founders (a phase vote must pass), so it runs locally only.
-- Next for this branch: open the PR, wait for CI, merge, smoke live (`projects.mjs`), move this
+- PR #16 opened 2026-10-21 ~04:00 UTC (3 pm Melbourne). Next: wait for CI, merge, smoke live (`projects.mjs`), move this
   section to "Done" and update README Status.
 
 ## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
