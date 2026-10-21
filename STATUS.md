@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-21: M4d notifications, first part (PR #16, branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-21: M4d notifications, first part, PR #16 merged (~04:04 UTC / 3:04 pm Melbourne), deployed
 web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-talk.md`
 "M4d as built"). **No integrity change** (one new directory coordinator call,
 `find_listing(seed)`), so merging resets nothing.
@@ -43,8 +43,11 @@ web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-t
   `chat.mjs`, `projects.mjs`, `public-chats.mjs`. Not run here: the other scenario files and
   the full workspace clippy/unit tests (no other Rust changed; CI runs them).
 - `notifications.mjs` needs the dev founders (a phase vote must pass), so it runs locally only.
-- PR #16 opened 2026-10-21 ~03:30 UTC (2:30 pm Melbourne). Next: wait for CI, merge, smoke live (`projects.mjs`), move this
-  section to "Done" and update README Status.
+- CI: `check` 5 min, shards 27–28 min. After deploy (waited ~8 min): `/readyz` ok,
+  `projects.mjs` and `public-chats.mjs` passed against the live UI on the first run.
+- Lessons: the home index's cards (`/index/projects`) already carry `networkSeed`, a cheaper
+  seed→listing source for later. `pkill -f gateway` kills your own shell when the command line
+  contains "gateway"; stop the local seed node by its task instead.
 
 ## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
 web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`
@@ -216,11 +219,14 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
    handover; web's Delete drops the membership silently and can leave a group without its
    manager. Removed people can still read what the chat gossips (they know its seed).
 
+8. **Notifications leave out "Plan became leading"** (ADR 0046): web sends it only to people
+   who turn it on in settings, and the app has no notification settings yet.
+
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `8983a4a` (PR #14 merged 2026-10-21 ~00:17 UTC, 11:17 am Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `30790ba` (PR #16 merged 2026-10-21 ~04:04 UTC, 3:04 pm Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -243,8 +249,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4: finish M4d (PR for `claude/social-production-handoff-dsam61`: CI, merge, smoke
-   `tests/e2e/notifications.mjs` locally, docs). Then from web: the Messages bell badge (web
+1. M4, from web: the Messages unread badge (web
    shows unread chats on the send icon), @mentions in chat (+ `mention` notifications), scroll
    to the linked chat message. Still from web later: attachments, calls, "seen" receipts, the project members panel.
    Project-chat read marks and list settings move into private entries with the next
