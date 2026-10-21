@@ -4,6 +4,7 @@
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
   import type { PublicChat } from '#lib/domain/messages.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
@@ -18,9 +19,11 @@
     chat: PublicChat;
     onBack: () => void;
     onRead: () => void;
+    /** web's header menu (Mute). */
+    onMenu: (x: number, y: number) => void;
   }
 
-  let { chat, onBack, onRead }: Props = $props();
+  let { chat, onBack, onRead, onMenu }: Props = $props();
 
   // The page keys this view by chat, so the first id is the one to keep.
   // svelte-ignore state_referenced_locally
@@ -74,10 +77,27 @@
   <div class="chat-identity">
     <div class="identity-trigger">
       <div>
-        <h2><span class="identity-title">{chat.title}</span></h2>
+        <button
+          class="title-hit"
+          type="button"
+          onclick={(event) => onMenu(event.clientX, event.clientY)}
+        >
+          <h2>
+            <span class="identity-title">{chat.title}</span>
+            <ChatMarks muted={chat.muted} header />
+          </h2>
+        </button>
         <p class="identity-note">Project chat · {members}</p>
       </div>
-      <AvatarBadge size="md" name={chat.title} />
+      <button
+        class="avatar-hit"
+        type="button"
+        aria-label="Chat options"
+        title="Chat options"
+        onclick={(event) => onMenu(event.clientX, event.clientY)}
+      >
+        <AvatarBadge size="md" name={chat.title} />
+      </button>
     </div>
   </div>
 </header>

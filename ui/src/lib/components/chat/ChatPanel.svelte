@@ -1,21 +1,21 @@
 <script lang="ts">
   import { tick } from 'svelte';
 
-  import { resolve } from '$app/paths';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import type { ChatLine } from '#lib/domain/chat.ts';
 
+  import BubbleMenu from './BubbleMenu.svelte';
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
-  import { messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
+  import { formatMessageTime, messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
   import { syncPanelHeight } from './chatViewport.ts';
 
   import '#lib/components/styles/chat.css';
 
   /**
    * web's LiveChatPanel for text chats: day dividers, author runs, reply quotes, the bubble
-   * menu (profile, reply, copy, delete your own) and the composer. Attachments, mentions,
-   * reports and pins come with their milestones.
+   * menu (profile, reply, copy, pin, edit and delete your own), "left the group" lines and
+   * the composer. Attachments, mentions and reports come with their milestones.
    */
   interface Props {
     lines: ChatLine[];
@@ -33,6 +33,12 @@
     hideAuthors?: boolean;
     onSend: (body: string, replyToId: string | null) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
+    /** web's conversationActions: edit your own messages (direct and group chats). */
+    onEdit?: (id: string, body: string) => Promise<void>;
+    /** Set when the viewer may pin here (web's onTogglePin). */
+    onTogglePin?: ((id: string, pinned: boolean) => Promise<void>) | null;
+    /** A message to scroll to and flash (web's highlightedMessageId, from the pin bar). */
+    focus?: { id: string; n: number } | null;
   }
 
   let p: Props = $props();
@@ -41,6 +47,7 @@
   let log = $state<HTMLDivElement>();
   let keyboardOpen = $state(false);
   let replyTarget = $state<ChatLine | null>(null);
+  let editing = $state<ChatLine | null>(null);
   let menu = $state<{ message: ChatLine; x: number; y: number } | null>(null);
   let blockMenuOpen = false;
   let confirming = $state<ChatLine | null>(null);
@@ -128,9 +135,25 @@
     flashTimer = setTimeout(() => (flashed = null), 1800);
   }
 
+  $effect(() => {
+    if (p.focus) jump(p.focus.id);
+  });
+
   function reply(message: ChatLine): void {
+    editing = null;
     replyTarget = message;
     menu = null;
+  }
+
+  function beginEdit(message: ChatLine): void {
+    replyTarget = null;
+    editing = message;
+    menu = null;
+  }
+
+  async function pin(message: ChatLine): Promise<void> {
+    menu = null;
+    await p.onTogglePin?.(message.id, message.pinned);
   }
 
   async function copy(message: ChatLine): Promise<void> {
@@ -143,6 +166,12 @@
   }
 
   async function send(body: string): Promise<void> {
+    const edited = editing;
+    if (edited && p.onEdit) {
+      await p.onEdit(edited.id, body);
+      editing = null;
+      return;
+    }
     const quoted = replyTarget;
     replyTarget = null;
     copyError = '';
@@ -198,49 +227,55 @@
               <span>{messageDayLabel(message.createdAt)}</span>
             </div>
           {/if}
-          <ChatBubble
-            {message}
-            showAuthor={!p.hideAuthors && showsAuthor(message, previous)}
-            flashed={flashed === message.id}
-            canReply={!p.paused && !message.pending}
-            onOpenMenu={openMenu}
-            onReply={reply}
-            onJump={jump}
-            {register}
-          />
+          {#if message.kind === 'system'}
+            <div id={`comment-${message.id}`} class="call-line system-line">
+              <span>{message.authorName} left the group.</span>
+              <span class="message-time">{formatMessageTime(message.createdAt)}</span>
+            </div>
+          {:else}
+            <ChatBubble
+              {message}
+              showAuthor={!p.hideAuthors && showsAuthor(message, previous)}
+              flashed={flashed === message.id}
+              canReply={!p.paused && !message.pending}
+              onOpenMenu={openMenu}
+              onReply={reply}
+              onJump={jump}
+              {register}
+            />
+          {/if}
         {/each}
       {/if}
     </div>
   </div>
 
   {#if menu}
-    {@const target = menu.message}
-    <div class="bubble-menu" role="menu" style="left: {menu.x}px; top: {menu.y}px">
-      <a
-        role="menuitem"
-        href={resolve('/profile/[agent]', { agent: target.author })}
-        onclick={() => (menu = null)}>View profile</a
-      >
-      {#if !p.paused && !target.pending}
-        <button type="button" role="menuitem" onclick={() => reply(target)}>Reply</button>
-      {/if}
-      <button type="button" role="menuitem" onclick={() => copy(target)}>Copy</button>
-      {#if target.own && !target.pending}
-        <button type="button" role="menuitem" onclick={() => ((confirming = target), (menu = null))}
-          >Delete</button
-        >
-      {/if}
-    </div>
+    <BubbleMenu
+      message={menu.message}
+      x={menu.x}
+      y={menu.y}
+      canWrite={!p.paused}
+      canPin={!!p.onTogglePin}
+      canEdit={!!p.onEdit}
+      onReply={reply}
+      onCopy={copy}
+      onPin={pin}
+      onEdit={beginEdit}
+      onDelete={(m) => ((confirming = m), (menu = null))}
+      onClose={() => (menu = null)}
+    />
   {/if}
 
   <ChatComposer
     placeholder={p.placeholder}
     submitLabel={p.submitLabel}
     {replyTarget}
+    {editing}
     paused={p.paused}
     error={p.error || copyError}
     onSubmit={send}
     onCancelReply={() => (replyTarget = null)}
+    onCancelEdit={() => (editing = null)}
     onFocus={sync}
   />
 </section>

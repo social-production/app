@@ -29,7 +29,7 @@ export function messageDayLabel(ms: number): string {
 
 /** Name once per run of messages from the same person, like a group chat elsewhere. */
 export function showsAuthor(message: ChatLine, previous: ChatLine | undefined): boolean {
-  if (!previous || previous.author !== message.author) return true;
+  if (!previous || previous.author !== message.author || previous.kind === 'system') return true;
   if (messageDayKey(previous.createdAt) !== messageDayKey(message.createdAt)) return true;
   return message.createdAt - previous.createdAt > 5 * 60_000;
 }

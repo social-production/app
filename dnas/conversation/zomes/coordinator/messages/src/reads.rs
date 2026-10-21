@@ -3,10 +3,12 @@
 use std::collections::{BTreeMap, BTreeSet};
 
 use hdk::prelude::*;
-use messages_integrity::{is_type, LinkTypes, Message, UnitEntryTypes};
+use messages_integrity::{is_type, Edit, LinkTypes, Message, UnitEntryTypes};
 use sp_core::chat::{preview, PAGE_MAX};
 
-use crate::{anchor, own, MessageView, ReplyRef};
+use crate::entries::all;
+use crate::people::Chat;
+use crate::{anchor, own, pins, MessageView, ReplyRef, MESSAGES};
 
 /// One record: the local copy first (messages never change once written), then the network.
 pub fn record(hash: &ActionHash) -> ExternResult<Option<Record>> {
@@ -51,8 +53,52 @@ pub fn decode(record: &Record) -> ExternResult<Option<Message>> {
         .map_err(|e| wasm_error!(e))
 }
 
-/// The newest `PAGE_MAX` messages, oldest first. Deleted ones are gone with their link.
-pub fn list() -> ExternResult<Vec<MessageView>> {
+/// The newest `PAGE_MAX` messages, oldest first, with edits applied, pins marked and a
+/// system row for each leave (web's "… left the group."). Deleted ones are gone with their
+/// link; messages written while their author was out of the chat don't count (ADR 0045).
+pub fn list(chat: &Chat) -> ExternResult<Vec<MessageView>> {
+    let edits: BTreeMap<ActionHash, String> =
+        all::<Edit>(UnitEntryTypes::Edit, LinkTypes::Edits, MESSAGES)?
+            .into_iter()
+            .map(|f| (f.entry.message, f.entry.body))
+            .collect();
+    let pinned = pins::pinned(chat)?;
+    let mut messages = Vec::new();
+    for (r, mut m) in page()? {
+        if !chat
+            .roster
+            .in_at(r.action().author(), r.action().timestamp())
+        {
+            continue;
+        }
+        if let Some(body) = edits.get(r.action_address()) {
+            m.body.clone_from(body);
+        }
+        messages.push((r, m));
+    }
+    let mut views = with_quotes(messages, &own::deleted()?)?;
+    for v in &mut views {
+        v.edited = edits.contains_key(&v.id);
+        v.pinned = pinned.contains_key(&v.id);
+    }
+    views.extend(chat.leaves.iter().map(|f| MessageView {
+        id: f.hash.clone(),
+        author: f.author.clone(),
+        body: String::new(),
+        created_at: f.at,
+        reply_to: None,
+        kind: "system".into(),
+        edited: false,
+        pinned: false,
+    }));
+    views.sort_by_key(|v| v.created_at);
+    let excess = views.len().saturating_sub(PAGE_MAX);
+    views.drain(..excess);
+    Ok(views)
+}
+
+/// The newest `PAGE_MAX` message records, oldest first.
+fn page() -> ExternResult<Vec<(Record, Message)>> {
     let deleted = own::deleted()?;
     let mut found: BTreeMap<ActionHash, Record> = own::messages()?
         .into_iter()
@@ -91,7 +137,7 @@ pub fn list() -> ExternResult<Vec<MessageView>> {
     messages.sort_by_key(|(r, _)| r.action().timestamp());
     let excess = messages.len().saturating_sub(PAGE_MAX);
     messages.drain(..excess);
-    with_quotes(messages, &deleted)
+    Ok(messages)
 }
 
 fn with_quotes(
@@ -128,6 +174,9 @@ fn with_quotes(
             created_at: r.action().timestamp(),
             reply_to: m.reply_to.and_then(|p| quotes.get(&p).cloned()),
             body: m.body,
+            kind: "text".into(),
+            edited: false,
+            pinned: false,
         })
         .collect())
 }

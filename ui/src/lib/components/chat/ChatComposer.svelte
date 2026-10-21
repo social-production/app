@@ -6,11 +6,14 @@
     placeholder: string;
     submitLabel: string;
     replyTarget: ChatLine | null;
+    /** Your own message being edited (web's editingMessage): its text fills the field. */
+    editing?: ChatLine | null;
     paused: boolean;
     error: string;
     /** Resolves once sent; throws to keep the draft. */
     onSubmit: (body: string) => Promise<void>;
     onCancelReply: () => void;
+    onCancelEdit?: () => void;
     onFocus: () => void;
   }
 
@@ -25,6 +28,17 @@
 
   $effect(() => {
     if (field && draft === '') field.style.height = '';
+  });
+
+  // Starting an edit puts the message's text in the field.
+  $effect(() => {
+    const message = p.editing;
+    if (!message) return;
+    draft = message.body;
+    void Promise.resolve().then(() => {
+      grow();
+      field?.focus();
+    });
   });
 
   function grow(): void {
@@ -56,8 +70,42 @@
   }
 </script>
 
+{#snippet cancel(label: string, onclick: () => void)}
+  <button type="button" aria-label={label} title={label} {onclick}>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+      <path
+        d="M6 6l12 12M18 6L6 18"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.2"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+{/snippet}
+
 <div class="composer-card">
-  {#if p.replyTarget}
+  {#if p.editing}
+    <div class="composer-context">
+      <svg
+        class="composer-context-icon"
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+      >
+        <path
+          d="M4 17.5V20h2.5l9.9-9.9-2.5-2.5L4 17.5zm15.7-9.8a1 1 0 0 0 0-1.4l-2-2a1 1 0 0 0-1.4 0l-1.5 1.5 3.4 3.4 1.5-1.5z"
+          fill="currentColor"
+        />
+      </svg>
+      <div class="composer-context-text"><strong>Edit message</strong></div>
+      {@render cancel('Cancel edit', () => {
+        draft = '';
+        p.onCancelEdit?.();
+      })}
+    </div>
+  {:else if p.replyTarget}
     <div class="composer-context">
       <svg
         class="composer-context-icon"
@@ -72,22 +120,7 @@
         <strong>Reply to {p.replyTarget.authorName}</strong>
         <p>{p.replyTarget.body}</p>
       </div>
-      <button
-        type="button"
-        aria-label="Cancel reply"
-        title="Cancel reply"
-        onclick={p.onCancelReply}
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-          <path
-            d="M6 6l12 12M18 6L6 18"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2.2"
-            stroke-linecap="round"
-          />
-        </svg>
-      </button>
+      {@render cancel('Cancel reply', p.onCancelReply)}
     </div>
   {/if}
   {#if p.error}
@@ -111,18 +144,27 @@
           aria-label={p.placeholder}
           rows="1"></textarea>
       </div>
-      <button
-        class="send-button"
-        aria-label={p.submitLabel}
-        title={p.submitLabel}
-        disabled={pending || !canSend}
-        type="button"
-        onclick={submit}
-      >
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
-          <path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" fill="currentColor" />
-        </svg>
-      </button>
+      {#if p.editing}
+        <button
+          class="send-button save"
+          disabled={pending || !canSend}
+          type="button"
+          onclick={submit}>Save</button
+        >
+      {:else}
+        <button
+          class="send-button"
+          aria-label={p.submitLabel}
+          title={p.submitLabel}
+          disabled={pending || !canSend}
+          type="button"
+          onclick={submit}
+        >
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20">
+            <path d="M3.4 20.4 21 12 3.4 3.6 3.4 10l12.6 2-12.6 2z" fill="currentColor" />
+          </svg>
+        </button>
+      {/if}
     </div>
   {/if}
 </div>

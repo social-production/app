@@ -18,6 +18,10 @@ export interface ChatMessage {
   body: string;
   createdAt: number;
   replyTo: ChatQuote | null;
+  /** Direct and group chats only: a leave shows as a system line, edits and pins as marks. */
+  kind?: 'text' | 'system';
+  edited?: boolean;
+  pinned?: boolean;
 }
 
 /** One message as the chat panel shows it (web's LiveChatPanel `ChatMessage`). */
@@ -34,4 +38,8 @@ export interface ChatLine {
   replyToId: string | null;
   replyAuthor: string | null;
   replyPreview: string | null;
+  /** `system`: "<author> left the group." */
+  kind: 'text' | 'system';
+  edited: boolean;
+  pinned: boolean;
 }

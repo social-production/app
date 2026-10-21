@@ -5,6 +5,7 @@ use std::path::PathBuf;
 use holo_hash::AgentPubKeyB64;
 use holochain::prelude::*;
 
+pub mod chats;
 pub mod links;
 pub mod net;
 pub mod plans;
