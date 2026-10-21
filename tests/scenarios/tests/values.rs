@@ -173,4 +173,5 @@ async fn values_are_rated_in_proposal_and_judge_the_plans() {
     net.demand_all().await;
     let space = rated_values(&net).await;
     criteria_on_a_plan(&net, &space).await;
+    net.shut_down().await;
 }

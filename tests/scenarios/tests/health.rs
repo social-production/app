@@ -32,6 +32,7 @@ async fn heartbeat_gossips_between_two_agents() {
             vec![posted],
             "bob sees alice's heartbeat in {dna_name}"
         );
+        common::shut_down(&mut conductors).await;
     }
 }
 
@@ -49,4 +50,5 @@ async fn rejects_blank_heartbeat() {
         .call_fallible(&cell.zome("health"), "post_heartbeat", "   ".to_string())
         .await;
     assert!(result.is_err(), "blank notes fail validation");
+    common::shut_down(&mut conductors).await;
 }

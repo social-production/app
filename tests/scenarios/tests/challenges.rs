@@ -156,4 +156,5 @@ async fn a_challenge_reopens_a_decision_that_left_members_out() {
             "decided again by all three"
         );
     }
+    net.shut_down().await;
 }

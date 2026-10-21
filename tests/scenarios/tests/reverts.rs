@@ -147,4 +147,5 @@ async fn members_can_return_a_project_to_an_earlier_phase() {
 
     // The fold carries on from the phase the return reached.
     advance(&net, "phase-2").await;
+    net.shut_down().await;
 }

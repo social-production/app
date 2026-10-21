@@ -117,6 +117,7 @@ async fn an_edit_passes_with_enough_yes_votes_and_applies() {
         let view = project(&net, i).await;
         assert_eq!(view.charter.map(|c| c.title), Some("Garden co-op".into()));
     }
+    net.shut_down().await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -161,6 +162,7 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
         project(&net, 1).await.charter.map(|c| c.title),
         Some("Garden".into())
     );
+    net.shut_down().await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -215,4 +217,5 @@ async fn leaving_proposal_needs_demand_then_a_vote() {
         (view.phase.as_str(), view.stage.as_str()),
         ("phase-2", "Production Plan")
     );
+    net.shut_down().await;
 }

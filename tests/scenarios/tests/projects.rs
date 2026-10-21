@@ -145,6 +145,7 @@ async fn members_join_signal_and_leave() {
     assert_eq!(after.members, vec![cells[0].agent_pubkey().clone()]);
     assert_eq!(after.charter.map(|c| c.title), Some("Garden".into()));
     assert_eq!((after.demand, after.opposition), (0, 1));
+    common::shut_down(&mut conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -198,6 +199,7 @@ async fn new_members_start_two_projects_a_week() {
     assert_eq!(all.len(), 5);
     let eves = all.iter().filter(|l| l.creator == eve_key).count();
     assert_eq!(eves, 2);
+    common::shut_down(&mut conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -237,4 +239,5 @@ async fn only_the_creator_updates_a_listing() {
         Box::pin(conductors[1].call_fallible::<_, ActionHash>(&eve, "update_listing", &update))
             .await;
     assert!(hijack.is_err(), "only the creator updates a listing");
+    common::shut_down(&mut conductors).await;
 }

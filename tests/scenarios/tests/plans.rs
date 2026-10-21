@@ -189,6 +189,7 @@ async fn an_approved_plan_lets_the_project_leave_its_plan_phase() {
         (view.phase.as_str(), view.stage.as_str()),
         ("phase-3", "Distribution Plan")
     );
+    net.shut_down().await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -232,4 +233,5 @@ async fn ratings_pick_the_leader_and_its_subtype_shapes_the_phases() {
     vote_yes(&net, 0, &next).await;
     net.settle().await;
     assert_eq!(project(&net, 0).await.stage, "Activity");
+    net.shut_down().await;
 }

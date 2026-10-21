@@ -77,6 +77,11 @@ impl Net {
             .map_err(|e| format!("{e:?}"))
     }
 
+    /// Stop every conductor and wait for it (see `common::shut_down`).
+    pub async fn shut_down(mut self) {
+        super::shut_down(&mut self.conductors).await;
+    }
+
     /// Wait for each network on its own: cells of different DNAs never share data.
     pub async fn settle(&self) {
         let directory: Vec<&SweetCell> = self.cells.iter().map(|(d, _)| d).collect();

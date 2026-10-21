@@ -117,6 +117,7 @@ async fn invited_people_talk_and_others_cannot() {
     assert_eq!((&quote.id, quote.preview.as_str()), (&hello, "Hello Bob"));
 
     Box::pin(summaries_and_deletes(&conductors, &cells, &hello, &reply)).await;
+    common::shut_down(&mut conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -157,6 +158,7 @@ async fn direct_chats_are_for_two() {
         .call_fallible(&chat, "send_invite", in_chat)
         .await;
     assert!(misplaced.is_err(), "invitations go through the inbox");
+    common::shut_down(&mut conductors).await;
 }
 
 /** Ann's summary of the group, private read marks, and deleting your own message only. */

@@ -52,6 +52,7 @@ async fn both_projects_approve_a_link_and_either_can_sever_it() {
         Some(b.active[0].create.mine.id.clone()),
     ];
     sever_both_ways(&pair, creates).await;
+    pair.shut_down().await;
 }
 
 /// B proposes a sever and A keeps the link; then A proposes one and both pass it.
