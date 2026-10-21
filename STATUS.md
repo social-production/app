@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see "In flight")
+# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-21: Messages unread badge (branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), not yet on the live UI (see Live)
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
 - web's `unreadCounts.messages` on the send icon (top bar and phone bottom nav), as on web:
   unread messages in personal chats you haven't deleted plus your project chats (Public tab).
@@ -235,7 +235,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `30790ba` (PR #16 merged 2026-10-21 ~04:04 UTC, 3:04 pm Melbourne). Pushing/merging to `main` redeploys bootstrap, seed-node and ui.
+- Deployed `main`: `dbb1621` (PR #19 merged 2026-10-21 ~07:27 UTC, 6:27 pm Melbourne). Merging to `main` should redeploy bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** on 2026-10-21 PR #19 (`dbb1621`, merged 07:27 UTC, `main` CI green 08:24 UTC) had still not reached the live UI at 09:14 UTC (its `index.html` was last modified 05:46 UTC; the new code's `messageCount` prop was absent from every chunk). GitHub's commit statuses show why: Railway deploys every service straight on merge (PR #18 at 05:46 and PR #17 at 06:19 UTC both have Railway "Success" statuses within 5 min), but `dbb1621` has no Railway deployment or status at all. Railway missed that push. Read the statuses with `curl https://api.github.com/repos/social-production/app/commits/<sha>/status`; no Railway token is needed. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge (concurrency), not a failed deploy. Cloud sessions can't see Railway yet: the owner will add a Railway **project token** as `RAILWAY_TOKEN` in the cloud environment (the API host `backboard.railway.com` is already reachable); Railway's Redeploy rebuilds that deployment's own commit (PR #17's), so it can't help; use "Deploy latest commit" on `ui`, or a fresh merge to `main`. Note that a merge landing while `main`'s CI runs cancels that run (concurrency).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
   plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
@@ -252,6 +252,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Known gaps
+- **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s). Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
