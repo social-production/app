@@ -36,7 +36,15 @@ web's Notifications page and the bell's unread count (ADR 0046, `docs/plans/M4-t
   (opens the Vote sheet on that proposal, as web's link does).
 - Left out on purpose: web's `prj-plan-lead` (off by default on web; no settings here yet),
   every kind without an app feature (follows, shares, invites, roles, mentions).
-- See "Checked" below for what this session ran; update it when the PR is open/merged.
+- Checked in the cloud session: fmt, clippy (`identity`, `scenarios`, `-D warnings`), hApp
+  build, scenario `projects` (with `find_listing`), `npm run check`/`lint`, sizes, boundaries;
+  against the local seed node at 390px: `notifications.mjs` (new; its first run timed out at
+  Ann's project creation on a cold node, the rerun passed in full), `governance.mjs`,
+  `chat.mjs`, `projects.mjs`, `public-chats.mjs`. Not run here: the other scenario files and
+  the full workspace clippy/unit tests (no other Rust changed; CI runs them).
+- `notifications.mjs` needs the dev founders (a phase vote must pass), so it runs locally only.
+- Next for this branch: open the PR, wait for CI, merge, smoke live (`projects.mjs`), move this
+  section to "Done" and update README Status.
 
 ## Done 2026-10-21: M4c group options, edits and pins, PR #14 merged (~00:17 UTC / 11:17 am Melbourne), deployed
 web's chat menu, Chat info sheet, message edits and pins (ADR 0045, `docs/plans/M4-talk.md`

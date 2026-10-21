@@ -60,12 +60,15 @@ for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).
 await ann.getByRole('button', { name: 'Publish project' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
-log('ann created the project');
+// Moving on from the Proposal phase needs support (web's signal gate), as in governance.mjs.
+await ann.getByRole('button', { name: /^Support/ }).click();
+log('ann created the project and supports it');
 
 await bob.goto(projectUrl);
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await bob.getByRole('button', { name: 'Join project' }).click();
 await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
+await bob.getByRole('button', { name: /^Support/ }).click();
 await bob.getByRole('tab', { name: 'Chat' }).click();
 await composer(bob).fill(hello);
 await bob.getByRole('button', { name: 'Send', exact: true }).click();
@@ -97,10 +100,18 @@ await toBob.getByRole('button', { name: 'Mark read' }).click();
 await toBob.locator('.unread-dot').waitFor({ state: 'detached', timeout: 10_000 });
 log('bob got the reply and marked it read');
 
-await ann.goto(projectUrl);
-await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Phase', exact: true }).click();
-await ann.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / }).click();
+// Reload until both supports have reached Ann (the gate unlocks "Advance to …").
+const advance = () =>
+  ann.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / });
+for (let i = 0; ; i++) {
+  await ann.goto(projectUrl);
+  await ann.getByRole('tab', { name: 'Participation' }).click();
+  await ann.getByRole('button', { name: 'Phase', exact: true }).click();
+  if (await advance().isEnabled()) break;
+  if (i >= 30) throw new Error('timed out waiting for the signal gate');
+  await ann.waitForTimeout(3000);
+}
+await advance().click();
 const sheet = ann.getByRole('dialog', { name: /^Advance to / });
 await sheet.getByPlaceholder('State why this phase change should happen now.').fill('Ready to plan.');
 await sheet.getByRole('button', { name: /^Advance to / }).click();
