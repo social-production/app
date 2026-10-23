@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,24 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-23: read receipts in direct chats (branch `claude/social-production-handoff-dsam61`)
+The owner asked for "seen" receipts on 2026-10-23. web shows ✓ (sent) / ✓✓ (read) on your own
+messages in **direct chats only** (`peer_read_at`). ADR 0048, `docs/plans/M4-talk.md` "M4c as
+built, fourth part".
+- **Integrity change** (conversation DNA only): a public `Seen` entry (the private `ReadMark`
+  can't be seen by the other person). Merging changes the hApp version: hosted apps reinstall
+  and existing direct/group chats are left on the old network (test chats only); projects and
+  people are untouched.
+- `mark_read` writes a `Seen` next to the read mark in direct chats; `peer_read_at()` reads the
+  other person's newest. UI: `ConversationView` → `withReceipts` → `ChatBubble`.
+- Checked in the cloud session: fmt, clippy (`messages`, `messages_integrity`, `scenarios`,
+  `-D warnings`), hApp build, scenarios `receipts` (new) and `messages`; `npm run check`/`lint`,
+  sizes, boundaries; against the local seed node at 390px: `messages.mjs` (✓ then ✓✓, none in
+  the group; first run timed out at sign-up on the cold node, rerun passed), `group-options.mjs`,
+  `mentions.mjs`, `chat.mjs`. Not run here: the other scenario files (CI runs them).
+- Next step: PR → CI green → merge → wait ~5 min after the seed node restarts (hApp version
+  changes) → live smoke (`messages.mjs` can run live; `projects.mjs`) → move this into "Done".
 
 ## Done 2026-10-23: links to the app's pages in messages, PR #30 merged (~11:21 UTC / 10:21 pm Melbourne), deployed ~11:33 UTC; live `public-chats.mjs` passed
 **UI only, no zome change.** web's `linkifyMessageBody` internal paths and `withoutRawPaths`:
@@ -343,7 +361,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: attachments, calls, "seen" receipts. When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: attachments, calls (read receipts are in flight). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

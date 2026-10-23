@@ -42,6 +42,8 @@ export interface ChatLine {
   kind: 'text' | 'system';
   edited: boolean;
   pinned: boolean;
+  /** Your own message in a direct chat: web's ✓ (sent) or ✓✓ (the other person read it). */
+  receipt?: 'sent' | 'read';
 }
 
 /** web's mention pattern (utils/linkifyMessageBody.ts, web-backend governance.py). */

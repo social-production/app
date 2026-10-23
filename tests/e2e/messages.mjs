@@ -1,7 +1,7 @@
 // M4c direct and group chats end to end at phone width (ADR 0043). Two new accounts: Ann
 // messages Bob from his profile, Bob sees the count on the send icon, finds the chat (unread) in
-// Messages and replies (the count clears), then Ann starts a named group with Bob from the New
-// message button.
+// Messages and replies (the count clears; Ann's message turns from ✓ to ✓✓, web's read
+// receipt), then Ann starts a named group with Bob from the New message button (no receipts).
 //   node tests/e2e/messages.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -20,6 +20,8 @@ const group = `Garden crew ${stamp}`;
 const kickoff = `Welcome to the crew ${stamp}`;
 
 const bubble = (page, text) => page.locator('.chat-log').getByText(text).first();
+const receipt = (page, text) =>
+  page.locator('.chat-message', { hasText: text }).first().locator('.receipt');
 const row = (page, name) => page.locator('.conversation-row', { hasText: name }).first();
 const sendBadge = (page) =>
   page.locator('.mobile-bottom-nav a[aria-label="Messages"] .count-badge');
@@ -55,6 +57,8 @@ await ann.getByRole('dialog').getByRole('button', { name: 'Send' }).click();
 await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
 await bubble(ann, hello).waitFor({ timeout: 60_000 });
 assert.equal(await ann.locator('.identity-title').innerText(), bobName, 'the header names Bob');
+await receipt(ann, hello).waitFor({ timeout: 30_000 });
+assert.equal(await receipt(ann, hello).getAttribute('aria-label'), 'Delivered', 'one tick: sent');
 await ann.screenshot({ path: `${out}/phone390-dm.png` });
 log('ann messaged bob from his profile');
 
@@ -83,6 +87,12 @@ log('reading it cleared the count');
 
 await bubble(ann, answer).waitFor({ timeout: 90_000 });
 log('ann sees the reply');
+await receipt(ann, hello)
+  .and(ann.locator('[aria-label="Read"]'))
+  .waitFor({ timeout: 90_000 });
+assert.equal(await receipt(ann, hello).innerText(), '✓✓', 'two ticks: Bob read it');
+await ann.screenshot({ path: `${out}/phone390-dm-read.png` });
+log("ann's message shows bob read it");
 
 await ann.getByRole('button', { name: 'Back to chats' }).click();
 await ann.getByRole('button', { name: 'New message' }).click();
@@ -97,6 +107,7 @@ await sheet.getByRole('button', { name: 'Send' }).click();
 await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
 await ann.locator('.identity-title', { hasText: group }).waitFor({ timeout: 60_000 });
 await bubble(ann, kickoff).waitFor({ timeout: 60_000 });
+assert.equal(await receipt(ann, kickoff).count(), 0, 'groups have no read receipts, as on web');
 log('ann started a group');
 
 await (await rowShows(bob, group)).click();

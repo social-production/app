@@ -5,8 +5,8 @@
   import { bodyParts, formatMessageTime } from './chatFormat.ts';
 
   /**
-   * One message of web's LiveChatPanel (text, reply quote, time, hover reply). Photos, files,
-   * reports and read receipts arrive with their milestones.
+   * One message of web's LiveChatPanel (text, reply quote, time, read receipt, hover reply).
+   * Photos, files and reports arrive with their milestones.
    */
   interface Props {
     message: ChatLine;
@@ -93,6 +93,12 @@
           <span class="message-time"
             >{message.pending ? 'Sending…' : formatMessageTime(message.createdAt)}</span
           >
+          {#if message.receipt}
+            {@const read = message.receipt === 'read'}
+            <span class="receipt" class:read aria-label={read ? 'Read' : 'Delivered'}
+              >{read ? '✓✓' : '✓'}</span
+            >
+          {/if}
           {#if message.edited}<span class="edited-mark">edited</span>{/if}
         </span>
       </p>

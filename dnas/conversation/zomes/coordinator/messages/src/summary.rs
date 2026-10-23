@@ -8,7 +8,7 @@ use sp_core::conversation::ChatKind;
 
 use crate::entries::{all, private};
 use crate::people::{load, Chat, MEMBERS};
-use crate::{reads, MessageView};
+use crate::{reads, receipts, MessageView};
 
 /// A view for the UI, so its flags are plain fields (web's row has the same ones).
 #[allow(clippy::struct_excessive_bools)]
@@ -123,7 +123,7 @@ pub fn summary() -> ExternResult<ChatSummary> {
 }
 
 /// Mark everything shown as read (web's `mark_conversation_as_read`). Writes a private mark
-/// only when something from someone else is unread.
+/// (and, in a direct chat, a read receipt) only when something from someone else is unread.
 #[hdk_extern]
 pub fn mark_read() -> ExternResult<()> {
     let chat = load()?;
@@ -133,6 +133,7 @@ pub fn mark_read() -> ExternResult<()> {
         let newest = messages.iter().map(|m| m.created_at).max();
         let at = newest.max(Some(sys_time()?)).unwrap_or(sys_time()?);
         create_entry(EntryTypes::ReadMark(ReadMark { at }))?;
+        receipts::mark(&chat, at)?;
     }
     Ok(())
 }
