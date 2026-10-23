@@ -1,6 +1,7 @@
 // M4c Public tab end to end at phone width (ADR 0044). Two new accounts: Ann starts a project,
 // Bob writes in its chat without joining, Ann finds it (unread) in Messages → Public and
-// replies there, then Bob reads the reply on the project's Chat tab and the unread count clears.
+// replies there (opening the members panel from the header), then Bob reads the reply on the
+// project's Chat tab and the unread count clears.
 //   node tests/e2e/public-chats.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -72,6 +73,12 @@ await (await publicRow(ann, 1)).click();
 await ann.waitForURL(/\/messages\?project=/);
 await bubble(ann, hello).waitFor({ timeout: 60_000 });
 assert.match(await ann.locator('.identity-note').innerText(), /^Project chat · 1 member$/);
+// web's members panel: the count opens the project's members.
+await ann.getByRole('button', { name: '1 member', exact: true }).click();
+await ann.locator('.people-sheet .person-row', { hasText: `ann${stamp}` }).waitFor();
+await ann.screenshot({ path: `${out}/phone390-public-members.png` });
+await ann.getByRole('button', { name: 'Close' }).last().click();
+await ann.locator('.people-sheet').waitFor({ state: 'detached' });
 await ann.getByRole('textbox', { name: 'Message the project...' }).fill(answer);
 await ann.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(ann, answer).waitFor({ timeout: 30_000 });
