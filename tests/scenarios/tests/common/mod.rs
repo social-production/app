@@ -12,16 +12,51 @@ pub mod plans;
 use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
 use identity_integrity::{DirectoryProperties, Founder};
 
-/// Shut every conductor down and wait until each has stopped. Call it at the end of each test:
-/// sweettest's `Drop` only spawns the shutdown on the test's runtime, which ends with the test,
-/// so after the last test the process could exit while conductors were still tearing down
-/// (heap-corruption aborts at exit in CI, after every test had passed).
-pub async fn shut_down(conductors: &mut SweetConductorBatch) {
+/// Shut every conductor down, drop them, and wait until their databases have closed. Call it
+/// at the end of each test. `shutdown()` keeps a conductor's state (its `SQLite` pools included)
+/// for a restart, and the pools' worker threads (`sqlx-sqlite-worker-*`) wind down for tens of
+/// seconds after the conductors are dropped. If the last test returned first, the process exited
+/// while those threads were still inside `SQLite`: heap-corruption aborts and SIGSEGVs at exit in
+/// CI, after every test had passed.
+pub async fn shut_down(mut conductors: SweetConductorBatch) {
     for i in 0..conductors.len() {
         if conductors[i].is_running() {
             conductors[i].shutdown().await;
         }
     }
+    drop(conductors);
+    databases_closed().await;
+}
+
+/// Wait (at most two minutes) until no `SQLite` worker thread is left in this process. Tests run
+/// one at a time (`--test-threads=1`), so every such thread belongs to the conductors just
+/// dropped.
+async fn databases_closed() {
+    let deadline = std::time::Instant::now() + std::time::Duration::from_mins(2);
+    while sqlite_workers() > 0 {
+        if std::time::Instant::now() > deadline {
+            eprintln!(
+                "warning: {} SQLite worker threads still running",
+                sqlite_workers()
+            );
+            return;
+        }
+        tokio::time::sleep(std::time::Duration::from_millis(250)).await;
+    }
+}
+
+/// Live threads named `sqlx-sqlite-worker-*` (Linux truncates names to 15 bytes).
+fn sqlite_workers() -> usize {
+    let Ok(tasks) = std::fs::read_dir("/proc/self/task") else {
+        return 0; // not Linux: nothing to wait for that we can see
+    };
+    tasks
+        .flatten()
+        .filter(|t| {
+            std::fs::read_to_string(t.path().join("comm"))
+                .is_ok_and(|name| name.starts_with("sqlx-sqlite-wor"))
+        })
+        .count()
 }
 
 fn dna_path(name: &str) -> PathBuf {
