@@ -33,7 +33,13 @@ built, fourth part".
   people are untouched.
 - `mark_read` writes a `Seen` next to the read mark in direct chats; `peer_read_at()` reads the
   other person's newest. UI: `ConversationView` → `withReceipts` → `ChatBubble`.
-- Checks: see the PR once opened (scenarios `receipts` + `messages`, `messages.mjs`).
+- Checked in the cloud session: fmt, clippy (`messages`, `messages_integrity`, `scenarios`,
+  `-D warnings`), hApp build, scenarios `receipts` (new) and `messages`; `npm run check`/`lint`,
+  sizes, boundaries; against the local seed node at 390px: `messages.mjs` (✓ then ✓✓, none in
+  the group; first run timed out at sign-up on the cold node, rerun passed), `group-options.mjs`,
+  `mentions.mjs`, `chat.mjs`. Not run here: the other scenario files (CI runs them).
+- Next step: PR → CI green → merge → wait ~5 min after the seed node restarts (hApp version
+  changes) → live smoke (`messages.mjs` can run live; `projects.mjs`) → move this into "Done".
 
 ## Done 2026-10-23: links to the app's pages in messages, PR #30 merged (~11:21 UTC / 10:21 pm Melbourne), deployed ~11:33 UTC; live `public-chats.mjs` passed
 **UI only, no zome change.** web's `linkifyMessageBody` internal paths and `withoutRawPaths`:
