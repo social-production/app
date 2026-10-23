@@ -43,3 +43,11 @@ export interface ChatLine {
   edited: boolean;
   pinned: boolean;
 }
+
+/** web's mention pattern (utils/linkifyMessageBody.ts, web-backend governance.py). */
+export const MENTION = /(^|[^\w])@([A-Za-z0-9_-]{1,32})/g;
+
+/** The usernames a message mentions, lowercased (web-backend `_mentioned_user_ids`). */
+export function mentionsOf(body: string): string[] {
+  return [...new Set([...body.matchAll(MENTION)].map((m) => (m[2] ?? '').toLowerCase()))];
+}

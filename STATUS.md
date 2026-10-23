@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-21 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,20 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-23: @mentions in project chats + scroll to the linked message (ADR 0047)
+Branch `claude/social-production-handoff-dsam61`. **UI only, no zome change**, so merging resets nothing.
+- web's mention menu in the project chat composer (`components/chat/MentionMenu.svelte`,
+  `mentions.ts`; styles ported into `styles/chat.css` via PORTS), `@name` links in bubbles
+  (resolved by name: chat participants first, then the directory; unknown names are an unlinked
+  `span.mention`), and the `mention` notification ("You were mentioned.") derived on the
+  mentioned person's device.
+- `?comment=<id>` now centres and marks the message (`.highlighted`); your next message drops
+  the mark and the parameter (web's behaviour).
+- New browser test `tests/e2e/mentions.mjs` (two new accounts, can run live).
+- Checked so far: `npm run check`/`lint`, sizes, boundaries. Next: run `mentions.mjs`,
+  `notifications.mjs`, `chat.mjs`, `public-chats.mjs` against the local seed node, push, PR,
+  CI, merge, live smoke, then move this into a "Done" entry and update README Status.
 
 ## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), deployed 2026-10-22 ~22:43 UTC after Railway's outage; live `messages.mjs` passed
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.
@@ -233,6 +247,11 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 8. **Notifications leave out "Plan became leading"** (ADR 0046): web sends it only to people
    who turn it on in settings, and the app has no notification settings yet.
 
+9. **Mentions resolve by name** (ADR 0047): app usernames aren't unique, so `@name` links to
+   someone in that chat with the name, else the first in the directory, and everyone with that
+   name gets the notification. Mentions in direct/group chats are left out for now (web offers
+   no menu there; web-backend does notify typed ones).
+
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
 - Deployed `main`: `4f42960` (PR #23, deployed 2026-10-22: ui ~22:43 UTC, seed-node 23:05 UTC, after Railway's outage). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
@@ -266,8 +285,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: @mentions in chat (+ `mention` notifications), scroll
-   to the linked chat message. Still from web later: attachments, calls, "seen" receipts, the project members panel.
+1. M4, from web: (mentions and linked-message scrolling are in flight, above). Still from web
+   later: attachments, calls, "seen" receipts, the project members panel, mentions in direct
+   and group chats (ADR 0047), internal-path links in messages.
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

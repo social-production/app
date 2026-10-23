@@ -28,6 +28,7 @@
   // web's links into a project: `?tab=…`, `?comment=…` (the chat) and `?open=vote&voteTarget=…`.
   const params = page.url.searchParams;
   const voteLink = params.get('open') === 'vote' ? params.get('voteTarget') : null;
+  let commentLink = $state(params.get('comment'));
   let tab = $state<DetailTabId>(
     params.get('comment') ? 'chat' : voteLink ? 'participation' : tabFromParam(params.get('tab')),
   );
@@ -68,8 +69,19 @@
 
   /** web's clearVoteLink: a vote opened from a link drops the link once its sheet closes. */
   function clearVoteLink(): void {
+    dropParams(['open', 'voteKind', 'voteTarget']);
+  }
+
+  /** web's clearHighlightedCommentTarget: writing in the chat drops the linked message. */
+  function clearCommentLink(): void {
+    if (!commentLink) return;
+    commentLink = null;
+    dropParams(['comment']);
+  }
+
+  function dropParams(keys: string[]): void {
     const url = new URL(window.location.href);
-    for (const key of ['open', 'voteKind', 'voteTarget']) url.searchParams.delete(key);
+    for (const key of keys) url.searchParams.delete(key);
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- the current page's own path
     void goto(`${url.pathname}${url.search}${url.hash}`, { replace: true, reset: false });
   }
@@ -138,6 +150,8 @@
               names={detail.names}
               fullscreen={compact}
               active={tab === 'chat'}
+              highlighted={commentLink}
+              onWrote={clearCommentLink}
             />
           </div>
         {/if}

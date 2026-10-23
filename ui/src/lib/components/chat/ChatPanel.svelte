@@ -8,14 +8,14 @@
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
   import { formatMessageTime, messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
-  import { syncPanelHeight } from './chatViewport.ts';
+  import { centerIn, scrollToEnd, syncPanelHeight } from './chatViewport.ts';
 
   import '#lib/components/styles/chat.css';
 
   /**
    * web's LiveChatPanel for text chats: day dividers, author runs, reply quotes, the bubble
    * menu (profile, reply, copy, pin, edit and delete your own), "left the group" lines and
-   * the composer. Attachments, mentions and reports come with their milestones.
+   * the composer, with @mentions where web has them. Attachments and reports come later.
    */
   interface Props {
     lines: ChatLine[];
@@ -39,6 +39,12 @@
     onTogglePin?: ((id: string, pinned: boolean) => Promise<void>) | null;
     /** A message to scroll to and flash (web's highlightedMessageId, from the pin bar). */
     focus?: { id: string; n: number } | null;
+    /** web's linked comment (`?comment=`): scrolled to and marked until the viewer writes. */
+    highlighted?: string | null;
+    /** Called after the viewer sends, so the link's mark can go (web's clearHighlighted…). */
+    onWrote?: () => void;
+    mentionSearch?: ((query: string) => Promise<{ agent: string; name: string }[]>) | null;
+    mentionAgent?: ((name: string) => string | null) | undefined;
   }
 
   let p: Props = $props();
@@ -61,22 +67,24 @@
     if (panel) keyboardOpen = syncPanelHeight(panel, p);
   }
 
-  function scrollToBottom(): void {
-    const el = log;
-    if (!el) return;
-    const apply = (): void => {
-      el.scrollTop = el.scrollHeight;
-    };
-    apply();
-    requestAnimationFrame(apply);
-  }
+  const scrollToBottom = (): void => scrollToEnd(log);
 
   // A new message (anyone's) scrolls the log to the bottom, as on web; a poll that brings
-  // nothing new leaves the reader where they are.
+  // nothing new leaves the reader where they are. A linked message is shown first instead.
   const count = $derived(p.lines.length);
+  let shownLink: string | null = null;
   $effect(() => {
     void count;
-    void tick().then(scrollToBottom);
+    const link = p.highlighted;
+    void tick().then(() => {
+      if (!link) return scrollToBottom();
+      if (shownLink === link) return;
+      const target = elements[link];
+      if (!target && count === 0) return;
+      shownLink = link;
+      if (target && log) centerIn(log, target, 'auto');
+      else scrollToBottom();
+    });
   });
 
   $effect(() => {
@@ -126,10 +134,7 @@
   function jump(id: string | null): void {
     const target = id ? elements[id] : undefined;
     if (!id || !target || !log) return;
-    const bounds = log.getBoundingClientRect();
-    const box = target.getBoundingClientRect();
-    const top = box.top - bounds.top + log.scrollTop - log.clientHeight / 2 + box.height / 2;
-    log.scrollTo({ top: Math.max(top, 0), behavior: 'smooth' });
+    centerIn(log, target, 'smooth');
     flashed = id;
     clearTimeout(flashTimer);
     flashTimer = setTimeout(() => (flashed = null), 1800);
@@ -181,6 +186,7 @@
       replyTarget = quoted;
       throw e;
     }
+    p.onWrote?.();
     await tick();
     scrollToBottom();
   }
@@ -237,6 +243,8 @@
               {message}
               showAuthor={!p.hideAuthors && showsAuthor(message, previous)}
               flashed={flashed === message.id}
+              highlighted={p.highlighted === message.id}
+              mentionAgent={p.mentionAgent}
               canReply={!p.paused && !message.pending}
               onOpenMenu={openMenu}
               onReply={reply}
@@ -277,6 +285,7 @@
     onCancelReply={() => (replyTarget = null)}
     onCancelEdit={() => (editing = null)}
     onFocus={sync}
+    mentionSearch={p.mentionSearch}
   />
 </section>
 

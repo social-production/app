@@ -1,4 +1,4 @@
-import type { ChatLine } from '#lib/domain/chat.ts';
+import { MENTION, type ChatLine } from '#lib/domain/chat.ts';
 
 /** Display helpers ported from web's LiveChatPanel and utils/linkifyMessageBody. */
 
@@ -34,14 +34,18 @@ export function showsAuthor(message: ChatLine, previous: ChatLine | undefined): 
   return message.createdAt - previous.createdAt > 5 * 60_000;
 }
 
-export type BodyPart = { text: string; href?: undefined } | { text: string; href: string };
+/** Text, a link, or an "@name" mention (web's `a.mention`). */
+export type BodyPart =
+  | { text: string; href?: undefined; mention?: undefined }
+  | { text: string; href: string; mention?: undefined }
+  | { text: string; href?: undefined; mention: string };
 
 const LINK = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
 const TRAILING = /[.,;:!?'")\]}]+$/;
 
 /**
- * web linkifies bare URLs with `{@html}`; here the body is split into text and link parts, so
- * nothing a person writes is ever parsed as HTML.
+ * web linkifies bare URLs and mentions with `{@html}`; here the body is split into text, link
+ * and mention parts, so nothing a person writes is ever parsed as HTML.
  */
 export function bodyParts(body: string): BodyPart[] {
   const parts: BodyPart[] = [];
@@ -51,11 +55,26 @@ export function bodyParts(body: string): BodyPart[] {
     const trailing = TRAILING.exec(raw)?.[0] ?? '';
     const core = raw.slice(0, raw.length - trailing.length);
     if (!core) continue;
-    if (match.index > last) parts.push({ text: body.slice(last, match.index) });
+    if (match.index > last) parts.push(...mentionParts(body.slice(last, match.index)));
     const href = core.toLowerCase().startsWith('www.') ? `https://${core}` : core;
     parts.push({ text: core, href });
     last = match.index + core.length;
   }
-  if (last < body.length) parts.push({ text: body.slice(last) });
+  if (last < body.length) parts.push(...mentionParts(body.slice(last)));
+  return parts;
+}
+
+/** web's linkMentions, outside links only. */
+function mentionParts(text: string): BodyPart[] {
+  const parts: BodyPart[] = [];
+  let last = 0;
+  for (const match of text.matchAll(MENTION)) {
+    const [whole, prefix = '', name = ''] = match;
+    const at = match.index + prefix.length;
+    if (at > last) parts.push({ text: text.slice(last, at) });
+    parts.push({ text: `@${name}`, mention: name });
+    last = match.index + whole.length;
+  }
+  if (last < text.length) parts.push({ text: text.slice(last) });
   return parts;
 }

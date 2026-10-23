@@ -52,3 +52,9 @@
   padding: 12px var(--page-gutter);
   color: var(--text-soft);
 }
+
+/* app/ui: names aren't unique here, so a mention nobody known has is a span, not web's link. */
+.chat-panel .message-copy p span.mention {
+  color: #5b9dff;
+  font-weight: 700;
+}

@@ -16,7 +16,7 @@ import {
 
 import { listMessages } from './chat.ts';
 import { listProposals } from './governance.ts';
-import { myAgent } from './people.ts';
+import { myAgent, viewer } from './people.ts';
 import { listingIdOf } from './projects.ts';
 
 /** The part of `get_project` notifications read. */
@@ -32,14 +32,13 @@ interface GlanceWire {
  * node, as the Public tab is (ADR 0044): reading any other project would join its network.
  */
 export async function myNotifications(): Promise<{ items: NotificationItem[] }> {
-  const me = await myAgent();
-  const seeds = await clonedSeeds('project');
-  const settled = await Promise.allSettled(seeds.map((seed) => fromProject(seed, me)));
+  const [{ agent: me, name }, seeds] = await Promise.all([viewer(), clonedSeeds('project')]);
+  const settled = await Promise.allSettled(seeds.map((seed) => fromProject(seed, me, name)));
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };
 }
 
-async function fromProject(seed: string, me: string) {
+async function fromProject(seed: string, me: string, myName: string) {
   const cell = await projectCell(seed, 'Project');
   const [project, proposals, messages] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
@@ -60,6 +59,7 @@ async function fromProject(seed: string, me: string) {
       messages,
     },
     me,
+    myName,
   );
 }
 

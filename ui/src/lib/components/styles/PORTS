@@ -49,6 +49,7 @@ governance.css    .update-card    web/src/lib/components/cards/details/DetailUpd
 governance.css    .return-sheet   web/src/lib/features/projects/detail/components/ProjectPhaseChangeSection.svelte
 chat.css          .chat-panel     web/src/lib/components/chat/LiveChatPanel.svelte
 chat.css          .chat-shell     web/src/lib/features/projects/detail/ProjectChatTab.svelte
+chat.css          .mention-menu   web/src/lib/components/shared/MentionMenu.svelte
 confirm.css       .confirm-root   web/src/lib/components/shared/ConfirmHost.svelte
 plans.css         .phase-surface  web/src/lib/features/projects/detail/lifecycle/productive/phases/ProjectLifecyclePlanPhaseContent.svelte
 plans.css         .phase-empty    web/src/lib/components/shared/PhaseEmptyState.svelte

@@ -70,3 +70,21 @@ export function syncPanelHeight(
   panel.style.setProperty('--chat-panel-height', `${Math.floor(height)}px`);
   return keyboardOpen;
 }
+
+/** web's scroll to a message: centre it in the chat log. */
+export function centerIn(log: HTMLElement, target: HTMLElement, behavior: ScrollBehavior): void {
+  const bounds = log.getBoundingClientRect();
+  const box = target.getBoundingClientRect();
+  const top = box.top - bounds.top + log.scrollTop - log.clientHeight / 2 + box.height / 2;
+  log.scrollTo({ top: Math.max(top, 0), behavior });
+}
+
+/** To the newest message, again after layout settles. */
+export function scrollToEnd(log: HTMLElement | undefined): void {
+  if (!log) return;
+  const apply = (): void => {
+    log.scrollTop = log.scrollHeight;
+  };
+  apply();
+  requestAnimationFrame(apply);
+}
