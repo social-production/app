@@ -14,6 +14,7 @@ identity_integrity = { workspace = true }
 sp_governance = { workspace = true }
 holochain = { workspace = true, features = ["wasmer-sys-cranelift", "test_utils"] }
 serde = { workspace = true }
+serde_bytes = "0.11"
 tokio = { workspace = true }
 
 [lints]

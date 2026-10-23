@@ -4,10 +4,13 @@
   import { MESSAGE_MAX, type ChatLine } from '#lib/domain/chat.ts';
   import type { Mentionable } from '#lib/domain/mentions.ts';
 
+  import AttachButtons from './AttachButtons.svelte';
+  import { ComposerFiles } from './composerFiles.svelte.ts';
   import MentionMenu from './MentionMenu.svelte';
   import { activeMention, insertMention } from './mentions.ts';
 
-  /** web LiveChatPanel's composer card: the reply bar, the growing textarea and Send. */
+  /** web LiveChatPanel's composer card: the reply bar, photos and files to send, the growing
+   * textarea and Send. */
   interface Props {
     placeholder: string;
     submitLabel: string;
@@ -16,8 +19,10 @@
     editing?: ChatLine | null;
     paused: boolean;
     error: string;
-    /** Resolves once sent; throws to keep the draft. */
-    onSubmit: (body: string) => Promise<void>;
+    /** Resolves once sent; throws to keep the draft (and the files). */
+    onSubmit: (body: string, files: File[]) => Promise<void>;
+    /** web's `allowAttachments` (direct and group chats, ADR 0049). */
+    attachments?: boolean;
     onCancelReply: () => void;
     onCancelEdit?: () => void;
     onFocus: () => void;
@@ -32,7 +37,8 @@
   let draft = $state('');
   let pending = $state(false);
   let field = $state<HTMLTextAreaElement>();
-  const canSend = $derived(Boolean(draft.trim()));
+  const files = new ComposerFiles();
+  const canSend = $derived(Boolean(draft.trim()) || files.items.length > 0);
   let mentionResults = $state<Mentionable[]>([]);
   let mentionStart = -1;
   let mentionCursor = 0;
@@ -61,14 +67,20 @@
 
   async function submit(): Promise<void> {
     const body = draft.trim();
-    if (!body || pending) return;
+    // An edit changes only the text, as on web.
+    const picked = p.editing ? [] : files.files;
+    if ((!body && picked.length === 0) || pending) return;
+    if (p.editing && !body) return;
     draft = '';
     clearMentions();
     pending = true;
     try {
-      await p.onSubmit(body);
-    } catch {
+      await p.onSubmit(body, picked);
+      if (picked.length) files.release();
+      files.error = '';
+    } catch (e) {
       draft = body;
+      if (e instanceof Error && e.message) files.error = e.message;
     } finally {
       pending = false;
     }
@@ -182,8 +194,24 @@
       {@render cancel('Cancel reply', p.onCancelReply)}
     </div>
   {/if}
-  {#if p.error}
-    <p class="attach-error" role="alert">{p.error}</p>
+  {#if p.attachments && files.items.length > 0}
+    <div class="attach-previews">
+      {#each files.items as item (item.id)}
+        <div class="attach-preview">
+          {#if item.previewUrl}<img alt="" src={item.previewUrl} />{:else}<span
+              >{item.file.name}</span
+            >{/if}
+          <button
+            aria-label="Remove attachment"
+            type="button"
+            onclick={() => files.release(item.id)}>Remove</button
+          >
+        </div>
+      {/each}
+    </div>
+  {/if}
+  {#if p.error || files.error}
+    <p class="attach-error" role="alert">{p.error || files.error}</p>
   {/if}
   {#if p.paused}
     <p class="composer-paused" role="status">
@@ -191,6 +219,7 @@
     </p>
   {:else}
     <div class="composer-row">
+      {#if p.attachments}<AttachButtons {files} part="buttons" />{/if}
       <div class="composer-input-shell">
         <MentionMenu results={mentionResults} onSelect={(name) => void chooseMention(name)} />
         <textarea
@@ -230,4 +259,5 @@
       {/if}
     </div>
   {/if}
+  {#if p.attachments && !p.paused}<AttachButtons {files} part="inputs" />{/if}
 </div>

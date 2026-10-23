@@ -6,6 +6,7 @@
 //! `send_invite` and `inbox`. The UI polls, as it does the project chat (ADR 0038).
 
 mod entries;
+mod files;
 mod group;
 mod inbox;
 mod own;
@@ -16,8 +17,9 @@ mod receipts;
 mod summary;
 
 use hdk::prelude::*;
-use messages_integrity::{Edit, EntryTypes, LinkTypes, Message};
-use sp_core::chat::check_message;
+use messages_integrity::{Attachment, Edit, EntryTypes, LinkTypes, Message};
+use sp_attachment::{check_body, preview_text};
+use sp_core::chat::{check_message, preview};
 
 pub(crate) const MESSAGES: &str = "messages";
 
@@ -25,6 +27,9 @@ pub(crate) const MESSAGES: &str = "messages";
 pub struct PostInput {
     pub body: String,
     pub reply_to: Option<ActionHash>,
+    /// Photos and files whose chunks the caller has written (`upload_chunk`), ADR 0049.
+    #[serde(default)]
+    pub attachments: Vec<Attachment>,
 }
 
 /// One message as the chat shows it (the project chat's shape).
@@ -39,6 +44,19 @@ pub struct MessageView {
     pub kind: String,
     pub edited: bool,
     pub pinned: bool,
+    pub attachments: Vec<Attachment>,
+}
+
+impl MessageView {
+    /// What a list row or a pin shows: the text, else "Photo" or the first file's name.
+    #[must_use]
+    pub fn preview(&self) -> String {
+        let first = self.attachments.first();
+        preview(&preview_text(
+            &self.body,
+            first.map(|a| (a.kind.as_str(), a.name.as_str())),
+        ))
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -69,7 +87,8 @@ pub(crate) fn guest(reason: &str) -> WasmError {
 #[hdk_extern]
 pub fn post_message(input: PostInput) -> ExternResult<ActionHash> {
     let body = input.body.trim().to_string();
-    check_message(&body).map_err(|reason| guest(&reason))?;
+    check_body(&body, input.attachments.len()).map_err(|reason| guest(&reason))?;
+    files::check(&input.attachments)?;
     let chat = people::load()?;
     chat.require_member()?;
     let invite = chat.my_invite()?;
@@ -84,6 +103,7 @@ pub fn post_message(input: PostInput) -> ExternResult<ActionHash> {
         body,
         reply_to: input.reply_to,
         invite,
+        attachments: input.attachments,
     };
     let hash = create_entry(EntryTypes::Message(message))?;
     create_link(anchor()?, hash.clone(), LinkTypes::Messages, ())?;
@@ -103,7 +123,11 @@ pub fn delete_message(id: ActionHash) -> ExternResult<()> {
     for link in own::live_links_to(&id)? {
         delete_link(link, GetOptions::default())?;
     }
+    let chunks = files::chunks_of(&mine, &id)?;
     delete_entry(id)?;
+    for chunk in chunks {
+        delete_entry(chunk)?;
+    }
     Ok(())
 }
 

@@ -50,3 +50,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0046](./0046-notifications-derived-on-device.md) Notifications are derived on each device from the projects it has opened
 - [0047](./0047-chat-mentions.md) @mentions in every chat: ranked by closeness, resolved by name, notified on the mentioned person's device
 - [0048](./0048-read-receipts.md) Read receipts in direct chats: a public `Seen` next to the private read mark
+- [0049](./0049-chat-attachments.md) Photos and files in direct and group chats: 1 MB chunk entries named by the message

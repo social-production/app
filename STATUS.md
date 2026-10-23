@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-24 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-24 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,20 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-24: photos and files in direct and group chats (ADR 0049), branch `claude/social-production-handoff-dsam61`
+STATUS.md Next item 1 ("attachments, then calls"). web's LiveChatPanel attachments, ported for
+direct and group chats; project chats stay text-only until the next project-DNA change.
+- **Integrity change** (conversation DNA only): public `Chunk` entries (≤1 MB parts) and
+  `Message.attachments`. Merging reinstalls hosted apps and leaves the live direct/group chats
+  on the old network (test chats), as PR #32 did. **Directory and project DNA hashes are
+  unchanged** (`hc dna hash`: directory `uhC0kX7veWx…`, project `uhC0kJTRl5t…`, same as main).
+- New crate `crates/sp_attachment` for the rules. Lesson: adding a module to `sp_core` changed
+  the directory and project hashes too (every integrity zome links it), so new rules that only
+  one DNA needs go in their own crate, and `hc dna hash` before/after any `sp_core` change.
+- UI: composer photo/file buttons, previews, errors; photo row, file bubbles; PhotoViewer;
+  "Photo"/file name in list previews and quotes (web-backend `_message_preview`).
+- Checks so far: see the newest update below this line (filled in as they run).
 
 ## Done 2026-10-24: read receipts in direct chats, PR #32 merged (~15:20 UTC 2026-10-23 / 2:20 am Melbourne), deployed ~15:41 UTC; live `messages.mjs` and `projects.mjs` passed
 The owner asked for "seen" receipts on 2026-10-23. web shows ✓ (sent) / ✓✓ (read) on your own

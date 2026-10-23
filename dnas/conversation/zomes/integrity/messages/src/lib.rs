@@ -3,12 +3,15 @@
 //! people they invited write there. The uncloned base cell is everyone's inbox: an `Inbox` link
 //! on a person's key carries an invitation (the chat's seed), encrypted to them.
 
+mod attachments;
 mod chat;
 mod rights;
 
 pub use chat::is_type;
 
 use hdi::prelude::*;
+use sp_attachment::preview_text;
+use sp_core::chat::preview;
 use sp_core::conversation::{chat_seed, ChatKind};
 
 /// The manager brings `agent` into the chat (web's `conversation_members` row).
@@ -28,6 +31,41 @@ pub struct Message {
     /// The message this one answers (web's `reply_to_id`), shown as a quote.
     pub reply_to: Option<ActionHash>,
     /// The author's invitation; `None` for the chat's creator.
+    pub invite: Option<ActionHash>,
+    /// Photos and files (web's `message_attachments`, ADR 0049); the body may then be empty.
+    pub attachments: Vec<Attachment>,
+}
+
+impl Message {
+    /// What a quote, a pin or a list row shows: the text, else "Photo" or the file's name.
+    #[must_use]
+    pub fn preview(&self) -> String {
+        let first = self.attachments.first();
+        preview(&preview_text(
+            &self.body,
+            first.map(|a| (a.kind.as_str(), a.name.as_str())),
+        ))
+    }
+}
+
+/// One photo or file on a message: web's `kind`, `filename`, `content_type`, `byte_size`,
+/// and the `Chunk`s that hold its bytes, in order.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct Attachment {
+    pub kind: String,
+    pub name: String,
+    pub mime: String,
+    pub size: u32,
+    pub chunks: Vec<ActionHash>,
+}
+
+/// Part of an attachment's bytes (at most `sp_attachment::CHUNK_MAX`), written by the
+/// message's author before the message. `invite` is theirs (`None` for the creator).
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Chunk {
+    #[serde(with = "serde_bytes")]
+    pub bytes: Vec<u8>,
     pub invite: Option<ActionHash>,
 }
 
@@ -121,6 +159,7 @@ pub enum EntryTypes {
     #[entry_type(visibility = "private")]
     Prefs(Prefs),
     Seen(Seen),
+    Chunk(Chunk),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -181,10 +220,11 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         | FlatOp::Delete(OpDelete { action }) => {
             let original = must_get_action(action.deletes_address.clone())?;
             let own = original.action().author() == action.author();
-            if own && chat::is_type(original.action(), UnitEntryTypes::Message)? {
+            let message = chat::is_type(original.action(), UnitEntryTypes::Message)?;
+            if own && (message || chat::is_type(original.action(), UnitEntryTypes::Chunk)?) {
                 Ok(ValidateCallbackResult::Valid)
             } else {
-                invalid("only a message's author can delete it, and nothing else is deleted")
+                invalid("only a message's author deletes it (and its files); nothing else goes")
             }
         }
         FlatOp::Link(OpLink::CreateLink { link_type, action })

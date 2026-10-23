@@ -75,3 +75,4 @@ messages.css      .compose-sheet  web/src/lib/components/shared/ComposeMessageSh
 messages.css      .compose-sheet  web/src/lib/components/shared/SuggestionList.svelte
 notifications.css .notifications-page web/src/lib/features/notifications/NotificationsPage.svelte
 notifications.css .notification-card web/src/lib/components/cards/inbox/NotificationCard.svelte
+photo-viewer.css  .photo-viewer   web/src/lib/components/shared/PhotoViewer.svelte

@@ -10,6 +10,7 @@
   import GroupInfoSheet from '#lib/components/messages/GroupInfoSheet.svelte';
   import PinBar from '#lib/components/messages/PinBar.svelte';
   import type { ChatPin, ChatSummary } from '#lib/domain/messages.ts';
+  import { attachmentBlob } from '#lib/services/attachments.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
     chatPeerReadAt,
@@ -48,7 +49,8 @@
   const thread = new ChatState(
     {
       list: () => listChatMessages(seed),
-      post: (body, replyTo) => inTurn(() => postChatMessage(seed, body, replyTo)),
+      post: (body, replyTo, files) => inTurn(() => postChatMessage(seed, body, replyTo, files)),
+      file: (attachment) => attachmentBlob(seed, attachment),
       remove: (id) => inTurn(() => deleteChatMessage(seed, id)),
       edit: (id, body) => inTurn(() => editChatMessage(seed, id, body)),
       pin: (id, pinned) => inTurn(() => pinChatMessage(seed, id, pinned)),
@@ -162,7 +164,8 @@
   paused={thread.paused}
   error={thread.error}
   {focus}
-  onSend={(body, replyTo) => thread.send(body, replyTo)}
+  onSend={(body, replyTo, files) => thread.send(body, replyTo, files)}
+  fileUrl={thread.fileUrl}
   onDelete={(id) => thread.remove(id)}
   onEdit={(id, body) => thread.edit(id, body)}
   onTogglePin={chat.canPin ? (id, pinned) => thread.pin(id, pinned) : null}

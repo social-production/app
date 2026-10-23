@@ -1,11 +1,14 @@
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
-import type { ChatLine, ChatMessage } from '#lib/domain/chat.ts';
+import type { ChatAttachment, ChatLine, ChatMessage } from '#lib/domain/chat.ts';
 
 /** Where a chat's messages come from: a project chat, or a direct or group chat. Features
  * pass services in, since components don't call them. */
 export interface ChatSource {
   list: () => Promise<ChatMessage[]>;
-  post: (body: string, replyTo: string | null) => Promise<unknown>;
+  /** `files` stays empty where the chat has no attachments (`file` unset). */
+  post: (body: string, replyTo: string | null, files: File[]) => Promise<unknown>;
+  /** Direct and group chats (ADR 0049): an attachment's bytes. */
+  file?: (attachment: ChatAttachment) => Promise<Blob>;
   remove: (id: string) => Promise<void>;
   /** Direct and group chats only (web's conversationActions): edit your own, pin. */
   edit?: (id: string, body: string) => Promise<void>;
@@ -25,6 +28,7 @@ interface Pending {
   body: string;
   replyTo: ChatLine | null;
   at: number;
+  attachments: ChatAttachment[];
 }
 
 /**
@@ -42,6 +46,10 @@ export class ChatState {
   loaded = $state(false);
   error = $state('');
   private stop: (() => void) | undefined;
+  /** Object URLs of attachments read so far, by their first part (they never change). Not
+   * state: bubbles await the URL rather than re-render on it. */
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a cache, not shown state
+  private readonly files = new Map<string, Promise<string>>();
   /** Who the viewer is: a copy being sent carries their key (and links to their profile). */
   private ready: Promise<void> = Promise.resolve();
 
@@ -78,6 +86,7 @@ export class ChatState {
       kind: m.kind ?? 'text',
       edited: m.edited ?? false,
       pinned: m.pinned ?? false,
+      attachments: m.attachments ?? [],
     };
   }
 
@@ -96,8 +105,29 @@ export class ChatState {
       kind: 'text',
       edited: false,
       pinned: false,
+      attachments: p.attachments,
     };
   }
+
+  /** Whether this chat takes photos and files (web's `allowAttachments`). */
+  get attachable(): boolean {
+    return !!this.source.file;
+  }
+
+  /** A URL for the attachment's bytes, read once per chat view; a failed read is retried. */
+  fileUrl = (a: ChatAttachment): Promise<string> => {
+    if (a.localUrl) return Promise.resolve(a.localUrl);
+    const key = a.chunks[0] ?? '';
+    const known = this.files.get(key);
+    if (known) return known;
+    const loading = (async () => {
+      if (!this.source.file) throw new Error('No files here');
+      return URL.createObjectURL(await this.source.file(a));
+    })();
+    this.files.set(key, loading);
+    loading.catch(() => this.files.delete(key));
+    return loading;
+  };
 
   /** Load now and keep polling; `isActive` says whether the chat tab is showing. */
   start(isActive: () => boolean): void {
@@ -114,6 +144,8 @@ export class ChatState {
   dispose(): void {
     this.stop?.();
     this.stop = undefined;
+    for (const url of this.files.values()) void url.then(URL.revokeObjectURL, () => undefined);
+    this.files.clear();
   }
 
   private async whoAmI(): Promise<void> {
@@ -149,20 +181,23 @@ export class ChatState {
   }
 
   /** Show a copy at once, write it, then reload; a failure removes the copy and keeps the draft. */
-  async send(body: string, replyToId: string | null): Promise<void> {
+  async send(body: string, replyToId: string | null, files: File[] = []): Promise<void> {
     if (!this.me) await this.ready;
     const replyTo = this.lines.find((l) => l.id === replyToId) ?? null;
-    const copy: Pending = { id: `pending-${crypto.randomUUID()}`, body, replyTo, at: Date.now() };
+    const attachments = files.map(localAttachment);
+    const at = Date.now();
+    const copy: Pending = { id: `pending-${crypto.randomUUID()}`, body, replyTo, at, attachments };
     this.pending = [...this.pending, copy];
     this.error = '';
     try {
-      await this.source.post(body, replyToId);
+      await this.source.post(body, replyToId, files);
       await this.refresh();
     } catch (e) {
       this.error = this.source.explain(e);
       throw e;
     } finally {
       this.pending = this.pending.filter((p) => p.id !== copy.id);
+      for (const a of attachments) if (a.localUrl) URL.revokeObjectURL(a.localUrl);
     }
   }
 
@@ -198,4 +233,17 @@ export class ChatState {
     }
     await this.refresh();
   }
+}
+
+/** A file being sent, as its copy shows it: photos from this device's bytes. */
+function localAttachment(file: File): ChatAttachment {
+  const kind = /^image\/(jpeg|png|webp)$/.test(file.type) ? 'image' : 'file';
+  return {
+    kind,
+    name: file.name,
+    mime: file.type,
+    size: file.size,
+    chunks: [],
+    ...(kind === 'image' ? { localUrl: URL.createObjectURL(file) } : {}),
+  };
 }

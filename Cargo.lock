@@ -5420,6 +5420,8 @@ dependencies = [
  "hdk",
  "messages_integrity",
  "serde",
+ "serde_bytes",
+ "sp_attachment",
  "sp_core",
 ]
 
@@ -5430,6 +5432,8 @@ dependencies = [
  "hdi",
  "holochain_serialized_bytes",
  "serde",
+ "serde_bytes",
+ "sp_attachment",
  "sp_core",
 ]
 
@@ -8077,6 +8081,7 @@ dependencies = [
  "holochain",
  "identity_integrity",
  "serde",
+ "serde_bytes",
  "sp_governance",
  "tokio",
 ]
@@ -8726,6 +8731,13 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
+]
+
+[[package]]
+name = "sp_attachment"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
 ]
 
 [[package]]

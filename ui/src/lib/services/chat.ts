@@ -1,4 +1,4 @@
-import type { ChatMessage } from '#lib/domain/chat.ts';
+import type { ChatAttachment, ChatMessage } from '#lib/domain/chat.ts';
 import {
   callCell,
   hashToString,
@@ -23,6 +23,25 @@ export interface MessageWire {
   kind?: 'text' | 'system';
   edited?: boolean;
   pinned?: boolean;
+  attachments?: AttachmentWire[];
+}
+
+export interface AttachmentWire {
+  kind: 'image' | 'file';
+  name: string;
+  mime: string;
+  size: number;
+  chunks: ActionHash[];
+}
+
+function toAttachment(a: AttachmentWire): ChatAttachment {
+  return {
+    kind: a.kind,
+    name: a.name,
+    mime: a.mime,
+    size: a.size,
+    chunks: a.chunks.map(hashToString),
+  };
 }
 
 export type { ProjectRef };
@@ -52,6 +71,7 @@ export function toChatMessage(m: MessageWire): ChatMessage {
     kind: m.kind ?? 'text',
     edited: m.edited ?? false,
     pinned: m.pinned ?? false,
+    attachments: (m.attachments ?? []).map(toAttachment),
   };
 }
 

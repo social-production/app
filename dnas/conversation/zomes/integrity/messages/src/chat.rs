@@ -2,6 +2,8 @@
 
 use hdi::prelude::*;
 use sp_core::chat::check_message;
+
+use crate::attachments::{validate_chunk, validate_message_files};
 use sp_core::conversation::{check_title, ChatKind, INBOX_TAG_MAX};
 
 use crate::rights::{manages, member, message_author};
@@ -60,6 +62,7 @@ pub fn validate_entry(
             member(author, r.invite.as_ref(), &creator)?,
             "only people in the chat mark it read",
         ),
+        EntryTypes::Chunk(c) => validate_chunk(c, author, &creator),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
     }
 }
@@ -113,8 +116,9 @@ fn validate_message(
     author: &AgentPubKey,
     creator: &AgentPubKey,
 ) -> ExternResult<ValidateCallbackResult> {
-    if let Err(reason) = check_message(&m.body) {
-        return invalid(&reason);
+    let files = validate_message_files(m, author)?;
+    if files != ValidateCallbackResult::Valid {
+        return Ok(files);
     }
     if !member(author, m.invite.as_ref(), creator)? {
         return invalid("only people invited to the chat write in it");

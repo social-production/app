@@ -61,7 +61,7 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 | `reports`, `report_votes` | `Moderation` proposal kind |
 | `platform_board_memberships` | `BoardMembership` kind + `ExecutionReceipt` |
 | `conversations`, `conversation_members`, `messages`, `message_attachments`, `conversation_pins`, `subject_chat_reads` | conversation DNA |
-| `blobs` | chunked file zome (open item) |
+| `blobs` | chat files: `Chunk` entries in the conversation DNA (ADR 0049); others open |
 | `notifications` | local derivation |
 | `searchable_documents` | `sp_index` |
 | `locations` | `Place` |
@@ -76,4 +76,6 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
    with `properties.kind`), or entries inside a project clone? The leaning is clones of the project DNA with a kind.
 2. **Communities and channels (scopes)**: clones of the project DNA with `kind: community`, or a separate scope DNA?
 3. **Files (`blobs`)**: chunked entries (Holochain entries max ~4 MB) vs a content-addressed blob zome with
-   member-only replication.
+   member-only replication. **Chats: decided** ([ADR 0049](decisions/0049-chat-attachments.md)): 1 MB
+   `Chunk` entries in the chat's own DNA, named in order by the message. Other files (avatars, project
+   photos) are still open.
