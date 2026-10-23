@@ -30,7 +30,11 @@ Public, the header's "N members" is now a button that reads the project's member
 `services/publicChats.ts` `projectChatMembers(seed)`; `PublicChatView.svelte` (its local
 `state` is now `talk`, since a local `state` clashes with the `$state` rune).
 `tests/e2e/public-chats.mjs` opens and closes the sheet.
-- Checked: `npm run check`/`lint`, sizes, boundaries. Browser test: see below once run.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; `public-chats.mjs`
+  against the local seed node at 390px passed (its first run timed out at sign-up on the cold
+  node, the rerun passed in full). No Rust changed, so fmt/clippy/scenarios weren't run here.
+- Next step: PR → CI green → merge → live smoke (`public-chats.mjs` can run live) → move this
+  into "Done".
 
 ## Done 2026-10-23: scenario exit crash fix, PR #27 merged (~04:38 UTC / 3:38 pm Melbourne)
 Test-only (`tests/scenarios`); the owner asked for it as its own PR.
