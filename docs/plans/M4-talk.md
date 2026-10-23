@@ -145,4 +145,14 @@ chat mentions and replies.
   `onWrote` drops it and the parameter (`ProjectDetail` `clearCommentLink`).
 - Tests: browser `tests/e2e/mentions.mjs` (two new accounts, can run live: project chat, then a
   group chat).
-- Not yet: follow circles in the ranking (no follows yet), web's internal-path links.
+- Not yet: follow circles in the ranking (no follows yet). Internal-path links came on
+  2026-10-23 (PR #30: `chatFormat.ts` `bodyParts`, `withoutRawPaths`).
+
+## M4c as built, fourth part (2026-10-23: read receipts in direct chats; ADR 0048)
+- Conversation integrity: public `Seen { at, invite }` (direct chats only, author in the chat),
+  linked under `messages` (`Seens`). Coordinator `receipts.rs`: `mark_read` writes one next to
+  the private `ReadMark`; `peer_read_at()` reads the other person's newest.
+- UI: `ConversationView` reads `peer_read_at` with each load (direct chats);
+  `chatFormat.ts` `withReceipts` sets `ChatLine.receipt`; `ChatBubble` shows web's ✓ / ✓✓.
+- Tests: scenario `tests/scenarios/tests/receipts.rs`, a "no receipts in groups" check in
+  `messages.rs`; browser `tests/e2e/messages.mjs` (✓ then ✓✓, none in the group).

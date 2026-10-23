@@ -176,9 +176,17 @@ export async function leaveGroup(seed: string): Promise<void> {
   await chat<null>(seed, 'leave');
 }
 
-/** A private read mark (web's mark_conversation_as_read); written only when needed. */
+/** A private read mark (web's mark_conversation_as_read), and in a direct chat a read receipt
+ * for the other person; written only when something is unread. */
 export async function markChatRead(seed: string): Promise<void> {
   await chat<null>(seed, 'mark_read');
+}
+
+/** How far the other person in a direct chat has read (web's `peer_read_at`), in
+ * milliseconds; `null` before they have read anything. */
+export async function chatPeerReadAt(seed: string): Promise<number | null> {
+  const at = await chat<number | null>(seed, 'peer_read_at');
+  return at === null ? null : at / 1000;
 }
 
 /** Everyone with a profile, by name, for the compose sheet's suggestions. */

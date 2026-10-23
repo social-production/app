@@ -83,6 +83,16 @@ pub struct ReadMark {
     pub at: Timestamp,
 }
 
+/// How far the author has read, for the other person in a direct chat (web's `peer_read_at`,
+/// shown as ✓✓ on their messages). Public, unlike `ReadMark`; web shows receipts only in
+/// direct chats, so groups have none. `invite` is the author's (`None` for the creator).
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Seen {
+    pub at: Timestamp,
+    pub invite: Option<ActionHash>,
+}
+
 /// The author's own list settings for this chat (web's `list_pinned_at`, `muted_at`,
 /// `hidden_at`); the newest counts. Private, like `ReadMark`.
 #[hdk_entry_helper]
@@ -110,6 +120,7 @@ pub enum EntryTypes {
     Pin(Pin),
     #[entry_type(visibility = "private")]
     Prefs(Prefs),
+    Seen(Seen),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -124,11 +135,12 @@ pub enum LinkTypes {
     /// Inbox network only: a person's key → the sender's key, the tag an invitation encrypted
     /// to that person.
     Inbox,
-    /// Chat anchor → a removal, a leave, an edit or a pin, each by its entry's author.
+    /// Chat anchor → a removal, a leave, an edit, a pin or a `Seen`, each by its entry's author.
     Removals,
     Leaves,
     Edits,
     Pins,
+    Seens,
 }
 
 /// Which network this cell is: one chat (its creator and kind) or the inbox.

@@ -161,7 +161,8 @@ async fn direct_chats_are_for_two() {
     common::shut_down(conductors).await;
 }
 
-/** Ann's summary of the group, private read marks, and deleting your own message only. */
+/** Ann's summary of the group, private read marks (no receipts), and deleting your own
+ * message only. */
 async fn summaries_and_deletes(
     conductors: &SweetConductorBatch,
     cells: &[(SweetCell, SweetCell)],
@@ -187,6 +188,8 @@ async fn summaries_and_deletes(
     assert_eq!(ann.unread, 0, "read marks count at once");
     let bob: ChatSummary = conductors[1].call(&chat(1), "summary", ()).await;
     assert_eq!(bob.unread, 1, "read marks are each person's own");
+    let receipt: Option<Timestamp> = conductors[1].call(&chat(1), "peer_read_at", ()).await;
+    assert_eq!(receipt, None, "groups have no read receipts, as on web");
 
     let () = conductors[1]
         .call(&chat(1), "delete_message", reply.clone())

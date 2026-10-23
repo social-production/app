@@ -3,6 +3,7 @@
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
+  import { withReceipts } from '#lib/components/chat/chatFormat.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
@@ -11,6 +12,7 @@
   import type { ChatPin, ChatSummary } from '#lib/domain/messages.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
+    chatPeerReadAt,
     chatPins,
     deleteChatMessage,
     editChatMessage,
@@ -75,13 +77,24 @@
     return () => thread.dispose();
   });
 
-  // Pins follow each load of the chat (a pin or an edit changes them).
+  // Pins and the read receipt follow each load of the chat (web reads `peer_read_at` with
+  // the thread); receipts are for direct chats only, as on web.
+  let peerReadAt = $state<number | null>(null);
+  const lines = $derived(
+    chat.kind === 'direct' ? withReceipts(thread.lines, peerReadAt) : thread.lines,
+  );
   $effect(() => {
     void thread.messages;
     void chatPins(seed).then(
       (list) => (pins = list),
       () => undefined,
     );
+    if (chat.kind === 'direct') {
+      void chatPeerReadAt(seed).then(
+        (at) => (peerReadAt = at),
+        () => undefined,
+      );
+    }
   });
 
   // The chat's members come first in @mention suggestions, then your other chats' (ADR 0047).
@@ -137,7 +150,7 @@
 </header>
 
 <ChatPanel
-  lines={thread.lines}
+  {lines}
   {title}
   placeholder="Write a message..."
   submitLabel="Send"

@@ -27,6 +27,16 @@ export function messageDayLabel(ms: number): string {
   });
 }
 
+/** web's `messageIsRead`: in a direct chat, your own messages show ✓, or ✓✓ once the other
+ * person has read up to them (`peerReadAt`, milliseconds). */
+export function withReceipts(lines: ChatLine[], peerReadAt: number | null): ChatLine[] {
+  return lines.map((l) =>
+    l.own && !l.pending && l.kind === 'text'
+      ? { ...l, receipt: peerReadAt !== null && peerReadAt >= l.createdAt ? 'read' : 'sent' }
+      : l,
+  );
+}
+
 /** Name once per run of messages from the same person, like a group chat elsewhere. */
 export function showsAuthor(message: ChatLine, previous: ChatLine | undefined): boolean {
   if (!previous || previous.author !== message.author || previous.kind === 'system') return true;

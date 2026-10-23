@@ -55,6 +55,11 @@ pub fn validate_entry(
             };
             allow(allowed, "in a group only the manager pins")
         }
+        EntryTypes::Seen(_) if group => invalid("only direct chats show read receipts"),
+        EntryTypes::Seen(r) => allow(
+            member(author, r.invite.as_ref(), &creator)?,
+            "only people in the chat mark it read",
+        ),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
     }
 }
@@ -144,6 +149,7 @@ pub fn validate_link(
         LinkTypes::Leaves => UnitEntryTypes::Leave,
         LinkTypes::Edits => UnitEntryTypes::Edit,
         LinkTypes::Pins => UnitEntryTypes::Pin,
+        LinkTypes::Seens => UnitEntryTypes::Seen,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
     // Whether the entry itself was allowed is the entry's own validation.
