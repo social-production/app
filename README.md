@@ -23,7 +23,8 @@ What works today:
 - **Messages (M4c):** web's Messages page. Message someone from their profile or start a direct
   or named group chat; chats list newest first with unread counts, and the send icon counts
   unread messages, as on web. The Public tab lists your
-  projects' chats with their unread counts (ADR 0044). Group managers rename and add or remove
+  projects' chats with their unread counts (ADR 0044); a project chat's member count opens its
+  members. Group managers rename and add or remove
   people, anyone can leave; the chat menu pins, mutes or deletes a chat; messages can be edited
   and pinned (ADR 0045). Each chat is
   its own private network; invitations travel encrypted (ADR 0043).

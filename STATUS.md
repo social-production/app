@@ -23,18 +23,34 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-23: project members panel from Messages (branch `claude/social-production-handoff-dsam61`)
-**UI only, no zome change.** web's `openProjectMembers`: in a project chat opened from Messages →
-Public, the header's "N members" is now a button that reads the project's members and opens the
-"Project members" sheet (the same `PeopleSheet` as the project page's member count).
-`services/publicChats.ts` `projectChatMembers(seed)`; `PublicChatView.svelte` (its local
-`state` is now `talk`, since a local `state` clashes with the `$state` rune).
-`tests/e2e/public-chats.mjs` opens and closes the sheet.
+## In flight 2026-10-23: links to the app's pages in messages (PR #30, branch `claude/social-production-handoff-dsam61`)
+**UI only, no zome change.** web's `linkifyMessageBody` internal paths and `withoutRawPaths`:
+- In every chat bubble, a path to one of the app's pages (`/projects/…`, `/messages…`,
+  `/profile/…`, with any `?query`) is a same-tab link; a line "Label: /projects/…" shows as a
+  "Label" link. web's other pages (events, threads, posts, …) aren't ported, so their paths stay
+  text. Chat-list previews drop raw paths, as web's do. `components/chat/chatFormat.ts`
+  (`bodyParts`, `withoutRawPaths`), `ChatBubble.svelte`, `messages/ChatRow.svelte`.
+- `tests/e2e/public-chats.mjs`: Ann's reply carries the project's path; her list preview
+  drops it and Bob follows the link from the bubble.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; web's linkify test
+  cases by hand (same output); against the local seed node at 390px, all passed:
+  `public-chats.mjs`, `mentions.mjs`, `messages.mjs`, `chat.mjs`. No Rust changed.
+- Next step: CI green → merge → live smoke (`public-chats.mjs`) → move this into "Done".
+
+## Done 2026-10-23: project members panel from Messages, PR #29 merged (~09:46 UTC / 8:46 pm Melbourne), deployed ~10:04 UTC; live `public-chats.mjs` passed
+**UI only, no zome change**, so merging reset nothing. web's `openProjectMembers`: in a project
+chat opened from Messages → Public, the header's "N members" is a button that reads the
+project's members and opens the "Project members" sheet (the same `PeopleSheet` as the project
+page's member count). `services/publicChats.ts` `projectChatMembers(seed)`;
+`PublicChatView.svelte` (its local `state` is now `talk`: a local `state` clashes with the
+`$state` rune). `tests/e2e/public-chats.mjs` opens and closes the sheet.
 - Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; `public-chats.mjs`
-  against the local seed node at 390px passed (its first run timed out at sign-up on the cold
-  node, the rerun passed in full). No Rust changed, so fmt/clippy/scenarios weren't run here.
-- Next step: PR → CI green → merge → live smoke (`public-chats.mjs` can run live) → move this
-  into "Done".
+  against the local seed node at 390px (first run timed out at sign-up on the cold node, the
+  rerun passed). CI: `check` 7 min, shards 36–63 min. After deploy (waited for Railway's
+  ui/seed-node statuses): `public-chats.mjs` passed against the live UI on the first run.
+- Lessons: `scripts/e2e-local.sh` takes test files only (no screens-dir argument; screens land
+  in `./screens`, delete them). Running a test against the live UI needs
+  `CHROMIUM_PATH=/opt/pw-browsers/chromium` in a cloud session too.
 
 ## Done 2026-10-23: scenario exit crash fix, PR #27 merged (~04:38 UTC / 3:38 pm Melbourne)
 Test-only (`tests/scenarios`); the owner asked for it as its own PR.
@@ -296,13 +312,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `cfc6b2e` (PR #25, deployed 2026-10-23 ~03:26 UTC; the seed node took ~12 min). Later merges (#26 docs, #27 scenario tests) redeploy the services but change nothing they run. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `ba2b056` (PR #29, deployed 2026-10-23 ~10:04 UTC, ~18 min after the merge). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -327,8 +343,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: attachments, calls, "seen" receipts, internal-path links
-   in messages. When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: attachments, calls, "seen" receipts. When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

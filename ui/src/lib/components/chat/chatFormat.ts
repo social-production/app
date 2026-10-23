@@ -34,36 +34,75 @@ export function showsAuthor(message: ChatLine, previous: ChatLine | undefined): 
   return message.createdAt - previous.createdAt > 5 * 60_000;
 }
 
-/** Text, a link, or an "@name" mention (web's `a.mention`). */
+/** Text, a link (`internal`: one of this app's own pages, opened in the same tab), or an
+ * "@name" mention (web's `a.mention`). */
 export type BodyPart =
-  | { text: string; href?: undefined; mention?: undefined }
-  | { text: string; href: string; mention?: undefined }
-  | { text: string; href?: undefined; mention: string };
+  | { text: string; href?: undefined; internal?: undefined; mention?: undefined }
+  | { text: string; href: string; internal: boolean; mention?: undefined }
+  | { text: string; href?: undefined; internal?: undefined; mention: string };
 
-const LINK = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
+/** web's internal paths, narrowed to the pages this app has (web's events, threads and posts
+ * aren't ported, so their paths stay text). */
+const PAGES = '(?:projects|messages|profile)';
+const LINK = new RegExp(
+  `(https?:\\/\\/[^\\s<]+|www\\.[^\\s<]+|\\/${PAGES}(?:\\/[^\\s<]+)?(?:\\?[^\\s<]+)?)`,
+  'gi',
+);
 const TRAILING = /[.,;:!?'")\]}]+$/;
+/** web's LABELLED_INTERNAL_LINE: "View request: /projects/x?…" on its own line reads as a
+ * "View request" link, not a raw path. */
+const LABELLED = new RegExp(`^([A-Za-z][A-Za-z ]{1,40}): (\\/${PAGES}\\S*)$`, 'gm');
+/** web's withoutRawPaths' INTERNAL_PATH (all of web's pages, since previews only drop them). */
+const RAW_PATH =
+  /\/(?:projects|events|threads|messages|posts|profile|help-requests|communities|channels|invites)\/?\S*/;
 
 /**
- * web linkifies bare URLs and mentions with `{@html}`; here the body is split into text, link
- * and mention parts, so nothing a person writes is ever parsed as HTML.
+ * web linkifies bare URLs, internal paths and mentions with `{@html}`; here the body is split
+ * into text, link and mention parts, so nothing a person writes is ever parsed as HTML.
  */
 export function bodyParts(body: string): BodyPart[] {
   const parts: BodyPart[] = [];
   let last = 0;
-  for (const match of body.matchAll(LINK)) {
+  for (const match of body.matchAll(LABELLED)) {
+    const [whole, label = '', path = ''] = match;
+    if (match.index > last) parts.push(...linkParts(body.slice(last, match.index)));
+    parts.push({ text: label, href: path, internal: true });
+    last = match.index + whole.length;
+  }
+  if (last < body.length) parts.push(...linkParts(body.slice(last)));
+  return parts;
+}
+
+/** web's linkBareUrls, then mentions between the links. */
+function linkParts(text: string): BodyPart[] {
+  const parts: BodyPart[] = [];
+  let last = 0;
+  for (const match of text.matchAll(LINK)) {
     const raw = match[0];
     const trailing = TRAILING.exec(raw)?.[0] ?? '';
     const core = raw.slice(0, raw.length - trailing.length);
     if (!core) continue;
-    if (match.index > last) parts.push(...mentionParts(body.slice(last, match.index)));
-    const href = core.toLowerCase().startsWith('www.') ? `https://${core}` : core;
-    parts.push({ text: core, href });
+    if (match.index > last) parts.push(...mentionParts(text.slice(last, match.index)));
+    const internal = core.startsWith('/');
+    const href = !internal && core.toLowerCase().startsWith('www.') ? `https://${core}` : core;
+    parts.push({ text: core, href, internal });
     last = match.index + core.length;
   }
-  if (last < body.length) parts.push(...mentionParts(body.slice(last)));
+  if (last < text.length) parts.push(...mentionParts(text.slice(last)));
   return parts;
 }
 
+/**
+ * web's withoutRawPaths, for chat-list previews: "View request: /projects/x?…" becomes
+ * "View request", and a stray "Open /projects/x" loses the path.
+ */
+export function withoutRawPaths(text: string): string {
+  return text
+    .replace(LABELLED, (_line, label: string) => label)
+    .replace(new RegExp(`\\s*\\bOpen ${RAW_PATH.source}`, 'g'), '')
+    .replace(new RegExp(`\\s*${RAW_PATH.source}`, 'g'), '')
+    .trim();
+}
 /** web's linkMentions, outside links only. */
 function mentionParts(text: string): BodyPart[] {
   const parts: BodyPart[] = [];

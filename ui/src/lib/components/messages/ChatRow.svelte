@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { withoutRawPaths } from '#lib/components/chat/chatFormat.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
 
   import ChatMarks from './ChatMarks.svelte';
@@ -83,7 +84,7 @@
       {#if kind}<span class="chat-kind">{kind}</span>{/if}
       <span class="conversation-time">{time}</span>
     </div>
-    <p class="conversation-preview">{preview}</p>
+    <p class="conversation-preview">{withoutRawPaths(preview)}</p>
   </div>
   {#if unread > 0}<span class="unread-pill">{unread}</span>{/if}
 </button>

@@ -1,7 +1,7 @@
 // M4c Public tab end to end at phone width (ADR 0044). Two new accounts: Ann starts a project,
 // Bob writes in its chat without joining, Ann finds it (unread) in Messages → Public and
-// replies there (opening the members panel from the header), then Bob reads the reply on the
-// project's Chat tab and the unread count clears.
+// replies there with the project's path (opening the members panel from the header), then Bob
+// follows that link from the reply on the project's Chat tab and the unread count clears.
 //   node tests/e2e/public-chats.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -79,13 +79,17 @@ await ann.locator('.people-sheet .person-row', { hasText: `ann${stamp}` }).waitF
 await ann.screenshot({ path: `${out}/phone390-public-members.png` });
 await ann.getByRole('button', { name: 'Close' }).last().click();
 await ann.locator('.people-sheet').waitFor({ state: 'detached' });
-await ann.getByRole('textbox', { name: 'Message the project...' }).fill(answer);
+// A path to one of the app's pages becomes a same-tab link; list previews drop it (web's
+// linkifyMessageBody / withoutRawPaths).
+const path = new URL(projectUrl).pathname;
+await ann.getByRole('textbox', { name: 'Message the project...' }).fill(`${answer} ${path}`);
 await ann.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(ann, answer).waitFor({ timeout: 30_000 });
 await sent(ann);
 await ann.screenshot({ path: `${out}/phone390-public-chat.png` });
 await ann.getByRole('button', { name: 'Back to chats' }).click();
-await publicRow(ann, 0);
+const preview = await (await publicRow(ann, 0)).locator('.conversation-preview').innerText();
+assert.equal(preview, answer, 'the preview drops the raw path');
 await ann.screenshot({ path: `${out}/phone390-public-list.png` });
 log('ann read and replied from Messages');
 
@@ -93,6 +97,10 @@ await publicRow(bob, 1);
 await bob.goto(projectUrl);
 await bob.getByRole('tab', { name: 'Chat' }).click();
 await bubble(bob, answer).waitFor({ timeout: 90_000 });
+const link = bob.locator(`.chat-log a[href="${path}"]`).first();
+assert.equal(await link.getAttribute('target'), null, 'internal links open in the same tab');
+await link.click();
+await bob.waitForURL(projectUrl.split('?')[0] + '*');
 await publicRow(bob, 0);
 log("bob read ann's reply on the project page");
 
