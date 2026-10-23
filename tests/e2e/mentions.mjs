@@ -1,7 +1,8 @@
 // @mentions in a project chat end to end at phone width (ADR 0047). Two new accounts: Bob
 // writes in Ann's project chat; Ann types "@bo…", picks Bob from web's mention menu and sends.
 // The bubble links the name to Bob's profile. Bob gets "You were mentioned.", whose card opens
-// the chat on that message, marked until he writes.
+// the chat on that message, marked until he writes. Then the same in a group chat: Ann's
+// mention gives Bob web's "… mentioned you in <group>." card, which opens the group.
 //   node tests/e2e/mentions.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -18,6 +19,9 @@ const bobName = `bob${stamp}`;
 const hello = `I can fix brakes ${stamp}`;
 const callOut = `can you bring a pump? ${stamp}`;
 const thanks = `Sure ${stamp}`;
+const group = `Pump crew ${stamp}`;
+const kickoff = `Group for the pumps ${stamp}`;
+const groupCall = `bring the big one ${stamp}`;
 
 const composer = (page) => page.getByRole('textbox', { name: 'Message the project...' });
 const bubble = (page, text) => page.locator('.chat-message', { hasText: text }).first();
@@ -116,6 +120,44 @@ await send(bob, thanks);
 await bob.waitForURL((url) => !url.search.includes('comment='), { timeout: 10_000 });
 assert.equal(await bob.locator('.chat-message.highlighted').count(), 0);
 log('writing in the chat dropped the mark and the link');
+
+await bob.goto(`${BASE}/notifications`);
+await card(bob, 'You were mentioned.').waitFor({ timeout: 60_000 });
+assert.equal(await card(bob, 'You were mentioned.').locator('.unread-dot').count(), 0);
+await ann.goto(`${BASE}/messages`);
+await ann.getByRole('button', { name: 'New message' }).click();
+const sheet = ann.getByRole('dialog');
+await sheet.getByRole('tab', { name: 'Group' }).click();
+await sheet.getByPlaceholder('Group name').fill(group);
+await sheet.getByPlaceholder('Add members').fill(bobName);
+await sheet.getByRole('option', { name: bobName }).click({ timeout: 60_000 });
+await sheet.getByPlaceholder('Write a message…').fill(kickoff);
+await sheet.getByRole('button', { name: 'Send' }).click();
+await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
+await bubble(ann, kickoff).waitFor({ timeout: 60_000 });
+const groupBox = ann.getByRole('textbox', { name: 'Write a message...' });
+await groupBox.pressSequentially(`@${bobName.slice(0, 4)}`, { delay: 30 });
+// Bob is in this chat, so he comes first.
+await ann.getByRole('option').first().waitFor({ timeout: 30_000 });
+assert.equal(await ann.getByRole('option').first().innerText(), bobName);
+await ann.getByRole('option').first().click();
+await groupBox.pressSequentially(groupCall);
+await ann.getByRole('button', { name: 'Send', exact: true }).click();
+await bubble(ann, groupCall).waitFor({ timeout: 30_000 });
+await sent(ann);
+assert.match(
+  await bubble(ann, groupCall).locator('a.mention').getAttribute('href'),
+  new RegExp(`/profile/${bobKey}$`),
+);
+log('ann mentioned bob in a group chat from the menu');
+
+const inGroup = await notified(bob, `mentioned you in ${group}.`);
+assert.match(await inGroup.innerText(), new RegExp(`ann${stamp} mentioned you in ${group}\\.`));
+await bob.screenshot({ path: `${out}/phone390-mention-group-card.png` });
+await inGroup.click();
+await bob.waitForURL(/\/messages\?conversation=/, { timeout: 60_000 });
+await bubble(bob, groupCall).waitFor({ timeout: 60_000 });
+log("bob's group mention card opened the group");
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all mention checks passed');

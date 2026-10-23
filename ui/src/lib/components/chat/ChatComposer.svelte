@@ -2,6 +2,7 @@
   import { tick } from 'svelte';
 
   import { MESSAGE_MAX, type ChatLine } from '#lib/domain/chat.ts';
+  import type { Mentionable } from '#lib/domain/mentions.ts';
 
   import MentionMenu from './MentionMenu.svelte';
   import { activeMention, insertMention } from './mentions.ts';
@@ -23,8 +24,6 @@
     /** Set where web offers mentions (project chats): people whose name matches. */
     mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null | undefined;
   }
-
-  type Mentionable = { agent: string; name: string };
 
   let p: Props = $props();
 

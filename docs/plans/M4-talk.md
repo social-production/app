@@ -130,14 +130,19 @@ chat mentions and replies.
 
 ## M4d as built, second part (2026-10-23: @mentions and linked messages; ADR 0047)
 - UI only, no zome change. Composer: `components/chat/MentionMenu.svelte` (web's, styles ported
-  to `styles/chat.css`), `mentions.ts` (web's `activeMention`/`insertMention`),
-  `ChatComposer` `mentionSearch`. Bubbles: `chatFormat.ts` `bodyParts` gains mention parts,
-  `ChatBubble` links them through `mentionAgent`. Wired for project chats in
-  `features/projects/ProjectChat.svelte` (directory people list, `services/messages.ts`
-  `contacts`).
-- Notifications: kind `mention` ("You were mentioned.", `domain/chat.ts` `mentionsOf`) in
-  `domain/notifications.ts`; the service passes your username.
+  to `styles/chat.css`; key tags for shared names in `additions.css`), `mentions.ts` (web's
+  `activeMention`/`insertMention`), `ChatComposer` `mentionSearch`. Bubbles: `chatFormat.ts`
+  `bodyParts` gains mention parts, `ChatBubble` links them through `mentionAgent`.
+- Ranking: `domain/mentions.ts` (`rankMentions`, `mentionTarget`); per chat view
+  `components/chat/mentionSource.svelte.ts` (`MentionSource`), fed by `services/messages.ts`
+  `mentionPool`. Wired in `features/projects/ProjectChat.svelte`,
+  `features/messages/ConversationView.svelte` and `PublicChatView.svelte`.
+- Notifications: kind `mention` in `domain/notifications.ts` (`subject` project or thread;
+  `chatMentionNotifications` for direct and group chats); `services/notifications.ts` reads
+  your chats too. Also fixed: "Mark all read" pressed before the list loaded forgot the cards
+  read one by one.
 - `?comment=<id>`: `ChatPanel` `highlighted` centres and marks the message (`.highlighted`);
   `onWrote` drops it and the parameter (`ProjectDetail` `clearCommentLink`).
-- Tests: browser `tests/e2e/mentions.mjs` (two new accounts, can run live).
-- Not yet: mentions in direct and group chats, web's internal-path links in messages.
+- Tests: browser `tests/e2e/mentions.mjs` (two new accounts, can run live: project chat, then a
+  group chat).
+- Not yet: follow circles in the ranking (no follows yet), web's internal-path links.

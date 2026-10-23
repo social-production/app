@@ -189,6 +189,23 @@ export async function contacts(): Promise<Contact[]> {
 }
 
 /**
+ * What @mention suggestions draw on (ADR 0047): the directory, and the people in the chats you
+ * are in. `known` saves reading every chat when the caller already has the list.
+ */
+export async function mentionPool(
+  known?: ChatSummary[],
+): Promise<{ people: Contact[]; partners: string[] }> {
+  const chats = async (): Promise<ChatSummary[]> => {
+    if (known) return known;
+    const invites = await myChats();
+    const settled = await Promise.allSettled(invites.map((i) => chatSummary(i.seed, i.at)));
+    return settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
+  };
+  const [people, mine] = await Promise.all([contacts(), chats()]);
+  return { people, partners: mine.filter((c) => c.member).flatMap((c) => c.members) };
+}
+
+/**
  * Start what the compose sheet asked for, or post into the direct chat you already have with
  * that person (web's start_direct_conversation reuses it). `known` saves reading every chat
  * when the caller already has the list. Returns the chat's id.

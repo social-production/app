@@ -58,3 +58,10 @@
   color: #5b9dff;
   font-weight: 700;
 }
+
+/* app/ui: two people may share a name here; the mention menu tells them apart by key tag. */
+.mention-menu .mention-tag {
+  margin-left: 6px;
+  color: var(--text-soft);
+  font-weight: 500;
+}

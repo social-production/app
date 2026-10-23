@@ -3,11 +3,13 @@
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
+  import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
   import type { PublicChat } from '#lib/domain/messages.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { mentionPool } from '#lib/services/messages.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
 
@@ -40,6 +42,14 @@
     },
     {},
   );
+
+  // People who wrote here come first in @mention suggestions (ADR 0047).
+  const mentions = new MentionSource(
+    () => mentionPool(),
+    () => ({ me: state.me, agents: Object.keys(state.names), names: state.names }),
+  );
+
+  $effect(() => mentions.watch(state.messages.map((m) => m.body)));
 
   const members = $derived(`${chat.members} ${chat.members === 1 ? 'member' : 'members'}`);
 
@@ -115,4 +125,6 @@
   error={state.error}
   onSend={(body, replyTo) => state.send(body, replyTo)}
   onDelete={(messageId) => state.remove(messageId)}
+  mentionSearch={mentions.search}
+  mentionAgent={mentions.agentOf}
 />

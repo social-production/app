@@ -3,6 +3,7 @@
 
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import type { ChatLine } from '#lib/domain/chat.ts';
+  import type { Mentionable } from '#lib/domain/mentions.ts';
 
   import BubbleMenu from './BubbleMenu.svelte';
   import ChatBubble from './ChatBubble.svelte';
@@ -43,7 +44,7 @@
     highlighted?: string | null;
     /** Called after the viewer sends, so the link's mark can go (web's clearHighlighted…). */
     onWrote?: () => void;
-    mentionSearch?: ((query: string) => Promise<{ agent: string; name: string }[]>) | null;
+    mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null;
     mentionAgent?: ((name: string) => string | null) | undefined;
   }
 

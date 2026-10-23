@@ -23,26 +23,30 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-23: @mentions in project chats + scroll to the linked message (ADR 0047)
+## In flight 2026-10-23: @mentions in every chat + scroll to the linked message, PR #25 (ADR 0047)
 Branch `claude/social-production-handoff-dsam61`. **UI only, no zome change**, so merging resets nothing.
-- web's mention menu in the project chat composer (`components/chat/MentionMenu.svelte`,
-  `mentions.ts`; styles ported into `styles/chat.css` via PORTS), `@name` links in bubbles
-  (resolved by name: chat participants first, then the directory; unknown names are an unlinked
-  `span.mention`), and the `mention` notification ("You were mentioned.") derived on the
-  mentioned person's device.
+- web's mention menu in every chat composer (project, direct, group; the owner asked for
+  direct/group on 2026-10-23), `@name` links in bubbles, and the `mention` notification derived
+  on the mentioned person's device: web's project card ("You were mentioned.") or its "Thread"
+  card ("<name> mentioned you in <group>."), which opens the chat.
+- Suggestions ranked by closeness (owner's ask): people in this chat, then people in your other
+  chats, then everyone; exact > prefix > substring, then by name. Follows (and followers of
+  followers) slot in when web's follow screens are ported: the app has none yet. Same names
+  show their key tag in the menu.
 - `?comment=<id>` now centres and marks the message (`.highlighted`); your next message drops
   the mark and the parameter (web's behaviour).
-- New browser test `tests/e2e/mentions.mjs` (two new accounts, can run live).
-- Also fixed: `tests/e2e/notifications.mjs` left the project right after Bob's vote, which
-  could cancel the queued vote write; the project then never moved and the "phase change
-  executed" card never came (it failed the same way with main's UI). It now waits on the
-  project page until the phase moves, as `governance.mjs` does.
+- Also fixed: "Mark all read" pressed before the list loaded forgot cards read one by one; and
+  `tests/e2e/notifications.mjs` left the project right after Bob's vote, which could cancel
+  the queued vote write (it failed the same way with main's UI); it now waits on the project
+  page until the phase moves, as `governance.mjs` does.
+- New browser test `tests/e2e/mentions.mjs` (two new accounts, can run live): project chat
+  mention, linked message, then a group chat mention and its card.
 - Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; against the local
-  seed node at 390px: `mentions.mjs` (new), `notifications.mjs`, `governance.mjs`, `chat.mjs`,
-  `public-chats.mjs`, `messages.mjs`, all passed. No Rust changed, so fmt/clippy/scenarios
-  weren't run here (CI runs them).
-- Next: PR CI, merge, live smoke (`mentions.mjs` can run live), then turn this into a "Done"
-  entry and update README Status.
+  seed node at 390px, all passed: `mentions.mjs`, `notifications.mjs`, `governance.mjs`,
+  `chat.mjs`, `public-chats.mjs`, `messages.mjs`, `group-options.mjs`. No Rust changed, so
+  fmt/clippy/scenarios weren't run here (CI runs them).
+- Next: PR #25 CI green → merge → live smoke (`/readyz`, `projects.mjs`, `mentions.mjs`) →
+  turn this into a "Done" entry and update README Status.
 - Lessons: after many runs the local conductor answered `database is locked` (SQLite) on every
   project creation; restarting `scripts/cloud-seed.sh` cleared it. The restart starts with an
   empty data dir, so the founders' first phrase sign-in waits on a restore (ADR 0035) and a
@@ -258,10 +262,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 8. **Notifications leave out "Plan became leading"** (ADR 0046): web sends it only to people
    who turn it on in settings, and the app has no notification settings yet.
 
-9. **Mentions resolve by name** (ADR 0047): app usernames aren't unique, so `@name` links to
-   someone in that chat with the name, else the first in the directory, and everyone with that
-   name gets the notification. Mentions in direct/group chats are left out for now (web offers
-   no menu there; web-backend does notify typed ones).
+9. **Mentions with shared names** (ADR 0047): app usernames aren't unique, so `@name` links to
+   the nearest person with that name (this chat, then your other chats, then the directory),
+   the menu shows key tags when names repeat, and everyone with that name is notified.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
@@ -297,8 +300,8 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
 1. M4, from web: (mentions and linked-message scrolling are in flight, above). Still from web
-   later: attachments, calls, "seen" receipts, the project members panel, mentions in direct
-   and group chats (ADR 0047), internal-path links in messages.
+   later: attachments, calls, "seen" receipts, the project members panel, internal-path links
+   in messages. When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
