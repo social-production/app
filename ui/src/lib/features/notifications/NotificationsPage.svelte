@@ -65,10 +65,15 @@
     opening = item.id;
     try {
       await read(item);
+      const t = item.target;
+      if (t && 'conversation' in t) {
+        // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved here
+        await goto(`${resolve('/messages')}?conversation=${encodeURIComponent(t.conversation)}`);
+        return;
+      }
       const id = await projectPageOf(item.seed);
       if (!id) return;
       const page = resolve('/projects/[id]', { id });
-      const t = item.target;
       const query = !t
         ? ''
         : 'tab' in t

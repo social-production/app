@@ -8,7 +8,7 @@
 
   import '#lib/components/styles/notifications.css';
 
-  /** web's inbox NotificationCard (project kinds only: the app has no follows yet). */
+  /** web's inbox NotificationCard (project and chat kinds: the app has no follows yet). */
   interface Props {
     item: NotificationItem;
     actorName: string;
@@ -30,7 +30,11 @@
   }
 </script>
 
-<FeedSurface compact clampExcerpts={false} accent={modeAccent(item.projectMode)}>
+<FeedSurface
+  compact
+  clampExcerpts={false}
+  accent={item.projectMode ? modeAccent(item.projectMode) : 'var(--type-accent-thread)'}
+>
   <div
     class:unread={item.isUnread}
     class="notification-card"
@@ -43,7 +47,7 @@
       {#if item.isUnread}
         <span class="unread-dot"></span>
       {/if}
-      <span class="subject-label">Project</span>
+      <span class="subject-label">{item.subject === 'thread' ? 'Thread' : 'Project'}</span>
     </div>
 
     <div class="copy-row">

@@ -1,5 +1,6 @@
 import {
   markRead,
+  chatMentionNotifications,
   projectNotifications,
   withReadMarks,
   type NotificationItem,
@@ -15,8 +16,9 @@ import {
 } from '#lib/holo/index.ts';
 
 import { listMessages } from './chat.ts';
+import { chatSummary, listChatMessages, myChats } from './messages.ts';
 import { listProposals } from './governance.ts';
-import { myAgent } from './people.ts';
+import { myAgent, namesOf, viewer } from './people.ts';
 import { listingIdOf } from './projects.ts';
 
 /** The part of `get_project` notifications read. */
@@ -32,14 +34,20 @@ interface GlanceWire {
  * node, as the Public tab is (ADR 0044): reading any other project would join its network.
  */
 export async function myNotifications(): Promise<{ items: NotificationItem[] }> {
-  const me = await myAgent();
-  const seeds = await clonedSeeds('project');
-  const settled = await Promise.allSettled(seeds.map((seed) => fromProject(seed, me)));
+  const [{ agent: me, name }, seeds, chats] = await Promise.all([
+    viewer(),
+    clonedSeeds('project'),
+    myChats(),
+  ]);
+  const settled = await Promise.allSettled([
+    ...seeds.map((seed) => fromProject(seed, me, name)),
+    ...chats.map((c) => fromChat(c.seed, c.at, me, name)),
+  ]);
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };
 }
 
-async function fromProject(seed: string, me: string) {
+async function fromProject(seed: string, me: string, myName: string) {
   const cell = await projectCell(seed, 'Project');
   const [project, proposals, messages] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
@@ -60,7 +68,22 @@ async function fromProject(seed: string, me: string) {
       messages,
     },
     me,
+    myName,
   );
+}
+
+/** Mentions in a direct or group chat you're still in (web notifies only its members). */
+async function fromChat(seed: string, at: number, me: string, myName: string) {
+  const [summary, messages] = await Promise.all([chatSummary(seed, at), listChatMessages(seed)]);
+  if (!summary.member) return [];
+  const found = chatMentionNotifications(
+    { seed, title: summary.title, messages, names: {} },
+    me,
+    myName,
+  );
+  if (found.length === 0) return [];
+  const names = await namesOf([...new Set(found.map((n) => n.actor))]);
+  return chatMentionNotifications({ seed, title: summary.title, messages, names }, me, myName);
 }
 
 /** Read one card (web's "Mark read"). */
@@ -72,8 +95,10 @@ export async function markNotificationRead(item: NotificationItem, all: Notifica
 /** web's "Mark all read": everything up to the newest card. */
 export async function markAllNotificationsRead(all: NotificationItem[]): Promise<void> {
   const me = await myAgent();
-  const newest = Math.max(marksOf(me).all, ...all.map((n) => n.createdAt));
-  saveMarks(me, { all: newest, ids: [] });
+  const marks = marksOf(me);
+  const newest = Math.max(marks.all, ...all.map((n) => n.createdAt));
+  // Pressed before the list loaded, it must not forget the cards already read one by one.
+  saveMarks(me, { all: newest, ids: newest === marks.all ? marks.ids : [] });
 }
 
 /**

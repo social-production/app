@@ -52,3 +52,16 @@
   padding: 12px var(--page-gutter);
   color: var(--text-soft);
 }
+
+/* app/ui: names aren't unique here, so a mention nobody known has is a span, not web's link. */
+.chat-panel .message-copy p span.mention {
+  color: #5b9dff;
+  font-weight: 700;
+}
+
+/* app/ui: two people may share a name here; the mention menu tells them apart by key tag. */
+.mention-menu .mention-tag {
+  margin-left: 6px;
+  color: var(--text-soft);
+  font-weight: 500;
+}

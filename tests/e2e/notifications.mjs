@@ -124,7 +124,14 @@ await vote.click();
 await bob.waitForURL(/open=vote/, { timeout: 60_000 });
 await bob.locator('.choice-bar .choice.yes').click({ timeout: 120_000 });
 await bob.waitForURL((url) => !url.search.includes('open=vote'), { timeout: 60_000 });
-log("bob's card opened the Vote sheet and he voted yes");
+// Leaving before the vote lands would cancel it; reloading the project also writes the Outcome.
+for (let i = 0; !(await bob.locator('.feed-card-stage', { hasText: 'Production Plan' }).count()); i++) {
+  if (i >= 40) throw new Error('timed out waiting for the phase move');
+  await bob.waitForTimeout(3000);
+  await bob.reload();
+  await bob.locator('.project-detail h1').waitFor({ state: 'attached', timeout: 60_000 });
+}
+log("bob's card opened the Vote sheet and he voted yes; the project moved on");
 
 const done = await notified(bob, 'Project phase change executed');
 assert.match(await done.innerText(), /The project phase changed to /);

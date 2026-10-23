@@ -1,28 +1,36 @@
-import type { ChatMessage } from './chat.ts';
+import { mentionsOf, type ChatMessage } from './chat.ts';
 import type { Proposal } from './governance.ts';
 import type { ProjectMode } from './projects.ts';
 
 /**
  * In-app notifications (web's NotificationItem, ADR 0046). Nothing is stored: each device
  * derives them from the projects opened on its node, the kinds web-backend creates for what
- * the app has so far: phase votes (`prj-phase-vote`), phase changes (`prj-phase-done`) and
- * chat replies (`reply`). Times are Holochain micros.
+ * the app has so far: phase votes (`prj-phase-vote`), phase changes (`prj-phase-done`), chat
+ * replies (`reply`) and @mentions in project, direct and group chats (`mention`, ADR 0047).
+ * Times are Holochain micros.
  */
-export type NotificationKind = 'prj-phase-vote' | 'prj-phase-done' | 'reply';
+export type NotificationKind = 'prj-phase-vote' | 'prj-phase-done' | 'reply' | 'mention';
 
 export interface NotificationItem {
   id: string;
   kind: NotificationKind;
-  /** The project's network seed; its page is found by seed when the card opens. */
+  /** web's subject: a project, or a direct or group chat (web's "Thread" card). */
+  subject: 'project' | 'thread';
+  /** The project's or chat's network seed; a project's page is found by seed on opening. */
   seed: string;
-  projectMode: ProjectMode;
+  /** Projects only. */
+  projectMode: ProjectMode | null;
   actor: string;
   title: string;
   body: string;
   /** Replies: web's "Replied to your comment" / "Replied to your project" lead. */
   lead: string | null;
   /** Where the card goes on the project page (web's href query). */
-  target: { tab: 'chat'; comment: string } | { open: 'vote'; voteTarget: string } | null;
+  target:
+    | { tab: 'chat'; comment: string }
+    | { open: 'vote'; voteTarget: string }
+    | { conversation: string }
+    | null;
   createdAt: number;
   isUnread: boolean;
 }
@@ -41,9 +49,12 @@ export interface ProjectActivity {
 
 type Unread = Omit<NotificationItem, 'isUnread'>;
 
-/** Everything one project notifies `me` of, as web-backend would have sent it. */
-export function projectNotifications(p: ProjectActivity, me: string): Unread[] {
-  const base = { seed: p.seed, projectMode: p.mode };
+/**
+ * Everything one project notifies `me` (whose username is `myName`) of, as web-backend would
+ * have sent it.
+ */
+export function projectNotifications(p: ProjectActivity, me: string, myName: string): Unread[] {
+  const base = { subject: 'project' as const, seed: p.seed, projectMode: p.mode };
   const out: Unread[] = [];
   if (p.amMember) {
     for (const v of p.proposals) {
@@ -79,8 +90,30 @@ export function projectNotifications(p: ProjectActivity, me: string): Unread[] {
       }
     }
   }
+  return [...out, ...chatNotifications(p, me, myName)];
+}
+
+/** Chat replies and @mentions (governance.py `_notify_comment_recipients`). */
+function chatNotifications(p: ProjectActivity, me: string, myName: string): Unread[] {
+  const base = { subject: 'project' as const, seed: p.seed, projectMode: p.mode };
+  const out: Unread[] = [];
+  const mentionName = myName.toLowerCase();
   for (const m of p.messages) {
     if (m.author === me || (m.kind ?? 'text') !== 'text') continue;
+    // governance.py: "@name" pings that person, as well as any reply notice.
+    if (mentionName && mentionsOf(m.body).includes(mentionName)) {
+      out.push({
+        ...base,
+        id: `mention:${m.id}`,
+        kind: 'mention',
+        actor: m.author,
+        title: p.title,
+        body: 'You were mentioned.',
+        lead: null,
+        target: { tab: 'chat', comment: m.id },
+        createdAt: m.createdAt,
+      });
+    }
     // governance.py `_notify_comment_recipients`: the replied-to author, else the owner.
     const lead =
       m.replyTo?.author === me
@@ -102,6 +135,43 @@ export function projectNotifications(p: ProjectActivity, me: string): Unread[] {
     });
   }
   return out;
+}
+
+/** What one direct or group chat gives the list. */
+export interface ChatActivity {
+  seed: string;
+  /** A group's name; `null` for a direct chat or an unnamed group. */
+  title: string | null;
+  messages: ChatMessage[];
+  /** Display names of the messages' authors. */
+  names: Record<string, string>;
+}
+
+/** messaging.py `_notify_chat_mentions`: "@name" in a chat you're in pings you. */
+export function chatMentionNotifications(c: ChatActivity, me: string, myName: string): Unread[] {
+  const name = myName.toLowerCase();
+  const where = c.title ? `in ${c.title}` : 'in a chat';
+  return c.messages
+    .filter(
+      (m) =>
+        m.author !== me &&
+        (m.kind ?? 'text') === 'text' &&
+        !!name &&
+        mentionsOf(m.body).includes(name),
+    )
+    .map((m) => ({
+      id: `mention:${m.id}`,
+      kind: 'mention' as const,
+      subject: 'thread' as const,
+      seed: c.seed,
+      projectMode: null,
+      actor: m.author,
+      title: c.title ?? 'Chat',
+      body: `${c.names[m.author] ?? 'Someone'} mentioned you ${where}.`,
+      lead: null,
+      target: { conversation: c.seed },
+      createdAt: m.createdAt,
+    }));
 }
 
 /** What this device has read: everything up to `all`, plus single cards read since. */

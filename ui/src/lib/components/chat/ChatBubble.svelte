@@ -17,10 +17,24 @@
     onReply: (message: ChatLine) => void;
     onJump: (id: string | null) => void;
     register: (node: HTMLElement, id: string) => { destroy: () => void };
+    /** web's linked comment (`?comment=`): marked until the viewer writes. */
+    highlighted?: boolean;
+    /** Who "@name" means here, for its profile link; `null` when nobody known has that name. */
+    mentionAgent?: ((name: string) => string | null) | undefined;
   }
 
-  let { message, showAuthor, flashed, canReply, onOpenMenu, onReply, onJump, register }: Props =
-    $props();
+  let {
+    message,
+    showAuthor,
+    flashed,
+    canReply,
+    onOpenMenu,
+    onReply,
+    onJump,
+    register,
+    highlighted = false,
+    mentionAgent,
+  }: Props = $props();
 </script>
 
 <!-- web's bubble opens its menu on click or right-click; the menu's items are buttons. -->
@@ -28,6 +42,7 @@
 <article
   id={`comment-${message.id}`}
   class:flash={flashed}
+  class:highlighted
   class:own={message.own}
   class="chat-message"
   use:register={message.id}
@@ -61,7 +76,12 @@
     <div class="caption-block">
       <p>
         {#each bodyParts(message.body) as part, i (i)}
-          {#if part.href}
+          {#if part.mention}
+            {@const agent = mentionAgent?.(part.mention)}
+            {#if agent}
+              <a class="mention" href={resolve('/profile/[agent]', { agent })}>{part.text}</a>
+            {:else}<span class="mention">{part.text}</span>{/if}
+          {:else if part.href}
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
             <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
           {:else}{part.text}{/if}

@@ -1,8 +1,10 @@
 <script lang="ts">
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
+  import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { mentionPool } from '#lib/services/messages.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
 
@@ -15,9 +17,12 @@
     names: Record<string, string>;
     fullscreen: boolean;
     active: boolean;
+    /** web's `?comment=` link: the message to show first. */
+    highlighted: string | null;
+    onWrote: () => void;
   }
 
-  let { projectId, seed, names, fullscreen, active }: Props = $props();
+  let { projectId, seed, names, fullscreen, active, highlighted, onWrote }: Props = $props();
 
   // The page mounts this once per project, so the first id and names are the ones to keep.
   // svelte-ignore state_referenced_locally
@@ -51,6 +56,14 @@
 
   $effect(() => () => chat.dispose());
 
+  // People in this project come first in @mention suggestions (ADR 0047).
+  const mentions = new MentionSource(
+    () => mentionPool(),
+    () => ({ me: chat.me, agents: Object.keys(chat.names), names: chat.names }),
+  );
+
+  $effect(() => mentions.watch(chat.messages.map((m) => m.body)));
+
   // web's LinkedChatReadMarker: reading the Chat tab clears the project in Messages' Public tab.
   $effect(() => {
     const newest = chat.messages.at(-1)?.createdAt;
@@ -75,5 +88,9 @@
     error={chat.error}
     onSend={(body, replyTo) => chat.send(body, replyTo)}
     onDelete={(id) => chat.remove(id)}
+    {highlighted}
+    {onWrote}
+    mentionSearch={mentions.search}
+    mentionAgent={mentions.agentOf}
   />
 </section>

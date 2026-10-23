@@ -1,5 +1,11 @@
 <script lang="ts">
+  import { tick } from 'svelte';
+
   import { MESSAGE_MAX, type ChatLine } from '#lib/domain/chat.ts';
+  import type { Mentionable } from '#lib/domain/mentions.ts';
+
+  import MentionMenu from './MentionMenu.svelte';
+  import { activeMention, insertMention } from './mentions.ts';
 
   /** web LiveChatPanel's composer card: the reply bar, the growing textarea and Send. */
   interface Props {
@@ -15,6 +21,8 @@
     onCancelReply: () => void;
     onCancelEdit?: () => void;
     onFocus: () => void;
+    /** Set where web offers mentions (project chats): people whose name matches. */
+    mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null | undefined;
   }
 
   let p: Props = $props();
@@ -25,6 +33,10 @@
   let pending = $state(false);
   let field = $state<HTMLTextAreaElement>();
   const canSend = $derived(Boolean(draft.trim()));
+  let mentionResults = $state<Mentionable[]>([]);
+  let mentionStart = -1;
+  let mentionCursor = 0;
+  let mentionTimer: ReturnType<typeof setTimeout> | undefined;
 
   $effect(() => {
     if (field && draft === '') field.style.height = '';
@@ -51,6 +63,7 @@
     const body = draft.trim();
     if (!body || pending) return;
     draft = '';
+    clearMentions();
     pending = true;
     try {
       await p.onSubmit(body);
@@ -61,8 +74,54 @@
     }
   }
 
+  function clearMentions(): void {
+    clearTimeout(mentionTimer);
+    mentionResults = [];
+    mentionStart = -1;
+  }
+
+  /** web's syncMentions: look names up shortly after the "@…" before the caret changes. */
+  function syncMentions(): void {
+    const search = p.mentionSearch;
+    if (!search || !field) return clearMentions();
+    const cursor = field.selectionStart ?? draft.length;
+    const found = activeMention(draft, cursor);
+    if (!found) return clearMentions();
+    mentionStart = found.start;
+    mentionCursor = cursor;
+    clearTimeout(mentionTimer);
+    mentionTimer = setTimeout(() => {
+      void search(found.query).then(
+        (items) => {
+          if (mentionStart === found.start) mentionResults = items;
+        },
+        () => clearMentions(),
+      );
+    }, 160);
+  }
+
+  async function chooseMention(name: string): Promise<void> {
+    const inserted = insertMention(draft, mentionStart, mentionCursor, name);
+    draft = inserted.value;
+    clearMentions();
+    await tick();
+    field?.focus();
+    field?.setSelectionRange(inserted.caret, inserted.caret);
+  }
+
   function keydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape' && mentionResults.length > 0) {
+      event.preventDefault();
+      clearMentions();
+      return;
+    }
     if (event.key !== 'Enter' || event.shiftKey) return;
+    const [first] = mentionResults;
+    if (first) {
+      event.preventDefault();
+      void chooseMention(first.name);
+      return;
+    }
     // On phones Enter adds a line, as in other messaging apps; the send button sends.
     if (window.matchMedia('(pointer: coarse)').matches) return;
     event.preventDefault();
@@ -133,12 +192,16 @@
   {:else}
     <div class="composer-row">
       <div class="composer-input-shell">
+        <MentionMenu results={mentionResults} onSelect={(name) => void chooseMention(name)} />
         <textarea
           bind:this={field}
           bind:value={draft}
           maxlength={MESSAGE_MAX}
           onfocus={p.onFocus}
-          oninput={grow}
+          oninput={() => {
+            syncMentions();
+            grow();
+          }}
           onkeydown={keydown}
           placeholder={p.placeholder}
           aria-label={p.placeholder}

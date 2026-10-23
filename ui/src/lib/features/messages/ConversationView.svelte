@@ -3,6 +3,7 @@
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
+  import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
   import GroupInfoSheet from '#lib/components/messages/GroupInfoSheet.svelte';
@@ -15,6 +16,7 @@
     editChatMessage,
     listChatMessages,
     markChatRead,
+    mentionPool,
     pinChatMessage,
     postChatMessage,
   } from '#lib/services/messages.ts';
@@ -82,6 +84,14 @@
     );
   });
 
+  // The chat's members come first in @mention suggestions, then your other chats' (ADR 0047).
+  const mentions = new MentionSource(
+    () => mentionPool(inbox.all),
+    () => ({ me: thread.me, agents: chat.members, names: thread.names }),
+  );
+
+  $effect(() => mentions.watch(thread.messages.map((m) => m.body)));
+
   function jump(id: string): void {
     focus = { id, n: (focus?.n ?? 0) + 1 };
   }
@@ -143,6 +153,8 @@
   onDelete={(id) => thread.remove(id)}
   onEdit={(id, body) => thread.edit(id, body)}
   onTogglePin={chat.canPin ? (id, pinned) => thread.pin(id, pinned) : null}
+  mentionSearch={mentions.search}
+  mentionAgent={mentions.agentOf}
 />
 
 {#if chat.kind === 'group'}

@@ -45,4 +45,5 @@ lives in its own network (a clone), and reading a project not yet opened joins i
 - Each refresh reads three zome calls per opened project. Fine at today's sizes; signals or a
   per-project summary call would trim it later.
 - A chat card opens the Chat tab but doesn't scroll to the message yet (web highlights it).
+  Done in [0047](./0047-chat-mentions.md).
 - Not yet: web's other kinds (each comes with its feature), notification settings, push.
