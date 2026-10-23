@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-23: links to the app's pages in messages (PR #30, branch `claude/social-production-handoff-dsam61`)
+## Done 2026-10-23: links to the app's pages in messages, PR #30 merged (~11:21 UTC / 10:21 pm Melbourne), deployed ~11:33 UTC; live `public-chats.mjs` passed
 **UI only, no zome change.** web's `linkifyMessageBody` internal paths and `withoutRawPaths`:
 - In every chat bubble, a path to one of the app's pages (`/projects/…`, `/messages…`,
   `/profile/…`, with any `?query`) is a same-tab link; a line "Label: /projects/…" shows as a
@@ -35,7 +35,7 @@ and continue from Next."
 - Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; web's linkify test
   cases by hand (same output); against the local seed node at 390px, all passed:
   `public-chats.mjs`, `mentions.mjs`, `messages.mjs`, `chat.mjs`. No Rust changed.
-- Next step: CI green → merge → live smoke (`public-chats.mjs`) → move this into "Done".
+- CI: `check` 5 min, shards 50–65 min. After deploy: `public-chats.mjs` passed live, first run.
 
 ## Done 2026-10-23: project members panel from Messages, PR #29 merged (~09:46 UTC / 8:46 pm Melbourne), deployed ~10:04 UTC; live `public-chats.mjs` passed
 **UI only, no zome change**, so merging reset nothing. web's `openProjectMembers`: in a project
@@ -312,13 +312,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `ba2b056` (PR #29, deployed 2026-10-23 ~10:04 UTC, ~18 min after the merge). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `9b40e9c` (PR #30, deployed 2026-10-23 ~11:33 UTC, ~12 min after the merge). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes

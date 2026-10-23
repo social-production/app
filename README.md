@@ -17,6 +17,7 @@ What works today:
 - **@mentions (ADR 0047):** web's mention menu in every chat (project, direct, group), ranked by
   who is closest (this chat, then your other chats, then everyone); `@name` links to their
   profile, and the person mentioned gets a notification that opens the chat on that message.
+  A path to one of the app's pages in a message (`/projects/…`) opens as a link, as on web.
 - **Notifications (M4d, first part):** web's Notifications page and the bell's unread count:
   phase votes, phase changes and replies in project chats, worked out on each device from the
   projects it has opened; a card opens the chat or the Vote sheet (ADR 0046).
