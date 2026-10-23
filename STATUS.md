@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-23 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,20 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-23: links to the app's pages in messages (PR #30, branch `claude/social-production-handoff-dsam61`)
+**UI only, no zome change.** web's `linkifyMessageBody` internal paths and `withoutRawPaths`:
+- In every chat bubble, a path to one of the app's pages (`/projects/…`, `/messages…`,
+  `/profile/…`, with any `?query`) is a same-tab link; a line "Label: /projects/…" shows as a
+  "Label" link. web's other pages (events, threads, posts, …) aren't ported, so their paths stay
+  text. Chat-list previews drop raw paths, as web's do. `components/chat/chatFormat.ts`
+  (`bodyParts`, `withoutRawPaths`), `ChatBubble.svelte`, `messages/ChatRow.svelte`.
+- `tests/e2e/public-chats.mjs`: Ann's reply carries the project's path; her list preview
+  drops it and Bob follows the link from the bubble.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; web's linkify test
+  cases by hand (same output); against the local seed node at 390px, all passed:
+  `public-chats.mjs`, `mentions.mjs`, `messages.mjs`, `chat.mjs`. No Rust changed.
+- Next step: CI green → merge → live smoke (`public-chats.mjs`) → move this into "Done".
 
 ## Done 2026-10-23: project members panel from Messages, PR #29 merged (~09:46 UTC / 8:46 pm Melbourne), deployed ~10:04 UTC; live `public-chats.mjs` passed
 **UI only, no zome change**, so merging reset nothing. web's `openProjectMembers`: in a project
@@ -329,8 +343,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: attachments, calls, "seen" receipts, internal-path links
-   in messages. When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: attachments, calls, "seen" receipts. When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

@@ -81,6 +81,9 @@
             {#if agent}
               <a class="mention" href={resolve('/profile/[agent]', { agent })}>{part.text}</a>
             {:else}<span class="mention">{part.text}</span>{/if}
+          {:else if part.internal}
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path written in the message -->
+            <a href={part.href}>{part.text}</a>
           {:else if part.href}
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
             <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
