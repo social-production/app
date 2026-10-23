@@ -13,10 +13,10 @@ use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDna
 use identity_integrity::{DirectoryProperties, Founder};
 
 /// Shut every conductor down, drop them, and wait until their databases have closed. Call it
-/// at the end of each test. `shutdown()` keeps a conductor's state (its SQLite pools included)
+/// at the end of each test. `shutdown()` keeps a conductor's state (its `SQLite` pools included)
 /// for a restart, and the pools' worker threads (`sqlx-sqlite-worker-*`) wind down for tens of
 /// seconds after the conductors are dropped. If the last test returned first, the process exited
-/// while those threads were still inside SQLite: heap-corruption aborts and SIGSEGVs at exit in
+/// while those threads were still inside `SQLite`: heap-corruption aborts and SIGSEGVs at exit in
 /// CI, after every test had passed.
 pub async fn shut_down(mut conductors: SweetConductorBatch) {
     for i in 0..conductors.len() {
@@ -28,14 +28,17 @@ pub async fn shut_down(mut conductors: SweetConductorBatch) {
     databases_closed().await;
 }
 
-/// Wait (at most two minutes) until no SQLite worker thread is left in this process. Tests run
+/// Wait (at most two minutes) until no `SQLite` worker thread is left in this process. Tests run
 /// one at a time (`--test-threads=1`), so every such thread belongs to the conductors just
 /// dropped.
 async fn databases_closed() {
-    let deadline = std::time::Instant::now() + std::time::Duration::from_secs(120);
+    let deadline = std::time::Instant::now() + std::time::Duration::from_mins(2);
     while sqlite_workers() > 0 {
         if std::time::Instant::now() > deadline {
-            eprintln!("warning: {} SQLite worker threads still running", sqlite_workers());
+            eprintln!(
+                "warning: {} SQLite worker threads still running",
+                sqlite_workers()
+            );
             return;
         }
         tokio::time::sleep(std::time::Duration::from_millis(250)).await;
