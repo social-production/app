@@ -23,8 +23,19 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-23: @mentions in every chat + scroll to the linked message, PR #25 (ADR 0047)
-Branch `claude/social-production-handoff-dsam61`. **UI only, no zome change**, so merging resets nothing.
+## In flight 2026-10-23: scenario exit crash fix (branch `claude/scenario-exit-crash-2`, owner asked for its own PR)
+- Cause, measured: after `shutdown()` 17–34 `sqlx-sqlite-worker` threads (the conductors'
+  SQLite pools) are still running, and they take tens of seconds to wind down; a test binary
+  that exits meanwhile aborts (`malloc_consolidate`) or segfaults after every test passed
+  (PR #25's CI on `1df5f05`, main's run #81).
+- Fix pushed (`f95f891`, `6a026c3`): `common::shut_down` takes the batch by value, drops it,
+  then waits until no SQLite worker thread is left (2 min cap). fmt and clippy pass.
+- Measured locally: the first `health` test waited 95 s for the pools to close, which would add
+  minutes to every CI shard. Next: find a faster way to close them (or wait only after a
+  binary's last test), run the scenarios, open the PR.
+
+## Done 2026-10-23: @mentions in every chat + scroll to the linked message, PR #25 merged (~03:14 UTC / 2:14 pm Melbourne), deployed 2:26 pm; live `projects.mjs` and `mentions.mjs` passed (ADR 0047)
+**UI only, no zome change**, so merging reset nothing.
 - web's mention menu in every chat composer (project, direct, group; the owner asked for
   direct/group on 2026-10-23), `@name` links in bubbles, and the `mention` notification derived
   on the mentioned person's device: web's project card ("You were mentioned.") or its "Thread"
@@ -45,8 +56,8 @@ Branch `claude/social-production-handoff-dsam61`. **UI only, no zome change**, s
   seed node at 390px, all passed: `mentions.mjs`, `notifications.mjs`, `governance.mjs`,
   `chat.mjs`, `public-chats.mjs`, `messages.mjs`, `group-options.mjs`. No Rust changed, so
   fmt/clippy/scenarios weren't run here (CI runs them).
-- Next: PR #25 CI green → merge → live smoke (`/readyz`, `projects.mjs`, `mentions.mjs`) →
-  turn this into a "Done" entry and update README Status.
+- CI: `check` 5 min, shards 29–57 min. One earlier run (`1df5f05`) failed `scenarios (3/4)`
+  on the exit crash above, after every test had passed; the next run was green.
 - Lessons: after many runs the local conductor answered `database is locked` (SQLite) on every
   project creation; restarting `scripts/cloud-seed.sh` cleared it. The restart starts with an
   empty data dir, so the founders' first phrase sign-in waits on a restore (ADR 0035) and a
@@ -268,13 +279,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `4f42960` (PR #23, deployed 2026-10-22: ui ~22:43 UTC, seed-node 23:05 UTC, after Railway's outage). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `cfc6b2e` (PR #25, deployed 2026-10-23 ~03:26 UTC; the seed node took ~12 min). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies; bell count), web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats, Public tab, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -299,8 +310,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: (mentions and linked-message scrolling are in flight, above). Still from web
-   later: attachments, calls, "seen" receipts, the project members panel, internal-path links
+1. M4, from web: attachments, calls, "seen" receipts, the project members panel, internal-path links
    in messages. When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
