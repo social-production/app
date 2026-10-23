@@ -80,7 +80,7 @@ async fn anyone_posts_replies_and_reads() {
     assert_eq!(quote.author.as_ref(), Some(cells[1].agent_pubkey()));
     assert_eq!(quote.preview, "Hello all");
     assert!(!quote.deleted);
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -119,7 +119,7 @@ async fn bad_messages_are_rejected() {
         )
         .await;
     assert!(odd.is_err(), "validation rejects a reply to a non-message");
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -159,5 +159,5 @@ async fn only_the_author_deletes() {
         .expect("the reply keeps its quote");
     assert!(quote.deleted, "and the quote reads as a deleted message");
     assert!(quote.preview.is_empty());
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }

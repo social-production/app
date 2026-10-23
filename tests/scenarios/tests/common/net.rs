@@ -78,8 +78,8 @@ impl Net {
     }
 
     /// Stop every conductor and wait for it (see `common::shut_down`).
-    pub async fn shut_down(mut self) {
-        super::shut_down(&mut self.conductors).await;
+    pub async fn shut_down(self) {
+        super::shut_down(self.conductors).await;
     }
 
     /// Wait for each network on its own: cells of different DNAs never share data.

@@ -69,7 +69,7 @@ async fn two_founder_vouches_grant_full_standing() {
     let stranger = SweetAgents::one(conductors[2].keystore()).await;
     let vouched: Result<ActionHash, _> = conductors[2].call_fallible(&eve, "vouch", stranger).await;
     assert!(vouched.is_ok(), "a member with a valid grant can vouch");
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -102,7 +102,7 @@ async fn validation_rejects_forged_standing() {
         .call_fallible(&mal, "submit_grant", steady)
         .await;
     assert!(r.is_err(), "a day-old chain is not steady activity");
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
@@ -169,7 +169,7 @@ async fn vouch_cap_profiles_and_device_pairing() {
     assert_eq!(primary.devices, vec![bea_key.clone()]);
     let device: Pairing = conductors[0].call(&ann, "get_pairing", bea_key).await;
     assert_eq!(device.primary, Some(ann_key), "the device knows its person");
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
 
 #[derive(Deserialize, Debug)]
@@ -204,5 +204,5 @@ async fn manifest_founders_are_valid_and_full() {
             founder.name
         );
     }
-    common::shut_down(&mut conductors).await;
+    common::shut_down(conductors).await;
 }
