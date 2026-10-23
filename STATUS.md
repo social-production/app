@@ -33,9 +33,20 @@ Branch `claude/social-production-handoff-dsam61`. **UI only, no zome change**, s
 - `?comment=<id>` now centres and marks the message (`.highlighted`); your next message drops
   the mark and the parameter (web's behaviour).
 - New browser test `tests/e2e/mentions.mjs` (two new accounts, can run live).
-- Checked so far: `npm run check`/`lint`, sizes, boundaries. Next: run `mentions.mjs`,
-  `notifications.mjs`, `chat.mjs`, `public-chats.mjs` against the local seed node, push, PR,
-  CI, merge, live smoke, then move this into a "Done" entry and update README Status.
+- Also fixed: `tests/e2e/notifications.mjs` left the project right after Bob's vote, which
+  could cancel the queued vote write; the project then never moved and the "phase change
+  executed" card never came (it failed the same way with main's UI). It now waits on the
+  project page until the phase moves, as `governance.mjs` does.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; against the local
+  seed node at 390px: `mentions.mjs` (new), `notifications.mjs`, `governance.mjs`, `chat.mjs`,
+  `public-chats.mjs`, `messages.mjs`, all passed. No Rust changed, so fmt/clippy/scenarios
+  weren't run here (CI runs them).
+- Next: PR CI, merge, live smoke (`mentions.mjs` can run live), then turn this into a "Done"
+  entry and update README Status.
+- Lessons: after many runs the local conductor answered `database is locked` (SQLite) on every
+  project creation; restarting `scripts/cloud-seed.sh` cleared it. The restart starts with an
+  empty data dir, so the founders' first phrase sign-in waits on a restore (ADR 0035) and a
+  retry within a few minutes fails with "already marked as restoring"; wait, then rerun.
 
 ## Done 2026-10-21: Messages unread badge, PR #19 merged (~07:27 UTC / 6:27 pm Melbourne), deployed 2026-10-22 ~22:43 UTC after Railway's outage; live `messages.mjs` passed
 - PR #18 (scenario tests await conductor shutdown) merged ~05:46 UTC; PR #17 (docs) ~06:19 UTC.

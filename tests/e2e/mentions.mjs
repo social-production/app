@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, keyOf, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -50,7 +50,11 @@ const ann = await device({ viewport: phone });
 await signUp(ann, `ann${stamp}`);
 const bob = await device({ viewport: phone });
 await signUp(bob, bobName);
-const bobKey = await keyOf(bob);
+// lib's keyOf opens Settings from the desktop rail; at phone width go there directly.
+await bob.goto(`${BASE}/settings`);
+const key = bob.locator('#settings-account .key');
+await key.waitFor({ timeout: 60_000 });
+const bobKey = (await key.innerText()).trim();
 // The first look on a device counts what came before as read, so Bob takes it now.
 await bob.goto(`${BASE}/notifications`);
 await bob.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
