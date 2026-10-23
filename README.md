@@ -27,7 +27,8 @@ What works today:
   projects' chats with their unread counts (ADR 0044); a project chat's member count opens its
   members. Group managers rename and add or remove
   people, anyone can leave; the chat menu pins, mutes or deletes a chat; messages can be edited
-  and pinned (ADR 0045). Each chat is
+  and pinned (ADR 0045). Your messages in a direct chat show ✓ when sent and ✓✓ once read
+  (ADR 0048). Each chat is
   its own private network; invitations travel encrypted (ADR 0043).
 - **Links (M3e):** web's Links tab. A member proposes a link to another project with a reason;
   each project votes on its own half and the link is active once both pass. Either side can
