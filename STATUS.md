@@ -23,16 +23,20 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-23: scenario exit crash fix (branch `claude/scenario-exit-crash-2`, owner asked for its own PR)
+## Done 2026-10-23: scenario exit crash fix, PR #27 merged (~04:38 UTC / 3:38 pm Melbourne)
+Test-only (`tests/scenarios`); the owner asked for it as its own PR.
 - Cause, measured: after `shutdown()` 17–34 `sqlx-sqlite-worker` threads (the conductors'
-  SQLite pools) are still running, and they take tens of seconds to wind down; a test binary
-  that exits meanwhile aborts (`malloc_consolidate`) or segfaults after every test passed
-  (PR #25's CI on `1df5f05`, main's run #81).
-- Fix pushed (`f95f891`, `6a026c3`): `common::shut_down` takes the batch by value, drops it,
-  then waits until no SQLite worker thread is left (2 min cap). fmt and clippy pass.
-- Measured locally: the first `health` test waited 95 s for the pools to close, which would add
-  minutes to every CI shard. Next: find a faster way to close them (or wait only after a
-  binary's last test), run the scenarios, open the PR.
+  SQLite pools) were still running and took 45–99 s to wind down; a test binary that exited
+  meanwhile aborted (`malloc_consolidate`) or segfaulted after every test had passed (PR #25's
+  CI on `1df5f05`, main's run #81).
+- Fix: `common::shut_down(conductors)` takes the batch by value, drops it, then waits until no
+  SQLite worker thread is left (2 min cap, warns if reached). New scenario tests must end with
+  it (or `net.shut_down()` / `pair.shut_down()`).
+- Cost: shards 36–63 min (were 30–57 on the same base). A single wait at process exit would be
+  cheaper but needs `unsafe` (`atexit`), which the workspace forbids.
+- The crash was intermittent, so a few green runs don't prove it gone: if a shard dies after
+  "test result: ok" again, look for another thread kind outliving the wait (list
+  `/proc/self/task/*/comm` after `shut_down`).
 
 ## Done 2026-10-23: @mentions in every chat + scroll to the linked message, PR #25 merged (~03:14 UTC / 2:14 pm Melbourne), deployed 2:26 pm; live `projects.mjs` and `mentions.mjs` passed (ADR 0047)
 **UI only, no zome change**, so merging reset nothing.
@@ -279,7 +283,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `cfc6b2e` (PR #25, deployed 2026-10-23 ~03:26 UTC; the seed node took ~12 min). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `cfc6b2e` (PR #25, deployed 2026-10-23 ~03:26 UTC; the seed node took ~12 min). Later merges (#26 docs, #27 scenario tests) redeploy the services but change nothing they run. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -325,7 +329,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
   - **Disk:** a debug build of the whole workspace is ~24 GB and fills a cloud session's disk. Build with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (the cloud scripts do), and never mix the stock `cargo` with the Nix one in one `target/` (two full builds); `rm -rf target/debug` if `df` shows the disk filling.
   - Settle each DNA's cells separately with `await_consistency`.
   - Never depend on two integrity crates in one test binary; mirror types with serde instead.
-  - **End every test with an awaited shutdown:** `common::shut_down(&mut conductors).await`, or `net.shut_down().await` / `pair.shut_down().await`. sweettest's `Drop` only spawns the shutdown on the test's runtime, so the last test's conductors could still be tearing down when the process exited. In CI the binary then crashed after every test had passed: SIGSEGV after `plans` (PR #13), and `malloc_consolidate(): unaligned fastbin chunk` after `groups` (PR #17).
+  - **End every test with `common::shut_down(conductors).await`** (or `net.shut_down().await` / `pair.shut_down().await`): it shuts the conductors down, drops them and waits for their SQLite worker threads to exit (PR #27). Otherwise the binary can crash at exit after every test has passed: SIGSEGV after `plans` (PR #13), `malloc_consolidate(): unaligned fastbin chunk` after `groups` (PR #17) and `values` (PR #25).
 - **Browser tests:**
   - Start the local seed node: `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`. It builds a dev hApp whose founders are `tests/e2e/fixtures/dev-founders.json`, so governance can be tested.
   - Wait for "zomes compiled" in its log.
