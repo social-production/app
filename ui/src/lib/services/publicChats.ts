@@ -1,9 +1,16 @@
 import type { ChatMessage } from '#lib/domain/chat.ts';
 import type { ListPrefs, PublicChat } from '#lib/domain/messages.ts';
-import { callCell, clonedSeeds, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
+import type { Person } from '#lib/domain/people.ts';
+import {
+  callCell,
+  clonedSeeds,
+  hashToString,
+  projectCell,
+  type AgentPubKey,
+} from '#lib/holo/index.ts';
 
 import { listMessages } from './chat.ts';
-import { myAgent } from './people.ts';
+import { getPerson, myAgent } from './people.ts';
 
 /** The part of `get_project` the list shows. */
 interface GlanceWire {
@@ -53,6 +60,14 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
     pinned: prefs.pinned,
     muted: prefs.muted,
   };
+}
+
+/** web's members panel from a project chat's header (MessagesPage `openProjectMembers`): the
+ * project's members as they stand now. */
+export async function projectChatMembers(seed: string): Promise<Person[]> {
+  const cell = await projectCell(seed, 'Project');
+  const project = await callCell<GlanceWire | null>(cell, 'project', 'get_project');
+  return Promise.all((project?.members ?? []).map((m) => getPerson(hashToString(m))));
 }
 
 function unreadAfter(messages: ChatMessage[], since: number, me: string): number {

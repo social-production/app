@@ -23,6 +23,19 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
+## In flight 2026-10-23: project members panel from Messages (branch `claude/social-production-handoff-dsam61`)
+**UI only, no zome change.** web's `openProjectMembers`: in a project chat opened from Messages →
+Public, the header's "N members" is now a button that reads the project's members and opens the
+"Project members" sheet (the same `PeopleSheet` as the project page's member count).
+`services/publicChats.ts` `projectChatMembers(seed)`; `PublicChatView.svelte` (its local
+`state` is now `talk`, since a local `state` clashes with the `$state` rune).
+`tests/e2e/public-chats.mjs` opens and closes the sheet.
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; `public-chats.mjs`
+  against the local seed node at 390px passed (its first run timed out at sign-up on the cold
+  node, the rerun passed in full). No Rust changed, so fmt/clippy/scenarios weren't run here.
+- Next step: PR → CI green → merge → live smoke (`public-chats.mjs` can run live) → move this
+  into "Done".
+
 ## Done 2026-10-23: scenario exit crash fix, PR #27 merged (~04:38 UTC / 3:38 pm Melbourne)
 Test-only (`tests/scenarios`); the owner asked for it as its own PR.
 - Cause, measured: after `shutdown()` 17–34 `sqlx-sqlite-worker` threads (the conductors'
@@ -269,7 +282,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
    before DMs go further.
 6. **Public tab and notification read marks are per device** (ADR 0044, 0046): project chats have no private read
    marks in the DNA yet, so "unread" is kept in the browser until an integrity change adds them.
-   The members count in a project chat's header is text (web opens a members panel).
+   The members count in a project chat's header opens the members sheet, as on web.
 7. **Group "Delete" leaves the group** (ADR 0045), with the "left the group" line and a
    handover; web's Delete drops the membership silently and can leave a group without its
    manager. Removed people can still read what the chat gossips (they know its seed).
@@ -309,12 +322,12 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
-- Guests can't open project pages yet (only the feed). No @mentions, photos or unread markers in chat.
+- Guests can't open project pages yet (only the feed). No photos or unread markers in chat.
 - Challenges have no screen (see "For the owner to review").
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: attachments, calls, "seen" receipts, the project members panel, internal-path links
+1. M4, from web: attachments, calls, "seen" receipts, internal-path links
    in messages. When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).

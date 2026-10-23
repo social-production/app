@@ -6,12 +6,14 @@
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
+  import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import type { PublicChat } from '#lib/domain/messages.ts';
+  import type { Person } from '#lib/domain/people.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
-  import { markProjectChatRead } from '#lib/services/publicChats.ts';
+  import { markProjectChatRead, projectChatMembers } from '#lib/services/publicChats.ts';
 
   import { inTurn } from './writes.ts';
 
@@ -31,7 +33,7 @@
   // svelte-ignore state_referenced_locally
   const id = chat.id;
   const project = { seed: id };
-  const state = new ChatState(
+  const talk = new ChatState(
     {
       list: () => listMessages(project),
       post: (body, replyTo) => inTurn(() => postMessage(project, body, replyTo)),
@@ -46,21 +48,42 @@
   // People who wrote here come first in @mention suggestions (ADR 0047).
   const mentions = new MentionSource(
     () => mentionPool(),
-    () => ({ me: state.me, agents: Object.keys(state.names), names: state.names }),
+    () => ({ me: talk.me, agents: Object.keys(talk.names), names: talk.names }),
   );
 
-  $effect(() => mentions.watch(state.messages.map((m) => m.body)));
+  $effect(() => mentions.watch(talk.messages.map((m) => m.body)));
 
   const members = $derived(`${chat.members} ${chat.members === 1 ? 'member' : 'members'}`);
 
+  // web's members panel: the count opens the project's members, read when asked for.
+  let membersOpen = $state(false);
+  let people = $state<Person[]>([]);
+  let membersRequest = 0;
+
+  async function toggleMembers() {
+    if (membersOpen) {
+      membersOpen = false;
+      return;
+    }
+    const request = ++membersRequest;
+    try {
+      const found = await projectChatMembers(id);
+      if (request !== membersRequest) return;
+      people = found;
+      membersOpen = true;
+    } catch (cause) {
+      if (request === membersRequest) talk.error = explain(cause);
+    }
+  }
+
   // untrack: starting reads chat state, which must not re-run (and so stop) this effect.
   $effect(() => {
-    untrack(() => state.start(() => true));
-    return () => state.dispose();
+    untrack(() => talk.start(() => true));
+    return () => talk.dispose();
   });
 
   $effect(() => {
-    const newest = state.messages.at(-1)?.createdAt;
+    const newest = talk.messages.at(-1)?.createdAt;
     if (newest) void markProjectChatRead(id, newest).then(onRead);
   });
 </script>
@@ -97,7 +120,15 @@
             <ChatMarks muted={chat.muted} header />
           </h2>
         </button>
-        <p class="identity-note">Project chat · {members}</p>
+        <p class="identity-note">
+          Project chat ·
+          <button
+            aria-expanded={membersOpen}
+            class="members-link"
+            type="button"
+            onclick={toggleMembers}>{members}</button
+          >
+        </p>
       </div>
       <button
         class="avatar-hit"
@@ -113,18 +144,27 @@
 </header>
 
 <ChatPanel
-  lines={state.lines}
+  lines={talk.lines}
   title={chat.title}
   placeholder="Message the project..."
   submitLabel="Send"
-  emptyCopy={state.loaded ? 'No project chat yet.' : 'Loading messages...'}
+  emptyCopy={talk.loaded ? 'No project chat yet.' : 'Loading messages...'}
   embedded={true}
   fitViewport={false}
   showHeader={false}
-  paused={state.paused}
-  error={state.error}
-  onSend={(body, replyTo) => state.send(body, replyTo)}
-  onDelete={(messageId) => state.remove(messageId)}
+  paused={talk.paused}
+  error={talk.error}
+  onSend={(body, replyTo) => talk.send(body, replyTo)}
+  onDelete={(messageId) => talk.remove(messageId)}
   mentionSearch={mentions.search}
   mentionAgent={mentions.agentOf}
+/>
+
+<PeopleSheet
+  open={membersOpen}
+  title="Project members"
+  description="Members coordinate planning, updates, and activity together."
+  emptyCopy="No members listed yet."
+  {people}
+  onClose={() => (membersOpen = false)}
 />
