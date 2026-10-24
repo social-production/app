@@ -18,6 +18,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
+import { uploadFiles } from './attachments.ts';
 import { toChatMessage, type MessageWire } from './chat.ts';
 import { listPeople, myAgent, namesOf } from './people.ts';
 
@@ -115,14 +116,18 @@ export async function listChatMessages(seed: string): Promise<ChatMessage[]> {
   return (await chat<MessageWire[]>(seed, 'list_messages')).map(toChatMessage);
 }
 
+/** A message, with any photos and files written first (ADR 0049). */
 export async function postChatMessage(
   seed: string,
   body: string,
   replyTo: string | null,
+  files: File[] = [],
 ): Promise<string> {
+  const attachments = files.length ? await uploadFiles(seed, files) : [];
   const id = await chat<ActionHash>(seed, 'post_message', {
     body,
     reply_to: replyTo ? stringToHash(replyTo) : null,
+    attachments,
   });
   return hashToString(id);
 }

@@ -3,7 +3,6 @@
 
 use hdk::prelude::*;
 use messages_integrity::{EntryTypes, LinkTypes, Prefs, ReadMark, Title, UnitEntryTypes};
-use sp_core::chat::preview;
 use sp_core::conversation::ChatKind;
 
 use crate::entries::{all, private};
@@ -93,7 +92,7 @@ pub fn summary() -> ExternResult<ChatSummary> {
     let messages = reads::list(&chat)?;
     let last = messages.last().map(|m| LastMessage {
         author: m.author.clone(),
-        preview: preview(&m.body),
+        preview: m.preview(),
         created_at: m.created_at,
         kind: m.kind.clone(),
     });

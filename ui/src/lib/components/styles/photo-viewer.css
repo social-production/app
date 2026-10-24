@@ -1,0 +1,57 @@
+/* Ported from web/src/lib/components/shared/PhotoViewer.svelte (ADR 0032, scripts/port-styles.py) */
+.photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sheet-elevated);
+  display: grid;
+}
+
+.photo-viewer .scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: color-mix(in srgb, #000 82%, transparent);
+}
+
+.photo-viewer .frame {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
+  pointer-events: none;
+}
+
+.photo-viewer img {
+  width: auto;
+  height: auto;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100dvh - 96px - var(--shell-safe-bottom, 0px));
+  margin: auto;
+  object-fit: contain;
+  transform-origin: center center;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  pointer-events: auto;
+}
+
+.photo-viewer .close {
+  position: absolute;
+  top: calc(12px + var(--shell-safe-top, 0px));
+  right: calc(12px + var(--shell-safe-right, 0px));
+  z-index: 2;
+  pointer-events: auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, #000 55%, transparent);
+  color: #fff;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+}

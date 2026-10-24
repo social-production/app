@@ -88,3 +88,15 @@ export function scrollToEnd(log: HTMLElement | undefined): void {
   apply();
   requestAnimationFrame(apply);
 }
+
+/** Where web's bubble menu opens: below the pointer, above it near the bottom, inside the
+ * window's right edge. */
+export function menuPlacement(event: MouseEvent): { x: number; y: number } {
+  const [width, height, gap] = [180, 140, 8];
+  let x = event.clientX;
+  let y = event.clientY + gap;
+  const below = window.innerHeight - event.clientY;
+  if (below < height + gap && event.clientY > below) y = Math.max(8, event.clientY - gap - height);
+  if (x + width > window.innerWidth - 8) x = Math.max(8, window.innerWidth - 8 - width);
+  return { x, y };
+}

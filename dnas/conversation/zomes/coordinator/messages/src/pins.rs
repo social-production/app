@@ -6,12 +6,11 @@ use std::collections::BTreeMap;
 
 use hdk::prelude::*;
 use messages_integrity::{EntryTypes, LinkTypes, Pin, UnitEntryTypes};
-use sp_core::chat::preview;
 use sp_core::conversation::ChatKind;
 
 use crate::entries::{all, path};
 use crate::people::{load, Chat};
-use crate::{guest, reads, MESSAGES};
+use crate::{guest, reads, MessageView, MESSAGES};
 
 /// web's `MAX_PINS`.
 const PINS_MAX: usize = 5;
@@ -83,13 +82,13 @@ pub fn pins() -> ExternResult<Vec<PinView>> {
         let shown = views
             .iter()
             .find(|v| v.id == message)
-            .map(|v| preview(&v.body));
+            .map(MessageView::preview);
         // Older than the page: show it unless its author deleted it (web drops those pins).
         let preview = match shown {
             Some(p) => Some(p),
             None => match get_details(message.clone(), GetOptions::default())? {
                 Some(Details::Record(d)) if d.deletes.is_empty() => {
-                    reads::decode(&d.record)?.map(|m| preview(&m.body))
+                    reads::decode(&d.record)?.map(|m| m.preview())
                 }
                 _ => None,
             },

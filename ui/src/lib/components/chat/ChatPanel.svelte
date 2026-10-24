@@ -2,13 +2,15 @@
   import { tick } from 'svelte';
 
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
-  import type { ChatLine } from '#lib/domain/chat.ts';
+  import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
+  import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
   import type { Mentionable } from '#lib/domain/mentions.ts';
 
   import BubbleMenu from './BubbleMenu.svelte';
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
   import { formatMessageTime, messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
+  import { BubbleMenuState } from './bubbleMenuState.svelte.ts';
   import { centerIn, scrollToEnd, syncPanelHeight } from './chatViewport.ts';
 
   import '#lib/components/styles/chat.css';
@@ -16,7 +18,8 @@
   /**
    * web's LiveChatPanel for text chats: day dividers, author runs, reply quotes, the bubble
    * menu (profile, reply, copy, pin, edit and delete your own), "left the group" lines and
-   * the composer, with @mentions where web has them. Attachments and reports come later.
+   * the composer, with @mentions where web has them, and photos and files in direct and
+   * group chats (`fileUrl`, ADR 0049). Reports come later.
    */
   interface Props {
     lines: ChatLine[];
@@ -32,7 +35,9 @@
     showHeader?: boolean;
     /** A direct chat names nobody above bubbles: there is only the other person. */
     hideAuthors?: boolean;
-    onSend: (body: string, replyToId: string | null) => Promise<void>;
+    onSend: (body: string, replyToId: string | null, files: File[]) => Promise<void>;
+    /** Set where web's `allowAttachments` is: an attachment's bytes as a URL. */
+    fileUrl?: ((attachment: ChatAttachment) => Promise<string>) | undefined;
     onDelete: (id: string) => Promise<void>;
     /** web's conversationActions: edit your own messages (direct and group chats). */
     onEdit?: (id: string, body: string) => Promise<void>;
@@ -55,12 +60,12 @@
   let keyboardOpen = $state(false);
   let replyTarget = $state<ChatLine | null>(null);
   let editing = $state<ChatLine | null>(null);
-  let menu = $state<{ message: ChatLine; x: number; y: number } | null>(null);
-  let blockMenuOpen = false;
+  const menu = new BubbleMenuState();
   let confirming = $state<ChatLine | null>(null);
   let copyError = $state('');
   let flashed = $state<string | null>(null);
   let flashTimer: ReturnType<typeof setTimeout> | undefined;
+  let photo = $state<{ url: string; name: string; from: HTMLElement | null } | null>(null);
   // Bubbles by message id, for reply jumps (not reactive state).
   const elements: Record<string, HTMLElement | undefined> = {};
 
@@ -106,31 +111,6 @@
     return { destroy: () => (elements[id] = undefined) };
   }
 
-  function openMenu(message: ChatLine, event: MouseEvent): void {
-    const target = event.target;
-    if (target instanceof Element && target.closest('a, button, input, textarea, label')) return;
-    if (blockMenuOpen || menu) {
-      blockMenuOpen = false;
-      menu = null;
-      return;
-    }
-    const [width, height, gap] = [180, 140, 8];
-    let x = event.clientX;
-    let y = event.clientY + gap;
-    const below = window.innerHeight - event.clientY;
-    if (below < height + gap && event.clientY > below)
-      y = Math.max(8, event.clientY - gap - height);
-    if (x + width > window.innerWidth - 8) x = Math.max(8, window.innerWidth - 8 - width);
-    menu = { message, x, y };
-  }
-
-  function menuPointerDown(event: PointerEvent): void {
-    if (!menu) return;
-    if (event.target instanceof Element && event.target.closest('.bubble-menu')) return;
-    menu = null;
-    blockMenuOpen = true;
-  }
-
   /** Tapping a reply quote jumps to the original and flashes it. */
   function jump(id: string | null): void {
     const target = id ? elements[id] : undefined;
@@ -148,22 +128,22 @@
   function reply(message: ChatLine): void {
     editing = null;
     replyTarget = message;
-    menu = null;
+    menu.close();
   }
 
   function beginEdit(message: ChatLine): void {
     replyTarget = null;
     editing = message;
-    menu = null;
+    menu.close();
   }
 
   async function pin(message: ChatLine): Promise<void> {
-    menu = null;
+    menu.close();
     await p.onTogglePin?.(message.id, message.pinned);
   }
 
   async function copy(message: ChatLine): Promise<void> {
-    menu = null;
+    menu.close();
     try {
       await navigator.clipboard.writeText(message.body);
     } catch {
@@ -171,7 +151,7 @@
     }
   }
 
-  async function send(body: string): Promise<void> {
+  async function send(body: string, files: File[]): Promise<void> {
     const edited = editing;
     if (edited && p.onEdit) {
       await p.onEdit(edited.id, body);
@@ -182,7 +162,7 @@
     replyTarget = null;
     copyError = '';
     try {
-      await p.onSend(body, quoted?.id ?? null);
+      await p.onSend(body, quoted?.id ?? null, files);
     } catch (e) {
       replyTarget = quoted;
       throw e;
@@ -201,10 +181,10 @@
 
 <svelte:window
   onkeydown={(event) => {
-    if (event.key === 'Escape' && menu) menu = null;
+    if (event.key === 'Escape') menu.close();
   }}
-  onclick={() => (blockMenuOpen = false)}
-  onpointerdown={menuPointerDown}
+  onclick={menu.clicked}
+  onpointerdown={menu.pointerDown}
   onresize={sync}
 />
 
@@ -247,10 +227,13 @@
               highlighted={p.highlighted === message.id}
               mentionAgent={p.mentionAgent}
               canReply={!p.paused && !message.pending}
-              onOpenMenu={openMenu}
+              onOpenMenu={menu.show}
               onReply={reply}
               onJump={jump}
               {register}
+              fileUrl={p.fileUrl}
+              onViewPhoto={(url, name, event) =>
+                (photo = { url, name, from: event.currentTarget as HTMLElement | null })}
             />
           {/if}
         {/each}
@@ -258,11 +241,11 @@
     </div>
   </div>
 
-  {#if menu}
+  {#if menu.open}
     <BubbleMenu
-      message={menu.message}
-      x={menu.x}
-      y={menu.y}
+      message={menu.open.message}
+      x={menu.open.x}
+      y={menu.open.y}
       canWrite={!p.paused}
       canPin={!!p.onTogglePin}
       canEdit={!!p.onEdit}
@@ -270,8 +253,8 @@
       onCopy={copy}
       onPin={pin}
       onEdit={beginEdit}
-      onDelete={(m) => ((confirming = m), (menu = null))}
-      onClose={() => (menu = null)}
+      onDelete={(m) => ((confirming = m), menu.close())}
+      onClose={menu.close}
     />
   {/if}
 
@@ -287,8 +270,18 @@
     onCancelEdit={() => (editing = null)}
     onFocus={sync}
     mentionSearch={p.mentionSearch}
+    attachments={!!p.fileUrl}
   />
 </section>
+
+<PhotoViewer
+  url={photo?.url ?? null}
+  alt={photo?.name ?? 'Photo'}
+  onClose={() => {
+    photo?.from?.focus();
+    photo = null;
+  }}
+/>
 
 <ConfirmDialog
   open={confirming !== null}

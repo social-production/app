@@ -3,6 +3,18 @@
 /** sp_core::chat::MESSAGE_MAX. */
 export const MESSAGE_MAX = 4_000;
 
+/** A photo or file on a direct or group message (web's MessageAttachment, ADR 0049). */
+export interface ChatAttachment {
+  kind: 'image' | 'file';
+  name: string;
+  mime: string;
+  size: number;
+  /** The parts holding its bytes, in order; empty on a copy still being sent. */
+  chunks: string[];
+  /** A copy being sent shows the file picked on this device. */
+  localUrl?: string;
+}
+
 /** The original a reply quotes. */
 export interface ChatQuote {
   id: string;
@@ -22,6 +34,7 @@ export interface ChatMessage {
   kind?: 'text' | 'system';
   edited?: boolean;
   pinned?: boolean;
+  attachments?: ChatAttachment[];
 }
 
 /** One message as the chat panel shows it (web's LiveChatPanel `ChatMessage`). */
@@ -42,6 +55,7 @@ export interface ChatLine {
   kind: 'text' | 'system';
   edited: boolean;
   pinned: boolean;
+  attachments: ChatAttachment[];
   /** Your own message in a direct chat: web's ✓ (sent) or ✓✓ (the other person read it). */
   receipt?: 'sent' | 'read';
 }

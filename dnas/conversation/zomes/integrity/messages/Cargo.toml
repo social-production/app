@@ -12,6 +12,8 @@ crate-type = ["cdylib", "rlib"]
 hdi = { workspace = true }
 holochain_serialized_bytes = { workspace = true }
 serde = { workspace = true }
+serde_bytes = "0.11"
+sp_attachment = { workspace = true }
 sp_core = { workspace = true }
 
 [lints]

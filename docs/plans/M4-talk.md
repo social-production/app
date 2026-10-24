@@ -156,3 +156,23 @@ chat mentions and replies.
   `chatFormat.ts` `withReceipts` sets `ChatLine.receipt`; `ChatBubble` shows web's ✓ / ✓✓.
 - Tests: scenario `tests/scenarios/tests/receipts.rs`, a "no receipts in groups" check in
   `messages.rs`; browser `tests/e2e/messages.mjs` (✓ then ✓✓, none in the group).
+
+## M4c as built, fifth part (2026-10-24: photos and files in direct and group chats; ADR 0049)
+- Rules: new crate `crates/sp_attachment` (web-backend's limits: photos JPEG/PNG/WebP ≤1 MB,
+  files ≤10 MB, no videos, ≤10 per message, 1 MB parts, "Photo"/file-name previews). Not in
+  `sp_core`, whose changes alter every DNA's hash.
+- Conversation integrity: public `Chunk { bytes, invite }` (≤1 MB, author in the chat);
+  `Message.attachments` (`kind`, `name`, `mime`, `size`, `chunks`), each part a `Chunk` by the
+  message's author, as many as the size needs; the body may be empty beside attachments. A
+  message's author may delete its parts.
+- Coordinator `files.rs`: `upload_chunk`, `get_chunk`; `post_message` takes `attachments`;
+  `delete_message` deletes the parts too; previews (list row, pins, quotes) via
+  `Message::preview` / `MessageView::preview`.
+- UI: `services/attachments.ts` (`uploadFiles`, `attachmentBlob`);
+  `components/chat/{attachmentLimits.ts (web's), composerFiles.svelte.ts, AttachButtons.svelte}`
+  in `ChatComposer`; photo row, file bubbles and footers in `ChatBubble`; `ChatState.fileUrl`
+  (object URLs per chat view); `components/overlay/PhotoViewer.svelte` + `zoomPan.svelte.ts`
+  (styles `photo-viewer.css` from PORTS). Only `ConversationView` passes `file`, so project
+  chats stay text-only until the next project-DNA integrity change.
+- Tests: scenario `tests/scenarios/tests/attachments.rs`; browser `tests/e2e/attachments.mjs`
+  (two new accounts, can run live).

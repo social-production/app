@@ -4,7 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use hdk::prelude::*;
 use messages_integrity::{is_type, Edit, LinkTypes, Message, UnitEntryTypes};
-use sp_core::chat::{preview, PAGE_MAX};
+use sp_core::chat::PAGE_MAX;
 
 use crate::entries::all;
 use crate::people::Chat;
@@ -90,6 +90,7 @@ pub fn list(chat: &Chat) -> ExternResult<Vec<MessageView>> {
         kind: "system".into(),
         edited: false,
         pinned: false,
+        attachments: Vec::new(),
     }));
     views.sort_by_key(|v| v.created_at);
     let excess = views.len().saturating_sub(PAGE_MAX);
@@ -151,7 +152,7 @@ fn with_quotes(
             let quote = ReplyRef {
                 id: id.clone(),
                 author: Some(r.action().author().clone()),
-                preview: preview(&m.body),
+                preview: m.preview(),
                 deleted: false,
             };
             (id, quote)
@@ -177,6 +178,7 @@ fn with_quotes(
             kind: "text".into(),
             edited: false,
             pinned: false,
+            attachments: m.attachments,
         })
         .collect())
 }
@@ -196,7 +198,7 @@ fn quote_of(parent: &ActionHash, deleted: &BTreeSet<ActionHash>) -> ExternResult
     quote.deleted |= !details.deletes.is_empty();
     if !quote.deleted {
         if let Some(m) = decode(&details.record)? {
-            quote.preview = preview(&m.body);
+            quote.preview = m.preview();
         }
     }
     Ok(quote)
