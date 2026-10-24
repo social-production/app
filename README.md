@@ -8,7 +8,7 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-23)
+## Status (2026-10-24)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
@@ -28,7 +28,8 @@ What works today:
   members. Group managers rename and add or remove
   people, anyone can leave; the chat menu pins, mutes or deletes a chat; messages can be edited
   and pinned (ADR 0045). Your messages in a direct chat show ✓ when sent and ✓✓ once read
-  (ADR 0048). Each chat is
+  (ADR 0048). Direct and group chats take photos (shown in the chat, full screen on tap) and
+  files up to 10 MB, as on web (ADR 0049; project chats not yet). Each chat is
   its own private network; invitations travel encrypted (ADR 0043).
 - **Links (M3e):** web's Links tab. A member proposes a link to another project with a reason;
   each project votes on its own half and the link is active once both pass. Either side can
