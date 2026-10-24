@@ -23,6 +23,30 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
+## In flight 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 (CI running; merge when green)
+STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
+change**, so merging resets nothing.
+- Signalling is Holochain 0.7's **direct signals** (`AppWebsocket.sendDirectSignal` /
+  `grantDirectSignalCapability`) on the inbox cell, not a zome: `holo/signals.ts`,
+  `services/calls.ts` (accepts a signal only from the other member of one of your direct
+  chats). UI: `features/calls/CallHost.svelte` (root layout), `callSession.svelte.ts`,
+  `callSignals.ts`, `components/calls/CallControls.svelte`, `services/callMedia.ts`,
+  `services/callTones.ts`, `styles/calls.css` (PORTS); the phone button in a direct chat's
+  header (`ConversationView.svelte` → `stores/callRequest.svelte.ts`).
+- App-only: the callee's device answers an invite with `ringing`; with none in 15 s the caller
+  sees "Not available right now" (web's server knew who was online).
+- Not ported yet: web's "Voice call · 4:12" / "Missed call" lines in the chat (they need a
+  message kind in the conversation DNA: next integrity change).
+- Checked in the cloud session: `npm run check`/`lint`, sizes, boundaries; against the local
+  seed node at 390px: `calls.mjs` (new: decline, accept with Chromium's fake microphone, timer,
+  pill, end, then "Not available right now" with Bob's app closed; passed on the first run,
+  twice) and `messages.mjs`. No Rust changed, so fmt/clippy/scenarios weren't run here.
+- `tests/e2e/lib.mjs` now launches Chromium with a fake, auto-allowed microphone (all tests).
+- **After merging:** wait for Railway's ui deploy, then run `calls.mjs` against the live UI.
+  If calls don't connect live (signals between two people hosted on the seed node, or audio
+  through Railway's network), check `/readyz`, then whether the ring arrives at all
+  (signalling) vs. stuck on "Connecting…" (ICE: needs a TURN relay, `VITE_CALL_TURN_URLS`).
+
 ## Done 2026-10-24: photos and files in direct and group chats (ADR 0049), PR #34 merged (~01:40 UTC / 12:40 pm Melbourne), deployed ~02:06 UTC; live `attachments.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("attachments, then calls"). web's LiveChatPanel attachments, ported for
 direct and group chats; project chats stay text-only until the next project-DNA change.
@@ -367,6 +391,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
     deleting a message marks its parts deleted, but peers may keep the bytes. Project chats get
     attachments with the next project-DNA reset; say if you want that sooner.
 
+12. **Calls (ADR 0050)**: signalling uses Holochain direct signals on the inbox network; any
+    node there may signal you, and the UI drops all but your direct chats' other members.
+    "Not available right now" comes after 15 s without the callee's device answering (web's
+    server knew at once). Only STUN is configured (as on web), so some networks won't connect
+    audio until a TURN relay is set (`VITE_CALL_TURN_URLS`, `_USERNAME`, `_CREDENTIAL` on the
+    ui service). No call lines in the chat until the next conversation-DNA reset.
+
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
 - Deployed `main`: `519d871` (PR #34, deployed 2026-10-24 ~02:06 UTC, ~25 min after the merge; hApp version changed). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
@@ -395,12 +426,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
-- Guests can't open project pages yet (only the feed). No photos or unread markers in chat.
+- Guests can't open project pages yet (only the feed). Project chats have no photos or files yet (ADR 0049).
 - Challenges have no screen (see "For the owner to review").
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: calls. Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: calls are in flight (above). Then web's call lines in the chat (with the next
+   conversation-DNA integrity change). Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.

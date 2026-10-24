@@ -51,3 +51,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0047](./0047-chat-mentions.md) @mentions in every chat: ranked by closeness, resolved by name, notified on the mentioned person's device
 - [0048](./0048-read-receipts.md) Read receipts in direct chats: a public `Seen` next to the private read mark
 - [0049](./0049-chat-attachments.md) Photos and files in direct and group chats: 1 MB chunk entries named by the message
+- [0050](./0050-voice-calls-direct-signals.md) Voice calls in direct chats: Holochain direct signals instead of web's call socket
