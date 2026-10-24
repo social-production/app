@@ -23,7 +23,29 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## Done 2026-10-24: call lines in direct chats (ADR 0051), PR #38 merged (~08:31 UTC / 7:31 pm Melbourne), deployed ~08:48 UTC; live `projects.mjs` and `messages.mjs` passed, live calls don't ring (below)
+## In flight 2026-10-24: live calls ring again (ADR 0050 addendum), branch `claude/social-production-handoff-dsam61`
+The owner can't read Railway logs and asked for a fix that doesn't depend on the seed node.
+**Cause, found by watching the live websocket frames** (Playwright `page.on('websocket')`,
+frames decoded with `@msgpack/msgpack`): the grant and `send_direct_signal` both succeed and the
+`app_direct` signal **does reach Bob's page**, but `services/calls.ts` `directPeer` read the
+chat's whole summary before accepting it; on the busy live node that took longer than Ann's
+15 s wait, so she saw "Not available right now", hung up, and Bob's late ring closed at once.
+One run also lost the first signal while Bob's page reloaded. Not the seed node, the relay or
+PR #38's DNA (the same upgrade works locally; agent records on the live bootstrap carry URLs).
+- Fix (UI only, no zome change): `findPeer` trusts the seed's creator in a chat someone else
+  started (the seed must be in your inbox; direct chats have two people), the call button
+  passes the known member (`rememberPeer`), the invite repeats every 2.5 s until `ringing`,
+  and a callee ignores invites for calls that already ended.
+- **Verified against the live node before merging:** built this UI with
+  `VITE_SP_GATEWAYS=https://seed-node-production.up.railway.app`, served it on localhost:4175
+  (the gateway accepts it; sign-up needs no passkey) and ran the tests there: the ring check
+  3/3 (~3.5 s), full `calls.mjs` passed, `messages.mjs` passed. Also `npm run check`/`lint`,
+  sizes, boundaries. **Useful technique for any live-only bug.**
+- Still a single point: the bootstrap/relay (`bootstrap-production-f978`, also on Railway)
+  that desktop apps use to reach each other (`native/src/network.rs`, one URL). A fallback
+  relay list is the next resilience step (STATUS Next item 2).
+
+## Done 2026-10-24: call lines in direct chats (ADR 0051), PR #38 merged (~08:31 UTC / 7:31 pm Melbourne), deployed ~08:48 UTC; live `projects.mjs` and `messages.mjs` passed; live calls didn't ring until the fix above
 STATUS.md Next item 1. web's "Voice call · 4:12" / "Call declined" / "No answer" / "Missed call"
 lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rules in the new
 `crates/sp_call`; directory and project DNA hashes unchanged (`hc dna hash`: `uhC0kX7veWx…`,
@@ -441,7 +463,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines (not ringing live since the 08:48 UTC deploy, see Known gaps), Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines (ringing fix in flight), Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -456,9 +478,6 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Known gaps
-- **Live calls don't ring since the 2026-10-24 ~08:48 UTC deploy** (newest "Done"): direct
-  signals between two people on the seed node don't arrive; everything else works, and the
-  same upgrade works locally.
 - **Railway security incident (2026-10-21, status.railway.com, blog.railway.com/p/security-disclosure-wednesday-october-21st):** an attacker may have read decrypted environment variables, and Railway advises rolling them all. Builds are back (2026-10-22), so rolled values can now be deployed; **not done yet** (owner). **Do not change `LAIR_PASSPHRASE` in Railway on its own:** it decrypts the keystore on `/data`, so a new value without re-encrypting the keystore locks every hosted agent's key away for good. The passphrase alone is useless without the keystore file, and the disclosure is about variables, not volumes. Re-keying needs a planned step (an ADR). The P2P project's other variables (`BOOTSTRAP_URL`, `RP_ID`/`RP_ORIGIN`, `POW_BITS`, …) are not secrets. The live FastAPI project (`social-production`) holds real secrets: `JWT_SECRET` (rolling it signs everyone out), the Postgres and Redis passwords, `GITHUB_TOKEN`, `TURNSTILE_SECRET_KEY` and `GEOCODING_PROVIDER_API_KEY`. Roll those. Its `MESSAGE_ENCRYPTION_KEY` decrypts every stored DM, so it needs MultiFernet re-encryption, not a plain swap.
 - **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s), during Railway's outage, so the reading may not be reliable. Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
@@ -469,10 +488,10 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: get live calls ringing again (Known gaps). Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: merge the live-calls fix (In flight) and smoke `calls.mjs` live. Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
-2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
+2. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway URL); move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
 3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
 4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
 

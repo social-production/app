@@ -1,7 +1,7 @@
 import type { CallChannel, CallEnvelope, CallPhase, CallView } from '#lib/domain/calls.ts';
 import type { CallLine } from '#lib/domain/chat.ts';
 import { configuredIceServers, createCallMedia, type CallMedia } from '#lib/services/callMedia.ts';
-import { openCallChannel } from '#lib/services/calls.ts';
+import { openCallChannel, rememberPeer } from '#lib/services/calls.ts';
 import { logChatCall } from '#lib/services/messages.ts';
 
 import { handleEnvelope } from './callSignals.ts';
@@ -12,6 +12,9 @@ import { handleEnvelope } from './callSignals.ts';
 const NO_ANSWER_MS = 45_000;
 /** App-only: with no `ringing` back by then, the other person doesn't have the app open. */
 const RING_ACK_MS = 15_000;
+/** App-only: direct signals are best effort (one sent while the other page reloads is lost),
+ * so the invite repeats this often until their device answers `ringing`. */
+const INVITE_REPEAT_MS = 2_500;
 
 const idleView: CallView = {
   phase: 'idle',
@@ -38,6 +41,12 @@ export class CallSession {
   private timers: ReturnType<typeof setTimeout>[] = [];
   /** Set when the callee's device answered the invite with `ringing`. */
   ringConfirmed = false;
+  /** Calls that ended here, so a repeated invite still on its way doesn't ring again. */
+  private finished: string[] = [];
+
+  hasFinished(callId: string): boolean {
+    return this.finished.includes(callId);
+  }
 
   patch(next: Partial<CallView>): void {
     this.view = { ...this.view, ...next };
@@ -70,6 +79,7 @@ export class CallSession {
 
   reset(phase: CallPhase = 'idle', notice: string | null = null, logLine = true): void {
     if (logLine && isLive(this.view.phase)) this.logLine(phase);
+    if (this.view.callId) this.finished = [...this.finished.slice(-19), this.view.callId];
     this.attempt += 1;
     this.clearTimers();
     this.media?.stop();
@@ -117,7 +127,12 @@ export class CallSession {
     this.view = { ...idleView };
   }
 
-  async placeDirectCall(conversationId: string, peerName: string): Promise<void> {
+  async placeDirectCall(
+    conversationId: string,
+    peerName: string,
+    peer: string | null = null,
+  ): Promise<void> {
+    if (peer) rememberPeer(conversationId, peer);
     this.connect();
     if (isLive(this.view.phase)) return;
     const callId = crypto.randomUUID();
@@ -135,6 +150,14 @@ export class CallSession {
     this.ringConfirmed = false;
     this.send('invite', {});
     this.clearTimers();
+    for (let at = INVITE_REPEAT_MS; at < RING_ACK_MS; at += INVITE_REPEAT_MS) {
+      this.timers.push(
+        setTimeout(() => {
+          const unanswered = this.view.callId === callId && this.view.phase === 'calling';
+          if (unanswered && !this.ringConfirmed) this.send('invite', {});
+        }, at),
+      );
+    }
     const giveUp = (phase: CallPhase, notice: string | null) => () => {
       if (this.view.callId !== callId || this.view.phase !== 'calling') return;
       if (phase === 'unavailable' && this.ringConfirmed) return;

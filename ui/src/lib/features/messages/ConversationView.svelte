@@ -155,7 +155,12 @@
       type="button"
       aria-label={`Call ${title}`}
       title={`Call ${title}`}
-      onclick={() => (callRequest.next = { seed, name: title })}
+      onclick={() =>
+        (callRequest.next = {
+          seed,
+          name: title,
+          peer: chat.members.find((m) => m !== inbox.me) ?? null,
+        })}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <path

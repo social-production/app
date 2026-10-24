@@ -49,7 +49,7 @@
     const next = callRequest.next;
     if (!next) return;
     callRequest.next = null;
-    void calls.placeDirectCall(next.seed, next.name);
+    void calls.placeDirectCall(next.seed, next.name, next.peer);
   });
 
   $effect(() => {

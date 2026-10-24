@@ -49,3 +49,21 @@ capability grant, which `grantDirectSignalCapability` writes from the app socket
 - A person signed in on two devices rings on both; the first to answer takes the call (the
   other keeps ringing until the caller hangs up), as on web.
 - Group calls, video, and a ring when the app is closed (push) are not ported; web has none.
+
+## Addendum (2026-10-24): the ring must not wait on reads
+Live calls stopped ringing after the ADR 0051 deploy. Watching the websocket frames showed the
+network delivered the invite, but the callee's check of the sender read the chat's whole
+summary first, which on a busy node took longer than the caller's 15 s; the caller then gave up
+("Not available right now") and the late ring closed at once. Also, a signal sent while the
+callee's page reloads is lost (direct signals are best effort). Now:
+- **The sender check reads as little as possible** (`services/calls.ts` `findPeer`): a chat's
+  seed names its creator and kind, a direct chat has two people, and the seed is in your inbox
+  only if you are one of them, so in a chat someone else started the other person is its
+  creator. Only the creator's own side reads the chat's members, and the call button passes
+  the member it already knows (`rememberPeer`). The inbox is read once and again only on a
+  miss.
+- **The caller repeats its invite every 2.5 s** until the callee's device answers `ringing`
+  (or 15 s pass); the callee answers a repeat again and ignores invites for calls that already
+  ended on it.
+- Nothing here needs the seed node: two desktop apps signal each other through the relay
+  (the bootstrap service), and two people hosted by the same gateway are bridged inside it.
