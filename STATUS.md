@@ -23,6 +23,16 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
+## In flight 2026-10-24: call lines in direct chats (ADR 0051), branch `claude/social-production-handoff-dsam61`
+STATUS.md Next item 1. web's "Voice call · 4:12" / "Call declined" / "No answer" / "Missed call"
+lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rules in the new
+`crates/sp_call`; directory and project DNA hashes unchanged (`hc dna hash`: `uhC0kX7veWx…`,
+`uhC0kJTRl5t…`). Merging resets the live direct/group test chats again.
+- Checked so far: fmt, clippy (`sp_call`, `messages`, `messages_integrity`, `-D warnings`),
+  `sp_call` unit tests, hApp build + DNA hashes, `npm run check`/`lint`, sizes, boundaries.
+- Still to do: scenarios `calls` (new) and `messages`; `calls.mjs` (now checks the lines) and
+  `messages.mjs` against the local seed node; open the PR; merge when CI is green; live smoke.
+
 ## Done 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 merged (~04:56 UTC / 3:56 pm Melbourne), deployed ~05:13 UTC; live `calls.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
 change**, so merging resets nothing.
