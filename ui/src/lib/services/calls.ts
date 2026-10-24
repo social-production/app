@@ -18,13 +18,36 @@ import { myAgent, namesOf } from './people.ts';
 /** Direct chat seed → the other person, once confirmed. */
 const peers = new Map<string, Promise<string | null>>();
 const names = new Map<string, Promise<string>>();
+/** The chats in your inbox; read again only when a seed isn't in it yet. */
+let inbox: Set<string> | null = null;
 
+async function inMyInbox(seed: string): Promise<boolean> {
+  if (inbox?.has(seed)) return true;
+  inbox = new Set((await myChats()).map((c) => c.seed));
+  return inbox.has(seed);
+}
+
+/**
+ * The other person in a direct chat. It has to answer within the caller's ring wait, so it
+ * reads as little as it can: a chat seed names its creator and kind
+ * (`<creator>.<direct|group>.<nonce>`), a direct chat has exactly two people, and the seed is
+ * in your inbox only if you are one of them. So in a chat someone else started, the other
+ * person is its creator; only in your own does it read the chat's members.
+ */
 async function findPeer(seed: string): Promise<string | null> {
-  if (!(await myChats()).some((c) => c.seed === seed)) return null;
-  const [chat, me] = await Promise.all([chatSummary(seed, 0), myAgent()]);
+  const [creator, kind] = seed.split('.');
+  if (kind !== 'direct' || !creator || !(await inMyInbox(seed))) return null;
+  const me = await myAgent();
+  if (creator !== me) return creator;
+  const chat = await chatSummary(seed, 0);
   if (chat.kind !== 'direct' || !chat.member) return null;
   const others = chat.members.filter((m) => m !== me);
   return others.length === 1 ? (others[0] ?? null) : null;
+}
+
+/** What the chat on screen already knows (the call button's chat), so no lookup is needed. */
+export function rememberPeer(seed: string, peer: string): void {
+  if (!peers.has(seed)) peers.set(seed, Promise.resolve(peer));
 }
 
 /** The other person in a direct chat, or null (not yours, a group, or not found yet). */

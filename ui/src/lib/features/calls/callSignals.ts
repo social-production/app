@@ -32,6 +32,12 @@ async function orHangUp(session: CallSession, run: () => Promise<void>): Promise
 }
 
 function invited(session: CallSession, envelope: CallEnvelope): void {
+  // The caller repeats its invite until this device answers; answer again, ring once.
+  if (session.hasFinished(envelope.callId)) return;
+  if (envelope.callId === session.view.callId) {
+    if (session.view.phase === 'ringing') session.send('ringing');
+    return;
+  }
   if (isLive(session.view.phase)) {
     session.reply(envelope, 'reject');
     return;
