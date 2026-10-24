@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-24 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-24 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-24: photos and files in direct and group chats (ADR 0049), branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-24: photos and files in direct and group chats (ADR 0049), PR #34 merged (~01:40 UTC / 12:40 pm Melbourne), deployed ~02:06 UTC; live `attachments.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("attachments, then calls"). web's LiveChatPanel attachments, ported for
 direct and group chats; project chats stay text-only until the next project-DNA change.
 - **Integrity change** (conversation DNA only): public `Chunk` entries (≤1 MB parts) and
@@ -42,8 +42,13 @@ direct and group chats; project chats stay text-only until the next project-DNA 
   file, list "Photo", viewer, download intact; first run timed out at sign-up on the cold node,
   rerun passed), `messages.mjs`, `group-options.mjs`, `chat.mjs`, `mentions.mjs`,
   `public-chats.mjs`. Not run here: the other scenario files (CI runs them).
-- Next for this item: open the PR, wait for CI (~1 h, 4 shards), merge, wait ~5 min for the
-  hosted apps to reinstall, then smoke live with `attachments.mjs` and `projects.mjs`.
+- CI: `check` 6 min, shards 30–81 min (`scenarios (1/4)` took 81 min; add shards if one nears
+  120). Railway: bootstrap and ui ~1 min after the merge, seed-node ~25 min.
+- After deploy: `projects.mjs` passed live. `attachments.mjs` run 3 min after the seed node
+  restarted failed: Ann's sent photo message never showed in her chat (the send itself
+  finished). The rerun ~5 min later passed in full (photo, viewer, 1.4 MB file intact). Same
+  cold-node pattern as earlier deploys, but if a sent attachment ever vanishes again, look at
+  `post_message` after `upload_chunk` on a freshly reinstalled app.
 
 ## Done 2026-10-24: read receipts in direct chats, PR #32 merged (~15:20 UTC 2026-10-23 / 2:20 am Melbourne), deployed ~15:41 UTC; live `messages.mjs` and `projects.mjs` passed
 The owner asked for "seen" receipts on 2026-10-23. web shows ✓ (sent) / ✓✓ (read) on your own
@@ -356,15 +361,21 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
     entry was an integrity change, so direct/group chats made before ~15:41 UTC are on the old
     network. There is no setting to turn receipts off (web has none either).
 
+11. **Attachments reset the live test chats again** (ADR 0049, 2026-10-24): chats made before
+    ~02:06 UTC are on the old network. Files are 1 MB public `Chunk` entries readable by anyone
+    with the chat's seed (and by a gateway's operator for hosted people, as on web's server);
+    deleting a message marks its parts deleted, but peers may keep the bytes. Project chats get
+    attachments with the next project-DNA reset; say if you want that sooner.
+
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `d844434` (PR #32, deployed 2026-10-23 ~15:41 UTC, ~21 min after the merge; hApp version changed). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `519d871` (PR #34, deployed 2026-10-24 ~02:06 UTC, ~25 min after the merge; hApp version changed). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -389,7 +400,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: calls (attachments are in flight above; project-chat attachments wait for the next project-DNA integrity change). When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: calls. Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
