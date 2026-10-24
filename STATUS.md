@@ -28,10 +28,15 @@ STATUS.md Next item 1. web's "Voice call · 4:12" / "Call declined" / "No answer
 lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rules in the new
 `crates/sp_call`; directory and project DNA hashes unchanged (`hc dna hash`: `uhC0kX7veWx…`,
 `uhC0kJTRl5t…`). Merging resets the live direct/group test chats again.
-- Checked so far: fmt, clippy (`sp_call`, `messages`, `messages_integrity`, `-D warnings`),
-  `sp_call` unit tests, hApp build + DNA hashes, `npm run check`/`lint`, sizes, boundaries.
-- Still to do: scenarios `calls` (new) and `messages`; `calls.mjs` (now checks the lines) and
-  `messages.mjs` against the local seed node; open the PR; merge when CI is green; live smoke.
+- Checked in the cloud session: fmt, clippy (`sp_call`, `messages`, `messages_integrity`,
+  `-D warnings`), `sp_call` unit tests, hApp build + DNA hashes, scenarios `calls` (new, 4 min)
+  and `messages` (11 min), `npm run check`/`lint`, sizes, boundaries; against the local seed
+  node at 390px: `calls.mjs` (now checks "Call declined", one "Voice call · 0:0X" on both
+  phones, "No answer"; first run timed out at sign-up on the cold node, rerun passed) and
+  `messages.mjs`. "Call declined" is red (computed style checked in the browser). Not run here:
+  the other scenario files (CI runs them).
+- Next: PR CI green → merge → wait ~5 min after the seed node restarts → live `calls.mjs` and
+  `projects.mjs` → README Status + this entry as "Done".
 
 ## Done 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 merged (~04:56 UTC / 3:56 pm Melbourne), deployed ~05:13 UTC; live `calls.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
