@@ -15,11 +15,6 @@ const phone = { width: 390, height: 844 };
 const stamp = Date.now().toString(36).slice(-5);
 const [annName, bobName] = [`ann${stamp}`, `bob${stamp}`];
 const hello = `Photos of the beds ${stamp}`;
-// A 1×1 PNG: the composer resizes it to a JPEG, as web does.
-const png = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==',
-  'base64',
-);
 const notes = Buffer.alloc(1_500_000, `seed list ${stamp}\n`);
 
 const row = (page, name) => page.locator('.conversation-row', { hasText: name }).first();
@@ -64,6 +59,19 @@ await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
 await ann.locator('.chat-log').getByText(hello).waitFor({ timeout: 60_000 });
 log('ann messaged bob');
 
+// A 320×240 PNG drawn in the page; the composer resizes it to a JPEG, as web does.
+const png = Buffer.from(
+  await ann.evaluate(() => {
+    const canvas = Object.assign(document.createElement('canvas'), { width: 320, height: 240 });
+    const g = canvas.getContext('2d');
+    g.fillStyle = '#4a7c3f';
+    g.fillRect(0, 0, 320, 240);
+    g.fillStyle = '#e8c547';
+    g.fillRect(40, 40, 120, 90);
+    return canvas.toDataURL('image/png').split(',')[1];
+  }),
+  'base64',
+);
 await ann.locator('input.attach-input[accept]').setInputFiles({
   name: 'bed.png',
   mimeType: 'image/png',
