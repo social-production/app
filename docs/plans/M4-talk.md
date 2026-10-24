@@ -194,3 +194,16 @@ chat mentions and replies.
   set in `tests/e2e/lib.mjs`).
 - Not yet: the "Voice call · 4:12" / "Missed call" lines in the chat (needs a message kind in
   the conversation DNA: next integrity change).
+  (Done in the seventh part.)
+
+## M4c as built, seventh part (2026-10-24: call lines in direct chats; ADR 0051)
+- **Integrity change (conversation DNA only):** a public `Call` entry + `Calls` link; rules in
+  `crates/sp_call` (`check_call`, `first_per_call`). Coordinator `calls.rs`: `log_call` (a
+  no-op once a line for that call is seen) and the call rows `list_messages` returns
+  (`kind: "call"`, `call: { outcome, seconds }`), one per call id, oldest report first.
+- UI: `chatFormat.ts` `callLineText` (web's), `components/chat/ChatNote.svelte` (call and
+  leave lines), `CallSession.logLine` (web's `logFinishedCall`), `services/messages.ts`
+  `logChatCall`.
+- Tests: scenario `calls` (two reports, one line; bad outcomes refused; unread and preview);
+  `tests/e2e/calls.mjs` checks "Call declined", one "Voice call · 0:0X" on both phones, then
+  "No answer".

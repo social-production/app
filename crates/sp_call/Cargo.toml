@@ -1,0 +1,11 @@
+[package]
+name = "sp_call"
+description = "Rules for the call lines in direct chats (web's call log, ADR 0051). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

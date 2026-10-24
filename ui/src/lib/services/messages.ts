@@ -1,4 +1,4 @@
-import type { ChatMessage } from '#lib/domain/chat.ts';
+import type { CallLine, ChatKindOfLine, ChatMessage } from '#lib/domain/chat.ts';
 import type {
   ChatKind,
   ChatPin,
@@ -38,7 +38,7 @@ interface SummaryWire {
     author: AgentPubKey;
     preview: string;
     created_at: number;
-    kind: 'text' | 'system';
+    kind: ChatKindOfLine;
   } | null;
   unread: number;
   member: boolean;
@@ -192,6 +192,21 @@ export async function markChatRead(seed: string): Promise<void> {
 export async function chatPeerReadAt(seed: string): Promise<number | null> {
   const at = await chat<number | null>(seed, 'peer_read_at');
   return at === null ? null : at / 1000;
+}
+
+/** web's `log_call`: a finished call's line in a direct chat (ADR 0051). Either phone may
+ * report it; the first report shows. */
+export async function logChatCall(
+  seed: string,
+  callId: string,
+  outcome: CallLine['outcome'],
+  seconds: number,
+): Promise<void> {
+  await chat<null>(seed, 'log_call', {
+    call_id: callId,
+    outcome,
+    seconds: outcome === 'completed' ? Math.min(Math.round(seconds), 24 * 3600) : 0,
+  });
 }
 
 /** Everyone with a profile, by name, for the compose sheet's suggestions. */

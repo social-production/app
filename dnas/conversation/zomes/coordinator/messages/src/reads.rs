@@ -8,7 +8,7 @@ use sp_core::chat::PAGE_MAX;
 
 use crate::entries::all;
 use crate::people::Chat;
-use crate::{anchor, own, pins, MessageView, ReplyRef, MESSAGES};
+use crate::{anchor, calls, own, pins, MessageView, ReplyRef, MESSAGES};
 
 /// One record: the local copy first (messages never change once written), then the network.
 pub fn record(hash: &ActionHash) -> ExternResult<Option<Record>> {
@@ -53,9 +53,10 @@ pub fn decode(record: &Record) -> ExternResult<Option<Message>> {
         .map_err(|e| wasm_error!(e))
 }
 
-/// The newest `PAGE_MAX` messages, oldest first, with edits applied, pins marked and a
-/// system row for each leave (web's "… left the group."). Deleted ones are gone with their
-/// link; messages written while their author was out of the chat don't count (ADR 0045).
+/// The newest `PAGE_MAX` messages, oldest first, with edits applied, pins marked, a system
+/// row for each leave (web's "… left the group.") and a row for each call (ADR 0051). Deleted
+/// ones are gone with their link; messages written while their author was out of the chat
+/// don't count (ADR 0045).
 pub fn list(chat: &Chat) -> ExternResult<Vec<MessageView>> {
     let edits: BTreeMap<ActionHash, String> =
         all::<Edit>(UnitEntryTypes::Edit, LinkTypes::Edits, MESSAGES)?
@@ -91,7 +92,9 @@ pub fn list(chat: &Chat) -> ExternResult<Vec<MessageView>> {
         edited: false,
         pinned: false,
         attachments: Vec::new(),
+        call: None,
     }));
+    views.extend(calls::rows(chat)?);
     views.sort_by_key(|v| v.created_at);
     let excess = views.len().saturating_sub(PAGE_MAX);
     views.drain(..excess);
@@ -179,6 +182,7 @@ fn with_quotes(
             edited: false,
             pinned: false,
             attachments: m.attachments,
+            call: None,
         })
         .collect())
 }

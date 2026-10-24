@@ -87,6 +87,7 @@ export class ChatState {
       edited: m.edited ?? false,
       pinned: m.pinned ?? false,
       attachments: m.attachments ?? [],
+      call: m.call ?? null,
     };
   }
 
@@ -106,6 +107,7 @@ export class ChatState {
       edited: false,
       pinned: false,
       attachments: p.attachments,
+      call: null,
     };
   }
 

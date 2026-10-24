@@ -2,7 +2,8 @@
 // Ann messages Bob, then calls him from the chat header. Bob's screen rings wherever he is in
 // the app; he declines the first call (Ann sees "Call declined"), accepts the second (both
 // see the timer, audio from Chromium's fake microphone), and Ann ends it. With Bob's app
-// closed, Ann's next call says "Not available right now".
+// closed, Ann's next call says "Not available right now". Each call leaves web's line in the
+// chat (ADR 0051): "Call declined", one "Voice call · 0:0X" on both phones, then "No answer".
 //   node tests/e2e/calls.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -19,6 +20,7 @@ const hello = `Can I call you? ${stamp}`;
 
 const screen = (page) => page.locator('.call-screen');
 const status = (page) => page.locator('.call-screen .call-status');
+const line = (page, text) => page.locator('.chat-panel .call-line', { hasText: text });
 const row = (page, name) => page.locator('.conversation-row', { hasText: name }).first();
 
 async function statusIs(page, pattern, timeout = 60_000) {
@@ -80,12 +82,26 @@ await ann.getByRole('button', { name: 'End call' }).click();
 await statusIs(bob, /^Call ended/);
 log('bob accepted the second call; ann ended it');
 
+await line(ann, 'Call declined').waitFor({ timeout: 60_000 });
+await line(ann, /Voice call · 0:0\d/).waitFor({ timeout: 60_000 });
+await ann.screenshot({ path: `${out}/phone390-call-lines.png` });
+await bob.goto(chatUrl);
+await line(bob, /Voice call · 0:0\d/).waitFor({ timeout: 120_000 });
+await line(bob, 'Call declined').waitFor({ timeout: 60_000 });
+await bob.waitForTimeout(6000);
+assert.equal(await line(bob, 'Voice call').count(), 1, 'both phones logged it: one line');
+assert.equal(await line(ann, 'Voice call').count(), 1, 'one line for Ann too');
+await bob.goto(`${BASE}/`);
+log('the declined and the finished call left their lines');
+
 await bob.context().close();
 await screen(ann).waitFor({ state: 'detached', timeout: 15_000 });
 await ann.goto(chatUrl);
 await callButton.click();
 await statusIs(ann, 'Not available right now', 40_000);
 log('a call to a closed app is not available');
+await line(ann, 'No answer').waitFor({ timeout: 60_000 });
+log('it left "No answer"');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('calls ok');

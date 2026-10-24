@@ -9,7 +9,8 @@
   import BubbleMenu from './BubbleMenu.svelte';
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
-  import { formatMessageTime, messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
+  import ChatNote from './ChatNote.svelte';
+  import { messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
   import { BubbleMenuState } from './bubbleMenuState.svelte.ts';
   import { centerIn, scrollToEnd, syncPanelHeight } from './chatViewport.ts';
 
@@ -17,7 +18,7 @@
 
   /**
    * web's LiveChatPanel for text chats: day dividers, author runs, reply quotes, the bubble
-   * menu (profile, reply, copy, pin, edit and delete your own), "left the group" lines and
+   * menu (profile, reply, copy, pin, edit and delete your own), "left the group" and call lines and
    * the composer, with @mentions where web has them, and photos and files in direct and
    * group chats (`fileUrl`, ADR 0049). Reports come later.
    */
@@ -214,11 +215,8 @@
               <span>{messageDayLabel(message.createdAt)}</span>
             </div>
           {/if}
-          {#if message.kind === 'system'}
-            <div id={`comment-${message.id}`} class="call-line system-line">
-              <span>{message.authorName} left the group.</span>
-              <span class="message-time">{formatMessageTime(message.createdAt)}</span>
-            </div>
+          {#if message.kind !== 'text'}
+            <ChatNote {message} />
           {:else}
             <ChatBubble
               {message}

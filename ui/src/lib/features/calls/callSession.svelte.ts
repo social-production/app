@@ -1,6 +1,8 @@
 import type { CallChannel, CallEnvelope, CallPhase, CallView } from '#lib/domain/calls.ts';
+import type { CallLine } from '#lib/domain/chat.ts';
 import { configuredIceServers, createCallMedia, type CallMedia } from '#lib/services/callMedia.ts';
 import { openCallChannel } from '#lib/services/calls.ts';
+import { logChatCall } from '#lib/services/messages.ts';
 
 import { handleEnvelope } from './callSignals.ts';
 
@@ -51,7 +53,23 @@ export class CallSession {
     this.timers = [];
   }
 
-  reset(phase: CallPhase = 'idle', notice: string | null = null): void {
+  /** web's `logFinishedCall`: one line per call in the chat. A call that connected is
+   * reported by both phones (the first report shows); one that didn't, by the caller. */
+  private logLine(phase: CallPhase): void {
+    const { callId, conversationId, connectedAt } = this.view;
+    if (!callId || !conversationId) return;
+    let outcome: CallLine['outcome'] | null = null;
+    if (connectedAt) outcome = 'completed';
+    else if (this.role === 'caller') outcome = phase === 'declined' ? 'declined' : 'missed';
+    if (!outcome) return;
+    const seconds = connectedAt ? (Date.now() - connectedAt) / 1000 : 0;
+    void logChatCall(conversationId, callId, outcome, seconds).catch(() => {
+      /* The other phone may still log it. */
+    });
+  }
+
+  reset(phase: CallPhase = 'idle', notice: string | null = null, logLine = true): void {
+    if (logLine && isLive(this.view.phase)) this.logLine(phase);
     this.attempt += 1;
     this.clearTimers();
     this.media?.stop();
@@ -109,7 +127,8 @@ export class CallSession {
     try {
       await this.ensureMedia();
     } catch {
-      this.reset('ended', 'Microphone unavailable. Allow microphone access to call.');
+      // Nothing rang, so this isn't a missed call; leave no call line in the chat.
+      this.reset('ended', 'Microphone unavailable. Allow microphone access to call.', false);
       return;
     }
     if (attempt !== this.attempt) return;
