@@ -1,0 +1,198 @@
+/* Ported from web/src/lib/calls/CallHost.svelte (ADR 0032, scripts/port-styles.py) */
+.call-host .call-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  padding: max(16px, env(safe-area-inset-top)) 20px max(28px, env(safe-area-inset-bottom));
+  background: linear-gradient(180deg, #123524 0%, #0a1f15 60%, #06130d 100%);
+  color: #f4fbf6;
+}
+
+.call-host .call-top {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+}
+
+.call-host .call-kind {
+  text-align: center;
+  color: rgb(244 251 246 / 70%);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.call-host .icon-plain {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.call-host .call-identity {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.call-host .avatar {
+  display: grid;
+  place-items: center;
+  width: 128px;
+  height: 128px;
+  margin-bottom: 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand, #2e8b57) 70%, #0a1f15);
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.call-host .avatar.pulsing {
+  animation: call-pulse 1.8s ease-out infinite;
+}
+
+@keyframes call-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgb(120 220 160 / 45%);
+  }
+  100% {
+    box-shadow: 0 0 0 36px rgb(120 220 160 / 0%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .call-host .avatar.pulsing {
+    animation: none;
+  }
+}
+
+.call-host h2 {
+  margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 30px;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+}
+
+.call-host .call-status {
+  margin: 0;
+  color: rgb(244 251 246 / 75%);
+  font-size: 17px;
+  font-variant-numeric: tabular-nums;
+}
+
+.call-host .call-controls {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 24px;
+}
+
+.call-host .control {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(244 251 246 / 85%);
+}
+
+.call-host .round {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 16%);
+  color: #fff;
+  cursor: pointer;
+}
+
+.call-host .round[aria-pressed='true'] {
+  background: #f4fbf6;
+  color: #0a1f15;
+}
+
+.call-host .round.accept {
+  background: #22a55a;
+}
+
+.call-host .round.decline {
+  background: #e0433a;
+}
+
+.call-host .round:disabled {
+  opacity: 0.6;
+}
+
+.call-host .call-pill {
+  position: fixed;
+  top: max(8px, env(safe-area-inset-top));
+  left: 50%;
+  z-index: 400;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(420px, calc(100% - 16px));
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: #22a55a;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 25%);
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.call-host .pill-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: #fff;
+  animation: pill-blink 1.4s ease-in-out infinite;
+}
+
+@keyframes pill-blink {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+.call-host .pill-text {
+  display: grid;
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+.call-host .pill-text strong {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.call-host .pill-text span,
+.call-host .pill-return {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.call-host .pill-return {
+  flex: 0 0 auto;
+  opacity: 0.9;
+}

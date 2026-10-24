@@ -4,7 +4,9 @@ import {
   decodeHashFromBase64,
   encodeHashToBase64,
   setSigningCredentials,
+  SignalType,
   type CellId,
+  type Signal,
 } from '@holochain/client';
 
 import { gatewayApi, GatewayError } from './gateway.ts';
@@ -25,6 +27,33 @@ let deviceSession: DeviceSession | undefined;
 let pending: Promise<AppWebsocket | undefined> | undefined;
 let state: ConnectionState = { status: 'connecting' };
 const listeners = new Set<(state: ConnectionState) => void>();
+const directListeners = new Set<(signal: DirectSignalIn) => void>();
+
+/** A direct signal another person's node sent to one of this person's cells (holo/signals.ts). */
+export interface DirectSignalIn {
+  dna: string;
+  from: string;
+  data: Uint8Array;
+}
+
+/** Listen for direct signals on every socket this page opens (a reconnect gets a new one). */
+export function onDirectSignal(listener: (signal: DirectSignalIn) => void): () => void {
+  directListeners.add(listener);
+  return () => directListeners.delete(listener);
+}
+
+function relaySignals(ws: AppWebsocket): void {
+  ws.on('signal', (signal: Signal) => {
+    if (signal.type !== SignalType.AppDirect) return;
+    const { cell_id, from_agent, signal: data } = signal.value;
+    const message = {
+      dna: encodeHashToBase64(cell_id[0]),
+      from: encodeHashToBase64(from_agent),
+      data,
+    };
+    for (const listener of directListeners) listener(message);
+  });
+}
 
 export function onConnectionChange(listener: (state: ConnectionState) => void): () => void {
   listeners.add(listener);
@@ -64,6 +93,7 @@ async function open(): Promise<AppWebsocket | undefined> {
 async function openNative(): Promise<AppWebsocket> {
   // Holochain's Tauri runtime injected the connection and signs our zome calls.
   client = await AppWebsocket.connect();
+  relaySignals(client);
   const agent = (await client.appInfo())?.agent_pub_key;
   emit({ status: 'connected', node: 'this device', agent: agent ? encodeHashToBase64(agent) : '' });
   return client;
@@ -84,6 +114,7 @@ export async function attach(
     setSigningCredentials(cellId, session);
   }
   client = await AppWebsocket.connect({ url: new URL(appWsUrl), token });
+  relaySignals(client);
   deviceSession = session;
   // Project cells joined since sign-in were granted to this key too (/session/cells).
   for (const cells of Object.values((await client.appInfo())?.cell_info ?? {})) {

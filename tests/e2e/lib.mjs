@@ -4,9 +4,11 @@ import { chromium } from 'playwright';
 
 export const BASE = process.argv[2] ?? 'http://localhost:4174';
 // CHROMIUM_PATH: a preinstalled Chromium (cloud sessions) instead of Playwright's download.
-export const browser = await chromium.launch(
-  process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {},
-);
+// A fake microphone, allowed without a prompt, for the call tests (calls.mjs).
+export const browser = await chromium.launch({
+  args: ['--use-fake-ui-for-media-stream', '--use-fake-device-for-media-stream'],
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}),
+});
 export const log = (...a) => console.log(...a);
 /** Uncaught page errors from every device; tests assert it stays empty. */
 export const errors = [];

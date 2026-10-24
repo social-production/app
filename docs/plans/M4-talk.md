@@ -176,3 +176,21 @@ chat mentions and replies.
   chats stay text-only until the next project-DNA integrity change.
 - Tests: scenario `tests/scenarios/tests/attachments.rs`; browser `tests/e2e/attachments.mjs`
   (two new accounts, can run live).
+
+## M4c as built, sixth part (2026-10-24: voice calls in direct chats; ADR 0050)
+- **UI only, no zome change.** Signalling is Holochain 0.7's direct signals on the inbox cell:
+  `holo/signals.ts` (`acceptSignals` grants once per agent and device, `sendSignal`,
+  `onSignal`), relayed from every socket by `holo/connection.ts` `onDirectSignal`.
+  `services/calls.ts` is web's call socket: JSON envelopes, accepted only from the other member
+  of one of your direct chats.
+- Ported from `web/src/lib/calls/*`: `features/calls/CallHost.svelte` (root layout),
+  `callSession.svelte.ts` + `callSignals.ts` (web's `session.ts`), `components/calls/
+  CallControls.svelte`, `services/callMedia.ts`, `services/callTones.ts`; `styles/calls.css`
+  (PORTS). The direct chat header's phone button (`ConversationView.svelte`) asks through
+  `stores/callRequest.svelte.ts`.
+- App-only: the callee's device answers an invite with `ringing`; without it in 15 s the
+  caller sees "Not available right now".
+- Tests: `tests/e2e/calls.mjs` (two new accounts, can run live; Chromium's fake microphone,
+  set in `tests/e2e/lib.mjs`).
+- Not yet: the "Voice call · 4:12" / "Missed call" lines in the chat (needs a message kind in
+  the conversation DNA: next integrity change).
