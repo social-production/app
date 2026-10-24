@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-24: voice calls in direct chats (ADR 0050), PR open on `claude/social-production-handoff-dsam61`
+## In flight 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 (CI running; merge when green)
 STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
 change**, so merging resets nothing.
 - Signalling is Holochain 0.7's **direct signals** (`AppWebsocket.sendDirectSignal` /
