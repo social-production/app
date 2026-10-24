@@ -39,7 +39,7 @@ pub struct LastMessage {
     pub author: AgentPubKey,
     pub preview: String,
     pub created_at: Timestamp,
-    /// "text", or "system" for "… left the group."
+    /// "text", "system" for "… left the group.", or "call" (an empty preview, as on web).
     pub kind: String,
 }
 

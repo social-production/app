@@ -2,9 +2,10 @@
 //! clone: `start_chat`, the group's `rename_group`/`add_member`/`remove_member`/`leave`, messages
 //! (`post_message`, `edit_message`, `delete_message`, `list_messages`), pins (`pin_message`,
 //! `pins`), and your own `summary`, `mark_read` and `set_prefs`; a direct chat's
-//! `peer_read_at` (read receipts). In the base cell (the inbox):
+//! `peer_read_at` (read receipts) and `log_call` (call lines). In the base cell (the inbox):
 //! `send_invite` and `inbox`. The UI polls, as it does the project chat (ADR 0038).
 
+mod calls;
 mod entries;
 mod files;
 mod group;
@@ -40,11 +41,14 @@ pub struct MessageView {
     pub body: String,
     pub created_at: Timestamp,
     pub reply_to: Option<ReplyRef>,
-    /// "text", or "system" for a leave (web's "… left the group."; the UI names who).
+    /// "text", "system" for a leave (web's "… left the group."; the UI names who), or "call"
+    /// for a finished voice call (ADR 0051).
     pub kind: String,
     pub edited: bool,
     pub pinned: bool,
     pub attachments: Vec<Attachment>,
+    /// A call row's outcome and length.
+    pub call: Option<calls::CallLine>,
 }
 
 impl MessageView {

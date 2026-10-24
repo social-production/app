@@ -1,5 +1,7 @@
 /** Mirrors the conversation DNA's messages zome (ADR 0043). Times are Holochain micros. */
 
+import type { ChatKindOfLine } from '#lib/domain/chat.ts';
+
 export type ChatKind = 'direct' | 'group';
 
 /** sp_core::conversation limits. */
@@ -17,8 +19,8 @@ export interface ChatSummary {
   /** Everyone in the chat now, longest-standing first. */
   members: string[];
   title: string | null;
-  /** `system` is a leave: "<name> left the group." */
-  last: { author: string; preview: string; createdAt: number; kind: 'text' | 'system' } | null;
+  /** `system` is a leave: "<name> left the group."; a `call` has an empty preview, as on web. */
+  last: { author: string; preview: string; createdAt: number; kind: ChatKindOfLine } | null;
   unread: number;
   /** When the invitation arrived (orders chats with no messages yet). */
   invitedAt: number;

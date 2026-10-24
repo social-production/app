@@ -30,11 +30,21 @@ export interface ChatMessage {
   body: string;
   createdAt: number;
   replyTo: ChatQuote | null;
-  /** Direct and group chats only: a leave shows as a system line, edits and pins as marks. */
-  kind?: 'text' | 'system';
+  /** Direct and group chats only: a leave shows as a system line, a finished call as a call
+   * line (direct chats, ADR 0051), edits and pins as marks. */
+  kind?: ChatKindOfLine;
   edited?: boolean;
   pinned?: boolean;
   attachments?: ChatAttachment[];
+  call?: CallLine | null;
+}
+
+export type ChatKindOfLine = 'text' | 'system' | 'call';
+
+/** web's `callOutcome` and `callDurationSeconds`. */
+export interface CallLine {
+  outcome: 'completed' | 'missed' | 'declined';
+  seconds: number;
 }
 
 /** One message as the chat panel shows it (web's LiveChatPanel `ChatMessage`). */
@@ -51,11 +61,12 @@ export interface ChatLine {
   replyToId: string | null;
   replyAuthor: string | null;
   replyPreview: string | null;
-  /** `system`: "<author> left the group." */
-  kind: 'text' | 'system';
+  /** `system`: "<author> left the group."; `call`: web's "Voice call · 4:12" line. */
+  kind: ChatKindOfLine;
   edited: boolean;
   pinned: boolean;
   attachments: ChatAttachment[];
+  call: CallLine | null;
   /** Your own message in a direct chat: web's ✓ (sent) or ✓✓ (the other person read it). */
   receipt?: 'sent' | 'read';
 }

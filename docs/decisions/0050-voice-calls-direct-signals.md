@@ -35,6 +35,7 @@ capability grant, which `grantDirectSignalCapability` writes from the app socket
 - **No call lines in the chat yet**: web's `kind: 'call'` message needs a field the
   conversation DNA's `Message` doesn't have. It waits for the next conversation-DNA integrity
   change (as project-chat attachments wait for the project DNA's, ADR 0049).
+  (Done in ADR 0051.)
 
 ## Consequences
 - **UI only**: no zome or DNA change, so deploying resets nothing.

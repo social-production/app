@@ -1,6 +1,7 @@
 //! Who may write what, in a chat and in the inbox (ADR 0043).
 
 use hdi::prelude::*;
+use sp_call::check_call;
 use sp_core::chat::check_message;
 
 use crate::attachments::{validate_chunk, validate_message_files};
@@ -63,6 +64,14 @@ pub fn validate_entry(
             "only people in the chat mark it read",
         ),
         EntryTypes::Chunk(c) => validate_chunk(c, author, &creator),
+        EntryTypes::Call(_) if group => invalid("only direct chats have calls"),
+        EntryTypes::Call(c) => match check_call(&c.call_id, &c.outcome, c.seconds) {
+            Ok(()) => allow(
+                member(author, c.invite.as_ref(), &creator)?,
+                "only people in the chat log its calls",
+            ),
+            Err(reason) => invalid(&reason),
+        },
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
     }
 }
@@ -154,6 +163,7 @@ pub fn validate_link(
         LinkTypes::Edits => UnitEntryTypes::Edit,
         LinkTypes::Pins => UnitEntryTypes::Pin,
         LinkTypes::Seens => UnitEntryTypes::Seen,
+        LinkTypes::Calls => UnitEntryTypes::Call,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
     // Whether the entry itself was allowed is the entry's own validation.

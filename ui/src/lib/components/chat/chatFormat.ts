@@ -37,9 +37,27 @@ export function withReceipts(lines: ChatLine[], peerReadAt: number | null): Chat
   );
 }
 
+/** web's `callLineText`: "Voice call · 4:12", "Call declined", or "Missed call" to the one
+ * called and "No answer" to the caller. */
+export function callLineText(line: ChatLine): string {
+  if (line.call?.outcome === 'completed') {
+    const total = Math.max(0, Math.round(line.call.seconds));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = String(total % 60).padStart(2, '0');
+    const length =
+      hours > 0
+        ? `${hours}:${String(minutes).padStart(2, '0')}:${seconds}`
+        : `${minutes}:${seconds}`;
+    return `Voice call · ${length}`;
+  }
+  if (line.call?.outcome === 'declined') return 'Call declined';
+  return line.own ? 'No answer' : 'Missed call';
+}
+
 /** Name once per run of messages from the same person, like a group chat elsewhere. */
 export function showsAuthor(message: ChatLine, previous: ChatLine | undefined): boolean {
-  if (!previous || previous.author !== message.author || previous.kind === 'system') return true;
+  if (!previous || previous.author !== message.author || previous.kind !== 'text') return true;
   if (messageDayKey(previous.createdAt) !== messageDayKey(message.createdAt)) return true;
   return message.createdAt - previous.createdAt > 5 * 60_000;
 }

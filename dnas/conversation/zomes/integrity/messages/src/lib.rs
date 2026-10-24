@@ -131,6 +131,19 @@ pub struct Seen {
     pub invite: Option<ActionHash>,
 }
 
+/// A finished voice call in a direct chat (web's `log_call`, ADR 0051): "Voice call · 4:12",
+/// "Missed call" or "Call declined". Either phone may write it; the first per `call_id` shows.
+/// `invite` is the author's (`None` for the creator).
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Call {
+    pub call_id: String,
+    /// "completed", "missed" or "declined".
+    pub outcome: String,
+    pub seconds: u32,
+    pub invite: Option<ActionHash>,
+}
+
 /// The author's own list settings for this chat (web's `list_pinned_at`, `muted_at`,
 /// `hidden_at`); the newest counts. Private, like `ReadMark`.
 #[hdk_entry_helper]
@@ -160,6 +173,7 @@ pub enum EntryTypes {
     Prefs(Prefs),
     Seen(Seen),
     Chunk(Chunk),
+    Call(Call),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -174,12 +188,14 @@ pub enum LinkTypes {
     /// Inbox network only: a person's key → the sender's key, the tag an invitation encrypted
     /// to that person.
     Inbox,
-    /// Chat anchor → a removal, a leave, an edit, a pin or a `Seen`, each by its entry's author.
+    /// Chat anchor → a removal, a leave, an edit, a pin, a `Seen` or a `Call`, each by its
+    /// entry's author.
     Removals,
     Leaves,
     Edits,
     Pins,
     Seens,
+    Calls,
 }
 
 /// Which network this cell is: one chat (its creator and kind) or the inbox.

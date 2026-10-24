@@ -1,4 +1,4 @@
-import type { ChatAttachment, ChatMessage } from '#lib/domain/chat.ts';
+import type { CallLine, ChatAttachment, ChatKindOfLine, ChatMessage } from '#lib/domain/chat.ts';
 import {
   callCell,
   hashToString,
@@ -20,10 +20,11 @@ export interface MessageWire {
     preview: string;
     deleted: boolean;
   } | null;
-  kind?: 'text' | 'system';
+  kind?: ChatKindOfLine;
   edited?: boolean;
   pinned?: boolean;
   attachments?: AttachmentWire[];
+  call?: CallLine | null;
 }
 
 export interface AttachmentWire {
@@ -72,6 +73,7 @@ export function toChatMessage(m: MessageWire): ChatMessage {
     edited: m.edited ?? false,
     pinned: m.pinned ?? false,
     attachments: (m.attachments ?? []).map(toAttachment),
+    call: m.call ?? null,
   };
 }
 
