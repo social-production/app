@@ -35,11 +35,18 @@ lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rule
   Reproduced the deploy locally and it works: seed node on main's previous hApp (`4e6c1ba`,
   ring OK), restarted on the same data with this hApp (4 old apps removed, as live), new
   accounts ring in ~1 s. Two people on one node need no network to message (both write
-  locally), but a direct signal goes out through the node's transport, so the guess is the
-  live node's network/relay state after this restart, not the code. Next: the docs PR's merge
-  redeploys (restarts) the seed node; rerun live `calls.mjs` after it. If it still fails, the
-  owner should read `railway logs --service seed-node` around a call (kitsune/iroh errors) or
-  restart the seed node; reverting PR #38 would reset the chats again and likely not help.
+  locally), but a direct signal goes out through the node's transport, so the first guess was
+  the live node's network/relay state, not the code.
+- **A restart didn't fix it**: docs PR #39 merged ~10:29 UTC, seed node redeployed 10:41 UTC;
+  at 10:47 UTC live `calls.mjs` and a debug run (3 min wait) failed the same way. Note that
+  live calls had passed only once before (PR #36's smoke, 05:13 UTC), so they may never have
+  been reliable live. **Needs the owner (Railway access):** `railway logs --service seed-node`
+  while running `node tests/e2e/calls.mjs https://ui-production-333c.up.railway.app` (look for
+  kitsune2/iroh or "signal" errors; raise `RUST_LOG` to `info,holochain_p2p=debug,kitsune2=debug`
+  for one run). Ideas to check in code: whether `send_direct_signal` to an agent on the same
+  conductor goes through the relay (`RELAY_URL` = the bootstrap service) and whether the
+  production relay accepts it; whether the gateway's `/ws` proxy forwards signals for the new
+  inbox cell. Reverting PR #38 would reset the test chats again and probably not help.
 - Checked in the cloud session: fmt, clippy (`sp_call`, `messages`, `messages_integrity`,
   `-D warnings`), `sp_call` unit tests, hApp build + DNA hashes, scenarios `calls` (new, 4 min)
   and `messages` (11 min), `npm run check`/`lint`, sizes, boundaries; against the local seed
