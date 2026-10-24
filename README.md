@@ -33,8 +33,7 @@ What works today:
   places a voice call with web's call screen (ring, mute, speaker, return pill); the two
   devices signal each other directly and the audio flows between them (ADR 0050). Each call
   leaves web's line in the chat: "Voice call · 4:12", "Call declined", "Missed call" (ADR 0051).
-  **Since the 2026-10-24 ~08:48 UTC deploy, calls don't ring on the live node** (see STATUS.md
-  Known gaps); they work on a local node. Each chat is
+  Each chat is
   its own private network; invitations travel encrypted (ADR 0043).
 - **Links (M3e):** web's Links tab. A member proposes a link to another project with a reason;
   each project votes on its own half and the link is active once both pass. Either side can
