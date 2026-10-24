@@ -17,7 +17,7 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 ## Rules
 - Layer and size rules are CI-enforced: `docs/CODE_RULES.md`. Files ≤300 lines, functions ≤60.
 - UI imports use `#lib/...` **with extensions** (`#lib/holo/index.ts`). `$lib` no longer exists in Kit 3.
-- An integrity zome change means a new DNA hash, which means a new network. Prefer coordinator-only changes. Size limits live in `sp_core::limits`.
+- An integrity zome change means a new DNA hash, which means a new network. Prefer coordinator-only changes. Size limits live in `sp_core::limits`. Any `sp_core` change (even an unused module) changes **every** DNA's hash: put rules only one DNA needs in their own crate (e.g. `sp_attachment`) and compare `hc dna hash` with main.
 - The three DNAs differ only by `properties.kind` until their own zomes land. Don't remove it, or they collapse into one network.
 - Own data reads (`get_profile`/standing for yourself) come from your own chain (`records::own_latest`), because network reads lag right after a write.
 - Holochain versions move together: `flake.nix`, `Cargo.toml` (`hdi =0.8.1`, `hdk =0.7.1`, `holochain =0.7.1`), `@holochain/client 0.21.x`, the Dockerfile's `HOLOCHAIN_VERSION`.

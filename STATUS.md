@@ -35,7 +35,15 @@ direct and group chats; project chats stay text-only until the next project-DNA 
   one DNA needs go in their own crate, and `hc dna hash` before/after any `sp_core` change.
 - UI: composer photo/file buttons, previews, errors; photo row, file bubbles; PhotoViewer;
   "Photo"/file name in list previews and quotes (web-backend `_message_preview`).
-- Checks so far: see the newest update below this line (filled in as they run).
+- Checked in the cloud session: fmt, clippy (`sp_attachment`, `messages`, `messages_integrity`,
+  `scenarios`, `-D warnings`), `sp_attachment` unit tests, hApp build + `hc dna hash` (above),
+  scenarios `attachments` (new, 6 min) and `messages` (10 min); `npm run check`/`lint`, sizes,
+  boundaries; against the local seed node at 390px: `attachments.mjs` (new: photo + 1.5 MB
+  file, list "Photo", viewer, download intact; first run timed out at sign-up on the cold node,
+  rerun passed), `messages.mjs`, `group-options.mjs`, `chat.mjs`, `mentions.mjs`,
+  `public-chats.mjs`. Not run here: the other scenario files (CI runs them).
+- Next for this item: open the PR, wait for CI (~1 h, 4 shards), merge, wait ~5 min for the
+  hosted apps to reinstall, then smoke live with `attachments.mjs` and `projects.mjs`.
 
 ## Done 2026-10-24: read receipts in direct chats, PR #32 merged (~15:20 UTC 2026-10-23 / 2:20 am Melbourne), deployed ~15:41 UTC; live `messages.mjs` and `projects.mjs` passed
 The owner asked for "seen" receipts on 2026-10-23. web shows ✓ (sent) / ✓✓ (read) on your own
@@ -381,7 +389,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: attachments, then calls. When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: calls (attachments are in flight above; project-chat attachments wait for the next project-DNA integrity change). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
@@ -406,6 +414,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **A write isn't in your own network reads at once:** after a vote, `tally.my_vote` can still be
   empty for a while; UI flows keep what they just wrote (as `LinksState.cast` does).
 - **Debugging the UI:** errors caught into `detail.error` are not shown once the project has loaded; log them temporarily, or find them with a Playwright script that listens to `console`. When stopping a preview server, kill it by port (`ss -ltnp | grep :4174`). `pkill -f "<its command>"` also matches your own shell and kills it.
+- **`sp_core` changes change every DNA's hash** (2026-10-24): even an unused new module did. Rules for one DNA go in their own `crates/sp_*` crate; compare `hc dna hash dnas/<d>/sp_<d>.dna` against main before pushing any shared-crate change.
 - **hdk externs** are unmangled C symbols: never name one after a libc function (`close`, `read`, `write`, `send`…), or native test binaries crash.
 - **Keystore:** lair is vendored with a 64 KiB message limit (ADR 0034). Keep one lair entry per person.
 - **Seed-node logs:** `railway logs --service seed-node`. `RUST_LOG` is back to `info,holochain=warn,kitsune2=warn`. Never print `LAIR_PASSPHRASE`.
