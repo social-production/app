@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 (CI running; merge when green)
+## Done 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 merged (~04:56 UTC / 3:56 pm Melbourne), deployed ~05:13 UTC; live `calls.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
 change**, so merging resets nothing.
 - Signalling is Holochain 0.7's **direct signals** (`AppWebsocket.sendDirectSignal` /
@@ -42,10 +42,11 @@ change**, so merging resets nothing.
   pill, end, then "Not available right now" with Bob's app closed; passed on the first run,
   twice) and `messages.mjs`. No Rust changed, so fmt/clippy/scenarios weren't run here.
 - `tests/e2e/lib.mjs` now launches Chromium with a fake, auto-allowed microphone (all tests).
-- **After merging:** wait for Railway's ui deploy, then run `calls.mjs` against the live UI.
-  If calls don't connect live (signals between two people hosted on the seed node, or audio
-  through Railway's network), check `/readyz`, then whether the ring arrives at all
-  (signalling) vs. stuck on "Connecting…" (ICE: needs a TURN relay, `VITE_CALL_TURN_URLS`).
+- CI: `check` 4 min, shards 55–81 min (`scenarios (1/4)` took 81 min again).
+- After deploy (all three services green at 05:13 UTC): `calls.mjs` passed against the live UI
+  on the first run (ring, decline, accept with audio connecting, timer, end, "Not available
+  right now"), so direct signals work between two people hosted on the seed node. Two people
+  on different networks may still need a TURN relay for audio (owner-review item 12).
 
 ## Done 2026-10-24: photos and files in direct and group chats (ADR 0049), PR #34 merged (~01:40 UTC / 12:40 pm Melbourne), deployed ~02:06 UTC; live `attachments.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("attachments, then calls"). web's LiveChatPanel attachments, ported for
@@ -400,13 +401,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `519d871` (PR #34, deployed 2026-10-24 ~02:06 UTC, ~25 min after the merge; hApp version changed). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `4991e42` (PR #36, deployed 2026-10-24 ~05:13 UTC, ~17 min after the merge; UI only). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -431,8 +432,8 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: calls are in flight (above). Then web's call lines in the chat (with the next
-   conversation-DNA integrity change). Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: calls are live (above); web's call lines in the chat wait for the next
+   conversation-DNA integrity change. Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
