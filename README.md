@@ -31,7 +31,10 @@ What works today:
   (ADR 0048). Direct and group chats take photos (shown in the chat, full screen on tap) and
   files up to 10 MB, as on web (ADR 0049; project chats not yet). A direct chat's phone button
   places a voice call with web's call screen (ring, mute, speaker, return pill); the two
-  devices signal each other directly and the audio flows between them (ADR 0050). Each chat is
+  devices signal each other directly and the audio flows between them (ADR 0050). Each call
+  leaves web's line in the chat: "Voice call · 4:12", "Call declined", "Missed call" (ADR 0051).
+  **Since the 2026-10-24 ~08:48 UTC deploy, calls don't ring on the live node** (see STATUS.md
+  Known gaps); they work on a local node. Each chat is
   its own private network; invitations travel encrypted (ADR 0043).
 - **Links (M3e):** web's Links tab. A member proposes a link to another project with a reason;
   each project votes on its own half and the link is active once both pass. Either side can
@@ -103,7 +106,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M1** | Identity | recovery-phrase accounts, optional passkeys, hosted agents, profiles, device pairing, vouches + standing, founders | ✅ live (M1.1 fixes deployed) |
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
-| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
+| M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | activities, roles, events, help + service requests, communities/channels | |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
