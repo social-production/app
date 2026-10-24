@@ -23,11 +23,23 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-24: call lines in direct chats (ADR 0051), branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-24: call lines in direct chats (ADR 0051), PR #38 merged (~08:31 UTC / 7:31 pm Melbourne), deployed ~08:48 UTC; live `projects.mjs` and `messages.mjs` passed, live calls don't ring (below)
 STATUS.md Next item 1. web's "Voice call · 4:12" / "Call declined" / "No answer" / "Missed call"
 lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rules in the new
 `crates/sp_call`; directory and project DNA hashes unchanged (`hc dna hash`: `uhC0kX7veWx…`,
-`uhC0kJTRl5t…`). Merging resets the live direct/group test chats again.
+`uhC0kJTRl5t…`). The live direct/group test chats made before ~08:48 UTC are on the old network.
+- **Open problem: live calls stopped ringing after this deploy.** `calls.mjs` against the live
+  UI (3 runs, 08:55–09:06 UTC) fails at the first ring: Ann sees "Not available right now",
+  Bob's page gets nothing, no console errors. `messages.mjs` and `projects.mjs` pass live, so
+  hosting, the new conversation DNA and the inbox work; only direct signals don't arrive.
+  Reproduced the deploy locally and it works: seed node on main's previous hApp (`4e6c1ba`,
+  ring OK), restarted on the same data with this hApp (4 old apps removed, as live), new
+  accounts ring in ~1 s. Two people on one node need no network to message (both write
+  locally), but a direct signal goes out through the node's transport, so the guess is the
+  live node's network/relay state after this restart, not the code. Next: the docs PR's merge
+  redeploys (restarts) the seed node; rerun live `calls.mjs` after it. If it still fails, the
+  owner should read `railway logs --service seed-node` around a call (kitsune/iroh errors) or
+  restart the seed node; reverting PR #38 would reset the chats again and likely not help.
 - Checked in the cloud session: fmt, clippy (`sp_call`, `messages`, `messages_integrity`,
   `-D warnings`), `sp_call` unit tests, hApp build + DNA hashes, scenarios `calls` (new, 4 min)
   and `messages` (11 min), `npm run check`/`lint`, sizes, boundaries; against the local seed
@@ -35,8 +47,7 @@ lines. **Integrity change (conversation DNA only)**: a public `Call` entry, rule
   phones, "No answer"; first run timed out at sign-up on the cold node, rerun passed) and
   `messages.mjs`. "Call declined" is red (computed style checked in the browser). Not run here:
   the other scenario files (CI runs them).
-- Next: PR CI green → merge → wait ~5 min after the seed node restarts → live `calls.mjs` and
-  `projects.mjs` → README Status + this entry as "Done".
+- CI: `check` 5 min, shards 46–81 min (`scenarios (2/4)` took 81 min).
 
 ## Done 2026-10-24: voice calls in direct chats (ADR 0050), PR #36 merged (~04:56 UTC / 3:56 pm Melbourne), deployed ~05:13 UTC; live `calls.mjs` and `projects.mjs` passed
 STATUS.md Next item 1 ("calls"). web's call screen, ported for direct chats. **UI only, no zome
@@ -412,17 +423,18 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
     "Not available right now" comes after 15 s without the callee's device answering (web's
     server knew at once). Only STUN is configured (as on web), so some networks won't connect
     audio until a TURN relay is set (`VITE_CALL_TURN_URLS`, `_USERNAME`, `_CREDENTIAL` on the
-    ui service). No call lines in the chat until the next conversation-DNA reset.
+    ui service). Call lines came with ADR 0051 (2026-10-24), which reset the live test chats
+    again; when the other person is busy the caller's line says "Call declined" (web: missed).
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `4991e42` (PR #36, deployed 2026-10-24 ~05:13 UTC, ~17 min after the merge; UI only). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `0196063` (PR #38, deployed 2026-10-24 ~08:48 UTC, ~17 min after the merge; conversation-DNA integrity change). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines (not ringing live since the 08:48 UTC deploy, see Known gaps), Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -437,6 +449,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - The live web site (web-production-885ec) is reachable for read-only 390px comparisons.
 
 ## Known gaps
+- **Live calls don't ring since the 2026-10-24 ~08:48 UTC deploy** (newest "Done"): direct
+  signals between two people on the seed node don't arrive; everything else works, and the
+  same upgrade works locally.
 - **Railway security incident (2026-10-21, status.railway.com, blog.railway.com/p/security-disclosure-wednesday-october-21st):** an attacker may have read decrypted environment variables, and Railway advises rolling them all. Builds are back (2026-10-22), so rolled values can now be deployed; **not done yet** (owner). **Do not change `LAIR_PASSPHRASE` in Railway on its own:** it decrypts the keystore on `/data`, so a new value without re-encrypting the keystore locks every hosted agent's key away for good. The passphrase alone is useless without the keystore file, and the disclosure is about variables, not volumes. Re-keying needs a planned step (an ADR). The P2P project's other variables (`BOOTSTRAP_URL`, `RP_ID`/`RP_ORIGIN`, `POW_BITS`, …) are not secrets. The live FastAPI project (`social-production`) holds real secrets: `JWT_SECRET` (rolling it signs everyone out), the Postgres and Redis passwords, `GITHUB_TOKEN`, `TURNSTILE_SECRET_KEY` and `GEOCODING_PROVIDER_API_KEY`. Roll those. Its `MESSAGE_ENCRYPTION_KEY` decrypts every stored DM, so it needs MultiFernet re-encryption, not a plain swap.
 - **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s), during Railway's outage, so the reading may not be reliable. Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
@@ -447,8 +462,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: calls are live (above); web's call lines in the chat wait for the next
-   conversation-DNA integrity change. Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
+1. M4, from web: get live calls ringing again (Known gaps). Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
