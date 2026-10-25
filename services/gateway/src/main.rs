@@ -4,9 +4,12 @@ use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt()
-        .with_env_filter(EnvFilter::from_default_env())
-        .init();
+    // A hosted person's publish retries warn on every attempt when nobody else holds that part
+    // of a network (NoPeersForLocation): on Railway that flooded past 500 lines/s and hid the
+    // lines that matter. Kept quiet whatever RUST_LOG says; real failures still log as errors.
+    let filter = EnvFilter::from_default_env()
+        .add_directive("holochain::core::workflow::publish_dht_ops_workflow=error".parse()?);
+    tracing_subscriber::fmt().with_env_filter(filter).init();
     let passphrase = gateway::keystore_passphrase()?;
     Box::pin(gateway::serve(
         gateway::Config::from_env(),

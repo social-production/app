@@ -30,6 +30,8 @@ pub struct AppState {
     pub signin_limit: Arc<SignupLimit>,
     /// Guest reads (`/public/read`) per IP per day.
     pub read_limit: Arc<SignupLimit>,
+    /// When this process started (`/readyz` uptime).
+    pub started: std::time::Instant,
 }
 
 pub fn router(state: AppState) -> Router {
@@ -60,7 +62,21 @@ async fn readyz(State(state): State<AppState>) -> (StatusCode, Json<serde_json::
     } else {
         StatusCode::SERVICE_UNAVAILABLE
     };
-    (status, Json(serde_json::json!({ "conductor": ready })))
+    // Uptime and resident memory let a session without Railway access see restarts and growth.
+    let body = serde_json::json!({
+        "conductor": ready,
+        "uptimeSecs": state.started.elapsed().as_secs(),
+        "rssMb": resident_mb(),
+    });
+    (status, Json(body))
+}
+
+/// This process's resident memory in MB (Linux), from `/proc/self/status`.
+fn resident_mb() -> Option<u64> {
+    let status = std::fs::read_to_string("/proc/self/status").ok()?;
+    let line = status.lines().find(|l| l.starts_with("VmRSS:"))?;
+    let kb: u64 = line.split_whitespace().nth(1)?.parse().ok()?;
+    Some(kb / 1024)
 }
 
 /// The `/ws` URL on whatever host the browser used; Railway sets X-Forwarded-Proto.

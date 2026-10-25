@@ -37,6 +37,7 @@ pub async fn serve(
         signin_limit: Arc::new(auth::ratelimit::SignupLimit::new(200)),
         // A guest's project page polls its chat every few seconds: an hour is ~1,500 reads.
         read_limit: Arc::new(auth::ratelimit::SignupLimit::new(20_000)),
+        started: std::time::Instant::now(),
         config: Arc::new(config),
         node,
     };
