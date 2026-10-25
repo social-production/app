@@ -539,7 +539,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `ae99045` (PR #43, deployed 2026-10-25 ~01:51 UTC, ~18 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `0d9084d` (PR #45, deployed 2026-10-25 ~05:25 UTC, ~28 min after the merge; gateway). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -571,9 +571,9 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 ## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
 1. Merge the parity batch (In flight), smoke it live (`shell.mjs`, `guests.mjs`, `projects.mjs`).
-2. **Shell parity**: web's phone `MobileMoreSheet` (More → profile or Sign in, Settings, About,
-   …) instead of opening the left rail; then walk every shell piece at 390px against live web
-   (top bar, rails, bottom nav, menus) and port what differs. UI only, resets nothing.
+2. **Parity pass** (checklist: `docs/plans/PARITY.md`): next web's Search page (plan in the
+   checklist: a gateway people index), then compare the screens under "Not compared yet"
+   (profile, settings, notifications, messages).
 3. Guests on profile pages, if web shows them signed out (same `/public/read` allowlist).
 4. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
    Batch the next project-DNA integrity change with project-chat attachments and private
