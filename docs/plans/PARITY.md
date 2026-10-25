@@ -61,8 +61,11 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [ ] Appearance rows waiting on features: language (web: "coming soon"), separate Public and
   Personal feeds (needs the personal feed), display timezone (needs scheduled times, M5).
 - [ ] Regional (default location, device GPS, network location): needs places (M6).
-- [ ] Notifications preferences: web's per-kind switches; the app derives notifications on the
-  device, so these can be per-device switches over `services/notifications.ts`.
+- [x] Notifications: web's switches for the categories the app has kinds for (Comments, Votes
+  needed, Phase finished), per device; off hides those cards and their bell count.
+- [ ] Notifications still to come: web's "Plan became leading" (off by default; the app could now
+  derive `prj-plan-lead`, ADR 0046 left it out for lack of settings), follows, shares/invites,
+  roles.
 - [ ] Follow requests and Privacy (profile activity visibility): need follows.
 
 ## Not compared yet
