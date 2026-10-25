@@ -67,18 +67,19 @@
 }
 
 /* app/ui: web scopes each strip's styles; here cards.css's VoteStrip "docked, no vote" rules
-   also match the feedback strip (both are .vote-strip), so its voted state is restated. */
-.feedback-strip
+   also match the feedback strip (both are .vote-strip), so its voted state is restated. The
+   doubled .feedback-strip outranks those rules (a tie would go to whichever loads last). */
+.feedback-strip.feedback-strip
   .vote-strip.signal-strip.docked:is(:has(.active-support), :has(.active-oppose))
   .vote-button:not(.active-support):not(.active-oppose) {
   background: var(--panel-strong);
   color: var(--text-main);
 }
-.feedback-strip .vote-strip.signal-strip.docked .vote-button.active-support {
+.feedback-strip.feedback-strip .vote-strip.signal-strip.docked .vote-button.active-support {
   background: var(--panel-strong);
   color: #22c55e;
 }
-.feedback-strip .vote-strip.signal-strip.docked .vote-button.active-oppose {
+.feedback-strip.feedback-strip .vote-strip.signal-strip.docked .vote-button.active-oppose {
   background: var(--panel-strong);
   color: #ef4444;
 }
