@@ -11,7 +11,7 @@
   interface Props {
     open: boolean;
     title: string;
-    description: string;
+    description?: string | undefined;
     emptyCopy: string;
     people: Person[];
     onClose: () => void;
@@ -35,7 +35,9 @@
 </script>
 
 <OverlaySheet {open} {title} rootClass="people-sheet" {onClose}>
-  {#snippet subtitle()}<p class="sheet-description">{description}</p>{/snippet}
+  {#snippet subtitle()}{#if description}<p class="sheet-description">
+        {description}
+      </p>{/if}{/snippet}
   {#snippet toolbar()}
     <div class="sheet-search">
       <label class="sr-only" for="people-sheet-search">Search people</label>

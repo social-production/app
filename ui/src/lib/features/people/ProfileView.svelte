@@ -2,12 +2,17 @@
   import type { Snippet } from 'svelte';
 
   import CopyKey from '#lib/components/CopyKey.svelte';
+  import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
+  import { acceptedCount, shownRows } from '#lib/domain/follows.ts';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/errors.ts';
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import FollowButton from './FollowButton.svelte';
+  import FollowRequests from './FollowRequests.svelte';
+  import { ProfileFollows } from './followState.svelte.ts';
   import MessageButton from './MessageButton.svelte';
   import VouchButton from './VouchButton.svelte';
 
@@ -30,6 +35,14 @@
   const canClaim = $derived(
     own && person?.standing.level === 'New' && person.standing.vouchers.length >= VOUCHES_FOR_FULL,
   );
+
+  const follows = $derived(new ProfileFollows(agent, own));
+  const sheetPeople = $derived.by(() => {
+    const view = follows.view;
+    if (!view || !follows.list) return [];
+    const rows = shownRows(follows.list === 'followers' ? view.followers : view.following, own);
+    return rows.flatMap((r) => follows.people[r.agent] ?? []);
+  });
 
   async function load(): Promise<void> {
     try {
@@ -64,6 +77,9 @@
     void agent;
     void load();
   });
+  $effect(() => {
+    void follows.load();
+  });
 </script>
 
 <div class="profile-page">
@@ -71,10 +87,37 @@
     {#if person}
       {@const shown = person}
       <ProfileHero person={shown} {devices}>
+        {#snippet counts()}
+          {@const view = follows.view}
+          {#if view}
+            {@const followers = acceptedCount(view.followers)}
+            <button
+              class:active={follows.list === 'followers'}
+              type="button"
+              onclick={() => (follows.list = follows.list === 'followers' ? null : 'followers')}
+            >
+              <strong>{followers}</strong>
+              {followers === 1 ? 'follower' : 'followers'}
+            </button>
+            <button
+              class:active={follows.list === 'following'}
+              type="button"
+              onclick={() => (follows.list = follows.list === 'following' ? null : 'following')}
+            >
+              <strong>{acceptedCount(view.following)}</strong> following
+            </button>
+          {/if}
+        {/snippet}
         {#snippet actions()}
           <!-- As on web, guests see no actions on someone's profile. -->
           {#if !own && me}
             <div class="action-row">
+              <FollowButton
+                name={shown.profile?.name ?? 'them'}
+                status={follows.view?.myStatus ?? null}
+                busy={follows.busy || !follows.view}
+                onToggle={() => void follows.toggle()}
+              />
               {#if me && me.standing.level !== 'Paused'}
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
@@ -91,6 +134,22 @@
           {/if}
         {/snippet}
       </ProfileHero>
+      {#if follows.error}<p class="warning-card" role="alert">{follows.error}</p>{/if}
+      {#if own}
+        <FollowRequests
+          requests={follows.requests}
+          people={follows.people}
+          pending={follows.deciding}
+          onDecide={(who, accept) => void follows.decide(who, accept)}
+        />
+      {/if}
+      <PeopleSheet
+        open={follows.list !== null}
+        title={follows.list === 'followers' ? 'Followers' : 'Following'}
+        emptyCopy={follows.list === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+        people={sheetPeople}
+        onClose={() => (follows.list = null)}
+      />
 
       {#if own}
         <section class="empty-card own-card">

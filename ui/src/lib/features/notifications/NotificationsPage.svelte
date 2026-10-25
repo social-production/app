@@ -6,6 +6,7 @@
   import NotificationCard from '#lib/components/cards/NotificationCard.svelte';
   import type { NotificationItem } from '#lib/domain/notifications.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { decideFollow } from '#lib/services/follows.ts';
   import {
     markAllNotificationsRead,
     markNotificationRead,
@@ -21,6 +22,7 @@
   /** web's NotificationsPage: the list, newest first, with "Mark all read". */
   let names = $state<Record<string, string>>({});
   let opening = $state('');
+  let deciding = $state('');
 
   let error = $state('');
 
@@ -59,12 +61,29 @@
     void namesOf(missing).then((found) => (names = { ...names, ...found }));
   });
 
+  /** web's follow-request card actions: decide, then read the card. */
+  async function decide(item: NotificationItem, accept: boolean): Promise<void> {
+    deciding = item.id;
+    try {
+      await decideFollow(item.actor, accept);
+      await read(item);
+    } catch (e) {
+      error = explain(e);
+    } finally {
+      deciding = '';
+    }
+  }
+
   /** web's activateNotification: read it, then open the project where it happened. */
   async function activate(item: NotificationItem): Promise<void> {
     if (opening) return;
     opening = item.id;
     try {
       await read(item);
+      if (item.subject === 'profile') {
+        await goto(resolve('/profile/[agent]', { agent: item.actor }));
+        return;
+      }
       const t = item.target;
       if (t && 'conversation' in t) {
         // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved here
@@ -109,6 +128,8 @@
         actorName={names[item.actor] ?? 'Someone'}
         onRead={() => read(item)}
         onActivate={() => activate(item)}
+        deciding={deciding === item.id}
+        onDecide={(accept) => decide(item, accept)}
       />
     {/each}
   </div>

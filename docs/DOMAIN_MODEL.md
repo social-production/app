@@ -9,12 +9,12 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 | Entry / link | Milestone | Notes |
 |---|---|---|
 | `Profile` | M1 | name, bio, avatar ref. Latest update wins |
-| `Follow` link | M1 | agent → agent |
+| `Follows` / `Followers` / `FollowAccepts` / `FollowRejects` / `RequiresFollowApproval` links | M5a | agent → agent (ADR 0054) |
 | `Vouch`, `StandingGrant` | M1 | see GOVERNANCE.md#standing |
 | `ProjectListing` | M2 ✅ | the project's network seed `<creator>.<nonce>` (ADR 0030) + title, summary, mode, tags, location, phase; the creator's Full-standing proof, or the New-member limit (2 per 7 days) |
 | `Place` | M6 | locations for map/discovery |
 | `NodeAnnouncement` | M1 | community seed/gateway URLs for failover |
-| `Feedback` | M5 | platform feedback |
+| `Feedback` + `AllFeedback` / `FeedbackVotes` links | M5a | platform feedback (ADR 0054) |
 | platform-level `Proposal/Vote/Outcome` | M3/M6 | bot reviews, board membership, platform channel |
 
 ## project (clone per project)

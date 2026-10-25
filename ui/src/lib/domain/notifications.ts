@@ -1,4 +1,5 @@
 import { mentionsOf, type ChatMessage } from './chat.ts';
+import type { FollowView } from './follows.ts';
 import type { Proposal } from './governance.ts';
 import type { ProjectMode } from './projects.ts';
 
@@ -6,29 +7,41 @@ import type { ProjectMode } from './projects.ts';
  * In-app notifications (web's NotificationItem, ADR 0046). Nothing is stored: each device
  * derives them from the projects opened on its node, the kinds web-backend creates for what
  * the app has so far: phase votes (`prj-phase-vote`), phase changes (`prj-phase-done`), chat
- * replies (`reply`) and @mentions in project, direct and group chats (`mention`, ADR 0047).
+ * replies (`reply`), @mentions in project, direct and group chats (`mention`, ADR 0047) and
+ * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054).
  * Times are Holochain micros.
  */
-export type NotificationKind = 'prj-phase-vote' | 'prj-phase-done' | 'reply' | 'mention';
+export type NotificationKind =
+  | 'prj-phase-vote'
+  | 'prj-phase-done'
+  | 'reply'
+  | 'mention'
+  | 'new-follower'
+  | 'follow-request'
+  | 'follow-accepted';
 
 /** web's notification settings categories the app has kinds for (web-backend
- * `notification_preferences.py` KIND_TO_CATEGORY); follows, shares, roles and plan-leading
- * come with their features. */
-export type NotificationCategory = 'comments' | 'votes_needed' | 'phase_done';
+ * `notification_preferences.py` KIND_TO_CATEGORY); shares, roles and plan-leading come with
+ * their features. */
+export type NotificationCategory = 'follows' | 'comments' | 'votes_needed' | 'phase_done';
 
 export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   reply: 'comments',
   mention: 'comments',
   'prj-phase-vote': 'votes_needed',
   'prj-phase-done': 'phase_done',
+  'new-follower': 'follows',
+  'follow-request': 'follows',
+  'follow-accepted': 'follows',
 };
 
 export interface NotificationItem {
   id: string;
   kind: NotificationKind;
-  /** web's subject: a project, or a direct or group chat (web's "Thread" card). */
-  subject: 'project' | 'thread';
-  /** The project's or chat's network seed; a project's page is found by seed on opening. */
+  /** web's subject: a project, a direct or group chat (web's "Thread" card), or a person. */
+  subject: 'project' | 'thread' | 'profile';
+  /** The project's or chat's network seed (empty for follows); a project's page is found by
+   *  seed on opening. */
   seed: string;
   /** Projects only. */
   projectMode: ProjectMode | null;
@@ -184,6 +197,40 @@ export function chatMentionNotifications(c: ChatActivity, me: string, myName: st
       target: { conversation: c.seed },
       createdAt: m.createdAt,
     }));
+}
+
+/** users.py: "New follower" / "Follow request" for your followers, and "Follow request
+ *  accepted" for people who accepted yours. Cards open the other person's profile. */
+export function followNotifications(mine: FollowView): Unread[] {
+  const base = { subject: 'profile' as const, seed: '', projectMode: null, lead: null };
+  const followers = mine.followers.map((r) => ({
+    ...base,
+    id: `follow:${r.agent}:${r.since}`,
+    kind: r.status === 'pending' ? ('follow-request' as const) : ('new-follower' as const),
+    actor: r.agent,
+    title: r.status === 'pending' ? 'Follow request' : 'New follower',
+    body: r.status === 'pending' ? 'requested to follow you.' : 'started following you.',
+    target: null,
+    // A request someone accepted later stays where it arrived.
+    createdAt: r.since,
+  }));
+  const accepted = mine.following.flatMap((r) =>
+    r.acceptedAt === null
+      ? []
+      : [
+          {
+            ...base,
+            id: `follow-accepted:${r.agent}:${r.acceptedAt}`,
+            kind: 'follow-accepted' as const,
+            actor: r.agent,
+            title: 'Follow request accepted',
+            body: 'accepted your follow request.',
+            target: null,
+            createdAt: r.acceptedAt,
+          },
+        ],
+  );
+  return [...followers, ...accepted];
 }
 
 /** What this device has read: everything up to `all`, plus single cards read since. */

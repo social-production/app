@@ -5,6 +5,11 @@
   /** web's Notifications settings for the kinds the app has; on this device. */
   const options: { id: NotificationCategory; title: string; description: string }[] = [
     {
+      id: 'follows',
+      title: 'Follows',
+      description: 'Follow requests, new followers, and accepted requests.',
+    },
+    {
       id: 'comments',
       title: 'Comments',
       description: 'Replies and mentions on your posts and activity.',

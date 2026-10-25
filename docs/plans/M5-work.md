@@ -7,7 +7,7 @@ test network's data is temporary until the FastAPI site is replaced (STATUS "Own
 Every batch ports web's screens (PARITY.md lists what each one unblocks) and ends deployed with
 scenario + browser tests, as M1–M4 did.
 
-## M5a — directory batch: follows and feedback (one directory reset)
+## M5a — directory batch: follows and feedback (one directory reset) — built (ADR 0054)
 - **Follow** (planned in DOMAIN_MODEL since M1, never built): a `Follows` link agent → agent,
   made by the follower; unfollow deletes it. Web's private profiles need follow requests
   (`follow-request` / `follow-accepted`): a request link the target accepts by linking back.
@@ -19,7 +19,8 @@ scenario + browser tests, as M1–M4 did.
 - **Reset:** the directory DNA hash changes, so people sign up again on the test network
   (hosted apps reinstall, ADR 0028). Projects and chats keyed to old agents become unreachable.
   Say so in STATUS and README when it ships.
-- Decide in an ADR: whether follow requests exist at all (they need private profiles).
+- Decided in ADR 0054: requests exist (approval switch); mention ranking by follows and the
+  personal feed / Home scope are still to do.
 
 ## M5b — project batch: activities and roles (one project reset)
 - `Activity`, `Role`, `Assignment`, `Rating` (DOMAIN_MODEL), web's
