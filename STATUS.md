@@ -31,7 +31,26 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: seed-node out-of-memory fix (ADR 0053), branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-25: parity batch, branch `claude/social-production-handoff-dsam61`
+From `docs/plans/PARITY.md` (the new checklist; compared with live web at 390px):
+- Phone More opens web's `MobileMoreSheet` (`components/shell/MobileMoreSheet.svelte`,
+  `shell/more-sheet.css`), pixel-identical with web.
+- Feed cards: web's comments `CountPill` (opens `?tab=chat`) and "Latest: …" line. The
+  gateway index card gained `latestUpdate` and `commentCount` (archivist reads
+  `list_messages` per project per round; counts up to 200).
+- Onboarding is web's auth surface (brand only; `Topbar auth`), web's heading; the signed-out
+  intro shows only on the feed.
+- About: web's page and copy (`features/about/*`, `styles/about.css`); owner review flagged in
+  PARITY (the copy describes web).
+- Tests: new `tests/e2e/shell.mjs`; `guests.mjs` checks the comments pill, `governance.mjs`
+  the Latest line; `lib.mjs` `signUp`/`phraseSignIn` now wait for the redirect off
+  /onboarding (onboarding hides the bottom nav, so clicking it right after sign-in raced).
+- Checked: `npm run check`/`lint`, sizes, boundaries; gateway clippy/tests (release); against a
+  local release seed node: shell, guests, governance, projects, accounts, messages, chat,
+  notifications (the last two once hit "database is locked" on a long-running local node;
+  passed after a restart, see How to work).
+
+## Done 2026-10-25: seed-node out-of-memory fix (ADR 0053), PR #45 merged (~04:57 UTC / 3:57 pm Melbourne), deployed ~05:25 UTC; live `projects.mjs` and `guests.mjs` passed
 Railway reported "Deploy Ran Out of Memory" for seed-node (2026-10-25). **Found and fixed:**
 Holochain 0.7.1 evicts a DNA's compiled zomes after every new cell's genesis (and after 1 h
 idle); each reload adds the machine code to wasmer's shared engine, which never frees it. So
@@ -54,8 +73,9 @@ measured on a release build).
   seed node: `projects`, `guests`, `chat`, `messages`, `governance`, `attachments`, `calls`
   browser tests all passed. Not run here: workspace clippy/unit tests and scenarios (a debug
   workspace build needs ~24 GB; CI runs them on the patched conductor).
-- After deploy: watch Railway memory for seed-node (the owner can see it); live smoke
-  `projects.mjs` + `guests.mjs`. Report upstream (holochain/holochain: genesis eviction;
+- CI: `check` 6 min, shards 45–60 min (all scenarios on the patched conductor). After deploy:
+  live `projects.mjs` + `guests.mjs` passed. The owner can confirm in Railway that seed-node
+  memory now stays flat. Report upstream (holochain/holochain: genesis eviction;
   wasmerio/wasmer: engine code memory never freed) is still to do; needs a GitHub account the
   owner chooses.
 
@@ -541,7 +561,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Known gaps
 - **Railway security incident (2026-10-21, status.railway.com, blog.railway.com/p/security-disclosure-wednesday-october-21st):** an attacker may have read decrypted environment variables, and Railway advises rolling them all. Builds are back (2026-10-22), so rolled values can now be deployed; **not done yet** (owner). **Do not change `LAIR_PASSPHRASE` in Railway on its own:** it decrypts the keystore on `/data`, so a new value without re-encrypting the keystore locks every hosted agent's key away for good. The passphrase alone is useless without the keystore file, and the disclosure is about variables, not volumes. Re-keying needs a planned step (an ADR). The P2P project's other variables (`BOOTSTRAP_URL`, `RP_ID`/`RP_ORIGIN`, `POW_BITS`, …) are not secrets. The live FastAPI project (`social-production`) holds real secrets: `JWT_SECRET` (rolling it signs everyone out), the Postgres and Redis passwords, `GITHUB_TOKEN`, `TURNSTILE_SECRET_KEY` and `GEOCODING_PROVIDER_API_KEY`. Roll those. Its `MESSAGE_ENCRYPTION_KEY` decrypts every stored DM, so it needs MultiFernet re-encryption, not a plain swap.
-- **Seed-node memory:** the 3.2 GB (2026-10-21) and the out-of-memory crash (2026-10-25) were a Holochain/wasmer module leak, ~350 MB per new account; fixed by ADR 0053 (in flight). After it deploys, live test runs that create accounts are cheap again.
+- **Seed-node memory:** the 3.2 GB (2026-10-21) and the out-of-memory crash (2026-10-25) were a Holochain/wasmer module leak, ~350 MB per new account; fixed by ADR 0053 (deployed 2026-10-25 ~05:25 UTC). After it deploys, live test runs that create accounts are cheap again.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
@@ -550,7 +570,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. Deploy ADR 0053 (memory) and confirm in Railway that seed-node memory stays flat.
+1. Merge the parity batch (In flight), smoke it live (`shell.mjs`, `guests.mjs`, `projects.mjs`).
 2. **Shell parity**: web's phone `MobileMoreSheet` (More → profile or Sign in, Settings, About,
    …) instead of opening the left rail; then walk every shell piece at 390px against live web
    (top bar, rails, bottom nav, menus) and port what differs. UI only, resets nothing.
