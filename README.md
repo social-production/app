@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Follows and Feedback (M5a, ADR 0054, live 2026-10-25 ~20:00 UTC; the directory reset, so
+  everyone signed up again):** follow people (Follow / Requested / Following), follower and
+  following counts and lists, optional approval with requests in Settings and on your profile,
+  follow notifications; web's Feedback page (bugs and suggestions, votes, trending), readable
+  signed out.
 - **Parity with web (2026-10-25, `docs/plans/PARITY.md`):** the phone More sheet, feed-card
   comment counts and "Latest:" lines, web's onboarding surface and About page, web's Search page
   (people and projects, also for guests), guest profiles and the profile feed.

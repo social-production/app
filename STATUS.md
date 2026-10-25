@@ -31,8 +31,8 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: M5a follows + feedback (ADR 0054), branch `claude/social-production-handoff-dsam61`
-**Merging this resets the directory network: everyone on the test network signs up again**
+## Done 2026-10-25: M5a follows + feedback (ADR 0054), PR #52 merged (19:32 UTC / 6:32 am Melbourne), seed node live 19:57 UTC
+**This reset the directory network: everyone on the test network signs up again**
 (projects and chats tied to old agents become unreachable, as after earlier directory changes).
 Project and conversation DNA hashes are unchanged (`hc dna hash`: project `uhC0kJTRl5t…`;
 conversation's zomes untouched); directory is now `uhC0kA14W4Y…`.
@@ -49,8 +49,10 @@ conversation's zomes untouched); directory is now `uhC0kA14W4Y…`.
 - Checked here: clippy `-D warnings` (identity, identity_integrity, sp_follow), `sp_follow`
   tests, `npm run check`/`lint`, sizes, boundaries; hApp build + DNA hashes; scenarios
   `follows` (2), `feedback` (1), `identity` (4); browser tests on a local release seed node:
-  `follows.mjs` (new), `guests`, `notifications`, `shell`, `accounts`. PR #52 open, CI running.
-- After merge: smoke live with `follows.mjs`, `shell.mjs`, `guests.mjs`; update README Status.
+  `follows.mjs` (new), `guests`, `notifications`, `shell`, `accounts`. CI green on `c9b30f1`.
+- Live (19:59–20:08 UTC): `follows.mjs`, `shell.mjs`, `guests.mjs` all passed. Seed node up since
+  19:57 UTC with no restart; `rssMb` 1192 at start, 1424 after those tests (9 accounts): higher
+  than the ~1.2 GB seen after earlier smokes, so keep sampling `/readyz` next session.
 - Known, not from this branch: the UI build warns that `detail.css` has a multi-line
   `:global(` the port script didn't unwrap (`.project-overview .signal-row`), so those rules
   are dropped; fix in `scripts/port-styles.py`'s `:global` regex.
