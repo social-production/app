@@ -11,6 +11,18 @@ import type { ProjectMode } from './projects.ts';
  */
 export type NotificationKind = 'prj-phase-vote' | 'prj-phase-done' | 'reply' | 'mention';
 
+/** web's notification settings categories the app has kinds for (web-backend
+ * `notification_preferences.py` KIND_TO_CATEGORY); follows, shares, roles and plan-leading
+ * come with their features. */
+export type NotificationCategory = 'comments' | 'votes_needed' | 'phase_done';
+
+export const categoryOf: Record<NotificationKind, NotificationCategory> = {
+  reply: 'comments',
+  mention: 'comments',
+  'prj-phase-vote': 'votes_needed',
+  'prj-phase-done': 'phase_done',
+};
+
 export interface NotificationItem {
   id: string;
   kind: NotificationKind;

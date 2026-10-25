@@ -118,6 +118,18 @@ await sheet.getByRole('button', { name: /^Advance to / }).click();
 await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 log('ann proposed a phase move');
 
+await notified(bob, 'Vote on advancing to');
+// web's notification settings (per device here): Votes needed off hides the card, on brings it back.
+const votesSwitch = (page) => page.getByRole('switch', { name: 'Votes needed' });
+await bob.goto(`${BASE}/settings`);
+await votesSwitch(bob).click();
+await bob.goto(`${BASE}/notifications`);
+await bob.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
+await bob.waitForTimeout(5000);
+assert.equal(await card(bob, 'Vote on advancing to').count(), 0, 'votes switched off');
+await bob.goto(`${BASE}/settings`);
+await votesSwitch(bob).click();
+log('switching Votes needed off in Settings hides the vote card');
 const vote = await notified(bob, 'Vote on advancing to');
 await bell(bob).waitFor({ timeout: 60_000 });
 await vote.click();

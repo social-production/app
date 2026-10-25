@@ -55,7 +55,20 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   "copy link" alone could come sooner.
 - [ ] Event, activity and plan cards (web's feed mixes them); the app lists projects only (M5).
 
+## Settings (compared with web's `SettingsPage.svelte` source)
+- [x] Appearance: type size, theme (light/dark/system), accent colour, font, kept on this device
+  under web's storage keys (web keeps them server-side too; the app has no settings store).
+- [ ] Appearance rows waiting on features: language (web: "coming soon"), separate Public and
+  Personal feeds (needs the personal feed), display timezone (needs scheduled times, M5).
+- [ ] Regional (default location, device GPS, network location): needs places (M6).
+- [x] Notifications: web's switches for the categories the app has kinds for (Comments, Votes
+  needed, Phase finished), per device; off hides those cards and their bell count.
+- [ ] Notifications still to come: web's "Plan became leading" (off by default; the app could now
+  derive `prj-plan-lead`, ADR 0046 left it out for lack of settings), follows, shares/invites,
+  roles.
+- [ ] Follow requests and Privacy (profile activity visibility): need follows.
+
 ## Not compared yet
-Settings, notifications, messages at 390px
+Notifications, messages at 390px
 against web signed in (needs a web account: don't create one on the FastAPI site; compare
 markup in web's source instead), desktop widths.

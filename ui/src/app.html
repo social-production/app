@@ -33,6 +33,8 @@
           // Accent and font too, so the first paint isn't green Inter for everyone.
           var accent = localStorage.getItem('sp_accent');
           var font = localStorage.getItem('sp_font');
+          var textSize = localStorage.getItem('sp_text_size');
+          if (textSize) document.documentElement.dataset.textSize = textSize;
           if (accent) document.documentElement.dataset.accent = accent;
           if (font) document.documentElement.dataset.font = font;
         } catch (e) {}

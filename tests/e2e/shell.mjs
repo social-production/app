@@ -87,6 +87,23 @@ await sheet(ann)
 await ann.waitForURL(/\/profile$/);
 log('signed in: More shows the profile, Settings and About');
 
+// web's Appearance settings, kept on this device: Dark sticks across a reload.
+await ann.goto(`${BASE}/settings`);
+const themes = ann.getByRole('radiogroup', { name: 'Theme' });
+await themes.getByRole('radio', { name: 'Dark' }).click();
+await ann
+  .getByRole('radiogroup', { name: 'Accent colour' })
+  .getByRole('radio', { name: 'Blue' })
+  .click();
+assert.equal(await ann.evaluate(() => document.documentElement.dataset.theme), 'dark');
+await ann.reload();
+await themes.getByRole('radio', { name: 'Dark', checked: true }).waitFor();
+const root = await ann.evaluate(() => ({ ...document.documentElement.dataset }));
+assert.equal(root.theme, 'dark');
+assert.equal(root.accent, 'blue');
+await ann.screenshot({ path: `${out}/phone390-settings-dark.png` });
+log('appearance: dark theme and blue accent stick across a reload');
+
 // web's Search page finds people (the gateway's people index refreshes every minute).
 const row = guest.locator('.result-card', { hasText: `ann${stamp}` });
 for (let i = 0; !(await row.count()); i++) {
