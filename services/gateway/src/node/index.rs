@@ -29,6 +29,10 @@ pub struct ProjectCard {
     pub opposition: u32,
     pub created_at: i64,
     pub last_activity_at: i64,
+    /// The newest applied update's text (web's `latestDescription`).
+    pub latest_update: Option<String>,
+    /// Messages in the project chat, up to its page size (web's `commentCount`).
+    pub comment_count: u32,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -109,6 +113,8 @@ mod tests {
             opposition: 0,
             created_at: at,
             last_activity_at: at,
+            latest_update: None,
+            comment_count: 0,
         }
     }
 

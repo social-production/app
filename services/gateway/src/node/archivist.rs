@@ -44,6 +44,14 @@ struct ProjectView {
     demand: u32,
     opposition: u32,
     last_activity_at: Option<Timestamp>,
+    updates: Vec<Update>,
+}
+
+/// An applied update (mirrors the project zome's `AppliedUpdate`; the card shows the newest).
+#[derive(Debug, Deserialize)]
+struct Update {
+    body: String,
+    at: Timestamp,
 }
 
 /// The profile field the feed shows (mirrors the identity zome's `Profile`).
@@ -110,8 +118,14 @@ impl Node {
                 )
                 .await
                 .unwrap_or(None);
+            // Only the count is used; each message is skipped, not decoded.
+            let messages: Vec<serde::de::IgnoredAny> = self
+                .call(&agent, cell.clone(), "discussion", "list_messages", ())
+                .await
+                .unwrap_or_default();
             let mut card = card(view, project);
             card.creator_name = profile.map(|p| p.name).unwrap_or_default();
+            card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
             cards.push(card);
         }
         let count = cards.len();
@@ -248,7 +262,12 @@ fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         opposition: project.as_ref().map_or(0, |p| p.opposition),
         created_at,
         last_activity_at: project
+            .as_ref()
             .and_then(|p| p.last_activity_at)
             .map_or(created_at, |t| t.as_micros().max(created_at)),
+        latest_update: project
+            .and_then(|p| p.updates.into_iter().max_by_key(|u| u.at))
+            .map(|u| u.body),
+        comment_count: 0,
     }
 }

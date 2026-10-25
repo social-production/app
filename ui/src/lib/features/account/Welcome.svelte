@@ -47,8 +47,8 @@
 <div class="onboarding">
   <section class="page">
     <section class="hero-card">
-      <h1>Join Social Production</h1>
-      <p>Organise projects and share the means of production — no central owner.</p>
+      <h1>Sign in or create an account</h1>
+      <p>Sign in to post, follow people, and create projects, threads, and events.</p>
     </section>
 
     <section class="panel">

@@ -91,6 +91,16 @@ await ann.getByRole('button', { name: 'Post update' }).click();
 await voteYes(bob);
 await until(bob, () => bob.locator('.update-card', { hasText: 'First repair night' }), 'the update');
 log('an update passed and is listed');
+// web's feed card shows the newest update ("Latest: …") once the index refreshes.
+await bob.goto(`${BASE}/search?q=${encodeURIComponent(title)}`);
+const latest = bob.locator('.project-card', { hasText: title }).getByText('Latest: First repair night went well.');
+for (let i = 0; i < 20 && !(await latest.count()); i++) {
+  await bob.waitForTimeout(3000);
+  await bob.reload();
+}
+await latest.waitFor();
+await bob.goto(projectUrl);
+log('the feed card shows the update as Latest');
 
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();

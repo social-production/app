@@ -38,6 +38,13 @@ for (let i = 0; i < 20 && !(await card.count()); i++) {
   await guest.waitForTimeout(3000);
   await guest.reload();
 }
+// web's comments pill: Ann's message counts (the index refreshes every archivist round).
+const pill = card.getByLabel('1 comment');
+for (let i = 0; i < 20 && !(await pill.count()); i++) {
+  await guest.waitForTimeout(3000);
+  await guest.reload();
+}
+await pill.waitFor();
 await card.locator('a.title').click();
 await guest.getByRole('heading', { name: title }).waitFor({ timeout: 60_000 });
 assert.equal(new URL(guest.url()).pathname, new URL(projectUrl).pathname);
