@@ -23,7 +23,16 @@ await guest.screenshot({ path: `${out}/phone390-more-guest.png` });
 await sheet(guest).getByRole('link', { name: 'About' }).click();
 await guest.waitForURL(/\/about$/);
 await sheet(guest).waitFor({ state: 'detached' });
+assert.equal(await guest.getByRole('complementary', { name: 'About Social Production' }).count(), 0, 'no intro on About');
 log('signed out: More shows sign in and About');
+
+// web's isAuthSurface: onboarding shows only the brand.
+await guest.goto(`${BASE}/onboarding`);
+await guest.getByRole('heading', { name: 'Sign in or create an account' }).waitFor();
+assert.equal(await guest.locator('.mobile-bottom-nav').count(), 0, 'no bottom nav');
+assert.equal(await guest.getByRole('button', { name: 'Open networks' }).count(), 0, 'no rail toggle');
+await guest.screenshot({ path: `${out}/phone390-onboarding.png` });
+log('onboarding shows only the brand, as on web');
 
 const ann = await device({ viewport: phone });
 await signUp(ann, `ann${stamp}`);

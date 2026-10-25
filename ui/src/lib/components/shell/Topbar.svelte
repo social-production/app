@@ -25,6 +25,8 @@
     toggleRight: () => void;
     onSearch: (query: string) => void;
     onSignIn: () => void;
+    /** web's isAuthSurface (onboarding): only the brand shows. */
+    auth?: boolean;
   }
 
   let p: Props = $props();
@@ -71,123 +73,125 @@
       <span><strong>Social Production</strong></span>
     </a>
 
-    <div class="panel-controls">
-      <button
-        aria-label="Open networks"
-        title="Networks"
-        aria-expanded={p.leftOpen}
-        class="panel-toggle"
-        data-active={p.leftOpen}
-        type="button"
-        onclick={p.toggleLeft}
-      >
-        <GroupsIcon className="panel-toggle-icon groups-icon" />
-      </button>
-      <button
-        aria-label="Open map"
-        title="Map (coming in M6)"
-        class="panel-toggle panel-toggle-map"
-        data-active={false}
-        type="button"
-        disabled
-      >
-        <SvgGlyph name="map" className="panel-toggle-icon" />
-      </button>
-      <button
-        aria-label="Open activity"
-        title="Activity"
-        aria-expanded={p.rightOpen}
-        class="panel-toggle panel-toggle-right"
-        data-active={p.rightOpen}
-        type="button"
-        onclick={p.toggleRight}
-      >
-        <SvgGlyph name="activity" className="panel-toggle-icon" />
-      </button>
-    </div>
-
-    <div class="toolbar-center">
-      {#if p.compact}
+    {#if !p.auth}
+      <div class="panel-controls">
         <button
-          aria-label="Open search"
-          title="Open search"
-          class="search-open-button"
+          aria-label="Open networks"
+          title="Networks"
+          aria-expanded={p.leftOpen}
+          class="panel-toggle"
+          data-active={p.leftOpen}
           type="button"
-          onclick={() => (searchExpanded = true)}
+          onclick={p.toggleLeft}
         >
-          <SvgGlyph name="search" className="search-icon" />
+          <GroupsIcon className="panel-toggle-icon groups-icon" />
         </button>
-      {:else}
-        <form class="toolbar-search" role="search" onsubmit={submit}>
-          <div class="toolbar-search-wrap">
-            <input
-              aria-label="Search"
-              bind:value={query}
-              class="toolbar-search-input"
-              placeholder="Search…"
-              type="search"
-            />
-          </div>
-        </form>
-        <nav class="primary-nav" aria-label="Primary">
-          <a
-            aria-label="Home"
-            class:active-link={p.isActive('/')}
-            class="nav-link nav-link-icon"
-            href={resolve('/')}><ToolbarIcon name="home" /></a
-          >
-          <a
-            aria-label="Notifications"
-            title="Notifications"
-            class:active-link={p.isActive('/notifications')}
-            class="nav-link nav-link-icon"
-            href={resolve('/notifications')}
-            ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
-                count={p.notificationCount ?? 0}
-              />{/if}</a
-          >
-          <a
-            aria-label="Messages"
-            title="Messages"
-            class:active-link={p.isActive('/messages')}
-            class="nav-link nav-link-icon"
-            href={resolve('/messages')}
-            ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
-                count={p.messageCount ?? 0}
-              />{/if}</a
-          >
-        </nav>
-      {/if}
-    </div>
-
-    <nav class="utility-nav" aria-label="Utilities">
-      {#if !p.compact}
-        <a class:active-link={p.isActive('/about')} class="utility-link" href={resolve('/about')}
-          >About</a
+        <button
+          aria-label="Open map"
+          title="Map (coming in M6)"
+          class="panel-toggle panel-toggle-map"
+          data-active={false}
+          type="button"
+          disabled
         >
-      {/if}
-      {#if p.signedIn}
-        {#if !p.compact}
-          <a
-            class:active-link={p.isActive('/profile')}
-            class="utility-link"
-            href={resolve('/profile')}>{p.viewerName}</a
+          <SvgGlyph name="map" className="panel-toggle-icon" />
+        </button>
+        <button
+          aria-label="Open activity"
+          title="Activity"
+          aria-expanded={p.rightOpen}
+          class="panel-toggle panel-toggle-right"
+          data-active={p.rightOpen}
+          type="button"
+          onclick={p.toggleRight}
+        >
+          <SvgGlyph name="activity" className="panel-toggle-icon" />
+        </button>
+      </div>
+
+      <div class="toolbar-center">
+        {#if p.compact}
+          <button
+            aria-label="Open search"
+            title="Open search"
+            class="search-open-button"
+            type="button"
+            onclick={() => (searchExpanded = true)}
           >
-          <div class="settings-wrap">
+            <SvgGlyph name="search" className="search-icon" />
+          </button>
+        {:else}
+          <form class="toolbar-search" role="search" onsubmit={submit}>
+            <div class="toolbar-search-wrap">
+              <input
+                aria-label="Search"
+                bind:value={query}
+                class="toolbar-search-input"
+                placeholder="Search…"
+                type="search"
+              />
+            </div>
+          </form>
+          <nav class="primary-nav" aria-label="Primary">
             <a
-              aria-label="Settings"
-              title="Settings"
-              class:active-link={p.isActive('/settings')}
-              class="gear-button"
-              href={resolve('/settings')}
+              aria-label="Home"
+              class:active-link={p.isActive('/')}
+              class="nav-link nav-link-icon"
+              href={resolve('/')}><ToolbarIcon name="home" /></a
             >
-              <SvgGlyph name="gear" className="gear-icon" />
-            </a>
-          </div>
+            <a
+              aria-label="Notifications"
+              title="Notifications"
+              class:active-link={p.isActive('/notifications')}
+              class="nav-link nav-link-icon"
+              href={resolve('/notifications')}
+              ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
+                  count={p.notificationCount ?? 0}
+                />{/if}</a
+            >
+            <a
+              aria-label="Messages"
+              title="Messages"
+              class:active-link={p.isActive('/messages')}
+              class="nav-link nav-link-icon"
+              href={resolve('/messages')}
+              ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
+                  count={p.messageCount ?? 0}
+                />{/if}</a
+            >
+          </nav>
         {/if}
-      {:else if !p.compact}
-        <button class="utility-link" type="button" onclick={p.onSignIn}>Sign in / Sign up</button>
-      {/if}
-    </nav>
+      </div>
+
+      <nav class="utility-nav" aria-label="Utilities">
+        {#if !p.compact}
+          <a class:active-link={p.isActive('/about')} class="utility-link" href={resolve('/about')}
+            >About</a
+          >
+        {/if}
+        {#if p.signedIn}
+          {#if !p.compact}
+            <a
+              class:active-link={p.isActive('/profile')}
+              class="utility-link"
+              href={resolve('/profile')}>{p.viewerName}</a
+            >
+            <div class="settings-wrap">
+              <a
+                aria-label="Settings"
+                title="Settings"
+                class:active-link={p.isActive('/settings')}
+                class="gear-button"
+                href={resolve('/settings')}
+              >
+                <SvgGlyph name="gear" className="gear-icon" />
+              </a>
+            </div>
+          {/if}
+        {:else if !p.compact}
+          <button class="utility-link" type="button" onclick={p.onSignIn}>Sign in / Sign up</button>
+        {/if}
+      </nav>
+    {/if}
   {/if}
 </header>

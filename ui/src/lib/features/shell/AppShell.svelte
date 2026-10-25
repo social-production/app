@@ -38,6 +38,13 @@
   let moreOpen = $state(false);
 
   const signedIn = $derived(connection.current.status === 'connected');
+  // web's isAuthSurface: onboarding shows only the brand (no rails, bottom nav or "+").
+  const authSurface = $derived(page.url.pathname === '/onboarding');
+  // web shows the signed-out intro only on the feed, channels and communities.
+  const showIntro = $derived(
+    connection.current.status === 'signed-out' &&
+      /^\/($|channels\/|communities\/)/.test(page.url.pathname),
+  );
   // "Sign in / Sign up" hides the intro banner; the sign-in card below it stays.
   const topbarHeight = $derived(compact ? 52 : 53);
   // web's immersiveChat: on phones an open detail chat hides the top bar and bottom nav.
@@ -106,7 +113,7 @@
   });
 
   // As on web: the "+" sits on feed pages only (web's isFeedDiscoveryPath).
-  const showCreateFab = $derived(['/', '/search'].includes(page.url.pathname));
+  const showCreateFab = $derived(['/', '/search'].includes(page.url.pathname) && !authSurface);
   const createLinks: CreateLink[] = [
     {
       href: resolve('/create/project'),
@@ -147,7 +154,7 @@
   data-signed-in={signedIn}
   class:shell-compact={compact}
   class:feed-chrome-collapsed={immersive}
-  style={`--left-width: ${leftOpen && !compact ? '262px' : '0px'}; --right-width: ${rightOpen && !compact ? '292px' : '0px'}; --topbar-height: ${shellTopbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${bottomNav === '0px' ? 'var(--shell-safe-bottom)' : '0px'}; --main-frame-max-width: ${frameMaxWidth};`}
+  style={`--left-width: ${leftOpen && !compact && !authSurface ? '262px' : '0px'}; --right-width: ${rightOpen && !compact && !authSurface ? '292px' : '0px'}; --topbar-height: ${shellTopbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${bottomNav === '0px' ? 'var(--shell-safe-bottom)' : '0px'}; --main-frame-max-width: ${frameMaxWidth};`}
 >
   <Topbar
     {compact}
@@ -163,6 +170,7 @@
     {toggleRight}
     onSearch={(q) => goto(resolve(`/search?q=${encodeURIComponent(q)}`))}
     onSignIn={() => goto(resolve('/onboarding'))}
+    auth={authSurface}
   />
 
   {#if compact && (leftOpen || rightOpen)}
@@ -175,13 +183,15 @@
   {/if}
 
   <div class="content-grid">
-    <aside class="rail left-rail" data-open={leftOpen}>
-      <LeftRail closePanels={closeCompact} onDiscover={() => goto(resolve('/'))} />
+    <aside class="rail left-rail" data-open={leftOpen && !authSurface}>
+      {#if !authSurface}
+        <LeftRail closePanels={closeCompact} onDiscover={() => goto(resolve('/'))} />
+      {/if}
     </aside>
 
     <main class="main-content" class:main-content-compact={compact}>
       <div class="main-frame">
-        {#if connection.current.status === 'signed-out' && page.url.pathname !== '/onboarding'}
+        {#if showIntro}
           <SignedOutIntro
             onSignup={() => goto(resolve('/onboarding'))}
             aboutHref={resolve('/about')}
@@ -194,8 +204,8 @@
       {/if}
     </main>
 
-    <aside class="rail right-rail" data-open={rightOpen}>
-      {#if rightOpen}
+    <aside class="rail right-rail" data-open={rightOpen && !authSurface}>
+      {#if rightOpen && !authSurface}
         <section class="rail-panel">
           <p class="empty-hint">Your activity will appear here.</p>
         </section>
@@ -203,7 +213,7 @@
     </aside>
   </div>
 
-  {#if compact && !immersive}
+  {#if compact && !immersive && !authSurface}
     <MobileBottomNav
       {tabs}
       {isActive}

@@ -54,6 +54,8 @@ export async function signUp(page, name) {
   }
   await page.getByRole('button', { name: 'Create account' }).click();
   await signedIn(page);
+  // The app then leaves onboarding for the feed (which has the full shell again).
+  await page.waitForURL((url) => !url.pathname.startsWith('/onboarding'));
   return words;
 }
 
@@ -63,6 +65,7 @@ export async function phraseSignIn(page, words) {
   await page.getByLabel('Recovery phrase').fill(words.join(' '));
   await page.getByRole('button', { name: 'Log in', exact: true }).click();
   await signedIn(page);
+  await page.waitForURL((url) => !url.pathname.startsWith('/onboarding'));
 }
 
 export async function signOut(page) {
