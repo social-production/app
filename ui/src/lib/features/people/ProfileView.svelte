@@ -32,7 +32,8 @@
     try {
       const [p, pairing, mine] = await Promise.all([
         getPerson(agent),
-        pairingOf(agent),
+        // Guests can't read devices (holo/guest.ts allowlist); the hero then shows one.
+        pairingOf(agent).catch(() => ({ primary: null, devices: [] })),
         myAgent ? getPerson(myAgent) : Promise.resolve(undefined),
       ]);
       person = p;
@@ -68,7 +69,8 @@
       {@const shown = person}
       <ProfileHero person={shown} {devices}>
         {#snippet actions()}
-          {#if !own}
+          <!-- As on web, guests see no actions on someone's profile. -->
+          {#if !own && me}
             <div class="action-row">
               {#if me && me.standing.level !== 'Paused'}
                 <MessageButton

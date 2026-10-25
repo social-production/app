@@ -5,7 +5,7 @@
   import ProfileView from '#lib/features/people/ProfileView.svelte';
 </script>
 
-<AccountGate>
+<AccountGate guests>
   {#key page.params.agent}
     <ProfileView agent={page.params.agent ?? ''} />
   {/key}

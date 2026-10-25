@@ -34,6 +34,13 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   show icons, the app's `IconMenuButton` has none yet.
 - [x] The "+" button follows web's `isFeedDiscoveryPath` (feed, platform, profiles), not search.
 
+- [x] Profiles open for guests (name, standing, no actions), as on web; the device count is
+  left out for guests (device data stays out of the guest allowlist).
+- [ ] Profile feed: web lists the person's items under the header (their projects, events,
+  activities, as feed cards with the feed's filter/sort toolbar). The app's profile has only the
+  header. Projects can come from the feed index filtered by creator.
+- [ ] Followers / following counts and Follow (web's follows aren't ported yet).
+
 ## Feed
 - [ ] Toolbar: web's scope menu (globe: Home / Global / Region) comes first. The app is Global
   only: Home needs follows and joined communities, Region needs place coordinates (M6 map).
@@ -47,6 +54,6 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [ ] Event, activity and plan cards (web's feed mixes them); the app lists projects only (M5).
 
 ## Not compared yet
-Profile pages (own and others'), settings, notifications, messages at 390px
+Settings, notifications, messages at 390px
 against web signed in (needs a web account: don't create one on the FastAPI site; compare
 markup in web's source instead), desktop widths.

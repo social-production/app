@@ -602,6 +602,9 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **Killing a process by name kills your shell** when your own command line contains the
   pattern (also a `/proc/*/cmdline` loop). Start servers with `& echo $! > pidfile` and kill
   that pid; `ss` isn't installed in the cloud container.
+- **`tests/e2e/shell.mjs`:** twice (not reproduced since, 6 runs) the very first More click found
+  no rendered app right after `e2e-local.sh` started its preview; the test now prints the URL,
+  the page text and `more-fail.png` when that happens. Look there before calling it a flake.
 - **Memory:** measure on a release build (`RELEASE=1 bash scripts/dev-seed.sh`); a debug build
   is no smaller, but production is release. The jemalloc heap-profile recipe is in ADR 0053's
   STATUS entry.
