@@ -68,7 +68,19 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   roles.
 - [ ] Follow requests and Privacy (profile activity visibility): need follows.
 
+## Notifications and Messages pages
+- [x] Notifications page: same header, intro, "Mark all read" and card list as web's
+  `NotificationsPage.svelte` (compared from source; web adds follow-request accept/decline on
+  cards, which comes with follows).
+- [x] Messages: ported in M4c (ADR 0043–0051); no new differences found.
+
+## Desktop (1280px, compared with live web signed out)
+- [x] Shell, rails, top bar, intro banner, feed toolbar and cards match.
+- [ ] Card tag row: web prefixes each scope tag with its kind's icon (channel/community/
+  platform, `FeedCardTop` + `ScopeGlyph`); the app's tags are plain words until channels and
+  communities exist (M5).
+
 ## Not compared yet
-Notifications, messages at 390px
-against web signed in (needs a web account: don't create one on the FastAPI site; compare
-markup in web's source instead), desktop widths.
+Signed-in screens other than Settings and Notifications (compare from web's source; don't create
+accounts on the FastAPI site). Everything left above waits on features: follows, channels and
+communities (M5), places and moderation (M6).
