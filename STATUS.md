@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: Search page, guest profiles, profile feed, branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-25: Search page, guest profiles, profile feed, PR #47 merged (~08:35 UTC / 7:35 pm Melbourne), deployed ~08:56 UTC; live `shell.mjs`, `guests.mjs`, `projects.mjs` passed
 From `docs/plans/PARITY.md`:
 - web's Search page (`features/search/SearchPage.svelte`, `components/search/*`,
   `services/search.ts`, `styles/search.css`): people + projects, live suggestions, kind filter
@@ -47,6 +47,9 @@ From `docs/plans/PARITY.md`:
 - Checked: `npm run check`/`lint`, sizes, boundaries; gateway fmt/clippy/tests (release, new
   people + creator-filter tests); against a local release seed node: shell, guests, projects,
   governance, accounts.
+- CI: `check` 5 min, shards 37–81 min. After deploy: `/index/people?q=` answers live; `shell.mjs`
+  and `projects.mjs` passed live; `guests.mjs` timed out once a minute after the seed node
+  restarted (output not kept), then passed in full: the cold-node pattern again.
 
 ## Done 2026-10-25: parity batch, PR #46 merged (~06:52 UTC / 5:52 pm Melbourne), deployed ~07:09 UTC; live `shell.mjs`, `guests.mjs`, `projects.mjs` passed
 From `docs/plans/PARITY.md` (the new checklist; compared with live web at 390px):
@@ -556,7 +559,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `3f8bf6c` (PR #46, deployed 2026-10-25 ~07:09 UTC, ~17 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `ecd6e46` (PR #47, deployed 2026-10-25 ~08:56 UTC, ~21 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -587,17 +590,15 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. Merge the Search/profile batch (In flight), smoke it live (`shell.mjs`, `guests.mjs`, `projects.mjs`).
-2. **Parity pass** (checklist: `docs/plans/PARITY.md`): compare the screens under "Not
+1. **Parity pass** (checklist: `docs/plans/PARITY.md`): compare the screens under "Not
    compared yet" (settings, notifications, messages; signed in, from web's source), then the
    open items (⋮ report menu needs M6; profile feed cards; scope menu).
-3. Guests on profile pages, if web shows them signed out (same `/public/read` allowlist).
-4. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
+2. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
    Batch the next project-DNA integrity change with project-chat attachments and private
    read marks (ADR 0049/0044).
-5. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
+3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.
-6. CI: scenarios run in 4 shards (~80 min worst); add shards if one nears 120 min.
+4. CI: scenarios run in 4 shards (~80 min worst); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
