@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,18 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-25: Settings appearance + notification switches, branch `claude/social-production-handoff-dsam61`
+From `docs/plans/PARITY.md` (Settings, compared with web's `SettingsPage.svelte` source):
+- Appearance: type size, theme (light/dark/system), accent colour, font, per device under web's
+  storage keys (`stores/appearance.svelte.ts`, applied by the shell; `app.html` also restores
+  the type size before first paint). The CSS was already ported in `app.css`.
+- Notifications: web's switches for Comments, Votes needed, Phase finished (per device,
+  `stores/notifications.svelte.ts` filters what the bell and page show).
+- Tests: `shell.mjs` sets Dark + Blue and checks they survive a reload; `notifications.mjs`
+  switches Votes needed off (card hidden) and on again.
+- Checked: `npm run check`/`lint`, sizes, boundaries; against a local release seed node:
+  shell, accounts, notifications. No Rust changed.
 
 ## Done 2026-10-25: Search page, guest profiles, profile feed, PR #47 merged (~08:35 UTC / 7:35 pm Melbourne), deployed ~08:56 UTC; live `shell.mjs`, `guests.mjs`, `projects.mjs` passed
 From `docs/plans/PARITY.md`:
