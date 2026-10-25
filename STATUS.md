@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -23,7 +23,7 @@ and continue from Next."
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
 
-## In flight 2026-10-25: guests open project pages (ADR 0052), branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-25: guests open project pages (ADR 0052), PR #43 merged (~01:33 UTC / 12:33 pm Melbourne), deployed ~01:51 UTC; live `guests.mjs` and `projects.mjs` passed
 STATUS Next item 3. web shows project pages signed out and gates actions with
 `requireViewer` → `AuthActionNotice`; ported. **No zome or integrity change** (gateway + UI),
 so merging resets nothing.
@@ -45,7 +45,9 @@ so merging resets nothing.
   allowlist test); `npm run check`/`lint`, sizes, boundaries; against the local seed node at
   390px: new `tests/e2e/guests.mjs` (can run live: one account), `projects.mjs` (its guest step
   now expects the notice), `chat.mjs`, `messages.mjs`. Not run: scenarios (no zome changed).
-- PR #43 opened ~00:08 UTC 25 Oct (11:08 am Melbourne). Next: CI green → merge → wait for the seed-node deploy → `guests.mjs` + `projects.mjs` against the live UI, then README Status + this file.
+- CI: `check` 7 min, shards 36–82 min. After deploy (all three services green 01:51 UTC, ~18 min
+  after the merge): `/public/read` refuses an unlisted call with 403 live, and `guests.mjs` and
+  `projects.mjs` passed against the live UI on the first run.
 
 ## Done 2026-10-24: live calls ring again (ADR 0050 addendum), PR #41 merged (~14:30 UTC / 1:30 am Melbourne 25 Oct), deployed ~15:06 UTC; live `calls.mjs` passed on the first run
 The owner can't read Railway logs and asked for a fix that doesn't depend on the seed node.
@@ -481,13 +483,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `cbf6bef` (PR #41, deployed 2026-10-24 ~15:06 UTC, ~36 min after the merge; UI only). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `ae99045` (PR #43, deployed 2026-10-25 ~01:51 UTC, ~18 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed and open project pages signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
@@ -507,7 +509,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
-- Guests can open project pages once ADR 0052 is deployed; @names in chat stay plain text for them. Project chats have no photos or files yet (ADR 0049).
+- Guests open project pages read-only (ADR 0052); @names in chat stay plain text for them. Project chats have no photos or files yet (ADR 0049).
 - Challenges have no screen (see "For the owner to review").
 
 ## Next (roadmap order)
@@ -516,8 +518,8 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway URL); move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
-3. ~~A public read-only project page for guests~~: in flight (ADR 0052). Next after it: guests
-   on profile pages if web shows them signed out (check web first).
+3. Guests: project pages done (ADR 0052). Next: profile pages signed out, if web shows them to
+   guests (check web's routes first); same `/public/read` allowlist, add only reads they need.
 4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
@@ -532,7 +534,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
   - Start the local seed node: `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`. It builds a dev hApp whose founders are `tests/e2e/fixtures/dev-founders.json`, so governance can be tested.
   - Wait for "zomes compiled" in its log.
   - Run `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`. Signed out, the home page is the feed; sign-up is at `/onboarding`.
-- **Live smoke:** `curl` `/readyz` and `/index/projects`, then `node tests/e2e/projects.mjs https://ui-production-333c.up.railway.app` (allowed on this test network: it creates two test accounts; in a cloud session run `npx playwright install --with-deps chromium` first). `chat.mjs`/`governance.mjs` need the dev founders, so they only run locally. Never create accounts on the FastAPI site; the live web site may be browsed read-only to compare layouts.
+- **Live smoke:** `curl` `/readyz` and `/index/projects`, then `node tests/e2e/projects.mjs https://ui-production-333c.up.railway.app` (and `guests.mjs`) (allowed on this test network: it creates two test accounts; in a cloud session run `npx playwright install --with-deps chromium` first). `chat.mjs`/`governance.mjs` need the dev founders, so they only run locally. Never create accounts on the FastAPI site; the live web site may be browsed read-only to compare layouts.
 - **Styles:** never hand-edit `ui/src/lib/components/styles/*.css`. Add rows to `styles/PORTS` and run `python3 scripts/port-styles.py`. App-only CSS goes in `styles/additions.css` (ADR 0032).
 - **One write at a time per person:** two zome calls that write to the same source chain at once are refused (the chain head moved). Optimistic UI that fires several writes (ratings, votes) must queue them, as `DetailState.inTurn` does.
 - **A write isn't in your own network reads at once:** after a vote, `tally.my_vote` can still be
