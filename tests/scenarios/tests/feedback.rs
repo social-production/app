@@ -30,6 +30,14 @@ struct FeedbackVote {
     direction: Option<VoteDirection>,
 }
 
+fn input(kind: FeedbackKind, title: &str, description: &str) -> Feedback {
+    Feedback {
+        kind,
+        title: title.into(),
+        description: description.into(),
+    }
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn feedback_and_votes() {
     let mut conductors = SweetConductorBatch::standard(2).await;
@@ -37,26 +45,18 @@ async fn feedback_and_votes() {
     let (ann, bob) = (cells[0].zome("identity"), cells[1].zome("identity"));
 
     let blank: Result<FeedbackView, _> = conductors[0]
-        .call_fallible(
-            &ann,
-            "create_feedback",
-            Feedback {
-                kind: FeedbackKind::Bug,
-                title: " ".into(),
-                description: "x".into(),
-            },
-        )
+        .call_fallible(&ann, "create_feedback", input(FeedbackKind::Bug, " ", "x"))
         .await;
     assert!(blank.is_err(), "feedback needs a title");
     let item: FeedbackView = conductors[0]
         .call(
             &ann,
             "create_feedback",
-            Feedback {
-                kind: FeedbackKind::Suggestion,
-                title: "Dark map tiles".into(),
-                description: "The map is bright at night.".into(),
-            },
+            input(
+                FeedbackKind::Suggestion,
+                "Dark map tiles",
+                "The map is bright at night.",
+            ),
         )
         .await;
     assert_eq!(item.kind, FeedbackKind::Suggestion);

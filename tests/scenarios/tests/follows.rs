@@ -2,7 +2,7 @@
 //! person followed decides, and nobody can write follow links for someone else.
 
 use holochain::prelude::*;
-use holochain::sweettest::{await_consistency, SweetConductorBatch};
+use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
 use serde::Deserialize;
 
 mod common;
@@ -73,31 +73,7 @@ async fn follows_with_and_without_approval() {
     assert_eq!(bobs.following.len(), 1);
     assert_eq!(bobs.following[0].agent, ann_key);
 
-    // Rejected: the request disappears; Cat can ask again, and Ann accepts this time.
-    let _: ActionHash = conductors[0]
-        .call(&ann, "reject_follow", cat_key.clone())
-        .await;
-    await_consistency(&cells).await.expect("consistency");
-    let view: FollowView = conductors[2]
-        .call(&cat, "follow_view", ann_key.clone())
-        .await;
-    assert_eq!(view.my_status, None);
-    assert_eq!(view.followers.len(), 1);
-    let s: Option<FollowStatus> = conductors[2].call(&cat, "follow", ann_key.clone()).await;
-    assert_eq!(s, Some(FollowStatus::Pending));
-    await_consistency(&cells).await.expect("consistency");
-    let _: ActionHash = conductors[0]
-        .call(&ann, "accept_follow", cat_key.clone())
-        .await;
-    await_consistency(&cells).await.expect("consistency");
-    let view: FollowView = conductors[2]
-        .call(&cat, "follow_view", ann_key.clone())
-        .await;
-    assert_eq!(view.my_status, Some(FollowStatus::Accepted));
-    assert!(view
-        .followers
-        .iter()
-        .all(|r| r.status == FollowStatus::Accepted));
+    reject_then_accept(&conductors, &cells).await;
 
     // Unfollow removes Bob from Ann's followers.
     let (): () = conductors[1].call(&bob, "unfollow", ann_key.clone()).await;
@@ -140,4 +116,38 @@ async fn follow_links_cannot_be_forged() {
         "a Follows link from someone else's key is invalid"
     );
     common::shut_down(conductors).await;
+}
+
+/// Ann (cell 0, approval on) rejects Cat's (cell 2) pending follow: the request disappears;
+/// Cat asks again, and Ann accepts this time.
+async fn reject_then_accept(conductors: &SweetConductorBatch, cells: &[SweetCell]) {
+    let (ann, cat) = (cells[0].zome("identity"), cells[2].zome("identity"));
+    let (ann_key, cat_key) = (
+        cells[0].agent_pubkey().clone(),
+        cells[2].agent_pubkey().clone(),
+    );
+    let _: ActionHash = conductors[0]
+        .call(&ann, "reject_follow", cat_key.clone())
+        .await;
+    await_consistency(cells).await.expect("consistency");
+    let view: FollowView = conductors[2]
+        .call(&cat, "follow_view", ann_key.clone())
+        .await;
+    assert_eq!(view.my_status, None);
+    assert_eq!(view.followers.len(), 1);
+    let s: Option<FollowStatus> = conductors[2].call(&cat, "follow", ann_key.clone()).await;
+    assert_eq!(s, Some(FollowStatus::Pending));
+    await_consistency(cells).await.expect("consistency");
+    let _: ActionHash = conductors[0]
+        .call(&ann, "accept_follow", cat_key.clone())
+        .await;
+    await_consistency(cells).await.expect("consistency");
+    let view: FollowView = conductors[2]
+        .call(&cat, "follow_view", ann_key.clone())
+        .await;
+    assert_eq!(view.my_status, Some(FollowStatus::Accepted));
+    assert!(view
+        .followers
+        .iter()
+        .all(|r| r.status == FollowStatus::Accepted));
 }
