@@ -2,6 +2,9 @@
 //! tests. Reads are best-effort views; integrity validation is what enforces the rules.
 
 mod devices;
+mod feedback;
+mod follow_links;
+mod follows;
 mod listings;
 mod profile;
 mod records;
@@ -10,6 +13,8 @@ mod standing;
 use hdk::prelude::*;
 use identity_integrity::{founder_agents, DirectoryProperties, Founder};
 
+pub use feedback::{FeedbackView, FeedbackVote, VoteDirection};
+pub use follows::{FollowRow, FollowStatus, FollowView};
 pub use listings::{Allowance, ListingInput, ListingView};
 pub use profile::ProfileInput;
 pub use standing::StandingView;
@@ -141,6 +146,80 @@ pub fn submit_grant(evidence: identity_integrity::Evidence) -> ExternResult<Acti
     create_entry(&identity_integrity::EntryTypes::StandingGrant(
         identity_integrity::StandingGrant { evidence },
     ))
+}
+
+/// Follow someone; returns the follow's status (pending while they require approval).
+#[hdk_extern]
+pub fn follow(target: AgentPubKey) -> ExternResult<Option<FollowStatus>> {
+    follows::follow(target)
+}
+
+#[hdk_extern]
+pub fn unfollow(target: AgentPubKey) -> ExternResult<()> {
+    follows::unfollow(target)
+}
+
+#[hdk_extern]
+pub fn accept_follow(follower: AgentPubKey) -> ExternResult<ActionHash> {
+    follows::decide(follower, true)
+}
+
+#[hdk_extern]
+pub fn reject_follow(follower: AgentPubKey) -> ExternResult<ActionHash> {
+    follows::decide(follower, false)
+}
+
+#[hdk_extern]
+pub fn set_follow_approval(on: bool) -> ExternResult<bool> {
+    follows::set_approval(on)
+}
+
+#[hdk_extern]
+pub fn follow_view(agent: AgentPubKey) -> ExternResult<FollowView> {
+    follows::view(agent)
+}
+
+#[hdk_extern]
+pub fn follow_requests(_: ()) -> ExternResult<Vec<FollowRow>> {
+    follows::requests()
+}
+
+#[hdk_extern]
+pub fn create_feedback(input: identity_integrity::Feedback) -> ExternResult<FeedbackView> {
+    feedback::create(input)
+}
+
+/// Every feedback item, newest first.
+#[hdk_extern]
+pub fn list_feedback(_: ()) -> ExternResult<Vec<FeedbackView>> {
+    feedback::list()
+}
+
+#[hdk_extern]
+pub fn get_feedback(id: ActionHash) -> ExternResult<Option<FeedbackView>> {
+    feedback::get(id)
+}
+
+#[hdk_extern]
+pub fn vote_feedback(input: FeedbackVote) -> ExternResult<Option<FeedbackView>> {
+    feedback::vote(input)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct RawFollowLink {
+    pub base: AgentPubKey,
+    pub target: AgentPubKey,
+}
+
+/// Write a `Follows` link exactly as given (see `submit_vouch`): tests prove forged ones fail.
+#[hdk_extern]
+pub fn submit_follow_link(link: RawFollowLink) -> ExternResult<ActionHash> {
+    create_link(
+        link.base,
+        link.target,
+        identity_integrity::LinkTypes::Follows,
+        (),
+    )
 }
 
 pub(crate) fn guest_error(message: impl Into<String>) -> WasmError {

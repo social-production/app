@@ -9,11 +9,19 @@ use super::archivist::{clones_by_seed, provisioned};
 use super::Node;
 
 /// Read-only calls a guest may make, by zome. Every one is public to any member of the
-/// network anyway: listings, profiles and standing in the directory; a project's page,
+/// network anyway: listings, profiles, standing, follows and feedback in the directory; a project's page,
 /// proposals, plans, values, links and chat in its own network.
 const DIRECTORY: &[(&str, &[&str])] = &[(
     "identity",
-    &["get_profile", "get_standing", "get_listing", "find_listing"],
+    &[
+        "get_profile",
+        "get_standing",
+        "get_listing",
+        "find_listing",
+        "follow_view",
+        "list_feedback",
+        "get_feedback",
+    ],
 )];
 const PROJECT: &[(&str, &[&str])] = &[
     ("project", &["get_project"]),

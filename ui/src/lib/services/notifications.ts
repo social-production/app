@@ -1,6 +1,7 @@
 import {
   markRead,
   chatMentionNotifications,
+  followNotifications,
   projectNotifications,
   withReadMarks,
   type NotificationItem,
@@ -16,6 +17,7 @@ import {
 } from '#lib/holo/index.ts';
 
 import { listMessages } from './chat.ts';
+import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
 import { listProposals } from './governance.ts';
 import { myAgent, namesOf, viewer } from './people.ts';
@@ -42,6 +44,7 @@ export async function myNotifications(): Promise<{ items: NotificationItem[] }> 
   const settled = await Promise.allSettled([
     ...seeds.map((seed) => fromProject(seed, me, name)),
     ...chats.map((c) => fromChat(c.seed, c.at, me, name)),
+    followView(me).then(followNotifications),
   ]);
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };

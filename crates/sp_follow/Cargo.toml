@@ -1,0 +1,11 @@
+[package]
+name = "sp_follow"
+description = "Rules for follows between people (web's user_follows, ADR 0054). Its own crate, used only by the identity coordinator, so it never changes a DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

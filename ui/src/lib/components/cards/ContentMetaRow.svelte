@@ -14,6 +14,8 @@
     updatedAt?: number | null;
     /** The whole name (detail pages, where the byline has its own line). */
     fullName?: boolean;
+    /** Just the clock (follow notices, whose name is in their own row). */
+    timeOnly?: boolean;
   }
 
   let {
@@ -23,6 +25,7 @@
     createdAt,
     updatedAt = null,
     fullName = false,
+    timeOnly = false,
   }: Props = $props();
 
   const NAME_LIMIT = 18;
@@ -37,9 +40,11 @@
   import '#lib/components/styles/cards.css';
 </script>
 
-<span class="content-meta-row">
-  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
-  <a class="inline-link" href={authorHref} title={authorName}>{shortName}</a>
+<span class="content-meta-row" class:time-only={timeOnly}>
+  {#if !timeOnly}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
+    <a class="inline-link" href={authorHref} title={authorName}>{shortName}</a>
+  {/if}
   {#if memberCount !== null}
     <span class="meta-chip" title={`${memberCount} members`}>
       <GroupsIcon className="meta-icon" />

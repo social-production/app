@@ -3,6 +3,8 @@
 
 mod chain;
 mod device;
+mod feedback;
+mod follow;
 mod founders;
 mod listing;
 mod profile;
@@ -13,6 +15,7 @@ use hdi::prelude::*;
 
 use chain::same_author;
 pub(crate) use chain::{earlier_creates, invalid, prev_action, typed_entry};
+pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
 
 #[hdk_entry_helper]
@@ -85,6 +88,22 @@ pub struct ProjectListing {
     pub creator_standing: Option<StandingProof>,
 }
 
+#[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum FeedbackKind {
+    Bug,
+    Suggestion,
+}
+
+/// A platform bug report or suggestion (web's Feedback page).
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Feedback {
+    pub kind: FeedbackKind,
+    pub title: String,
+    pub description: String,
+}
+
 #[derive(Serialize, Deserialize)]
 #[serde(tag = "type")]
 #[hdk_entry_types]
@@ -95,6 +114,7 @@ pub enum EntryTypes {
     StandingGrant(StandingGrant),
     DeviceLink(DeviceLink),
     ProjectListing(ProjectListing),
+    Feedback(Feedback),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -107,6 +127,15 @@ pub enum LinkTypes {
     AgentToDeviceLinks,
     AllProjects,
     AgentToListings,
+    // Follows (ADR 0054).
+    Follows,
+    Followers,
+    FollowAccepts,
+    FollowRejects,
+    RequiresFollowApproval,
+    // Feedback: "feedback" anchor → item; item → voter, tag `[VOTE_UP]` or `[VOTE_DOWN]`.
+    AllFeedback,
+    FeedbackVotes,
 }
 
 #[hdk_extern]
@@ -160,6 +189,7 @@ fn validate_create(
         EntryTypes::StandingGrant(g) => standing::validate_create(g, action),
         EntryTypes::DeviceLink(d) => device::validate_create(d, action),
         EntryTypes::ProjectListing(l) => listing::validate_create(l, action),
+        EntryTypes::Feedback(f) => feedback::validate_fields(f),
     }
 }
 
@@ -194,6 +224,13 @@ fn validate_create_link(
                 invalid("agents can only link their own profile, grants and listings")
             }
         }
+        LinkTypes::Follows
+        | LinkTypes::Followers
+        | LinkTypes::FollowAccepts
+        | LinkTypes::FollowRejects
+        | LinkTypes::RequiresFollowApproval => follow::validate_create_link(link_type, action),
+        LinkTypes::AllFeedback => feedback::validate_listing_link(action),
+        LinkTypes::FeedbackVotes => feedback::validate_vote_link(action),
         _ => Ok(ValidateCallbackResult::Valid),
     }
 }

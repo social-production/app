@@ -11,9 +11,11 @@
     person: Person;
     devices?: number;
     actions?: Snippet;
+    /** Leading items of the count row (web's follower / following buttons). */
+    counts?: Snippet;
   }
 
-  let { person, devices = 1, actions }: Props = $props();
+  let { person, devices = 1, actions, counts }: Props = $props();
 
   import '#lib/components/styles/profile.css';
 </script>
@@ -40,6 +42,7 @@
             <p class="profile-bio">{person.profile.bio}</p>
           {/if}
           <div class="count-row">
+            {@render counts?.()}
             {#if person.profile?.home_area}<span>{person.profile.home_area}</span>{/if}
             {#if devices > 1}<span><strong>{devices}</strong> devices</span>{/if}
             {#if person.standing.level === 'New'}

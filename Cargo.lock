@@ -4254,6 +4254,7 @@ dependencies = [
  "hdk",
  "identity_integrity",
  "serde",
+ "sp_follow",
  "sp_governance",
 ]
 
@@ -8751,6 +8752,10 @@ version = "0.0.1"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "sp_follow"
+version = "0.0.1"
 
 [[package]]
 name = "sp_governance"
