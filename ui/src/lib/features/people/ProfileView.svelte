@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import CopyKey from '#lib/components/CopyKey.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
@@ -12,7 +14,8 @@
   import '#lib/components/styles/profile.css';
 
   /** web's profile page: hero with standing chip, and the Message and Vouch actions for others. */
-  let { agent }: { agent: string } = $props();
+  /** `children`: what the route shows under the header (the person's feed). */
+  let { agent, children }: { agent: string; children?: Snippet | undefined } = $props();
 
   let person = $state<Person>();
   let me = $state<Person>();
@@ -117,6 +120,7 @@
       <p class="end-copy">Loading…</p>
     {/if}
     {#if error}<p class="warning-card">{error}</p>{/if}
+    {@render children?.()}
   </section>
 </div>
 

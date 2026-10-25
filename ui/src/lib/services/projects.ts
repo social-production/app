@@ -53,11 +53,19 @@ export interface FeedQuery {
   window: FeedWindow;
   q: string;
   offset: number;
+  /** Only this person's projects (their profile's feed). */
+  creator?: string;
 }
 
 export function feed(query: FeedQuery): Promise<{ items: ProjectCard[]; total: number }> {
   const tzOffset = String(-new Date().getTimezoneOffset());
-  return projectFeed({ ...query, offset: String(query.offset), tzOffset });
+  const { creator, ...rest } = query;
+  return projectFeed({
+    ...rest,
+    offset: String(query.offset),
+    tzOffset,
+    ...(creator ? { creator } : {}),
+  });
 }
 
 /** How many more projects you may start this week; `null` means no limit (Full members). */

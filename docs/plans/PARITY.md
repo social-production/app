@@ -36,9 +36,11 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 - [x] Profiles open for guests (name, standing, no actions), as on web; the device count is
   left out for guests (device data stays out of the guest allowlist).
-- [ ] Profile feed: web lists the person's items under the header (their projects, events,
-  activities, as feed cards with the feed's filter/sort toolbar). The app's profile has only the
-  header. Projects can come from the feed index filtered by creator.
+- [x] Profile feed: web's toolbar (All/Public, Newest/Top/Oldest) and stack under the header,
+  with the person's projects from the feed index (`/index/projects?creator=`).
+- [ ] Profile feed cards: web uses `PersonalFeedCard` there (author row with avatar inside the
+  card); the app reuses the public `ProjectCard`. Port it when events/activities join the
+  profile feed (M5).
 - [ ] Followers / following counts and Follow (web's follows aren't ported yet).
 
 ## Feed

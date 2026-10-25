@@ -26,6 +26,9 @@ pub struct FeedParams {
     /// The viewer's UTC offset in minutes east (JS: `-new Date().getTimezoneOffset()`).
     #[serde(default)]
     tz_offset: i32,
+    /// Only this person's projects (their profile's feed), by agent key.
+    #[serde(default)]
+    creator: String,
 }
 
 #[derive(Serialize)]
@@ -53,7 +56,12 @@ pub async fn projects(
         utc_offset_minutes: p.tz_offset.clamp(-14 * 60, 14 * 60),
     };
     let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
-    let (items, total) = state.node.index.page(&query, p.offset, limit).await;
+    let creator = Some(p.creator.as_str()).filter(|c| !c.is_empty());
+    let (items, total) = state
+        .node
+        .index
+        .page(&query, creator, p.offset, limit)
+        .await;
     Ok(Json(FeedPage { items, total }))
 }
 

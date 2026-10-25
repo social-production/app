@@ -16,7 +16,10 @@ export class FeedState {
 
   readonly hasMore = $derived(this.items.length < this.total);
 
-  constructor(readonly search: () => string) {}
+  constructor(
+    readonly search: () => string,
+    readonly creator?: string,
+  ) {}
 
   async reload(): Promise<void> {
     this.loading = true;
@@ -33,6 +36,7 @@ export class FeedState {
         window: this.window,
         q: this.search(),
         offset: this.items.length,
+        ...(this.creator ? { creator: this.creator } : {}),
       });
       this.items = [...this.items, ...page.items.slice(0, PAGE)];
       this.total = page.total;
