@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,42 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## Owner direction (2026-10-25)
+- **The owner steers less until parity; the cloud session steers the ship.** Decide, record the
+  decision here or in an ADR, and keep going. The owner will review once the app matches web.
+- Secrets can wait: everything on the P2P network is temporary test data with no real users
+  until the FastAPI site is replaced.
+- UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
+  profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-25: seed-node out-of-memory fix (ADR 0053), branch `claude/social-production-handoff-dsam61`
+Railway reported "Deploy Ran Out of Memory" for seed-node (2026-10-25). **Found and fixed:**
+Holochain 0.7.1 evicts a DNA's compiled zomes after every new cell's genesis (and after 1 h
+idle); each reload adds the machine code to wasmer's shared engine, which never frees it. So
+every sign-up, chat and opened project leaked ~100 MB per cell (~350 MB per new account,
+measured on a release build).
+- Fix: `vendor/holochain` (patched 0.7.1, `[patch.crates-io]`, row in `vendor/README.md`): no
+  eviction at genesis, no time-to-idle. **No DNA or hApp change**: merging resets nothing.
+- Measured (release, `RELEASE=1 bash scripts/dev-seed.sh`): 3 accounts +110 MB then +8 MB for 3
+  more (was +0.9–1.2 GB each time); 7 browser test files moved the node 1.1 → 1.4 GB.
+- Tried and dropped: sleeping idle hosted apps (disable after 2 h, wake on resume). It worked
+  but freed nothing (the leak isn't owned by apps) and would make sleeping people unreachable.
+  If idle apps ever cost CPU/network, the design is in ADR 0053's "Considered".
+- How it was found (reuse for any memory problem): release build; RSS from `/proc/<pid>/status`
+  per step; `smaps` showed anonymous heap; jemalloc built with `--enable-prof` through Nix
+  (`nix build --impure --expr '…jemalloc.overrideAttrs (o: { configureFlags = o.configureFlags
+  ++ ["--enable-prof"]; })'`), `LD_PRELOAD` on the gateway only (a Nix library preloaded into
+  system binaries breaks them), `MALLOC_CONF=prof:true,lg_prof_sample:19,lg_prof_interval:30,
+  prof_prefix:…`, then `jeprof --text --inuse_space [--focus=…] target/release/gateway <heap>`.
+- Checked in the cloud session: release gateway build (no warnings), against the patched local
+  seed node: `projects`, `guests`, `chat`, `messages`, `governance`, `attachments`, `calls`
+  browser tests all passed. Not run here: workspace clippy/unit tests and scenarios (a debug
+  workspace build needs ~24 GB; CI runs them on the patched conductor).
+- After deploy: watch Railway memory for seed-node (the owner can see it); live smoke
+  `projects.mjs` + `guests.mjs`. Report upstream (holochain/holochain: genesis eviction;
+  wasmerio/wasmer: engine code memory never freed) is still to do; needs a GitHub account the
+  owner chooses.
 
 ## Done 2026-10-25: guests open project pages (ADR 0052), PR #43 merged (~01:33 UTC / 12:33 pm Melbourne), deployed ~01:51 UTC; live `guests.mjs` and `projects.mjs` passed
 STATUS Next item 3. web shows project pages signed out and gates actions with
@@ -505,22 +541,26 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Known gaps
 - **Railway security incident (2026-10-21, status.railway.com, blog.railway.com/p/security-disclosure-wednesday-october-21st):** an attacker may have read decrypted environment variables, and Railway advises rolling them all. Builds are back (2026-10-22), so rolled values can now be deployed; **not done yet** (owner). **Do not change `LAIR_PASSPHRASE` in Railway on its own:** it decrypts the keystore on `/data`, so a new value without re-encrypting the keystore locks every hosted agent's key away for good. The passphrase alone is useless without the keystore file, and the disclosure is about variables, not volumes. Re-keying needs a planned step (an ADR). The P2P project's other variables (`BOOTSTRAP_URL`, `RP_ID`/`RP_ORIGIN`, `POW_BITS`, …) are not secrets. The live FastAPI project (`social-production`) holds real secrets: `JWT_SECRET` (rolling it signs everyone out), the Postgres and Redis passwords, `GITHUB_TOKEN`, `TURNSTILE_SECRET_KEY` and `GEOCODING_PROVIDER_API_KEY`. Roll those. Its `MESSAGE_ENCRYPTION_KEY` decrypts every stored DM, so it needs MultiFernet re-encryption, not a plain swap.
-- **Seed-node memory (2026-10-21):** the owner saw ~3.2 GB in Railway, against a usual ~0.8 GB. It was healthy then (`/readyz` 0.3 s), during Railway's outage, so the reading may not be reliable. Unconfirmed guess: every live test account and its DM/group chat cells stay hosted and loaded (each chat is a clone cell per member). Check it with Railway metrics and logs once `RAILWAY_TOKEN` is set. Cut live test runs that create accounts until then.
+- **Seed-node memory:** the 3.2 GB (2026-10-21) and the out-of-memory crash (2026-10-25) were a Holochain/wasmer module leak, ~350 MB per new account; fixed by ADR 0053 (in flight). After it deploys, live test runs that create accounts are cheap again.
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
 - Guests open project pages read-only (ADR 0052); @names in chat stay plain text for them. Project chats have no photos or files yet (ADR 0049).
 - Challenges have no screen (see "For the owner to review").
 
-## Next (roadmap order)
+## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. M4, from web: Project-chat attachments wait for the next project-DNA integrity change (ADR 0049). When web's follows are ported, add them to the mention ranking (ADR 0047).
-   Project-chat read marks and list settings move into private entries with the next
-   project-DNA integrity change. Threads stay parked (Owner decisions).
-2. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway URL); move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
-3. Guests: project pages done (ADR 0052). Next: profile pages signed out, if web shows them to
-   guests (check web's routes first); same `/public/read` allowlist, add only reads they need.
-4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
+1. Deploy ADR 0053 (memory) and confirm in Railway that seed-node memory stays flat.
+2. **Shell parity**: web's phone `MobileMoreSheet` (More → profile or Sign in, Settings, About,
+   …) instead of opening the left rail; then walk every shell piece at 390px against live web
+   (top bar, rails, bottom nav, menus) and port what differs. UI only, resets nothing.
+3. Guests on profile pages, if web shows them signed out (same `/public/read` allowlist).
+4. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
+   Batch the next project-DNA integrity change with project-chat attachments and private
+   read marks (ADR 0049/0044).
+5. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
+   URL); archivist + index into a crate any full node runs; desktop Storage setting.
+6. CI: scenarios run in 4 shards (~80 min worst); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
@@ -542,6 +582,9 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **Killing a process by name kills your shell** when your own command line contains the
   pattern (also a `/proc/*/cmdline` loop). Start servers with `& echo $! > pidfile` and kill
   that pid; `ss` isn't installed in the cloud container.
+- **Memory:** measure on a release build (`RELEASE=1 bash scripts/dev-seed.sh`); a debug build
+  is no smaller, but production is release. The jemalloc heap-profile recipe is in ADR 0053's
+  STATUS entry.
 - **Debugging the UI:** errors caught into `detail.error` are not shown once the project has loaded; log them temporarily, or find them with a Playwright script that listens to `console`. When stopping a preview server, kill it by port (`ss -ltnp | grep :4174`). `pkill -f "<its command>"` also matches your own shell and kills it.
 - **`sp_core` changes change every DNA's hash** (2026-10-24): even an unused new module did. Rules for one DNA go in their own `crates/sp_*` crate; compare `hc dna hash dnas/<d>/sp_<d>.dna` against main before pushing any shared-crate change.
 - **hdk externs** are unmangled C symbols: never name one after a libc function (`close`, `read`, `write`, `send`…), or native test binaries crash.

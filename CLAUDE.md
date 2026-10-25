@@ -20,7 +20,7 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - An integrity zome change means a new DNA hash, which means a new network. Prefer coordinator-only changes. Size limits live in `sp_core::limits`. Any `sp_core` change (even an unused module) changes **every** DNA's hash: put rules only one DNA needs in their own crate (e.g. `sp_attachment`) and compare `hc dna hash` with main.
 - The three DNAs differ only by `properties.kind` until their own zomes land. Don't remove it, or they collapse into one network.
 - Own data reads (`get_profile`/standing for yourself) come from your own chain (`records::own_latest`), because network reads lag right after a write.
-- Holochain versions move together: `flake.nix`, `Cargo.toml` (`hdi =0.8.1`, `hdk =0.7.1`, `holochain =0.7.1`), `@holochain/client 0.21.x`, the Dockerfile's `HOLOCHAIN_VERSION`.
+- Holochain versions move together: `flake.nix`, `Cargo.toml` (`hdi =0.8.1`, `hdk =0.7.1`, `holochain =0.7.1`), `@holochain/client 0.21.x`, the Dockerfile's `HOLOCHAIN_VERSION`, and the patched `vendor/holochain` (ADR 0053: re-vendor and re-apply its patch, then re-measure memory).
 - New decisions get an ADR (`docs/decisions/NNNN-*.md`, plus the index in its README).
 - The workspace path contains a space ("Social Production"). `flake.nix`'s shellHook strips stdenv's `-rpath $out/lib` and sets `OPENSSL_NO_VENDOR=1` because of it. Quote paths in scripts.
 - Commit messages: one plain sentence describing the user-visible effect.

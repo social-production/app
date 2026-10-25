@@ -54,3 +54,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0050](./0050-voice-calls-direct-signals.md) Voice calls in direct chats: Holochain direct signals instead of web's call socket
 - [0051](./0051-call-lines.md) Call lines in direct chats: a public `Call` entry, the first report per call shows
 - [0052](./0052-guest-project-pages.md) Guests open project pages: the gateway's archivist answers a short list of reads
+- [0053](./0053-wasm-module-leak.md) Patch Holochain so compiled zomes are loaded once, not once per new cell (the seed node's out-of-memory crash)

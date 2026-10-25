@@ -68,3 +68,4 @@ codegen-units = 1
 # Workspace-wide patches of upstream crates; each has a row in vendor/README.md and an ADR.
 [patch.crates-io]
 lair_keystore_api = { path = "vendor/lair_keystore_api" }
+holochain = { path = "vendor/holochain" }
