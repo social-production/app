@@ -45,7 +45,7 @@ so merging resets nothing.
   allowlist test); `npm run check`/`lint`, sizes, boundaries; against the local seed node at
   390px: new `tests/e2e/guests.mjs` (can run live: one account), `projects.mjs` (its guest step
   now expects the notice), `chat.mjs`, `messages.mjs`. Not run: scenarios (no zome changed).
-- PR #43 opened ~00:50 UTC 25 Oct (11:50 am Melbourne). Next: CI green → merge → wait for the seed-node deploy → `guests.mjs` + `projects.mjs` against the live UI, then README Status + this file.
+- PR #43 opened ~00:08 UTC 25 Oct (11:08 am Melbourne). Next: CI green → merge → wait for the seed-node deploy → `guests.mjs` + `projects.mjs` against the live UI, then README Status + this file.
 
 ## Done 2026-10-24: live calls ring again (ADR 0050 addendum), PR #41 merged (~14:30 UTC / 1:30 am Melbourne 25 Oct), deployed ~15:06 UTC; live `calls.mjs` passed on the first run
 The owner can't read Railway logs and asked for a fix that doesn't depend on the seed node.
