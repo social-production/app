@@ -48,9 +48,8 @@ conversation's zomes untouched); directory is now `uhC0kA14W4Y…`.
   notifications (with Accept / Decline on the card) and the Follows switch; the Feedback page.
 - Checked here: clippy `-D warnings` (identity, identity_integrity, sp_follow), `sp_follow`
   tests, `npm run check`/`lint`, sizes, boundaries; hApp build + DNA hashes; scenarios
-  `follows` (2), `feedback` (1), `identity` (3 of 4 seen passing, the 4th was still running);
-  browser tests on a local release seed node: `follows.mjs` (new), `notifications`, `shell`,
-  `accounts`.
+  `follows` (2), `feedback` (1), `identity` (4); browser tests on a local release seed node:
+  `follows.mjs` (new), `guests`, `notifications`, `shell`, `accounts`. PR #52 open, CI running.
 - After merge: smoke live with `follows.mjs`, `shell.mjs`, `guests.mjs`; update README Status.
 - Known, not from this branch: the UI build warns that `detail.css` has a multi-line
   `:global(` the port script didn't unwrap (`.project-overview .signal-row`), so those rules
