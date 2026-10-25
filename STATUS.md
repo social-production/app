@@ -31,7 +31,23 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: Settings appearance + notification switches, branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-25: seed-node crash (12:30 UTC) diagnostics, branch `claude/social-production-handoff-dsam61`
+Railway reported "Deploy Crashed" for seed-node right after PR #49's deploy, during the live
+smoke (`projects.mjs` saw its websocket close with 1006 at ~12:31 UTC). Railway restarted it;
+it has answered since. **Cause not found yet**: not reproduced locally (same tests on main,
+release build, no panic, 1.2→1.4 GB). The owner pasted log lines: `sqlcipher_mlock: mlock()
+returned -1 errno=12` (SQLCipher can't lock key memory in Railway's container: harmless noise)
+and "Railway rate limit of 500 logs/sec reached", from `NoPeersForLocation` publish warnings
+(hosted people's publish retries in networks where nobody else holds that part).
+- This branch: the gateway keeps `publish_dht_ops_workflow` at `error` whatever `RUST_LOG`
+  says (locally: 0 such lines, 97 lines for a full test run), so the crash line can't be
+  drowned out next time; `/readyz` now returns `uptimeSecs` and `rssMb` so a session can see
+  restarts and memory without Railway access.
+- Next if it crashes again: ask the owner for the last ~50 lines before the crash in the
+  deploy log (look for `panicked at`, `memory allocation`, `killed`), and watch `/readyz`
+  `uptimeSecs` resets and `rssMb` from a cloud session.
+
+## Done 2026-10-25: Settings appearance + notification switches, PR #49 merged (~11:50 UTC / 10:50 pm Melbourne), deployed ~12:29 UTC; live `shell.mjs` and `guests.mjs` passed, `projects.mjs` passed every step and then saw the seed-node crash above
 From `docs/plans/PARITY.md` (Settings, compared with web's `SettingsPage.svelte` source):
 - Appearance: type size, theme (light/dark/system), accent colour, font, per device under web's
   storage keys (`stores/appearance.svelte.ts`, applied by the shell; `app.html` also restores
@@ -571,7 +587,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `ecd6e46` (PR #47, deployed 2026-10-25 ~08:56 UTC, ~21 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `d4ca75c` (PR #49, deployed 2026-10-25 ~12:29 UTC, ~39 min after the merge; UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
