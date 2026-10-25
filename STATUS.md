@@ -31,6 +31,33 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
+## In flight 2026-10-25: M5a follows + feedback (ADR 0054), branch `claude/social-production-handoff-dsam61`
+**Merging this resets the directory network: everyone on the test network signs up again**
+(projects and chats tied to old agents become unreachable, as after earlier directory changes).
+Project and conversation DNA hashes are unchanged (`hc dna hash`: project `uhC0kJTRl5t…`;
+conversation's zomes untouched); directory is now `uhC0kA14W4Y…`.
+- Directory integrity: `Follows`, `Followers`, `FollowAccepts`, `FollowRejects`,
+  `RequiresFollowApproval` links; `Feedback` entry with `AllFeedback` / `FeedbackVotes` links.
+  Status rule in the new pure crate `crates/sp_follow` (coordinator-only, no DNA hash impact).
+- Identity coordinator: `follow`, `unfollow`, `accept_follow`, `reject_follow`,
+  `set_follow_approval`, `follow_view`, `follow_requests`, `create_feedback`, `list_feedback`,
+  `get_feedback`, `vote_feedback`; the caller's own follows and votes read from their chain.
+  Guests read `follow_view` / `list_feedback` / `get_feedback` (gateway `node/public.rs`).
+- UI from web: profile Follow button, follower/following counts + people sheets, requests card
+  on your own profile; Settings Follow requests + Privacy (approval switch); follow
+  notifications (with Accept / Decline on the card) and the Follows switch; the Feedback page.
+- Checked here: clippy `-D warnings` (identity, identity_integrity, sp_follow), `sp_follow`
+  tests, `npm run check`/`lint`, sizes, boundaries; hApp build + DNA hashes; scenarios
+  `follows` (2), `feedback` (1), `identity` (3 of 4 seen passing, the 4th was still running);
+  browser tests on a local release seed node: `follows.mjs` (new), `notifications`, `shell`,
+  `accounts`.
+- After merge: smoke live with `follows.mjs`, `shell.mjs`, `guests.mjs`; update README Status.
+- Known, not from this branch: the UI build warns that `detail.css` has a multi-line
+  `:global(` the port script didn't unwrap (`.project-overview .signal-row`), so those rules
+  are dropped; fix in `scripts/port-styles.py`'s `:global` regex.
+- Still to do in M5: mention ranking by follows (ADR 0047), the personal feed / Home scope,
+  then M5b (activities and roles, one project reset).
+
 ## Open 2026-10-25: seed-node crash (12:30 UTC), diagnostics deployed with PR #50 (merged ~14:17 UTC, live ~14:46 UTC)
 Railway reported "Deploy Crashed" for seed-node right after PR #49's deploy, during the live
 smoke (`projects.mjs` saw its websocket close with 1006 at ~12:31 UTC). Railway restarted it;
