@@ -4,6 +4,7 @@
 pub mod account;
 pub mod index;
 pub mod passkey;
+pub mod public;
 pub mod session;
 pub mod ws_proxy;
 
@@ -27,6 +28,8 @@ pub struct AppState {
     pub pow: Arc<Pow>,
     pub signup_limit: Arc<SignupLimit>,
     pub signin_limit: Arc<SignupLimit>,
+    /// Guest reads (`/public/read`) per IP per day.
+    pub read_limit: Arc<SignupLimit>,
 }
 
 pub fn router(state: AppState) -> Router {
@@ -42,6 +45,7 @@ pub fn router(state: AppState) -> Router {
         .route("/session/resume", post(session::resume))
         .route("/session/cells", post(session::cells))
         .route("/index/projects", get(index::projects))
+        .route("/public/read", post(public::read))
         .route("/ws", get(ws_proxy::upgrade))
         // The UI is served from another origin (ui service, dev server).
         .layer(CorsLayer::permissive())

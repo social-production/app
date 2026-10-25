@@ -77,3 +77,4 @@ calls.css         .call-host      web/src/lib/calls/CallHost.svelte
 notifications.css .notifications-page web/src/lib/features/notifications/NotificationsPage.svelte
 notifications.css .notification-card web/src/lib/components/cards/inbox/NotificationCard.svelte
 photo-viewer.css  .photo-viewer   web/src/lib/components/shared/PhotoViewer.svelte
+notice.css        .auth-action-notice web/src/lib/components/shared/AuthActionNotice.svelte

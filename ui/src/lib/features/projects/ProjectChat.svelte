@@ -7,6 +7,8 @@
   import { mentionPool } from '#lib/services/messages.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
+  import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+  import { connection } from '#lib/stores/connection.svelte.ts';
 
   /** web's ProjectChatTab: the project's "# project-chat", polled while the tab is open. */
   interface Props {
@@ -37,6 +39,8 @@
     },
     names,
   );
+  // Guests read the chat; sending shows web's sign-in notice.
+  const guest = $derived(connection.current.status !== 'connected');
   let compact = $state(false);
   const embedded = $derived(compact || fullscreen);
 
@@ -62,12 +66,14 @@
     () => ({ me: chat.me, agents: Object.keys(chat.names), names: chat.names }),
   );
 
-  $effect(() => mentions.watch(chat.messages.map((m) => m.body)));
+  $effect(() => {
+    if (!guest) mentions.watch(chat.messages.map((m) => m.body));
+  });
 
   // web's LinkedChatReadMarker: reading the Chat tab clears the project in Messages' Public tab.
   $effect(() => {
     const newest = chat.messages.at(-1)?.createdAt;
-    if (active && newest) void markProjectChatRead(seed, newest);
+    if (active && newest && !guest) void markProjectChatRead(seed, newest);
   });
 </script>
 
@@ -90,7 +96,8 @@
     onDelete={(id) => chat.remove(id)}
     {highlighted}
     {onWrote}
-    mentionSearch={mentions.search}
+    mentionSearch={guest ? null : mentions.search}
     mentionAgent={mentions.agentOf}
+    signIn={guest ? () => void requireViewer('Sign in to send a message.') : null}
   />
 </section>

@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-24 by a cloud session; see the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -22,6 +22,30 @@ and continue from Next."
   (`claude/take-part-layout`); (3) `claude/m3c-reverts`: merge main, check it invented nothing
   (its app-only ChallengeList must be flagged to the owner, since web-backend has no challenge
   window), open a PR.
+
+## In flight 2026-10-25: guests open project pages (ADR 0052), branch `claude/social-production-handoff-dsam61`
+STATUS Next item 3. web shows project pages signed out and gates actions with
+`requireViewer` → `AuthActionNotice`; ported. **No zome or integrity change** (gateway + UI),
+so merging resets nothing.
+- Gateway: `POST /public/read` (`routes/public.rs`, `node/public.rs`): the archivist answers an
+  allowlist of read-only calls (directory `get_profile`/`get_standing`/`get_listing`/
+  `find_listing`; project `get_project`, `list_proposals`, `list_plans`, `list_values`,
+  `link_sides`, `list_links`, `list_messages`), msgpack in and out; 403 otherwise, 404 for a
+  project the archivist hasn't joined; 20,000 reads per IP per day. New dep `rmpv`.
+- UI: `holo/guest.ts`; signed out, `callZome('directory')` and `callCell` on a stand-in project
+  cell go to the gateway, so services are unchanged. `AccountGate guests` on `/projects/[id]`.
+  web's notice: `features/shell/AuthActionNotice.svelte`, `stores/authNotice.svelte.ts`
+  (`requireViewer`), `styles/notice.css` (PORTS). Join/Support on the page, Support on feed
+  cards (was a jump to /onboarding) and the chat composer's "Sign in" button use it.
+- Bug found and fixed on the way: `holo/connection.ts` `connect()` re-ran `open()` on every call
+  while signed out, flipping the state to "connecting" and back, so `AccountGate` remounted the
+  page in a loop (thousands of reads, `ERR_INSUFFICIENT_RESOURCES`). Signed out now stays
+  signed out until `attach()`.
+- Checked in the cloud session: clippy (`gateway`, `-D warnings`), fmt, gateway unit tests (new
+  allowlist test); `npm run check`/`lint`, sizes, boundaries; against the local seed node at
+  390px: new `tests/e2e/guests.mjs` (can run live: one account), `projects.mjs` (its guest step
+  now expects the notice), `chat.mjs`, `messages.mjs`. Not run: scenarios (no zome changed).
+- Next for this: open the PR, wait for CI, merge, then `guests.mjs` + `projects.mjs` live.
 
 ## Done 2026-10-24: live calls ring again (ADR 0050 addendum), PR #41 merged (~14:30 UTC / 1:30 am Melbourne 25 Oct), deployed ~15:06 UTC; live `calls.mjs` passed on the first run
 The owner can't read Railway logs and asked for a fix that doesn't depend on the seed node.
@@ -483,7 +507,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 - Plan rating/vote errors go to `detail.error`, which is only shown when the project fails to
   load, so a refused write is invisible. The optimistic plan sheet doesn't roll back, and leaving
   the page before queued writes finish cancels them.
-- Guests can't open project pages yet (only the feed). Project chats have no photos or files yet (ADR 0049).
+- Guests can open project pages once ADR 0052 is deployed; @names in chat stay plain text for them. Project chats have no photos or files yet (ADR 0049).
 - Challenges have no screen (see "For the owner to review").
 
 ## Next (roadmap order)
@@ -492,7 +516,8 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    Project-chat read marks and list settings move into private entries with the next
    project-DNA integrity change. Threads stay parked (Owner decisions).
 2. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway URL); move archivist + index out of the gateway into a crate any full node runs; desktop Storage setting (light / slice / archive + GB limit); sharding switch at ~30 always-on full nodes, 20+ copies; phones light; Android-only "help while charging" later.
-3. A public read-only project page for guests (the node would serve it; today project pages need sign-in).
+3. ~~A public read-only project page for guests~~: in flight (ADR 0052). Next after it: guests
+   on profile pages if web shows them signed out (check web first).
 4. CI: scenarios run in 4 shards (~55 min); add shards if one nears 120 min.
 
 ## How to work (things learned the hard way)
@@ -512,6 +537,9 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **One write at a time per person:** two zome calls that write to the same source chain at once are refused (the chain head moved). Optimistic UI that fires several writes (ratings, votes) must queue them, as `DetailState.inTurn` does.
 - **A write isn't in your own network reads at once:** after a vote, `tally.my_vote` can still be
   empty for a while; UI flows keep what they just wrote (as `LinksState.cast` does).
+- **Killing a process by name kills your shell** when your own command line contains the
+  pattern (also a `/proc/*/cmdline` loop). Start servers with `& echo $! > pidfile` and kill
+  that pid; `ss` isn't installed in the cloud container.
 - **Debugging the UI:** errors caught into `detail.error` are not shown once the project has loaded; log them temporarily, or find them with a Playwright script that listens to `console`. When stopping a preview server, kill it by port (`ss -ltnp | grep :4174`). `pkill -f "<its command>"` also matches your own shell and kills it.
 - **`sp_core` changes change every DNA's hash** (2026-10-24): even an unused new module did. Rules for one DNA go in their own `crates/sp_*` crate; compare `hc dna hash dnas/<d>/sp_<d>.dna` against main before pushing any shared-crate change.
 - **hdk externs** are unmangled C symbols: never name one after a libc function (`close`, `read`, `write`, `send`…), or native test binaries crash.

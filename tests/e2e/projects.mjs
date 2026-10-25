@@ -66,7 +66,8 @@ await waitInFeed(guest, title);
 const guestCard = guest.locator('.project-card', { hasText: title });
 await guestCard.getByText(`ann_${stamp}`).waitFor();
 await guestCard.getByRole('button', { name: /^Support/ }).click();
-await guest.waitForURL(/\/onboarding$/);
+// web's requireViewer: a notice with a Sign in link (not a redirect).
+await guest.locator('.auth-action-notice').getByText('Sign in to support this project.').waitFor();
 log('a guest sees the feed with names, and Support asks them to sign in');
 
 await ann.reload();

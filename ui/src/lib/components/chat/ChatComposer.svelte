@@ -28,6 +28,8 @@
     onFocus: () => void;
     /** Set where web offers mentions (project chats): people whose name matches. */
     mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null | undefined;
+    /** Guests: web shows "Sign in" in place of Send, and sending asks them to sign in. */
+    signIn?: (() => void) | null | undefined;
   }
 
   let p: Props = $props();
@@ -66,6 +68,7 @@
   }
 
   async function submit(): Promise<void> {
+    if (p.signIn) return p.signIn();
     const body = draft.trim();
     // An edit changes only the text, as on web.
     const picked = p.editing ? [] : files.files;
@@ -236,7 +239,9 @@
           aria-label={p.placeholder}
           rows="1"></textarea>
       </div>
-      {#if p.editing}
+      {#if p.signIn}
+        <button class="primary-button" type="button" onclick={p.signIn}>Sign in</button>
+      {:else if p.editing}
         <button
           class="send-button save"
           disabled={pending || !canSend}

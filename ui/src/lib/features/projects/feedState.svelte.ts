@@ -1,10 +1,7 @@
 import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
 import { feed, setSignal } from '#lib/services/projects.ts';
-import { connection } from '#lib/stores/connection.svelte.ts';
-
-import { goto } from '$app/navigation';
-import { resolve } from '$app/paths';
+import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
 const PAGE = 20;
 
@@ -46,10 +43,9 @@ export class FeedState {
     }
   }
 
-  /** Guests are sent to sign in (web's requireViewer); the strip rolls back. */
+  /** Guests see web's sign-in notice (requireViewer); the strip rolls back. */
   async signal(card: ProjectCard, next: Stance | null): Promise<void> {
-    if (connection.current.status !== 'connected') {
-      await goto(resolve('/onboarding'));
+    if (!requireViewer('Sign in to support this project.')) {
       throw new Error('Sign in to support this project.');
     }
     await setSignal(card.id, next);

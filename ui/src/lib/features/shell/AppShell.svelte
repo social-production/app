@@ -23,6 +23,8 @@
   import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
+  import AuthActionNotice from './AuthActionNotice.svelte';
+
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
 
@@ -202,4 +204,5 @@
       onNavigate={closeCompact}
     />
   {/if}
+  <AuthActionNotice />
 </div>

@@ -52,6 +52,8 @@
     onWrote?: () => void;
     mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null;
     mentionAgent?: ((name: string) => string | null) | undefined;
+    /** Set for guests: the composer's button is web's "Sign in" (LiveChatPanel's promptChatSignIn). */
+    signIn?: (() => void) | null;
   }
 
   let p: Props = $props();
@@ -244,7 +246,7 @@
       message={menu.open.message}
       x={menu.open.x}
       y={menu.open.y}
-      canWrite={!p.paused}
+      canWrite={!p.paused && !p.signIn}
       canPin={!!p.onTogglePin}
       canEdit={!!p.onEdit}
       onReply={reply}
@@ -268,7 +270,8 @@
     onCancelEdit={() => (editing = null)}
     onFocus={sync}
     mentionSearch={p.mentionSearch}
-    attachments={!!p.fileUrl}
+    attachments={!!p.fileUrl && !p.signIn}
+    signIn={p.signIn}
   />
 </section>
 

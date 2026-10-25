@@ -20,6 +20,7 @@ import { getPerson } from '#lib/services/people.ts';
 import { listPlans, ratePlan as rate, submitPlan as submit } from '#lib/services/plans.ts';
 import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
+import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
 export class DetailState {
@@ -135,7 +136,7 @@ export class DetailState {
   }
 
   async toggleJoin(): Promise<void> {
-    if (!this.project) return;
+    if (!this.project || !requireViewer('Sign in to join this project.')) return;
     this.joining = true;
     try {
       await joinProject(this.id, !this.project.amMember);
@@ -147,7 +148,11 @@ export class DetailState {
     }
   }
 
+  /** Guests see web's sign-in notice; the strip rolls back. */
   signal(next: Stance | null): Promise<void> {
+    if (!requireViewer('Sign in to support this project.')) {
+      return Promise.reject(new Error('Sign in to support this project.'));
+    }
     return setSignal(this.id, next);
   }
 

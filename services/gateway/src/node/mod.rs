@@ -5,6 +5,7 @@ mod archivist;
 mod bundle;
 mod hosting;
 mod index;
+mod public;
 mod release;
 mod restore;
 mod seeds;
@@ -23,6 +24,7 @@ use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
 pub use index::{ProjectCard, ProjectIndex};
+pub use public::{PublicRead, Refused};
 
 use crate::config::Config;
 

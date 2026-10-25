@@ -5,7 +5,7 @@
   import { page } from '$app/state';
 </script>
 
-<AccountGate>
+<AccountGate guests>
   {#key page.params.id}
     <ProjectDetail id={page.params.id ?? ''} />
   {/key}
