@@ -15,7 +15,8 @@ network of desktops, Raspberry Pis and phones.
 
 What works today:
 - **Parity with web (2026-10-25, `docs/plans/PARITY.md`):** the phone More sheet, feed-card
-  comment counts and "Latest:" lines, web's onboarding surface and About page.
+  comment counts and "Latest:" lines, web's onboarding surface and About page, web's Search page
+  (people and projects, also for guests), guest profiles and the profile feed.
 - **Guests (ADR 0052):** signed out, people open project pages read-only (Details, Take part,
   Chat, Links); joining, supporting or sending shows web's "Sign in" notice.
 - **@mentions (ADR 0047):** web's mention menu in every chat (project, direct, group), ranked by
