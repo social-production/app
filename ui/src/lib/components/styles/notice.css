@@ -1,0 +1,40 @@
+/* Ported from web/src/lib/components/shared/AuthActionNotice.svelte (ADR 0032, scripts/port-styles.py) */
+.auth-action-notice {
+  position: fixed;
+  left: 50%;
+  bottom: calc(20px + var(--shell-bottom-nav-offset, 0px));
+  z-index: 80;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  max-width: min(92vw, 520px);
+  padding: 10px 10px 10px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 13px;
+  box-shadow: 0 10px 30px color-mix(in srgb, black 18%, transparent);
+  transform: translateX(-50%);
+}
+
+.auth-action-notice a {
+  color: var(--brand-strong);
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.auth-action-notice a:hover {
+  text-decoration: underline;
+}
+
+.auth-action-notice .dismiss {
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}

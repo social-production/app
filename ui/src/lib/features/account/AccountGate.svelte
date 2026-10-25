@@ -8,12 +8,14 @@
 
   import '#lib/components/styles/onboarding.css';
 
-  let { children }: { children: Snippet } = $props();
+  /** `guests`: signed-out people see the page too (web's public pages; reads go through the
+   * gateway, holo/guest.ts). */
+  let { children, guests = false }: { children: Snippet; guests?: boolean } = $props();
 
   // The shell connects on every page; this only decides what an account-only page shows.
 </script>
 
-{#if connection.current.status === 'connected'}
+{#if connection.current.status === 'connected' || (guests && connection.current.status === 'signed-out')}
   {@render children()}
 {:else if connection.current.status === 'signed-out'}
   <Welcome />

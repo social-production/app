@@ -72,8 +72,8 @@ Known gaps:
 - The M3e deploy (2026-10-20) changed the project DNA, so projects were reset again (people and
   profiles stay).
 - Links to events come with events (M5), as do personal-service updates.
-- Guests browse the feed signed out but can't open project pages yet; feed cards don't show your
-  own signal (see docs/plans/M2-projects.md#as-built-2026-10-19).
+- Guests browse the feed and (from ADR 0052's deploy) open project pages read-only; feed cards
+  don't show your own signal (see docs/plans/M2-projects.md#as-built-2026-10-19).
 - A refused plan rating or vote isn't shown yet (STATUS.md, Known gaps).
 - iOS phone nodes wait on an upstream Holochain keystore fix (ADR 0020/0021). Android builds.
 

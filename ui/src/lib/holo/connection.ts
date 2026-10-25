@@ -10,6 +10,7 @@ import {
 } from '@holochain/client';
 
 import { gatewayApi, GatewayError } from './gateway.ts';
+import { guestRead, guestSeedOf } from './guest.ts';
 import { forgetSession, loadSession, type DeviceSession } from './keys.ts';
 import { describeGateway, homeGateway, inNativeApp } from './nodes.ts';
 
@@ -69,6 +70,8 @@ function emit(next: ConnectionState): void {
 /** Connect using the device's own node (app) or its stored gateway session (browser). */
 export function connect(): Promise<AppWebsocket | undefined> {
   if (client) return Promise.resolve(client);
+  // Signed out stays signed out until a sign-in attaches (a guest's every read comes here).
+  if (state.status === 'signed-out') return Promise.resolve(undefined);
   pending ??= open().finally(() => (pending = undefined));
   return pending;
 }
@@ -136,6 +139,11 @@ export async function signOut(): Promise<void> {
   window.location.reload();
 }
 
+/** Signed out: reads go to the gateway as a guest (guest.ts). */
+export function isGuest(): boolean {
+  return state.status === 'signed-out';
+}
+
 function signedOut(): undefined {
   emit({ status: 'signed-out' });
   return undefined;
@@ -149,6 +157,7 @@ export async function callZome<T>(
   payload?: unknown,
 ): Promise<T> {
   const ws = await connect();
+  if (!ws && isGuest() && role === 'directory') return guestRead<T>(undefined, zome, fn, payload);
   if (!ws) throw new Error('Not signed in.');
   try {
     return await ws.callZome<T>({ role_name: role, zome_name: zome, fn_name: fn, payload });
@@ -172,6 +181,8 @@ export async function callCell<T>(
   fn: string,
   payload?: unknown,
 ): Promise<T> {
+  const seed = guestSeedOf(cellId);
+  if (seed !== undefined) return guestRead<T>(seed, zome, fn, payload);
   const { ws } = await connection();
   return ws.callZome<T>({ cell_id: cellId, zome_name: zome, fn_name: fn, payload });
 }

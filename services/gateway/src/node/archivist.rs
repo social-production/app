@@ -174,7 +174,7 @@ impl Node {
     }
 
     /// A zome call as the cell's own agent (author grant; no capability secret needed).
-    async fn call<I, O>(
+    pub(super) async fn call<I, O>(
         &self,
         agent: &AgentPubKey,
         cell: CellId,
@@ -193,7 +193,7 @@ impl Node {
     }
 }
 
-fn provisioned(app: &AppInfo, role: &str) -> anyhow::Result<CellId> {
+pub(super) fn provisioned(app: &AppInfo, role: &str) -> anyhow::Result<CellId> {
     app.cell_info
         .get(role)
         .into_iter()
@@ -205,7 +205,7 @@ fn provisioned(app: &AppInfo, role: &str) -> anyhow::Result<CellId> {
         .ok_or_else(|| anyhow!("archivist has no {role} cell"))
 }
 
-fn clones_by_seed(app: &AppInfo) -> BTreeMap<String, CellId> {
+pub(super) fn clones_by_seed(app: &AppInfo) -> BTreeMap<String, CellId> {
     app.cell_info
         .get("project")
         .into_iter()

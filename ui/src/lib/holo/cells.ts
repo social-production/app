@@ -1,7 +1,8 @@
 import { CellType, setSigningCredentials, type CellId } from '@holochain/client';
 
-import { connection } from './connection.ts';
+import { connect, connection, isGuest } from './connection.ts';
 import { gatewayApi } from './gateway.ts';
+import { guestCell } from './guest.ts';
 
 /** Cell ids resolved (or being resolved) this page view, by network seed. Two reads of a
  * project not opened before arrive together (the Links tab reads its page and its links);
@@ -13,7 +14,9 @@ const known = new Map<string, Promise<CellId>>();
  * `<creator key>.<nonce>`). Opening a project for the first time clones it, which joins
  * its network (not its membership); in a browser the gateway then grants this device.
  */
-export function projectCell(networkSeed: string, title: string): Promise<CellId> {
+export async function projectCell(networkSeed: string, title: string): Promise<CellId> {
+  // A guest reads the project through the gateway's archivist instead (guest.ts).
+  if (!(await connect()) && isGuest()) return guestCell(networkSeed);
   return cloneOf('project', networkSeed, title);
 }
 

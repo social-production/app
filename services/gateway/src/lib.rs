@@ -35,6 +35,8 @@ pub async fn serve(
         )),
         // Phrase sign-ins: generous, just enough to stop hammering.
         signin_limit: Arc::new(auth::ratelimit::SignupLimit::new(200)),
+        // A guest's project page polls its chat every few seconds: an hour is ~1,500 reads.
+        read_limit: Arc::new(auth::ratelimit::SignupLimit::new(20_000)),
         config: Arc::new(config),
         node,
     };
