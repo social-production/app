@@ -4,6 +4,7 @@
   import { resolve } from '$app/paths';
 
   import ContentMetaRow from './ContentMetaRow.svelte';
+  import CountPill from './CountPill.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import SignalStrip from './SignalStrip.svelte';
@@ -27,6 +28,9 @@
     <FeedCardTop tags={card.tags} stage={card.phase} />
     <a class="title" href={resolve('/projects/[id]', { id: card.id })}>{card.title}</a>
     <p class="summary">{card.summary}</p>
+    {#if card.latestUpdate}
+      <p class="latest-summary">Latest: {card.latestUpdate}</p>
+    {/if}
     <div class="footer">
       <div class="engagement-row feed-corner-actions">
         <SignalStrip
@@ -37,6 +41,12 @@
           disabled={!takesSignals(card.mode)}
           {onSignal}
         />
+        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + web's ?tab=chat -->
+        <a class="comment-link" href={`${href}?tab=chat`}>
+          <CountPill
+            label={`${card.commentCount} ${card.commentCount === 1 ? 'comment' : 'comments'}`}
+          />
+        </a>
       </div>
       <div class="footer-meta">
         <ContentMetaRow

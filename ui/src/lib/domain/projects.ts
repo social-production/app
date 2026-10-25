@@ -37,6 +37,10 @@ export interface ProjectCard {
   opposition: number;
   createdAt: number;
   lastActivityAt: number;
+  /** The newest applied update's text (web's `latestDescription`), if any. */
+  latestUpdate: string | null;
+  /** Messages in the project chat (web's `commentCount`; counts up to the chat's page size). */
+  commentCount: number;
 }
 
 export interface Project {

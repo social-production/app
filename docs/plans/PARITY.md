@@ -18,10 +18,12 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 ## Feed
 - [ ] Toolbar: web has a scope (globe) button first; the app starts at filter.
-- [ ] Cards: web shows the author top-left (`ContentMetaRow`), a ⋮ menu (report) top-right, and
-  a comments-count button beside the vote strip; the bottom right shows place/community,
-  members and date. The app shows tags top-left and the creator bottom-right, no ⋮, no
-  comments count. Check web's `ProjectCard.svelte` + `FeedCardTop.svelte` before porting.
+- [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
+  the gateway index (`commentCount` counts up to the chat's 200-message page).
+- [x] Cards: layout already matched (channel/community tags top-left, author + members + date
+  bottom-right).
+- [ ] Cards: web's ⋮ `ReportControl` (copy link, report) top-right. Comes with M6 moderation;
+  "copy link" alone could come sooner.
 - [ ] Event, activity and plan cards (web's feed mixes them); the app lists projects only (M5).
 
 ## Not compared yet

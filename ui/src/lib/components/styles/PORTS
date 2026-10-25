@@ -12,6 +12,7 @@ cards.css         .vote-strip     web/src/lib/components/cards/shared/VoteStrip.
 cards.css         .content-meta-row web/src/lib/components/shared/ContentMetaRow.svelte
 cards.css         .project-card   web/src/lib/components/cards/public-feed/ProjectCard.svelte
 cards.css         .tag-list       web/src/lib/components/cards/shared/TagList.svelte
+cards.css         .surface        web/src/lib/components/cards/shared/CountPill.svelte
 feed.css          .feed-page      web/src/lib/features/public-feed/PublicFeed.svelte
 icon-menu.css     .icon-menu-shell web/src/lib/components/shared/IconMenuButton.svelte
 fab.css           .create-fab     web/src/lib/app/shell/CreateFab.svelte
