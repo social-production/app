@@ -83,3 +83,8 @@ shell/more-sheet.css .more-sheet-root web/src/lib/app/shell/MobileMoreSheet.svel
 about.css         .about-page     web/src/lib/features/about/AboutPage.svelte
 search.css        .search-page    web/src/lib/features/search/SearchPage.svelte
 search.css        .search-page    web/src/lib/features/search/SearchSuggestionsList.svelte
+feedback.css      .feedback-page  web/src/lib/features/feedback/FeedbackPage.svelte
+feedback.css      .feedback-card  web/src/lib/components/cards/feedback/FeedbackCard.svelte
+feedback.css      .feedback-strip web/src/lib/components/shared/FeedbackVoteStrip.svelte
+feedback.css      .feedback-sheet web/src/lib/components/shared/FeedbackComposeSheet.svelte
+feedback.css      .feedback-sheet web/src/lib/components/shared/FeedbackDetailSheet.svelte

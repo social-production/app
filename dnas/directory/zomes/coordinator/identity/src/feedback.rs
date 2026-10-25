@@ -1,7 +1,7 @@
 //! Platform feedback (ADR 0054). Items hang off a "feedback" anchor; votes are links from an
 //! item to the voter, the newest per voter counting. Sorting (web's trending rule) is the UI's.
 
-use std::collections::BTreeMap;
+use std::collections::{BTreeMap, BTreeSet};
 
 use hdk::prelude::*;
 use identity_integrity::{EntryTypes, Feedback, FeedbackKind, LinkTypes, VOTE_DOWN, VOTE_UP};
@@ -87,7 +87,8 @@ pub fn get(id: ActionHash) -> ExternResult<Option<FeedbackView>> {
     }))
 }
 
-/// Each voter's newest vote and when they cast it.
+/// Each voter's newest vote and when they cast it. The caller's own vote comes from their
+/// chain: network reads lag right after a write.
 fn newest_votes(
     id: &ActionHash,
 ) -> ExternResult<BTreeMap<AgentPubKey, (VoteDirection, Timestamp)>> {
@@ -98,23 +99,72 @@ fn newest_votes(
         let Some(voter) = link.target.into_agent_pub_key() else {
             continue;
         };
-        let direction = match link.tag.0.as_slice() {
-            [VOTE_UP] => VoteDirection::Up,
-            [VOTE_DOWN] => VoteDirection::Down,
-            _ => continue,
-        };
-        votes.insert(voter, (direction, link.timestamp));
+        if let Some(direction) = direction_of(&link.tag) {
+            votes.insert(voter, (direction, link.timestamp));
+        }
     }
+    let me = agent_info()?.agent_initial_pubkey;
+    match own_vote(id)? {
+        Some(vote) => votes.insert(me, vote),
+        None => votes.remove(&me),
+    };
     Ok(votes)
+}
+
+fn direction_of(tag: &LinkTag) -> Option<VoteDirection> {
+    match tag.0.as_slice() {
+        [VOTE_UP] => Some(VoteDirection::Up),
+        [VOTE_DOWN] => Some(VoteDirection::Down),
+        _ => None,
+    }
+}
+
+/// The caller's live vote links on `id`, straight from their chain.
+fn own_vote_links(id: &ActionHash) -> ExternResult<Vec<(ActionHash, LinkTag, Timestamp)>> {
+    let scoped: ScopedLinkType = LinkTypes::FeedbackVotes.try_into()?;
+    let removed: BTreeSet<ActionHash> =
+        query(ChainQueryFilter::new().action_type(ActionType::DeleteLink))?
+            .iter()
+            .filter_map(|r| match &r.action().data {
+                ActionData::DeleteLink(d) => Some(d.link_add_address.clone()),
+                _ => None,
+            })
+            .collect();
+    let base = AnyLinkableHash::from(id.clone());
+    Ok(
+        query(ChainQueryFilter::new().action_type(ActionType::CreateLink))?
+            .iter()
+            .filter(|r| !removed.contains(r.action_address()))
+            .filter_map(|r| match &r.action().data {
+                ActionData::CreateLink(c)
+                    if c.zome_index == scoped.zome_index
+                        && c.link_type == scoped.zome_type
+                        && c.base_address == base =>
+                {
+                    Some((
+                        r.action_address().clone(),
+                        c.tag.clone(),
+                        r.action().timestamp(),
+                    ))
+                }
+                _ => None,
+            })
+            .collect(),
+    )
+}
+
+fn own_vote(id: &ActionHash) -> ExternResult<Option<(VoteDirection, Timestamp)>> {
+    Ok(own_vote_links(id)?
+        .into_iter()
+        .max_by_key(|(_, _, at)| *at)
+        .and_then(|(_, tag, at)| Some((direction_of(&tag)?, at))))
 }
 
 /// Replace the caller's vote on an item (or clear it).
 pub fn vote(input: FeedbackVote) -> ExternResult<Option<FeedbackView>> {
     let me = agent_info()?.agent_initial_pubkey;
-    for link in links(input.id.clone(), LinkTypes::FeedbackVotes)? {
-        if link.author == me {
-            delete_link(link.create_link_hash, GetOptions::default())?;
-        }
+    for (hash, _, _) in own_vote_links(&input.id)? {
+        delete_link(hash, GetOptions::default())?;
     }
     if let Some(direction) = input.direction {
         let tag = if direction == VoteDirection::Up {

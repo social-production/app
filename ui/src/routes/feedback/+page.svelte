@@ -1,5 +1,8 @@
 <script lang="ts">
-  import RouteStub from '#lib/components/shell/RouteStub.svelte';
+  import AccountGate from '#lib/features/account/AccountGate.svelte';
+  import FeedbackPage from '#lib/features/feedback/FeedbackPage.svelte';
 </script>
 
-<RouteStub title="Feedback" body="Feedback posts arrive with discussions in M4." />
+<AccountGate guests>
+  <FeedbackPage />
+</AccountGate>

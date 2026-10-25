@@ -36,8 +36,10 @@ pub fn edges(base: &AgentPubKey, link_type: LinkTypes) -> ExternResult<Vec<Edge>
         .collect())
 }
 
-/// The caller's own live links of `link_type`, straight from their chain.
+/// The caller's own live links of `link_type`, straight from their chain. `other` is the
+/// person the link is about: the base for `Followers` (which point at their author).
 pub fn own_edges(link_type: LinkTypes) -> ExternResult<Vec<Edge>> {
+    let about_base = matches!(link_type, LinkTypes::Followers);
     let scoped: ScopedLinkType = link_type.try_into()?;
     let removed: BTreeSet<ActionHash> =
         query(ChainQueryFilter::new().action_type(ActionType::DeleteLink))?
@@ -55,8 +57,13 @@ pub fn own_edges(link_type: LinkTypes) -> ExternResult<Vec<Edge>> {
             ActionData::CreateLink(c)
                 if c.zome_index == scoped.zome_index && c.link_type == scoped.zome_type =>
             {
+                let other = if about_base {
+                    &c.base_address
+                } else {
+                    &c.target_address
+                };
                 Some(Edge {
-                    other: c.target_address.clone().into_agent_pub_key()?,
+                    other: other.clone().into_agent_pub_key()?,
                     at: r.action().timestamp().as_micros(),
                     hash: r.action_address().clone(),
                 })

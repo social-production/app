@@ -41,7 +41,8 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [ ] Profile feed cards: web uses `PersonalFeedCard` there (author row with avatar inside the
   card); the app reuses the public `ProjectCard`. Port it when events/activities join the
   profile feed (M5).
-- [ ] Followers / following counts and Follow (web's follows aren't ported yet).
+- [x] Followers / following counts with people sheets, the Follow / Requested / Following
+  button and the Follow requests card on your own profile (M5a, ADR 0054).
 
 ## Feed
 - [ ] Toolbar: web's scope menu (globe: Home / Global / Region) comes first. The app is Global
@@ -64,14 +65,18 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Notifications: web's switches for the categories the app has kinds for (Comments, Votes
   needed, Phase finished), per device; off hides those cards and their bell count.
 - [ ] Notifications still to come: web's "Plan became leading" (off by default; the app could now
-  derive `prj-plan-lead`, ADR 0046 left it out for lack of settings), follows, shares/invites,
-  roles.
-- [ ] Follow requests and Privacy (profile activity visibility): need follows.
+  derive `prj-plan-lead`, ADR 0046 left it out for lack of settings), shares/invites, roles.
+- [x] Follows notifications switch (M5a).
+- [x] Follow requests and Privacy's "Require approval to follow you" (M5a). Privacy's three
+  "hide … from non-followers / personal feeds" switches wait for personal posts and the
+  personal feed.
 
 ## Notifications and Messages pages
 - [x] Notifications page: same header, intro, "Mark all read" and card list as web's
-  `NotificationsPage.svelte` (compared from source; web adds follow-request accept/decline on
-  cards, which comes with follows).
+  `NotificationsPage.svelte` (compared from source), with follow cards and their
+  Accept follower / Decline actions (M5a).
+- [x] Feedback page: web's `FeedbackPage` (filter, sort, compose and detail sheets, votes),
+  readable by guests (M5a).
 - [x] Messages: ported in M4c (ADR 0043–0051); no new differences found.
 
 ## Desktop (1280px, compared with live web signed out)
@@ -82,5 +87,5 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 ## Not compared yet
 Signed-in screens other than Settings and Notifications (compare from web's source; don't create
-accounts on the FastAPI site). Everything left above waits on features: follows, channels and
+accounts on the FastAPI site). Everything left above waits on features: the personal feed, channels and
 communities (M5), places and moderation (M6).

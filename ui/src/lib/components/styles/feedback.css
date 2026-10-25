@@ -1,0 +1,637 @@
+/* Ported from web/src/lib/features/feedback/FeedbackPage.svelte (ADR 0032, scripts/port-styles.py) */
+.feedback-page {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  padding: 20px 0 32px;
+}
+
+.feedback-page .page-hero {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.feedback-page .hero-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.feedback-page .eyebrow {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.feedback-page h1 {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 38px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.feedback-page .hero-body {
+  max-width: 54ch;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.feedback-page .hero-body a {
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+.feedback-page .create-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid color-mix(in srgb, var(--brand) 72%, transparent);
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.feedback-page .toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px;
+}
+
+.feedback-page .feedback-list {
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
+  border-top: 1px solid color-mix(in srgb, var(--panel-border) 72%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 72%, transparent);
+}
+
+.feedback-page .status-card {
+  margin: 0 16px;
+  padding: 14px 16px;
+  border: 1px solid color-mix(in srgb, var(--panel-border) 80%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--panel-soft) 58%, transparent);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.feedback-page .status-card.warning {
+  border-color: color-mix(in srgb, var(--accent-warm) 36%, var(--panel-border));
+  color: var(--text-main);
+}
+
+@media (max-width: 760px) {
+  .feedback-page .page-hero {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .feedback-page .create-button {
+    justify-content: center;
+    width: 100%;
+  }
+}
+
+/* Ported from web/src/lib/components/cards/feedback/FeedbackCard.svelte (ADR 0032, scripts/port-styles.py) */
+.feedback-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: clip;
+  outline: none;
+}
+
+.feedback-card:focus-visible {
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 30%, transparent);
+}
+
+.feedback-card .kind {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  padding-top: 2px;
+  color: var(--text-soft);
+}
+
+.feedback-card .kind .toolbar-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.feedback-card .kind.bug {
+  color: color-mix(in srgb, var(--accent-warm) 88%, var(--text-main));
+}
+
+.feedback-card .kind.suggestion {
+  color: var(--brand-strong);
+}
+
+.feedback-card .title-wrap {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.feedback-card .feedback-title {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.feedback-card .votes {
+  flex: 0 0 auto;
+  padding-top: 2px;
+}
+
+/* Ported from web/src/lib/components/shared/FeedbackVoteStrip.svelte (ADR 0032, scripts/port-styles.py) */
+.feedback-strip .vote-strip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  transition:
+    border-color 120ms ease,
+    background-color 120ms ease;
+}
+
+.feedback-strip .vote-strip:hover {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 78%, var(--panel-strong));
+}
+
+.feedback-strip .vote-strip.disabled {
+  opacity: 0.6;
+}
+
+.feedback-strip .vote-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease;
+}
+
+.feedback-strip .vote-button:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand-soft) 78%, var(--panel-strong));
+  color: var(--brand-strong);
+  box-shadow: inset 0 0 0 1px var(--brand);
+}
+
+.feedback-strip .vote-button:disabled {
+  cursor: not-allowed;
+}
+
+.feedback-strip .vote-strip:not(.labeled):not(.docked) {
+  flex: 0 0 auto;
+}
+
+.feedback-strip .signal-strip {
+  gap: 4px;
+  padding: 4px 6px;
+}
+
+.feedback-strip .signal-percent {
+  box-sizing: content-box;
+  width: 4ch;
+  min-width: 4ch;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.feedback-strip .signal-strip.labeled {
+  gap: 8px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.feedback-strip .signal-strip.labeled:hover {
+  border: none;
+  background: transparent;
+}
+
+.feedback-strip .signal-strip.labeled .vote-button {
+  width: auto;
+  min-width: 72px;
+  min-height: 28px;
+  padding: 4px 10px;
+  gap: 4px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  font-size: 12px;
+}
+
+.feedback-strip .signal-strip.labeled .vote-button:hover:not(:disabled) {
+  border-color: var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 78%, var(--panel-strong));
+  color: var(--text-main);
+}
+
+.feedback-strip .signal-strip.docked {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.feedback-strip .signal-strip.docked:hover {
+  border: none;
+  background: transparent;
+}
+
+.feedback-strip .signal-strip.docked .vote-button {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 44px;
+  align-self: stretch;
+  padding: 0 12px;
+  gap: 6px;
+  border: 0;
+  border-radius: 0;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.feedback-strip .signal-strip.docked .vote-button:hover:not(:disabled) {
+  filter: brightness(1.12);
+}
+
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button,
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:hover:not(:disabled),
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:focus,
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:focus-visible {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child,
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:hover:not(:disabled),
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:focus,
+.feedback-strip
+  .signal-strip.docked:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:focus-visible {
+  background: var(--danger);
+  color: white;
+}
+
+.feedback-strip .signal-strip.docked:has(.active-support) .vote-button,
+.feedback-strip .signal-strip.docked:has(.active-oppose) .vote-button,
+.feedback-strip .signal-strip.docked:has(.active-support) .vote-button:hover:not(:disabled),
+.feedback-strip .signal-strip.docked:has(.active-oppose) .vote-button:hover:not(:disabled),
+.feedback-strip .signal-strip.docked:has(.active-support) .vote-button:focus,
+.feedback-strip .signal-strip.docked:has(.active-oppose) .vote-button:focus,
+.feedback-strip .signal-strip.docked:has(.active-support) .vote-button:focus-visible,
+.feedback-strip .signal-strip.docked:has(.active-oppose) .vote-button:focus-visible {
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.feedback-strip
+  .signal-strip.docked
+  .vote-button:not(.active-support):not(.active-oppose)
+  .signal-label,
+.feedback-strip
+  .signal-strip.docked
+  .vote-button:not(.active-support):not(.active-oppose)
+  .signal-count {
+  color: inherit;
+}
+
+.feedback-strip .signal-strip.docked .vote-button.active-support,
+.feedback-strip .signal-strip.docked .vote-button.active-support:hover:not(:disabled),
+.feedback-strip .signal-strip.docked .vote-button.active-support:focus,
+.feedback-strip .signal-strip.docked .vote-button.active-support:focus-visible {
+  background: var(--panel-strong);
+  color: #22c55e;
+}
+
+.feedback-strip .signal-strip.docked .vote-button.active-support .signal-label,
+.feedback-strip .signal-strip.docked .vote-button.active-support .signal-count {
+  color: #22c55e;
+}
+
+.feedback-strip .signal-strip.docked .vote-button.active-oppose,
+.feedback-strip .signal-strip.docked .vote-button.active-oppose:hover:not(:disabled),
+.feedback-strip .signal-strip.docked .vote-button.active-oppose:focus,
+.feedback-strip .signal-strip.docked .vote-button.active-oppose:focus-visible {
+  background: var(--panel-strong);
+  color: #ef4444;
+}
+
+.feedback-strip .signal-strip.docked .vote-button.active-oppose .signal-label,
+.feedback-strip .signal-strip.docked .vote-button.active-oppose .signal-count {
+  color: #ef4444;
+}
+
+.feedback-strip .signal-strip.docked .signal-percent {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  justify-content: center;
+  width: auto;
+  min-width: 72px;
+  height: 100%;
+  min-height: 44px;
+  padding: 0 18px;
+  border-right: 1px solid var(--panel-border);
+  border-left: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.feedback-strip .signal-strip.docked .signal-label,
+.feedback-strip .signal-strip.docked .signal-count {
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.feedback-strip .signal-label,
+.feedback-strip .signal-count {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.feedback-strip .signal-count {
+  color: var(--text-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.feedback-strip .active-support {
+  color: #22c55e;
+}
+
+.feedback-strip .active-oppose {
+  color: #ef4444;
+}
+
+@media (max-width: 760px) {
+  .feedback-strip .vote-strip:not(.labeled):not(.docked) {
+    gap: 4px;
+    min-height: 24px;
+    padding: 2px 4px;
+    border-color: color-mix(in srgb, var(--panel-border) 88%, transparent);
+  }
+
+  .feedback-strip .vote-strip:not(.labeled):not(.docked) .vote-button {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .feedback-strip .vote-strip:not(.docked) .signal-percent {
+    width: 4ch;
+    min-width: 4ch;
+    font-size: 10px;
+  }
+
+  .feedback-strip .signal-strip.labeled .vote-button {
+    min-width: 64px;
+    min-height: 26px;
+    padding: 3px 8px;
+  }
+
+  .feedback-strip .signal-strip.docked .vote-button {
+    min-height: 52px;
+  }
+}
+
+/* Ported from web/src/lib/components/shared/FeedbackComposeSheet.svelte (ADR 0032, scripts/port-styles.py) */
+.feedback-sheet .feedback-form {
+  display: grid;
+  gap: 16px;
+  padding: 8px 16px 4px;
+}
+
+.feedback-sheet .field {
+  display: grid;
+  gap: 8px;
+}
+
+.feedback-sheet .field-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.feedback-sheet .type-switcher {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.feedback-sheet .type-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease,
+    color 120ms ease;
+}
+
+.feedback-sheet .type-option.active {
+  border-color: color-mix(in srgb, var(--brand) 62%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand) 12%, var(--panel));
+  color: var(--text-main);
+}
+
+.feedback-sheet input,
+.feedback-sheet textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+}
+
+.feedback-sheet textarea {
+  resize: vertical;
+  min-height: 140px;
+}
+
+.feedback-sheet .warning-card {
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--status-yellow) 50%, var(--panel-border));
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--status-yellow) 14%, var(--panel-strong));
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/components/shared/FeedbackDetailSheet.svelte (ADR 0032, scripts/port-styles.py) */
+.feedback-sheet .sheet-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.feedback-sheet .kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.feedback-sheet .kind .toolbar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.feedback-sheet .kind.bug {
+  color: color-mix(in srgb, var(--accent-warm) 88%, var(--text-main));
+}
+
+.feedback-sheet .kind.suggestion {
+  color: var(--brand-strong);
+}
+
+.feedback-sheet .sheet-byline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.feedback-sheet .detail-stack {
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 16px 16px 20px;
+}
+
+.feedback-sheet .detail-title {
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.feedback-sheet .description {
+  margin: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  color: color-mix(in srgb, var(--text-main) 86%, var(--text-soft));
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+
+.feedback-sheet .overlay-footer:has(.vote-dock) {
+  padding: 0;
+}
+
+.feedback-sheet .vote-dock {
+  display: flex;
+  width: 100%;
+  height: auto;
+  min-height: 56px;
+}
+
+.feedback-sheet .vote-dock .signal-strip.docked {
+  flex: 1 1 auto;
+}

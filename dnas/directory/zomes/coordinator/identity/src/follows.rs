@@ -85,15 +85,14 @@ pub fn follow(target: AgentPubKey) -> ExternResult<Option<FollowStatus>> {
     my_status(&target)
 }
 
+/// Delete both links of the caller's follow (from their own chain, so a follow made a moment
+/// ago is found too).
 pub fn unfollow(target: AgentPubKey) -> ExternResult<()> {
-    let me = agent_info()?.agent_initial_pubkey;
-    for edge in my_follow_of(&target)? {
+    let mirrors = own_edges(LinkTypes::Followers)?
+        .into_iter()
+        .filter(|e| e.other == target);
+    for edge in my_follow_of(&target)?.into_iter().chain(mirrors) {
         delete_link(edge.hash, GetOptions::default())?;
-    }
-    for edge in edges(&target, LinkTypes::Followers)? {
-        if edge.other == me {
-            delete_link(edge.hash, GetOptions::default())?;
-        }
     }
     Ok(())
 }
