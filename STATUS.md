@@ -602,12 +602,11 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. **Parity pass** (checklist: `docs/plans/PARITY.md`): compare the screens under "Not
-   compared yet" (settings, notifications, messages; signed in, from web's source), then the
-   open items (⋮ report menu needs M6; profile feed cards; scope menu).
-2. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
-   Batch the next project-DNA integrity change with project-chat attachments and private
-   read marks (ADR 0049/0044).
+1. **Parity pass** (checklist: `docs/plans/PARITY.md`): what's left there waits on features
+   (follows, scopes, places, moderation); pick items up as their features land.
+2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset),
+   M5b activities and roles + the waiting project-chat items (one project reset), M5c events
+   and help requests, M5d communities and channels. Each starts with its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.
 4. CI: scenarios run in 4 shards (~80 min worst); add shards if one nears 120 min.
