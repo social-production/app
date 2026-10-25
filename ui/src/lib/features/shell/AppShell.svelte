@@ -18,6 +18,7 @@
   import { myNotifications } from '#lib/services/notifications.ts';
   import { getPerson } from '#lib/services/people.ts';
   import { unreadMessageCount } from '#lib/services/unread.ts';
+  import { applyAppearance, appearance } from '#lib/stores/appearance.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
@@ -73,6 +74,16 @@
     apply();
     media.addEventListener('change', apply);
     return () => media.removeEventListener('change', apply);
+  });
+
+  // web's root layout: apply the appearance settings; "system" keeps following the device.
+  $effect(() => {
+    const query = window.matchMedia('(prefers-color-scheme: dark)');
+    const apply = (): void => applyAppearance(query.matches);
+    void [appearance.theme, appearance.accent, appearance.font, appearance.textSize];
+    apply();
+    query.addEventListener('change', apply);
+    return () => query.removeEventListener('change', apply);
   });
 
   // Connect in the background on every page; public pages work signed out (as on web).
