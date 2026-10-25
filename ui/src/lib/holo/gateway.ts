@@ -88,4 +88,5 @@ export const gatewayApi = {
   resume: (g: string, signingKey: number[]) => post<Resumed>(g, '/session/resume', { signingKey }),
   cells: (g: string, body: CellsBody) => post<{ granted: number }>(g, '/session/cells', body),
   projects: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/projects', query),
+  people: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/people', query),
 };

@@ -5,6 +5,7 @@ mod archivist;
 mod bundle;
 mod hosting;
 mod index;
+mod people;
 mod public;
 mod release;
 mod restore;
@@ -24,6 +25,7 @@ use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
 pub use index::{ProjectCard, ProjectIndex};
+pub use people::{PeopleIndex, PersonCard};
 pub use public::{PublicRead, Refused};
 
 use crate::config::Config;
@@ -38,6 +40,8 @@ pub struct Node {
     coordinators: Arc<BTreeMap<String, CoordinatorBundle>>,
     /// Feed index over every project the archivist holds (refreshed in the background).
     pub index: ProjectIndex,
+    /// Names and bios of everyone in the directory, for search (refreshed every minute).
+    pub people: PeopleIndex,
 }
 
 impl std::fmt::Debug for Node {
@@ -77,6 +81,7 @@ impl Node {
             happ_version: info.version,
             coordinators: Arc::new(info.coordinators),
             index: ProjectIndex::default(),
+            people: PeopleIndex::default(),
         };
         node.ensure_app_interface(config.app_ws_port).await?;
         let removed = Box::pin(node.remove_stale_apps()).await?;

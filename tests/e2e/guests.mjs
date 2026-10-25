@@ -45,6 +45,15 @@ for (let i = 0; i < 20 && !(await pill.count()); i++) {
   await guest.reload();
 }
 await pill.waitFor();
+// web's profile feed: the author link opens Ann's profile, which lists her project.
+await card.locator('.content-meta-row a').first().click();
+await guest.waitForURL(/\/profile\//);
+await guest.locator('.feed-stack .project-card', { hasText: title }).waitFor({ timeout: 60_000 });
+await guest.screenshot({ path: `${out}/phone390-guest-profile-feed.png` });
+const authors = await guest.locator('.feed-stack .content-meta-row a').allInnerTexts();
+assert.deepEqual([...new Set(authors)], [`ann${stamp}`], 'only her projects');
+await guest.goBack();
+log('the guest saw the project on its author\'s profile');
 await card.locator('a.title').click();
 await guest.getByRole('heading', { name: title }).waitFor({ timeout: 60_000 });
 assert.equal(new URL(guest.url()).pathname, new URL(projectUrl).pathname);

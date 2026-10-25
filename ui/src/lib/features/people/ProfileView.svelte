@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import CopyKey from '#lib/components/CopyKey.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
@@ -12,7 +14,8 @@
   import '#lib/components/styles/profile.css';
 
   /** web's profile page: hero with standing chip, and the Message and Vouch actions for others. */
-  let { agent }: { agent: string } = $props();
+  /** `children`: what the route shows under the header (the person's feed). */
+  let { agent, children }: { agent: string; children?: Snippet | undefined } = $props();
 
   let person = $state<Person>();
   let me = $state<Person>();
@@ -32,7 +35,8 @@
     try {
       const [p, pairing, mine] = await Promise.all([
         getPerson(agent),
-        pairingOf(agent),
+        // Guests can't read devices (holo/guest.ts allowlist); the hero then shows one.
+        pairingOf(agent).catch(() => ({ primary: null, devices: [] })),
         myAgent ? getPerson(myAgent) : Promise.resolve(undefined),
       ]);
       person = p;
@@ -68,7 +72,8 @@
       {@const shown = person}
       <ProfileHero person={shown} {devices}>
         {#snippet actions()}
-          {#if !own}
+          <!-- As on web, guests see no actions on someone's profile. -->
+          {#if !own && me}
             <div class="action-row">
               {#if me && me.standing.level !== 'Paused'}
                 <MessageButton
@@ -115,6 +120,7 @@
       <p class="end-copy">Loading…</p>
     {/if}
     {#if error}<p class="warning-card">{error}</p>{/if}
+    {@render children?.()}
   </section>
 </div>
 

@@ -1,7 +1,10 @@
 <script lang="ts">
-  import ProjectFeed from '#lib/features/projects/ProjectFeed.svelte';
+  import SearchPage from '#lib/features/search/SearchPage.svelte';
 
   import { page } from '$app/state';
 </script>
 
-<ProjectFeed search={page.url.searchParams.get('q') ?? ''} />
+<SearchPage
+  query={page.url.searchParams.get('q') ?? ''}
+  typeParam={page.url.searchParams.get('type')}
+/>

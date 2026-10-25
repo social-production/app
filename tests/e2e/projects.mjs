@@ -81,7 +81,18 @@ await ann.getByRole('button', { name: 'Close' }).last().click();
 log('Ann sees Bob in the members sheet');
 
 // Edits are proposals since M3: tests/e2e/governance.mjs covers them.
-await waitInFeed(bob, title, `/search?q=seeds`);
+// web's Search page: a tag finds the project as a result row.
+for (let i = 0; ; i++) {
+  await bob.goto(`${BASE}/search?q=seeds`);
+  await bob.getByRole('heading', { name: 'Search', exact: true }).waitFor();
+  const row = bob.locator('.result-card', { hasText: title });
+  try {
+    await row.waitFor({ timeout: 10_000 });
+    break;
+  } catch (e) {
+    if (i >= 12) throw e;
+  }
+}
 log('search by tag finds the project');
 
 await createProject(ann, `Second ${stamp}`, 'x');
