@@ -625,7 +625,8 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 Port each screen from web (Owner decisions); compare at 390px with live web first.
 1. **Parity pass** (checklist: `docs/plans/PARITY.md`): what's left there waits on features
    (follows, scopes, places, moderation); pick items up as their features land.
-2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset),
+2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset;
+   ADR 0054 drafted as **proposed**, build it next),
    M5b activities and roles + the waiting project-chat items (one project reset), M5c events
    and help requests, M5d communities and channels. Each starts with its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
