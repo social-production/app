@@ -10,6 +10,7 @@
   import CreateFab, { type CreateLink } from '#lib/components/shell/CreateFab.svelte';
   import LeftRail from '#lib/components/shell/LeftRail.svelte';
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
+  import MobileMoreSheet from '#lib/components/shell/MobileMoreSheet.svelte';
   import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
   import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
@@ -34,6 +35,7 @@
   let compact = $state(true);
   let leftOpen = $state(false);
   let rightOpen = $state(false);
+  let moreOpen = $state(false);
 
   const signedIn = $derived(connection.current.status === 'connected');
   // "Sign in / Sign up" hides the intro banner; the sign-in card below it stays.
@@ -128,6 +130,12 @@
     if (compact && leftOpen) rightOpen = false;
   }
 
+  /** web's toggleMoreSheet: the phone "More" tab opens its own sheet, closing the rails. */
+  function toggleMore(): void {
+    moreOpen = !moreOpen;
+    if (moreOpen) leftOpen = rightOpen = false;
+  }
+
   function toggleRight(): void {
     rightOpen = !rightOpen;
     if (compact && rightOpen) leftOpen = false;
@@ -199,9 +207,21 @@
     <MobileBottomNav
       {tabs}
       {isActive}
-      moreActive={leftOpen}
-      onMore={toggleLeft}
-      onNavigate={closeCompact}
+      moreActive={moreOpen}
+      onMore={toggleMore}
+      onNavigate={() => {
+        closeCompact();
+        moreOpen = false;
+      }}
+    />
+    <MobileMoreSheet
+      open={moreOpen}
+      viewer={signedIn ? { name: viewer.name, href: resolve('/profile') } : null}
+      signInHref={resolve('/onboarding')}
+      settingsHref={resolve('/settings')}
+      aboutHref={resolve('/about')}
+      {isActive}
+      onClose={() => (moreOpen = false)}
     />
   {/if}
   <AuthActionNotice />

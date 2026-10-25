@@ -78,3 +78,4 @@ notifications.css .notifications-page web/src/lib/features/notifications/Notific
 notifications.css .notification-card web/src/lib/components/cards/inbox/NotificationCard.svelte
 photo-viewer.css  .photo-viewer   web/src/lib/components/shared/PhotoViewer.svelte
 notice.css        .auth-action-notice web/src/lib/components/shared/AuthActionNotice.svelte
+shell/more-sheet.css .more-sheet-root web/src/lib/app/shell/MobileMoreSheet.svelte

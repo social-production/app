@@ -1,0 +1,74 @@
+/* Ported from web/src/lib/app/shell/MobileMoreSheet.svelte (ADR 0032, scripts/port-styles.py) */
+.more-sheet-root .sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  border: none;
+  padding: 0;
+  background: var(--shell-scrim);
+}
+
+.more-sheet-root .more-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sheet);
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  padding-top: var(--shell-safe-top, 0px);
+  background: var(--panel);
+}
+
+.more-sheet-root .sheet-x {
+  position: absolute;
+  top: calc(8px + var(--shell-safe-top, 0px));
+  right: 8px;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.more-sheet-root .sheet-links {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: repeat(3, minmax(96px, 1fr));
+  gap: 0;
+}
+
+.more-sheet-root .sheet-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  min-height: 96px;
+  padding: 0 24px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: var(--panel);
+  color: var(--text-main);
+  font-size: 20px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.more-sheet-root .sheet-link svg {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+}
+
+.more-sheet-root .sheet-link:hover,
+.more-sheet-root .sheet-link.active-link {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
