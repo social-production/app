@@ -31,7 +31,24 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: parity batch, branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-25: Search page, guest profiles, profile feed, branch `claude/social-production-handoff-dsam61`
+From `docs/plans/PARITY.md`:
+- web's Search page (`features/search/SearchPage.svelte`, `components/search/*`,
+  `services/search.ts`, `styles/search.css`): people + projects, live suggestions, kind filter
+  (All / Projects / Users), web's empty-query chips. People come from a new gateway index
+  (`node/people.rs`, `GET /index/people?q=`, the archivist re-reads profiles every minute), so
+  guests search too. The "+" follows web's `isFeedDiscoveryPath` (not on search any more).
+- Guests open profiles (`/profile/[agent]`, `AccountGate guests`; no actions, no device count).
+- Profile feed: web's toolbar and stack with the person's projects (`features/projects/
+  ProfileFeed.svelte`, composed by the profile routes; `/index/projects?creator=`).
+- Tests: `shell.mjs` searches a person as a guest and opens the profile; `guests.mjs` opens the
+  author's profile and checks it lists only their projects; `projects.mjs` searches by tag on
+  the Search page; `governance.mjs` reads Latest from the feed sorted Most recent.
+- Checked: `npm run check`/`lint`, sizes, boundaries; gateway fmt/clippy/tests (release, new
+  people + creator-filter tests); against a local release seed node: shell, guests, projects,
+  governance, accounts.
+
+## Done 2026-10-25: parity batch, PR #46 merged (~06:52 UTC / 5:52 pm Melbourne), deployed ~07:09 UTC; live `shell.mjs`, `guests.mjs`, `projects.mjs` passed
 From `docs/plans/PARITY.md` (the new checklist; compared with live web at 390px):
 - Phone More opens web's `MobileMoreSheet` (`components/shell/MobileMoreSheet.svelte`,
   `shell/more-sheet.css`), pixel-identical with web.
@@ -539,7 +556,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `0d9084d` (PR #45, deployed 2026-10-25 ~05:25 UTC, ~28 min after the merge; gateway). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `3f8bf6c` (PR #46, deployed 2026-10-25 ~07:09 UTC, ~17 min after the merge; gateway + UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -570,10 +587,10 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Next (roadmap order; set by the cloud session on 2026-10-25, see Owner direction)
 Port each screen from web (Owner decisions); compare at 390px with live web first.
-1. Merge the parity batch (In flight), smoke it live (`shell.mjs`, `guests.mjs`, `projects.mjs`).
-2. **Parity pass** (checklist: `docs/plans/PARITY.md`): next web's Search page (plan in the
-   checklist: a gateway people index), then compare the screens under "Not compared yet"
-   (profile, settings, notifications, messages).
+1. Merge the Search/profile batch (In flight), smoke it live (`shell.mjs`, `guests.mjs`, `projects.mjs`).
+2. **Parity pass** (checklist: `docs/plans/PARITY.md`): compare the screens under "Not
+   compared yet" (settings, notifications, messages; signed in, from web's source), then the
+   open items (⋮ report menu needs M6; profile feed cards; scope menu).
 3. Guests on profile pages, if web shows them signed out (same `/public/read` allowlist).
 4. M5 Work, from web: activities, roles, events, help + service requests, communities/channels.
    Batch the next project-DNA integrity change with project-chat attachments and private
