@@ -1,0 +1,265 @@
+/* Ported from web/src/lib/features/about/AboutPage.svelte (ADR 0032, scripts/port-styles.py) */
+.about-page .page {
+  display: grid;
+  gap: 20px;
+  box-sizing: border-box;
+  width: min(100%, 96ch);
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 8px var(--page-gutter) 48px;
+  overflow-x: clip;
+}
+
+.about-page .hero {
+  display: grid;
+  gap: 8px;
+}
+
+.about-page h1,
+.about-page h2,
+.about-page h3,
+.about-page p {
+  margin: 0;
+}
+
+.about-page h1 {
+  color: var(--text-main);
+  font-size: clamp(32px, 5vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+}
+
+.about-page .eyebrow {
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-page .reader {
+  display: grid;
+  gap: 0;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid var(--panel-border);
+  border-left: 0;
+  border-right: 0;
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.about-page .tab-row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 12px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel-strong);
+}
+
+.about-page .tab {
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 2px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  overflow: hidden;
+  font-size: clamp(9px, 1.1vw, 14px);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.about-page .tab-label-compact {
+  display: none;
+}
+
+@media (min-width: 761px) {
+  .about-page .tab {
+    overflow: visible;
+    font-size: 13px;
+    text-overflow: clip;
+  }
+}
+
+.about-page .phase-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.about-page .phase-heading h3 {
+  margin-top: 0;
+}
+
+.about-page .phase-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 0 9px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.about-page .phase-tag.current {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.about-page .essay {
+  display: grid;
+  gap: 14px;
+  padding: 28px 22px 22px;
+}
+
+.about-page h2 {
+  color: var(--text-main);
+  font-size: clamp(28px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.about-page h3 {
+  margin-top: 8px;
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.about-page p {
+  max-width: 68ch;
+  color: var(--text-main);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.65;
+}
+
+.about-page .definition-intro {
+  margin-top: 8px;
+  color: var(--text-main);
+  font-size: 19px;
+  font-weight: 700;
+  line-height: 1.5;
+}
+
+.about-page .definition {
+  display: grid;
+  gap: 6px;
+  margin-top: 4px;
+  padding: 16px;
+  border-left: 4px solid var(--brand);
+  background: color-mix(in srgb, var(--brand-soft) 58%, var(--panel));
+}
+
+.about-page .definition h3 {
+  margin-top: 0;
+  font-size: 22px;
+}
+
+.about-page .definition-label {
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  text-transform: uppercase;
+}
+
+.about-page a {
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+.about-page .discover {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 48px;
+  margin-top: 12px;
+  padding: 0 18px;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 16px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+@media (max-width: 760px) {
+  .about-page .page {
+    width: 100%;
+    gap: 12px;
+    padding: 12px 0 32px;
+  }
+
+  .about-page .hero {
+    padding: 0 16px;
+  }
+
+  .about-page h1 {
+    font-size: 32px;
+  }
+
+  .about-page .reader {
+    border-right: 0;
+    border-left: 0;
+    border-radius: 0;
+  }
+
+  .about-page .tab-row {
+    position: sticky;
+    top: var(--topbar-height, 56px);
+    z-index: var(--z-detail-tabs);
+    padding: 8px 12px;
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.22s ease;
+    will-change: transform;
+  }
+
+  .about-page .feed-chrome-collapsed .tab-row {
+    padding-top: calc(8px + var(--shell-safe-top, 0px));
+    transform: translate3d(0, calc(-1 * var(--topbar-height, 0px)), 0);
+  }
+
+  .about-page .tab-label-full {
+    display: none;
+  }
+
+  .about-page .tab-label-compact {
+    display: inline;
+  }
+
+  .about-page .essay {
+    padding: 22px 16px 20px;
+  }
+
+  .about-page p {
+    font-size: 16px;
+  }
+
+  .about-page .definition-intro {
+    font-size: 18px;
+  }
+
+  .about-page .discover {
+    width: 100%;
+  }
+}

@@ -23,9 +23,10 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   it used to show on every page.
 
 ## Pages
-- [ ] About: web's long About page with tabs (Purpose, Strategy, Roadmap, Costs, Gov, Mod,
-  Join) (`web/src/lib/features/about/*`, `routes/about`); the app has a one-paragraph stub.
-  Static content: port it as is, then adjust only facts that differ for the P2P app.
+- [x] About: web's About page with its tabs, ported with web's copy unchanged (pixel-identical
+  at 390px). **Owner review:** the copy describes web (Roadmap "Now: Web prototype, FastAPI
+  backend"; quorum from weekly actives, while the app counts full members, ADR 0033). Say if
+  the P2P app should say something different.
 - [ ] Search: web's own page (`features/search/SearchPage.svelte`: heading, search box with
   live suggestions, kind filter All/Projects/…/Users, result list). The app shows the feed
   filtered by the query. Projects come from `/index/projects?q=`; users from the directory.

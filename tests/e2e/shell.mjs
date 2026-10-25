@@ -24,6 +24,11 @@ await sheet(guest).getByRole('link', { name: 'About' }).click();
 await guest.waitForURL(/\/about$/);
 await sheet(guest).waitFor({ state: 'detached' });
 assert.equal(await guest.getByRole('complementary', { name: 'About Social Production' }).count(), 0, 'no intro on About');
+// web's About page: the essay in tabs, the open tab in ?section=.
+await guest.getByRole('heading', { name: /Collective coordination of activity/ }).waitFor();
+await guest.getByRole('tab', { name: /Strategy/ }).click();
+await guest.waitForURL(/section=strategy/);
+await guest.getByRole('heading', { name: 'Strategy', exact: true }).waitFor();
 log('signed out: More shows sign in and About');
 
 // web's isAuthSurface: onboarding shows only the brand.

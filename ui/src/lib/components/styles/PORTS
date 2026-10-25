@@ -80,3 +80,4 @@ notifications.css .notification-card web/src/lib/components/cards/inbox/Notifica
 photo-viewer.css  .photo-viewer   web/src/lib/components/shared/PhotoViewer.svelte
 notice.css        .auth-action-notice web/src/lib/components/shared/AuthActionNotice.svelte
 shell/more-sheet.css .more-sheet-root web/src/lib/app/shell/MobileMoreSheet.svelte
+about.css         .about-page     web/src/lib/features/about/AboutPage.svelte
