@@ -112,8 +112,13 @@
     });
   });
 
-  // As on web: the "+" sits on feed pages only (web's isFeedDiscoveryPath).
-  const showCreateFab = $derived(['/', '/search'].includes(page.url.pathname) && !authSurface);
+  // web's isFeedDiscoveryPath: the "+" sits on the feed, platform and profile pages (and
+  // channel/community feeds once they exist), never on onboarding.
+  const showCreateFab = $derived(
+    !authSurface &&
+      (['/', '/platform', '/profile'].includes(page.url.pathname) ||
+        /^\/(profile|channels|communities)\/[^/]+$/.test(page.url.pathname)),
+  );
   const createLinks: CreateLink[] = [
     {
       href: resolve('/create/project'),

@@ -133,7 +133,7 @@ impl Node {
         Ok(count)
     }
 
-    async fn archivist_app(&self, happ: &Path) -> anyhow::Result<AppInfo> {
+    pub(super) async fn archivist_app(&self, happ: &Path) -> anyhow::Result<AppInfo> {
         let id = format!("archivist-{}", self.happ_version);
         if let Some(app) = self.find_app(&id).await? {
             return Ok(app);

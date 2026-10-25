@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sp_index::{FeedQuery, Sort, Window};
 
 use super::{ApiResult, AppState};
-use crate::node::ProjectCard;
+use crate::node::{PersonCard, ProjectCard};
 
 const PAGE_MAX: usize = 50;
 
@@ -55,4 +55,20 @@ pub async fn projects(
     let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
     let (items, total) = state.node.index.page(&query, p.offset, limit).await;
     Ok(Json(FeedPage { items, total }))
+}
+
+#[derive(Deserialize)]
+pub struct PeopleParams {
+    #[serde(default)]
+    q: String,
+    limit: Option<usize>,
+}
+
+/// `GET /index/people?q=`: people whose name or bio matches, for web's Search page.
+pub async fn people(
+    State(state): State<AppState>,
+    Query(p): Query<PeopleParams>,
+) -> ApiResult<Vec<PersonCard>> {
+    let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
+    Ok(Json(state.node.people.search(&p.q, limit).await))
 }

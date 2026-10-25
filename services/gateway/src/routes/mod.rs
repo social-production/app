@@ -45,6 +45,7 @@ pub fn router(state: AppState) -> Router {
         .route("/session/resume", post(session::resume))
         .route("/session/cells", post(session::cells))
         .route("/index/projects", get(index::projects))
+        .route("/index/people", get(index::people))
         .route("/public/read", post(public::read))
         .route("/ws", get(ws_proxy::upgrade))
         // The UI is served from another origin (ui service, dev server).

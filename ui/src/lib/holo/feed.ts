@@ -7,3 +7,10 @@ export function projectFeed<T>(query: Record<string, string>): Promise<T> {
   if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
   return gatewayApi.projects<T>(gateway, query);
 }
+
+/** People whose name or bio matches, from the home node's index (GET /index/people). */
+export function peopleIndex<T>(query: Record<string, string>): Promise<T> {
+  const gateway = homeGateway();
+  if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
+  return gatewayApi.people<T>(gateway, query);
+}

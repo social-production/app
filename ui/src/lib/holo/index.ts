@@ -12,7 +12,7 @@ export {
   newProjectSeed,
   projectCell,
 } from './cells.ts';
-export { projectFeed } from './feed.ts';
+export { peopleIndex, projectFeed } from './feed.ts';
 export {
   callCell,
   callZome,

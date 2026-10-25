@@ -66,7 +66,7 @@ async fn background(node: node::Node, happ: std::path::PathBuf) {
         Err(e) => tracing::warn!(error = %e, "coordinator update failed"),
     }
     let mut last = usize::MAX;
-    loop {
+    for round in 0_u64.. {
         match Box::pin(node.archive_round(&happ)).await {
             Ok(count) if count != last => {
                 tracing::info!(projects = count, "project index refreshed");
@@ -74,6 +74,12 @@ async fn background(node: node::Node, happ: std::path::PathBuf) {
             }
             Ok(_) => {}
             Err(e) => tracing::warn!(error = %e, "archivist round failed"),
+        }
+        // People change less often than project counts: every fourth round (a minute).
+        if round % 4 == 0 {
+            if let Err(e) = Box::pin(node.people_round(&happ)).await {
+                tracing::warn!(error = %e, "people index round failed");
+            }
         }
         tokio::time::sleep(ARCHIVE_EVERY).await;
     }

@@ -27,15 +27,12 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   at 390px). **Owner review:** the copy describes web (Roadmap "Now: Web prototype, FastAPI
   backend"; quorum from weekly actives, while the app counts full members, ADR 0033). Say if
   the P2P app should say something different.
-- [ ] Search: web's own page (`features/search/SearchPage.svelte` + `SearchSuggestionsList`,
-  `liveSearch.ts`, `formatSearchMeta.ts`, `searchKinds.ts`: heading, search box with live
-  suggestions, kind filter, result rows with a kind chip). The app shows the feed filtered by
-  the query. Plan: kinds the app has today are Projects and Users (keep web's filter list but
-  show only those two until the others land). Projects: `/index/projects?q=`. Users: add a
-  people index to the gateway (the archivist already reads profiles each round; serve
-  `/index/people?q=` with name + key + standing), so guests can search too without
-  `list_people` in the guest allowlist. `suggestedQueries` (web's empty-query chips): web's
-  backend picks popular tags; use the index's most common tags.
+- [x] Search: web's own page (`features/search/SearchPage.svelte`, live suggestions, kind
+  filter, result rows, empty-query chips). Kinds today: Projects (from `/index/projects?q=`)
+  and Users (new gateway people index, `/index/people?q=`, refreshed every minute), so guests
+  search too. The filter lists only those two until the others land; web's filter options
+  show icons, the app's `IconMenuButton` has none yet.
+- [x] The "+" button follows web's `isFeedDiscoveryPath` (feed, platform, profiles), not search.
 
 ## Feed
 - [ ] Toolbar: web's scope menu (globe: Home / Global / Region) comes first. The app is Global
