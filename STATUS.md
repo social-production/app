@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-25: seed-node crash (12:30 UTC) diagnostics, branch `claude/social-production-handoff-dsam61`
+## Open 2026-10-25: seed-node crash (12:30 UTC), diagnostics deployed with PR #50 (merged ~14:17 UTC, live ~14:46 UTC)
 Railway reported "Deploy Crashed" for seed-node right after PR #49's deploy, during the live
 smoke (`projects.mjs` saw its websocket close with 1006 at ~12:31 UTC). Railway restarted it;
 it has answered since. **Cause not found yet**: not reproduced locally (same tests on main,
@@ -43,6 +43,11 @@ and "Railway rate limit of 500 logs/sec reached", from `NoPeersForLocation` publ
   says (locally: 0 such lines, 97 lines for a full test run), so the crash line can't be
   drowned out next time; `/readyz` now returns `uptimeSecs` and `rssMb` so a session can see
   restarts and memory without Railway access.
+- After PR #50 (live ~14:46 UTC): `/readyz` uptime rose without a reset through the live
+  smoke; memory 811 MB at start, ~870 MB idle after 10 min, 1.2 GB after `projects`, `guests`
+  and `shell` created ~6 accounts. `projects.mjs` and `shell.mjs` passed; `guests.mjs` timed
+  out once waiting for Ann's new project page (no restart; output not captured), then passed
+  in full with a failure screenshot hook. Watch for slow project creation on the live node.
 - Next if it crashes again: ask the owner for the last ~50 lines before the crash in the
   deploy log (look for `panicked at`, `memory allocation`, `killed`), and watch `/readyz`
   `uptimeSecs` resets and `rssMb` from a cloud session.
@@ -587,7 +592,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `d4ca75c` (PR #49, deployed 2026-10-25 ~12:29 UTC, ~39 min after the merge; UI). Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `f55b5e9` (PR #50, deployed 2026-10-25 ~14:46 UTC, ~29 min after the merge; gateway). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -620,7 +625,8 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 Port each screen from web (Owner decisions); compare at 390px with live web first.
 1. **Parity pass** (checklist: `docs/plans/PARITY.md`): what's left there waits on features
    (follows, scopes, places, moderation); pick items up as their features land.
-2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset),
+2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset;
+   ADR 0054 drafted as **proposed**, build it next),
    M5b activities and roles + the waiting project-chat items (one project reset), M5c events
    and help requests, M5d communities and channels. Each starts with its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
