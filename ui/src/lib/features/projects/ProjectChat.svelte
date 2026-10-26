@@ -2,6 +2,7 @@
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
+  import { projectAttachmentBlob } from '#lib/services/attachments.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
@@ -31,7 +32,8 @@
   const chat = new ChatState(
     {
       list: () => listMessages(projectId),
-      post: (body, replyTo) => postMessage(projectId, body, replyTo),
+      post: (body, replyTo, files) => postMessage(projectId, body, replyTo, files),
+      file: (attachment) => projectAttachmentBlob(projectId, attachment),
       remove: (id) => deleteMessage(projectId, id),
       viewer,
       names: namesOf,
@@ -92,7 +94,8 @@
     fitViewport={embedded}
     paused={chat.paused}
     error={chat.error}
-    onSend={(body, replyTo) => chat.send(body, replyTo)}
+    onSend={(body, replyTo, files) => chat.send(body, replyTo, files)}
+    fileUrl={chat.fileUrl}
     onDelete={(id) => chat.remove(id)}
     {highlighted}
     {onWrote}

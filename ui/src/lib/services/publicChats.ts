@@ -9,7 +9,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
-import { listMessages } from './chat.ts';
+import { chatReadAt, listMessages, markChatRead } from './chat.ts';
 import { getPerson, myAgent } from './people.ts';
 
 /** The part of `get_project` the list shows. */
@@ -39,9 +39,10 @@ export async function myProjectChats(): Promise<PublicChat[]> {
 
 async function projectChat(seed: string, me: string): Promise<PublicChat | null> {
   const cell = await projectCell(seed, 'Project');
-  const [project, messages] = await Promise.all([
+  const [project, messages, readAt] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
     listMessages({ seed }),
+    chatReadAt({ seed }),
   ]);
   if (!project?.charter) return null;
   if (!project.am_member && !messages.some((m) => m.author === me)) return null;
@@ -55,7 +56,7 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
     last: last
       ? { author: last.author, preview: last.body.slice(0, PREVIEW_MAX), createdAt: last.createdAt }
       : null,
-    unread: unreadAfter(messages, readAt(me, seed), me),
+    unread: unreadAfter(messages, readAt ?? 0, me),
     activeAt: last?.createdAt ?? project.last_activity_at ?? project.created_at ?? 0,
     pinned: prefs.pinned,
     muted: prefs.muted,
@@ -75,28 +76,11 @@ function unreadAfter(messages: ChatMessage[], since: number, me: string): number
 }
 
 /**
- * When you last read a project's chat on this device (Holochain micros). Project chats have no
- * private read marks yet; until they do, the mark stays in the browser (ADR 0044).
+ * Mark a project's chat (by its seed) read up to `at`, its newest message; never backwards.
+ * The mark is a private entry on your chain (ADR 0056), so every device you use agrees.
  */
-const readKey = (me: string, seed: string): string => `sp.projectChatRead.${me}.${seed}`;
-
-function readAt(me: string, seed: string): number {
-  try {
-    return Number(localStorage.getItem(readKey(me, seed)) ?? 0) || 0;
-  } catch {
-    return 0;
-  }
-}
-
-/** Mark a project's chat (by its seed) read up to `at`, its newest message; never backwards. */
 export async function markProjectChatRead(seed: string, at: number): Promise<void> {
-  const me = await myAgent();
-  if (at <= readAt(me, seed)) return;
-  try {
-    localStorage.setItem(readKey(me, seed), String(at));
-  } catch {
-    // Private windows may refuse storage; the chat just stays unread here.
-  }
+  await markChatRead({ seed }, at);
 }
 
 interface StoredPrefs {
@@ -107,7 +91,7 @@ interface StoredPrefs {
 }
 
 /** web's chat menu on a project chat (subject_chat_reads' pin/mute/hide), kept in the browser
- * like the read marks above until project chats get private entries (ADR 0044, 0045). */
+ * (ADR 0044, 0045); read marks moved to the chain with ADR 0056. */
 const prefsKey = (me: string, seed: string): string => `sp.projectChatPrefs.${me}.${seed}`;
 
 function prefsOf(me: string, seed: string): StoredPrefs {
