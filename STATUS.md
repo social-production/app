@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-26 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,27 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-26: @mention suggestions ranked by follows (ADR 0047 update), branch `claude/social-production-handoff-dsam61`
+STATUS Next (M5a leftovers). **UI only, no zome change**, so merging resets nothing.
+- web-backend's `people_suggestions.py` order: people you follow, then your followers
+  (accepted only). The app's circles are now: this chat, following, followers, your other
+  chats' members, everyone (`domain/mentions.ts` `MentionPool`, `services/follows.ts`
+  `followCircles`, `services/messages.ts` `mentionPool`).
+- Test: `tests/e2e/follows.mjs` now has Ann follow Cat and checks her project chat's menu for
+  "@<stamp>" lists Cat before Bob (a follower whose name sorts first).
+- Checked: `npm run check`/`lint`, sizes, boundaries; against a local release seed node
+  (`RELEASE=1 bash scripts/cloud-seed.sh`): `follows.mjs`, `mentions.mjs`.
+- Live at start of session (~13:00 UTC 2026-10-26): `/readyz` uptime 15.4 h (no restart since
+  the M5a deploy), `rssMb` 629.
+- **Next after this:** web's Home scope (decided 2026-10-26): the feed toolbar's scope menu
+  (Home / Global; Region waits on M6 places) and the audience menu (Following only /
+  Following + popular), with web's `combineFeeds` default (on; the app has no setting for it).
+  Home = items from joined channels/communities (none until M5d) merged with the personal feed
+  (`mergeHomeFeed`); the app's personal items are the projects of people you follow, shown with
+  web's `PersonalActivityCard` (+ `PersonalFeedIdentity`), which the profile feed should use
+  too (PARITY). Gateway: `/index/projects?creator=` takes a comma-separated list. "Popular"
+  adds discovery posts/threads on web: none exist in the app yet.
 
 ## Done 2026-10-25: M5a follows + feedback (ADR 0054), PR #52 merged (19:32 UTC / 6:32 am Melbourne), seed node live 19:57 UTC
 **This reset the directory network: everyone on the test network signs up again**

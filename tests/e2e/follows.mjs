@@ -1,6 +1,7 @@
 // Follows and platform feedback (ADR 0054), as on web: Follow → Following, approval turns new
 // follows into requests the person accepts in Settings; Feedback lists bugs and suggestions
-// with votes, and guests can read it.
+// with votes, and guests can read it. @mention suggestions rank people you follow first, then
+// your followers, as web-backend does (ADR 0047).
 //   node tests/e2e/follows.mjs http://localhost:4174 [screens dir]
 // It signs up three test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -90,6 +91,35 @@ await until(
   'the accepted follow',
 );
 log('ann accepts; cat is following');
+
+// Mentions: Ann follows Cat, so "@<stamp>" in her project chat offers Cat before Bob (a
+// follower), although Bob's name sorts first.
+await until(ann, `${BASE}/profile/${await keyOf(cat)}`, () =>
+  ann.getByRole('button', { name: `Follow cat${stamp}` }).isVisible(), 'cat');
+await ann.getByRole('button', { name: `Follow cat${stamp}` }).click();
+await ann.getByRole('button', { name: `Unfollow cat${stamp}` }).waitFor({ timeout: 60_000 });
+await ann.goto(`${BASE}/create/project`);
+await ann.getByRole('button', { name: 'Continue' }).click();
+await ann.getByLabel('Title').fill(`Seed swap ${stamp}`);
+await ann.getByLabel('Proposal description').fill('Swap seeds in spring.');
+for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('heading', { name: `Seed swap ${stamp}` }).waitFor({ timeout: 120_000 });
+const chatUrl = `${ann.url()}?tab=chat`;
+const options = ann.getByRole('option');
+const offered = async () => {
+  const box = ann.getByRole('textbox', { name: 'Message the project...' });
+  await box.fill('');
+  await box.pressSequentially(`@${stamp}`, { delay: 30 });
+  await options.first().waitFor({ timeout: 10_000 });
+  return (await options.count()) >= 2;
+};
+await until(ann, chatUrl, offered, 'both people in the mention menu');
+assert.deepEqual(
+  (await options.allInnerTexts()).map((t) => t.trim().split(/\s/)[0]),
+  [`cat${stamp}`, `bob${stamp}`],
+);
+log('ann\'s mention menu offers cat (followed) before bob (a follower)');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);

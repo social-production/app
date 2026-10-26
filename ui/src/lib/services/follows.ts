@@ -6,6 +6,7 @@ import {
   type ActionHash,
   type AgentPubKey,
 } from '#lib/holo/index.ts';
+import { myAgent } from './people.ts';
 
 const identity = <T>(fn: string, payload?: unknown) =>
   callZome<T>('directory', 'identity', fn, payload);
@@ -60,4 +61,19 @@ export async function followRequests(): Promise<FollowRow[]> {
 
 export async function setFollowApproval(on: boolean): Promise<void> {
   await identity<boolean>('set_follow_approval', on);
+}
+
+/**
+ * The accepted follows around you, for ranking @mention suggestions as web-backend does
+ * (people you follow, then your followers). Empty when the directory can't be read.
+ */
+export async function followCircles(): Promise<{ following: string[]; followers: string[] }> {
+  try {
+    const view = await followView(await myAgent());
+    const accepted = (rows: FollowRow[]) =>
+      rows.filter((r) => r.status === 'accepted').map((r) => r.agent);
+    return { following: accepted(view.following), followers: accepted(view.followers) };
+  } catch {
+    return { following: [], followers: [] };
+  }
 }
