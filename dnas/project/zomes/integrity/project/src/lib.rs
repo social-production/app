@@ -4,7 +4,10 @@
 //! Membership and signals are links whose target is their author, so they need no entries.
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
 //! importance votes are records too (ADR 0041); links to other projects are proposals (ADR 0042).
+//! Activities and their roles, suggestions and ratings are records; taking a role is a link
+//! (ADR 0056).
 
+mod activity;
 mod challenge;
 mod charter;
 mod governance;
@@ -16,6 +19,9 @@ mod value;
 use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
 
+pub use activity::{
+    Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
+};
 pub use governance::SNAPSHOT_MAX;
 pub use link::{LinkRequest, ProjectRef};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
@@ -132,6 +138,11 @@ pub enum EntryTypes {
     Challenge(Challenge),
     Value(Value),
     Importance(Importance),
+    Activity(Activity),
+    RoleSuggestion(RoleSuggestion),
+    SuggestionDecline(SuggestionDecline),
+    ActivityRating(ActivityRating),
+    ActivityCompletion(ActivityCompletion),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -155,6 +166,14 @@ pub enum LinkTypes {
     Values,
     /// Value → a member's importance vote.
     ValueToImportance,
+    /// "activities" anchor → activity.
+    Activities,
+    /// Activity → the member taking a role; tag `[role index]` + their `Members` link hash.
+    Assignments,
+    /// Activity → a role suggestion or a decline of one.
+    ActivityToSuggestions,
+    /// Activity → a participant's rating or completion check-in.
+    ActivityToRatings,
 }
 
 /// The project's creator, from the network seed; `None` in the (unused) base cell.
@@ -190,6 +209,11 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::Challenge(c) => challenge::validate(&c, &action),
             EntryTypes::Value(v) => value::validate_value(&v, &action),
             EntryTypes::Importance(i) => value::validate_importance(&i, &action),
+            EntryTypes::Activity(a) => activity::validate_activity(&a, &action),
+            EntryTypes::RoleSuggestion(r) => activity::validate_suggestion(&r, &action),
+            EntryTypes::SuggestionDecline(d) => activity::validate_decline(&d, &action),
+            EntryTypes::ActivityRating(r) => activity::validate_rating(&r, &action),
+            EntryTypes::ActivityCompletion(c) => activity::validate_completion(&c, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })
@@ -206,12 +230,15 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         FlatOp::Link(OpLink::DeleteLink {
             original_action,
             action,
+            link_type,
             ..
         }) => {
-            if original_action.author() == action.author() {
-                Ok(ValidateCallbackResult::Valid)
-            } else {
+            if original_action.author() != action.author() {
                 invalid("only the link's author can remove it")
+            } else if matches!(link_type, LinkTypes::Assignments) {
+                activity::validate_leave(&original_action.base_address, action.timestamp())
+            } else {
+                Ok(ValidateCallbackResult::Valid)
             }
         }
         _ => Ok(ValidateCallbackResult::Valid),

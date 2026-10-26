@@ -3,6 +3,16 @@
 version = 4
 
 [[package]]
+name = "activities"
+version = "0.0.1"
+dependencies = [
+ "hdk",
+ "project_integrity",
+ "serde",
+ "sp_activity",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.25.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1989,6 +1999,8 @@ dependencies = [
  "discussion_integrity",
  "hdk",
  "serde",
+ "serde_bytes",
+ "sp_attachment",
  "sp_core",
 ]
 
@@ -1999,6 +2011,8 @@ dependencies = [
  "hdi",
  "holochain_serialized_bytes",
  "serde",
+ "serde_bytes",
+ "sp_attachment",
  "sp_core",
 ]
 
@@ -7169,6 +7183,7 @@ dependencies = [
  "holo_hash",
  "holochain_serialized_bytes",
  "serde",
+ "sp_activity",
  "sp_core",
  "sp_governance",
 ]
@@ -8733,6 +8748,13 @@ dependencies = [
  "gobject-sys",
  "libc",
  "system-deps",
+]
+
+[[package]]
+name = "sp_activity"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
 ]
 
 [[package]]

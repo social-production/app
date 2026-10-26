@@ -97,7 +97,9 @@
         ? ''
         : 'tab' in t
           ? `?tab=chat&comment=${encodeURIComponent(t.comment)}`
-          : `?open=vote&voteKind=phase_change&voteTarget=${encodeURIComponent(t.voteTarget)}`;
+          : 'activity' in t
+            ? `?activity=${encodeURIComponent(t.activity)}`
+            : `?open=vote&voteKind=phase_change&voteTarget=${encodeURIComponent(t.voteTarget)}`;
       // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved above
       await goto(`${page}${query}`);
     } finally {

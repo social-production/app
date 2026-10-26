@@ -8,7 +8,8 @@ import type { ProjectMode } from './projects.ts';
  * derives them from the projects opened on its node, the kinds web-backend creates for what
  * the app has so far: phase votes (`prj-phase-vote`), phase changes (`prj-phase-done`), chat
  * replies (`reply`), @mentions in project, direct and group chats (`mention`, ADR 0047) and
- * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054).
+ * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054) and activities
+ * (`prj-activity`, `prj-role-suggest`, `prj-role-taken`, ADR 0056).
  * Times are Holochain micros.
  */
 export type NotificationKind =
@@ -18,12 +19,15 @@ export type NotificationKind =
   | 'mention'
   | 'new-follower'
   | 'follow-request'
-  | 'follow-accepted';
+  | 'follow-accepted'
+  | 'prj-activity'
+  | 'prj-role-suggest'
+  | 'prj-role-taken';
 
 /** web's notification settings categories the app has kinds for (web-backend
- * `notification_preferences.py` KIND_TO_CATEGORY); shares, roles and plan-leading come with
- * their features. */
-export type NotificationCategory = 'follows' | 'comments' | 'votes_needed' | 'phase_done';
+ * `notification_preferences.py` KIND_TO_CATEGORY); shares and plan-leading come with their
+ * features. */
+export type NotificationCategory = 'follows' | 'comments' | 'votes_needed' | 'phase_done' | 'roles';
 
 export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   reply: 'comments',
@@ -33,6 +37,9 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'new-follower': 'follows',
   'follow-request': 'follows',
   'follow-accepted': 'follows',
+  'prj-activity': 'roles',
+  'prj-role-suggest': 'roles',
+  'prj-role-taken': 'roles',
 };
 
 export interface NotificationItem {
@@ -55,6 +62,7 @@ export interface NotificationItem {
     | { tab: 'chat'; comment: string }
     | { open: 'vote'; voteTarget: string }
     | { conversation: string }
+    | { activity: string }
     | null;
   createdAt: number;
   isUnread: boolean;

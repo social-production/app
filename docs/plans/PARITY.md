@@ -72,6 +72,19 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   "hide … from non-followers / personal feeds" switches wait for personal posts and the
   personal feed.
 
+## Project page: Activity phase (M5b, ADR 0056)
+- [x] Calendar card with Add activity, the creation wizard, agenda rows by day, the activity
+  sheet with roles (Take/Leave, Suggest someone, Decline), Share activity.
+- [ ] Place search in the wizard (web's LocationPicker with quick picks): a plain label until
+  places land (M6). Times in the browser's zone until a Display timezone setting exists.
+- [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
+  ratings, Community). The requester side waits on service requests.
+- [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
+  the activity's author), and Settings' Roles switch. Still to do: web's "suggestion declined"
+  card to the suggester (the view drops declined suggestions).
+- [ ] Software governance panel (pull requests) in a software project's Activity phase.
+- [x] Photos and files in project chats (ADR 0056 ride-along).
+
 ## Notifications and Messages pages
 - [x] Notifications page: same header, intro, "Mark all read" and card list as web's
   `NotificationsPage.svelte` (compared from source), with follow cards and their

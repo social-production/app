@@ -30,12 +30,19 @@
 <div class="personal-activity-card">
   <FeedSurface {href} tone="personal" accent={modeAccent(card.mode)}>
     <div class="card-header">
-      <FeedCardTop stage={card.phase} tags={card.tags} />
+      {#if card.tags.length > 0}
+        <FeedCardTop stage={card.phase} tags={card.tags} />
+      {/if}
+      <!-- Without tags the stage joins the author's row (web's header-row + header-end, as its
+           private items use), rather than sitting alone above it. -->
       <div class="header-row">
         <PersonalFeedIdentity
           name={authorName}
           href={resolve('/profile/[agent]', { agent: card.creator })}
         />
+        {#if card.tags.length === 0 && card.phase}
+          <div class="header-end"><span class="feed-card-stage">{card.phase}</span></div>
+        {/if}
       </div>
     </div>
     <a class="title" href={resolve('/projects/[id]', { id: card.id })}>{card.title}</a>

@@ -9,6 +9,7 @@
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import type { PublicChat } from '#lib/domain/messages.ts';
   import type { Person } from '#lib/domain/people.ts';
+  import { projectAttachmentBlob } from '#lib/services/attachments.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
@@ -36,7 +37,8 @@
   const talk = new ChatState(
     {
       list: () => listMessages(project),
-      post: (body, replyTo) => inTurn(() => postMessage(project, body, replyTo)),
+      post: (body, replyTo, files) => inTurn(() => postMessage(project, body, replyTo, files)),
+      file: (attachment) => projectAttachmentBlob(project, attachment),
       remove: (messageId) => inTurn(() => deleteMessage(project, messageId)),
       viewer,
       names: namesOf,
@@ -154,7 +156,8 @@
   showHeader={false}
   paused={talk.paused}
   error={talk.error}
-  onSend={(body, replyTo) => talk.send(body, replyTo)}
+  onSend={(body, replyTo, files) => talk.send(body, replyTo, files)}
+  fileUrl={talk.fileUrl}
   onDelete={(messageId) => talk.remove(messageId)}
   mentionSearch={mentions.search}
   mentionAgent={mentions.agentOf}

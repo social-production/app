@@ -83,3 +83,19 @@
   background: var(--panel-strong);
   color: #ef4444;
 }
+
+/* app/ui wraps a card's surface in a scoping div (.project-card, .personal-activity-card), so
+   web's `.stack .surface:last-child { border-bottom: none }` matched every card and the feeds
+   lost their dividers. Only the stack's last card goes without one, as on web. */
+.feed-page .stack > :not(:last-child) > .surface.surface,
+.profile-page .feed-stack > :not(:last-child) > .surface.surface {
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 68%, transparent);
+}
+
+/* The stage on a personal card's author row when it has no tags (web's .feed-card-stage). */
+.personal-activity-card .header-end .feed-card-stage {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}

@@ -4,6 +4,7 @@ use std::collections::{BTreeMap, BTreeSet};
 
 use discussion_integrity::{is_message, ChatMessage, LinkTypes};
 use hdk::prelude::*;
+use sp_attachment::preview_text;
 use sp_core::chat::{preview, PAGE_MAX};
 
 use crate::{anchor, own, MessageView, ReplyRef};
@@ -105,7 +106,7 @@ fn with_quotes(
             let quote = ReplyRef {
                 id: id.clone(),
                 author: Some(r.action().author().clone()),
-                preview: preview(&m.body),
+                preview: preview_of(m),
                 deleted: false,
             };
             (id, quote)
@@ -128,6 +129,7 @@ fn with_quotes(
             created_at: r.action().timestamp(),
             reply_to: m.reply_to.and_then(|p| quotes.get(&p).cloned()),
             body: m.body,
+            attachments: m.attachments,
         })
         .collect())
 }
@@ -147,8 +149,17 @@ fn quote_of(parent: &ActionHash, deleted: &BTreeSet<ActionHash>) -> ExternResult
     quote.deleted |= !details.deletes.is_empty();
     if !quote.deleted {
         if let Some(m) = decode(&details.record)? {
-            quote.preview = preview(&m.body);
+            quote.preview = preview_of(&m);
         }
     }
     Ok(quote)
+}
+
+/// What a quote shows: the text, else "Photo" or the file's name (web's `_message_preview`).
+fn preview_of(m: &ChatMessage) -> String {
+    let first = m.attachments.first();
+    preview(&preview_text(
+        &m.body,
+        first.map(|a| (a.kind.as_str(), a.name.as_str())),
+    ))
 }

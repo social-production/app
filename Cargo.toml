@@ -32,6 +32,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 
 # Our pure crates
 sp_core = { path = "crates/sp_core" }
+sp_activity = { path = "crates/sp_activity" }
 sp_attachment = { path = "crates/sp_attachment" }
 sp_call = { path = "crates/sp_call" }
 sp_follow = { path = "crates/sp_follow" }

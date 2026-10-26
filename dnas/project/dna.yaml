@@ -28,6 +28,10 @@ coordinator:
       path: ../../target/wasm32-unknown-unknown/zome/governance.wasm
       dependencies:
         - name: project_integrity
+    - name: activities
+      path: ../../target/wasm32-unknown-unknown/zome/activities.wasm
+      dependencies:
+        - name: project_integrity
     - name: discussion
       path: ../../target/wasm32-unknown-unknown/zome/discussion.wasm
       dependencies:

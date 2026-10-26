@@ -22,7 +22,7 @@ scenario + browser tests, as M1–M4 did.
 - Decided in ADR 0054: requests exist (approval switch). Mention ranking by follows (ADR 0047
   update) and the Home scope with the personal feed (ADR 0055) followed on 2026-10-26.
 
-## M5b — project batch: activities and roles (one project reset)
+## M5b — project batch: activities and roles (one project reset) — first part built (ADR 0056)
 - `Activity`, `Role`, `Assignment`, `Rating` (DOMAIN_MODEL), web's
   `ActivitySchedulingPanel`, `ActivityAgendaList`, `CollapsibleActivityCard`,
   `ActivityCreationWizard`, and the activity cards in the feed.

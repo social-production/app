@@ -31,7 +31,44 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54, branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-26: M5b activities and roles, first part (ADR 0056), branch `claude/social-production-handoff-dsam61`
+**Project-DNA reset when merged** (integrity change): every live test project starts again;
+people, follows and chats are untouched (directory and conversation hashes unchanged).
+- `crates/sp_activity` (limits, time locks, `fill`: who holds each role when two take the last
+  place at once: earliest action wins, one role per person, leavers lapse until it ends).
+- Project integrity `activity.rs`: `Activity` (roles embedded, web's linked plan stage as a
+  string id), `RoleSuggestion`, `SuggestionDecline`, `ActivityRating`; taking a role is an
+  `Assignments` link (deleted to leave), refused after the activity ends.
+- New coordinator zome `activities` (project DNA): `create_activity` (Activity phase:
+  phase-5, or phase-1 for a personal service by its creator; starts in the future),
+  `list_activities`, `take_role`, `leave_role`, `suggest_role`, `decline_suggestion`,
+  `rate_activity`; guests read `list_activities` through the gateway.
+- Ride-alongs in the discussion zome: photos and files in project chats (`Chunk`,
+  `upload_chunk`, `get_chunk`; guests read chunks) and a private `ReadMark` (`mark_read`,
+  `read_at`), so the Public tab's unread counts follow you across devices.
+- UI from web: calendar card + Add activity, creation wizard (place is a plain label or
+  Online), agenda rows, the activity sheet (roles Take/Leave, Suggest someone, Decline, Share),
+  and Past activity (web's ActivityHistorySection: participants check in Completed /
+  Uncompleted and rate 1–5; Community shows completion and ratings). Check-ins are an
+  `ActivityCompletion` entry (`check_in`), added before merging so the reset happens once.
+- Tests: scenario `activities` (2 tests, ~28 min locally: it waits for a short activity to
+  end); `discussion` scenario re-run; browser `activities.mjs` (new: create, take → Full,
+  leave, suggest/decline, a photo in the project chat) plus chat, public-chats, attachments,
+  projects, governance (timed out once under load, then passed), notifications, guests,
+  mentions, all against a local release seed node.
+- `activities.mjs` also runs a two-minute activity into Past activity (check-in + rating) and
+  checks the role-taken and suggestion notifications.
+- Activity notifications (role taken, suggested for a role, new activity) and Settings' Roles
+  switch are in too; `notifications.mjs` still passes.
+- Owner review (2026-10-26): feed cards had lost their dividers (the app wraps each card's
+  `.surface` in a scoping div, so web's `.stack .surface:last-child` rule matched every card;
+  fixed in `additions.css`), and a personal card with no tags showed its stage alone above the
+  author; it now sits on the author's row (web's `header-end`). **Lesson:** compare computed
+  styles with live web, not only screenshots of one card.
+- Next (no reset needed): the "suggestion declined" card, feed/profile activity cards, the
+  right rail's activity (PARITY).
+
+## Done 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54 merged (15:05 UTC / 2:05 am Melbourne 27 Oct)
 STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.
 - **Mention ranking** (web-backend `people_suggestions.py`): people you follow, then your
   followers (accepted only). Circles now: this chat, following, followers, your other chats'
@@ -59,8 +96,13 @@ STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging reset
   `shell`, `projects`, `governance`, `mentions` all passed. No scenario changes (no zome change).
 - Live at start of session (~13:00 UTC 2026-10-26): `/readyz` uptime 15.4 h (no restart since
   the M5a deploy), `rssMb` 629.
-- After merge: smoke live `follows.mjs` (creates 3 accounts), `guests.mjs`, `shell.mjs`;
-  update README Status + this entry to "Done".
+- CI: `check` 5 min, shards 43–73 min.
+- **Deploy: ui and bootstrap went live (~15:06 UTC); the seed-node deploy FAILED at 15:48 UTC**
+  ("Deployment failed" after 43 min, no logs from a cloud session). The old seed node (PR #52's
+  gateway) kept running. Until a seed-node deploy succeeds, the live Home feed shows nothing
+  for someone who follows two or more people (the old gateway reads `creator=` as one key).
+  Owner: look at the seed-node build log in Railway (Deployments → the failed one); the next
+  merge (#55) redeploys anyway. Then smoke `follows.mjs`, `guests.mjs`, `shell.mjs` live.
 
 ## Done 2026-10-25: M5a follows + feedback (ADR 0054), PR #52 merged (19:32 UTC / 6:32 am Melbourne), seed node live 19:57 UTC
 **This reset the directory network: everyone on the test network signs up again**

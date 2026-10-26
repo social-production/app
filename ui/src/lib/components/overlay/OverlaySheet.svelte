@@ -16,6 +16,9 @@
     title: string;
     labelledById?: string;
     wide?: boolean;
+    /** web's activity sheet (wider body, its own close) and elevated layer (above a sheet). */
+    activity?: boolean;
+    elevated?: boolean;
     /** Extra class on the root, so a sheet's own ported styles can scope under it. */
     rootClass?: string;
     onClose: () => void;
@@ -30,6 +33,8 @@
     title,
     labelledById = 'overlay-sheet-title',
     wide = false,
+    activity = false,
+    elevated = false,
     rootClass = '',
     onClose,
     subtitle,
@@ -86,7 +91,7 @@
 </script>
 
 {#if open}
-  <div class={`overlay-root ${rootClass}`} role="presentation" use:portal>
+  <div class={`overlay-root ${rootClass}`} class:elevated role="presentation" use:portal>
     <button aria-label="Close" title="Close" class="overlay-scrim" type="button" onclick={onClose}
     ></button>
     <div
@@ -95,6 +100,7 @@
       class="overlay-sheet has-footer"
       class:has-toolbar={!!toolbar}
       class:wide
+      class:activity
       role="dialog"
     >
       <header class="overlay-header">

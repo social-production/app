@@ -5,6 +5,7 @@
   import { phaseProgressLabel, phaseSummary } from '#lib/domain/phaseCopy.ts';
   import { planKindFor } from '#lib/domain/plans.ts';
 
+  import ActivityPhase from './ActivityPhase.svelte';
   import type { DetailState } from './detailState.svelte.ts';
   import PhaseChangeSection from './PhaseChangeSection.svelte';
   import PlanPhase from './PlanPhase.svelte';
@@ -12,8 +13,8 @@
 
   /**
    * web's ProjectLifecyclePanel: the phase stepper, the selected phase's context (kicker, title,
-   * summary), then its work (values in Proposal, plans, M3b) and the phase-change menu. Roles and activities join
-   * the work in M5.
+   * summary), then its work (values in Proposal, plans, M3b; activities and roles in the
+   * Activity phase, M5b) and the phase-change menu.
    */
   let { detail }: { detail: DetailState } = $props();
 
@@ -21,6 +22,9 @@
   const project = $derived(detail.project);
   const shown = $derived(selected || project?.phase || 'phase-1');
   const planKind = $derived(project?.charter ? planKindFor(project.charter.mode, shown) : null);
+  // web's activity phase: phase-5, or phase-1 for a personal service.
+  const personal = $derived(project?.charter?.mode === 'personal-service');
+  const activityPhase = $derived(personal ? shown === 'phase-1' : shown === 'phase-5');
 </script>
 
 {#if project}
@@ -39,6 +43,8 @@
     <section class="phase-panel overview-phase-work">
       {#if planKind}
         <PlanPhase {detail} kind={planKind} />
+      {:else if activityPhase}
+        <ActivityPhase {detail} current={project.phase === shown} />
       {:else if shown === 'phase-1' && project.charter?.mode !== 'personal-service'}
         <ValuePhase {detail} />
       {:else}
