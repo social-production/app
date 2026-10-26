@@ -60,6 +60,11 @@ people, follows and chats are untouched (directory and conversation hashes uncha
   checks the role-taken and suggestion notifications.
 - Activity notifications (role taken, suggested for a role, new activity) and Settings' Roles
   switch are in too; `notifications.mjs` still passes.
+- Owner review (2026-10-26): feed cards had lost their dividers (the app wraps each card's
+  `.surface` in a scoping div, so web's `.stack .surface:last-child` rule matched every card;
+  fixed in `additions.css`), and a personal card with no tags showed its stage alone above the
+  author; it now sits on the author's row (web's `header-end`). **Lesson:** compare computed
+  styles with live web, not only screenshots of one card.
 - Next (no reset needed): the "suggestion declined" card, feed/profile activity cards, the
   right rail's activity (PARITY).
 
