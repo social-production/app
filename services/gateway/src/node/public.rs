@@ -35,6 +35,7 @@ const PROJECT: &[(&str, &[&str])] = &[
             "list_links",
         ],
     ),
+    ("activities", &["list_activities"]),
     ("discussion", &["list_messages"]),
 ];
 
@@ -109,6 +110,8 @@ mod tests {
     fn only_listed_reads() {
         assert!(allowed(PROJECT, "project", "get_project"));
         assert!(allowed(PROJECT, "discussion", "list_messages"));
+        assert!(allowed(PROJECT, "activities", "list_activities"));
+        assert!(!allowed(PROJECT, "activities", "take_role"));
         assert!(allowed(DIRECTORY, "identity", "get_profile"));
         assert!(!allowed(PROJECT, "project", "join"));
         assert!(!allowed(PROJECT, "identity", "get_profile"));

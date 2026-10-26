@@ -1,0 +1,18 @@
+[package]
+name = "activities"
+description = "Project DNA API for activities: schedule them, take and leave roles, suggest people, rate (ADR 0056)."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+project_integrity = { workspace = true }
+sp_activity = { workspace = true }
+
+[lints]
+workspace = true
