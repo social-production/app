@@ -7169,6 +7169,7 @@ dependencies = [
  "holo_hash",
  "holochain_serialized_bytes",
  "serde",
+ "sp_activity",
  "sp_core",
  "sp_governance",
 ]

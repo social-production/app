@@ -13,6 +13,7 @@ hdi = { workspace = true }
 holo_hash = { version = "=0.7.1", features = ["encoding"] }
 holochain_serialized_bytes = { workspace = true }
 serde = { workspace = true }
+sp_activity = { workspace = true }
 sp_core = { workspace = true }
 sp_governance = { workspace = true }
 

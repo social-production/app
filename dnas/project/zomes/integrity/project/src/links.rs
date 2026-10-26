@@ -22,13 +22,17 @@ pub fn validate_create(
         LinkTypes::Members | LinkTypes::Signals => {
             invalid("agents can only join or signal as themselves")
         }
+        LinkTypes::Assignments => crate::activity::validate_assignment(action),
         LinkTypes::Proposals
         | LinkTypes::ProposalToVotes
         | LinkTypes::ProposalToOutcomes
         | LinkTypes::ProposalToRatings
         | LinkTypes::ProposalToChallenges
         | LinkTypes::Values
-        | LinkTypes::ValueToImportance => Ok(ValidateCallbackResult::Valid),
+        | LinkTypes::ValueToImportance
+        | LinkTypes::Activities
+        | LinkTypes::ActivityToSuggestions
+        | LinkTypes::ActivityToRatings => Ok(ValidateCallbackResult::Valid),
     }
 }
 

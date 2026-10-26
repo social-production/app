@@ -17,6 +17,8 @@ pub const PLACE_MAX: usize = 160;
 pub const MEETING_URL_MAX: usize = 500;
 /// web-backend `ProjectActivityRoleRequirementIn.label`.
 pub const ROLE_LABEL_MAX: usize = 100;
+/// web-backend `linked_plan_phase_id` (`String(64)`).
+pub const PLAN_STAGE_MAX: usize = 64;
 /// web has no cap; a bound keeps an entry small.
 pub const ROLES_MAX: usize = 20;
 /// web has no cap on a role's counts; this keeps them sane.
@@ -43,6 +45,7 @@ pub struct ActivitySpec<'a> {
     pub place: &'a str,
     pub meeting_url: Option<&'a str>,
     pub note: &'a str,
+    pub plan_stage: Option<&'a str>,
     pub roles: Vec<RoleSpec<'a>>,
 }
 
@@ -73,6 +76,9 @@ pub fn check_activity(a: &ActivitySpec<'_>) -> Result<(), String> {
         return Err(format!(
             "an activity's note is 1–{LONG_TEXT_MAX} characters"
         ));
+    }
+    if a.plan_stage.is_some_and(|s| !text_ok(s, PLAN_STAGE_MAX)) {
+        return Err(format!("a plan stage id is 1–{PLAN_STAGE_MAX} characters"));
     }
     if a.roles.len() > ROLES_MAX {
         return Err(format!("an activity has at most {ROLES_MAX} roles"));
@@ -131,6 +137,7 @@ mod tests {
             place: "Shed",
             meeting_url: None,
             note: "Bring tools.",
+            plan_stage: Some("production:0"),
             roles: vec![RoleSpec {
                 label: "Mechanic",
                 required: 2,

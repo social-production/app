@@ -26,15 +26,18 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
 - **Rules in a new crate `sp_activity`** (not `sp_core`, which would change every DNA's
   hash): field limits, the role-count rule below, the time locks, rating bounds.
 - **`Activity` entry** (project integrity), roles embedded (a role is its index in the list),
-  citing the author's `Members` link; linked from an "activities" anchor. Validation: author is
+  citing the author's `Members` link, with web's linked plan stage as a string id
+  (`production:<stage index>`, resolved to a label from the approved plans when read); linked
+  from an "activities" anchor. Validation: author is
   a member (cited link is theirs and valid), limits, `ends_at > starts_at`. The Activity-phase
   and "starts in the future" checks stay in the coordinator: validation can't know "now" or
   the current phase without citing the outcome that moved there (as web does it in the API).
   Never updated or deleted, as on web.
-- **`Assignment` entry** {activity, role index, membership}, linked activity → assignment by
-  its author; leaving deletes it (only its author may). Validation: member, role index in
-  range, action timestamp before the activity's `ends_at` (deterministic: the action's own
-  time against a fetched record).
+- **Taking a role is an `Assignments` link** (activity → the person, tag = role index + their
+  `Members` link hash), so leaving deletes it (only its author may; project entries are never
+  deleted). Validation: target is the author, member, role index in range, the action's time
+  before the activity's `ends_at` (deterministic: the action's own time against a fetched
+  record); a delete is checked against the same time.
 - **Over-subscription without a server:** two people can take the last place at once, and one
   person can take two roles from two devices. The view (`sp_activity::fill`) orders an
   activity's live assignments by action timestamp (then hash) and counts only each person's
@@ -43,9 +46,10 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
   the project don't count for activities that haven't ended (web's release on leave).
 - **`RoleSuggestion` entry** {activity, role, person, membership}, latest per role wins; a
   `SuggestionDecline` by the suggested person clears it. Not self, author a member.
-- **`ActivityRating` entry** {activity, stars 1–5, comment ≤2000, assignment}: the cited
-  assignment is the author's own in that activity and the action time is after `ends_at`;
-  latest per person wins, deleting it removes the rating.
+- **`ActivityRating` entry** {activity, stars 1–5 or none, comment ≤2000, assignment}: the
+  cited `Assignments` link is the author's own on that activity (taken at some point: a link
+  later deleted still counts, validators can't see deletes deterministically) and the action
+  time is after `ends_at`; the latest per person counts and "none" removes the rating.
 - **Notifications** derived on the device (ADR 0046): new activity, suggested for a role,
   suggestion declined, a role in your activity taken.
 - **Ride-alongs in the discussion zome:** `ChatMessage.attachments` + `Chunk` (rules from
