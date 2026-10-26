@@ -7,6 +7,7 @@ import {
   type NotificationItem,
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
+import { activityNotifications } from '#lib/domain/activityNotifications.ts';
 import type { ProjectMode } from '#lib/domain/projects.ts';
 import {
   callCell,
@@ -16,6 +17,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
+import { listActivities } from './activities.ts';
 import { listMessages } from './chat.ts';
 import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
@@ -52,27 +54,33 @@ export async function myNotifications(): Promise<{ items: NotificationItem[] }> 
 
 async function fromProject(seed: string, me: string, myName: string) {
   const cell = await projectCell(seed, 'Project');
-  const [project, proposals, messages] = await Promise.all([
+  const [project, proposals, messages, activities] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
     listProposals({ seed }),
     listMessages({ seed }),
+    listActivities({ seed }).catch(() => []),
   ]);
   if (!project?.charter) return [];
   const labels = new Map(project.phases.map((p) => [p.id, p.label]));
-  return projectNotifications(
-    {
-      seed,
-      title: project.charter.title,
-      mode: project.charter.mode,
-      creator: hashToString(project.creator),
-      amMember: project.am_member,
-      phaseLabel: (id) => labels.get(id) ?? id,
-      proposals,
-      messages,
-    },
-    me,
-    myName,
+  const glance = {
+    seed,
+    title: project.charter.title,
+    mode: project.charter.mode,
+    creator: hashToString(project.creator),
+    amMember: project.am_member,
+    phaseLabel: (id: string) => labels.get(id) ?? id,
+    proposals,
+    messages,
+  };
+  // Role-taken cards name whoever took a role in one of your activities.
+  const takers = activities.flatMap((a) =>
+    a.author === me ? a.roles.flatMap((r) => r.people) : [],
   );
+  const names = takers.length ? await namesOf([...new Set(takers)]) : {};
+  return [
+    ...projectNotifications(glance, me, myName),
+    ...activityNotifications(glance, activities, me, names),
+  ];
 }
 
 /** Mentions in a direct or group chat you're still in (web notifies only its members). */

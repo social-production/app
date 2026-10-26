@@ -15,6 +15,11 @@
       description: 'Replies and mentions on your posts and activity.',
     },
     {
+      id: 'roles',
+      title: 'Roles',
+      description: 'Role sign-ups and suggested roles on your work.',
+    },
+    {
       id: 'votes_needed',
       title: 'Votes needed',
       description: 'Phase votes and approvals that need your input.',

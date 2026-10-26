@@ -18,6 +18,7 @@ pub struct SuggestionView {
     pub id: ActionHash,
     pub person: AgentPubKey,
     pub by: AgentPubKey,
+    pub at: Timestamp,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -25,8 +26,9 @@ pub struct RoleView {
     pub label: String,
     pub required: u32,
     pub maximum: Option<u32>,
-    /// Who holds it, in the order they took it.
+    /// Who holds it, in the order they took it, and when each took it.
     pub people: Vec<AgentPubKey>,
+    pub taken_at: Vec<Timestamp>,
     pub suggestion: Option<SuggestionView>,
 }
 
@@ -99,6 +101,15 @@ fn one(
         history::completion(&a.hash, &everyone, me)?
     };
     let mut suggestions = suggestions(&a.hash)?;
+    let takes = reads::takes(&a.hash)?;
+    let taken_at = |role: usize, agent: &AgentPubKey| {
+        takes
+            .iter()
+            .filter(|t| usize::from(t.role) == role && t.agent == *agent)
+            .map(|t| t.at)
+            .min()
+            .unwrap_or(a.at)
+    };
     let roles = a
         .entry
         .roles
@@ -109,6 +120,7 @@ fn one(
             label: r.label.clone(),
             required: r.required,
             maximum: r.maximum,
+            taken_at: people.iter().map(|p| taken_at(i, p)).collect(),
             people,
             suggestion: u8::try_from(i).ok().and_then(|i| suggestions.remove(&i)),
         })
@@ -201,6 +213,7 @@ fn suggestions(activity: &ActionHash) -> ExternResult<BTreeMap<u8, SuggestionVie
                     id: s.hash,
                     person: s.entry.person,
                     by: s.author,
+                    at: s.at,
                 },
             )
         })

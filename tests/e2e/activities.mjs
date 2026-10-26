@@ -31,6 +31,17 @@ await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url().split('?')[0];
 log('ann offers a personal service');
 
+/** Reload Notifications until a card with `text` shows (derived from the network). */
+async function notified(page, text) {
+  const card = page.locator('.notification-card', { hasText: text }).first();
+  for (let i = 0; i < 20; i++) {
+    await page.goto(`${BASE}/notifications`);
+    await page.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
+    if (await card.waitFor({ timeout: 10_000 }).then(() => true, () => false)) return card;
+  }
+  throw new Error(`timed out waiting for a "${text}" notification`);
+}
+
 const takePart = async (page) => {
   await page.goto(projectUrl);
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
@@ -78,6 +89,8 @@ await bob.screenshot({ path: `${out}/phone390-activity-sheet.png` });
 await bob.keyboard.press('Escape');
 assert.equal(await row(bob).locator('.agenda-chip').innerText(), 'Full');
 log('bob took the helper role; the row reads Full');
+await notified(ann, `took the "Helper" role in ${activity}`);
+log('ann is told bob took the role');
 
 await row(bob).click();
 await sheet.getByRole('button', { name: 'Leave role' }).click();
@@ -100,6 +113,10 @@ for (let i = 0; ; i++) {
   if (await sheet.getByText(`Suggested · bob${stamp}`).waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
   if (i > 8) throw new Error('the suggestion never reached bob');
 }
+await notified(bob, `You've been suggested for Helper on ${activity}.`);
+log('bob is told about the suggestion');
+await takePart(bob);
+await row(bob).click();
 await sheet.getByRole('button', { name: 'Decline' }).click();
 await sheet.getByText(`Suggested · bob${stamp}`).waitFor({ state: 'detached', timeout: 60_000 });
 log('bob declined the suggestion');

@@ -25,12 +25,17 @@
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
   const detail = new DetailState(id);
-  // web's links into a project: `?tab=…`, `?comment=…` (the chat) and `?open=vote&voteTarget=…`.
+  // web's links into a project: `?tab=…`, `?comment=…` (the chat), `?open=vote&voteTarget=…`
+  // and `?activity=…` (the Take part tab, ADR 0056).
   const params = page.url.searchParams;
   const voteLink = params.get('open') === 'vote' ? params.get('voteTarget') : null;
   let commentLink = $state(params.get('comment'));
   let tab = $state<DetailTabId>(
-    params.get('comment') ? 'chat' : voteLink ? 'participation' : tabFromParam(params.get('tab')),
+    params.get('comment')
+      ? 'chat'
+      : voteLink || params.get('activity')
+        ? 'participation'
+        : tabFromParam(params.get('tab')),
   );
   let sheet = $state<'members' | 'edit' | 'update' | null>(null);
   let compact = $state(false);

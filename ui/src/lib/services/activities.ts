@@ -27,7 +27,8 @@ interface ActivityWire {
     required: number;
     maximum: number | null;
     people: AgentPubKey[];
-    suggestion: { id: ActionHash; person: AgentPubKey; by: AgentPubKey } | null;
+    taken_at: number[];
+    suggestion: { id: ActionHash; person: AgentPubKey; by: AgentPubKey; at: number } | null;
   }[];
   my_role: number | null;
   roles_open: boolean;
@@ -85,10 +86,12 @@ function toActivity(w: ActivityWire): Activity {
       required: r.required,
       maximum: r.maximum,
       people: r.people.map(hashToString),
+      takenAt: r.taken_at,
       suggestion: r.suggestion && {
         id: hashToString(r.suggestion.id),
         person: hashToString(r.suggestion.person),
         by: hashToString(r.suggestion.by),
+        at: r.suggestion.at,
       },
     })),
     myRole: w.my_role,

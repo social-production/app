@@ -56,9 +56,12 @@ people, follows and chats are untouched (directory and conversation hashes uncha
   leave, suggest/decline, a photo in the project chat) plus chat, public-chats, attachments,
   projects, governance (timed out once under load, then passed), notifications, guests,
   mentions, all against a local release seed node.
-- `activities.mjs` also runs a two-minute activity into Past activity (check-in + rating).
-- Next (no reset needed): activity notifications, feed/profile activity cards, the right
-  rail's activity (PARITY).
+- `activities.mjs` also runs a two-minute activity into Past activity (check-in + rating) and
+  checks the role-taken and suggestion notifications.
+- Activity notifications (role taken, suggested for a role, new activity) and Settings' Roles
+  switch are in too; `notifications.mjs` still passes.
+- Next (no reset needed): the "suggestion declined" card, feed/profile activity cards, the
+  right rail's activity (PARITY).
 
 ## Done 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54 merged (15:05 UTC / 2:05 am Melbourne 27 Oct)
 STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.

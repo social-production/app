@@ -7,9 +7,10 @@ export interface ActivityRole {
   label: string;
   required: number;
   maximum: number | null;
-  /** Who holds it, in the order they took it. */
+  /** Who holds it, in the order they took it, and when each took it (micros). */
   people: string[];
-  suggestion: { id: string; person: string; by: string } | null;
+  takenAt: number[];
+  suggestion: { id: string; person: string; by: string; at: number } | null;
 }
 
 export interface ActivityRating {

@@ -77,7 +77,11 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
   uncompleted or cleared; the latest counts; only someone who took a role, after the end),
   `check_in`; "Marked uncompleted — no participants signed up" when fewer people took part
   than the roles needed, as web-backend's staffing rule.
-- Not yet: activity notifications, feed and profile activity cards, the right rail's activity.
+- Notifications derived on the device (`domain/activityNotifications.ts`): `prj-activity`,
+  `prj-role-suggest`, `prj-role-taken`, under Settings' Roles switch; `?activity=` opens the
+  Take part tab on that activity's sheet. The view carries each suggestion's time and when each
+  person took their role for them.
+- Not yet: the "suggestion declined" card, feed and profile activity cards, the right rail.
 
 ## Open before building
 - The requester side of history check-ins comes with service requests.

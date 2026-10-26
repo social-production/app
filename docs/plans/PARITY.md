@@ -79,7 +79,9 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   places land (M6). Times in the browser's zone until a Display timezone setting exists.
 - [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
   ratings, Community). The requester side waits on service requests.
-- [ ] Activity notifications ("prj-activity", role suggested/declined, role taken).
+- [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
+  the activity's author), and Settings' Roles switch. Still to do: web's "suggestion declined"
+  card to the suggester (the view drops declined suggestions).
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
 - [x] Photos and files in project chats (ADR 0056 ride-along).
 
