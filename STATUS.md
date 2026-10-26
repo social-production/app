@@ -47,14 +47,18 @@ people, follows and chats are untouched (directory and conversation hashes uncha
   `upload_chunk`, `get_chunk`; guests read chunks) and a private `ReadMark` (`mark_read`,
   `read_at`), so the Public tab's unread counts follow you across devices.
 - UI from web: calendar card + Add activity, creation wizard (place is a plain label or
-  Online), agenda rows, the activity sheet (roles Take/Leave, Suggest someone, Decline, Share).
+  Online), agenda rows, the activity sheet (roles Take/Leave, Suggest someone, Decline, Share),
+  and Past activity (web's ActivityHistorySection: participants check in Completed /
+  Uncompleted and rate 1–5; Community shows completion and ratings). Check-ins are an
+  `ActivityCompletion` entry (`check_in`), added before merging so the reset happens once.
 - Tests: scenario `activities` (2 tests, ~28 min locally: it waits for a short activity to
   end); `discussion` scenario re-run; browser `activities.mjs` (new: create, take → Full,
   leave, suggest/decline, a photo in the project chat) plus chat, public-chats, attachments,
   projects, governance (timed out once under load, then passed), notifications, guests,
   mentions, all against a local release seed node.
-- Next (no reset needed): Past activity with ratings (web's ActivityHistorySection), activity
-  notifications, feed/profile activity cards, the right rail's activity (PARITY).
+- `activities.mjs` also runs a two-minute activity into Past activity (check-in + rating).
+- Next (no reset needed): activity notifications, feed/profile activity cards, the right
+  rail's activity (PARITY).
 
 ## Done 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54 merged (15:05 UTC / 2:05 am Melbourne 27 Oct)
 STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.
@@ -84,7 +88,13 @@ STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging reset
   `shell`, `projects`, `governance`, `mentions` all passed. No scenario changes (no zome change).
 - Live at start of session (~13:00 UTC 2026-10-26): `/readyz` uptime 15.4 h (no restart since
   the M5a deploy), `rssMb` 629.
-- CI: `check` 5 min, shards 43–73 min. Live smoke after deploy: see the M5b entry above.
+- CI: `check` 5 min, shards 43–73 min.
+- **Deploy: ui and bootstrap went live (~15:06 UTC); the seed-node deploy FAILED at 15:48 UTC**
+  ("Deployment failed" after 43 min, no logs from a cloud session). The old seed node (PR #52's
+  gateway) kept running. Until a seed-node deploy succeeds, the live Home feed shows nothing
+  for someone who follows two or more people (the old gateway reads `creator=` as one key).
+  Owner: look at the seed-node build log in Railway (Deployments → the failed one); the next
+  merge (#55) redeploys anyway. Then smoke `follows.mjs`, `guests.mjs`, `shell.mjs` live.
 
 ## Done 2026-10-25: M5a follows + feedback (ADR 0054), PR #52 merged (19:32 UTC / 6:32 am Melbourne), seed node live 19:57 UTC
 **This reset the directory network: everyone on the test network signs up again**

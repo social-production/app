@@ -73,10 +73,12 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
   plain label or Online until places land, M6), agenda rows grouped by day, the activity sheet
   (place, when, linked plan stage, description, roles with Take/Leave, Suggest someone,
   Decline, Share activity). Photos and files in project chats.
-- Not yet (next part): Past activity (web's ActivityHistorySection: ratings and "mark done"),
-  activity notifications, feed and profile activity cards, the right rail's activity.
+- Past activity (web's ActivityHistorySection): an `ActivityCompletion` entry (completed,
+  uncompleted or cleared; the latest counts; only someone who took a role, after the end),
+  `check_in`; "Marked uncompleted — no participants signed up" when fewer people took part
+  than the roles needed, as web-backend's staffing rule.
+- Not yet: activity notifications, feed and profile activity cards, the right rail's activity.
 
 ## Open before building
-- Whether "mark done" history (`project_service_history_completions`) is in this batch: it
-  belongs to service projects' history; leaning: later, with service requests.
+- The requester side of history check-ins comes with service requests.
 - Event activities reuse this when events land (M5c), if events are project-DNA clones.

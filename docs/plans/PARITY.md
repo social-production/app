@@ -77,8 +77,8 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   sheet with roles (Take/Leave, Suggest someone, Decline), Share activity.
 - [ ] Place search in the wizard (web's LocationPicker with quick picks): a plain label until
   places land (M6). Times in the browser's zone until a Display timezone setting exists.
-- [ ] Past activity: web's ActivityHistorySection (ratings, "mark done"); the zome already
-  takes ratings (`rate_activity`).
+- [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
+  ratings, Community). The requester side waits on service requests.
 - [ ] Activity notifications ("prj-activity", role suggested/declined, role taken).
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
 - [x] Photos and files in project chats (ADR 0056 ride-along).
