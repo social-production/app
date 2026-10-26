@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
-  import ProjectCard from '#lib/components/cards/ProjectCard.svelte';
+  import PersonalActivityCard from '#lib/components/cards/PersonalActivityCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
@@ -11,8 +11,8 @@
 
   import { FeedState } from './feedState.svelte.ts';
 
-  /** web's profile feed (ProfilePage's toolbar and stack): the person's public items. The app
-   * has their projects so far, shown with the public feed's cards (PARITY.md). */
+  /** web's profile feed (ProfilePage's toolbar and stack): the person's public items, with
+   * web's personal-feed cards. The app has their projects so far (PARITY.md). */
   let { agent }: { agent?: string } = $props();
 
   // Your own profile (/profile) passes no key: it is the signed-in person's.
@@ -72,7 +72,7 @@
     <section class="empty-card"><p>No activity matches this view yet.</p></section>
   {:else}
     {#each feed.items as card (card.id)}
-      <ProjectCard
+      <PersonalActivityCard
         {card}
         authorName={card.creatorName || 'Unnamed'}
         onSignal={(next) => feed.signal(card, next)}

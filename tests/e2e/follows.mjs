@@ -1,7 +1,8 @@
 // Follows and platform feedback (ADR 0054), as on web: Follow → Following, approval turns new
 // follows into requests the person accepts in Settings; Feedback lists bugs and suggestions
 // with votes, and guests can read it. @mention suggestions rank people you follow first, then
-// your followers, as web-backend does (ADR 0047).
+// your followers, as web-backend does (ADR 0047). Bob follows Ann, so her new project shows on
+// his Home feed with web's personal card; signed out, the feed stays Global.
 //   node tests/e2e/follows.mjs http://localhost:4174 [screens dir]
 // It signs up three test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -120,6 +121,27 @@ assert.deepEqual(
   [`cat${stamp}`, `bob${stamp}`],
 );
 log('ann\'s mention menu offers cat (followed) before bob (a follower)');
+
+// Home: Bob follows Ann, so her project is on his Home feed as a personal card.
+const seedSwap = `Seed swap ${stamp}`;
+await bob.goto(`${BASE}/`);
+await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
+await bob.getByRole('menuitemradio', { name: 'Home' }).click();
+await until(
+  bob,
+  `${BASE}/`,
+  () => bob.locator('.personal-activity-card', { hasText: seedSwap }).isVisible(),
+  'ann\'s project on Home',
+);
+const homeCard = bob.locator('.personal-activity-card', { hasText: seedSwap });
+assert.equal((await homeCard.locator('.identity .header-name').innerText()).trim(), `ann${stamp}`);
+assert.equal(await bob.locator('.project-card').count(), 0, 'Home has no public rows yet');
+await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
+await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
+await bob.getByRole('menuitemradio', { name: 'Global' }).click();
+await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
+assert.equal(await bob.locator('.personal-activity-card', { hasText: seedSwap }).count(), 0);
+log('bob\'s Home shows ann\'s project as a personal card; Global shows it once, as a public card');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);

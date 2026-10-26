@@ -19,8 +19,8 @@ scenario + browser tests, as M1–M4 did.
 - **Reset:** the directory DNA hash changes, so people sign up again on the test network
   (hosted apps reinstall, ADR 0028). Projects and chats keyed to old agents become unreachable.
   Say so in STATUS and README when it ships.
-- Decided in ADR 0054: requests exist (approval switch); mention ranking by follows and the
-  personal feed / Home scope are still to do.
+- Decided in ADR 0054: requests exist (approval switch). Mention ranking by follows (ADR 0047
+  update) and the Home scope with the personal feed (ADR 0055) followed on 2026-10-26.
 
 ## M5b — project batch: activities and roles (one project reset)
 - `Activity`, `Role`, `Assignment`, `Rating` (DOMAIN_MODEL), web's

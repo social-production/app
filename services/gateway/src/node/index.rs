@@ -43,18 +43,19 @@ impl ProjectIndex {
         *self.0.write().await = cards;
     }
 
-    /// One page of the feed, best first; `creator` keeps one person's projects (profiles).
+    /// One page of the feed, best first; non-empty `creators` keeps only their projects (a
+    /// profile's feed, or the people someone follows for web's Home feed).
     pub async fn page(
         &self,
         q: &FeedQuery<'_>,
-        creator: Option<&str>,
+        creators: &[&str],
         offset: usize,
         limit: usize,
     ) -> (Vec<ProjectCard>, usize) {
         let all = self.0.read().await;
         let cards: Vec<&ProjectCard> = all
             .iter()
-            .filter(|c| creator.is_none_or(|key| c.creator == key))
+            .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))
             .collect();
         let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
         let pairs: Vec<(&ProjectCard, &ItemStats)> = cards.into_iter().zip(&stats).collect();
@@ -140,7 +141,7 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, None, 0, 2).await;
+        let (page, total) = index.page(&q, &[], 0, 2).await;
         assert_eq!(total, 3);
         assert_eq!(
             page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -150,15 +151,17 @@ mod tests {
             search: "FOOD garden",
             ..q
         };
-        assert_eq!(index.page(&q, None, 0, 10).await.1, 1);
+        assert_eq!(index.page(&q, &[], 0, 10).await.1, 1);
     }
 
     #[tokio::test]
-    async fn keeps_one_creator() {
+    async fn keeps_the_given_creators() {
         let index = ProjectIndex::default();
         let mut mine = card("Garden", 1, 10);
         mine.creator = "ann".into();
-        index.replace(vec![mine, card("Bikes", 5, 5)]).await;
+        let mut bobs = card("Tools", 2, 20);
+        bobs.creator = "bob".into();
+        index.replace(vec![mine, card("Bikes", 5, 5), bobs]).await;
         let q = FeedQuery {
             sort: Sort::Top,
             window: Window::All,
@@ -166,7 +169,15 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, Some("ann"), 0, 10).await;
+        let (page, total) = index.page(&q, &["ann"], 0, 10).await;
         assert_eq!((page[0].title.as_str(), total), ("Garden", 1));
+        let (page, total) = index.page(&q, &["ann", "bob"], 0, 10).await;
+        assert_eq!(
+            (
+                page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
+                total
+            ),
+            (vec!["Tools", "Garden"], 2)
+        );
     }
 }

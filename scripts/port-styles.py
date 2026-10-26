@@ -41,10 +41,21 @@ def scope_selectors(selectors: str, root: str) -> str:
     return ", ".join(out)
 
 
+def unwrap_global(css: str) -> str:
+    """Replace every ":global(x)" with x, however deeply x nests its own parentheses."""
+    while (start := css.find(":global(")) != -1:
+        depth, end = 0, start + len(":global")
+        for end in range(end, len(css)):
+            depth += (css[end] == "(") - (css[end] == ")")
+            if depth == 0:
+                break
+        css = css[:start] + css[start + len(":global(") : end] + css[end + 1 :]
+    return css
+
+
 def port(css: str, root: str) -> str:
     css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-    for _ in range(3):
-        css = re.sub(r":global\(((?:[^()]|\([^()]*\))*)\)", r"\1", css)
+    css = unwrap_global(css)
     result, stack, pos = [], [], 0
     while pos < len(css):
         brace, close = css.find("{", pos), css.find("}", pos)

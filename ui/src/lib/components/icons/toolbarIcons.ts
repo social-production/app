@@ -10,6 +10,9 @@ export const toolbarIcons: Record<string, string> = {
     '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M12 7.5V12l3 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
   people:
     '<circle cx="9" cy="10" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M4.5 18.5c.8-2.4 2.4-3.8 4.5-3.8s3.7 1.4 4.5 3.8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" /> <circle cx="16.5" cy="10.5" r="2.3" fill="none" stroke="currentColor" stroke-width="1.6" /> <path d="M14.5 18.5c.5-1.6 1.5-2.5 3-2.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />',
+  // web's fallback icon (FeedToolbarIcon's {:else}), which its 'trending' falls through to.
+  trending:
+    '<path d="M5 17l4-6 3.5 4L16 9l3 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" /> <path d="M5 19h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
   'person-plus':
     '<circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M4.5 17.5c.8-2.2 2.3-3.5 4.5-3.5s3.7 1.3 4.5 3.5M17.5 8.5v5M15 11h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
   'person-check':

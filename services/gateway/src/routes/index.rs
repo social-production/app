@@ -10,6 +10,8 @@ use super::{ApiResult, AppState};
 use crate::node::{PersonCard, ProjectCard};
 
 const PAGE_MAX: usize = 50;
+/// The most creators one feed request may filter by (a Home feed of everyone someone follows).
+const CREATORS_MAX: usize = 500;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -26,7 +28,8 @@ pub struct FeedParams {
     /// The viewer's UTC offset in minutes east (JS: `-new Date().getTimezoneOffset()`).
     #[serde(default)]
     tz_offset: i32,
-    /// Only this person's projects (their profile's feed), by agent key.
+    /// Only these people's projects, by agent key, comma-separated: one for a profile's feed,
+    /// the people someone follows for web's Home feed.
     #[serde(default)]
     creator: String,
 }
@@ -56,11 +59,16 @@ pub async fn projects(
         utc_offset_minutes: p.tz_offset.clamp(-14 * 60, 14 * 60),
     };
     let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
-    let creator = Some(p.creator.as_str()).filter(|c| !c.is_empty());
+    let creators: Vec<&str> = p
+        .creator
+        .split(',')
+        .filter(|c| !c.is_empty())
+        .take(CREATORS_MAX)
+        .collect();
     let (items, total) = state
         .node
         .index
-        .page(&query, creator, p.offset, limit)
+        .page(&query, &creators, p.offset, limit)
         .await;
     Ok(Json(FeedPage { items, total }))
 }

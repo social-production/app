@@ -48,9 +48,9 @@ await pill.waitFor();
 // web's profile feed: the author link opens Ann's profile, which lists her project.
 await card.locator('.content-meta-row a').first().click();
 await guest.waitForURL(/\/profile\//);
-await guest.locator('.feed-stack .project-card', { hasText: title }).waitFor({ timeout: 60_000 });
+await guest.locator('.feed-stack .personal-activity-card', { hasText: title }).waitFor({ timeout: 60_000 });
 await guest.screenshot({ path: `${out}/phone390-guest-profile-feed.png` });
-const authors = await guest.locator('.feed-stack .content-meta-row a').allInnerTexts();
+const authors = await guest.locator('.feed-stack .identity .header-name').allInnerTexts();
 assert.deepEqual([...new Set(authors)], [`ann${stamp}`], 'only her projects');
 await guest.goBack();
 log('the guest saw the project on its author\'s profile');
