@@ -19,6 +19,15 @@ export interface ActivityRating {
   at: number;
 }
 
+/** Participants' check-ins once it has ended (web's participant completion side). */
+export interface ActivityCompletion {
+  eligible: number;
+  completed: number;
+  uncompleted: number;
+  mine: boolean | null;
+  canSet: boolean;
+}
+
 export interface Activity {
   id: string;
   author: string;
@@ -36,6 +45,7 @@ export interface Activity {
   rolesOpen: boolean;
   ratings: ActivityRating[];
   canRate: boolean;
+  completion: ActivityCompletion;
 }
 
 /** web's `minimumParticipants`: every role's required count. */

@@ -998,3 +998,347 @@
     display: flex;
   }
 }
+
+/* Ported from web/src/lib/features/projects/detail/components/ActivityHistorySection.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .card-rail-section,
+.activity-ui .card-rail,
+.activity-ui .history-expanded-content,
+.activity-ui .history-panel,
+.activity-ui .completion-follow-up,
+.activity-ui .community-completion-lines,
+.activity-ui .comments-list {
+  display: grid;
+  gap: 10px;
+}
+
+.activity-ui .history-expanded-content {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-ui .history-expanded-actions {
+  display: grid;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
+
+.activity-ui .history-context {
+  display: grid;
+  gap: 4px;
+}
+
+.activity-ui .history-context-primary,
+.activity-ui .history-context-meta,
+.activity-ui .community-completion-lines p,
+.activity-ui .community-rating-summary,
+.activity-ui .comment-row p {
+  margin: 0;
+}
+
+.activity-ui .history-context-primary {
+  color: var(--text-main);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.activity-ui .history-context-primary strong {
+  font-weight: 700;
+}
+
+.activity-ui .history-context-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.activity-ui .meta-separator {
+  color: var(--text-soft);
+}
+
+.activity-ui .history-panel {
+  gap: 8px;
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.activity-ui .history-section-heading {
+  margin: 0;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-ui .card-rail {
+  gap: 12px;
+}
+
+.activity-ui .card-rail:has(.activity-card-shell) {
+  gap: 0;
+}
+
+.activity-ui .history-rows {
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--panel-strong);
+  overflow: hidden;
+}
+
+.activity-ui .history-rows > .rail-card + .rail-card {
+  border-top: 1px solid var(--panel-border);
+}
+
+.activity-ui .section-head,
+.activity-ui .section-copy {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.activity-ui .section-head {
+  justify-content: space-between;
+}
+
+.activity-ui .section-copy {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.activity-ui .section-copy h3,
+.activity-ui .section-copy p {
+  margin: 0;
+}
+
+.activity-ui .section-copy p,
+.activity-ui .community-completion-lines p,
+.activity-ui .community-rating-summary,
+.activity-ui .comments-toggle {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.activity-ui .community-completion-lines p strong {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.activity-ui .comment-row,
+.activity-ui .empty-card {
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.activity-ui .comments-toggle {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activity-ui .comment-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.activity-ui .tone-good,
+.activity-ui .tone-mixed,
+.activity-ui .tone-poor {
+  --history-stripe: var(--panel-border);
+}
+
+.activity-ui .tone-good {
+  --history-stripe: #22c55e;
+}
+
+.activity-ui .tone-mixed {
+  --history-stripe: var(--status-yellow);
+}
+
+.activity-ui .tone-poor {
+  --history-stripe: var(--danger);
+}
+
+.activity-ui .tone-good .activity-card-shell,
+.activity-ui .tone-mixed .activity-card-shell,
+.activity-ui .tone-poor .activity-card-shell {
+  box-shadow: inset 3px 0 0 var(--history-stripe);
+}
+
+.activity-ui .role-badge {
+  padding: 2px 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  color: var(--text-soft);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.activity-ui .comment-row {
+  display: grid;
+  gap: 4px;
+}
+
+/* Ported from web/src/lib/features/projects/detail/components/HistoryRatingComposer.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .rating-saved,
+.activity-ui .rating-editor {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.activity-ui .rating-saved.rating-flat,
+.activity-ui .rating-editor.rating-flat {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.activity-ui .rating-note,
+.activity-ui .saved-comment {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.activity-ui .rating-note {
+  font-size: 11px;
+}
+
+.activity-ui .saved-stars,
+.activity-ui .star-row,
+.activity-ui .rating-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.activity-ui .saved-star {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-ui .saved-star.selected {
+  color: var(--brand-strong);
+}
+
+.activity-ui .star-button,
+.activity-ui .secondary-button,
+.activity-ui .text-button {
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activity-ui .star-button {
+  padding: 7px 10px;
+}
+
+.activity-ui .star-button.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.activity-ui .secondary-button {
+  padding: 8px 12px;
+  width: fit-content;
+}
+
+.activity-ui .secondary-button:disabled,
+.activity-ui .text-button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.activity-ui .text-button {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  width: fit-content;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.activity-ui textarea {
+  width: 100%;
+  resize: vertical;
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font: inherit;
+}
+
+/* Ported from web/src/lib/features/projects/detail/components/HistoryCompletionSideRow.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .completion-side-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.activity-ui .completion-side-label {
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-ui .completion-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.activity-ui .vote-chip {
+  padding: 7px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.activity-ui .vote-chip.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.activity-ui .vote-chip.negative.selected {
+  border-color: color-mix(in srgb, var(--status-red, #c44) 50%, var(--panel-border));
+  background: color-mix(in srgb, var(--status-red, #c44) 12%, var(--panel));
+  color: var(--status-red, #c44);
+}

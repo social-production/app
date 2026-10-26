@@ -19,7 +19,9 @@ mod value;
 use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
 
-pub use activity::{Activity, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline};
+pub use activity::{
+    Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
+};
 pub use governance::SNAPSHOT_MAX;
 pub use link::{LinkRequest, ProjectRef};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
@@ -140,6 +142,7 @@ pub enum EntryTypes {
     RoleSuggestion(RoleSuggestion),
     SuggestionDecline(SuggestionDecline),
     ActivityRating(ActivityRating),
+    ActivityCompletion(ActivityCompletion),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -169,7 +172,7 @@ pub enum LinkTypes {
     Assignments,
     /// Activity → a role suggestion or a decline of one.
     ActivityToSuggestions,
-    /// Activity → a participant's rating.
+    /// Activity → a participant's rating or completion check-in.
     ActivityToRatings,
 }
 
@@ -210,6 +213,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::RoleSuggestion(r) => activity::validate_suggestion(&r, &action),
             EntryTypes::SuggestionDecline(d) => activity::validate_decline(&d, &action),
             EntryTypes::ActivityRating(r) => activity::validate_rating(&r, &action),
+            EntryTypes::ActivityCompletion(c) => activity::validate_completion(&c, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })

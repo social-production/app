@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { fillChip, placeLabel, signupTone, type Activity } from '#lib/domain/activities.ts';
   import { clockTime, dateLine, multiDayEnd, zoneOf } from '#lib/domain/activityTime.ts';
@@ -24,6 +26,9 @@
     onSuggest: (role: number, agent: string) => void;
     onDecline: (suggestion: string) => void;
     searchPeople: (q: string) => Promise<{ agent: string; name: string }[]>;
+    /** web's historyMode: the past row's badge and rating line; the sheet gets `children`. */
+    history?: { badge: string; tone: 'open' | 'need' | 'locked'; rating: string } | null;
+    children?: Snippet;
   }
 
   let p: Props = $props();
@@ -38,6 +43,9 @@
   const place = $derived(placeLabel(a));
   const zone = $derived(zoneOf(new Date(a.startsAt / 1000)));
   const until = $derived(multiDayEnd(a.startsAt, a.endsAt));
+  const shortDay = $derived(
+    new Date(a.startsAt / 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }),
+  );
   const mapHref = $derived(
     `https://www.openstreetmap.org/search?query=${encodeURIComponent(a.place)}`,
   );
@@ -70,17 +78,25 @@
     onclick={() => (open = true)}
   >
     <span class="agenda-time">
+      {#if p.history}<span>{shortDay}</span>{/if}
       <span>{clockTime(a.startsAt)}</span>
-      <span class="agenda-end">{clockTime(a.endsAt)}{zone ? ` ${zone}` : ''}</span>
+      {#if !p.history}
+        <span class="agenda-end">{clockTime(a.endsAt)}{zone ? ` ${zone}` : ''}</span>
+      {/if}
     </span>
     <span class="agenda-main">
       <strong>{a.title}</strong>
       <span
         >{#if until}Until {until} ·{/if}
-        {place || 'Place to be confirmed'}</span
+        {place || 'Place to be confirmed'}{#if p.history}
+          · {p.history.rating}{/if}</span
       >
     </span>
-    <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+    {#if p.history}
+      <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
+    {:else}
+      <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+    {/if}
   </button>
 
   <OverlaySheet
@@ -125,6 +141,7 @@
       {/if}
       {#if a.roles.length > 0}
         <ActivityRoles
+          past={!!p.history}
           activity={a}
           names={p.names}
           me={p.me}
@@ -136,6 +153,7 @@
           searchPeople={p.searchPeople}
         />
       {/if}
+      {@render p.children?.()}
       <button
         class="text-button share-activity"
         type="button"

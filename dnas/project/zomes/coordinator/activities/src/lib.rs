@@ -3,12 +3,14 @@
 //! activity they took part in once it has ended.
 
 mod calls;
+mod history;
 mod reads;
 mod view;
 mod write;
 
 use hdk::prelude::*;
 
+pub use history::{CheckInInput, CompletionView};
 pub use view::{ActivityView, RatingView, RoleView, SuggestionView};
 pub use write::{NewActivity, NewRole, RateInput, RoleInput, SuggestInput};
 
@@ -51,4 +53,10 @@ pub fn decline_suggestion(suggestion: ActionHash) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn rate_activity(input: RateInput) -> ExternResult<ActionHash> {
     write::rate(input)
+}
+
+/// Say whether an activity you took part in happened, once it has ended (or clear it).
+#[hdk_extern]
+pub fn check_in(input: CheckInInput) -> ExternResult<ActionHash> {
+    history::check_in(input)
 }

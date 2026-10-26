@@ -10,6 +10,8 @@
     names: Record<string, string>;
     me: string;
     readOnly: boolean;
+    /** web's historyMode: who held each role, without suggestions. */
+    past?: boolean;
     canSuggest: boolean;
     onCommit: (role: number | null) => void;
     onSuggest: (role: number, agent: string) => void;
@@ -67,7 +69,9 @@
               {/each}
             </div>
           {/if}
-          {#if role.suggestion}
+          {#if p.past}
+            <!-- web shows no suggestions on past activities -->
+          {:else if role.suggestion}
             <span class="suggested-chip">Suggested · {nameOf(role.suggestion.person)}</span>
             {#if role.suggestion.person === p.me}
               {@const id = role.suggestion.id}

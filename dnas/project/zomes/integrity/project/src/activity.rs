@@ -146,21 +146,54 @@ pub fn validate_rating(
             return invalid(&reason);
         }
     }
-    let taken = must_get_action(r.assignment.clone())?;
+    if !is_own_assignment(&r.assignment, &r.activity, action.author())? {
+        return invalid("only participants can rate activities");
+    }
+    Ok(ValidateCallbackResult::Valid)
+}
+
+/// A participant's check-in once the activity has ended (web's history completion): it
+/// happened (`Some(true)`), it didn't (`Some(false)`), or cleared (`None`); the latest counts.
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct ActivityCompletion {
+    pub activity: ActionHash,
+    pub done: Option<bool>,
+    /// The author's `Assignments` link on this activity: only participants check in.
+    pub assignment: ActionHash,
+}
+
+pub fn validate_completion(
+    c: &ActivityCompletion,
+    action: &TypedAction<CreateData>,
+) -> ExternResult<ValidateCallbackResult> {
+    let Some(activity) = activity_at(&c.activity)? else {
+        return invalid("a check-in is for an activity");
+    };
+    if roles_open(activity.ends_at.as_micros(), action.timestamp().as_micros()) {
+        return invalid("an activity is checked in once it has ended");
+    }
+    if !is_own_assignment(&c.assignment, &c.activity, action.author())? {
+        return invalid("only assigned participants can set participant completion");
+    }
+    Ok(ValidateCallbackResult::Valid)
+}
+
+/// `hash` is an `Assignments` link `author` made on `activity` (deleted later or not).
+fn is_own_assignment(
+    hash: &ActionHash,
+    activity: &ActionHash,
+    author: &AgentPubKey,
+) -> ExternResult<bool> {
+    let taken = must_get_action(hash.clone())?;
     let ActionData::CreateLink(link) = &taken.action().data else {
-        return invalid("a rating cites its author's role in the activity");
+        return Ok(false);
     };
     let assignments: ScopedLinkType = crate::LinkTypes::Assignments.try_into()?;
     let is_assignment =
         link.zome_index == assignments.zome_index && link.link_type == assignments.zome_type;
     let base = link.base_address.clone().into_action_hash();
-    if !is_assignment
-        || taken.action().author() != action.author()
-        || base != Some(r.activity.clone())
-    {
-        return invalid("only participants can rate activities");
-    }
-    Ok(ValidateCallbackResult::Valid)
+    Ok(is_assignment && taken.action().author() == author && base.as_ref() == Some(activity))
 }
 
 /// Taking a role: activity → yourself, tag `[role]` + your `Members` link, before it ends.

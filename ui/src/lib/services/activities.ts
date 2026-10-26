@@ -33,6 +33,13 @@ interface ActivityWire {
   roles_open: boolean;
   ratings: { author: AgentPubKey; stars: number; comment: string; at: number }[];
   can_rate: boolean;
+  completion: {
+    eligible: number;
+    completed: number;
+    uncompleted: number;
+    mine: boolean | null;
+    can_set: boolean;
+  };
 }
 
 export interface NewActivityRole {
@@ -88,6 +95,13 @@ function toActivity(w: ActivityWire): Activity {
     rolesOpen: w.roles_open,
     ratings: w.ratings.map((r) => ({ ...r, author: hashToString(r.author) })),
     canRate: w.can_rate,
+    completion: {
+      eligible: w.completion.eligible,
+      completed: w.completion.completed,
+      uncompleted: w.completion.uncompleted,
+      mine: w.completion.mine,
+      canSet: w.completion.can_set,
+    },
   };
 }
 
@@ -157,4 +171,13 @@ export async function rateActivity(
     stars,
     comment,
   });
+}
+
+/** web's history completion: it happened, it didn't, or clear your check-in. */
+export async function checkIn(
+  project: ProjectRef,
+  activity: string,
+  done: boolean | null,
+): Promise<void> {
+  await activities<ActionHash>(project, 'check_in', { activity: stringToHash(activity), done });
 }

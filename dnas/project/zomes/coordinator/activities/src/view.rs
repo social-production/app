@@ -10,6 +10,7 @@ use project_integrity::{
 use sp_activity::{fill, roles_open, Taken};
 
 use crate::calls;
+use crate::history::{self, CompletionView};
 use crate::reads::{self, Found};
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -57,6 +58,8 @@ pub struct ActivityView {
     pub ratings: Vec<RatingView>,
     /// The caller took a role here, so may rate once it has ended.
     pub can_rate: bool,
+    /// Participants' check-ins (meaningful once it has ended).
+    pub completion: CompletionView,
 }
 
 /// Every activity, soonest first.
@@ -89,6 +92,12 @@ fn one(
         .iter()
         .position(|p| p.contains(me))
         .and_then(|i| u8::try_from(i).ok());
+    let everyone: Vec<AgentPubKey> = holders.iter().flatten().cloned().collect();
+    let completion = if open {
+        CompletionView::default()
+    } else {
+        history::completion(&a.hash, &everyone, me)?
+    };
     let mut suggestions = suggestions(&a.hash)?;
     let roles = a
         .entry
@@ -107,6 +116,7 @@ fn one(
     Ok(ActivityView {
         can_rate: my_take(&a.hash, me)?.is_some(),
         ratings: ratings(&a.hash)?,
+        completion,
         id: a.hash,
         author: a.author,
         created_at: a.at,

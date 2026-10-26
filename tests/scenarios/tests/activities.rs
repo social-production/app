@@ -65,11 +65,24 @@ struct RatingView {
 }
 
 #[derive(Deserialize, Debug)]
+struct CompletionView {
+    eligible: u32,
+    completed: u32,
+}
+
+#[derive(Deserialize, Debug)]
 struct ActivityView {
     id: ActionHash,
     roles: Vec<RoleView>,
     my_role: Option<u8>,
     ratings: Vec<RatingView>,
+    completion: CompletionView,
+}
+
+#[derive(Serialize, Debug)]
+struct CheckInInput {
+    activity: ActionHash,
+    done: Option<bool>,
 }
 
 fn in_secs(secs: i64) -> Timestamp {
@@ -242,7 +255,23 @@ async fn ratings(net: &Net) {
         .call(1, "activities", "rate_activity", rate(Some(4)))
         .await;
     net.settle().await;
+    let check_in = |done| CheckInInput {
+        activity: short.clone(),
+        done,
+    };
+    let not_assigned: Result<ActionHash, String> = net
+        .try_call(2, "activities", "check_in", check_in(Some(true)))
+        .await;
+    assert!(not_assigned.is_err(), "only participants check in");
+    let _: ActionHash = net
+        .call(1, "activities", "check_in", check_in(Some(true)))
+        .await;
+    net.settle().await;
     let seen = view(net, 0, &short).await;
+    assert_eq!(
+        (seen.completion.eligible, seen.completion.completed),
+        (1, 1)
+    );
     assert_eq!(seen.ratings.len(), 1, "the latest counts");
     assert_eq!(
         (seen.ratings[0].stars, seen.ratings[0].comment.as_str()),

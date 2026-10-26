@@ -4,9 +4,11 @@ import { namedRoles, newActivityForm, type ActivityForm } from '#lib/domain/acti
 import { rankMentions, type MentionPool } from '#lib/domain/mentions.ts';
 import type { PlanBoard, PlanKind } from '#lib/domain/plans.ts';
 import {
+  checkIn,
   createActivity,
   declineSuggestion,
   listActivities,
+  rateActivity,
   setCommitment,
   suggestRole,
 } from '#lib/services/activities.ts';
@@ -45,6 +47,7 @@ export class ActivitiesState {
   ) {}
 
   readonly live = $derived(this.activities.filter((a) => a.rolesOpen));
+  readonly past = $derived(this.activities.filter((a) => !a.rolesOpen));
 
   async load(): Promise<void> {
     try {
@@ -52,6 +55,7 @@ export class ActivitiesState {
       const people = all.flatMap((a) => [
         a.author,
         ...a.roles.flatMap((r) => [...r.people, ...(r.suggestion ? [r.suggestion.person] : [])]),
+        ...a.ratings.map((r) => r.author),
       ]);
       const unique = people.filter((a, i) => people.indexOf(a) === i);
       this.names = { ...this.names, ...(await namesOf(unique)) };
@@ -113,6 +117,12 @@ export class ActivitiesState {
 
   suggest = (activity: string, role: number, agent: string): Promise<void> =>
     this.write(() => suggestRole(this.projectId, activity, role, agent));
+
+  checkIn = (activity: string, done: boolean): Promise<void> =>
+    this.write(() => checkIn(this.projectId, activity, done));
+
+  rate = (activity: string, stars: number | null, comment: string): Promise<void> =>
+    this.write(() => rateActivity(this.projectId, activity, stars, comment));
 
   decline = (suggestion: string): Promise<void> =>
     this.write(() => declineSuggestion(this.projectId, suggestion));

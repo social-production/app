@@ -1,6 +1,7 @@
 <script lang="ts">
   import ActivityAgenda from '#lib/components/activities/ActivityAgenda.svelte';
   import ActivityCalendar from '#lib/components/activities/ActivityCalendar.svelte';
+  import ActivityHistory from '#lib/components/activities/ActivityHistory.svelte';
   import ActivityWizard from '#lib/components/activities/ActivityWizard.svelte';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
@@ -13,8 +14,8 @@
 
   /**
    * web's Activity phase (ProductiveLifecyclePhaseFive → ActivitySchedulingPanel): the calendar
-   * with Add activity, the composer, and upcoming activities as agenda rows. Past activity
-   * (history and ratings) follows in the next part of M5b.
+   * with Add activity, the composer, upcoming activities as agenda rows, and Past activity
+   * (check-ins and ratings).
    */
   let { detail, current }: { detail: DetailState; current: boolean } = $props();
 
@@ -75,6 +76,37 @@
         />
       {/if}
     </section>
+    {#if state.past.length > 0}
+      <details class="history-section">
+        <summary class="history-summary">
+          <span>Past activity</span>
+          <svg
+            class="history-chevron"
+            aria-hidden="true"
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+          >
+            <path
+              d="M6 9l6 6 6-6"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </summary>
+        <ActivityHistory
+          items={state.past}
+          names={state.names}
+          {me}
+          planStageOf={(id) => stages.find((s) => s.id === id)?.label ?? null}
+          onCheckIn={state.checkIn}
+          onRate={state.rate}
+        />
+      </details>
+    {/if}
   </section>
   {#if canCreate}
     <ActivityWizard

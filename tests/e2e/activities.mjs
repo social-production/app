@@ -2,7 +2,8 @@
 // phase is its first, so Ann offers one: she adds an activity with one Helper place on web's
 // calendar; Bob joins, takes the role (the row then reads Full), leaves it again; Ann's
 // suggestion of Bob for the role shows on his sheet and he declines it. Project chats take
-// photos since the same change: Bob sends one and Ann sees it load.
+// photos since the same change: Bob sends one and Ann sees it load. Last, a two-minute
+// activity Bob takes part in moves to Past activity, where he checks in and rates it.
 //   node tests/e2e/activities.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -132,6 +133,54 @@ await ann.waitForFunction((el) => el.complete && el.naturalWidth > 0, await phot
 });
 await ann.screenshot({ path: `${out}/phone390-project-chat-photo.png` });
 log('bob sent a photo in the project chat; ann sees it');
+
+// Past activity: a short activity ends; Bob checks in Completed and rates it 4 stars.
+const local = (d) => {
+  const pad = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+};
+const quick = `Quick tune ${stamp}`;
+const start = new Date(Date.now() + 2 * 60_000);
+const end = new Date(start.getTime() + 60_000);
+await takePart(ann);
+await ann.getByRole('button', { name: 'Add activity' }).click();
+await ann.getByPlaceholder('Activity title').fill(quick);
+await next();
+await ann.getByLabel('Start time').fill(local(start));
+await ann.getByLabel('Finish time').fill(local(end));
+await next();
+await ann.getByPlaceholder('Place or address').fill('The shed');
+await next();
+await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
+await next();
+await ann.getByPlaceholder('What should happen in this activity?').fill('A quick tune-up.');
+await next();
+await ann.getByRole('button', { name: 'Create activity' }).click();
+const quickRow = (page) => page.locator('.agenda-row', { hasText: quick });
+await quickRow(ann).waitFor({ timeout: 60_000 });
+for (let i = 0; ; i++) {
+  await takePart(bob);
+  if (await quickRow(bob).waitFor({ timeout: 20_000 }).then(() => true, () => false)) break;
+  if (i > 8) throw new Error('the short activity never reached bob');
+}
+await quickRow(bob).click();
+const quickSheet = bob.getByRole('dialog', { name: quick });
+await quickSheet.getByRole('button', { name: 'Take role' }).click();
+await quickSheet.getByRole('button', { name: 'Leave role' }).waitFor({ timeout: 60_000 });
+await bob.keyboard.press('Escape');
+log('bob took a role in a two-minute activity');
+await bob.waitForTimeout(Math.max(0, end.getTime() - Date.now()) + 5_000);
+await takePart(bob);
+await bob.getByText('Past activity').click();
+await quickRow(bob).click();
+await quickSheet.getByRole('button', { name: 'Completed', exact: true }).click();
+await quickSheet.getByText('1/1 completed · 0 uncompleted').waitFor({ timeout: 60_000 });
+await quickSheet.getByRole('button', { name: '4★' }).click();
+await quickSheet.getByPlaceholder('Optional comment').fill('Smooth gears.');
+await quickSheet.getByRole('button', { name: 'Save rating' }).click();
+await quickSheet.getByText('4★ · 1 ratings').waitFor({ timeout: 60_000 });
+await bob.screenshot({ path: `${out}/phone390-activity-history.png` });
+log('bob checked in and rated the past activity');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all activity checks passed');
