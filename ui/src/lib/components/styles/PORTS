@@ -90,3 +90,9 @@ feedback.css      .feedback-card  web/src/lib/components/cards/feedback/Feedback
 feedback.css      .feedback-strip web/src/lib/components/shared/FeedbackVoteStrip.svelte
 feedback.css      .feedback-sheet web/src/lib/components/shared/FeedbackComposeSheet.svelte
 feedback.css      .feedback-sheet web/src/lib/components/shared/FeedbackDetailSheet.svelte
+activities.css    .activity-ui    web/src/lib/components/cards/project-detail/ActivityAgendaList.svelte
+activities.css    .activity-ui    web/src/lib/components/cards/project-detail/CollapsibleActivityCard.svelte
+activities.css    .activity-ui    web/src/lib/features/projects/detail/components/ActivitySchedulingPanel.svelte
+activities.css    .activity-wizard web/src/lib/components/shared/ActivityCreationWizard.svelte
+activities.css    .activity-wizard web/src/lib/components/forms/project-detail/ProjectActivityRolesEditor.svelte
+activities.css    .activity-ui    web/src/lib/components/cards/project-detail/ProjectActivityCalendarCard.svelte

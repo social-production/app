@@ -1,0 +1,1000 @@
+/* Ported from web/src/lib/components/cards/project-detail/ActivityAgendaList.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .agenda {
+  display: grid;
+  gap: 10px;
+}
+
+.activity-ui .agenda-day-label {
+  margin: 0 0 4px;
+  color: var(--text-muted, var(--text-main));
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-ui .agenda-rows {
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm, 10px);
+  background: var(--panel-strong);
+  overflow: hidden;
+}
+
+.activity-ui .agenda-rows > .rail-card + .rail-card {
+  border-top: 1px solid var(--panel-border);
+}
+
+/* Ported from web/src/lib/components/cards/project-detail/CollapsibleActivityCard.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .activity-card-shell {
+  border: 1px solid var(--panel-border);
+  border-left-width: 4px;
+  border-radius: 0;
+  background: var(--panel-strong);
+  overflow: hidden;
+}
+
+.activity-ui .activity-card-shell.agenda {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.activity-ui .agenda-row {
+  width: 100%;
+  min-height: 64px;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr) max-content;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px 10px 16px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.activity-ui .activity-card-shell.agenda:not(.history-mode).signup-empty .agenda-row {
+  box-shadow: inset 3px 0 0 #ef4444;
+}
+
+.activity-ui .activity-card-shell.agenda:not(.history-mode).signup-partial .agenda-row {
+  box-shadow: inset 3px 0 0 var(--status-yellow);
+}
+
+.activity-ui .activity-card-shell.agenda:not(.history-mode).signup-met .agenda-row {
+  box-shadow: inset 3px 0 0 var(--brand);
+}
+
+.activity-ui .agenda-row:hover,
+.activity-ui .agenda-row:focus-visible,
+.activity-ui .activity-card-shell.agenda.highlighted .agenda-row {
+  background: var(--brand-soft);
+}
+
+.activity-ui .agenda-time {
+  display: grid;
+  gap: 2px;
+  min-width: 64px;
+  padding-right: 14px;
+  border-right: 1px solid var(--panel-border);
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.activity-ui .agenda-time .agenda-end {
+  font-size: 12px;
+}
+
+.activity-ui .agenda-end,
+.activity-ui .agenda-main span {
+  color: var(--text-muted, var(--text-main));
+  font-weight: 500;
+}
+
+.activity-ui .agenda-main {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.activity-ui .agenda-main strong {
+  display: -webkit-box;
+  overflow: hidden;
+  font-size: 15px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow-wrap: anywhere;
+}
+
+.activity-ui .agenda-main span {
+  overflow: hidden;
+  font-size: 13px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.activity-ui .agenda-chip {
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.activity-ui .agenda-chip.need {
+  background: var(--need-soft);
+  color: var(--need-strong);
+}
+
+.activity-ui .agenda-chip.full,
+.activity-ui .agenda-chip.locked {
+  background: var(--panel-soft);
+  color: var(--text-soft);
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+
+.activity-ui .activity-card-shell.signup-empty {
+  border-left-color: #ef4444;
+}
+
+.activity-ui .activity-card-shell.signup-partial {
+  border-left-color: var(--status-yellow);
+}
+
+.activity-ui .activity-card-shell.signup-met {
+  border-left-color: var(--brand);
+}
+
+.activity-ui .activity-card-shell:hover,
+.activity-ui .activity-card-shell.highlighted {
+  border-top-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  border-right-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  border-bottom-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+}
+
+.activity-ui .card-rail:has(.activity-card-shell),
+.activity-ui .surface-stack:has(.activity-card-shell) {
+  gap: 0;
+}
+
+.activity-ui .rail-card + .rail-card > .activity-card-shell,
+.activity-ui .surface-stack > * + * > .activity-card-shell {
+  margin-top: -1px;
+}
+
+.activity-ui .collapse-toggle {
+  width: 100%;
+  padding: 14px 14px 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  display: grid;
+  gap: 3px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.activity-ui .activity-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.activity-ui .activity-head strong {
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.3;
+  min-width: 0;
+}
+
+.activity-ui .live-fact {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.activity-ui .activity-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--panel-border);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-ui .history-rating-muted {
+  color: var(--text-soft);
+  font-style: italic;
+}
+
+.activity-ui .creator-tag {
+  color: var(--text-main);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.activity-ui .sheet-place,
+.activity-ui .sheet-when,
+.activity-ui .activity-stage {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.activity-ui .sheet-when,
+.activity-ui .activity-stage {
+  color: var(--text-soft);
+  font-weight: 400;
+}
+
+.activity-ui .sheet-section {
+  display: grid;
+  gap: 8px;
+}
+
+.activity-ui .sheet-section h3 {
+  margin: 0;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-ui .activity-note {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.activity-ui .activity-body {
+  display: grid;
+  gap: 8px;
+}
+
+.activity-ui .activity-body > .sheet-section {
+  margin-top: 10px;
+}
+
+.activity-ui .role-list {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid var(--panel-border);
+}
+
+.activity-ui .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--panel-border);
+  background: transparent;
+}
+
+.activity-ui .role-bar:last-child {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.activity-ui .role-copy {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.activity-ui .role-copy strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.activity-ui .role-copy > span {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.activity-ui .signup {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: auto;
+  min-width: 96px;
+  height: auto;
+  min-height: 40px;
+  padding: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  cursor: pointer;
+}
+
+.activity-ui .signup.selected {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+
+.activity-ui .signup.selected:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--danger) 12%, var(--panel-strong));
+  color: var(--danger);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--danger) 45%, transparent);
+}
+
+.activity-ui .signup:not(.selected):hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.activity-ui .signup.selected:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.activity-ui .signup:disabled {
+  opacity: 1;
+  color: var(--text-main);
+  background: var(--panel-strong);
+  cursor: not-allowed;
+}
+
+.activity-ui .assignee-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.activity-ui .assignee-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 6px;
+  border-radius: var(--radius-sm);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.activity-ui .assignee-row:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.activity-ui .suggested-chip {
+  justify-self: start;
+  width: fit-content;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.activity-ui .text-button {
+  justify-self: start;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.activity-ui .phase-badge {
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.activity-ui .phase-badge.complete {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 75%, var(--panel));
+  color: var(--brand-strong);
+}
+
+.activity-ui .phase-badge.upcoming {
+  border-color: color-mix(in srgb, var(--status-yellow) 44%, var(--panel-border));
+  background: color-mix(in srgb, var(--status-yellow-soft) 72%, var(--panel));
+  color: var(--status-yellow-strong);
+}
+
+.activity-ui .phase-badge.locked {
+  border-color: var(--panel-border);
+  background: var(--panel);
+  color: var(--text-soft);
+}
+
+.activity-ui .roles-locked-copy {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.activity-ui .map-link,
+.activity-ui .meeting-link {
+  color: var(--brand-strong);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.activity-ui .meeting-link {
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/features/projects/detail/components/ActivitySchedulingPanel.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .scheduling-panel,
+.activity-ui .card-rail-section,
+.activity-ui .unified-history {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-ui .history-section {
+  min-width: 0;
+  border-top: 1px solid var(--panel-border);
+  padding-top: 12px;
+}
+
+.activity-ui .empty-card {
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-ui .history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.activity-ui .history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.activity-ui .history-chevron {
+  transition: transform 0.15s ease;
+}
+
+.activity-ui .history-section[open] .history-chevron {
+  transform: rotate(180deg);
+}
+
+.activity-ui .history-section[open] > :not(summary) {
+  margin-top: 8px;
+}
+
+.activity-ui .scheduling-panel [id^='activity-card-'] {
+  scroll-margin-top: 92px;
+}
+
+/* Ported from web/src/lib/components/shared/ActivityCreationWizard.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-wizard .question-block {
+  display: grid;
+  gap: 16px;
+}
+
+.activity-wizard h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.activity-wizard .helper-copy {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.activity-wizard .validation-copy {
+  margin: 0;
+  color: var(--status-red-strong, #b42318);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.activity-wizard input,
+.activity-wizard textarea,
+.activity-wizard select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.activity-wizard .field-grid,
+.activity-wizard .review-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-wizard .field-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.activity-wizard label {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.activity-wizard .count-readout {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.activity-wizard .count-readout strong {
+  color: var(--text-main);
+}
+
+.activity-wizard .review-row {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.activity-wizard .review-row span {
+  font-size: 12px;
+  color: var(--text-soft);
+}
+
+.activity-wizard .review-row strong {
+  color: var(--text-main);
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+  .activity-wizard .field-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* Ported from web/src/lib/components/forms/project-detail/ProjectActivityRolesEditor.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-wizard .role-editor-shell,
+.activity-wizard .role-row-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-wizard .role-editor-note {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.activity-wizard .role-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px 132px auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.activity-wizard .role-suggest-field {
+  grid-column: 1 / -1;
+}
+
+.activity-wizard .suggested-chip-row,
+.activity-wizard .suggestion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.activity-wizard .suggested-chip,
+.activity-wizard .suggestion-item {
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-wizard .text-button {
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-wizard .role-field {
+  display: grid;
+  gap: 6px;
+}
+
+.activity-wizard .field-inline-label {
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.activity-wizard .role-remove-cell,
+.activity-wizard .role-add-row {
+  display: flex;
+}
+
+.activity-wizard .role-remove-cell {
+  align-items: end;
+  min-height: 100%;
+}
+
+.activity-wizard .role-add-row {
+  justify-content: flex-start;
+}
+
+.activity-wizard input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+}
+
+.activity-wizard .secondary-button {
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+@media (max-width: 760px) {
+  .activity-wizard .role-row {
+    grid-template-columns: 1fr;
+  }
+
+  .activity-wizard .role-remove-cell {
+    justify-content: flex-start;
+  }
+}
+
+/* Ported from web/src/lib/components/cards/project-detail/ProjectActivityCalendarCard.svelte (ADR 0032, scripts/port-styles.py) */
+.activity-ui .zone-label {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.activity-ui .calendar-shell {
+  container-type: inline-size;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  overflow-x: clip;
+}
+
+.activity-ui .create-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 2px;
+}
+
+.activity-ui .calendar-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.activity-ui .month-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-main);
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.activity-ui .month-button:hover,
+.activity-ui .month-button:focus-visible {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 20%, transparent);
+}
+
+.activity-ui .month-label {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+  text-align: center;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.activity-ui .calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0;
+  min-width: 0;
+}
+
+.activity-ui .calendar-header-row {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.activity-ui .weekday-short {
+  display: none;
+}
+
+.activity-ui .calendar-cell {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: var(--panel);
+  min-width: 0;
+  min-height: 96px;
+  padding: 0;
+  display: block;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.activity-ui .calendar-cell:hover,
+.activity-ui .calendar-cell:focus-visible,
+.activity-ui .calendar-cell:active,
+.activity-ui .hovered-day {
+  border-color: color-mix(in srgb, var(--brand) 42%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 34%, var(--panel));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 24%, transparent);
+}
+
+.activity-ui .selected-day {
+  border-color: var(--brand);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+.activity-ui .today-day .calendar-day-number {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.activity-ui .planned-day {
+  border-color: color-mix(in srgb, var(--brand) 34%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 16%, var(--panel));
+}
+
+.activity-ui .unplanned-day {
+  cursor: default;
+  opacity: 0.62;
+}
+
+.activity-ui .muted-day {
+  opacity: 0.45;
+}
+
+.activity-ui .past-day {
+  opacity: 0.7;
+}
+
+.activity-ui .calendar-day-number {
+  position: relative;
+  z-index: 1;
+  display: inline-block;
+  margin: 6px 0 0 6px;
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 999px;
+  line-height: 1.3;
+}
+
+.activity-ui .planned-indicator {
+  position: absolute;
+  top: 10px;
+  right: 8px;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.activity-ui .activity-dots {
+  display: none;
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 6px;
+  gap: 3px;
+  justify-content: center;
+}
+
+.activity-ui .activity-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+}
+
+.activity-ui .timeline-track {
+  position: absolute;
+  inset: 22px 3px 4px;
+  display: block;
+}
+
+.activity-ui .timeline-item {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 0;
+  border-radius: 3px;
+  border: 0;
+  min-height: 8px;
+  cursor: pointer;
+}
+
+.activity-ui .timeline-item:hover,
+.activity-ui .timeline-item:focus-visible,
+.activity-ui .hovered-activity,
+.activity-ui .selected-activity {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 40%, transparent);
+  z-index: 2;
+}
+
+.activity-ui .tone-red,
+.activity-ui .activity-dot.tone-red {
+  background: color-mix(in srgb, var(--tablet-community-bg) 70%, var(--panel));
+}
+
+.activity-ui .tone-yellow,
+.activity-ui .activity-dot.tone-yellow {
+  background: color-mix(in srgb, var(--status-yellow) 70%, var(--panel));
+}
+
+.activity-ui .tone-green,
+.activity-ui .activity-dot.tone-green {
+  background: color-mix(in srgb, var(--brand) 55%, var(--panel));
+}
+
+.activity-ui .tone-muted,
+.activity-ui .activity-dot.tone-muted {
+  background: color-mix(in srgb, var(--text-soft) 35%, var(--panel));
+}
+
+@container (max-width: 560px) {
+  .activity-ui .weekday-full {
+    display: none;
+  }
+
+  .activity-ui .weekday-short {
+    display: inline;
+  }
+
+  .activity-ui .calendar-cell {
+    min-height: 52px;
+  }
+
+  .activity-ui .calendar-day-number {
+    font-size: 14px;
+    margin: 4px auto 0;
+    display: block;
+    text-align: center;
+  }
+
+  .activity-ui .timeline-track {
+    display: none;
+  }
+
+  .activity-ui .activity-dots {
+    display: flex;
+  }
+}
+
+@media (max-width: 760px) {
+  .activity-ui .weekday-full {
+    display: none;
+  }
+
+  .activity-ui .weekday-short {
+    display: inline;
+  }
+
+  .activity-ui .calendar-cell {
+    min-height: 52px;
+  }
+
+  .activity-ui .calendar-day-number {
+    font-size: 14px;
+    margin: 4px auto 0;
+    display: block;
+    text-align: center;
+  }
+
+  .activity-ui .timeline-track {
+    display: none;
+  }
+
+  .activity-ui .activity-dots {
+    display: flex;
+  }
+}
