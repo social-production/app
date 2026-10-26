@@ -31,15 +31,15 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: deploy of PR #55 + docs, branch `claude/social-production-handoff-dsam61`
-- PR #55 merged 17:50 UTC; ui + bootstrap live by 17:52 UTC; **seed-node deploy pending** at
-  18:05 UTC (PR #54's seed-node deploy had failed after 43 min, so the live node was still
-  PR #52's gateway and hApp). Until the seed node redeploys, the new live UI calls an
-  `activities` zome the old hApp doesn't have.
-- This branch: README Status/roadmap for M5a/M5b, CI scenarios in 5 shards (CLAUDE.md too).
-- After the seed node is up: live `activities.mjs` (creates 2 accounts), `follows.mjs`,
-  `guests.mjs`, `shell.mjs`; then move this entry to Done. If the deploy fails again, the owner
-  needs Railway's build log (seed-node → Deployments).
+## In flight 2026-10-27: docs + CI in 5 shards, branch `claude/social-production-handoff-dsam61`
+- README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
+- **PR #55 deployed:** merged 17:50 UTC; ui + bootstrap live 17:52 UTC, seed node 18:16 UTC
+  (26 min; this one succeeded, so PR #54's gateway is live too). Live smoke 18:21–18:29 UTC
+  all passed on the first run: `shell.mjs`, `guests.mjs`, `follows.mjs` (Home personal cards,
+  mention order), `activities.mjs` (activity, roles, suggestion, project-chat photo, Past
+  activity check-in and rating). `/readyz` 1333 MB at start, 1672 MB after those tests
+  (~9 accounts): keep sampling it.
+- Next: merge this PR once CI is green (scenarios in 5 shards), then STATUS Next.
 
 ## Done 2026-10-26: M5b activities and roles, first part (ADR 0056), PR #55 merged (17:50 UTC / 4:50 am Melbourne 27 Oct)
 **The project network reset with this merge** (integrity change): every live test project starts again;
@@ -702,7 +702,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `f55b5e9` (PR #50, deployed 2026-10-25 ~14:46 UTC, ~29 min after the merge; gateway). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `daf5b73` (PR #55, merged 2026-10-26 17:50 UTC; seed node live 18:16 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
