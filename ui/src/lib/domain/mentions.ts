@@ -1,13 +1,21 @@
 /**
  * Who "@na…" suggests and who "@name" means (ADR 0047). web-backend ranks people you follow,
- * then your followers, then everyone (people_suggestions.py). The app has no follows yet, so
- * the nearest circles are the people in this chat, then the people you have direct or group
- * chats with; follows slot in between when they are ported. Within a circle an exact name
- * comes first, then names starting with the query, then names containing it, by name.
+ * then your followers, then everyone (people_suggestions.py). The app puts the people in this
+ * chat first, then those two, then the people you have direct or group chats with. Within a
+ * circle an exact name comes first, then names starting with the query, then names containing
+ * it, by name.
  */
 export interface Mentionable {
   agent: string;
   name: string;
+}
+
+/** Where suggestions come from: the directory, your accepted follows, your chat partners. */
+export interface MentionPool {
+  people: Mentionable[];
+  following: string[];
+  followers: string[];
+  partners: string[];
 }
 
 export const MENTION_RESULTS = 8;

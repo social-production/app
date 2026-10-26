@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-25 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-26 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,6 +31,37 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
+## In flight 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54, branch `claude/social-production-handoff-dsam61`
+STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.
+- **Mention ranking** (web-backend `people_suggestions.py`): people you follow, then your
+  followers (accepted only). Circles now: this chat, following, followers, your other chats'
+  members, everyone (`domain/mentions.ts` `MentionPool`, `services/follows.ts` `followCircles`).
+- **Home scope (ADR 0055):** web's scope menu (Home / Global; Region waits on M6) and audience
+  menu (Following only / Following + popular, signed in), with web's `combineFeeds` default
+  on. Home = joined channels/communities (none until M5d) merged with the projects of people
+  you follow (`domain/homeFeed.ts` `mergeHomeFeed`, `features/projects/homeFeedState.svelte.ts`).
+  Personal rows use web's `PersonalActivityCard` + `PersonalFeedIdentity` (new, styles via
+  PORTS), and so does the profile feed. Gateway: `/index/projects?creator=` takes a
+  comma-separated list (≤500). Scope/audience kept per device (`sp_feed_scope`,
+  `sp_home_audience`). "Following + popular" changes nothing until posts/threads exist.
+- **Fixed** `scripts/port-styles.py`: `:global(...)` with nested parentheses is unwrapped by
+  paren matching, so `detail.css`'s project-overview signal-row rules (dropped before, with a
+  lightningcss build warning) now apply as on web. Regenerating all PORTS now changes only
+  `detail.css` (+ the new cards block) after prettier: the other ported files match today's web.
+- `screens/` (test screenshots) is now in `.gitignore`: the first commit had added some by
+  mistake; they're removed again on this branch.
+- Tests: `tests/e2e/follows.mjs` checks Ann's menu offers Cat (followed) before Bob (a
+  follower, sorts first), Bob's Home shows Ann's project as a personal card and Global shows it
+  once as a public card; `guests.mjs` reads the profile feed's personal cards.
+- Checked: `npm run check`/`lint`, sizes, boundaries; gateway clippy `-D warnings` (release),
+  fmt, gateway tests (new multi-creator test); against a local release seed node
+  (`RELEASE=1 bash scripts/cloud-seed.sh`, restarted with this gateway): `follows`, `guests`,
+  `shell`, `projects`, `governance`, `mentions` all passed. No scenario changes (no zome change).
+- Live at start of session (~13:00 UTC 2026-10-26): `/readyz` uptime 15.4 h (no restart since
+  the M5a deploy), `rssMb` 629.
+- After merge: smoke live `follows.mjs` (creates 3 accounts), `guests.mjs`, `shell.mjs`;
+  update README Status + this entry to "Done".
+
 ## Done 2026-10-25: M5a follows + feedback (ADR 0054), PR #52 merged (19:32 UTC / 6:32 am Melbourne), seed node live 19:57 UTC
 **This reset the directory network: everyone on the test network signs up again**
 (projects and chats tied to old agents become unreachable, as after earlier directory changes).
@@ -53,9 +84,8 @@ conversation's zomes untouched); directory is now `uhC0kA14W4Y…`.
 - Live (19:59–20:08 UTC): `follows.mjs`, `shell.mjs`, `guests.mjs` all passed. Seed node up since
   19:57 UTC with no restart; `rssMb` 1192 at start, 1424 after those tests (9 accounts): higher
   than the ~1.2 GB seen after earlier smokes, so keep sampling `/readyz` next session.
-- Known, not from this branch: the UI build warns that `detail.css` has a multi-line
-  `:global(` the port script didn't unwrap (`.project-overview .signal-row`), so those rules
-  are dropped; fix in `scripts/port-styles.py`'s `:global` regex.
+- Known, not from this branch: the UI build warned that `detail.css` had a multi-line
+  `:global(` the port script didn't unwrap; fixed 2026-10-26 (PR #54).
 - Still to do in M5: mention ranking by follows (ADR 0047), the personal feed / Home scope,
   then M5b (activities and roles, one project reset).
 
@@ -653,9 +683,8 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 Port each screen from web (Owner decisions); compare at 390px with live web first.
 1. **Parity pass** (checklist: `docs/plans/PARITY.md`): what's left there waits on features
    (follows, scopes, places, moderation); pick items up as their features land.
-2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (one directory reset;
-   ADR 0054 drafted as **proposed**, build it next),
-   M5b activities and roles + the waiting project-chat items (one project reset), M5c events
+2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (done, ADR 0054; its
+   mention ranking and Home scope in PR #54), **next: M5b** activities and roles + the waiting project-chat items (one project reset), M5c events
    and help requests, M5d communities and channels. Each starts with its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.

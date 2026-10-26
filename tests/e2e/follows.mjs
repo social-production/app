@@ -1,6 +1,8 @@
 // Follows and platform feedback (ADR 0054), as on web: Follow → Following, approval turns new
 // follows into requests the person accepts in Settings; Feedback lists bugs and suggestions
-// with votes, and guests can read it.
+// with votes, and guests can read it. @mention suggestions rank people you follow first, then
+// your followers, as web-backend does (ADR 0047). Bob follows Ann, so her new project shows on
+// his Home feed with web's personal card; signed out, the feed stays Global.
 //   node tests/e2e/follows.mjs http://localhost:4174 [screens dir]
 // It signs up three test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -90,6 +92,56 @@ await until(
   'the accepted follow',
 );
 log('ann accepts; cat is following');
+
+// Mentions: Ann follows Cat, so "@<stamp>" in her project chat offers Cat before Bob (a
+// follower), although Bob's name sorts first.
+await until(ann, `${BASE}/profile/${await keyOf(cat)}`, () =>
+  ann.getByRole('button', { name: `Follow cat${stamp}` }).isVisible(), 'cat');
+await ann.getByRole('button', { name: `Follow cat${stamp}` }).click();
+await ann.getByRole('button', { name: `Unfollow cat${stamp}` }).waitFor({ timeout: 60_000 });
+await ann.goto(`${BASE}/create/project`);
+await ann.getByRole('button', { name: 'Continue' }).click();
+await ann.getByLabel('Title').fill(`Seed swap ${stamp}`);
+await ann.getByLabel('Proposal description').fill('Swap seeds in spring.');
+for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('heading', { name: `Seed swap ${stamp}` }).waitFor({ timeout: 120_000 });
+const chatUrl = `${ann.url()}?tab=chat`;
+const options = ann.getByRole('option');
+const offered = async () => {
+  const box = ann.getByRole('textbox', { name: 'Message the project...' });
+  await box.fill('');
+  await box.pressSequentially(`@${stamp}`, { delay: 30 });
+  await options.first().waitFor({ timeout: 10_000 });
+  return (await options.count()) >= 2;
+};
+await until(ann, chatUrl, offered, 'both people in the mention menu');
+assert.deepEqual(
+  (await options.allInnerTexts()).map((t) => t.trim().split(/\s/)[0]),
+  [`cat${stamp}`, `bob${stamp}`],
+);
+log('ann\'s mention menu offers cat (followed) before bob (a follower)');
+
+// Home: Bob follows Ann, so her project is on his Home feed as a personal card.
+const seedSwap = `Seed swap ${stamp}`;
+await bob.goto(`${BASE}/`);
+await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
+await bob.getByRole('menuitemradio', { name: 'Home' }).click();
+await until(
+  bob,
+  `${BASE}/`,
+  () => bob.locator('.personal-activity-card', { hasText: seedSwap }).isVisible(),
+  'ann\'s project on Home',
+);
+const homeCard = bob.locator('.personal-activity-card', { hasText: seedSwap });
+assert.equal((await homeCard.locator('.identity .header-name').innerText()).trim(), `ann${stamp}`);
+assert.equal(await bob.locator('.project-card').count(), 0, 'Home has no public rows yet');
+await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
+await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
+await bob.getByRole('menuitemradio', { name: 'Global' }).click();
+await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
+assert.equal(await bob.locator('.personal-activity-card', { hasText: seedSwap }).count(), 0);
+log('bob\'s Home shows ann\'s project as a personal card; Global shows it once, as a public card');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);

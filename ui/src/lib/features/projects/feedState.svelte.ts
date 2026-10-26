@@ -16,9 +16,10 @@ export class FeedState {
 
   readonly hasMore = $derived(this.items.length < this.total);
 
+  /** Only these people's projects (comma-separated keys): a profile, or the people you follow. */
   constructor(
     readonly search: () => string,
-    readonly creator?: string,
+    public creator?: string,
   ) {}
 
   async reload(): Promise<void> {

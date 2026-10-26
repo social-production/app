@@ -38,16 +38,17 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   left out for guests (device data stays out of the guest allowlist).
 - [x] Profile feed: web's toolbar (All/Public, Newest/Top/Oldest) and stack under the header,
   with the person's projects from the feed index (`/index/projects?creator=`).
-- [ ] Profile feed cards: web uses `PersonalFeedCard` there (author row with avatar inside the
-  card); the app reuses the public `ProjectCard`. Port it when events/activities join the
-  profile feed (M5).
+- [x] Profile feed cards: web's `PersonalActivityCard` (author row with avatar inside the
+  card), ADR 0055. Avatars show initials (the index has no pictures).
 - [x] Followers / following counts with people sheets, the Follow / Requested / Following
   button and the Follow requests card on your own profile (M5a, ADR 0054).
 
 ## Feed
-- [ ] Toolbar: web's scope menu (globe: Home / Global / Region) comes first. The app is Global
-  only: Home needs follows and joined communities, Region needs place coordinates (M6 map).
-  Port the menu when either lands.
+- [x] Toolbar: web's scope menu (Home / Global) first, then the audience menu (Following
+  only / Following + popular) signed in (ADR 0055). Home = joined channels/communities (none
+  until M5d) merged with the projects of people you follow, on web's personal cards.
+- [ ] Toolbar: Region in the scope menu (needs place coordinates, M6); "Following + popular"
+  adds web's discovery posts and threads once they exist.
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
   the gateway index (`commentCount` counts up to the chat's 200-message page).
 - [x] Cards: layout already matched (channel/community tags top-left, author + members + date

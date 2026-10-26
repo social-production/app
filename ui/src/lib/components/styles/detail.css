@@ -473,52 +473,40 @@
 
 .project-overview
   .signal-row
-  :global(.signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose)) .vote-button),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button,
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:hover:not(:disabled)
-  ),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:hover:not(:disabled),
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose)) .vote-button:focus
-  ),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:focus,
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:focus-visible
-  ) {
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:focus-visible {
   background: var(--brand);
   color: var(--page-bg);
 }
 
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:last-child
-  ),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child,
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:last-child:hover:not(:disabled)
-  ),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:hover:not(:disabled),
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:last-child:focus
-  ),
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:focus,
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:last-child:focus-visible
-  ) {
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:focus-visible {
   background: var(--danger);
   color: white;
 }
@@ -633,10 +621,8 @@
 
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:first-child:hover:not(:disabled)
-  ) {
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:first-child:hover:not(:disabled) {
   background: color-mix(in srgb, var(--brand) 78%, white);
   color: var(--page-bg);
   filter: none;
@@ -645,10 +631,8 @@
 
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
-      .vote-button:last-child:hover:not(:disabled)
-  ) {
+  .signal-strip.labeled:not(:has(.active-support)):not(:has(.active-oppose))
+  .vote-button:last-child:hover:not(:disabled) {
   background: color-mix(in srgb, var(--danger) 78%, white);
   color: white;
   filter: none;
@@ -657,10 +641,8 @@
 
 .project-overview
   .signal-row
-  :global(
-    .signal-strip.labeled:is(:has(.active-support), :has(.active-oppose))
-      .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled)
-  ) {
+  .signal-strip.labeled:is(:has(.active-support), :has(.active-oppose))
+  .vote-button:not(.active-support):not(.active-oppose):hover:not(:disabled) {
   background: var(--brand-soft);
   color: var(--brand-strong);
   filter: none;

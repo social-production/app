@@ -20,6 +20,8 @@ import {
 
 import { uploadFiles } from './attachments.ts';
 import { toChatMessage, type MessageWire } from './chat.ts';
+import type { MentionPool } from '#lib/domain/mentions.ts';
+import { followCircles } from './follows.ts';
 import { listPeople, myAgent, namesOf } from './people.ts';
 
 interface InvitationWire {
@@ -217,20 +219,18 @@ export async function contacts(): Promise<Contact[]> {
 }
 
 /**
- * What @mention suggestions draw on (ADR 0047): the directory, and the people in the chats you
- * are in. `known` saves reading every chat when the caller already has the list.
+ * What @mention suggestions draw on (ADR 0047): the directory, your follows, and the people in
+ * the chats you are in. `known` saves reading every chat when the caller already has the list.
  */
-export async function mentionPool(
-  known?: ChatSummary[],
-): Promise<{ people: Contact[]; partners: string[] }> {
+export async function mentionPool(known?: ChatSummary[]): Promise<MentionPool> {
   const chats = async (): Promise<ChatSummary[]> => {
     if (known) return known;
     const invites = await myChats();
     const settled = await Promise.allSettled(invites.map((i) => chatSummary(i.seed, i.at)));
     return settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []));
   };
-  const [people, mine] = await Promise.all([contacts(), chats()]);
-  return { people, partners: mine.filter((c) => c.member).flatMap((c) => c.members) };
+  const [people, mine, follows] = await Promise.all([contacts(), chats(), followCircles()]);
+  return { people, ...follows, partners: mine.filter((c) => c.member).flatMap((c) => c.members) };
 }
 
 /**

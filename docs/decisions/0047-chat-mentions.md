@@ -19,16 +19,16 @@ In the app a profile's address is its agent key, and usernames aren't unique on 
 - **Menu in every chat:** project chats (as on web) and, at the owner's request (2026-10-23),
   direct and group chats too. web-backend already notifies mentions typed there.
 - **Ranked by closeness** (`domain/mentions.ts`): web-backend ranks people you follow, then your
-  followers, then everyone. The app has no follows yet, so the circles are the people in this
-  chat (a chat's members, or the people a project page knows), then the people in your other
-  direct and group chats, then everyone in the directory; follows (and their followers) slot in
-  once web's follow screens are ported. Within a circle: the exact name, then names starting
+  followers, then everyone. The app's circles are the people in this chat (a chat's members,
+  or the people a project page knows), then people you follow, then your followers (accepted
+  follows only, ADR 0054; added 2026-10-26), then the people in your other direct and group
+  chats, then everyone in the directory. Within a circle: the exact name, then names starting
   with the query, then names containing it, alphabetically. 8 at most, yourself left out.
 - **Same names:** a name shown twice in the menu carries its key tag (`Bob · 7NFm`), as the
   app does elsewhere. `@name` links to the nearest person with that name by the same ranking;
   a name nobody known has is shown styled but unlinked.
-- **Sources:** the directory's people list and your chats' members (`services/messages.ts`
-  `mentionPool`), read once per chat view when someone types `@` or a message mentions
+- **Sources:** the directory's people list, your follows (`services/follows.ts`
+  `followCircles`) and your chats' members (`services/messages.ts` `mentionPool`), read once per chat view when someone types `@` or a message mentions
   someone, and again after a search finds nobody (a new account can lag).
 - **Notifications** are derived on the mentioned person's device (ADR 0046): a message by
   someone else whose `@name`s include your username (case ignored). Project chats give web's
@@ -48,5 +48,5 @@ In the app a profile's address is its agent key, and usernames aren't unique on 
 - Each bell refresh now also reads the newest page of messages in every direct and group chat
   you're in (the unread badge already reads their summaries). Fine at today's sizes; a
   per-chat "mentions of me" call would trim it later.
-- Not yet: the follow circles (no follows in the app), web's internal-path links
-  (`/projects/…`) in messages.
+- Internal-path links (`/projects/…`) in messages came on 2026-10-23 (PR #30); the follow
+  circles on 2026-10-26, after follows (ADR 0054).

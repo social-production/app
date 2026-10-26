@@ -11,6 +11,8 @@
     href?: ResolvedPathname | null;
     /** CSS colour for the left accent bar (web's surface type accent). */
     accent: string | null;
+    /** web's tones: public-feed rows, or personal-feed rows (author first). */
+    tone?: 'public' | 'personal';
     /** Tighter padding for dense rows such as notifications. */
     compact?: boolean;
     /** Feed cards clamp body/summary; notifications show it whole. */
@@ -18,11 +20,18 @@
     children: Snippet;
   }
 
-  let { href = null, accent, compact = false, clampExcerpts = true, children }: Props = $props();
+  let {
+    href = null,
+    tone = 'public',
+    accent,
+    compact = false,
+    clampExcerpts = true,
+    children,
+  }: Props = $props();
 </script>
 
 <article
-  class="surface tone-public clickable"
+  class="surface clickable tone-{tone}"
   class:compact
   class:has-accent={!!accent}
   style={accent ? `--row-accent: ${accent};` : undefined}

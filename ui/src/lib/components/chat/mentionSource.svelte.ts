@@ -1,10 +1,9 @@
-import { mentionTarget, rankMentions, type Mentionable } from '#lib/domain/mentions.ts';
-
-/** Where suggestions come from: the directory, and the people you have chats with. */
-export interface MentionPool {
-  people: Mentionable[];
-  partners: string[];
-}
+import {
+  mentionTarget,
+  rankMentions,
+  type Mentionable,
+  type MentionPool,
+} from '#lib/domain/mentions.ts';
 
 /** The chat being written in: you, its people, and the names it already knows. */
 export interface MentionHere {
@@ -19,7 +18,12 @@ export interface MentionHere {
  * account can take a while to reach this node's directory.
  */
 export class MentionSource {
-  private pool = $state<MentionPool>({ people: [], partners: [] });
+  private pool = $state<MentionPool>({
+    people: [],
+    following: [],
+    followers: [],
+    partners: [],
+  });
   private loading: Promise<MentionPool> | undefined;
 
   constructor(
@@ -58,6 +62,7 @@ export class MentionSource {
   }
 
   private circles(): string[][] {
-    return [this.here().agents, this.pool.partners];
+    const { following, followers, partners } = this.pool;
+    return [this.here().agents, following, followers, partners];
   }
 }
