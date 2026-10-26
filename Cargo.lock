@@ -8736,6 +8736,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "sp_activity"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
+]
+
+[[package]]
 name = "sp_attachment"
 version = "0.0.1"
 dependencies = [
