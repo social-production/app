@@ -57,3 +57,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0053](./0053-wasm-module-leak.md) Patch Holochain so compiled zomes are loaded once, not once per new cell (the seed node's out-of-memory crash)
 - [0054](./0054-follows-and-feedback.md) Follows and platform feedback in the directory (M5a)
 - [0055](./0055-home-feed-scope.md) The feed's Home scope: the projects of people you follow, merged as on web
+- [0056](./0056-activities-and-roles.md) Activities and roles in projects, plus the waiting project-chat items (M5b, proposed)
