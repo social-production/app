@@ -1,6 +1,6 @@
 # 0056. Activities and roles in projects, plus the waiting project-chat items (M5b)
 
-Status: **proposed** (2026-10-26). Plan: [`docs/plans/M5-work.md`](../plans/M5-work.md) M5b.
+Status: **accepted** (2026-10-26), first part built (see "As built"). Plan: [`docs/plans/M5-work.md`](../plans/M5-work.md) M5b.
 One project-DNA reset carries all of it: every live test project starts again.
 
 ## Context
@@ -22,7 +22,7 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
 - Waiting since ADR 0044/0049 for the next project-DNA change: photos and files in project
   chats, and private read marks for project chats (today kept per device).
 
-## Decision (proposed)
+## Decision
 - **Rules in a new crate `sp_activity`** (not `sp_core`, which would change every DNA's
   hash): field limits, the role-count rule below, the time locks, rating bounds.
 - **`Activity` entry** (project integrity), roles embedded (a role is its index in the list),
@@ -58,6 +58,23 @@ web (web-backend `services/projects/actions.py`, `activity_role_suggestions.py`,
 - **UI ported from web:** the Activity phase's scheduling panel, agenda list, collapsible
   activity cards (roles, take/leave, suggest, rate), the creation wizard; feed and profile
   activity cards and the right rail's activity follow once this lands (PARITY).
+
+## As built (2026-10-26, first part)
+- `crates/sp_activity` (limits, `roles_open`, `check_rating`, `fill`); project integrity
+  `activity.rs` (`Activity`, `RoleSuggestion`, `SuggestionDecline`, `ActivityRating`, links
+  `Activities`, `Assignments`, `ActivityToSuggestions`, `ActivityToRatings`); a new coordinator
+  zome `activities` in the project DNA (`create_activity`, `list_activities`, `take_role`,
+  `leave_role`, `suggest_role`, `decline_suggestion`, `rate_activity`), readable by guests
+  through the gateway (`list_activities`).
+- Discussion zome: `ChatMessage.attachments`, `Chunk`, a private `ReadMark` (`mark_read`,
+  `read_at`, `upload_chunk`, `get_chunk`); the Public tab's unread counts now read it. Pin, mute
+  and hide for project chats stay per device (ADR 0044).
+- UI ported from web: the calendar card with Add activity, the creation wizard (place is a
+  plain label or Online until places land, M6), agenda rows grouped by day, the activity sheet
+  (place, when, linked plan stage, description, roles with Take/Leave, Suggest someone,
+  Decline, Share activity). Photos and files in project chats.
+- Not yet (next part): Past activity (web's ActivityHistorySection: ratings and "mark done"),
+  activity notifications, feed and profile activity cards, the right rail's activity.
 
 ## Open before building
 - Whether "mark done" history (`project_service_history_completions`) is in this batch: it

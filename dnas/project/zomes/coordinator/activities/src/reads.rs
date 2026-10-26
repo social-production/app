@@ -21,9 +21,21 @@ pub struct Found<T> {
 pub fn found<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
     hash: ActionHash,
 ) -> ExternResult<Option<Found<T>>> {
+    found_of(hash, None)
+}
+
+/// The record at `hash` as a `T`; `None` when it is missing or (with `kind`) of another type,
+/// since suggestions and declines share one link type.
+fn found_of<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
+    hash: ActionHash,
+    kind: Option<&EntryType>,
+) -> ExternResult<Option<Found<T>>> {
     let Some(record) = get(hash.clone(), GetOptions::default())? else {
         return Ok(None);
     };
+    if kind.is_some_and(|k| record.action().entry_type() != Some(k)) {
+        return Ok(None);
+    }
     let entry = record
         .entry()
         .to_app_option::<T>()
@@ -47,9 +59,10 @@ pub fn linked<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
         .into_iter()
         .filter_map(|l| l.target.into_action_hash())
         .collect();
+    let kind = EntryType::App(entry_type.try_into()?);
     let mine = query(
         ChainQueryFilter::new()
-            .entry_type(EntryType::App(entry_type.try_into()?))
+            .entry_type(kind.clone())
             .include_entries(true),
     )?;
     hashes.extend(mine.iter().map(|r| r.action_address().clone()));
@@ -57,7 +70,7 @@ pub fn linked<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
     hashes.dedup();
     let mut out: Vec<Found<T>> = hashes
         .into_iter()
-        .filter_map(|h| found::<T>(h).transpose())
+        .filter_map(|h| found_of::<T>(h, Some(&kind)).transpose())
         .collect::<ExternResult<_>>()?;
     out.sort_by(|a, b| (a.at, &a.hash).cmp(&(b.at, &b.hash)));
     Ok(out)
