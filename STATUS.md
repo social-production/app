@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-26 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,8 +31,18 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-26: M5b activities and roles, first part (ADR 0056), branch `claude/social-production-handoff-dsam61`
-**Project-DNA reset when merged** (integrity change): every live test project starts again;
+## In flight 2026-10-27: deploy of PR #55 + docs, branch `claude/social-production-handoff-dsam61`
+- PR #55 merged 17:50 UTC; ui + bootstrap live by 17:52 UTC; **seed-node deploy pending** at
+  18:05 UTC (PR #54's seed-node deploy had failed after 43 min, so the live node was still
+  PR #52's gateway and hApp). Until the seed node redeploys, the new live UI calls an
+  `activities` zome the old hApp doesn't have.
+- This branch: README Status/roadmap for M5a/M5b, CI scenarios in 5 shards (CLAUDE.md too).
+- After the seed node is up: live `activities.mjs` (creates 2 accounts), `follows.mjs`,
+  `guests.mjs`, `shell.mjs`; then move this entry to Done. If the deploy fails again, the owner
+  needs Railway's build log (seed-node → Deployments).
+
+## Done 2026-10-26: M5b activities and roles, first part (ADR 0056), PR #55 merged (17:50 UTC / 4:50 am Melbourne 27 Oct)
+**The project network reset with this merge** (integrity change): every live test project starts again;
 people, follows and chats are untouched (directory and conversation hashes unchanged).
 - `crates/sp_activity` (limits, time locks, `fill`: who holds each role when two take the last
   place at once: earliest action wins, one role per person, leavers lapse until it ends).
@@ -608,7 +618,7 @@ ProductiveLifecyclePhaseOne / ProjectValueCard / DiscreteScale / AddValueSheet:
 - **Integrity change** (new `Value`/`Importance` entries, two link types, value criteria in
   `Rating`): merging resets projects again (people stay).
 - **CI split**: `scripts/check-fast.sh` (everything but scenarios) + `scripts/check-scenarios.sh
-  [<shard> <shards>]`; CI runs the scenarios as 4 parallel shards (`ci.yml` job `scenarios`).
+  [<shard> <shards>]`; CI runs the scenarios as 5 parallel shards (`ci.yml` job `scenarios`).
   `check-all.sh` still runs everything. New scenario files are picked up automatically.
 - `scripts/port-styles.py` now dedents web's `<style>` blocks. Regenerating everything today
   also pulls ~500 lines of web's newer styles into the other stylesheets; that drift was left
@@ -730,7 +740,8 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    and help requests, M5d communities and channels. Each starts with its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.
-4. CI: scenarios run in 4 shards (~80 min worst); add shards if one nears 120 min.
+4. CI: scenarios run in 5 shards since 2026-10-27 (with 4, PR #55's shard 0 took 102 of its
+   120 min after the `activities` file landed); add more if one nears 120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
