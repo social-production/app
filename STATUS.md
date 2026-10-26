@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: docs + CI in 5 shards, branch `claude/social-production-handoff-dsam61`
+## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
 - README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
 - **PR #55 deployed:** merged 17:50 UTC; ui + bootstrap live 17:52 UTC, seed node 18:16 UTC
   (26 min; this one succeeded, so PR #54's gateway is live too). Live smoke 18:21–18:29 UTC
@@ -39,7 +39,8 @@ and continue from Next."
   mention order), `activities.mjs` (activity, roles, suggestion, project-chat photo, Past
   activity check-in and rating). `/readyz` 1333 MB at start, 1672 MB after those tests
   (~9 accounts): keep sampling it.
-- Next: merge this PR once CI is green (scenarios in 5 shards), then STATUS Next.
+- CI with 5 shards: `check` 5 min, shards 46–63 min (with 4 the worst was 102). Nothing is
+  in flight; continue from Next.
 
 ## Done 2026-10-26: M5b activities and roles, first part (ADR 0056), PR #55 merged (17:50 UTC / 4:50 am Melbourne 27 Oct)
 **The project network reset with this merge** (integrity change): every live test project starts again;
