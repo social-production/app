@@ -149,9 +149,11 @@ async fn an_event_moves_through_webs_event_lifecycle() {
         )
         .await;
     net.settle().await;
-    vote_yes(&net, 0, &id).await;
-    vote_yes(&net, 1, &id).await;
-    net.settle().await;
+    // Settle after each vote, so the last voter sees both and closes the proposal.
+    for i in 0..2 {
+        vote_yes(&net, i, &id).await;
+        net.settle().await;
+    }
     let board: PlanBoard = net.call(0, "governance", "list_plans", ()).await;
     let view = &board.plans[0];
     assert_eq!(board.open_kind, Some(PlanKind::Event));
