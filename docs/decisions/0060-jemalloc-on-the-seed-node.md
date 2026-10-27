@@ -21,7 +21,10 @@ Separately, browser tests that need Full standing (governance, events, chat, lin
 notifications) could only run locally, because the live founders are the owner's accounts.
 
 ## Decision
-- The gateway binary uses jemalloc (`tikv-jemallocator`) as its global allocator.
+- The gateway binary uses jemalloc (`tikv-jemallocator`) as its global allocator, behind the
+  gateway's `jemalloc` feature: the seed node's Docker build and `RELEASE=1` dev seed turn it
+  on; debug builds (CI's clippy and tests) leave it off, because jemalloc's `configure` fails
+  under Nix's hardening flags at `-O0`.
 - The two test identities in `tests/e2e/fixtures/dev-founders.json` are also founders of the
   test network (`dnas/directory/dna.yaml`), so every browser test runs against the live site.
   Their phrases are public, so anyone can use them on the test network; the real launch uses

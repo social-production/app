@@ -27,8 +27,8 @@ sha2 = "0.10"
 sodoken = "0.1"
 sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio", "sqlite", "macros"] }
 tokio = { workspace = true, features = ["net", "signal", "sync", "time"] }
-# The allocator (ADR 0060): glibc malloc kept ~1.1 GB idle; jemalloc ~0.5 GB.
-tikv-jemallocator = "0.6"
+# The allocator (ADR 0060): glibc malloc kept ~1.1 GB idle; jemalloc ~0.7 GB.
+tikv-jemallocator = { version = "0.6", optional = true }
 tokio-tungstenite = "0.28"
 tower-http = { version = "0.6", features = ["cors"] }
 tracing = "0.1"
@@ -36,6 +36,11 @@ tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 url2 = "0.0.6"
 uuid = { version = "1", features = ["v4"] }
 webauthn-rs = { version = "0.5", features = ["conditional-ui"] }
+
+[features]
+# On for the seed node's release build (deploy/seed-node/Dockerfile, `RELEASE=1` dev seed).
+# Off by default: jemalloc's configure fails in debug builds under Nix's hardening flags.
+jemalloc = ["dep:tikv-jemallocator"]
 
 [lints]
 workspace = true

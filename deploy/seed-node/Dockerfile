@@ -16,7 +16,7 @@ RUN curl -fsSL -o /usr/local/bin/hc \
  && bash scripts/build-zomes.sh \
  && for dna in directory project conversation; do hc dna pack "dnas/$dna" -o "dnas/$dna/sp_$dna.dna"; done \
  && hc app pack happ -o happ/social_production.happ \
- && cargo build --release -p gateway
+ && cargo build --release -p gateway --features jemalloc
 
 FROM debian:bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libssl3 \

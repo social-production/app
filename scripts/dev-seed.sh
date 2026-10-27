@@ -39,4 +39,4 @@ export HAPP_PATH=$dev/social_production.happ RP_ID=localhost RP_ORIGIN=${RP_ORIG
 export POW_BITS=${POW_BITS:-16} SIGNUPS_PER_IP_PER_DAY=${SIGNUPS_PER_IP_PER_DAY:-1000}
 export RUST_LOG=${RUST_LOG:-info,holochain=warn,kitsune2=warn}
 # RELEASE=1 runs the optimised build, as production does (memory measurements, ADR 0053).
-cargo run ${RELEASE:+--release} -q -p gateway
+cargo run ${RELEASE:+--release --features jemalloc} -q -p gateway
