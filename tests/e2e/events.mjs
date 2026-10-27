@@ -74,7 +74,12 @@ async function advance(page) {
   const sheet = page.getByRole('dialog', { name: /^Advance to / });
   await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
   await sheet.getByRole('button', { name: /^Advance to / }).click();
-  await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+  try {
+    await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+  } catch (e) {
+    log('advance sheet:', await sheet.innerText());
+    throw e;
+  }
 }
 
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');

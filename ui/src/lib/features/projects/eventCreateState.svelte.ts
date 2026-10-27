@@ -46,10 +46,11 @@ export class EventCreateState extends CreateState {
     return true;
   }
 
-  /** web copies the Location step's place into the plan. */
+  /** web copies the Location step's place into the plan ("TBD" when deciding later, as
+   * web-backend's `create_event` does); event plans need a place. */
   private planWithPlace(): PlanForm {
     const location =
-      this.intent === 'online' ? 'Online' : this.intent === 'physical' ? this.place.trim() : '';
+      this.intent === 'online' ? 'Online' : this.intent === 'physical' ? this.place.trim() : 'TBD';
     const stages = this.plan.stages.filter((s) => s.title.trim() || s.details.trim());
     return { ...this.plan, stages, location, demandNote: ORGANIZER_DEMAND_NOTE };
   }

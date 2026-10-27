@@ -58,7 +58,14 @@ await ann.locator('.stage-card').getByLabel('Details').fill('Plates on the long 
 await next(); // → Overview
 await ann.getByText('Organizer-controlled').waitFor();
 await ann.getByRole('button', { name: 'Publish event' }).click();
-await ann.getByRole('heading', { name: title }).waitFor({ timeout: 180_000 });
+try {
+  await ann.getByRole('heading', { name: title }).waitFor({ timeout: 180_000 });
+} catch (e) {
+  // Say why publishing stopped (the create sheet's status line) before failing.
+  log('status:', await ann.locator('.status-note').allInnerTexts(), 'errors:', errors);
+  await ann.screenshot({ path: 'private-events-fail.png', fullPage: true });
+  throw e;
+}
 assert.match(ann.url(), /\/events\/[^/]+\.organized\./);
 await ann.locator('.feed-card-top .private-mark').waitFor();
 await ann.locator('.feed-card-stage', { hasText: 'Activity' }).waitFor({ timeout: 60_000 });
@@ -68,11 +75,20 @@ log('founder one created the private event; it opened in Activity');
 const rows = () => guest.getByRole('link', { name: /^Invites/ });
 for (let i = 0; ; i++) {
   await guest.goto(`${BASE}/invites`);
+  // The first read joins the event's network, so let the page finish loading.
+  await guest
+    .getByText(new RegExp(`No invites waiting|${title}`))
+    .first()
+    .waitFor({ timeout: 180_000 });
   if (await guest.getByText(title).count()) break;
-  if (i >= 40) throw new Error('the invite never arrived');
+  if (i >= 40) {
+    log('invites page:', await guest.locator('.invites').innerText(), 'errors:', errors);
+    throw new Error('the invite never arrived');
+  }
   await guest.waitForTimeout(3000);
 }
-await guest.getByText('Private event · from').waitFor();
+// "· from <name>" follows once the inviter has a profile name.
+await guest.locator('.invites .kind', { hasText: 'Private event' }).waitFor();
 log('the invite arrived');
 await guest.getByRole('button', { name: 'Accept' }).click();
 await guest.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
