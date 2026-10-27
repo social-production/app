@@ -51,9 +51,14 @@ Done on the branch (pushed):
    (`features/invites`, `services/events.ts` pending/answer, declines in localStorage), left
    rail Invites row + count, `evt-invite` notification (+ "Shares and invites" setting),
    PrivateMark, leave confirm, non-organizers can't propose in organized events.
-   [ ] browser test `tests/e2e/private-events.mjs` written, not yet run; `events.mjs` now
-   clicks Continue 4× (the public path gained web's Audience step).
-6. [ ] Run local seed + browser tests, PR, merge when green, live smoke, docs.
+   [x] browser tests on a local release seed node: `private-events.mjs` (create invite-only
+   organizer-run event → opens in Activity → invitee accepts under Invites) and `events.mjs`
+   (now clicks Continue 4×: the public path gained web's Audience step) both pass.
+   Lessons: event plans need a place, so the up-front plan writes "TBD" when the location is
+   decided later (web-backend does too); the first Invites read joins the event's network and
+   takes a while; after many runs, project creation hung again until `cloud-seed.sh` restarted.
+6. [ ] PR open; merge when CI is green, then live smoke (`private-events.mjs`, `events.mjs`,
+   `shell.mjs`), read `/readyz` `cpus`/`threads`, README Status.
 **Seed-node memory (ADR 0062, same branch):** per project the conductor opens two SQLite
 DBs, and sqlx runs each connection on its own thread with its own page cache; Holochain's
 default pool is 2 × CPUs (≥ 8) + 1 per DB. The gateway now sets `DB_MAX_READERS` (default 4 →
