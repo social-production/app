@@ -35,7 +35,8 @@ struct NewActivity {
 }
 
 fn activity() -> NewActivity {
-    let at = |hours: i64| Timestamp::from_micros(Timestamp::now().as_micros() + hours * 3_600_000_000);
+    let at =
+        |hours: i64| Timestamp::from_micros(Timestamp::now().as_micros() + hours * 3_600_000_000);
     NewActivity {
         title: "Set up the hall".into(),
         starts_at: at(24),
@@ -111,12 +112,20 @@ async fn organizers_run_an_organizer_controlled_event() {
         .try_call::<_, ActionHash>(2, "governance", "add_value", "Fun".to_string())
         .await;
     assert!(value.is_err(), "no values here");
-    assert!(propose(&net, 2, move_to("phase-2")).await.is_err(), "members don't propose");
+    assert!(
+        propose(&net, 2, move_to("phase-2")).await.is_err(),
+        "members don't propose"
+    );
 
     let agent1 = net.cells[1].1.agent_pubkey().clone();
     let _: ActionHash = net.call(0, "project", "add_organizer", agent1).await;
     let refused = net
-        .try_call::<_, ActionHash>(2, "project", "add_organizer", net.cells[2].1.agent_pubkey().clone())
+        .try_call::<_, ActionHash>(
+            2,
+            "project",
+            "add_organizer",
+            net.cells[2].1.agent_pubkey().clone(),
+        )
         .await;
     assert!(refused.is_err(), "only organizers add organizers");
     net.settle().await;
@@ -124,24 +133,38 @@ async fn organizers_run_an_organizer_controlled_event() {
     assert!(v.am_organizer && v.organizers.len() == 2);
 
     // A co-organizer's move passes at once, without votes or signals.
-    propose(&net, 1, move_to("phase-2")).await.expect("co-organizer moves");
+    propose(&net, 1, move_to("phase-2"))
+        .await
+        .expect("co-organizer moves");
     net.settle().await;
     assert_eq!(view(&net, 2).await.phase, "phase-2");
 
-    propose(&net, 0, event_plan()).await.expect("organizer plan");
+    propose(&net, 0, event_plan())
+        .await
+        .expect("organizer plan");
     net.settle().await;
     let board: PlanBoard = net.call(2, "governance", "list_plans", ()).await;
     assert!(board.plans[0].approved, "the organizer's plan is approved");
     assert_eq!(board.plans[0].leader.as_deref(), Some("Leading"));
-    propose(&net, 0, move_to("phase-5")).await.expect("into Activity");
+    propose(&net, 0, move_to("phase-5"))
+        .await
+        .expect("into Activity");
     net.settle().await;
     assert_eq!(view(&net, 2).await.phase, "phase-5");
+    in_activity(&net).await;
+    net.shut_down().await;
+}
 
+/// In Activity: no return to Proposal, and only organizers add activities.
+async fn in_activity(net: &Net) {
     let back = ProposalKind::Return {
         to: "phase-1".into(),
         reason: "Start over.".into(),
     };
-    assert!(propose(&net, 0, back).await.is_err(), "no way back to Proposal");
+    assert!(
+        propose(net, 0, back).await.is_err(),
+        "no way back to Proposal"
+    );
     let member = net
         .try_call::<_, ActionHash>(2, "activities", "create_activity", activity())
         .await;
@@ -150,7 +173,6 @@ async fn organizers_run_an_organizer_controlled_event() {
         .try_call::<_, ActionHash>(1, "activities", "create_activity", activity())
         .await;
     assert!(organizer.is_ok(), "{organizer:?}");
-    net.shut_down().await;
 }
 
 /// A collaborative private event takes organizers but still votes; a public one has none.
@@ -165,9 +187,15 @@ async fn private_collaborative_events_still_vote() {
     let agent1 = net.cells[1].1.agent_pubkey().clone();
     let _: ActionHash = net.call(0, "project", "add_organizer", agent1).await;
     net.demand_all().await;
-    propose(&net, 0, move_to("phase-2")).await.expect("proposed");
+    propose(&net, 0, move_to("phase-2"))
+        .await
+        .expect("proposed");
     net.settle().await;
-    assert_eq!(view(&net, 1).await.phase, "phase-1", "waits for the second vote");
+    assert_eq!(
+        view(&net, 1).await.phase,
+        "phase-1",
+        "waits for the second vote"
+    );
     net.shut_down().await;
 
     let public = Net::with_charter(2, 2, "fair", charter("event")).await;

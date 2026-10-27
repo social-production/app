@@ -19,8 +19,8 @@ pub struct Config {
     /// Signup proof-of-work difficulty in leading zero bits (20 ≈ a few seconds).
     pub pow_bits: u32,
     pub signups_per_ip_per_day: u32,
-    /// Readers per SQLite database. Every project (each its own DNA) opens two databases, and
-    /// sqlx runs each connection on its own thread with its own page cache, so Holochain's
+    /// Readers per database (`SQLite`). Every project (each its own DNA) opens two databases, and
+    /// `sqlx` runs each connection on its own thread with its own page cache, so Holochain's
     /// default (2 × CPUs, at least 8) costs memory per project (ADR 0062).
     pub db_max_readers: u16,
 }
