@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -159,9 +159,18 @@ log('founder one filed a production plan');
 
 /** Open the plan, rate every criterion "Support", vote Yes, and wait until the tally shows
  * `yes` votes (writes run one at a time; leaving the page earlier would cancel them). */
-async function assess(page, yes) {
-  await page.getByRole('tab', { name: 'Participation' }).click();
-  await page.locator('.plan-card', { hasText: planTitle }).click();
+async function assess(page, yes, fromRail = false) {
+  if (fromRail) {
+    // web's rail: "Assess and approve this plan" opens the plan's own sheet.
+    const row = () => rail(page).locator('.vote-row', { hasText: planTitle });
+    await railShows(page, row, 'the plan vote');
+    assert.match(await row().innerText(), /Assess and approve this plan/);
+    await row().getByRole('button', { name: 'Assess', exact: true }).click();
+    await page.getByRole('dialog', { name: planTitle }).waitFor({ timeout: 120_000 });
+  } else {
+    await page.getByRole('tab', { name: 'Participation' }).click();
+    await page.locator('.plan-card', { hasText: planTitle }).click();
+  }
   const sheet = page.locator('.plan-sheet');
   await sheet.locator('.criterion-row', { hasText: valueLabel }).getByText('Shared value').waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
@@ -175,7 +184,8 @@ async function assess(page, yes) {
 
 await assess(ann, 1);
 await until(bob, () => bob.locator('.plan-card', { hasText: planTitle }), 'the plan');
-await assess(bob, 2);
+await assess(bob, 2, true);
+log('bob opened the plan from his rail');
 await until(bob, () => bob.locator('.plan-card.leading', { hasText: planTitle }), 'the plan to lead');
 log('both rated and approved the plan; it leads');
 

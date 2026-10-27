@@ -109,6 +109,10 @@ export function planKindFor(mode: ProjectMode, phase: string): PlanKind | null {
   return null;
 }
 
+/** The phase a plan kind belongs to (the reverse of `planKindFor`). */
+export const planPhaseOf = (kind: PlanKind): string =>
+  kind === 'Production' || kind === 'Organisation' ? 'phase-2' : 'phase-3';
+
 export const PLAN_RATING_OPTIONS: { value: PlanRating; label: string }[] = [
   { value: 1, label: 'Strongly oppose' },
   { value: 2, label: 'Oppose' },

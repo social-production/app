@@ -3,7 +3,7 @@
   import PhaseStepper from '#lib/components/governance/PhaseStepper.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import { phaseProgressLabel, phaseSummary } from '#lib/domain/phaseCopy.ts';
-  import { planKindFor } from '#lib/domain/plans.ts';
+  import { planKindFor, planPhaseOf } from '#lib/domain/plans.ts';
 
   import ActivityPhase from './ActivityPhase.svelte';
   import type { DetailState } from './detailState.svelte.ts';
@@ -16,9 +16,24 @@
    * summary), then its work (values in Proposal, plans, M3b; activities and roles in the
    * Activity phase, M5b) and the phase-change menu.
    */
-  let { detail }: { detail: DetailState } = $props();
+  interface Props {
+    detail: DetailState;
+    /** A plan a vote link asks to open (web's `?open=vote&voteKind=plan&voteTarget=…`). */
+    revealPlan?: string | null;
+    onRevealDone?: (() => void) | undefined;
+  }
+
+  let { detail, revealPlan = null, onRevealDone }: Props = $props();
 
   let selected = $state('');
+  // web's focusVoteCard: show the plan's phase, then open the plan's sheet.
+  let revealed = false;
+  $effect(() => {
+    const plan = detail.plans?.plans.find((p) => p.id === revealPlan);
+    if (!plan || revealed) return;
+    revealed = true;
+    selected = planPhaseOf(plan.plan.kind);
+  });
   const project = $derived(detail.project);
   const shown = $derived(selected || project?.phase || 'phase-1');
   const planKind = $derived(project?.charter ? planKindFor(project.charter.mode, shown) : null);
@@ -42,7 +57,7 @@
     />
     <section class="phase-panel overview-phase-work">
       {#if planKind}
-        <PlanPhase {detail} kind={planKind} />
+        <PlanPhase {detail} kind={planKind} {revealPlan} {onRevealDone} />
       {:else if activityPhase}
         <ActivityPhase {detail} current={project.phase === shown} />
       {:else if shown === 'phase-1' && project.charter?.mode !== 'personal-service'}

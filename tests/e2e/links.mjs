@@ -1,11 +1,12 @@
 // Links between projects (ADR 0042) end to end against a local seed node started by
 // scripts/dev-seed.sh (dev founders, so their votes count). Each founder creates a project;
-// one proposes a link from the Links tab, both projects approve it, then they sever it.
+// one proposes a link from the Links tab, both projects approve it (the second from the
+// right rail's link vote), then they sever it.
 //   node tests/e2e/links.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -93,7 +94,17 @@ await voteOn(ann, '.request-stack', titles[1], 'Approve');
 await ann.screenshot({ path: `${shots}/links-pending-390.png` });
 log('founder one proposed the link and approved it for project A');
 
-await linksUntil(bob, urlB, () => bob.locator('.request-stack .link-card', { hasText: titles[0] }), 'the request in B');
+// web's rail: B's half waits on founder two under Votes to cast; Assess opens B's Links tab
+// with the request expanded.
+const linkRow = () => rail(bob).locator('.vote-row', { hasText: `Link vote · ${titles[0]}` });
+await bob.goto(urlB);
+await railShows(bob, linkRow, 'the link vote');
+assert.match(await linkRow().innerText(), /Vote · link/i);
+assert.match(await linkRow().innerText(), new RegExp(titles[1]));
+await linkRow().getByRole('button', { name: 'Assess', exact: true }).click();
+await bob.locator('.request-stack .link-card.expanded', { hasText: titles[0] }).waitFor({ timeout: 180_000 });
+assert.match(bob.url(), /tab=links&linkRequest=/);
+log('founder two opened the link vote from the rail');
 await voteOn(bob, '.request-stack', titles[0], 'Approve', true);
 await linksUntil(bob, urlB, () => bob.locator('.network-stack .link-card', { hasText: titles[0] }), 'the active link');
 log('founder two approved it for project B: the link is active');

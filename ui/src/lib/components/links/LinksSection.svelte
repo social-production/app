@@ -9,6 +9,7 @@
   } from '#lib/domain/links.ts';
   import { modeAccent } from '#lib/domain/projects.ts';
 
+  import { focusLinkCard } from './focusLinkCard.ts';
   import LinkCard from './LinkCard.svelte';
   import LinkVotePanel from './LinkVotePanel.svelte';
 
@@ -25,12 +26,32 @@
     pendingId: string | null;
     onSever?: (link: ProjectLink) => void;
     onVote?: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
+    /** A sever request a link asks to show (web's `?linkRequest=…`). */
+    highlight?: string | null;
   }
 
-  let { title, description, items, emptyMessage, allowSever, pendingId, onSever, onVote }: Props =
-    $props();
+  let {
+    title,
+    description,
+    items,
+    emptyMessage,
+    allowSever,
+    pendingId,
+    onSever,
+    onVote,
+    highlight = null,
+  }: Props = $props();
 
   let expanded = $state<Record<string, boolean>>({});
+  let shown: string | null = null;
+
+  $effect(() => {
+    const match = highlight ? items.find((i) => i.sever?.id === highlight) : undefined;
+    if (!match || !highlight || shown === highlight) return;
+    shown = highlight;
+    expanded = { ...expanded, [match.id]: true };
+    void focusLinkCard(highlight);
+  });
 
   function metaLine(item: ProjectLink): string {
     const label = item.sever ? tallyLabel(item.sever) : allowSever ? 'Linked' : 'Inactive';

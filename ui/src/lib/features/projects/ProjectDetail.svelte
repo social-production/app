@@ -25,12 +25,15 @@
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
   const detail = new DetailState(id);
-  // web's links into a project: `?tab=…`, `?comment=…` (the chat), `?open=vote&voteTarget=…`
-  // and `?activity=…` (the Take part tab, ADR 0056).
+  // web's links into a project: `?tab=…`, `?comment=…` (the chat), `?open=vote&voteTarget=…`,
+  // `?activity=…` (the Take part tab, ADR 0056) and `?linkRequest=…` (the Links tab).
   const params = page.url.searchParams;
   const voteLink = params.get('open') === 'vote' ? params.get('voteTarget') : null;
-  // web votes on edits and updates in the Details tab's dock, on the rest in Take part's.
+  // web votes on edits and updates in the Details tab's dock, on the rest in Take part's;
+  // a plan's vote opens that plan's sheet.
   const detailsVote = ['edit', 'update'].includes(params.get('voteKind') ?? '');
+  const planVote = params.get('voteKind') === 'plan' ? voteLink : null;
+  const linkRequest = params.get('linkRequest');
   let commentLink = $state(params.get('comment'));
   let tab = $state<DetailTabId>(
     params.get('comment')
@@ -39,7 +42,9 @@
         ? 'context'
         : voteLink || params.get('activity')
           ? 'participation'
-          : tabFromParam(params.get('tab')),
+          : linkRequest
+            ? 'links'
+            : tabFromParam(params.get('tab')),
   );
   let sheet = $state<'members' | 'edit' | 'update' | null>(null);
   let compact = $state(false);
@@ -78,7 +83,7 @@
 
   /** web's clearVoteLink: a vote opened from a link drops the link once its sheet closes. */
   function clearVoteLink(): void {
-    dropParams(['open', 'voteKind', 'voteTarget']);
+    dropParams(['open', 'voteKind', 'voteTarget', 'assess']);
   }
 
   /** web's clearHighlightedCommentTarget: writing in the chat drops the linked message. */
@@ -141,10 +146,10 @@
             active={tab === 'participation'}
             membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
-            revealVote={detailsVote ? null : voteLink}
+            revealVote={detailsVote || planVote ? null : voteLink}
             onRevealDone={clearVoteLink}
           />
-          <ParticipationPanel {detail} />
+          <ParticipationPanel {detail} revealPlan={planVote} onRevealDone={clearVoteLink} />
         </div>
         {#if chatOpened}
           <div
@@ -171,7 +176,7 @@
             hidden={tab !== 'links'}
             inert={tab !== 'links'}
           >
-            <LinksTab {detail} />
+            <LinksTab {detail} highlight={linkRequest} />
           </div>
         {/if}
         {#if tab === 'context'}

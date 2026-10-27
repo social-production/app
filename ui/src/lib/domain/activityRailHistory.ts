@@ -5,6 +5,8 @@
 import {
   activityQuery,
   inActivityPhase,
+  linkKind,
+  linkQuery,
   voteQuery,
   type RailItem,
   type RailProject,
@@ -82,7 +84,7 @@ interface Cast {
   id: string;
   p: RailProject;
   kind: RailVoteKind;
-  target: string;
+  query: string;
   title: string;
   meta: string;
   createdAt: number;
@@ -97,29 +99,26 @@ const truncate = (text: string, max: number): string =>
 function proposalCast(p: RailProject, v: Proposal & { myVote: VoteChoice }): Cast | null {
   const base = {
     p,
-    target: v.id,
+    query: '',
     createdAt: v.createdAt,
     vote: v.myVote,
     outcome: outcomeOf(v.status),
   };
+  const cast = (kind: RailVoteKind, id: string, title: string, meta: string): Cast => ({
+    ...base,
+    id: `vote-project-${id}-${v.id}`,
+    kind,
+    query: voteQuery(kind, v.id),
+    title,
+    meta,
+  });
   if ('Phase' in v.kind) {
-    const meta = `Advance to ${p.phaseLabel(v.kind.Phase.to)}`;
-    return {
-      ...base,
-      id: `vote-project-phase-${v.id}`,
-      kind: 'phase_change',
-      title: p.title,
-      meta,
-    };
+    return cast('phase_change', 'phase', p.title, `Advance to ${p.phaseLabel(v.kind.Phase.to)}`);
   }
   if ('Update' in v.kind) {
-    const title = truncate(v.kind.Update.body, UPDATE_TITLE_MAX);
-    return { ...base, id: `vote-project-update-${v.id}`, kind: 'update', title, meta: p.title };
+    return cast('update', 'update', truncate(v.kind.Update.body, UPDATE_TITLE_MAX), p.title);
   }
-  if ('Edit' in v.kind) {
-    const title = v.kind.Edit.title ?? p.title;
-    return { ...base, id: `vote-project-edit-${v.id}`, kind: 'edit', title, meta: p.title };
-  }
+  if ('Edit' in v.kind) return cast('edit', 'edit', v.kind.Edit.title ?? p.title, p.title);
   return null;
 }
 
@@ -138,7 +137,7 @@ function castVotes(projects: RailProject[]): RailItem[] {
               id: `vote-project-plan-${x.id}`,
               p,
               kind: 'plan',
-              target: x.id,
+              query: voteQuery('plan', x.id),
               title: x.plan.title,
               meta: p.title,
               createdAt: x.createdAt,
@@ -148,9 +147,11 @@ function castVotes(projects: RailProject[]): RailItem[] {
           ],
     ),
   );
-  const byKind = new Map<RailVoteKind, Cast[]>();
-  for (const c of [...plans, ...proposals]) {
-    if (c) byKind.set(c.kind, [...(byKind.get(c.kind) ?? []), c]);
+  // web-backend keeps 12 of each kind; link and sever votes share one list.
+  const byKind = new Map<string, Cast[]>();
+  for (const c of [...plans, ...proposals, ...linkCasts(projects)]) {
+    const key = c?.kind === 'link_sever' ? 'link' : c?.kind;
+    if (c && key) byKind.set(key, [...(byKind.get(key) ?? []), c]);
   }
   return [...byKind.values()].flatMap((rows) =>
     rows
@@ -161,7 +162,7 @@ function castVotes(projects: RailProject[]): RailItem[] {
         seed: c.p.seed,
         kind: 'vote' as const,
         title: c.title,
-        query: voteQuery(c.kind, c.target),
+        query: c.query,
         meta: `You voted ${VOTE_LABELS[c.vote]} · ${c.meta}`,
         createdAt: c.createdAt,
         projectMode: c.p.mode,
@@ -169,6 +170,33 @@ function castVotes(projects: RailProject[]): RailItem[] {
         viewerParticipated: true,
         outcome: c.outcome,
       })),
+  );
+}
+
+/**
+ * Link votes you cast, as web words them ("You voted Yes · Link vote"). The outcome is this
+ * project's half's; web reads the whole request's (both halves).
+ */
+function linkCasts(projects: RailProject[]): Cast[] {
+  return projects.flatMap((p) =>
+    p.links.flatMap((l): Cast[] =>
+      l.myVote === null
+        ? []
+        : [
+            {
+              id: `vote-${linkKind(l)}-${l.id}`,
+              p,
+              kind: linkKind(l),
+              query: linkQuery(l.id),
+              title: p.title,
+              meta: l.sever ? 'Sever link' : 'Link vote',
+              createdAt: l.createdAt,
+              vote: l.myVote,
+              outcome:
+                l.status === 'Approved' ? 'passed' : l.status === 'Rejected' ? 'failed' : 'open',
+            },
+          ],
+    ),
   );
 }
 

@@ -16,9 +16,12 @@
   interface Props {
     detail: DetailState;
     kind: PlanKind;
+    /** A plan whose sheet a vote link opens; its link is dropped when the sheet closes. */
+    revealPlan?: string | null;
+    onRevealDone?: (() => void) | undefined;
   }
 
-  let { detail, kind }: Props = $props();
+  let { detail, kind, revealPlan = null, onRevealDone }: Props = $props();
 
   let composing = $state(false);
 
@@ -71,6 +74,8 @@
               {plan}
               authorName={detail.names[plan.author] ?? '…'}
               canVote={project.amMember}
+              reveal={revealPlan === plan.id}
+              {onRevealDone}
               onRate={(criterion, rating) => void detail.ratePlan(plan.id, criterion, rating)}
               onVote={(choice) => void detail.votePlan(plan.id, choice)}
             />
