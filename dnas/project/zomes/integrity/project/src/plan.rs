@@ -6,6 +6,7 @@
 use hdi::prelude::*;
 use holo_hash::ActionHashB64;
 use sp_core::plan::{check_plan, PlanFields, StageFields};
+use sp_event::{check_schedule, ScheduleFields};
 use sp_governance::plans::{criteria, rating_ok, PlanKind};
 use sp_governance::values::parse_criterion;
 
@@ -27,6 +28,19 @@ pub struct Plan {
     pub location: Option<String>,
     pub recipients: Option<String>,
     pub stages: Vec<PlanStage>,
+    /// Event plans only, and required there (ADR 0057).
+    #[serde(default)]
+    pub schedule: Option<EventSchedule>,
+}
+
+/// web's `EventPlanScheduleInput`, in UTC wall time (ADR 0057).
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+pub struct EventSchedule {
+    pub mode: String,
+    pub start_date: Option<String>,
+    pub end_date: Option<String>,
+    pub start_time: Option<String>,
+    pub finish_time: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -56,6 +70,7 @@ pub struct Rating {
 }
 
 pub fn check(plan: &Plan) -> Result<(), String> {
+    check_event_fields(plan)?;
     check_plan(&PlanFields {
         title: &plan.title,
         description: &plan.description,
@@ -75,6 +90,27 @@ pub fn check(plan: &Plan) -> Result<(), String> {
             })
             .collect(),
     })
+}
+
+/// An event plan names its place and schedule; other plans have no schedule.
+fn check_event_fields(plan: &Plan) -> Result<(), String> {
+    match (plan.kind, &plan.schedule) {
+        (PlanKind::Event, Some(s)) => {
+            if plan.location.as_deref().is_none_or(|l| l.trim().is_empty()) {
+                return Err("an event plan needs a place".into());
+            }
+            check_schedule(&ScheduleFields {
+                mode: &s.mode,
+                start_date: s.start_date.as_deref(),
+                end_date: s.end_date.as_deref(),
+                start_time: s.start_time.as_deref(),
+                finish_time: s.finish_time.as_deref(),
+            })
+        }
+        (PlanKind::Event, None) => Err("an event plan needs a schedule".into()),
+        (_, Some(_)) => Err("only event plans have a schedule".into()),
+        (_, None) => Ok(()),
+    }
 }
 
 /// The plan a record proposes, if it is a plan proposal.

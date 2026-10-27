@@ -48,6 +48,7 @@ fn draft(kind: PlanKind, title: &str, subtype: &str) -> Plan {
             start_date: Some("2026-11-01".into()),
             end_date: None,
         }],
+        schedule: None,
     }
 }
 

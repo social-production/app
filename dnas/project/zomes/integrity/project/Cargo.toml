@@ -15,6 +15,7 @@ holochain_serialized_bytes = { workspace = true }
 serde = { workspace = true }
 sp_activity = { workspace = true }
 sp_core = { workspace = true }
+sp_event = { workspace = true }
 sp_governance = { workspace = true }
 
 [lints]

@@ -1,6 +1,6 @@
 use hdi::prelude::*;
 use holo_hash::AgentPubKeyB64;
-use sp_core::project::{check_fields, CharterFields, SUMMARY_MAX};
+use sp_core::project::{check_fields, CharterFields, MODES, SUBTYPES, SUMMARY_MAX, TAG_MAX};
 use sp_governance::projects::{check_new_member_project_cap, NEW_PROJECT_WINDOW_US};
 
 use crate::vouch::not_full;
@@ -63,12 +63,38 @@ fn check(l: &ProjectListing) -> Result<(), String> {
     if l.summary.chars().count() > SUMMARY_MAX {
         return Err(format!("summary must be at most {SUMMARY_MAX} characters"));
     }
+    // Other kinds (ADR 0057: events, later help requests, communities, channels) get shape
+    // checks only; their clone's own DNA holds the rules, so new kinds need no directory reset.
+    let (mode, subtype) = if MODES.contains(&l.mode.as_str()) {
+        (l.mode.as_str(), l.subtype.as_str())
+    } else {
+        check_other_kind(&l.mode, &l.subtype)?;
+        (MODES[0], SUBTYPES[0])
+    };
     check_fields(&CharterFields {
         title: &l.title,
-        mode: &l.mode,
-        subtype: &l.subtype,
+        mode,
+        subtype,
         location_label: &l.location_label,
         phase: &l.phase,
         tags: &l.tags,
     })
+}
+
+/// A kind is a lowercase slug (`event`, `help-request`, …), at most 24 characters.
+const KIND_MAX: usize = 24;
+
+fn check_other_kind(kind: &str, subtype: &str) -> Result<(), String> {
+    let slug = kind.len() <= KIND_MAX
+        && kind.starts_with(|c: char| c.is_ascii_lowercase())
+        && kind.chars().all(|c| c.is_ascii_lowercase() || c == '-');
+    if !slug {
+        return Err(format!("unknown listing kind {kind:?}"));
+    }
+    if subtype.chars().count() > TAG_MAX {
+        return Err(format!(
+            "a listing's type must be at most {TAG_MAX} characters"
+        ));
+    }
+    Ok(())
 }

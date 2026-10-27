@@ -72,7 +72,7 @@ make sure parity misses nothing. Types are filled in milestone by milestone.
 
 ## Open placement questions (decide at the milestone)
 
-1. **Events and help requests**: their own DNA clones (same lifecycle machinery as projects,
+1. **Events and help requests**: events decided ([ADR 0057](decisions/0057-events-as-project-clones.md)): project-DNA clones with mode "event". Help requests: open. Was: their own DNA clones (same lifecycle machinery as projects,
    with `properties.kind`), or entries inside a project clone? The leaning is clones of the project DNA with a kind.
 2. **Communities and channels (scopes)**: clones of the project DNA with `kind: community`, or a separate scope DNA?
 3. **Files (`blobs`)**: chunked entries (Holochain entries max ~4 MB) vs a content-addressed blob zome with

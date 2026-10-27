@@ -2,7 +2,7 @@
 //! `services/projects/phases/revert.py` (the rule) and `projects/detail/hydrate.py`
 //! (`revertablePhaseIds`, the choices the Return sheet offers). ADR 0040.
 
-use crate::phases::{visible_phases, Phase, Shape};
+use crate::phases::{visible_phases, Phase, Shape, EVENT};
 
 /// web's `revertablePhaseIds`: the phases up to the second plan phase (`order <= 3`) that come
 /// before the current one and that this project shows. Personal services take no proposals
@@ -11,6 +11,13 @@ use crate::phases::{visible_phases, Phase, Shape};
 pub fn returnable(shape: Shape<'_>, current: Phase) -> Vec<Phase> {
     if shape.mode == "personal-service" {
         return Vec::new();
+    }
+    // web's event lifecycle offers every earlier phase (`order < current_order`).
+    if shape.mode == EVENT {
+        return visible_phases(shape, current)
+            .into_iter()
+            .filter(|p| *p < current)
+            .collect();
     }
     visible_phases(shape, current)
         .into_iter()
@@ -54,6 +61,13 @@ mod tests {
         assert_eq!(returnable(productive, P3), vec![P1, P2]);
         assert_eq!(returnable(productive, P5), vec![P1, P2, P3]);
         assert_eq!(returnable(productive, P7), vec![P1, P2, P3]);
+    }
+
+    #[test]
+    fn events_return_to_any_earlier_phase() {
+        let event = shape("event", "standard", false);
+        assert_eq!(returnable(event, P5), vec![P1, P2]);
+        assert_eq!(returnable(event, P7), vec![P1, P2, P5]);
     }
 
     #[test]

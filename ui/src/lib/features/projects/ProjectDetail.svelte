@@ -3,7 +3,7 @@
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
-  import type { DetailTabId } from '#lib/domain/projects.ts';
+  import { isEvent, type DetailTabId } from '#lib/domain/projects.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import { goto } from '$app/navigation';
@@ -19,7 +19,10 @@
 
   import '#lib/components/styles/detail.css';
 
-  /** web's ProjectDetailPage: Details, Participation, Chat and Links tabs (history: M5). */
+  /**
+   * web's ProjectDetailPage: Details, Participation, Chat and Links tabs (history: M5). Events
+   * are project clones (ADR 0057), so web's EventDetailPage is this page with its event copy.
+   */
   let { id }: { id: string } = $props();
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
@@ -114,11 +117,12 @@
     {:else}
       {@const project = detail.project}
       {@const charter = detail.project.charter}
+      {@const event = isEvent(charter.mode)}
       <section class="hero-card" class:chat-tab-active={chatFull}>
         <DetailTopTabs
           active={tab}
           available={['context', 'participation', 'chat', 'links']}
-          ariaLabel="Project detail tabs"
+          ariaLabel={event ? 'Event detail tabs' : 'Project detail tabs'}
           onSelect={(t) => (tab = t)}
         />
         <div
@@ -130,6 +134,7 @@
           <ContextPanel
             {project}
             {charter}
+            plans={detail.plans}
             names={detail.names}
             canPropose={detail.canPropose}
             onAddUpdate={() => (sheet = 'update')}
@@ -193,8 +198,10 @@
 
       <PeopleSheet
         open={sheet === 'members'}
-        title="Project members"
-        description="Members coordinate planning, updates, and activity together."
+        title={event ? 'Members' : 'Project members'}
+        description={event
+          ? 'Public event members can propose and vote on update and detail edit decisions.'
+          : 'Members coordinate planning, updates, and activity together.'}
         emptyCopy="No members listed yet."
         people={detail.members}
         onClose={() => (sheet = null)}

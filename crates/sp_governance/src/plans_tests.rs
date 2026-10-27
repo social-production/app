@@ -31,6 +31,24 @@ fn kinds_follow_mode_and_phase() {
         Some(PlanKind::Organisation)
     );
     assert_eq!(PlanKind::for_phase("personal-service", Phase::P2), None);
+    assert_eq!(
+        PlanKind::for_phase("event", Phase::P2),
+        Some(PlanKind::Event)
+    );
+    assert_eq!(PlanKind::for_phase("event", Phase::P5), None);
+    let ids: Vec<&str> = criteria(PlanKind::Event, "standard")
+        .iter()
+        .map(|c| c.id)
+        .collect();
+    assert_eq!(
+        ids,
+        [
+            "rubric:description-clarity",
+            "rubric:achievability",
+            "rubric:timing-suitable",
+            "rubric:location-appropriate"
+        ]
+    );
     assert_eq!(PlanKind::for_phase("productive", Phase::P1), None);
     assert!(!PlanKind::Access.allowed("productive"));
     assert_eq!(

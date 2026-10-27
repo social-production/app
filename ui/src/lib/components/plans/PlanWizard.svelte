@@ -4,27 +4,25 @@
     emptyPlanForm,
     planFromForm,
     planSteps,
-    PLAN_KIND_NAMES,
     stepReady,
-    subtypeOptions,
-    type Plan,
-    type PlanKind,
     type PlanStepType,
-  } from '#lib/domain/plans.ts';
-  import type { ProjectMode, ProjectSubtype } from '#lib/domain/projects.ts';
+  } from '#lib/domain/planForm.ts';
+  import { PLAN_KIND_NAMES, subtypeOptions, type Plan, type PlanKind } from '#lib/domain/plans.ts';
+  import type { CharterMode, ProjectSubtype } from '#lib/domain/projects.ts';
 
   import PlanReview from './PlanReview.svelte';
   import PlanWizardShell from './PlanWizardShell.svelte';
   import PlanWizardStep from './PlanWizardStep.svelte';
 
   /**
-   * web's PlanCreationWizard for project plans: overview, subtype, repository or location,
-   * support response, stages, review. Dismissing keeps the draft; closing starts over.
+   * web's PlanCreationWizard for project plans (overview, subtype, repository or location,
+   * support response, stages, review) and event plans (overview, schedule, place, support
+   * response, stages, review). Dismissing keeps the draft; closing starts over.
    */
   interface Props {
     open: boolean;
     kind: PlanKind;
-    mode: ProjectMode;
+    mode: CharterMode;
     subtype: ProjectSubtype;
     productionLocation: string | null;
     demand: number;
@@ -59,7 +57,7 @@
   let form = $state(emptyPlanForm(subtype));
   let index = $state(0);
 
-  const steps = $derived(planSteps(kind, form.subtype));
+  const steps = $derived(planSteps(kind, form));
   const step = $derived(steps[Math.min(index, steps.length - 1)]);
   const reviewing = $derived(step?.id === 'review');
   const name = $derived(PLAN_KIND_NAMES[kind]);
@@ -129,7 +127,7 @@
           <PlanWizardStep
             {step}
             bind:form
-            subtypes={subtypeOptions(mode)}
+            subtypes={mode === 'event' ? [] : subtypeOptions(mode)}
             {productionLocation}
             {demand}
             {opposition}

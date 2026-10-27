@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { PlanForm } from '#lib/domain/plans.ts';
+  import type { PlanForm } from '#lib/domain/planForm.ts';
 
   /** web's plan wizard stages step: add, remove and reorder stages, each with optional dates. */
   let { stages = $bindable() }: { stages: PlanForm['stages'] } = $props();

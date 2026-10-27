@@ -6,7 +6,7 @@ use std::cmp::Ordering;
 
 use serde::{Deserialize, Serialize};
 
-use crate::phases::{Phase, Shape};
+use crate::phases::{Phase, Shape, EVENT};
 
 /// web's `phase_kind`. "organisation" is web's id for the operations plan.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -15,14 +15,17 @@ pub enum PlanKind {
     Distribution,
     Organisation,
     Access,
+    /// An event plan, with its schedule (ADR 0057).
+    Event,
 }
 
 impl PlanKind {
-    pub const ALL: [Self; 4] = [
+    pub const ALL: [Self; 5] = [
         Self::Production,
         Self::Distribution,
         Self::Organisation,
         Self::Access,
+        Self::Event,
     ];
 
     #[must_use]
@@ -32,6 +35,7 @@ impl PlanKind {
             Self::Distribution => "distribution",
             Self::Organisation => "organisation",
             Self::Access => "access",
+            Self::Event => "event",
         }
     }
 
@@ -44,7 +48,7 @@ impl PlanKind {
     #[must_use]
     pub fn phase(self) -> Phase {
         match self {
-            Self::Production | Self::Organisation => Phase::P2,
+            Self::Production | Self::Organisation | Self::Event => Phase::P2,
             Self::Distribution | Self::Access => Phase::P3,
         }
     }
@@ -55,6 +59,7 @@ impl PlanKind {
         match mode {
             "productive" => matches!(self, Self::Production | Self::Distribution),
             "collective-service" => matches!(self, Self::Organisation | Self::Access),
+            EVENT => self == Self::Event,
             _ => false,
         }
     }
@@ -104,6 +109,17 @@ const SHARED: [Criterion; 2] = [
         label: "Does this plan seem realistically achievable?",
     },
 ];
+/// web's `EVENT_RUBRIC`.
+const EVENT_RUBRIC: [Criterion; 2] = [
+    Criterion {
+        id: "rubric:timing-suitable",
+        label: "Is the timing and schedule realistic?",
+    },
+    Criterion {
+        id: "rubric:location-appropriate",
+        label: "Is the location appropriate and accessible?",
+    },
+];
 const PRODUCTION: Criterion = Criterion {
     id: "rubric:production-approach",
     label: "Is the proposed production approach appropriate?",
@@ -131,6 +147,7 @@ pub fn criteria(kind: PlanKind, subtype: &str) -> Vec<Criterion> {
         // web's `elif plan_kind == "distribution"`: access plans get only the shared rubric.
         PlanKind::Distribution => out.push(DISTRIBUTION),
         PlanKind::Access => {}
+        PlanKind::Event => out.extend(EVENT_RUBRIC),
     }
     out
 }

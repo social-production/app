@@ -23,9 +23,23 @@ pub struct Plan {
     pub location: Option<String>,
     pub recipients: Option<String>,
     pub stages: Vec<PlanStage>,
+    /// Event plans only (ADR 0057).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub schedule: Option<EventSchedule>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+pub struct EventSchedule {
+    pub mode: String,
+    pub start_date: Option<String>,
+    pub end_date: Option<String>,
+    pub start_time: Option<String>,
+    pub finish_time: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+// A test mirror: built once per call, so the plan variant's size doesn't matter.
+#[allow(clippy::large_enum_variant)]
 pub enum ProposalKind {
     Phase {
         to: String,

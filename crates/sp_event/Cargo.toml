@@ -1,0 +1,12 @@
+[package]
+name = "sp_event"
+description = "Rules for events, project clones with mode \"event\" (ADR 0057). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sp_core = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,7 +1,7 @@
 /** Links between projects (web's Links tab, ADR 0042). Each project votes on its own half. */
 
 import { APPROVAL_PERCENT, type VoteChoice } from './governance.ts';
-import type { ProjectMode } from './projects.ts';
+import type { CharterMode } from './projects.ts';
 
 export type SideStatus = 'Open' | 'Approved' | 'Rejected';
 
@@ -34,7 +34,7 @@ export interface LinkTarget {
   id: string;
   title: string;
   description: string;
-  mode: ProjectMode;
+  mode: CharterMode;
   stageLabel: string;
   locationLabel: string;
   memberCount: number | null;

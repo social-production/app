@@ -1,6 +1,6 @@
 import type { Activity, ActivityRole } from './activities.ts';
 import type { NotificationItem } from './notifications.ts';
-import type { ProjectMode } from './projects.ts';
+import type { CharterMode } from './projects.ts';
 
 type Unread = Omit<NotificationItem, 'isUnread'>;
 
@@ -12,7 +12,7 @@ type Unread = Omit<NotificationItem, 'isUnread'>;
  * whoever made a suggestion its person turned down.
  */
 export function activityNotifications(
-  p: { seed: string; title: string; mode: ProjectMode; amMember: boolean },
+  p: { seed: string; title: string; mode: CharterMode; amMember: boolean },
   activities: Activity[],
   me: string,
   names: Record<string, string>,

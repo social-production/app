@@ -57,6 +57,10 @@ impl Phase {
     }
 }
 
+/// The charter mode of an event (ADR 0057): a project clone whose phases are Proposal, Event
+/// Plan (`phase-2`), Activity (`phase-5`) and Closed (`phase-7`), as web's event lifecycle.
+pub const EVENT: &str = "event";
+
 /// The project shape that decides which phases exist (mode, subtype, access plan opted in).
 #[derive(Clone, Copy, Debug)]
 pub struct Shape<'a> {
@@ -76,6 +80,12 @@ impl Shape<'_> {
 pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
     let phase = phase.effective();
     match shape.mode {
+        EVENT => match phase {
+            Phase::P2 => "Event Plan",
+            Phase::P5 => "Activity",
+            Phase::P7 => "Closed",
+            _ => "Proposal",
+        },
         "personal-service" => {
             if phase == Phase::P2 {
                 "Closed"
@@ -107,6 +117,7 @@ pub fn visible_phases(shape: Shape<'_>, current: Phase) -> Vec<Phase> {
     match shape.mode {
         "personal-service" if current == P2 => vec![P1, P2],
         "personal-service" => vec![P1],
+        EVENT => vec![P1, P2, P5, P7],
         "collective-service" if shape.include_access || current == P3 => vec![P1, P2, P3, P5, P7],
         "collective-service" => vec![P1, P2, P5, P7],
         _ if shape.skips_distribution() => vec![P1, P2, P5, P7],
@@ -129,6 +140,7 @@ pub fn next_phase(shape: Shape<'_>, current: Phase) -> Option<Phase> {
         .find(|p| match p {
             Phase::P3 => {
                 !(shape.skips_distribution()
+                    || shape.mode == EVENT
                     || (shape.mode == "collective-service" && !shape.include_access))
             }
             Phase::P4 | Phase::P6 => false,
@@ -168,6 +180,23 @@ mod tests {
         subtype: "standard",
         include_access: false,
     };
+
+    const EVENT_SHAPE: Shape<'static> = Shape {
+        mode: EVENT,
+        subtype: "standard",
+        include_access: false,
+    };
+
+    #[test]
+    fn events_follow_webs_event_lifecycle() {
+        assert_eq!(stage_label(EVENT_SHAPE, P2), "Event Plan");
+        assert_eq!(stage_label(EVENT_SHAPE, P5), "Activity");
+        assert_eq!(visible_phases(EVENT_SHAPE, P1), vec![P1, P2, P5, P7]);
+        assert_eq!(next_phase(EVENT_SHAPE, P1), Some(P2));
+        assert_eq!(next_phase(EVENT_SHAPE, P2), Some(P5));
+        assert_eq!(next_phase(EVENT_SHAPE, P5), Some(P7));
+        assert_eq!(next_phase(EVENT_SHAPE, P7), None);
+    }
 
     #[test]
     fn labels_match_web() {

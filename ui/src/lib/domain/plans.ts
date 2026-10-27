@@ -3,11 +3,12 @@
  * steps are web's (web/src/lib/utils/planRubric.ts, ProjectLifecyclePlanPhaseContent.svelte).
  */
 
+import type { EventSchedule } from './eventSchedule.ts';
 import type { ProposalStatus, VoteChoice } from './governance.ts';
-import type { ProjectMode, ProjectSubtype } from './projects.ts';
+import type { CharterMode, ProjectMode, ProjectSubtype } from './projects.ts';
 
 /** sp_governance::plans::PlanKind ("Organisation" is web's operations plan). */
-export type PlanKind = 'Production' | 'Distribution' | 'Organisation' | 'Access';
+export type PlanKind = 'Production' | 'Distribution' | 'Organisation' | 'Access' | 'Event';
 export type PlanRating = 1 | 2 | 3 | 4 | 5;
 
 export interface PlanStage {
@@ -28,6 +29,8 @@ export interface Plan {
   location: string | null;
   recipients: string | null;
   stages: PlanStage[];
+  /** Event plans only (ADR 0057). */
+  schedule?: EventSchedule | null;
 }
 
 export interface PlanCriterion {
@@ -82,6 +85,7 @@ export const PLAN_KIND_NAMES: Record<PlanKind, string> = {
   Distribution: 'distribution plan',
   Organisation: 'operations plan',
   Access: 'access plan',
+  Event: 'event plan',
 };
 
 /** web-backend `_subtype_label`. */
@@ -101,7 +105,8 @@ export function subtypeOptions(mode: ProjectMode): { value: ProjectSubtype; labe
 }
 
 /** The plan kind a phase of this mode takes (sp_governance `PlanKind::for_phase`). */
-export function planKindFor(mode: ProjectMode, phase: string): PlanKind | null {
+export function planKindFor(mode: CharterMode, phase: string): PlanKind | null {
+  if (mode === 'event') return phase === 'phase-2' ? 'Event' : null;
   const collective = mode === 'collective-service';
   if (mode === 'personal-service') return null;
   if (phase === 'phase-2') return collective ? 'Organisation' : 'Production';
@@ -111,7 +116,7 @@ export function planKindFor(mode: ProjectMode, phase: string): PlanKind | null {
 
 /** The phase a plan kind belongs to (the reverse of `planKindFor`). */
 export const planPhaseOf = (kind: PlanKind): string =>
-  kind === 'Production' || kind === 'Organisation' ? 'phase-2' : 'phase-3';
+  kind === 'Production' || kind === 'Organisation' || kind === 'Event' ? 'phase-2' : 'phase-3';
 
 export const PLAN_RATING_OPTIONS: { value: PlanRating; label: string }[] = [
   { value: 1, label: 'Strongly oppose' },
@@ -141,147 +146,4 @@ export function approvalLine(t: Pick<PlanTally, 'yes' | 'no'>): string {
   const total = t.yes + t.no;
   const percent = total === 0 ? 0 : Math.round((t.yes / total) * 100);
   return `${percent}% approved · ${t.yes} yes · ${t.no} no`;
-}
-
-export type PlanStepType =
-  | 'plan-overview'
-  | 'subtype'
-  | 'repository'
-  | 'location'
-  | 'distribution-location'
-  | 'demand-note'
-  | 'stages'
-  | 'review';
-
-export interface PlanStep {
-  id: PlanStepType;
-  question: string;
-  helper?: string;
-}
-
-export interface PlanForm {
-  title: string;
-  description: string;
-  demandNote: string;
-  subtype: ProjectSubtype;
-  repositoryUrl: string;
-  location: string;
-  sameAsProduction: boolean;
-  recipients: string;
-  stages: { title: string; details: string; startDate: string; endDate: string }[];
-}
-
-export function emptyPlanForm(subtype: ProjectSubtype): PlanForm {
-  return {
-    title: '',
-    description: '',
-    demandNote: '',
-    subtype,
-    repositoryUrl: '',
-    location: '',
-    sameAsProduction: false,
-    recipients: '',
-    stages: [{ title: '', details: '', startDate: '', endDate: '' }],
-  };
-}
-
-const REVIEW: PlanStep = {
-  id: 'review',
-  question: 'Review your plan before submitting',
-  helper: 'Check each section, then submit when you are ready.',
-};
-
-/** web's `buildProjectProductionCreationSteps` / `buildProjectDistributionCreationSteps`. */
-export function planSteps(kind: PlanKind, subtype: ProjectSubtype): PlanStep[] {
-  const producing = kind === 'Production' || kind === 'Organisation';
-  const steps: PlanStep[] = [
-    {
-      id: 'plan-overview',
-      question: 'What is this plan called, and what does it deliver?',
-      helper: producing
-        ? 'Use a clear title and explain what will be produced and why this approach makes sense.'
-        : 'Use a clear title and explain how people will access or receive what is produced.',
-    },
-  ];
-  if (producing) {
-    steps.push({ id: 'subtype', question: 'What type of production plan is this?' });
-    if (subtype === 'software')
-      steps.push({
-        id: 'repository',
-        question: 'What is the official repository URL?',
-        helper:
-          'Link a public repository under AGPL v3. Assessors need a place they can verify, and the license keeps the software in the commons.',
-      });
-    else
-      steps.push({
-        id: 'location',
-        question: 'Where will production or operations happen?',
-        helper: 'Choose the primary project or production site.',
-      });
-  } else {
-    steps.push({
-      id: 'distribution-location',
-      question: 'Where will distribution or access happen?',
-      helper: 'This can be the same address as the production plan location.',
-    });
-  }
-  steps.push(
-    {
-      id: 'demand-note',
-      question: 'How does this plan respond to current support?',
-      helper:
-        'Support signals show how many people want this to exist right now. Assessors compare every plan against that need, so say whether your plan meets it and what gap remains.',
-    },
-    {
-      id: 'stages',
-      question: 'What are the stages of this plan?',
-      helper:
-        'Break the work into stages. Each stage needs a title and details. You can add, remove, and reorder stages.',
-    },
-    REVIEW,
-  );
-  return steps;
-}
-
-/** web's `validateStep`: whether Next is allowed. */
-export function stepReady(step: PlanStepType, f: PlanForm): boolean {
-  switch (step) {
-    case 'plan-overview':
-      return !!f.title.trim() && !!f.description.trim();
-    case 'demand-note':
-      return !!f.demandNote.trim();
-    case 'repository':
-      return !!f.repositoryUrl.trim();
-    case 'location':
-    case 'distribution-location':
-      return !!f.location.trim();
-    case 'stages':
-      return f.stages.length > 0 && f.stages.every((s) => s.title.trim() && s.details.trim());
-    default:
-      return true;
-  }
-}
-
-const orNull = (text: string): string | null => (text.trim() ? text.trim() : null);
-
-/** The form as the zome takes it. The subtype only matters for production/operations plans. */
-export function planFromForm(kind: PlanKind, f: PlanForm): Plan {
-  const producing = kind === 'Production' || kind === 'Organisation';
-  const software = producing && f.subtype === 'software';
-  return {
-    kind,
-    title: f.title.trim(),
-    description: f.description.trim(),
-    demand_note: f.demandNote.trim(),
-    subtype: producing ? f.subtype : null,
-    repository_url: software ? orNull(f.repositoryUrl) : null,
-    location: software ? null : orNull(f.location),
-    recipients: producing ? null : orNull(f.recipients),
-    stages: f.stages.map((s) => ({
-      title: s.title.trim(),
-      details: s.details.trim(),
-      start_date: orNull(s.startDate),
-      end_date: orNull(s.endDate),
-    })),
-  };
 }

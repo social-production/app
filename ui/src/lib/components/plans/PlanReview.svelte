@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { scheduleSummary } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
-  import type { PlanForm, PlanStep, PlanStepType } from '#lib/domain/plans.ts';
+  import type { PlanForm, PlanStep, PlanStepType } from '#lib/domain/planForm.ts';
 
   /** web's plan wizard review step: every answer, each with an Edit link back to its step. */
   interface Props {
@@ -36,6 +37,9 @@
     </div>
     <button class="text-button" type="button" onclick={() => onEdit('plan-overview')}>Edit</button>
   </div>
+  {#if has('schedule-mode')}
+    {@render row('Schedule', scheduleSummary(form), 'schedule-mode')}
+  {/if}
   {#if (has('location') || has('distribution-location')) && form.location}
     {@render row(placeLabel, form.location, placeStep)}
   {/if}

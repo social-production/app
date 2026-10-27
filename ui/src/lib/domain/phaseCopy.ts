@@ -1,5 +1,5 @@
 import type { PlanKind } from './plans.ts';
-import type { ProjectMode } from './projects.ts';
+import type { CharterMode } from './projects.ts';
 
 /**
  * web-backend's `lifecycle_copy.py` phase summaries (web shows the first sentence under the
@@ -16,7 +16,7 @@ const DEFAULT: Record<string, string> = {
   'phase-7': 'The project has finished its lifecycle and is archived for reference.',
 };
 
-const OVERRIDES: Partial<Record<ProjectMode, Record<string, string>>> = {
+const OVERRIDES: Partial<Record<CharterMode, Record<string, string>>> = {
   'collective-service': {
     'phase-2': 'Define how the collective service will operate day to day.',
     'phase-3': 'Decide who can access the service and under what conditions.',
@@ -25,9 +25,16 @@ const OVERRIDES: Partial<Record<ProjectMode, Record<string, string>>> = {
     'phase-1': 'One person offers this service.',
     'phase-2': 'This personal service is closed and no longer takes requests.',
   },
+  // web-backend `DEFAULT_EVENT_PHASE_COPY` (events use the app's phase ids, ADR 0057).
+  event: {
+    'phase-1': 'Gather interest and define the values this event should optimize for.',
+    'phase-2': 'Propose schedules, locations, and staged plans for the event.',
+    'phase-5': 'Run scheduled event activities and fill roles.',
+    'phase-7': 'The event has ended; outcomes and history remain visible.',
+  },
 };
 
-export function phaseSummary(mode: ProjectMode | undefined, phaseId: string): string {
+export function phaseSummary(mode: CharterMode | undefined, phaseId: string): string {
   return (mode && OVERRIDES[mode]?.[phaseId]) ?? DEFAULT[phaseId] ?? '';
 }
 
@@ -47,6 +54,8 @@ export function signalGateMet(demand: number, opposition: number): boolean {
 
 /** web's projectPlanGateMessage, for the plan kind the next move needs an approved leader of. */
 export function planGateMessage(gate: PlanKind, hasPlans: boolean): string {
+  // web's EventPhaseChangeSection note.
+  if (gate === 'Event') return 'Planning cannot advance until a plan clears quorum and approval.';
   const kind =
     gate === 'Production' || gate === 'Organisation'
       ? 'production or operations plan'

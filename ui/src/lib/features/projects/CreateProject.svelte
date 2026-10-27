@@ -14,7 +14,7 @@
 
   /** web's CreateProjectPage: type → basics → location → scope (tags) → overview. */
   const s = new CreateState();
-  const steps = [...CREATE_STEPS];
+  const steps = CREATE_STEPS;
 
   $effect(() => {
     void s.checkAllowance();

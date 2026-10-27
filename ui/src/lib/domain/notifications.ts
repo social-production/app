@@ -1,7 +1,7 @@
 import { mentionsOf, type ChatMessage } from './chat.ts';
 import type { FollowView } from './follows.ts';
 import type { Proposal } from './governance.ts';
-import type { ProjectMode } from './projects.ts';
+import type { CharterMode } from './projects.ts';
 
 /**
  * In-app notifications (web's NotificationItem, ADR 0046). Nothing is stored: each device
@@ -51,7 +51,7 @@ export interface NotificationItem {
    *  seed on opening. */
   seed: string;
   /** Projects only. */
-  projectMode: ProjectMode | null;
+  projectMode: CharterMode | null;
   actor: string;
   title: string;
   body: string;
@@ -72,7 +72,7 @@ export interface NotificationItem {
 export interface ProjectActivity {
   seed: string;
   title: string;
-  mode: ProjectMode;
+  mode: CharterMode;
   creator: string;
   amMember: boolean;
   phaseLabel: (id: string) => string;

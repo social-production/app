@@ -3,6 +3,8 @@
 import type { ProjectUpdate } from './governance.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
+/** A charter's mode: a project's, or "event" for an event (a project clone, ADR 0057). */
+export type CharterMode = ProjectMode | 'event';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
@@ -11,7 +13,7 @@ export type Stance = 'Demand' | 'Oppose';
 export interface Charter {
   title: string;
   description: string;
-  mode: ProjectMode;
+  mode: CharterMode;
   subtype: ProjectSubtype;
   location_label: string;
   phase: string;
@@ -27,7 +29,7 @@ export interface ProjectCard {
   creatorName: string;
   title: string;
   summary: string;
-  mode: ProjectMode;
+  mode: CharterMode;
   subtype: ProjectSubtype;
   locationLabel: string;
   phase: string;
@@ -92,8 +94,14 @@ export function summaryOf(description: string): string {
   return first.length > SUMMARY_MAX ? `${first.slice(0, SUMMARY_MAX - 1)}…` : first;
 }
 
+/** Events are project clones whose charter mode is "event" (ADR 0057). */
+export function isEvent(mode: CharterMode | undefined): boolean {
+  return mode === 'event';
+}
+
 /** The left accent bar colour per mode (web's surfaceTypeAccent). */
-export function modeAccent(mode: ProjectMode): string {
+export function modeAccent(mode: CharterMode): string {
+  if (mode === 'event') return 'var(--type-accent-event)';
   if (mode === 'productive') return 'var(--type-accent-project-production)';
   return mode === 'personal-service'
     ? 'var(--type-accent-project-personal-service)'
@@ -101,7 +109,7 @@ export function modeAccent(mode: ProjectMode): string {
 }
 
 /** Personal-service projects take no demand/opposition signals (as on web). */
-export function takesSignals(mode: ProjectMode): boolean {
+export function takesSignals(mode: CharterMode): boolean {
   return mode !== 'personal-service';
 }
 

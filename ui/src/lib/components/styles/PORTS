@@ -11,6 +11,7 @@ cards.css         .feed-card-top  web/src/lib/components/cards/shared/FeedCardTo
 cards.css         .vote-strip     web/src/lib/components/cards/shared/VoteStrip.svelte
 cards.css         .content-meta-row web/src/lib/components/shared/ContentMetaRow.svelte
 cards.css         .project-card   web/src/lib/components/cards/public-feed/ProjectCard.svelte
+cards.css         .event-card     web/src/lib/components/cards/public-feed/EventCard.svelte
 cards.css         .tag-list       web/src/lib/components/cards/shared/TagList.svelte
 cards.css         .surface        web/src/lib/components/cards/shared/CountPill.svelte
 cards.css         .personal-activity-card web/src/lib/components/cards/personal-feed/PersonalActivityCard.svelte
@@ -37,6 +38,7 @@ create.css        .create-sheet   web/src/lib/features/create/shared/CreateScope
 create.css        .create-sheet   web/src/lib/components/shared/RequiredFieldLabel.svelte
 create.css        .create-sheet   web/src/lib/components/shared/DirectUsePolicyNotice.svelte
 create.css        .create-sheet   web/src/lib/features/create/project/CreateProjectPage.svelte
+create.css        .create-sheet   web/src/lib/features/create/event/CreateEventPage.svelte
 governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
 governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
 governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte

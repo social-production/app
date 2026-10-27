@@ -160,6 +160,12 @@
       description: 'Start a productive or service project',
       icon: 'project',
     },
+    {
+      href: resolve('/create/event'),
+      label: 'Event',
+      description: 'Plan a scheduled gathering',
+      icon: 'event',
+    },
   ];
 
   function isActive(href: string): boolean {

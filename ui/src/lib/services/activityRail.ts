@@ -7,7 +7,7 @@ import {
 import { railHistory } from '#lib/domain/activityRailHistory.ts';
 import type { VoteChoice } from '#lib/domain/governance.ts';
 import type { SideStatus } from '#lib/domain/links.ts';
-import type { ProjectMode } from '#lib/domain/projects.ts';
+import type { CharterMode } from '#lib/domain/projects.ts';
 import {
   callCell,
   clonedSeeds,
@@ -24,7 +24,7 @@ import { listingTitle } from './projects.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
-  charter: { title: string; mode: ProjectMode } | null;
+  charter: { title: string; mode: CharterMode } | null;
   am_member: boolean;
   phase: string;
   phases: { id: string; label: string }[];
