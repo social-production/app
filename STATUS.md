@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: web's right rail (the activity button), branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-27: web's right rail (the activity button), branch `claude/social-production-handoff-dsam61`, PR #57
 PARITY "Activity (calendar) button" and M5b's "right rail's activity". **UI only, no zome or
 gateway change**, so merging resets nothing.
 - `domain/activityRail.ts` + `activityRailHistory.ts` (pure): web-backend's
@@ -56,7 +56,7 @@ gateway change**, so merging resets nothing.
   project after `governance` had loaded the founders' node, then passed alone. Watch whether
   the rail's extra reads (4 calls per joined project per minute) slow busy accounts.
 - Live at session start (00:50 UTC): `/readyz` uptime 4.8 h (PR #56's redeploy), `rssMb` 641.
-- Next: open the PR, wait for CI, merge, smoke `rail.mjs` (it can run live: two accounts),
+- PR #57 opened ~12:05 pm Melbourne; CI takes ~1 h. Next: when CI is green, merge, smoke `rail.mjs` (it can run live: two accounts),
   `shell.mjs`, `guests.mjs`; then README Status.
 
 ## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
