@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~12:00 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,35 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: docs + CI in 5 shards, branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-27: web's right rail (the activity button), branch `claude/social-production-handoff-dsam61`, PR #57
+PARITY "Activity (calendar) button" and M5b's "right rail's activity". **UI only, no zome or
+gateway change**, so merging resets nothing.
+- `domain/activityRail.ts` + `activityRailHistory.ts` (pure): web-backend's
+  `bootstrap/activity_rail.py` and `activity_rail_history.py` rules and limits, from the
+  projects open on this node (`services/activityRail.ts`: `get_project`, `list_activities`,
+  `list_proposals`, `list_plans` per joined project, as notifications do, ADR 0046).
+  `stores/activityRail.svelte.ts` keeps cleared/seen ids under web's localStorage keys;
+  `features/shell/activityRailLoop.ts` refreshes it every 60 s while visible and on opening.
+- UI from web: `features/shell/RightRailPanel.svelte` + `components/rail/*` (sections, rows,
+  History with its Show filter, Cleared with Restore / Restore all, `SurfaceTypeLabel`); the
+  top bar's badge; the first desktop load opens the rail when something needs doing.
+  Styles: `styles/rail.css` via PORTS, rooted at `.right-rail` (web's left rail also uses
+  `.rail-panel`; Svelte scoped them apart, our global CSS must not).
+- Vote links `?open=vote&voteKind=edit|update&voteTarget=…` now open the Details tab's vote
+  sheet (web's place for them); phase votes still open Take part's. `listPlans` takes a seed.
+- Decided (owner review in PARITY): personal services' activities (`phase-1`) are listed too;
+  web-backend checks `phase-5` only. Gaps: link votes, plan Assess opens the tab not the plan.
+- Checked: `npm run check`/`lint`, sizes, boundaries; local release seed node
+  (`RELEASE=1 bash scripts/cloud-seed.sh`): new `tests/e2e/rail.mjs` (signed-out rail text
+  matches live web's; activity row, badge, clear/restore, open → sheet; Bob's edit vote →
+  Assess → vote → History), `shell`, `governance`; `notifications` timed out once creating a
+  project after `governance` had loaded the founders' node, then passed alone. Watch whether
+  the rail's extra reads (4 calls per joined project per minute) slow busy accounts.
+- Live at session start (00:50 UTC): `/readyz` uptime 4.8 h (PR #56's redeploy), `rssMb` 641.
+- PR #57 opened ~12:05 pm Melbourne; CI takes ~1 h. Next: when CI is green, merge, smoke `rail.mjs` (it can run live: two accounts),
+  `shell.mjs`, `guests.mjs`; then README Status.
+
+## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
 - README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
 - **PR #55 deployed:** merged 17:50 UTC; ui + bootstrap live 17:52 UTC, seed node 18:16 UTC
   (26 min; this one succeeded, so PR #54's gateway is live too). Live smoke 18:21–18:29 UTC
@@ -39,7 +67,8 @@ and continue from Next."
   mention order), `activities.mjs` (activity, roles, suggestion, project-chat photo, Past
   activity check-in and rating). `/readyz` 1333 MB at start, 1672 MB after those tests
   (~9 accounts): keep sampling it.
-- Next: merge this PR once CI is green (scenarios in 5 shards), then STATUS Next.
+- CI with 5 shards: `check` 5 min, shards 46–63 min (with 4 the worst was 102). Nothing is
+  in flight; continue from Next.
 
 ## Done 2026-10-26: M5b activities and roles, first part (ADR 0056), PR #55 merged (17:50 UTC / 4:50 am Melbourne 27 Oct)
 **The project network reset with this merge** (integrity change): every live test project starts again;
@@ -76,7 +105,7 @@ people, follows and chats are untouched (directory and conversation hashes uncha
   author; it now sits on the author's row (web's `header-end`). **Lesson:** compare computed
   styles with live web, not only screenshots of one card.
 - Next (no reset needed): the "suggestion declined" card, feed/profile activity cards, the
-  right rail's activity (PARITY).
+  right rail's activity (PARITY; the rail is in flight above).
 
 ## Done 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54 merged (15:05 UTC / 2:05 am Melbourne 27 Oct)
 STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.
@@ -699,6 +728,10 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
     audio until a TURN relay is set (`VITE_CALL_TURN_URLS`, `_USERNAME`, `_CREDENTIAL` on the
     ui service). Call lines came with ADR 0051 (2026-10-24), which reset the live test chats
     again; when the other person is busy the caller's line says "Call declined" (web: missed).
+
+13. **Right rail lists personal services' activities** (2026-10-27): web-backend's rail only
+    reads projects in `phase-5`, so on web a personal service's activities (its Activity phase
+    is `phase-1`) never reach the rail. The app lists them; say if it should copy web exactly.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).

@@ -14,9 +14,19 @@
     membersOpen: boolean;
     onOpenMembers: () => void;
     onEdit: () => void;
+    /** An edit or update a link asks to open (web's `?open=vote&voteKind=edit|update`). */
+    revealVote?: string | null;
+    onRevealDone?: () => void;
   }
 
-  let { detail, membersOpen, onOpenMembers, onEdit }: Props = $props();
+  let {
+    detail,
+    membersOpen,
+    onOpenMembers,
+    onEdit,
+    revealVote = null,
+    onRevealDone,
+  }: Props = $props();
 </script>
 
 {#if detail.project?.charter}
@@ -53,6 +63,8 @@
               stage={project.stage}
               phaseLabel={detail.phaseLabel}
               onVote={(p, c) => detail.vote(p, c)}
+              reveal={revealVote}
+              {onRevealDone}
             />
           {/if}
           {#if detail.canPropose}

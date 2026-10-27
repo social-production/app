@@ -8,7 +8,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
-import { cellOf } from './projects.ts';
+import { cellFor, type ProjectRef } from './projects.ts';
 
 interface PlanViewWire {
   id: ActionHash;
@@ -47,14 +47,12 @@ interface PlanBoardWire {
   required: number;
 }
 
-const governance = async <T>(projectId: string, fn: string, payload?: unknown): Promise<T> => {
-  const { cell } = await cellOf(projectId);
-  return callCell<T>(cell, 'governance', fn, payload);
-};
+const governance = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> =>
+  callCell<T>(await cellFor(project), 'governance', fn, payload);
 
 /** Every plan with its assessment, and what leaving the current phase needs. */
-export async function listPlans(projectId: string): Promise<PlanBoard> {
-  const wire = await governance<PlanBoardWire>(projectId, 'list_plans');
+export async function listPlans(project: ProjectRef): Promise<PlanBoard> {
+  const wire = await governance<PlanBoardWire>(project, 'list_plans');
   return {
     plans: wire.plans.map((p) => ({
       id: hashToString(p.id),

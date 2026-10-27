@@ -29,13 +29,17 @@
   // and `?activity=…` (the Take part tab, ADR 0056).
   const params = page.url.searchParams;
   const voteLink = params.get('open') === 'vote' ? params.get('voteTarget') : null;
+  // web votes on edits and updates in the Details tab's dock, on the rest in Take part's.
+  const detailsVote = ['edit', 'update'].includes(params.get('voteKind') ?? '');
   let commentLink = $state(params.get('comment'));
   let tab = $state<DetailTabId>(
     params.get('comment')
       ? 'chat'
-      : voteLink || params.get('activity')
-        ? 'participation'
-        : tabFromParam(params.get('tab')),
+      : voteLink && detailsVote
+        ? 'context'
+        : voteLink || params.get('activity')
+          ? 'participation'
+          : tabFromParam(params.get('tab')),
   );
   let sheet = $state<'members' | 'edit' | 'update' | null>(null);
   let compact = $state(false);
@@ -137,7 +141,7 @@
             active={tab === 'participation'}
             membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
-            revealVote={voteLink}
+            revealVote={detailsVote ? null : voteLink}
             onRevealDone={clearVoteLink}
           />
           <ParticipationPanel {detail} />
@@ -176,6 +180,8 @@
             membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
             onEdit={() => (sheet = 'edit')}
+            revealVote={detailsVote ? voteLink : null}
+            onRevealDone={clearVoteLink}
           />
         {/if}
       </section>

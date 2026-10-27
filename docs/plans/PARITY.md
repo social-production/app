@@ -13,8 +13,17 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   Discover, Feedback).
 - [ ] Map button: web opens the map panel (`features/map/MapPanel.svelte`, radius, time,
   filters); the app's does nothing. Comes with M6 map/places.
-- [ ] Activity (calendar) button: web opens the right rail's activity; the app shows "Your
-  activity will appear here." Comes with M5 activities.
+- [x] Activity (calendar) button: web's right rail (`RightRailPanel`): Project Activity &
+  Events (upcoming activities in your projects' Activity phase, with signups), Votes to cast
+  (open phase moves, plans, updates and edits you haven't voted on, with Assess), History
+  (ended activities, roles you hold, votes you cast, with the Show filter) and Cleared
+  (dismiss ×, Restore, Restore all); the button's badge and the first desktop load opening it
+  when there's something to do. Signed out it matches web at 390px (`tests/e2e/rail.mjs`).
+  Help Requests and Requests stay empty until help requests and service requests exist (M5c).
+  **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
+  out personal services (Activity is their `phase-1`); the app lists both.
+- [ ] Rail gaps: link votes (web's "Link request" rows) aren't listed yet, and a plan vote's
+  Assess opens the Take part tab, not the plan's sheet itself.
 
 - [x] Onboarding is web's auth surface: only the brand in the top bar, no rails, bottom nav or
   "+"; heading "Sign in or create an account" with web's intro line (also on account-only
