@@ -31,6 +31,18 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
+## In flight 2026-10-27: "suggestion declined" notifications, PR #58 (with the docs for PR #57)
+M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
+DNA hashes are unchanged (`hc dna hash` before/after `build-happ.sh`: project `uhC0kkykG2Y…`)
+and merging resets nothing; the gateway upgrades hosted coordinators on start.
+- UI: `domain/activityNotifications.ts` adds web's "<role> suggestion declined" / "The person
+  you suggested declined this role." card for the suggester (`prj-role-suggest`, Roles switch).
+- Checked: clippy `-D warnings` (activities, scenarios), fmt; `npm run check`/`lint`, sizes,
+  boundaries; scenario `activities` (2 passed, 14 min, now asserts the decline); local release
+  seed node: `activities.mjs` (now waits for Ann's declined card) and `notifications.mjs` passed.
+- Next: CI green → merge → smoke `activities.mjs` live (two accounts; ~5 min incl. its
+  two-minute activity) → STATUS Done.
+
 ## Done 2026-10-27: web's right rail (the activity button), PR #57 merged (02:18 UTC / 1:18 pm Melbourne), seed node live 02:40 UTC; live `rail.mjs`, `shell.mjs`, `guests.mjs` passed
 PARITY "Activity (calendar) button" and M5b's "right rail's activity". **UI only, no zome or
 gateway change**, so merging resets nothing.
@@ -59,8 +71,7 @@ gateway change**, so merging resets nothing.
 - CI: `check` 5 min, shards 35–85 min. Deploy: ui 1 min after the merge, seed node 22 min.
   Live smoke 02:41–02:46 UTC: `rail`, `shell`, `guests` all passed on the first run.
   `/readyz` 577 MB at start, 1037 MB five minutes later after those tests (~5 accounts).
-- Nothing is in flight; continue from Next (M5b leftovers: the "suggestion declined" card,
-  feed/profile activity cards; rail gaps: link votes, plan Assess → the plan's sheet).
+- Then: the "suggestion declined" card (in flight above); feed/profile activity cards; rail gaps: link votes, plan Assess → the plan's sheet).
 
 ## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
 - README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
