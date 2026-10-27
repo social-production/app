@@ -9,6 +9,7 @@
   } from '#lib/domain/links.ts';
   import { modeAccent } from '#lib/domain/projects.ts';
 
+  import { focusLinkCard } from './focusLinkCard.ts';
   import LinkCard from './LinkCard.svelte';
   import LinkVotePanel from './LinkVotePanel.svelte';
 
@@ -22,11 +23,29 @@
     pendingId: string | null;
     onCompose: () => void;
     onVote: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
+    /** A request a link asks to show (web's `?linkRequest=…`): expanded and scrolled to. */
+    highlight?: string | null;
   }
 
-  let { requests, names, canPropose, pendingId, onCompose, onVote }: Props = $props();
+  let {
+    requests,
+    names,
+    canPropose,
+    pendingId,
+    onCompose,
+    onVote,
+    highlight = null,
+  }: Props = $props();
 
   let expanded = $state<Record<string, boolean>>({});
+  let shown: string | null = null;
+
+  $effect(() => {
+    if (!highlight || shown === highlight || !requests.some((r) => r.id === highlight)) return;
+    shown = highlight;
+    expanded = { ...expanded, [highlight]: true };
+    void focusLinkCard(highlight);
+  });
 </script>
 
 <section class="request-stack">

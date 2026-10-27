@@ -91,6 +91,12 @@ async function listing(id: string): Promise<ListingWire> {
   return found;
 }
 
+/** A listed project's title from the directory, without joining its network. */
+export async function listingTitle(id: string): Promise<string | null> {
+  const found = await directory<ListingWire | null>('get_listing', stringToHash(id));
+  return found?.listing.title ?? null;
+}
+
 /** A project's cell on this node (cloned on first use, which joins its network). */
 export async function cellOf(id: string) {
   const l = await listing(id);

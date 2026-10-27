@@ -25,11 +25,26 @@
     canVote: boolean;
     onRate: (criterion: string, rating: PlanRating | null) => void;
     onVote: (choice: VoteChoice) => void;
+    /** Open the sheet once (a vote link to this plan). */
+    reveal?: boolean;
+    onRevealDone?: (() => void) | undefined;
   }
 
-  let { plan, authorName, canVote, onRate, onVote }: Props = $props();
+  let { plan, authorName, canVote, onRate, onVote, reveal = false, onRevealDone }: Props = $props();
 
   let open = $state(false);
+  let revealed = $state(false);
+
+  $effect(() => {
+    if (!reveal || revealed) return;
+    revealed = true;
+    open = true;
+  });
+
+  function close(): void {
+    open = false;
+    if (revealed) onRevealDone?.();
+  }
 
   const chip = $derived(planChip(plan));
   const leading = $derived(plan.leader === 'Leading');
@@ -83,7 +98,7 @@
   labelledById={sheetId}
   rootClass="plan-scope"
   wide
-  onClose={() => (open = false)}
+  onClose={close}
 >
   {#snippet subtitle()}
     {#if chip}<p class="sheet-kicker">{chip}</p>{/if}

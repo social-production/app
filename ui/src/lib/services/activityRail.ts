@@ -1,11 +1,26 @@
-import { railItems, type RailItem, type RailProject } from '#lib/domain/activityRail.ts';
+import {
+  railItems,
+  type RailItem,
+  type RailLink,
+  type RailProject,
+} from '#lib/domain/activityRail.ts';
 import { railHistory } from '#lib/domain/activityRailHistory.ts';
+import type { VoteChoice } from '#lib/domain/governance.ts';
+import type { SideStatus } from '#lib/domain/links.ts';
 import type { ProjectMode } from '#lib/domain/projects.ts';
-import { callCell, clonedSeeds, projectCell } from '#lib/holo/index.ts';
+import {
+  callCell,
+  clonedSeeds,
+  hashToString,
+  projectCell,
+  type ActionHash,
+  type CellId,
+} from '#lib/holo/index.ts';
 
 import { listActivities } from './activities.ts';
 import { listProposals } from './governance.ts';
 import { listPlans } from './plans.ts';
+import { listingTitle } from './projects.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
@@ -13,6 +28,45 @@ interface GlanceWire {
   am_member: boolean;
   phase: string;
   phases: { id: string; label: string }[];
+}
+
+/** The part of `link_sides` the rail reads (this project's halves of link requests). */
+interface SidesWire {
+  halves: {
+    id: ActionHash;
+    created_at: number;
+    request: { other: { listing: ActionHash }; sever: ActionHash | null };
+    tally: { yes: number; no: number; my_vote: VoteChoice | null; settled: boolean };
+    status: SideStatus;
+  }[];
+}
+
+/** Listing titles don't change; the rail refreshes every minute, so keep the ones found. */
+const titles = new Map<string, string>();
+
+async function titleOf(listing: string): Promise<string> {
+  const known = titles.get(listing);
+  if (known) return known;
+  const found = await listingTitle(listing).catch(() => null);
+  if (found) titles.set(listing, found);
+  return found ?? 'linked record';
+}
+
+async function railLinks(cell: CellId): Promise<RailLink[]> {
+  const sides = await callCell<SidesWire>(cell, 'governance', 'link_sides');
+  return Promise.all(
+    sides.halves.map(async (h) => ({
+      id: hashToString(h.id),
+      sever: h.request.sever !== null,
+      otherTitle: await titleOf(hashToString(h.request.other.listing)),
+      createdAt: h.created_at,
+      yes: h.tally.yes,
+      no: h.tally.no,
+      status: h.status,
+      settled: h.tally.settled,
+      myVote: h.tally.my_vote,
+    })),
+  );
 }
 
 /**
@@ -31,10 +85,11 @@ async function railProject(seed: string): Promise<RailProject | null> {
   const cell = await projectCell(seed, 'Project');
   const project = await callCell<GlanceWire | null>(cell, 'project', 'get_project');
   if (!project?.charter || !project.am_member) return null;
-  const [activities, proposals, board] = await Promise.all([
+  const [activities, proposals, board, links] = await Promise.all([
     listActivities({ seed }).catch(() => []),
     listProposals({ seed }).catch(() => []),
     listPlans({ seed }).catch(() => null),
+    railLinks(cell).catch(() => []),
   ]);
   const labels = new Map(project.phases.map((p) => [p.id, p.label]));
   return {
@@ -47,5 +102,6 @@ async function railProject(seed: string): Promise<RailProject | null> {
     activities,
     proposals,
     plans: board?.plans ?? [],
+    links,
   };
 }

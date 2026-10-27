@@ -5,13 +5,14 @@
  */
 import { committedOf, minimumOf, type Activity } from './activities.ts';
 import { zoneOf } from './activityTime.ts';
-import type { Proposal } from './governance.ts';
+import type { Proposal, VoteChoice } from './governance.ts';
+import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
 import type { ProjectMode } from './projects.ts';
 
 /** web's kinds this app has so far; events, help requests and service requests come later. */
 export type RailKind = 'project' | 'vote';
-export type RailVoteKind = 'phase_change' | 'plan' | 'update' | 'edit';
+export type RailVoteKind = 'phase_change' | 'plan' | 'update' | 'edit' | 'link' | 'link_sever';
 
 export interface RailItem {
   id: string;
@@ -42,6 +43,20 @@ export interface RailProject {
   activities: Activity[];
   proposals: Proposal[];
   plans: PlanView[];
+  links: RailLink[];
+}
+
+/** This project's half of a link request (its `link_sides`), with the other project's title. */
+export interface RailLink {
+  id: string;
+  sever: boolean;
+  otherTitle: string;
+  createdAt: number;
+  yes: number;
+  no: number;
+  status: SideStatus;
+  settled: boolean;
+  myVote: VoteChoice | null;
 }
 
 /** web-backend's limits: four activities, three votes of each kind. */
@@ -59,6 +74,11 @@ export const voteQuery = (kind: RailVoteKind, target: string, assess = false): s
   `?open=vote&voteKind=${kind}&voteTarget=${encodeURIComponent(target)}${assess ? '&assess=1' : ''}`;
 
 export const activityQuery = (id: string): string => `?activity=${encodeURIComponent(id)}`;
+
+/** web's link vote href: the Links tab with the request highlighted. */
+export const linkQuery = (id: string): string => `?tab=links&linkRequest=${encodeURIComponent(id)}`;
+
+export const linkKind = (l: RailLink): RailVoteKind => (l.sever ? 'link_sever' : 'link');
 
 /** web's "2 signed up · 1 needed". */
 export function signupLabel(a: Activity): string {
@@ -122,7 +142,33 @@ function votesToCast(projects: RailProject[]): RailItem[] {
   const edits = pick(projects.flatMap((p) => open(p, 'Edit'))).map(({ p, v }) =>
     proposalItem(p, v, 'edit', p.title, 'Edit request'),
   );
-  return [...phases, ...plans, ...updates, ...edits];
+  return [...phases, ...plans, ...updates, ...edits, ...linksToCast(projects)];
+}
+
+/**
+ * web-backend reads the newest nine open link requests (three times its per-kind limit) and
+ * keeps the halves the viewer hasn't voted on: "Link vote · <other project>".
+ */
+function linksToCast(projects: RailProject[]): RailItem[] {
+  const rows = projects.flatMap((p) =>
+    p.links
+      .filter((l) => l.status === 'Open' && !l.settled && l.myVote === null)
+      .map((l) => ({ p, l, createdAt: l.createdAt })),
+  );
+  return newestFirst(rows)
+    .slice(0, VOTE_LIMIT * 3)
+    .map(({ p, l }) => ({
+      id: l.id,
+      seed: p.seed,
+      kind: 'vote' as const,
+      title: p.title,
+      query: linkQuery(l.id),
+      meta: `${l.sever ? 'Sever link' : 'Link vote'} · ${l.otherTitle}`,
+      createdAt: l.createdAt,
+      countLabel: tally(l),
+      projectMode: p.mode,
+      voteKindLabel: linkKind(l),
+    }));
 }
 
 function proposalItem(

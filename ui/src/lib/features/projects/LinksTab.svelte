@@ -14,7 +14,13 @@
    * web's DetailLinksTab for projects: the venue, active links, pending requests, historical
    * links and past votes. Events and conversions arrive with their own screens.
    */
-  let { detail }: { detail: DetailState } = $props();
+  interface Props {
+    detail: DetailState;
+    /** web's `?linkRequest=…`: the request (or sever vote) to open. */
+    highlight?: string | null;
+  }
+
+  let { detail, highlight = null }: Props = $props();
 
   const links = new LinksState(() => detail.project);
   let composing = $state(false);
@@ -63,6 +69,7 @@
       emptyMessage="No active links yet."
       allowSever={frame.canPropose}
       pendingId={links.pendingId}
+      {highlight}
       onSever={(link) => void links.sever(link)}
       onVote={(id, side, choice) => void links.vote(id, side, choice)}
     />
@@ -71,6 +78,7 @@
       names={links.names}
       canPropose={frame.canPropose}
       pendingId={links.pendingId}
+      {highlight}
       onCompose={() => {
         links.composerMessage = undefined;
         composing = true;

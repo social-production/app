@@ -22,8 +22,12 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   Help Requests and Requests stay empty until help requests and service requests exist (M5c).
   **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
   out personal services (Activity is their `phase-1`); the app lists both.
-- [ ] Rail gaps: link votes (web's "Link request" rows) aren't listed yet, and a plan vote's
-  Assess opens the Take part tab, not the plan's sheet itself.
+- [x] Rail link votes: web's "Link vote · <other project>" / "Sever link · …" rows (this
+  project's half of a link request you haven't voted on, from `link_sides`; the other project's
+  title from its directory listing) open the Links tab with the request expanded
+  (`?tab=links&linkRequest=…`); cast link votes reach History. A plan vote's Assess opens
+  that plan's own sheet in its phase. History's link outcome is this project's half's (web
+  reads the whole request's).
 
 - [x] Onboarding is web's auth surface: only the brand in the top bar, no rails, bottom nav or
   "+"; heading "Sign in or create an account" with web's intro line (also on account-only
@@ -64,7 +68,9 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   bottom-right).
 - [ ] Cards: web's ⋮ `ReportControl` (copy link, report) top-right. Comes with M6 moderation;
   "copy link" alone could come sooner.
-- [ ] Event, activity and plan cards (web's feed mixes them); the app lists projects only (M5).
+- [ ] Event cards (M5c). web's project-activity cards (`ProjectActivityCard`: activity title,
+  parent project, time, place, distance) come only from web-backend's Region feed
+  (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.
 
 ## Settings (compared with web's `SettingsPage.svelte` source)
 - [x] Appearance: type size, theme (light/dark/system), accent colour, font, kept on this device

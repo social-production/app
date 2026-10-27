@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, rail, railButton, railShows, signUp } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -28,19 +28,6 @@ async function create(page, title, personal) {
   await page.getByRole('button', { name: 'Publish project' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];
-}
-
-const rail = (page) => page.locator('.right-rail .rail-panel');
-const railButton = (page) => page.getByRole('button', { name: 'Open activity' });
-
-/** Open the rail (it reloads on open) until `locator` shows in it. */
-async function railShows(page, locator, what) {
-  for (let i = 0; i < 20; i++) {
-    if (!(await rail(page).count())) await railButton(page).click();
-    if (await locator().waitFor({ timeout: 10_000 }).then(() => true, () => false)) return;
-    await railButton(page).click(); // close, then reopen to reload it
-  }
-  throw new Error(`timed out waiting for ${what} in the rail`);
 }
 
 const ann = await device({ viewport: phone });
