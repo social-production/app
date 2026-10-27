@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~3:55 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~5:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,32 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-27: rail link votes + plan votes open the plan's sheet (branch `claude/social-production-handoff-dsam61`)
+PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets nothing.
+- Feed/profile activity cards (the old Next) turned out to wait on M6: web's
+  `ProjectActivityCard` comes only from web-backend's Region feed (`feeds/region.py`, with
+  distance); web's feed has no plan cards; event cards come with M5c. PARITY updated.
+- Rail: web-backend's link rows ("Link vote · <other project>" / "Sever link · …", kicker
+  "Vote · link" / "Vote · link sever"): this project's half of each open request you haven't
+  voted on (`governance.link_sides`, one more read per joined project per minute), newest 9;
+  the other project's title from `get_listing` in the directory (cached; no project network
+  joined). Cast link votes go to History (12, both kinds together).
+- Project page: `?tab=links&linkRequest=<half id>` opens the Links tab, expands the request
+  (or the active link whose sever vote it is), scrolls to it and flashes web's
+  `request-highlight`. `?open=vote&voteKind=plan&voteTarget=…` selects the plan's phase and
+  opens that plan's sheet (Assess is inline there); closing drops the link.
+- Tests: rail helpers moved to `tests/e2e/lib.mjs`; `links.mjs` has founder two open B's link
+  vote from the rail; `governance.mjs` has Bob open the plan from his rail.
+- Checked: `npm run check`/`lint`, sizes, boundaries; local release seed node
+  (`RELEASE=1 bash scripts/cloud-seed.sh`): `links`, `governance`, `rail` all passed. A first
+  `governance` run failed on a strict-mode locator (the row's "Assess and approve this plan"
+  also matched the Assess button; now `exact: true`); after that aborted run founder one's
+  writes kept failing with SQLite "database is locked" (code 517) until the seed node was
+  restarted. **Lesson:** if project creation hangs locally after an aborted test, check the
+  page for "database is locked" and restart `cloud-seed.sh`.
+- No scenario changes (no zome change). Next: open the PR, wait for CI, merge, live smoke
+  `rail.mjs` + `shell.mjs` (links/governance need the dev founders, local only), then M5c.
 
 ## Done 2026-10-27: "suggestion declined" notifications, PR #58 merged (04:31 UTC / 3:31 pm Melbourne), seed node live 04:44 UTC; live `activities.mjs` and `shell.mjs` passed
 M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
@@ -786,8 +812,10 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 1. **Parity pass** (checklist: `docs/plans/PARITY.md`): what's left there waits on features
    (follows, scopes, places, moderation); pick items up as their features land.
 2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (done, ADR 0054; its
-   mention ranking and Home scope in PR #54), **next: M5b** activities and roles + the waiting project-chat items (one project reset), M5c events
-   and help requests, M5d communities and channels. Each starts with its ADR.
+   mention ranking and Home scope in PR #54), M5b activities and roles (done; the rail's link
+   and plan votes in flight), **next: M5c** events and help requests (event cards in the feed;
+   project-activity cards wait on Region, M6), M5d communities and channels. Each starts with
+   its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.
 4. CI: scenarios run in 5 shards since 2026-10-27 (with 4, PR #55's shard 0 took 102 of its

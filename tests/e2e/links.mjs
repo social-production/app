@@ -101,7 +101,7 @@ await bob.goto(urlB);
 await railShows(bob, linkRow, 'the link vote');
 assert.match(await linkRow().innerText(), /Vote · link/i);
 assert.match(await linkRow().innerText(), new RegExp(titles[1]));
-await linkRow().getByRole('button', { name: 'Assess' }).click();
+await linkRow().getByRole('button', { name: 'Assess', exact: true }).click();
 await bob.locator('.request-stack .link-card.expanded', { hasText: titles[0] }).waitFor({ timeout: 180_000 });
 assert.match(bob.url(), /tab=links&linkRequest=/);
 log('founder two opened the link vote from the rail');

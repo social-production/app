@@ -165,7 +165,7 @@ async function assess(page, yes, fromRail = false) {
     const row = () => rail(page).locator('.vote-row', { hasText: planTitle });
     await railShows(page, row, 'the plan vote');
     assert.match(await row().innerText(), /Assess and approve this plan/);
-    await row().getByRole('button', { name: 'Assess' }).click();
+    await row().getByRole('button', { name: 'Assess', exact: true }).click();
     await page.getByRole('dialog', { name: planTitle }).waitFor({ timeout: 120_000 });
   } else {
     await page.getByRole('tab', { name: 'Participation' }).click();
