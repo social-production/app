@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~8:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-28 ~4:20 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,32 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## Done 2026-10-28: seed-node memory (jemalloc), busy-conductor retry, test founders live (ADR 0060), PR #61 merged (16:19 UTC 27 Oct / 3:19 am Melbourne), seed node live 16:39 UTC; ALL 18 browser test files passed live
+**Directory reset with this merge** (founders list changed): everyone signs up again.
+- **Memory:** the gateway uses jemalloc (feature `jemalloc`, on in the Docker build and
+  `RELEASE=1` dev seed; off in debug builds, where jemalloc's configure fails under Nix
+  hardening). Idle: local 1148 → ~700 MB; **live idle 698 MB** (was 1.1–1.4 GB).
+- **Still growing with projects:** live, all 18 files took it 698 → 1407 MB (links rerun:
+  1495). Big steps come with projects (`projects.mjs` +270 MB, each `links.mjs` run ~+80 MB for
+  2 projects), so the cost is per project cell (the archivist joins every project; the creator
+  and members hold it too), not per account. **Next memory step:** profile one cell's cost
+  (SQLite page caches and connection pools per cell DB, kitsune space per DNA) with the
+  jemalloc recipe (ADR 0053 STATUS entry); see whether the archivist needs a full cell per
+  project or a lighter read path.
+- **Busy conductor:** creating a project/chat cell retried on SQLite 517 "database is
+  locked" (`ui/src/lib/holo/cells.ts`). This was the "project creation hangs" in local runs.
+- **Test founders on the test network:** `tests/e2e/fixtures/dev-founders.json` identities
+  are founders in `dnas/directory/dna.yaml` (remove at launch). **Every browser test now runs
+  live**, no owner accounts needed:
+  `for t in <files>; do node tests/e2e/$t.mjs https://ui-production-333c.up.railway.app; done`.
+  Live run 16:41–17:13 UTC: all passed; `links.mjs` failed once (cause not captured) and
+  passed on rerun. Locally `governance.mjs` also timed out once and passed on rerun: watch both.
+- The identity scenario now counts the founders in `dna.yaml` instead of expecting 2.
+- **Next:** M5c part 2 (private events: secret seed + invites, organizer-controlled
+  governance; activities limited to the plan's days), then help requests (own ADR), then M5d
+  (communities/channels + coordinates on listings, ADR 0058, in one directory reset). Do the
+  per-cell memory profiling alongside.
 
 ## Owner direction (2026-10-27)
 - **No real users; launch only on the Holochain system**, at parity, after a UX pass
@@ -835,7 +861,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `59e021e` (PR #60, merged 2026-10-27 11:21 UTC; seed node live 11:33 UTC; project and directory networks reset). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `419e2c8` (PR #61, merged 2026-10-27 16:19 UTC; seed node live 16:39 UTC; directory network reset). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -890,7 +916,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
   - Start the local seed node: `RP_ORIGIN=http://localhost:4174 bash scripts/dev-seed.sh`. It builds a dev hApp whose founders are `tests/e2e/fixtures/dev-founders.json`, so governance can be tested.
   - Wait for "zomes compiled" in its log.
   - Run `bash scripts/e2e-local.sh tests/e2e/{accounts,projects,chat,governance}.mjs`. Signed out, the home page is the feed; sign-up is at `/onboarding`.
-- **Live smoke:** `curl` `/readyz` and `/index/projects`, then `node tests/e2e/projects.mjs https://ui-production-333c.up.railway.app` (and `guests.mjs`) (allowed on this test network: it creates two test accounts; in a cloud session run `npx playwright install --with-deps chromium` first). `chat.mjs`/`governance.mjs` need the dev founders, so they only run locally. Never create accounts on the FastAPI site; the live web site may be browsed read-only to compare layouts.
+- **Live smoke:** `curl` `/readyz` and `/index/projects`, then any browser test file against `https://ui-production-333c.up.railway.app` (`CHROMIUM_PATH=/opt/pw-browsers/chromium node tests/e2e/<t>.mjs <url>`). Since PR #61 the dev founders are founders on the live test network too, so every file runs live (allowed on this test network: they create test accounts). Never create accounts on the FastAPI site; the live web site may be browsed read-only to compare layouts.
 - **Styles:** never hand-edit `ui/src/lib/components/styles/*.css`. Add rows to `styles/PORTS` and run `python3 scripts/port-styles.py`. App-only CSS goes in `styles/additions.css` (ADR 0032).
 - **One write at a time per person:** two zome calls that write to the same source chain at once are refused (the chain head moved). Optimistic UI that fires several writes (ratings, votes) must queue them, as `DetailState.inTurn` does.
 - **A write isn't in your own network reads at once:** after a vote, `tally.my_vote` can still be
