@@ -32,19 +32,32 @@ and continue from Next."
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
 ## In flight 2026-10-28: M5c part 2a, invite-only events and organizers (ADR 0061), branch `claude/social-production-handoff-dsam61`
-Plan (tick off as it lands; ADR 0061 has the reasons):
-1. [ ] `sp_event::Audience` from the seed (`.private.` / `.organized.`), unit tests.
-2. [ ] Project integrity: `Organizer { agent, grant }`; `organizer: Option<ActionHash>` on
-   `Proposal` and `Activity` (serde default); organized events: organizer-only proposals and
-   activities, vote-less passed outcomes, no values/importance/signals, no return to Proposal.
-3. [ ] Coordinators: governance closes organizer proposals at once, skips the signal gate and
-   recount, newest approved plan leads; project `grant_organizer`/`organizers` + view fields;
-   activities cite the grant; messages inbox accepts event seeds.
-4. [ ] Scenario `private_events`.
-5. [ ] UI: create steps (Audience, Who, Control, Plan), `/events/<seed>`, `/invites`, rail
-   Invites row, `evt-invite` notification, PrivateMark, leave warning; browser test.
-6. [ ] Checks, PR, merge when green, live smoke, docs.
-**Merging resets the project network** (everyone's test projects/events start again).
+**Merging resets the project network** (integrity change; directory and conversation DNA
+hashes unchanged: directory has no changed deps, conversation `uhC0kUmCMHl…` as on main).
+Done on the branch (pushed):
+1. [x] `sp_event::Audience` from the seed (`<creator>.private.<nonce>` / `.organized.`), tests.
+2. [x] Project integrity: `Organizer { agent, grant }` + `Organizers` link; `organizer:
+   Option<ActionHash>` on `Proposal` and `Activity` (serde default); organized events:
+   organizer-only proposals/activities, vote-less passed outcomes, no values/importance/
+   signals, no return to Proposal (`integrity/project/src/organizer.rs`).
+3. [x] Coordinators: governance `decide_now` closes organizer proposals, skips the signal gate
+   and the recount, newest approved plan leads (`plans::leader`); project `add_organizer`,
+   `my_organizer_role`, view `audience`/`governance`/`organizers`/`am_organizer`; activities
+   cite the grant; messages inbox accepts private-event seeds.
+4. [ ] Scenario `private_events` (2 tests) written; first local run in progress.
+5. [x] UI: create steps (Audience, Who, Control, Plan; `eventCreateState.svelte.ts`,
+   `domain/eventCreate.ts`, `components/create/{EventAudiencePanel,PeoplePicker,EventPlanStep}`),
+   private events open at `/events/<seed>` (`isPrivateSeed`, `cellOf`), `/invites`
+   (`features/invites`, `services/events.ts` pending/answer, declines in localStorage), left
+   rail Invites row + count, `evt-invite` notification (+ "Shares and invites" setting),
+   PrivateMark, leave confirm, non-organizers can't propose in organized events.
+   [ ] browser test `tests/e2e/private-events.mjs` written, not yet run; `events.mjs` now
+   clicks Continue 4× (the public path gained web's Audience step).
+6. [ ] Run local seed + browser tests, PR, merge when green, live smoke, docs.
+**Not in this part (next):** the event page's members panel for private events (web's
+EventMembersPanel: Organizers section, "Promote to organizer", "Invite +"), "Edit event"/Save
+wording for organized events, revoking organizers, activities limited to the plan's days,
+private events in the feed for their members, `private_community` (M5d).
 
 ## Done 2026-10-28: seed-node memory (jemalloc), busy-conductor retry, test founders live (ADR 0060), PR #61 merged (16:19 UTC 27 Oct / 3:19 am Melbourne), seed node live 16:39 UTC; ALL 18 browser test files passed live
 **Directory reset with this merge** (founders list changed): everyone signs up again.

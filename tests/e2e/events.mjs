@@ -20,7 +20,7 @@ await ann.getByRole('button', { name: 'Create', exact: true }).click();
 await ann.getByRole('menuitem', { name: /Event/ }).click();
 await ann.getByLabel('Event title').fill(title);
 await ann.getByLabel('Description').fill('Weed, mulch and share lunch.');
-for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+for (let i = 0; i < 4; i++) await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByText("Set when members approve the event's plan").waitFor();
 await ann.getByRole('button', { name: 'Publish event' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
