@@ -26,3 +26,10 @@ happened to cover it, and projects with every member offline would be unreachabl
   is lost, as long as at least one full node with the data is online.
 - Full arc costs disk and bandwidth that grow with the network. Arcs shrink to Holochain's
   automatic sizing once there are enough full nodes; this is set per node type.
+
+## Update (owner, 2026-10-27)
+- Desktop users choose whether their app is a full node, and "full" stays available to anyone
+  who wants it, also after sharding arrives (ADR 0037).
+- Every full node holds the feed index and runs the archivist, so any one desktop online is a
+  complete backup. Until that move (M7) only the seed node's `/data` volume is a full copy.
+- No hurry to shard: it waits until there are thousands of users and the space to shard.

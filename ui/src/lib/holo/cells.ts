@@ -58,11 +58,13 @@ async function resolveCell(role: CloneRole, networkSeed: string, title: string):
   if (existing?.type === CellType.Cloned) {
     cellId = existing.value.cell_id;
   } else {
-    const created = await ws.createCloneCell({
-      role_name: role,
-      modifiers: { network_seed: networkSeed },
-      name: title.slice(0, 100),
-    });
+    const created = await retryWhenBusy(() =>
+      ws.createCloneCell({
+        role_name: role,
+        modifiers: { network_seed: networkSeed },
+        name: title.slice(0, 100),
+      }),
+    );
     cellId = created.cell_id;
     if (session) {
       await gatewayApi.cells(session.gateway, {
@@ -75,6 +77,22 @@ async function resolveCell(role: CloneRole, networkSeed: string, title: string):
   }
   if (session) setSigningCredentials(cellId, session);
   return cellId;
+}
+
+/**
+ * Creating a cell writes the conductor's own state database. When another write lands at the
+ * same moment (the seed node's archivist joining a new project), SQLite refuses with "database
+ * is locked" (517) and Holochain doesn't retry, so we do, briefly.
+ */
+async function retryWhenBusy<T>(write: () => Promise<T>): Promise<T> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await write();
+    } catch (e) {
+      if (attempt >= 5 || !String(e).includes('database is locked')) throw e;
+      await new Promise((r) => setTimeout(r, 400 * attempt));
+    }
+  }
 }
 
 function nonce(bytes: number): string {

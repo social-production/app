@@ -192,7 +192,16 @@ async fn manifest_founders_are_valid_and_full() {
 
     let founders: Vec<identity_integrity::Founder> =
         conductors[0].call(&zome, "founders", ()).await;
-    assert_eq!(founders.len(), 2);
+    let manifest = std::fs::read_to_string(concat!(
+        env!("CARGO_MANIFEST_DIR"),
+        "/../../dnas/directory/dna.yaml"
+    ))
+    .expect("directory manifest");
+    let listed = manifest
+        .lines()
+        .filter(|l| l.trim_start().starts_with("agent: "))
+        .count();
+    assert_eq!(founders.len(), listed, "every founder in dna.yaml");
     for founder in founders {
         let key: AgentPubKey = holo_hash::AgentPubKeyB64::from_b64_str(&founder.agent)
             .expect("valid founder key")

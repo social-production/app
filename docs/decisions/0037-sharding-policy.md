@@ -47,3 +47,7 @@ Every full node gets a **Storage** setting, with a default that depends on the p
 - The Storage setting lives in the native app's settings (and the Pi image's config file); light mode
   sets the arc to zero.
 - Measured, not assumed: the docs/NETWORK.md timings get a sharded run before the default flips.
+
+## Update (owner, 2026-10-27)
+A person can always choose to be a full node (whole network plus the feed index), whatever the
+default becomes; sharding comes later.

@@ -9,12 +9,18 @@ integrity:
     kind: directory
     # Founders start with Full standing so the vouch chain can begin
     # (docs/GOVERNANCE.md#standing). Test network founders (2026-10-18); the real
-    # launch uses fresh keys for a fresh network.
+    # launch uses fresh keys for a fresh network. The two test founders are
+    # tests/e2e/fixtures/dev-founders.json (their phrases are public), so browser tests that
+    # need Full standing run against the live test network too (2026-10-27). Remove at launch.
     founders:
       - name: thebestdamn
         agent: uhCAkVzM3E-2KG_M2homDJ0A3w3W18KADL0GzdimGmGTAFaHrqspy
       - name: BigBird
         agent: uhCAkMGeYLUjiwSGs0yzl9qIDA_VMyJxEH4qCtxv4YAcF4gIkqWRS
+      - name: Dev Founder One
+        agent: uhCAkCY4gQjb1YENdBiESwZHGwkL3vxxqt4Zs-q34XYIak8ak8fgj
+      - name: Dev Founder Two
+        agent: uhCAkBGTu0PUV7lb1reldz1L6uVDJk1KG43ENCCrjOBV263hl7OvB
   zomes:
     - name: health_integrity
       path: ../../target/wasm32-unknown-unknown/zome/health_integrity.wasm

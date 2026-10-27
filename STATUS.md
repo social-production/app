@@ -31,7 +31,19 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: M5c events, first part (ADR 0057), PR open on `claude/social-production-handoff-dsam61`
+## Owner direction (2026-10-27)
+- **No real users; launch only on the Holochain system**, at parity, after a UX pass
+  (`docs/plans/UX.md`). The FastAPI site is a prototype: it gets wiped with all its data and
+  users; nothing is migrated or handed over, and its secrets don't need rolling.
+- **Full nodes:** desktop users choose whether they are full; "full" always stays available;
+  full nodes hold the feed index too; sharding waits for thousands of users (ADR 0036/0037
+  updates).
+- **Map:** ADR 0058 (OpenFreeMap, Photon via gateways, approximate by default, viewer location
+  on the device). **Types evolve through plans** and personal services go, after parity
+  (ADR 0059). Until then don't add rules that fix the type at creation.
+- Estimate given: parity in about 1–2 weeks at the current pace.
+
+## Done 2026-10-27: M5c events, first part (ADR 0057), PR #60 merged (11:21 UTC / 10:21 pm Melbourne), seed node live 11:33 UTC; live `shell.mjs` and `guests.mjs` passed
 **Merging resets the project AND directory networks** (integrity changes): everyone on the test
 network signs up again; projects, follows and chats from before become unreachable. The
 conversation DNA hash is unchanged (`hc dna hash`: directory `uhC0kzkuwcU…`, project
@@ -63,7 +75,11 @@ conversation DNA hash is unchanged (`hc dna hash`: directory `uhC0kzkuwcU…`, p
   Restarting `cloud-seed.sh` fixed it each time. Also: while scenarios run, browser tests
   can time out on the 4-core container; run them on an idle machine.
 - Not run here: the full `check-all.sh` (CI runs it).
-- **Next after merge:** smoke live (`shell.mjs`, `guests.mjs`, and `events.mjs` needs the dev
+- CI: `check` 15 min, shards 39–110 min (shard 3 now holds challenges, governance, messages
+  and values; move to 6 shards if it nears 120). Deploy: ui/bootstrap at once, seed node 12
+  min. Live 12:20–12:30 UTC: `shell.mjs`, `guests.mjs` passed; `/readyz` 1455 MB at start,
+  1662 MB after. The live test network was reset by this merge (sign up again).
+- **Was next after merge:** smoke live (`shell.mjs`, `guests.mjs`, and `events.mjs` needs the dev
   founders, so local only); README Status. Then M5c part 2: private events (secret seed +
   invites, ADR 0043 style) and organizer-controlled governance; activities limited to the
   plan's days; help requests (own ADR).
@@ -819,7 +835,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `fed423c` (PR #59, merged 2026-10-27 06:48 UTC; seed node live 07:00 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `59e021e` (PR #60, merged 2026-10-27 11:21 UTC; seed node live 11:33 UTC; project and directory networks reset). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
