@@ -57,7 +57,7 @@ Done on the branch (pushed):
    Lessons: event plans need a place, so the up-front plan writes "TBD" when the location is
    decided later (web-backend does too); the first Invites read joins the event's network and
    takes a while; after many runs, project creation hung again until `cloud-seed.sh` restarted.
-6. [ ] PR open; merge when CI is green, then live smoke (`private-events.mjs`, `events.mjs`,
+6. [ ] PR #62 open (2026-10-28 ~10:16 am Melbourne); merge when CI is green, then live smoke (`private-events.mjs`, `events.mjs`,
    `shell.mjs`), read `/readyz` `cpus`/`threads`, README Status.
 **Seed-node memory (ADR 0062, same branch):** per project the conductor opens two SQLite
 DBs, and sqlx runs each connection on its own thread with its own page cache; Holochain's
