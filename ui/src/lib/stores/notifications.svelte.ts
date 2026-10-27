@@ -9,10 +9,14 @@ import {
  * app shell refreshes it while someone is signed in; the Notifications page reads and marks it.
  * Categories switched off in Settings are left out (web's notification settings, per device).
  */
-export const notifications = $state<{ items: NotificationItem[]; unread: number }>({
-  items: [],
-  unread: 0,
-});
+export const notifications = $state<{ items: NotificationItem[]; unread: number; invites: number }>(
+  {
+    items: [],
+    unread: 0,
+    // web's unreadCounts.invites: waiting invites, whatever the notification settings.
+    invites: 0,
+  },
+);
 
 const OFF_KEY = 'sp_notifications_off';
 
@@ -33,6 +37,7 @@ let latest: NotificationItem[] = [];
 
 export function showNotifications(items: NotificationItem[]): void {
   latest = items;
+  notifications.invites = items.filter((n) => n.kind === 'evt-invite').length;
   const shown = items.filter((n) => !notificationsOff.categories.includes(categoryOf[n.kind]));
   notifications.items = shown;
   notifications.unread = shown.filter((n) => n.isUnread).length;

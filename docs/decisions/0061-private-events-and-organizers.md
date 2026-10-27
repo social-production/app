@@ -59,6 +59,9 @@ web (web-backend `services/events/helpers.py::create_event`, `events/phases/gate
    `Organizer` records, then three closed proposals: Proposal → Event Plan, the event plan
    (schedule required, as web's Plan step), Event Plan → Activity citing it. So the event
    opens in Activity with web's "Set when members approve" replaced by the plan's dates.
+   web stores an empty demand note for that plan; plan integrity (`sp_core`) requires one,
+   so the app writes "Set by the organizers; this event takes no support signals." rather
+   than change `sp_core` (which would reset every network).
 7. **UI ported from web:** the Audience step (Public, Invite only), the Who step (Invite
    people, Organizers (optional)), Control and Plan steps, the Overview rows, `/invites`
    with Accept/Decline, the left rail's Invites row and count, the `evt-invite`

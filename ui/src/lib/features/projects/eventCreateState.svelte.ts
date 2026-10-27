@@ -1,0 +1,107 @@
+import {
+  eventSteps,
+  ORGANIZER_DEMAND_NOTE,
+  upfrontPlanProblems,
+  type EventStepId,
+} from '#lib/domain/eventCreate.ts';
+import type { Contact } from '#lib/domain/messages.ts';
+import { emptyPlanForm, planFromForm, type PlanForm } from '#lib/domain/planForm.ts';
+import type { EventAudience, EventGovernance } from '#lib/domain/projects.ts';
+import { explain } from '#lib/services/errors.ts';
+import { createEvent } from '#lib/services/events.ts';
+import { contacts } from '#lib/services/messages.ts';
+import { myAgent } from '#lib/services/people.ts';
+
+import { CreateState } from './createState.svelte.ts';
+
+/** web's CreateEventPage draft: the project draft plus audience, people, control and plan. */
+export class EventCreateState extends CreateState {
+  audience = $state<EventAudience>('public');
+  /** web preselects organizer-controlled for private events. */
+  chosenGovernance = $state<EventGovernance>('organizer_controlled');
+  invitees = $state<Contact[]>([]);
+  organizers = $state<Contact[]>([]);
+  plan = $state<PlanForm>(emptyPlanForm('standard'));
+  private people: Promise<Contact[]> | undefined;
+
+  readonly isPrivate = $derived(this.audience !== 'public');
+  readonly governance = $derived<EventGovernance>(
+    this.isPrivate ? this.chosenGovernance : 'collaborative',
+  );
+  readonly upfrontPlan = $derived(this.governance === 'organizer_controlled');
+  override readonly steps = $derived(eventSteps(this.isPrivate, this.upfrontPlan));
+  readonly planProblems = $derived(
+    this.upfrontPlan ? upfrontPlanProblems(this.planWithPlace(), this.intent === 'physical') : [],
+  );
+  readonly canContinue = $derived(this.stepReady(this.stepId));
+
+  constructor() {
+    super('event');
+  }
+
+  /** web's per-step gates (basics and location come from the project draft's `missing`). */
+  private stepReady(id: EventStepId | 'type'): boolean {
+    if (id === 'scope') return this.audience !== 'invite_only' || this.invitees.length > 0;
+    if (id === 'plan') return this.planProblems.length === 0;
+    return true;
+  }
+
+  /** web copies the Location step's place into the plan. */
+  private planWithPlace(): PlanForm {
+    const location =
+      this.intent === 'online' ? 'Online' : this.intent === 'physical' ? this.place.trim() : '';
+    const stages = this.plan.stages.filter((s) => s.title.trim() || s.details.trim());
+    return { ...this.plan, stages, location, demandNote: ORGANIZER_DEMAND_NOTE };
+  }
+
+  /** People matching `query` by name, not yourself (as the compose sheet searches). */
+  async search(query: string): Promise<Contact[]> {
+    this.people ??= Promise.all([contacts(), myAgent()]).then(([all, me]) =>
+      all.filter((c) => c.agent !== me),
+    );
+    const needle = query.trim().toLowerCase();
+    try {
+      return (await this.people).filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 6);
+    } catch {
+      this.people = undefined;
+      return [];
+    }
+  }
+
+  addInvitee(c: Contact): void {
+    if (!this.invitees.some((i) => i.agent === c.agent)) this.invitees = [...this.invitees, c];
+  }
+
+  /** web: an organizer of an invite-only event is invited too. */
+  addOrganizer(c: Contact): void {
+    if (!this.organizers.some((o) => o.agent === c.agent))
+      this.organizers = [...this.organizers, c];
+    if (this.audience === 'invite_only') this.addInvitee(c);
+  }
+
+  /** The new event's page id (listing id, or a private event's seed), or undefined with
+   * `message` set. */
+  override async submit(): Promise<string | undefined> {
+    if (this.planProblems[0]) {
+      this.message = this.planProblems[0];
+      return undefined;
+    }
+    this.submitting = true;
+    this.message = undefined;
+    try {
+      return await createEvent({
+        charter: this.charter(),
+        audience: this.audience,
+        organized: this.isPrivate && this.upfrontPlan,
+        invitees: this.isPrivate ? this.invitees.map((c) => c.agent) : [],
+        organizers: this.isPrivate ? this.organizers.map((c) => c.agent) : [],
+        plan: this.upfrontPlan ? planFromForm('Event', this.planWithPlace()) : null,
+      });
+    } catch (e) {
+      this.message = explain(e);
+      return undefined;
+    } finally {
+      this.submitting = false;
+    }
+  }
+}

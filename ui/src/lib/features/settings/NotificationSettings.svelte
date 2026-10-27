@@ -15,6 +15,11 @@
       description: 'Replies and mentions on your posts and activity.',
     },
     {
+      id: 'shares_invites',
+      title: 'Shares and invites',
+      description: 'Shared projects or events, and invites to join.',
+    },
+    {
       id: 'roles',
       title: 'Roles',
       description: 'Role sign-ups and suggested roles on your work.',

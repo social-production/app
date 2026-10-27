@@ -105,6 +105,12 @@ export function newProjectSeed(creator: string): string {
   return `${creator}.${nonce(9)}`;
 }
 
+/** A fresh private event's seed (sp_event::Audience, ADR 0061): its address is secret, so
+ * the random part is as long as a chat's. */
+export function newPrivateEventSeed(creator: string, organized: boolean): string {
+  return `${creator}.${organized ? 'organized' : 'private'}.${nonce(24)}`;
+}
+
 /** A fresh chat seed (sp_core::conversation::chat_seed): whoever knows it can find the chat,
  * so the random part is long. */
 export function newChatSeed(creator: string, kind: 'direct' | 'group'): string {

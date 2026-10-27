@@ -67,7 +67,13 @@
         {#if item.isUnread}
           <span class="unread-dot"></span>
         {/if}
-        <span class="subject-label">{item.subject === 'thread' ? 'Thread' : 'Project'}</span>
+        <span class="subject-label"
+          >{item.subject === 'thread'
+            ? 'Thread'
+            : item.projectMode === 'event'
+              ? 'Event'
+              : 'Project'}</span
+        >
       </div>
     {/if}
 

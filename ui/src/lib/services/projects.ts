@@ -1,5 +1,8 @@
 import {
+  isPrivateSeed,
   summaryOf,
+  type EventAudience,
+  type EventGovernance,
   type Charter,
   type FeedSort,
   type FeedWindow,
@@ -43,6 +46,10 @@ interface ProjectWire {
   next_phase: { id: string; label: string } | null;
   returns: { id: string; label: string }[];
   updates: { proposal: ActionHash; author: AgentPubKey; body: string; at: number }[];
+  audience: EventAudience;
+  governance: EventGovernance;
+  organizers: AgentPubKey[];
+  am_organizer: boolean;
 }
 
 const directory = <T>(fn: string, payload?: unknown) =>
@@ -97,8 +104,10 @@ export async function listingTitle(id: string): Promise<string | null> {
   return found?.listing.title ?? null;
 }
 
-/** A project's cell on this node (cloned on first use, which joins its network). */
+/** A project's cell on this node (cloned on first use, which joins its network). A private
+ * event isn't listed: its id is its seed (ADR 0061). */
 export async function cellOf(id: string) {
+  if (isPrivateSeed(id)) return { cell: await projectCell(id, 'Event'), seed: id };
   const l = await listing(id);
   return {
     cell: await projectCell(l.listing.network_seed, l.listing.title),
@@ -118,6 +127,7 @@ export async function cellFor(project: ProjectRef) {
 
 /** A project's listing id from its network seed (`null` while the listing can't be found). */
 export async function listingIdOf(seed: string): Promise<string | null> {
+  if (isPrivateSeed(seed)) return seed;
   const found = await directory<ListingWire | null>('find_listing', seed);
   return found ? hashToString(found.id) : null;
 }
@@ -149,6 +159,10 @@ export async function getProject(id: string): Promise<Project> {
       body: u.body,
       at: u.at,
     })),
+    audience: p.audience,
+    governance: p.governance,
+    organizers: p.organizers.map(hashToString),
+    amOrganizer: p.am_organizer,
   };
 }
 

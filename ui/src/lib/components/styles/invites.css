@@ -1,0 +1,72 @@
+/* Ported from web/src/lib/features/invites/InvitesPage.svelte (ADR 0032, scripts/port-styles.py) */
+.invites {
+  display: grid;
+  gap: 14px;
+  max-width: 640px;
+  margin: 24px auto;
+  padding: 0 16px 48px;
+}
+
+.invites h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.invites ul {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.invites li {
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.invites .kind,
+.invites .muted,
+.invites .when {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.invites .description {
+  margin: 0;
+  color: var(--text-main);
+  line-height: 1.5;
+}
+
+.invites .actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.invites .actions button {
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.invites .accept {
+  border: 0;
+  background: var(--brand);
+  color: var(--on-brand, #fff);
+}
+
+.invites .decline {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text-main);
+}
