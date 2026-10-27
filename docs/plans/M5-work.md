@@ -31,7 +31,7 @@ scenario + browser tests, as M1–M4 did.
 - Unblocks: the right rail's activity, feed activity cards, the display-timezone setting,
   `roles` notifications.
 
-## M5c — events and help requests
+## M5c — events and help requests — public events built (ADR 0057)
 - Decide DOMAIN_MODEL open question 1 in an ADR. The leaning: clones of the project DNA with a
   `kind`, reusing membership, governance and plans; their own listings in the directory.
 - Web's events feature is large (~4,200 lines across `features/events/**`); port it in parts

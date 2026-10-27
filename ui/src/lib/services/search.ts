@@ -44,8 +44,8 @@ export async function search(query: string, type: SearchType): Promise<SearchRes
       kind: 'project' as const,
       title: c.title,
       summary: c.summary || c.title,
-      meta: 'project',
-      href: `/projects/${c.id}`,
+      meta: c.mode === 'event' ? 'event' : 'project',
+      href: c.mode === 'event' ? `/events/${c.id}` : `/projects/${c.id}`,
     })),
   ];
   return results.slice(0, LIMIT);

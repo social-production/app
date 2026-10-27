@@ -24,7 +24,11 @@
 
   let { card, authorName, onSignal }: Props = $props();
 
-  const href = $derived(resolve('/projects/[id]', { id: card.id }));
+  const href = $derived(
+    card.mode === 'event'
+      ? resolve('/events/[id]', { id: card.id })
+      : resolve('/projects/[id]', { id: card.id }),
+  );
 </script>
 
 <div class="personal-activity-card">
@@ -45,7 +49,12 @@
         {/if}
       </div>
     </div>
-    <a class="title" href={resolve('/projects/[id]', { id: card.id })}>{card.title}</a>
+    <a
+      class="title"
+      href={card.mode === 'event'
+        ? resolve('/events/[id]', { id: card.id })
+        : resolve('/projects/[id]', { id: card.id })}>{card.title}</a
+    >
     <p class="body">{card.summary}</p>
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>

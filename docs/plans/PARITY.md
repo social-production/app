@@ -68,7 +68,13 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   bottom-right).
 - [ ] Cards: web's ⋮ `ReportControl` (copy link, report) top-right. Comes with M6 moderation;
   "copy link" alone could come sooner.
-- [ ] Event cards (M5c). web's project-activity cards (`ProjectActivityCard`: activity title,
+- [x] Event cards (M5c, ADR 0057): web's `EventCard` (place line, signals, comments) linking to
+  `/events/<id>` (as do the rail, notifications, search and personal cards). Still to come:
+  the time on the card (the index needs the leading plan's schedule).
+- [ ] Events, later parts (ADR 0057): web's Audience step (private events: invite-only and
+  private-community), organizer-controlled governance with co-organizers, activities limited
+  to the plan's days, History tab.
+- [ ] web's project-activity cards (`ProjectActivityCard`: activity title,
   parent project, time, place, distance) come only from web-backend's Region feed
   (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.
 
