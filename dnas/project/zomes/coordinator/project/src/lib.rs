@@ -2,11 +2,14 @@
 //! signals, and the project view with passed decisions applied (ADR 0033).
 
 mod charter;
+mod organizers;
 mod own;
 mod people;
 
 use hdk::prelude::*;
-use project_integrity::{creator, Applied, AppliedUpdate, Charter, LinkTypes};
+use project_integrity::{
+    audience, creator, Applied, AppliedUpdate, Charter, LinkTypes, OrganizerRole,
+};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
 
@@ -41,6 +44,12 @@ pub struct ProjectView {
     pub my_signal: Option<Stance>,
     pub created_at: Option<Timestamp>,
     pub last_activity_at: Option<Timestamp>,
+    /// web's event audience and governance, from the seed (ADR 0061).
+    pub audience: String,
+    pub governance: String,
+    /// The creator and co-organizers (private events; just the creator otherwise).
+    pub organizers: Vec<AgentPubKey>,
+    pub am_organizer: bool,
 }
 
 /// One phase as the stepper shows it (ids and labels from `sp_governance::phases`).
@@ -78,7 +87,23 @@ pub fn leave() -> ExternResult<()> {
 
 #[hdk_extern]
 pub fn set_signal(stance: Option<Stance>) -> ExternResult<()> {
+    if audience()?.organized() && stance.is_some() {
+        return Err(wasm_error!(WasmErrorInner::Guest(
+            "Organizer-controlled events don't use proposal signals.".into()
+        )));
+    }
     people::set_signal(stance)
+}
+
+#[hdk_extern]
+pub fn add_organizer(agent: AgentPubKey) -> ExternResult<ActionHash> {
+    organizers::add(agent)
+}
+
+/// What makes the caller an organizer, if anything (governance and activities cite it).
+#[hdk_extern]
+pub fn my_organizer_role() -> ExternResult<Option<OrganizerRole>> {
+    organizers::role_of(&agent_info()?.agent_initial_pubkey)
 }
 
 #[hdk_extern]
@@ -136,6 +161,8 @@ pub fn get_project() -> ExternResult<Option<ProjectView>> {
     let returns = returnable(shape, current).into_iter().map(step).collect();
     let stage = stage_label(shape, current).to_string();
 
+    let organizers = organizers::list()?;
+    let seen = audience()?;
     let last_activity_at = [created_at, people.last_at, applied.last_decision_at]
         .into_iter()
         .flatten()
@@ -156,6 +183,10 @@ pub fn get_project() -> ExternResult<Option<ProjectView>> {
         my_signal: people.my_signal,
         created_at,
         last_activity_at,
+        audience: seen.audience_id().into(),
+        governance: seen.governance_id().into(),
+        am_organizer: organizers.contains(&agent_info()?.agent_initial_pubkey),
+        organizers,
     }))
 }
 

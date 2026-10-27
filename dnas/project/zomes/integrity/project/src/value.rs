@@ -32,6 +32,9 @@ pub fn validate_value(
     v: &Value,
     action: &TypedAction<CreateData>,
 ) -> ExternResult<ValidateCallbackResult> {
+    if crate::organized()? {
+        return invalid("organizer-controlled events don't use values");
+    }
     if !text_ok(&v.label, LABEL_MAX) || v.label.trim() != v.label {
         return invalid("a value is 1–160 characters, trimmed");
     }
@@ -45,6 +48,9 @@ pub fn validate_importance(
     i: &Importance,
     action: &TypedAction<CreateData>,
 ) -> ExternResult<ValidateCallbackResult> {
+    if crate::organized()? {
+        return invalid("organizer-controlled events don't use values");
+    }
     if !is_value(&i.value)? {
         return invalid("an importance vote must be on a value");
     }

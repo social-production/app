@@ -45,12 +45,25 @@ pub fn propose(link: LinkRequest) -> ExternResult<ActionHash> {
             }
         }
     }
+    // In an organizer-controlled event an organizer's own half is decided at once (ADR 0061).
+    let decides = link.source.is_none() && project_integrity::organized()?;
+    let organizer = if decides {
+        calls::my_organizer_role()?
+            .ok_or_else(|| guest("Only the creator or co-organizers can link this event."))?
+            .grant()
+    } else {
+        None
+    };
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         kind: ProposalKind::Link(link),
         membership,
         members: calls::member_snapshot()?,
+        organizer,
     }))?;
     create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;
+    if decides {
+        crate::write::decide_now(&hash)?;
+    }
     Ok(hash)
 }
 

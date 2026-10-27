@@ -45,9 +45,20 @@ pub struct ImportanceInput {
     pub importance: u8,
 }
 
+/// web: "Organizer-controlled events don't use proposal values" (ADR 0061).
+fn no_values_when_organized() -> ExternResult<()> {
+    if project_integrity::organized()? {
+        return Err(guest(
+            "Organizer-controlled events don't use proposal values.",
+        ));
+    }
+    Ok(())
+}
+
 pub fn add(label: String) -> ExternResult<ActionHash> {
     let membership =
         calls::my_membership()?.ok_or_else(|| guest("Join the project to add values."))?;
+    no_values_when_organized()?;
     in_proposal_phase("Values can only be added during the proposal phase.")?;
     let label = label.trim().to_string();
     if label.is_empty() {
@@ -68,6 +79,7 @@ pub fn add(label: String) -> ExternResult<ActionHash> {
 pub fn rate(input: ImportanceInput) -> ExternResult<ActionHash> {
     let membership =
         calls::my_membership()?.ok_or_else(|| guest("Join the project to rate its values."))?;
+    no_values_when_organized()?;
     in_proposal_phase("Values can only be voted on during the proposal phase.")?;
     if !importance_ok(input.importance) {
         return Err(guest("Importance is between 1 and 10."));

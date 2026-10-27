@@ -21,7 +21,8 @@ pub fn check_phase_move(state: &State, to: &str) -> ExternResult<Option<ActionHa
     if next_phase(shape, current).map(Phase::id) != Some(to) {
         return Err(guest("A project can only move to its next phase."));
     }
-    if current == Phase::P1 {
+    // Organizer-controlled events skip signals (ADR 0061).
+    if current == Phase::P1 && !project_integrity::organized()? {
         let s = calls::signal_counts()?;
         if !signal_gate_met(s.demand, s.opposition) {
             return Err(guest(
@@ -48,6 +49,11 @@ pub fn check_return(state: &State, to: &str, reason: &str, roll: &Roll) -> Exter
     if !target.is_some_and(|t| can_return(state.shape(), state.phase(), t)) {
         return Err(guest(
             "A project can only return to an earlier planning phase.",
+        ));
+    }
+    if target == Some(Phase::P1) && project_integrity::organized()? {
+        return Err(guest(
+            "Organizer-controlled events can't return to Proposal.",
         ));
     }
     if reason.trim().is_empty() {

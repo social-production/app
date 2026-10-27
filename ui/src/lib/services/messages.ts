@@ -62,10 +62,20 @@ const inbox = <T>(fn: string, payload?: unknown): Promise<T> =>
 const chat = async <T>(seed: string, fn: string, payload?: unknown): Promise<T> =>
   callCell<T>(await conversationCell(seed), 'messages', fn, payload);
 
+/** Everything in your inbox, each once: chat and private-event seeds (ADR 0043, 0061). */
+export async function inboxInvitations(): Promise<{ seed: string; from: string; at: number }[]> {
+  const wire = await inbox<InvitationWire[]>('inbox');
+  return wire.map((i) => ({ seed: i.seed, from: hashToString(i.from), at: i.at }));
+}
+
+/** A chat seed is `<creator>.direct|group.<nonce>`; private events share the inbox. */
+const isChatSeed = (seed: string) => /^[^.]+\.(direct|group)\./.test(seed);
+
 /** Every chat you're in, each once: their seeds and when the invitation came. */
 export async function myChats(): Promise<{ seed: string; at: number }[]> {
-  const wire = await inbox<InvitationWire[]>('inbox');
-  return wire.map((i) => ({ seed: i.seed, at: i.at }));
+  return (await inboxInvitations())
+    .filter((i) => isChatSeed(i.seed))
+    .map(({ seed, at }) => ({ seed, at }));
 }
 
 export async function chatSummary(seed: string, invitedAt: number): Promise<ChatSummary> {

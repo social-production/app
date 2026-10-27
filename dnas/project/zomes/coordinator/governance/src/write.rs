@@ -28,6 +28,17 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     if charter.mode == "personal-service" {
         return Err(guest("Personal services don't take proposals."));
     }
+    // Organizer-controlled events (ADR 0061): only organizers propose, and it applies at once.
+    let organized = project_integrity::organized()?;
+    let organizer =
+        if organized {
+            calls::my_organizer_role()?.ok_or_else(|| {
+            guest("Only the creator or co-organizers can manage this organizer-controlled event.")
+        })?
+        .grant()
+        } else {
+            None
+        };
     let roll = Roll::load()?;
     let kind = match kind {
         ProposalKind::Phase { to, reason, .. } => {
@@ -58,9 +69,12 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         kind,
         membership: Some(membership),
         members,
+        organizer,
     }))?;
     create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;
-    if proposer_votes {
+    if organized {
+        decide_now(&hash)?;
+    } else if proposer_votes {
         vote(hash.clone(), VoteChoice::Yes)?;
     }
     Ok(hash)
@@ -89,6 +103,24 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
         (),
     )?;
     close(&proposal, reads::found::<Vote>(hash.clone())?)?;
+    Ok(hash)
+}
+
+/// An organizer's proposal passes without votes (ADR 0061).
+pub(crate) fn decide_now(proposal: &ActionHash) -> ExternResult<ActionHash> {
+    let outcome = Outcome {
+        proposal: proposal.clone(),
+        votes: Vec::new(),
+        passed: true,
+        challenges: Vec::new(),
+    };
+    let hash = create_entry(EntryTypes::Outcome(outcome))?;
+    create_link(
+        proposal.clone(),
+        hash.clone(),
+        LinkTypes::ProposalToOutcomes,
+        (),
+    )?;
     Ok(hash)
 }
 

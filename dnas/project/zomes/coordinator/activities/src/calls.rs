@@ -23,6 +23,11 @@ pub fn my_membership() -> ExternResult<Option<ActionHash>> {
     project("my_membership")
 }
 
+/// What makes the caller an organizer of this event, if anything (ADR 0061).
+pub fn my_organizer_role() -> ExternResult<Option<project_integrity::OrganizerRole>> {
+    project("my_organizer_role")
+}
+
 /// The parts of the project zome's `ProjectView` activities need.
 #[derive(Deserialize, Debug)]
 pub struct Glance {

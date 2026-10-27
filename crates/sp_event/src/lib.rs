@@ -60,6 +60,66 @@ pub fn is_time(text: &str) -> bool {
     two(h) && two(m) && h < "24" && m < "60"
 }
 
+/// Who an event is for and who runs it, read from its network seed (ADR 0061).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum Audience {
+    /// `<creator>.<nonce>`: listed in the directory, collaborative.
+    Public,
+    /// `<creator>.private.<nonce>`: invite only, collaborative.
+    Private,
+    /// `<creator>.organized.<nonce>`: invite only, the creator and co-organizers decide.
+    Organized,
+}
+
+/// The seed word after the creator for each private audience.
+pub const PRIVATE: &str = "private";
+pub const ORGANIZED: &str = "organized";
+
+impl Audience {
+    /// `<creator>.<word>.<nonce>` with a private word, else public. A project seed's nonce
+    /// never contains a dot, so older seeds stay public.
+    #[must_use]
+    pub fn of_seed(seed: &str) -> Self {
+        let mut parts = seed.splitn(3, '.');
+        let (_creator, word, nonce) = (parts.next(), parts.next(), parts.next());
+        match (word, nonce) {
+            (Some(PRIVATE), Some(n)) if !n.is_empty() => Self::Private,
+            (Some(ORGANIZED), Some(n)) if !n.is_empty() => Self::Organized,
+            _ => Self::Public,
+        }
+    }
+
+    #[must_use]
+    pub fn is_private(self) -> bool {
+        self != Self::Public
+    }
+
+    #[must_use]
+    pub fn organized(self) -> bool {
+        self == Self::Organized
+    }
+
+    /// web's `audience` (`private_community` waits for communities, M5d).
+    #[must_use]
+    pub fn audience_id(self) -> &'static str {
+        if self.is_private() {
+            "invite_only"
+        } else {
+            "public"
+        }
+    }
+
+    /// web's `governance`.
+    #[must_use]
+    pub fn governance_id(self) -> &'static str {
+        if self.organized() {
+            "organizer_controlled"
+        } else {
+            "collaborative"
+        }
+    }
+}
+
 /// An event's charter and listing use mode `"event"` with subtype `"standard"`.
 pub fn check_kind(mode: &str, subtype: &str) -> Result<(), String> {
     if mode == MODE && subtype == SUBTYPE {
@@ -110,6 +170,20 @@ mod tests {
         let mut s = schedule("any-day", None, None);
         s.finish_time = Some("5pm");
         assert!(check_schedule(&s).is_err());
+    }
+
+    #[test]
+    fn the_seed_names_the_audience() {
+        assert_eq!(Audience::of_seed("uhCAkme.abc123"), Audience::Public);
+        assert_eq!(Audience::of_seed("uhCAkme.private.abc"), Audience::Private);
+        assert_eq!(
+            Audience::of_seed("uhCAkme.organized.abc"),
+            Audience::Organized
+        );
+        assert_eq!(Audience::of_seed("uhCAkme.organized."), Audience::Public);
+        assert_eq!(Audience::of_seed("uhCAkme.direct.abc"), Audience::Public);
+        assert!(Audience::Organized.is_private() && Audience::Organized.organized());
+        assert!(Audience::Private.is_private() && !Audience::Private.organized());
     }
 
     #[test]

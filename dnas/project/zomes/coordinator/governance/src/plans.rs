@@ -52,6 +52,14 @@ pub fn approved(
 }
 
 pub fn leader(approved: &[Approved], kind: PlanKind) -> Leader<ActionHash> {
+    // Organizers set the plan (ADR 0061): their newest approved plan leads.
+    if project_integrity::organized().unwrap_or(false) {
+        return approved
+            .iter()
+            .rev()
+            .find(|a| a.kind == kind)
+            .map_or(Leader::None, |a| Leader::One(a.hash.clone()));
+    }
     let candidates: Vec<Candidate<ActionHash>> = approved
         .iter()
         .filter(|a| a.kind == kind)
