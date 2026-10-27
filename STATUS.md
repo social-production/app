@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~6:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~8:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,43 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-27: M5c events, first part (ADR 0057), PR open on `claude/social-production-handoff-dsam61`
+**Merging resets the project AND directory networks** (integrity changes): everyone on the test
+network signs up again; projects, follows and chats from before become unreachable. The
+conversation DNA hash is unchanged (`hc dna hash`: directory `uhC0kzkuwcU…`, project
+`uhC0kOPCCpG…`, conversation `uhC0kUmCMHl…` as on main).
+- **Decision (ADR 0057):** an event is a project-DNA clone whose charter mode is `"event"`,
+  using the app's phase ids (Proposal `phase-1`, Event Plan `phase-2`, Activity `phase-5`,
+  Closed `phase-7`). Event rules are in `sp_governance` (mode `EVENT`: labels, phases, returns
+  to any earlier phase, `PlanKind::Event`, web's event rubric) and a new crate `sp_event`
+  (schedule shape, charter kind). `sp_core` untouched.
+- **Event plans** carry `schedule: Option<EventSchedule>` (mode any-day/date/range, dates,
+  times, stored in UTC as web does) and need a place. The event page shows the leading
+  approved plan's time and place (`domain/eventSchedule.ts`).
+- **Directory:** a listing's `mode` is a project mode (checked as before) or any lowercase
+  kind (`event`, later `help-request`, `community`, `channel`) with shape checks only, so
+  later kinds need no directory reset.
+- **UI from web:** "Event" in the + menu, `/create/event` (public path: Basics, Tags,
+  Location, Overview; web's Audience step waits on private events), `EventCard` in the feed,
+  `/events/[id]` (the project page with web's event copy, "Join event"), the event plan
+  wizard (date or range, times, place), phase copy, rail/notification/search links to
+  `/events/`. Styles via PORTS (`CreateEventPage`, `EventCard`). `domain/plans.ts` split:
+  the wizard form is `domain/planForm.ts`.
+- **Tests:** new scenario `events` (2 tests, ~10 min; it must settle after each plan vote or
+  the last voter can't close the plan); `plans`, `values`, `projects` re-run and pass. New
+  browser test `tests/e2e/events.mjs` (create, join, Event Plan, dated plan approved, time
+  and place on the page, Activity, event card in the feed) passed; `governance`, `rail`,
+  `projects` passed.
+- **Lesson:** on the local release seed node, project creation started hanging (heading never
+  appears) after an aborted browser test, even without "database is locked" in the log.
+  Restarting `cloud-seed.sh` fixed it each time. Also: while scenarios run, browser tests
+  can time out on the 4-core container; run them on an idle machine.
+- Not run here: the full `check-all.sh` (CI runs it).
+- **Next after merge:** smoke live (`shell.mjs`, `guests.mjs`, and `events.mjs` needs the dev
+  founders, so local only); README Status. Then M5c part 2: private events (secret seed +
+  invites, ADR 0043 style) and organizer-controlled governance; activities limited to the
+  plan's days; help requests (own ADR).
 
 ## Done 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 merged (06:48 UTC / 5:48 pm Melbourne), seed node live 07:00 UTC; live `rail.mjs` and `shell.mjs` passed
 PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets nothing.
@@ -817,7 +854,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    (follows, scopes, places, moderation); pick items up as their features land.
 2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (done, ADR 0054; its
    mention ranking and Home scope in PR #54), M5b activities and roles (done; the rail's link
-   and plan votes in flight), **next: M5c** events and help requests (event cards in the feed;
+   and plan votes done), **M5c** events (first part in flight, ADR 0057) and help requests (event cards in the feed;
    project-activity cards wait on Region, M6), M5d communities and channels. Each starts with
    its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
