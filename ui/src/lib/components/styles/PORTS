@@ -99,3 +99,5 @@ activities.css    .activity-ui    web/src/lib/components/cards/project-detail/Pr
 activities.css    .activity-ui    web/src/lib/features/projects/detail/components/ActivityHistorySection.svelte
 activities.css    .activity-ui    web/src/lib/features/projects/detail/components/HistoryRatingComposer.svelte
 activities.css    .activity-ui    web/src/lib/features/projects/detail/components/HistoryCompletionSideRow.svelte
+rail.css          .right-rail     web/src/lib/features/right-rail/RightRailPanel.svelte
+rail.css          .surface-type-label web/src/lib/components/cards/shared/SurfaceTypeLabel.svelte

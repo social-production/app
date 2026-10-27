@@ -18,6 +18,8 @@
     notificationCount?: number;
     /** Unread chat messages for the send icon (web's unreadCounts.messages). */
     messageCount?: number;
+    /** Rail cards you haven't opened or cleared (web's rightRailActionCount). */
+    activityCount?: number;
     leftOpen: boolean;
     rightOpen: boolean;
     isActive: (href: string) => boolean;
@@ -106,6 +108,11 @@
           onclick={p.toggleRight}
         >
           <SvgGlyph name="activity" className="panel-toggle-icon" />
+          {#if (p.activityCount ?? 0) > 0}
+            <span class="panel-toggle-badge">
+              <CountBadge count={p.activityCount ?? 0} />
+            </span>
+          {/if}
         </button>
       </div>
 

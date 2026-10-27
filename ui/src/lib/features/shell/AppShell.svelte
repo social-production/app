@@ -24,8 +24,12 @@
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
+  import { countActionable } from '#lib/domain/activityRail.ts';
+  import { activityRail } from '#lib/stores/activityRail.svelte.ts';
 
+  import { refreshActivityRail, startActivityRail } from './activityRailLoop.ts';
   import AuthActionNotice from './AuthActionNotice.svelte';
+  import RightRailPanel from './RightRailPanel.svelte';
 
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
@@ -115,6 +119,25 @@
     };
   });
 
+  // web's activity rail: its badge counts cards you haven't opened or cleared, and the first
+  // desktop load opens it when there is something to do (until you toggle it yourself).
+  $effect(() => {
+    const current = connection.current;
+    if (current.status !== 'connected') return;
+    return untrack(() => startActivityRail(current.agent));
+  });
+  const railCount = $derived(
+    countActionable(activityRail.items, activityRail.dismissed, activityRail.seen),
+  );
+  let railPreferenceApplied = false;
+  $effect(() => {
+    if (railPreferenceApplied || compact || !activityRail.loaded) return;
+    railPreferenceApplied = true;
+    if (railCount > 0 && !authSurface && !page.url.pathname.startsWith('/messages')) {
+      untrack(() => (rightOpen = true));
+    }
+  });
+
   $effect(() => {
     const current = connection.current;
     if (current.status !== 'connected') return;
@@ -161,7 +184,9 @@
 
   function toggleRight(): void {
     rightOpen = !rightOpen;
+    railPreferenceApplied = true;
     if (compact && rightOpen) leftOpen = false;
+    if (rightOpen) refreshActivityRail();
   }
 </script>
 
@@ -179,6 +204,7 @@
     viewerName={viewer.name}
     notificationCount={notifications.unread}
     messageCount={messageBadge.unread}
+    activityCount={railCount}
     {leftOpen}
     {rightOpen}
     {isActive}
@@ -222,9 +248,7 @@
 
     <aside class="rail right-rail" data-open={rightOpen && !authSurface}>
       {#if rightOpen && !authSurface}
-        <section class="rail-panel">
-          <p class="empty-hint">Your activity will appear here.</p>
-        </section>
+        <RightRailPanel onClose={closeCompact} />
       {/if}
     </aside>
   </div>
