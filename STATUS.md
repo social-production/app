@@ -44,7 +44,7 @@ Done on the branch (pushed):
    and the recount, newest approved plan leads (`plans::leader`); project `add_organizer`,
    `my_organizer_role`, view `audience`/`governance`/`organizers`/`am_organizer`; activities
    cite the grant; messages inbox accepts private-event seeds.
-4. [ ] Scenario `private_events` (2 tests) written; first local run in progress.
+4. [x] Scenario `private_events` (2 tests) passes locally (~15 min for the organizer test).
 5. [x] UI: create steps (Audience, Who, Control, Plan; `eventCreateState.svelte.ts`,
    `domain/eventCreate.ts`, `components/create/{EventAudiencePanel,PeoplePicker,EventPlanStep}`),
    private events open at `/events/<seed>` (`isPrivateSeed`, `cellOf`), `/invites`
@@ -54,6 +54,14 @@ Done on the branch (pushed):
    [ ] browser test `tests/e2e/private-events.mjs` written, not yet run; `events.mjs` now
    clicks Continue 4× (the public path gained web's Audience step).
 6. [ ] Run local seed + browser tests, PR, merge when green, live smoke, docs.
+**Seed-node memory (ADR 0062, same branch):** per project the conductor opens two SQLite
+DBs, and sqlx runs each connection on its own thread with its own page cache; Holochain's
+default pool is 2 × CPUs (≥ 8) + 1 per DB. The gateway now sets `DB_MAX_READERS` (default 4 →
+5 connections per DB). Local release runs (`MEM_PROJECTS=6 bash scripts/e2e-local.sh
+tests/e2e/memory-projects.mjs`): ~16 MB per project before, ~7 MB after; sqlx threads followed
+the setting. `/readyz` now has `threads` and `cpus`: **after the deploy, read them live** (if
+`cpus` is large the live saving is bigger) and re-sample `rssMb` across a test run. Next if
+growth persists: whether the archivist needs a full cell per project.
 **Not in this part (next):** the event page's members panel for private events (web's
 EventMembersPanel: Organizers section, "Promote to organizer", "Invite +"), "Edit event"/Save
 wording for organized events, revoking organizers, activities limited to the plan's days,
