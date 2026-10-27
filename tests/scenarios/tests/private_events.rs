@@ -43,7 +43,7 @@ fn activity() -> NewActivity {
         online: false,
         place: "Hall".into(),
         meeting_url: None,
-        note: String::new(),
+        note: "Bring a table.".into(),
         plan_stage: None,
         roles: Vec::new(),
     }
