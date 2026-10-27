@@ -6,6 +6,9 @@ export const DIRECT_USE_CORE =
 export const DIRECT_USE_CREATE =
   'Projects and services on Social Production are for direct community use. Nothing produced or offered may be sold, and pooled costs cover materials only — not profit.';
 
+export const DIRECT_USE_EVENT_CREATE =
+  'Events must stay free to join. Do not plan ticket sales, paid entry, or paid facilitation through this platform.';
+
 export const DIRECT_USE_PLAN =
   'Plans must describe work for direct use only. Do not plan to sell outputs, charge for access, or run paid facilitation.';
 

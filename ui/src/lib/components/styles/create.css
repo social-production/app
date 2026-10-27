@@ -413,3 +413,171 @@
   width: auto;
   margin: 0;
 }
+
+/* Ported from web/src/lib/features/create/event/CreateEventPage.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .form-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .helper-text {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.create-sheet .plan-step {
+  gap: 14px;
+}
+
+.create-sheet .schedule-fieldset {
+  display: grid;
+  gap: 12px;
+  min-width: 0;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+}
+
+.create-sheet .schedule-mode-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.create-sheet .schedule-mode-option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+  cursor: pointer;
+}
+
+.create-sheet .schedule-mode-option.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.create-sheet .schedule-mode-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.create-sheet .schedule-fields {
+  display: grid;
+  gap: 10px;
+}
+
+.create-sheet .schedule-fields > label {
+  min-width: 0;
+}
+
+.create-sheet .schedule-fields.is-range {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.create-sheet .stages,
+.create-sheet .stage-card {
+  display: grid;
+  gap: 10px;
+}
+
+.create-sheet .stages-header,
+.create-sheet .stage-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.create-sheet .stages-helper {
+  margin: 4px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.create-sheet .secondary-button,
+.create-sheet .remove-stage {
+  font: inherit;
+  cursor: pointer;
+}
+
+.create-sheet .secondary-button {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.create-sheet .stage-card,
+.create-sheet .overview-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
+}
+
+.create-sheet .overview-row {
+  gap: 4px;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: inherit;
+}
+
+.create-sheet .overview-row span,
+.create-sheet .remove-stage {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .remove-stage {
+  border: 0;
+  background: transparent;
+  padding: 0;
+}
+
+@media (max-width: 640px) {
+  .create-sheet .schedule-fields.is-range {
+    grid-template-columns: 1fr;
+  }
+}
+
+.create-sheet .validation-list,
+.create-sheet .status-note {
+  margin: 0;
+  color: var(--danger, #c0392b);
+}
+
+.create-sheet .validation-list {
+  padding-left: 18px;
+}
+
+.create-sheet .scope-more-toggle {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.create-sheet .scope-more-toggle input {
+  flex: 0 0 auto;
+  width: auto;
+  margin: 0;
+}

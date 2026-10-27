@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~4:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~8:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,44 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 (branch `claude/social-production-handoff-dsam61`), CI running
+## In flight 2026-10-27: M5c events, first part (ADR 0057), PR open on `claude/social-production-handoff-dsam61`
+**Merging resets the project AND directory networks** (integrity changes): everyone on the test
+network signs up again; projects, follows and chats from before become unreachable. The
+conversation DNA hash is unchanged (`hc dna hash`: directory `uhC0kzkuwcU…`, project
+`uhC0kOPCCpG…`, conversation `uhC0kUmCMHl…` as on main).
+- **Decision (ADR 0057):** an event is a project-DNA clone whose charter mode is `"event"`,
+  using the app's phase ids (Proposal `phase-1`, Event Plan `phase-2`, Activity `phase-5`,
+  Closed `phase-7`). Event rules are in `sp_governance` (mode `EVENT`: labels, phases, returns
+  to any earlier phase, `PlanKind::Event`, web's event rubric) and a new crate `sp_event`
+  (schedule shape, charter kind). `sp_core` untouched.
+- **Event plans** carry `schedule: Option<EventSchedule>` (mode any-day/date/range, dates,
+  times, stored in UTC as web does) and need a place. The event page shows the leading
+  approved plan's time and place (`domain/eventSchedule.ts`).
+- **Directory:** a listing's `mode` is a project mode (checked as before) or any lowercase
+  kind (`event`, later `help-request`, `community`, `channel`) with shape checks only, so
+  later kinds need no directory reset.
+- **UI from web:** "Event" in the + menu, `/create/event` (public path: Basics, Tags,
+  Location, Overview; web's Audience step waits on private events), `EventCard` in the feed,
+  `/events/[id]` (the project page with web's event copy, "Join event"), the event plan
+  wizard (date or range, times, place), phase copy, rail/notification/search links to
+  `/events/`. Styles via PORTS (`CreateEventPage`, `EventCard`). `domain/plans.ts` split:
+  the wizard form is `domain/planForm.ts`.
+- **Tests:** new scenario `events` (2 tests, ~10 min; it must settle after each plan vote or
+  the last voter can't close the plan); `plans`, `values`, `projects` re-run and pass. New
+  browser test `tests/e2e/events.mjs` (create, join, Event Plan, dated plan approved, time
+  and place on the page, Activity, event card in the feed) passed; `governance`, `rail`,
+  `projects` passed.
+- **Lesson:** on the local release seed node, project creation started hanging (heading never
+  appears) after an aborted browser test, even without "database is locked" in the log.
+  Restarting `cloud-seed.sh` fixed it each time. Also: while scenarios run, browser tests
+  can time out on the 4-core container; run them on an idle machine.
+- Not run here: the full `check-all.sh` (CI runs it).
+- **Next after merge:** smoke live (`shell.mjs`, `guests.mjs`, and `events.mjs` needs the dev
+  founders, so local only); README Status. Then M5c part 2: private events (secret seed +
+  invites, ADR 0043 style) and organizer-controlled governance; activities limited to the
+  plan's days; help requests (own ADR).
+
+## Done 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 merged (06:48 UTC / 5:48 pm Melbourne), seed node live 07:00 UTC; live `rail.mjs` and `shell.mjs` passed
 PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets nothing.
 - Feed/profile activity cards (the old Next) turned out to wait on M6: web's
   `ProjectActivityCard` comes only from web-backend's Region feed (`feeds/region.py`, with
@@ -54,8 +91,12 @@ PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets no
   writes kept failing with SQLite "database is locked" (code 517) until the seed node was
   restarted. **Lesson:** if project creation hangs locally after an aborted test, check the
   page for "database is locked" and restart `cloud-seed.sh`.
-- No scenario changes (no zome change). Next: open the PR, wait for CI, merge, live smoke
-  `rail.mjs` + `shell.mjs` (links/governance need the dev founders, local only), then M5c.
+- No scenario changes (no zome change). CI: `check` 5 min, shards 35–76 min. Deploy: seed
+  node 12 min after the merge; the live UI bundle has the new rail rows ("Sever link").
+  Live 07:01–07:15 UTC: `rail.mjs` and `shell.mjs` passed on the first run (`links`/`governance`
+  need the dev founders, so they ran locally only). `/readyz` 604 MB at start, 1060 MB after.
+- Nothing is in flight. Next: M5c (events and help requests), starting with its ADR; read
+  web's events screens (`features/events/**`) and web-backend's event tables first.
 
 ## Done 2026-10-27: "suggestion declined" notifications, PR #58 merged (04:31 UTC / 3:31 pm Melbourne), seed node live 04:44 UTC; live `activities.mjs` and `shell.mjs` passed
 M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
@@ -778,7 +819,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `a9ee6a4` (PR #58, merged 2026-10-27 04:31 UTC; seed node live 04:44 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `fed423c` (PR #59, merged 2026-10-27 06:48 UTC; seed node live 07:00 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
@@ -813,7 +854,7 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    (follows, scopes, places, moderation); pick items up as their features land.
 2. **M5 Work** (plan: `docs/plans/M5-work.md`): M5a follows + feedback (done, ADR 0054; its
    mention ranking and Home scope in PR #54), M5b activities and roles (done; the rail's link
-   and plan votes in flight), **next: M5c** events and help requests (event cards in the feed;
+   and plan votes done), **M5c** events (first part in flight, ADR 0057) and help requests (event cards in the feed;
    project-activity cards wait on Region, M6), M5d communities and channels. Each starts with
    its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway

@@ -7185,6 +7185,7 @@ dependencies = [
  "serde",
  "sp_activity",
  "sp_core",
+ "sp_event",
  "sp_governance",
 ]
 
@@ -8773,6 +8774,13 @@ name = "sp_core"
 version = "0.0.1"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "sp_event"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
 ]
 
 [[package]]

@@ -9,6 +9,8 @@
     count: number;
     pending?: boolean;
     membersOpen?: boolean;
+    /** web's `joinAriaLabel`: "Join event" on event pages. */
+    noun?: 'project' | 'event';
     onToggleJoin: () => void;
     onOpenMembers: () => void;
   }
@@ -18,11 +20,12 @@
     count,
     pending = false,
     membersOpen = false,
+    noun = 'project',
     onToggleJoin,
     onOpenMembers,
   }: Props = $props();
 
-  const joinAria = $derived(joined ? 'Leave project' : 'Join project');
+  const joinAria = $derived(joined ? `Leave ${noun}` : `Join ${noun}`);
 </script>
 
 <div class="membership-split" class:joined class:pending class:members-open={membersOpen}>

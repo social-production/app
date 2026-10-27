@@ -18,6 +18,7 @@
 
   import '#lib/components/styles/messages.css';
   import '#lib/components/styles/notifications.css';
+  import { isEvent } from '#lib/domain/projects.ts';
 
   /** web's NotificationsPage: the list, newest first, with "Mark all read". */
   let names = $state<Record<string, string>>({});
@@ -92,7 +93,9 @@
       }
       const id = await projectPageOf(item.seed);
       if (!id) return;
-      const page = resolve('/projects/[id]', { id });
+      const page = isEvent(item.projectMode ?? undefined)
+        ? resolve('/events/[id]', { id })
+        : resolve('/projects/[id]', { id });
       const query = !t
         ? ''
         : 'tab' in t

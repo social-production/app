@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
+  import EventCard from '#lib/components/cards/EventCard.svelte';
   import PersonalActivityCard from '#lib/components/cards/PersonalActivityCard.svelte';
   import ProjectCard from '#lib/components/cards/ProjectCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
@@ -130,6 +131,12 @@
       {#each feed.rows as row (row.key)}
         {#if row.source === 'personal'}
           <PersonalActivityCard
+            card={row.card}
+            authorName={row.card.creatorName || 'Unnamed'}
+            onSignal={(next) => feed.signal(row.card, next)}
+          />
+        {:else if row.card.mode === 'event'}
+          <EventCard
             card={row.card}
             authorName={row.card.creatorName || 'Unnamed'}
             onSignal={(next) => feed.signal(row.card, next)}

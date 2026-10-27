@@ -2,23 +2,34 @@ import {
   PROJECT_TYPES,
   type Charter,
   type LocationChoice,
-  type ProjectMode,
+  type CharterMode,
 } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
 import { createProject, projectAllowance } from '#lib/services/projects.ts';
 
-export const CREATE_STEPS = [
+type Step = { id: 'type' | 'basics' | 'location' | 'scope' | 'overview'; title: string };
+
+export const CREATE_STEPS: Step[] = [
   { id: 'type', title: 'Type' },
   { id: 'basics', title: 'Basics' },
   { id: 'location', title: 'Location' },
   { id: 'scope', title: 'Scope' },
   { id: 'overview', title: 'Overview' },
-] as const;
+];
 
-/** The create-project wizard's draft (web's CreateProjectPage state). */
+/** web's public create-event steps. Its Audience step (private events) comes with them. */
+export const EVENT_STEPS: Step[] = [
+  { id: 'basics', title: 'Basics' },
+  { id: 'scope', title: 'Tags' },
+  { id: 'location', title: 'Location' },
+  { id: 'overview', title: 'Overview' },
+];
+
+/** The create-project wizard's draft (web's CreateProjectPage state); events use it too. */
 export class CreateState {
   step = $state(0);
-  mode = $state<ProjectMode>('productive');
+  mode = $state<CharterMode>('productive');
+  readonly steps = $derived(this.mode === 'event' ? EVENT_STEPS : CREATE_STEPS);
   title = $state('');
   description = $state('');
   intent = $state<LocationChoice>('later');
@@ -29,7 +40,7 @@ export class CreateState {
   /** Projects left this week for a New member; `null`: no limit. */
   allowance = $state<number | null>(null);
 
-  readonly stepId = $derived(CREATE_STEPS[this.step]?.id ?? 'type');
+  readonly stepId = $derived(this.steps[this.step]?.id ?? 'basics');
   readonly typeLabel = $derived(PROJECT_TYPES.find((t) => t.value === this.mode)?.label ?? '');
   readonly locationLabel = $derived(
     this.intent === 'online'
@@ -48,6 +59,18 @@ export class CreateState {
       return ['place'];
     return [];
   });
+
+  constructor(mode: CharterMode = 'productive') {
+    this.mode = mode;
+  }
+
+  /** The overview's link back to a step. */
+  stepOf(id: Step['id']): number {
+    return Math.max(
+      this.steps.findIndex((s) => s.id === id),
+      0,
+    );
+  }
 
   async checkAllowance(): Promise<void> {
     try {

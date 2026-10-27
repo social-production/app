@@ -2,7 +2,7 @@
 //! proposals, applied at read time (ADR 0033).
 
 use hdi::prelude::*;
-use sp_core::project::{check_fields, CharterFields, DESCRIPTION_MAX};
+use sp_core::project::{check_fields, CharterFields, DESCRIPTION_MAX, MODES, SUBTYPES};
 
 use crate::{creator, invalid, Charter};
 
@@ -30,10 +30,17 @@ fn check_charter(c: &Charter) -> Result<(), String> {
             "description must be 1–{DESCRIPTION_MAX} characters"
         ));
     }
+    // An event (ADR 0057) checks its kind here and the shared field limits below.
+    let (mode, subtype) = if c.mode == sp_event::MODE {
+        sp_event::check_kind(&c.mode, &c.subtype)?;
+        (MODES[0], SUBTYPES[0])
+    } else {
+        (c.mode.as_str(), c.subtype.as_str())
+    };
     check_fields(&CharterFields {
         title: &c.title,
-        mode: &c.mode,
-        subtype: &c.subtype,
+        mode,
+        subtype,
         location_label: &c.location_label,
         phase: &c.phase,
         tags: &c.tags,

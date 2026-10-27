@@ -8,7 +8,7 @@ import {
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
-import type { ProjectMode } from '#lib/domain/projects.ts';
+import type { CharterMode } from '#lib/domain/projects.ts';
 import {
   callCell,
   clonedSeeds,
@@ -28,7 +28,7 @@ import { listingIdOf } from './projects.ts';
 /** The part of `get_project` notifications read. */
 interface GlanceWire {
   creator: AgentPubKey;
-  charter: { title: string; mode: ProjectMode } | null;
+  charter: { title: string; mode: CharterMode } | null;
   am_member: boolean;
   phases: { id: string; label: string }[];
 }

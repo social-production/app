@@ -8,7 +8,7 @@ import { zoneOf } from './activityTime.ts';
 import type { Proposal, VoteChoice } from './governance.ts';
 import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
-import type { ProjectMode } from './projects.ts';
+import type { CharterMode } from './projects.ts';
 
 /** web's kinds this app has so far; events, help requests and service requests come later. */
 export type RailKind = 'project' | 'vote';
@@ -25,7 +25,7 @@ export interface RailItem {
   meta: string;
   createdAt: number;
   countLabel?: string;
-  projectMode: ProjectMode;
+  projectMode: CharterMode;
   activityId?: string;
   voteKindLabel?: RailVoteKind;
   viewerParticipated?: boolean;
@@ -36,7 +36,7 @@ export interface RailItem {
 export interface RailProject {
   seed: string;
   title: string;
-  mode: ProjectMode;
+  mode: CharterMode;
   amMember: boolean;
   phase: string;
   phaseLabel: (id: string) => string;

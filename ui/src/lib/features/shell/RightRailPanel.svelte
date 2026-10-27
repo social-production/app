@@ -18,6 +18,7 @@
   } from '#lib/stores/activityRail.svelte.ts';
 
   import '#lib/components/styles/rail.css';
+  import { isEvent } from '#lib/domain/projects.ts';
 
   /**
    * web's RightRailPanel: Project Activity & Events, Help Requests, Requests, Votes to cast,
@@ -39,7 +40,9 @@
     onClose();
     const id = await projectPageOf(item.seed);
     if (!id) return;
-    const path = resolve('/projects/[id]', { id });
+    const path = isEvent(item.projectMode)
+      ? resolve('/events/[id]', { id })
+      : resolve('/projects/[id]', { id });
     if (page.url.pathname === path) {
       window.location.assign(`${path}${item.query}`);
       return;

@@ -5,7 +5,9 @@
     SOFTWARE_LICENSE_TITLE,
     SOFTWARE_LICENSE_WHY,
   } from '#lib/domain/policy.ts';
-  import type { PlanForm, PlanStep } from '#lib/domain/plans.ts';
+  import { zoneOf } from '#lib/domain/activityTime.ts';
+  import { scheduleProblem } from '#lib/domain/eventSchedule.ts';
+  import type { PlanForm, PlanStep } from '#lib/domain/planForm.ts';
   import type { ProjectSubtype } from '#lib/domain/projects.ts';
 
   import PlanStagesEditor from './PlanStagesEditor.svelte';
@@ -38,6 +40,7 @@
   }: Props = $props();
 
   const total = $derived(demand + opposition);
+  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   function sameAsProduction(checked: boolean): void {
     form.sameAsProduction = checked;
@@ -128,6 +131,42 @@
     bind:value={form.demandNote}
     rows="5"
     placeholder="Explain how this plan responds to support"></textarea>
+{:else if step.id === 'schedule-mode'}
+  <select bind:value={form.scheduleMode} aria-label="Schedule">
+    <option value="date">Single date</option>
+    <option value="range">Date range</option>
+  </select>
+{:else if step.id === 'schedule-date'}
+  <input type="date" bind:value={form.scheduledDate} aria-label="Date" />
+{:else if step.id === 'schedule-range'}
+  <div class="field-grid">
+    <label>
+      <span>Start date</span>
+      <input type="date" bind:value={form.rangeStartDate} />
+    </label>
+    <label>
+      <span>End date</span>
+      <input type="date" bind:value={form.rangeEndDate} />
+    </label>
+  </div>
+{:else if step.id === 'schedule-time'}
+  <div class="field-grid">
+    <label>
+      <span>Start time</span>
+      <input type="time" bind:value={form.startTime} />
+    </label>
+    <label>
+      <span>Finish time</span>
+      <input type="time" bind:value={form.finishTime} />
+    </label>
+  </div>
+  {#if form.startTime && form.finishTime && scheduleProblem(form)}
+    <p class="helper-copy">{scheduleProblem(form)}</p>
+  {/if}
+  <!-- web's TimeZoneNote, without its Settings link: the app has no display time zone yet. -->
+  <p class="helper-copy">
+    Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
+  </p>
 {:else if step.id === 'stages'}
   <PlanStagesEditor bind:stages={form.stages} />
 {/if}

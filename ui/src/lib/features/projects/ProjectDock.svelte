@@ -4,7 +4,7 @@
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
-  import { takesSignals } from '#lib/domain/projects.ts';
+  import { isEvent, takesSignals } from '#lib/domain/projects.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
@@ -52,6 +52,7 @@
             count={project.members.length}
             pending={detail.joining}
             {membersOpen}
+            noun={isEvent(project.charter?.mode) ? 'event' : 'project'}
             onToggleJoin={() => void detail.toggleJoin()}
             {onOpenMembers}
           />
