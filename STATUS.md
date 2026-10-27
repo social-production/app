@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~5:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~4:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: rail link votes + plan votes open the plan's sheet (branch `claude/social-production-handoff-dsam61`)
+## In flight 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 (branch `claude/social-production-handoff-dsam61`), CI running
 PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets nothing.
 - Feed/profile activity cards (the old Next) turned out to wait on M6: web's
   `ProjectActivityCard` comes only from web-backend's Region feed (`feeds/region.py`, with
