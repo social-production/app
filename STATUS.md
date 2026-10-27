@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~4:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~6:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 (branch `claude/social-production-handoff-dsam61`), CI running
+## Done 2026-10-27: rail link votes + plan votes open the plan's sheet, PR #59 merged (06:48 UTC / 5:48 pm Melbourne), seed node live 07:00 UTC; live `rail.mjs` and `shell.mjs` passed
 PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets nothing.
 - Feed/profile activity cards (the old Next) turned out to wait on M6: web's
   `ProjectActivityCard` comes only from web-backend's Region feed (`feeds/region.py`, with
@@ -54,8 +54,12 @@ PARITY "Rail gaps". **UI only, no zome or gateway change**, so merging resets no
   writes kept failing with SQLite "database is locked" (code 517) until the seed node was
   restarted. **Lesson:** if project creation hangs locally after an aborted test, check the
   page for "database is locked" and restart `cloud-seed.sh`.
-- No scenario changes (no zome change). Next: open the PR, wait for CI, merge, live smoke
-  `rail.mjs` + `shell.mjs` (links/governance need the dev founders, local only), then M5c.
+- No scenario changes (no zome change). CI: `check` 5 min, shards 35–76 min. Deploy: seed
+  node 12 min after the merge; the live UI bundle has the new rail rows ("Sever link").
+  Live 07:01–07:15 UTC: `rail.mjs` and `shell.mjs` passed on the first run (`links`/`governance`
+  need the dev founders, so they ran locally only). `/readyz` 604 MB at start, 1060 MB after.
+- Nothing is in flight. Next: M5c (events and help requests), starting with its ADR; read
+  web's events screens (`features/events/**`) and web-backend's event tables first.
 
 ## Done 2026-10-27: "suggestion declined" notifications, PR #58 merged (04:31 UTC / 3:31 pm Melbourne), seed node live 04:44 UTC; live `activities.mjs` and `shell.mjs` passed
 M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
@@ -778,7 +782,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `a9ee6a4` (PR #58, merged 2026-10-27 04:31 UTC; seed node live 04:44 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `fed423c` (PR #59, merged 2026-10-27 06:48 UTC; seed node live 07:00 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
