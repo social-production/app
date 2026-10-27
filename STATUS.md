@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~1:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~3:55 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,7 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: "suggestion declined" notifications, PR #58 (with the docs for PR #57)
+## Done 2026-10-27: "suggestion declined" notifications, PR #58 merged (04:31 UTC / 3:31 pm Melbourne), seed node live 04:44 UTC; live `activities.mjs` and `shell.mjs` passed
 M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
 DNA hashes are unchanged (`hc dna hash` before/after `build-happ.sh`: project `uhC0kkykG2Y…`)
 and merging resets nothing; the gateway upgrades hosted coordinators on start.
@@ -40,8 +40,11 @@ and merging resets nothing; the gateway upgrades hosted coordinators on start.
 - Checked: clippy `-D warnings` (activities, scenarios), fmt; `npm run check`/`lint`, sizes,
   boundaries; scenario `activities` (2 passed, 14 min, now asserts the decline); local release
   seed node: `activities.mjs` (now waits for Ann's declined card) and `notifications.mjs` passed.
-- Next: CI green → merge → smoke `activities.mjs` live (two accounts; ~5 min incl. its
-  two-minute activity) → STATUS Done.
+- CI: `check` 5 min, shards 36–73 min. Deploy: ui 1 min, seed node 13 min after the merge.
+  Live 04:45–04:49 UTC: `activities.mjs` (Ann got the declined card) and `shell.mjs` passed
+  on the first run; `/readyz` 587 MB at start, 1253 MB after (4 accounts, a photo).
+- Nothing is in flight. Next: feed/profile activity cards (PARITY "Event, activity and plan
+  cards"), then the rail gaps (link votes; plan Assess → the plan's sheet), then M5c.
 
 ## Done 2026-10-27: web's right rail (the activity button), PR #57 merged (02:18 UTC / 1:18 pm Melbourne), seed node live 02:40 UTC; live `rail.mjs`, `shell.mjs`, `guests.mjs` passed
 PARITY "Activity (calendar) button" and M5b's "right rail's activity". **UI only, no zome or
@@ -71,7 +74,7 @@ gateway change**, so merging resets nothing.
 - CI: `check` 5 min, shards 35–85 min. Deploy: ui 1 min after the merge, seed node 22 min.
   Live smoke 02:41–02:46 UTC: `rail`, `shell`, `guests` all passed on the first run.
   `/readyz` 577 MB at start, 1037 MB five minutes later after those tests (~5 accounts).
-- Then: the "suggestion declined" card (in flight above); feed/profile activity cards; rail gaps: link votes, plan Assess → the plan's sheet).
+- Then: the "suggestion declined" card (done, PR #58); feed/profile activity cards; rail gaps: link votes, plan Assess → the plan's sheet).
 
 ## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
 - README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
@@ -749,7 +752,7 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `66bc7cb` (PR #57, merged 2026-10-27 02:18 UTC; seed node live 02:40 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `a9ee6a4` (PR #58, merged 2026-10-27 04:31 UTC; seed node live 04:44 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
