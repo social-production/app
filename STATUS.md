@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-28 ~4:20 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-28 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -30,6 +30,21 @@ and continue from Next."
   until the FastAPI site is replaced.
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
+
+## In flight 2026-10-28: M5c part 2a, invite-only events and organizers (ADR 0061), branch `claude/social-production-handoff-dsam61`
+Plan (tick off as it lands; ADR 0061 has the reasons):
+1. [ ] `sp_event::Audience` from the seed (`.private.` / `.organized.`), unit tests.
+2. [ ] Project integrity: `Organizer { agent, grant }`; `organizer: Option<ActionHash>` on
+   `Proposal` and `Activity` (serde default); organized events: organizer-only proposals and
+   activities, vote-less passed outcomes, no values/importance/signals, no return to Proposal.
+3. [ ] Coordinators: governance closes organizer proposals at once, skips the signal gate and
+   recount, newest approved plan leads; project `grant_organizer`/`organizers` + view fields;
+   activities cite the grant; messages inbox accepts event seeds.
+4. [ ] Scenario `private_events`.
+5. [ ] UI: create steps (Audience, Who, Control, Plan), `/events/<seed>`, `/invites`, rail
+   Invites row, `evt-invite` notification, PrivateMark, leave warning; browser test.
+6. [ ] Checks, PR, merge when green, live smoke, docs.
+**Merging resets the project network** (everyone's test projects/events start again).
 
 ## Done 2026-10-28: seed-node memory (jemalloc), busy-conductor retry, test founders live (ADR 0060), PR #61 merged (16:19 UTC 27 Oct / 3:19 am Melbourne), seed node live 16:39 UTC; ALL 18 browser test files passed live
 **Directory reset with this merge** (founders list changed): everyone signs up again.
