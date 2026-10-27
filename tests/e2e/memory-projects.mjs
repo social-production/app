@@ -1,13 +1,13 @@
 // Seed-node memory per project (ADR 0060 follow-up): founder one creates N projects one by one
 // and the seed node's resident size is read from /readyz after each, once the archivist has
 // joined it. Not part of CI; run against a local release seed node (RELEASE=1).
-//   node tests/e2e/memory-projects.mjs http://localhost:4174 [N] [gateway URL]
+//   MEM_PROJECTS=6 bash scripts/e2e-local.sh tests/e2e/memory-projects.mjs
 import { readFileSync } from 'node:fs';
 
 import { BASE, browser, device, log, phraseSignIn } from './lib.mjs';
 
-const count = Number(process.argv[3] ?? 6);
-const gateway = process.argv[4] ?? 'http://localhost:8080';
+const count = Number(process.env.MEM_PROJECTS ?? 6);
+const gateway = process.env.MEM_GATEWAY ?? 'http://localhost:8080';
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const rss = async () => (await (await fetch(`${gateway}/readyz`)).json()).rssMb;
 const indexed = async () => (await (await fetch(`${gateway}/index/projects`)).json()).total ?? 0;
