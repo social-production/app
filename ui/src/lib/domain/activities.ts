@@ -10,7 +10,16 @@ export interface ActivityRole {
   /** Who holds it, in the order they took it, and when each took it (micros). */
   people: string[];
   takenAt: number[];
-  suggestion: { id: string; person: string; by: string; at: number } | null;
+  suggestion: RoleSuggestion | null;
+  /** Suggestions their person turned down (the decline's id and time). */
+  declined: RoleSuggestion[];
+}
+
+export interface RoleSuggestion {
+  id: string;
+  person: string;
+  by: string;
+  at: number;
 }
 
 export interface ActivityRating {

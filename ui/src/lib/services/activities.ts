@@ -9,6 +9,20 @@ import {
 
 import { cellFor, type ProjectRef } from './projects.ts';
 
+interface SuggestionWire {
+  id: ActionHash;
+  person: AgentPubKey;
+  by: AgentPubKey;
+  at: number;
+}
+
+const toSuggestion = (s: SuggestionWire) => ({
+  id: hashToString(s.id),
+  person: hashToString(s.person),
+  by: hashToString(s.by),
+  at: s.at,
+});
+
 /** The activities zome's `ActivityView` (ADR 0056). */
 interface ActivityWire {
   id: ActionHash;
@@ -28,7 +42,8 @@ interface ActivityWire {
     maximum: number | null;
     people: AgentPubKey[];
     taken_at: number[];
-    suggestion: { id: ActionHash; person: AgentPubKey; by: AgentPubKey; at: number } | null;
+    suggestion: SuggestionWire | null;
+    declined: SuggestionWire[];
   }[];
   my_role: number | null;
   roles_open: boolean;
@@ -87,12 +102,9 @@ function toActivity(w: ActivityWire): Activity {
       maximum: r.maximum,
       people: r.people.map(hashToString),
       takenAt: r.taken_at,
-      suggestion: r.suggestion && {
-        id: hashToString(r.suggestion.id),
-        person: hashToString(r.suggestion.person),
-        by: hashToString(r.suggestion.by),
-        at: r.suggestion.at,
-      },
+      suggestion: r.suggestion && toSuggestion(r.suggestion),
+      // Older coordinators don't send it (a hosted node may lag a deploy).
+      declined: (r.declined ?? []).map(toSuggestion),
     })),
     myRole: w.my_role,
     rolesOpen: w.roles_open,

@@ -30,6 +30,9 @@ pub struct RoleView {
     pub people: Vec<AgentPubKey>,
     pub taken_at: Vec<Timestamp>,
     pub suggestion: Option<SuggestionView>,
+    /// Suggestions their person turned down (`id` and `at` are the decline's), which web
+    /// tells the suggester about.
+    pub declined: Vec<SuggestionView>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -100,7 +103,7 @@ fn one(
     } else {
         history::completion(&a.hash, &everyone, me)?
     };
-    let mut suggestions = suggestions(&a.hash)?;
+    let (mut suggestions, mut declined) = suggestions(&a.hash)?;
     let takes = reads::takes(&a.hash)?;
     let taken_at = |role: usize, agent: &AgentPubKey| {
         takes
@@ -123,6 +126,10 @@ fn one(
             taken_at: people.iter().map(|p| taken_at(i, p)).collect(),
             people,
             suggestion: u8::try_from(i).ok().and_then(|i| suggestions.remove(&i)),
+            declined: u8::try_from(i)
+                .ok()
+                .and_then(|i| declined.remove(&i))
+                .unwrap_or_default(),
         })
         .collect();
     Ok(ActivityView {
@@ -183,23 +190,48 @@ pub fn my_take(activity: &ActionHash, me: &AgentPubKey) -> ExternResult<Option<A
         .map(|t| t.link))
 }
 
-/// The latest suggestion per role that its person hasn't declined.
-fn suggestions(activity: &ActionHash) -> ExternResult<BTreeMap<u8, SuggestionView>> {
-    let made = reads::linked::<RoleSuggestion>(
+type PerRole<T> = BTreeMap<u8, T>;
+
+/// The latest suggestion per role that its person hasn't declined, and every decline per role.
+fn suggestions(
+    activity: &ActionHash,
+) -> ExternResult<(PerRole<SuggestionView>, PerRole<Vec<SuggestionView>>)> {
+    let made: Vec<Found<RoleSuggestion>> = reads::linked::<RoleSuggestion>(
         activity.clone(),
         LinkTypes::ActivityToSuggestions,
         UnitEntryTypes::RoleSuggestion,
-    )?;
+    )?
+    .into_iter()
+    .filter(|s| s.entry.activity == *activity)
+    .collect();
     let declines = reads::linked::<SuggestionDecline>(
         activity.clone(),
         LinkTypes::ActivityToSuggestions,
         UnitEntryTypes::SuggestionDecline,
     )?;
-    let mut latest: BTreeMap<u8, Found<RoleSuggestion>> = BTreeMap::new();
-    for s in made.into_iter().filter(|s| s.entry.activity == *activity) {
+    let mut declined: PerRole<Vec<SuggestionView>> = BTreeMap::new();
+    for d in &declines {
+        let Some(s) = made
+            .iter()
+            .find(|s| s.hash == d.entry.suggestion && s.entry.person == d.author)
+        else {
+            continue;
+        };
+        declined
+            .entry(s.entry.role)
+            .or_default()
+            .push(SuggestionView {
+                id: d.hash.clone(),
+                person: d.author.clone(),
+                by: s.author.clone(),
+                at: d.at,
+            });
+    }
+    let mut latest: PerRole<&Found<RoleSuggestion>> = BTreeMap::new();
+    for s in &made {
         latest.insert(s.entry.role, s);
     }
-    Ok(latest
+    let standing = latest
         .into_iter()
         .filter(|(_, s)| {
             !declines
@@ -210,14 +242,15 @@ fn suggestions(activity: &ActionHash) -> ExternResult<BTreeMap<u8, SuggestionVie
             (
                 role,
                 SuggestionView {
-                    id: s.hash,
-                    person: s.entry.person,
-                    by: s.author,
+                    id: s.hash.clone(),
+                    person: s.entry.person.clone(),
+                    by: s.author.clone(),
                     at: s.at,
                 },
             )
         })
-        .collect())
+        .collect();
+    Ok((standing, declined))
 }
 
 /// Each participant's latest rating, unless they removed it.
