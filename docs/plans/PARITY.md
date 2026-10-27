@@ -89,8 +89,8 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
   ratings, Community). The requester side waits on service requests.
 - [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
-  the activity's author), and Settings' Roles switch. Still to do: web's "suggestion declined"
-  card to the suggester (the view drops declined suggestions).
+  the activity's author), Settings' Roles switch, and web's "<role> suggestion declined" card
+  to the suggester (the activities view lists declines per role; coordinator only).
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
 - [x] Photos and files in project chats (ADR 0056 ride-along).
 

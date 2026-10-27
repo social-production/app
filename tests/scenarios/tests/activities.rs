@@ -50,12 +50,14 @@ struct RateInput {
 struct SuggestionView {
     id: ActionHash,
     person: AgentPubKey,
+    by: AgentPubKey,
 }
 
 #[derive(Deserialize, Debug)]
 struct RoleView {
     people: Vec<AgentPubKey>,
     suggestion: Option<SuggestionView>,
+    declined: Vec<SuggestionView>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -213,10 +215,11 @@ async fn suggestions(net: &Net, repairs: &ActionHash) {
     assert!(by_other.is_err(), "only the suggested person declines");
     let _: ActionHash = net.call(1, "activities", "decline_suggestion", s.id).await;
     net.settle().await;
-    assert!(
-        view(net, 0, repairs).await.roles[0].suggestion.is_none(),
-        "declined"
-    );
+    let role = &view(net, 0, repairs).await.roles[0];
+    assert!(role.suggestion.is_none(), "declined");
+    assert_eq!(role.declined.len(), 1);
+    assert_eq!(role.declined[0].person, agent(net, 1));
+    assert_eq!(role.declined[0].by, agent(net, 0));
 }
 
 /// Participants rate once it has ended; roles lock then.

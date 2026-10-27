@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The activity button's right rail (2026-10-27, PR #57):** web's panel with your upcoming
+  activities, votes you still need to cast (Assess opens the vote), History (ended activities,
+  roles you hold, votes you cast) and Cleared cards, plus the button's badge.
 - **Activities and roles (M5b, ADR 0056, merged 2026-10-26 17:50 UTC; the project network
   reset, so every test project starts again):** in a project's Activity phase, web's calendar
   with Add activity, the creation wizard, agenda rows, and each activity's sheet: take or leave
@@ -126,7 +129,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
 | M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
-| M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. Next: feed/profile activity cards and the right rail's activity, then events and help requests (M5c), communities and channels (M5d) | in progress |
+| M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail. Next: feed/profile activity cards, then events and help requests (M5c), communities and channels (M5d) | in progress |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
 

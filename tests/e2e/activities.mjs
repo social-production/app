@@ -1,9 +1,10 @@
 // Activities and roles (ADR 0056) end to end at phone width. A personal service's Activity
 // phase is its first, so Ann offers one: she adds an activity with one Helper place on web's
 // calendar; Bob joins, takes the role (the row then reads Full), leaves it again; Ann's
-// suggestion of Bob for the role shows on his sheet and he declines it. Project chats take
-// photos since the same change: Bob sends one and Ann sees it load. Last, a two-minute
-// activity Bob takes part in moves to Past activity, where he checks in and rates it.
+// suggestion of Bob for the role shows on his sheet and he declines it (Ann is told).
+// Project chats take photos since the same change: Bob sends one and Ann sees it load. Last,
+// a two-minute activity Bob takes part in moves to Past activity, where he checks in and
+// rates it.
 //   node tests/e2e/activities.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -120,6 +121,8 @@ await row(bob).click();
 await sheet.getByRole('button', { name: 'Decline' }).click();
 await sheet.getByText(`Suggested · bob${stamp}`).waitFor({ state: 'detached', timeout: 60_000 });
 log('bob declined the suggestion');
+await notified(ann, 'The person you suggested declined this role.');
+log('ann is told bob declined');
 
 // Photos in the project chat (ADR 0056 ride-along).
 const png = Buffer.from(

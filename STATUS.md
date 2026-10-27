@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-27 ~12:00 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-27 ~1:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -31,7 +31,19 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: web's right rail (the activity button), branch `claude/social-production-handoff-dsam61`, PR #57
+## In flight 2026-10-27: "suggestion declined" notifications, PR #58 (with the docs for PR #57)
+M5b leftover. **Coordinator only** (`activities` zome's view gains `RoleView.declined`), so the
+DNA hashes are unchanged (`hc dna hash` before/after `build-happ.sh`: project `uhC0kkykG2Y…`)
+and merging resets nothing; the gateway upgrades hosted coordinators on start.
+- UI: `domain/activityNotifications.ts` adds web's "<role> suggestion declined" / "The person
+  you suggested declined this role." card for the suggester (`prj-role-suggest`, Roles switch).
+- Checked: clippy `-D warnings` (activities, scenarios), fmt; `npm run check`/`lint`, sizes,
+  boundaries; scenario `activities` (2 passed, 14 min, now asserts the decline); local release
+  seed node: `activities.mjs` (now waits for Ann's declined card) and `notifications.mjs` passed.
+- Next: CI green → merge → smoke `activities.mjs` live (two accounts; ~5 min incl. its
+  two-minute activity) → STATUS Done.
+
+## Done 2026-10-27: web's right rail (the activity button), PR #57 merged (02:18 UTC / 1:18 pm Melbourne), seed node live 02:40 UTC; live `rail.mjs`, `shell.mjs`, `guests.mjs` passed
 PARITY "Activity (calendar) button" and M5b's "right rail's activity". **UI only, no zome or
 gateway change**, so merging resets nothing.
 - `domain/activityRail.ts` + `activityRailHistory.ts` (pure): web-backend's
@@ -56,8 +68,10 @@ gateway change**, so merging resets nothing.
   project after `governance` had loaded the founders' node, then passed alone. Watch whether
   the rail's extra reads (4 calls per joined project per minute) slow busy accounts.
 - Live at session start (00:50 UTC): `/readyz` uptime 4.8 h (PR #56's redeploy), `rssMb` 641.
-- PR #57 opened ~12:05 pm Melbourne; CI takes ~1 h. Next: when CI is green, merge, smoke `rail.mjs` (it can run live: two accounts),
-  `shell.mjs`, `guests.mjs`; then README Status.
+- CI: `check` 5 min, shards 35–85 min. Deploy: ui 1 min after the merge, seed node 22 min.
+  Live smoke 02:41–02:46 UTC: `rail`, `shell`, `guests` all passed on the first run.
+  `/readyz` 577 MB at start, 1037 MB five minutes later after those tests (~5 accounts).
+- Then: the "suggestion declined" card (in flight above); feed/profile activity cards; rail gaps: link votes, plan Assess → the plan's sheet).
 
 ## Done 2026-10-27: docs + CI in 5 shards, PR #56 merged (19:33 UTC / 6:33 am Melbourne)
 - README Status/roadmap for M5a/M5b; CI runs the scenarios in 5 shards (CLAUDE.md too).
@@ -105,7 +119,7 @@ people, follows and chats are untouched (directory and conversation hashes uncha
   author; it now sits on the author's row (web's `header-end`). **Lesson:** compare computed
   styles with live web, not only screenshots of one card.
 - Next (no reset needed): the "suggestion declined" card, feed/profile activity cards, the
-  right rail's activity (PARITY; the rail is in flight above).
+  right rail's activity (PARITY; the rail shipped in PR #57).
 
 ## Done 2026-10-26: follows in mentions and the feed (ADR 0047 update, ADR 0055), PR #54 merged (15:05 UTC / 2:05 am Melbourne 27 Oct)
 STATUS Next (M5a leftovers). **No zome change** (gateway + UI), so merging resets nothing.
@@ -735,13 +749,13 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).
-- Deployed `main`: `daf5b73` (PR #55, merged 2026-10-26 17:50 UTC; seed node live 18:16 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
+- Deployed `main`: `66bc7cb` (PR #57, merged 2026-10-27 02:18 UTC; seed node live 02:40 UTC). `/readyz` now shows `uptimeSecs` and `rssMb`. Merging to `main` redeploys bootstrap, seed-node and ui. **Check that the UI actually changed before smoking:** `curl https://api.github.com/repos/social-production/app/commits/<sha>/status` lists Railway's per-service deploy statuses. A red ✗ on a merge commit is usually its `main` CI run cancelled by the next merge, not a failed deploy. **Lessons from Railway's 2026-10-21/22 outage and security incident:**
   - Merges made while builds were paused were never deployed, and pushes after recovery didn't trigger deploys either.
   - Railway's Redeploy rebuilds the same old commit. To pick up the latest `main`, the owner switched the services' deploy branch away and back (Settings → Source), or reconnected the repo; on desktop, Cmd/Ctrl+K → "Deploy latest commit" also works.
   - After the cache wipe the seed node took ~40 min to build (normally ~5).
   - Check status.railway.com first when deploys stall. A Railway project token as `RAILWAY_TOKEN` in the cloud environment would let a session read deployments (`backboard.railway.com` is reachable).
 - Live: M1 identity, M2 projects, M3a governance (edit/update/phase proposals, Vote sheet), M3b
-  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, guests browse the feed and open project pages signed out, usernames without spaces. Founders
+  plans, M3c phase returns (+ challenge rules), M3d project values, M3e links between projects (web's Links tab), M4a project chat, M4c Messages (direct and group chats with read receipts, photos and files, voice calls in direct chats with call lines, Public tab with the project members panel, group options, chat menu, edits and pins), M4d notifications (phase votes, phase changes, chat replies, @mentions; bell count), @mentions and links to the app's pages in every chat, web's Take part tab, M5b activities and roles, the activity button's right rail, guests browse the feed and open project pages signed out, usernames without spaces. Founders
   thebestdamn + BigBird.
 
 ## Cloud environment notes
