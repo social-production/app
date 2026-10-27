@@ -50,7 +50,7 @@ const day = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
 const iso = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
 await ann.getByLabel('Plan title').fill('Lunch at the hall');
 await ann.getByLabel('Plan description').fill('Everyone brings a plate.');
-await ann.getByLabel('Date', { exact: true }).fill(iso);
+await ann.getByLabel(/^Date/).fill(iso);
 await ann.getByLabel('Start time').fill('12:00');
 await ann.getByLabel('Finish time').fill('15:00');
 await ann.locator('.stage-card').getByLabel('Title').fill('Lunch');
