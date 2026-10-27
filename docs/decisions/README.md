@@ -59,3 +59,5 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0055](./0055-home-feed-scope.md) The feed's Home scope: the projects of people you follow, merged as on web
 - [0056](./0056-activities-and-roles.md) Activities and roles in projects, plus the waiting project-chat items (M5b)
 - [0057](./0057-events-as-project-clones.md) Events are project-DNA clones with mode "event"; directory listings take any kind (M5c)
+- [0058](./0058-places-and-the-map.md) Places and the map: OpenFreeMap tiles, Photon search through gateways, approximate by default (M6)
+- [0059](./0059-types-evolve-through-plans.md) Types evolve through plans; personal services go (after parity)

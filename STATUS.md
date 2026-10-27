@@ -31,7 +31,19 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-27: M5c events, first part (ADR 0057), PR open on `claude/social-production-handoff-dsam61`
+## Owner direction (2026-10-27)
+- **No real users; launch only on the Holochain system**, at parity, after a UX pass
+  (`docs/plans/UX.md`). The FastAPI site is a prototype: it gets wiped with all its data and
+  users; nothing is migrated or handed over, and its secrets don't need rolling.
+- **Full nodes:** desktop users choose whether they are full; "full" always stays available;
+  full nodes hold the feed index too; sharding waits for thousands of users (ADR 0036/0037
+  updates).
+- **Map:** ADR 0058 (OpenFreeMap, Photon via gateways, approximate by default, viewer location
+  on the device). **Types evolve through plans** and personal services go, after parity
+  (ADR 0059). Until then don't add rules that fix the type at creation.
+- Estimate given: parity in about 1–2 weeks at the current pace.
+
+## Done 2026-10-27: M5c events, first part (ADR 0057), PR #60 merged (11:21 UTC / 10:21 pm Melbourne)
 **Merging resets the project AND directory networks** (integrity changes): everyone on the test
 network signs up again; projects, follows and chats from before become unreachable. The
 conversation DNA hash is unchanged (`hc dna hash`: directory `uhC0kzkuwcU…`, project
