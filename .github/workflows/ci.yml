@@ -31,16 +31,16 @@ jobs:
       - name: Everything but the scenarios (scripts/check-fast.sh)
         run: nix develop --accept-flake-config --command bash scripts/check-fast.sh
 
-  # The multi-conductor scenarios took ~130 min in one job; each shard runs a fifth of the
+  # The multi-conductor scenarios took ~130 min in one job; each shard runs a sixth of the
   # files (scripts/check-scenarios.sh picks them, so new files need no change here).
   scenarios:
-    name: scenarios (${{ matrix.shard }}/5)
+    name: scenarios (${{ matrix.shard }}/6)
     runs-on: ubuntu-latest
     timeout-minutes: 120
     strategy:
       fail-fast: false
       matrix:
-        shard: [0, 1, 2, 3, 4]
+        shard: [0, 1, 2, 3, 4, 5]
     steps:
       - uses: actions/checkout@v7
       - uses: DeterminateSystems/nix-installer-action@v23
@@ -52,5 +52,5 @@ jobs:
           shared-key: scenarios
       - name: Pack the hApp (scripts/build-happ.sh)
         run: nix develop --accept-flake-config --command bash scripts/build-happ.sh
-      - name: Scenarios, shard ${{ matrix.shard }} of 5
-        run: nix develop --accept-flake-config --command bash scripts/check-scenarios.sh ${{ matrix.shard }} 5
+      - name: Scenarios, shard ${{ matrix.shard }} of 6
+        run: nix develop --accept-flake-config --command bash scripts/check-scenarios.sh ${{ matrix.shard }} 6

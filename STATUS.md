@@ -42,6 +42,12 @@ and continue from Next."
   ~491 MB idle (10 projects, 31 cells), threads 150 vs 17. Projects cost ~3.5 MB each at idle,
   so cold storage is a CPU/scale step, not today's memory fix. ADR 0064 records the order:
   index on change instead of every 15 s, then cold archivist clones; not sleeping people's apps.
+- **Growth under use levels off (live, 05:30–05:50 UTC):** settled 1282 MB → +95 after a round
+  of `private-events` + `events` → +37 after a second round (1414 MB); threads 102 → 294 while
+  busy, falling back when idle. Each round adds accounts and two events, so growth now follows
+  new data rather than leaking. Cold projects (ADR 0064) are the lever as data grows.
+- **CI: 6 scenario shards now.** PR #64's shard 3 (challenges, governance, messages, reverts) hit
+  the 120-min job timeout (95–97 min on #62/#63); `ci.yml` runs 6 shards.
 - **After merge:** after the next version-changing deploy, check the seed node restarts once
   and idles near the plain-restart figure.
 
@@ -837,7 +843,7 @@ ProductiveLifecyclePhaseOne / ProjectValueCard / DiscreteScale / AddValueSheet:
 - **Integrity change** (new `Value`/`Importance` entries, two link types, value criteria in
   `Rating`): merging resets projects again (people stay).
 - **CI split**: `scripts/check-fast.sh` (everything but scenarios) + `scripts/check-scenarios.sh
-  [<shard> <shards>]`; CI runs the scenarios as 5 parallel shards (`ci.yml` job `scenarios`).
+  [<shard> <shards>]`; CI runs the scenarios as 6 parallel shards (`ci.yml` job `scenarios`).
   `check-all.sh` still runs everything. New scenario files are picked up automatically.
 - `scripts/port-styles.py` now dedents web's `<style>` blocks. Regenerating everything today
   also pulls ~500 lines of web's newer styles into the other stylesheets; that drift was left
