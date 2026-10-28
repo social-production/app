@@ -40,3 +40,9 @@ connections per database followed the setting exactly and growth per project rou
 - Still per project: the two databases, their remaining connections, and a kitsune space with
   its gossip state. The next step, if growth stays a problem, is the archivist: does it need
   a full cell per project, or a lighter read path (ADR 0031, 0037)?
+
+## Amended by ADR 0065 (2026-10-28)
+The cap belonged to one-network-per-project. In the commons every public space shares one
+database, and 4 readers (with 1 concurrent incoming request) left local reads waiting up to
+85 s during browser tests, so project chats looked empty. The default is now **16** (Holochain's
+2 × CPUs on the 8-CPU seed node). A `DB_MAX_READERS` set on Railway overrides it.

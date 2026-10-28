@@ -19,9 +19,10 @@ pub struct Config {
     /// Signup proof-of-work difficulty in leading zero bits (20 ≈ a few seconds).
     pub pow_bits: u32,
     pub signups_per_ip_per_day: u32,
-    /// Readers per database (`SQLite`). Every project (each its own DNA) opens two databases, and
-    /// `sqlx` runs each connection on its own thread with its own page cache, so Holochain's
-    /// default (2 × CPUs, at least 8) costs memory per project (ADR 0062).
+    /// Readers per database (`SQLite`). ADR 0062 capped them at 4 while every project was its
+    /// own DNA with its own databases. Since the commons (ADR 0065) every public space shares
+    /// one database, so it needs Holochain's usual count (2 × CPUs on the seed node): 4 readers
+    /// left reads waiting over a minute behind each other.
     pub db_max_readers: u16,
     /// Exit after removing apps of older hApp versions, so the platform restarts a process
     /// without their compiled zomes (ADR 0064). Railway's `ON_FAILURE` policy restarts it.
@@ -43,7 +44,7 @@ impl Config {
             rp_origin: env_or("RP_ORIGIN", "http://localhost:5173"),
             pow_bits: env_num("POW_BITS", 20),
             signups_per_ip_per_day: env_num("SIGNUPS_PER_IP_PER_DAY", 5),
-            db_max_readers: env_num("DB_MAX_READERS", 4),
+            db_max_readers: env_num("DB_MAX_READERS", 16),
             restart_after_upgrade: env_or("RESTART_AFTER_UPGRADE", "1") != "0",
         }
     }
