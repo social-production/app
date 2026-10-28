@@ -2,6 +2,7 @@
 //! the browser uses to open its app websocket (docs/IDENTITY.md).
 
 pub mod account;
+mod heap;
 pub mod index;
 pub mod passkey;
 pub mod public;
@@ -70,6 +71,9 @@ async fn readyz(State(state): State<AppState>) -> (StatusCode, Json<serde_json::
         // Thread count and the CPUs Holochain sizes its pools by (ADR 0062).
         "threads": status_field("Threads:"),
         "cpus": std::thread::available_parallelism().map_or(0, std::num::NonZero::get),
+        // Live data vs allocator overhead, and how many apps and cells run (ADR 0064).
+        "heap": heap::heap(),
+        "cells": state.node.cell_counts().await.ok(),
     });
     (status, Json(body))
 }
