@@ -31,7 +31,7 @@ mod tests {
 
     #[test]
     fn reads_the_space_from_a_listing_seed() {
-        let hash = ActionHash::from_raw_36(vec![7; 36]);
+        let hash = ActionHash::from_raw_32(vec![7; 32]);
         let b64 = ActionHashB64::from(hash.clone());
         assert_eq!(space_of_seed(&format!("uhCAkAnn.space.{b64}")), Some(hash));
         assert_eq!(space_of_seed("uhCAkAnn.private.abc"), None);
