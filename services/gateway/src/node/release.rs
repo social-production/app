@@ -4,7 +4,7 @@
 
 use holochain::conductor::api::{AdminRequest, AdminResponse, AppInfo, CellInfo};
 use holochain::prelude::DnaHash;
-use holochain_types::app::{CoordinatorSource, UpdateCoordinatorsPayload};
+use holochain_types::app::{AppStatus, CoordinatorSource, UpdateCoordinatorsPayload};
 
 use super::Node;
 
@@ -35,6 +35,27 @@ impl Node {
             }
         }
         Ok(removed)
+    }
+
+    /// Installed apps, enabled apps and their cells, for `/readyz` (ADR 0064).
+    pub async fn cell_counts(&self) -> anyhow::Result<serde_json::Value> {
+        let AdminResponse::AppsListed(apps) = self
+            .admin(AdminRequest::ListApps {
+                status_filter: None,
+            })
+            .await?
+        else {
+            return Ok(serde_json::Value::Null);
+        };
+        let enabled = apps
+            .iter()
+            .filter(|a| matches!(a.status, AppStatus::Enabled))
+            .count();
+        let cells: usize = apps
+            .iter()
+            .map(|a| a.cell_info.values().map(Vec::len).sum::<usize>())
+            .sum();
+        Ok(serde_json::json!({ "apps": apps.len(), "enabled": enabled, "cells": cells }))
     }
 
     /// Give every cell of this hApp version the bundle's coordinators; returns how many cells

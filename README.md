@@ -8,12 +8,19 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-27)
+## Status (2026-10-28)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Invite-only and organizer-run events (M5c part 2a, ADR 0061, PR #62, 2026-10-28; the
+  project network reset):** web's create-event Audience, Who, Control and Plan steps; private
+  events open at `/events/<seed>`, invites arrive under Invites (left rail count and an
+  `evt-invite` notification) to accept or decline; organizer-run events start in Activity and
+  only organizers change them. Seed-node fixes the same day: SQLite readers capped per
+  database (ADR 0062), coordinator updates reach every hosted cell (ADR 0063), and the seed
+  node restarts once after an upgrade so old code isn't kept in memory (ADR 0064).
 - **The activity button's right rail (2026-10-27, PR #57):** web's panel with your upcoming
   activities, votes you still need to cast (Assess opens the vote), History (ended activities,
   roles you hold, votes you cast) and Cleared cards, plus the button's badge. Since PR #59

@@ -31,7 +31,24 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-28: restart once after upgrades (ADR 0064), branch `claude/social-production-handoff-dsam61`
+## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
+Owner: "we could have tens of thousands of projects… major changes can still be made… you have
+control". One network per project cannot reach that (each costs two databases, a gossip space and
+a cell on every archiver). Decided: public spaces become records in the project DNA's base cell
+(one sharded network); private spaces stay clones of the same DNA; the index follows changes via
+time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
+otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
+
+## Next for the seed node's memory (open, 2026-10-28)
+- Live costs more per account and project than local (~3.5 MB per project at idle locally,
+  ADR 0064): live idle went 887 → 1414 MB across a day of test runs. Add allocator stats to
+  `/readyz` (jemalloc allocated vs resident vs retained, plus app and cell counts) to see
+  whether it is live data or allocator overhead on the 8-CPU container, then decide between
+  the ADR 0064 steps (index on change instead of every 15 s; cold archivist clones).
+- The owner asked for projects not to run hot unless opened (2026-10-28): ADR 0064 holds the
+  measured plan; build step 1 (index on change) first.
+
+## Done 2026-10-28: restart once after upgrades (ADR 0064) + CI in 6 shards, PR #64 merged (08:07 UTC / 7:07 pm Melbourne), seed node live 08:24 UTC
 - **Memory finding:** after PR #62 (network reset) live idle was ~1.51 GB; PR #63's plain restart
   brought it to **~0.89 GB** (8 CPUs, 88 threads). ~0.6 GB came from the conductor starting the
   old version's apps before `remove_stale_apps` uninstalled them (compiled zomes never freed,
@@ -48,8 +65,13 @@ and continue from Next."
   new data rather than leaking. Cold projects (ADR 0064) are the lever as data grows.
 - **CI: 6 scenario shards now.** PR #64's shard 3 (challenges, governance, messages, reverts) hit
   the 120-min job timeout (95–97 min on #62/#63); `ci.yml` runs 6 shards.
-- **After merge:** after the next version-changing deploy, check the seed node restarts once
-  and idles near the plain-restart figure.
+- CI with 6 shards: `check` 5 min, shards 41–70 min (was up to 120 with 5).
+- Live after the deploy (a plain restart): `shell.mjs` passed; `/readyz` 1164 MB at 158 s,
+  **1414 MB settled at 7 min** (143 threads). Higher than this morning's 887 MB because today's
+  test runs added many accounts and events (the archivist rejoins every project at start).
+- **The restart path itself is untested live** (this deploy didn't change the hApp version):
+  after the next integrity change, check that `/readyz` uptime resets twice and idle sits near
+  a plain restart.
 
 ## Done 2026-10-28: coordinators updated per cell (ADR 0063), PR #63 merged (04:01 UTC / 3:01 pm Melbourne), seed node live 04:14 UTC
 - Fixed live private events ("That isn't a chat."): Holochain 0.7 keeps a ribosome per cell;

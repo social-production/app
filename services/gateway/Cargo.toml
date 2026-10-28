@@ -29,6 +29,8 @@ sqlx = { version = "0.9", default-features = false, features = ["runtime-tokio",
 tokio = { workspace = true, features = ["net", "signal", "sync", "time"] }
 # The allocator (ADR 0060): glibc malloc kept ~1.1 GB idle; jemalloc ~0.7 GB.
 tikv-jemallocator = { version = "0.6", optional = true }
+# jemalloc's own figures in /readyz (ADR 0064): live data vs allocator overhead.
+tikv-jemalloc-ctl = { version = "0.6", optional = true, features = ["stats"] }
 tokio-tungstenite = "0.28"
 tower-http = { version = "0.6", features = ["cors"] }
 tracing = "0.1"
@@ -40,7 +42,7 @@ webauthn-rs = { version = "0.5", features = ["conditional-ui"] }
 [features]
 # On for the seed node's release build (deploy/seed-node/Dockerfile, `RELEASE=1` dev seed).
 # Off by default: jemalloc's configure fails in debug builds under Nix's hardening flags.
-jemalloc = ["dep:tikv-jemallocator"]
+jemalloc = ["dep:tikv-jemallocator", "dep:tikv-jemalloc-ctl"]
 
 [lints]
 workspace = true
