@@ -39,7 +39,12 @@ pub fn validate_value(
         return invalid("a value is 1–160 characters, trimmed");
     }
     // The membership chooses the value's space.
-    if !is_membership(&v.membership, action.author(), Some(action.timestamp()), None)? {
+    if !is_membership(
+        &v.membership,
+        action.author(),
+        Some(action.timestamp()),
+        None,
+    )? {
         return invalid("only members can add values");
     }
     Ok(ValidateCallbackResult::Valid)
@@ -58,7 +63,12 @@ pub fn validate_importance(
     if !importance_ok(i.importance) {
         return invalid("importance is 1 to 10");
     }
-    if !is_membership(&i.membership, action.author(), Some(action.timestamp()), Some(&space))? {
+    if !is_membership(
+        &i.membership,
+        action.author(),
+        Some(action.timestamp()),
+        Some(&space),
+    )? {
         return invalid("only members can rate values");
     }
     Ok(ValidateCallbackResult::Valid)

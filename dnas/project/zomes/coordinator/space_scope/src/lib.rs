@@ -53,7 +53,9 @@ pub fn guest(message: &str) -> WasmError {
 pub fn enter<T>(call: In<T>) -> ExternResult<T> {
     let space = match call.space {
         Some(space) => space,
-        None => clone_space()?.ok_or_else(|| guest("Which project? This space has no charter yet."))?,
+        None => {
+            clone_space()?.ok_or_else(|| guest("Which project? This space has no charter yet."))?
+        }
     };
     CURRENT.with(|c| *c.borrow_mut() = Some(space));
     Ok(call.input)
@@ -114,7 +116,10 @@ pub fn clone_space() -> ExternResult<Option<ActionHash>> {
         return Ok(Some(first.action_address().clone()));
     }
     let mut found = get_links(
-        LinkQuery::try_new(Path::from(CHARTER).path_entry_hash()?, LinkTypes::ProjectCharter)?,
+        LinkQuery::try_new(
+            Path::from(CHARTER).path_entry_hash()?,
+            LinkTypes::ProjectCharter,
+        )?,
         GetStrategy::default(),
     )?;
     found.sort_by_key(|l| l.timestamp);
@@ -149,7 +154,10 @@ pub fn touch() -> ExternResult<()> {
 pub fn active_in(hour: i64) -> ExternResult<Vec<ActionHash>> {
     let bucket = Path::from(format!("recent.{hour}")).path_entry_hash()?;
     let mut out: Vec<ActionHash> = Vec::new();
-    for link in get_links(LinkQuery::try_new(bucket, LinkTypes::Recent)?, GetStrategy::default())? {
+    for link in get_links(
+        LinkQuery::try_new(bucket, LinkTypes::Recent)?,
+        GetStrategy::default(),
+    )? {
         if let Some(space) = link.target.into_action_hash() {
             if !out.contains(&space) {
                 out.push(space);

@@ -99,7 +99,12 @@ pub fn validate_activity(
         return invalid(&reason);
     }
     // The membership chooses the activity's space.
-    if !is_membership(&a.membership, action.author(), Some(action.timestamp()), None)? {
+    if !is_membership(
+        &a.membership,
+        action.author(),
+        Some(action.timestamp()),
+        None,
+    )? {
         return invalid("only members can add activities");
     }
     let organizer = a.organizer.as_ref();
@@ -125,7 +130,12 @@ pub fn validate_suggestion(
         return invalid("suggest someone else for this role");
     }
     let space = membership_space(&activity.membership)?;
-    if !is_membership(&s.membership, action.author(), Some(action.timestamp()), space.as_ref())? {
+    if !is_membership(
+        &s.membership,
+        action.author(),
+        Some(action.timestamp()),
+        space.as_ref(),
+    )? {
         return invalid("only project members can suggest a role");
     }
     Ok(ValidateCallbackResult::Valid)
@@ -230,7 +240,12 @@ pub fn validate_assignment(
         return invalid("an assignment cites its author's membership");
     };
     let space = membership_space(&activity.membership)?;
-    if !is_membership(&membership, action.author(), Some(action.timestamp()), space.as_ref())? {
+    if !is_membership(
+        &membership,
+        action.author(),
+        Some(action.timestamp()),
+        space.as_ref(),
+    )? {
         return invalid("only members can take roles");
     }
     open_at(&activity, action.timestamp())

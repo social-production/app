@@ -19,7 +19,6 @@ use crate::reads::{self, Found};
 use crate::roll::Roll;
 use crate::write::guest;
 
-
 /// web's `phaseOne.values` item.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ValueView {

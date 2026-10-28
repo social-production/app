@@ -146,8 +146,8 @@ pub async fn project_network(conductors: &mut SweetConductorBatch, seed: &str) -
         agents.push(SweetAgents::one(conductors[i].keystore()).await);
     }
     // A clone's creator is named in the seed (project_integrity::creator_in_seed).
-    let modifiers =
-        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(project_seed(&agents[0], seed));
+    let modifiers = DnaModifiersOpt::<SerializedBytes>::none()
+        .with_network_seed(project_seed(&agents[0], seed));
     let dna = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
         .await
         .expect("load project dna");
@@ -188,8 +188,8 @@ pub async fn install_project_with_directory(
         agents.push(SweetAgents::one(conductors[i].keystore()).await);
     }
     let directory = directory_with_founders(&agents[..founders]).await;
-    let modifiers =
-        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(project_seed(&agents[0], seed));
+    let modifiers = DnaModifiersOpt::<SerializedBytes>::none()
+        .with_network_seed(project_seed(&agents[0], seed));
     let project = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
         .await
         .expect("load project dna");

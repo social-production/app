@@ -89,7 +89,11 @@ async fn anyone_posts_replies_and_reads() {
 
     // Bob never joined: as on web, anyone signed in may write in a project's chat.
     let hello: ActionHash = conductors[1]
-        .call(&bob, "post_message", at(&space, post("  Hello all  ", None)))
+        .call(
+            &bob,
+            "post_message",
+            at(&space, post("  Hello all  ", None)),
+        )
         .await;
     let mine: Vec<MessageView> = conductors[1]
         .call(&bob, "list_messages", at(&space, ()))

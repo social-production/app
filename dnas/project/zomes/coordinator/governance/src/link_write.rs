@@ -6,9 +6,9 @@ use hdk::prelude::*;
 use project_integrity::{EntryTypes, LinkRequest, LinkTypes, Proposal, ProposalKind};
 use sp_governance::links::{DEFAULT_RELATIONSHIP, RELATIONSHIP_MAX, SEVER_SUMMARY};
 
+use crate::calls;
 use crate::link_view::halves;
 use crate::write::guest;
-use crate::calls;
 
 pub fn propose(link: LinkRequest) -> ExternResult<ActionHash> {
     let link = tidy(link)?;

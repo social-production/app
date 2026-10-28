@@ -11,10 +11,9 @@ use hdk::prelude::*;
 use project_integrity::{
     audience, space_creator, Applied, AppliedUpdate, Charter, LinkTypes, OrganizerRole,
 };
-use space_scope::{enter, In};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
-
+use space_scope::{enter, In};
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Stance {

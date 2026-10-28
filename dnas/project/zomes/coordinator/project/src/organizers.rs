@@ -73,7 +73,12 @@ pub fn add(agent: AgentPubKey) -> ExternResult<ActionHash> {
         agent,
         grant: mine.grant(),
     }))?;
-    create_link(space_scope::base()?, hash.clone(), LinkTypes::Organizers, ())?;
+    create_link(
+        space_scope::base()?,
+        hash.clone(),
+        LinkTypes::Organizers,
+        (),
+    )?;
     space_scope::touch()?;
     Ok(hash)
 }

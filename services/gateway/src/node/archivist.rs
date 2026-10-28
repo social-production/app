@@ -95,7 +95,13 @@ impl Node {
         } else {
             let hour = Timestamp::now().as_micros() / 3_600_000_000;
             let found: Vec<ActionHash> = self
-                .call(&agent, commons.clone(), "project", "active_spaces", vec![hour - 1, hour])
+                .call(
+                    &agent,
+                    commons.clone(),
+                    "project",
+                    "active_spaces",
+                    vec![hour - 1, hour],
+                )
                 .await?;
             found.into_iter().collect()
         };
@@ -106,7 +112,10 @@ impl Node {
                 continue; // not a commons space (a listing from before ADR 0065)
             };
             let id = ActionHashB64::from(view.id.clone()).to_string();
-            if let Some(card) = before.get(&id).filter(|_| !full && !active.contains(&space)) {
+            if let Some(card) = before
+                .get(&id)
+                .filter(|_| !full && !active.contains(&space))
+            {
                 cards.push(card.clone());
                 continue;
             }
@@ -147,7 +156,13 @@ impl Node {
             .unwrap_or(None);
         // Only the count is used; each message is skipped, not decoded.
         let messages: Vec<serde::de::IgnoredAny> = self
-            .call(agent, commons.clone(), "discussion", "list_messages", at(()))
+            .call(
+                agent,
+                commons.clone(),
+                "discussion",
+                "list_messages",
+                at(()),
+            )
             .await
             .unwrap_or_default();
         let mut card = card(view, project);

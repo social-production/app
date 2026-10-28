@@ -6,7 +6,6 @@ use std::collections::BTreeMap;
 use hdk::prelude::*;
 use project_integrity::LinkTypes;
 
-
 pub struct Span {
     pub hash: ActionHash,
     pub agent: AgentPubKey,

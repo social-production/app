@@ -19,7 +19,9 @@ pub fn validate_create(c: &Charter, author: &AgentPubKey) -> ExternResult<Valida
 
 /// The "charter" anchor link (how a private clone finds its one space) points at a charter
 /// its author wrote.
-pub fn validate_anchor(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateCallbackResult> {
+pub fn validate_anchor(
+    action: &TypedAction<CreateLinkData>,
+) -> ExternResult<ValidateCallbackResult> {
     let founder = match action.target_address.clone().into_action_hash() {
         Some(hash) => crate::space_creator(&hash)?,
         None => None,

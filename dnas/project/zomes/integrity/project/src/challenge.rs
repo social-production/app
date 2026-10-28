@@ -23,7 +23,12 @@ pub fn validate(
         return invalid("a challenge comes after its proposal");
     }
     let space = Some(&proposal.space);
-    if !is_membership(&c.membership, action.author(), Some(action.timestamp()), space)? {
+    if !is_membership(
+        &c.membership,
+        action.author(),
+        Some(action.timestamp()),
+        space,
+    )? {
         return invalid("only members can challenge a count");
     }
     if c.omitted.is_empty() || c.omitted.len() > SNAPSHOT_MAX {

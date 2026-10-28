@@ -142,7 +142,12 @@ pub fn validate_rating(
     if r.rating.is_some_and(|v| !rating_ok(v)) {
         return invalid("a rating is 1 to 5");
     }
-    if !is_membership(&r.membership, action.author(), Some(action.timestamp()), Some(&space))? {
+    if !is_membership(
+        &r.membership,
+        action.author(),
+        Some(action.timestamp()),
+        Some(&space),
+    )? {
         return invalid("only members can rate plans");
     }
     Ok(ValidateCallbackResult::Valid)
