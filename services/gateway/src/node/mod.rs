@@ -86,6 +86,15 @@ impl Node {
         node.ensure_app_interface(config.app_ws_port).await?;
         let removed = Box::pin(node.remove_stale_apps()).await?;
         tracing::info!(version = %node.happ_version, removed, "hosting hApp version");
+        if removed > 0 && config.restart_after_upgrade {
+            // The conductor started the old apps before they were removed, and their compiled
+            // zomes stay loaded for the life of the process (ADR 0053): ~0.6 GB live after a
+            // network reset. Exit so the platform restarts a clean process (ADR 0064).
+            let _ = node.conductor.clone().shutdown().await;
+            anyhow::bail!(
+                "removed {removed} apps of older hApp versions; restarting once (ADR 0064)"
+            );
+        }
         Ok(node)
     }
 

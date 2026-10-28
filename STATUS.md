@@ -31,25 +31,28 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-28: coordinators updated per cell (ADR 0063), fix PR from `claude/social-production-handoff-dsam61`
-**Live private events are broken until this deploys:** creating one fails with "That isn't a
-chat." (the old inbox coordinator). Holochain 0.7 keeps a ribosome per cell; the gateway updated
-one cell per DNA at startup, so cells installed later ran the conversation DNA's old coordinator
-(its hash didn't change). Reproduced and fixed locally (kept data dir, hApp v1 → v2:
-`private-events.mjs` failed, passes with the fix). The gateway now updates every cell at startup,
-after `ensure_hosted`, and for new clones in `grant_new_cells`. Also removes a stray
-`private-events-fail.png` that PR #62 committed at the repo root.
-**After it deploys:** live `private-events.mjs`, `events.mjs` (it failed live on its last step,
-the event card in the feed: re-check, may be index lag), `shell.mjs`.
-**Live memory after PR #62 (01:09 UTC):** `cpus` 8 (Holochain's old default was 17 connections per
-DB there); idle ~1.51 GB with 66 threads, about double the 0.7 GB idle after PR #61. Not yet
-explained: the previous network ran 8 h with all 18 test files, so the next suspect is something
-left from the old version's apps (they are uninstalled at startup, after the conductor started
-them; Holochain drops their databases and spaces, so look at kitsune spaces and the wasm/module
-caches). Check whether a plain restart brings idle down (needs Railway, or a local kept-data
-experiment, below). Smoke runs took it 1509 → 1666 MB.
-Local kept-data experiments: `scripts/kept-seed.sh` (`KEEP=<dir>`, `EXTRA_FOUNDER=1` for a new
-hApp version; header has the cloud-session command).
+## In flight 2026-10-28: restart once after upgrades (ADR 0064), branch `claude/social-production-handoff-dsam61`
+- **Memory finding:** after PR #62 (network reset) live idle was ~1.51 GB; PR #63's plain restart
+  brought it to **~0.89 GB** (8 CPUs, 88 threads). ~0.6 GB came from the conductor starting the
+  old version's apps before `remove_stale_apps` uninstalled them (compiled zomes never freed,
+  ADR 0053). Fix on this branch: after removing old apps the gateway exits once and Railway's
+  `ON_FAILURE` restarts it clean (`RESTART_AFTER_UPGRADE=0` disables; health check 300 s).
+  Tested locally with `scripts/kept-seed.sh`: v1 → v2 exits once, the next start serves.
+- **Cold projects (owner's question):** measured locally, hot vs every app disabled: ~527 vs
+  ~491 MB idle (10 projects, 31 cells), threads 150 vs 17. Projects cost ~3.5 MB each at idle,
+  so cold storage is a CPU/scale step, not today's memory fix. ADR 0064 records the order:
+  index on change instead of every 15 s, then cold archivist clones; not sleeping people's apps.
+- **After merge:** after the next version-changing deploy, check the seed node restarts once
+  and idles near the plain-restart figure.
+
+## Done 2026-10-28: coordinators updated per cell (ADR 0063), PR #63 merged (04:01 UTC / 3:01 pm Melbourne), seed node live 04:14 UTC
+- Fixed live private events ("That isn't a chat."): Holochain 0.7 keeps a ribosome per cell;
+  the gateway now updates every cell at startup, after `ensure_hosted` and for new clones.
+- Live smoke 04:30–04:45 UTC: `private-events.mjs`, `events.mjs` (feed card too) and `shell.mjs`
+  all passed. `/readyz`: idle 887 MB → 1189 after private-events (2 accounts, 1 event) → 1386
+  after events → 1328 after shell (threads 88 → 196 → 111). Part is the one-time first load of
+  the project zomes after a restart (~110 MB in ADR 0053); **next: watch whether repeated runs
+  level off** (run the same files again and compare), since growth under use is the open part.
 
 ## Done 2026-10-28: M5c part 2a, invite-only events and organizers (ADR 0061) + SQLite reader cap (ADR 0062), PR #62 merged (00:55 UTC / 11:55 am Melbourne), seed node live 01:09 UTC
 **Merging resets the project network** (integrity change; directory and conversation DNA

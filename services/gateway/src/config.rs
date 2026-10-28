@@ -23,6 +23,9 @@ pub struct Config {
     /// `sqlx` runs each connection on its own thread with its own page cache, so Holochain's
     /// default (2 × CPUs, at least 8) costs memory per project (ADR 0062).
     pub db_max_readers: u16,
+    /// Exit after removing apps of older hApp versions, so the platform restarts a process
+    /// without their compiled zomes (ADR 0064). Railway's `ON_FAILURE` policy restarts it.
+    pub restart_after_upgrade: bool,
 }
 
 impl Config {
@@ -41,6 +44,7 @@ impl Config {
             pow_bits: env_num("POW_BITS", 20),
             signups_per_ip_per_day: env_num("SIGNUPS_PER_IP_PER_DAY", 5),
             db_max_readers: env_num("DB_MAX_READERS", 4),
+            restart_after_upgrade: env_or("RESTART_AFTER_UPGRADE", "1") != "0",
         }
     }
 }
