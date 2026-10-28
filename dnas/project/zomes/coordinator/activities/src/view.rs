@@ -26,6 +26,8 @@ pub struct RoleView {
     pub label: String,
     pub required: u32,
     pub maximum: Option<u32>,
+    /// A help request's role description (ADR 0067).
+    pub description: String,
     /// Who holds it, in the order they took it, and when each took it.
     pub people: Vec<AgentPubKey>,
     pub taken_at: Vec<Timestamp>,
@@ -113,12 +115,10 @@ fn one(
     let (mut suggestions, mut declined) = suggestions(&a.hash)?;
     let takes = reads::takes(&a.hash)?;
     let taken_at = |role: usize, agent: &AgentPubKey| {
-        takes
+        let mine = takes
             .iter()
-            .filter(|t| usize::from(t.role) == role && t.agent == *agent)
-            .map(|t| t.at)
-            .min()
-            .unwrap_or(a.at)
+            .filter(|t| usize::from(t.role) == role && t.agent == *agent);
+        mine.map(|t| t.at).min().unwrap_or(a.at)
     };
     let roles = a
         .entry
@@ -128,6 +128,7 @@ fn one(
         .enumerate()
         .map(|(i, (r, people))| RoleView {
             label: r.label.clone(),
+            description: r.description.clone(),
             required: r.required,
             maximum: r.maximum,
             taken_at: people.iter().map(|p| taken_at(i, p)).collect(),

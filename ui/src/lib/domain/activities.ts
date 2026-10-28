@@ -7,6 +7,8 @@ export interface ActivityRole {
   label: string;
   required: number;
   maximum: number | null;
+  /** A help request's role description (ADR 0067); empty elsewhere. */
+  description: string;
   /** Who holds it, in the order they took it, and when each took it (micros). */
   people: string[];
   takenAt: number[];

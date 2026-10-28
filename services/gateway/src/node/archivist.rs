@@ -6,12 +6,12 @@ use std::collections::BTreeSet;
 use std::path::Path;
 
 use anyhow::anyhow;
-use holo_hash::{ActionHashB64, AgentPubKeyB64};
+use holo_hash::ActionHashB64;
 use holochain::conductor::api::{AdminRequest, AppInfo, CellInfo};
 use holochain::prelude::*;
 use holochain_types::app::{AppBundleSource, InstallAppPayload};
-use serde::Deserialize;
 
+use super::cards::{card, help_of, ActivityView, ListingView, Profile, ProjectView};
 use super::spaces::{space_of_seed, Scoped};
 use super::{Node, ProjectCard};
 
@@ -19,60 +19,6 @@ use super::{Node, ProjectCard};
 const FULL_EVERY: u64 = 60;
 /// Every this many rounds the recently written spaces are: about once a minute.
 const ACTIVE_EVERY: u64 = 4;
-
-/// Mirrors the directory zome's `ListingView`.
-#[derive(Debug, Deserialize)]
-struct ListingView {
-    id: ActionHash,
-    creator: AgentPubKey,
-    created_at: Timestamp,
-    listing: Listing,
-}
-
-#[derive(Debug, Deserialize)]
-struct Listing {
-    network_seed: String,
-    title: String,
-    summary: String,
-    mode: String,
-    subtype: String,
-    location_label: String,
-    phase: String,
-    tags: Vec<String>,
-}
-
-/// Mirrors the project zome's `ProjectView` (the fields the index needs).
-#[derive(Debug, Deserialize)]
-struct ProjectView {
-    charter: Option<Charter>,
-    stage: String,
-    members: Vec<AgentPubKey>,
-    demand: u32,
-    opposition: u32,
-    last_activity_at: Option<Timestamp>,
-    updates: Vec<Update>,
-}
-
-/// An applied update (mirrors the project zome's `AppliedUpdate`; the card shows the newest).
-#[derive(Debug, Deserialize)]
-struct Update {
-    body: String,
-    at: Timestamp,
-}
-
-/// The profile field the feed shows (mirrors the identity zome's `Profile`).
-#[derive(Debug, Deserialize)]
-struct Profile {
-    name: String,
-}
-
-/// The current charter fields the feed shows (passed edits applied).
-#[derive(Debug, Deserialize)]
-struct Charter {
-    title: String,
-    description: String,
-    location_label: String,
-}
 
 impl Node {
     /// One pass over the listed public spaces (ADR 0065): all of them live in the archivist's
@@ -165,7 +111,21 @@ impl Node {
             )
             .await
             .unwrap_or_default();
+        let help = project.as_ref().is_some_and(ProjectView::is_help_request);
+        let activities: Vec<ActivityView> = if help {
+            let read = self.call(
+                agent,
+                commons.clone(),
+                "activities",
+                "list_activities",
+                at(()),
+            );
+            read.await.unwrap_or_default()
+        } else {
+            Vec::new()
+        };
         let mut card = card(view, project);
+        card.help = help.then(|| help_of(&activities));
         card.creator_name = profile.map(|p| p.name).unwrap_or_default();
         card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
         card
@@ -255,45 +215,4 @@ pub(super) fn provisioned(app: &AppInfo, role: &str) -> anyhow::Result<CellId> {
             _ => None,
         })
         .ok_or_else(|| anyhow!("archivist has no {role} cell"))
-}
-
-fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
-    let created_at = view.created_at.as_micros();
-    let mut l = view.listing;
-    // The project's own network is the source of truth once decisions change it (ADR 0033).
-    if let Some(p) = &project {
-        if let Some(c) = &p.charter {
-            l.title.clone_from(&c.title);
-            l.summary = sp_core::project::summary_of(&c.description);
-            l.location_label.clone_from(&c.location_label);
-        }
-        l.phase.clone_from(&p.stage);
-    }
-    ProjectCard {
-        id: ActionHashB64::from(view.id).to_string(),
-        network_seed: l.network_seed,
-        creator: AgentPubKeyB64::from(view.creator).to_string(),
-        creator_name: String::new(),
-        title: l.title,
-        summary: l.summary,
-        mode: l.mode,
-        subtype: l.subtype,
-        location_label: l.location_label,
-        phase: l.phase,
-        tags: l.tags,
-        members: project
-            .as_ref()
-            .map_or(1, |p| u32::try_from(p.members.len()).unwrap_or(u32::MAX)),
-        demand: project.as_ref().map_or(0, |p| p.demand),
-        opposition: project.as_ref().map_or(0, |p| p.opposition),
-        created_at,
-        last_activity_at: project
-            .as_ref()
-            .and_then(|p| p.last_activity_at)
-            .map_or(created_at, |t| t.as_micros().max(created_at)),
-        latest_update: project
-            .and_then(|p| p.updates.into_iter().max_by_key(|u| u.at))
-            .map(|u| u.body),
-        comment_count: 0,
-    }
 }

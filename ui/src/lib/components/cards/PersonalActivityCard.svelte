@@ -4,6 +4,7 @@
   import { resolve } from '$app/paths';
 
   import ContentMetaRow from './ContentMetaRow.svelte';
+  import { spaceHref } from './spaceHref.ts';
   import CountPill from './CountPill.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
@@ -24,11 +25,7 @@
 
   let { card, authorName, onSignal }: Props = $props();
 
-  const href = $derived(
-    card.mode === 'event'
-      ? resolve('/events/[id]', { id: card.id })
-      : resolve('/projects/[id]', { id: card.id }),
-  );
+  const href = $derived(spaceHref(card.mode, card.id));
 </script>
 
 <div class="personal-activity-card">
@@ -49,12 +46,8 @@
         {/if}
       </div>
     </div>
-    <a
-      class="title"
-      href={card.mode === 'event'
-        ? resolve('/events/[id]', { id: card.id })
-        : resolve('/projects/[id]', { id: card.id })}>{card.title}</a
-    >
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it -->
+    <a class="title" {href}>{card.title}</a>
     <p class="body">{card.summary}</p>
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>

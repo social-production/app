@@ -32,6 +32,8 @@ pub struct RoleSpec<'a> {
     pub label: &'a str,
     pub required: u32,
     pub maximum: Option<u32>,
+    /// A help request's role description (ADR 0067); may be empty.
+    pub description: &'a str,
 }
 
 /// What an activity says about itself, borrowed from the entry.
@@ -90,6 +92,11 @@ fn check_role(r: &RoleSpec<'_>) -> Result<(), String> {
     if !text_ok(r.label, ROLE_LABEL_MAX) {
         return Err(format!("a role's name is 1–{ROLE_LABEL_MAX} characters"));
     }
+    if r.description.chars().count() > LONG_TEXT_MAX {
+        return Err(format!(
+            "a role's description is at most {LONG_TEXT_MAX} characters"
+        ));
+    }
     if !(1..=COUNT_MAX).contains(&r.required) {
         return Err(format!("a role needs 1–{COUNT_MAX} people"));
     }
@@ -142,6 +149,7 @@ mod tests {
                 label: "Mechanic",
                 required: 2,
                 maximum: Some(3),
+                description: "",
             }],
         }
     }
@@ -184,6 +192,7 @@ mod tests {
             label: "Cook",
             required: 2,
             maximum: Some(1),
+            description: "",
         };
         assert!(check_activity(&ActivitySpec {
             roles: vec![low],
@@ -194,6 +203,7 @@ mod tests {
             label: "Cook",
             required: 0,
             maximum: None,
+            description: "",
         };
         assert!(check_activity(&ActivitySpec {
             roles: vec![none],

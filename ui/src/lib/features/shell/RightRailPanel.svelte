@@ -1,6 +1,5 @@
 <script lang="ts">
   import { goto } from '$app/navigation';
-  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import RailCleared from '#lib/components/rail/RailCleared.svelte';
@@ -18,7 +17,7 @@
   } from '#lib/stores/activityRail.svelte.ts';
 
   import '#lib/components/styles/rail.css';
-  import { isEvent } from '#lib/domain/projects.ts';
+  import { spaceHref } from '#lib/components/cards/spaceHref.ts';
 
   /**
    * web's RightRailPanel: Project Activity & Events, Help Requests, Requests, Votes to cast,
@@ -40,9 +39,7 @@
     onClose();
     const id = await projectPageOf(item.seed);
     if (!id) return;
-    const path = isEvent(item.projectMode)
-      ? resolve('/events/[id]', { id })
-      : resolve('/projects/[id]', { id });
+    const path = spaceHref(item.projectMode, id);
     if (page.url.pathname === path) {
       window.location.assign(`${path}${item.query}`);
       return;

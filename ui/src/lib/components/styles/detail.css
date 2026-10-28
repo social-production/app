@@ -1075,3 +1075,113 @@
   border-radius: 0;
   background: transparent;
 }
+
+/* Ported from web/src/lib/features/help-requests/detail/HelpRequestRolesSection.svelte (ADR 0032, scripts/port-styles.py) */
+.help-roles .context-dock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.help-roles .role-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.help-roles .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel);
+}
+
+.help-roles .role-copy {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.help-roles .role-copy strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.help-roles .role-copy p,
+.help-roles .role-copy span {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.help-roles .signup {
+  display: grid;
+  place-items: center;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  padding: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.help-roles .signup.selected {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+
+.help-roles .signup:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.help-roles .signup.selected:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.help-roles .signup:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.help-roles .signal-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.help-roles .signal-row .share-shell {
+  flex: 0 0 56px;
+  border-right: 1px solid var(--panel-border);
+}
+
+.help-roles .signal-row .vote-strip.docked {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.help-roles .role-message {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}

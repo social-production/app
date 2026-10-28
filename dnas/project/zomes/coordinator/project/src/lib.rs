@@ -169,22 +169,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
     let (mode, subtype) = charter.as_ref().map_or(("productive", "standard"), |c| {
         (c.mode.as_str(), c.subtype.as_str())
     });
-    let shape = Shape {
-        mode,
-        subtype,
-        include_access: false,
-    };
-    let step = |p: Phase| PhaseStep {
-        id: p.id().to_string(),
-        label: stage_label(shape, p).to_string(),
-    };
-    let phases = visible_phases(shape, current)
-        .into_iter()
-        .map(step)
-        .collect();
-    let next = next_phase(shape, current).map(step);
-    let returns = returnable(shape, current).into_iter().map(step).collect();
-    let stage = stage_label(shape, current).to_string();
+    let (phases, next, returns, stage) = lifecycle(mode, subtype, current);
 
     let organizers = organizers::list()?;
     let seen = audience()?;
@@ -213,6 +198,36 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         am_organizer: organizers.contains(&agent_info()?.agent_initial_pubkey),
         organizers,
     }))
+}
+
+/// The stepper's phases, the next phase, the returns and the stage label for this mode. A help
+/// request never moves (ADR 0067); `sp_governance` doesn't know its mode.
+fn lifecycle(
+    mode: &str,
+    subtype: &str,
+    current: Phase,
+) -> (Vec<PhaseStep>, Option<PhaseStep>, Vec<PhaseStep>, String) {
+    if mode == sp_help::MODE {
+        return (Vec::new(), None, Vec::new(), "Help request".into());
+    }
+    let shape = Shape {
+        mode,
+        subtype,
+        include_access: false,
+    };
+    let step = |p: Phase| PhaseStep {
+        id: p.id().to_string(),
+        label: stage_label(shape, p).to_string(),
+    };
+    (
+        visible_phases(shape, current)
+            .into_iter()
+            .map(step)
+            .collect(),
+        next_phase(shape, current).map(step),
+        returnable(shape, current).into_iter().map(step).collect(),
+        stage_label(shape, current).to_string(),
+    )
 }
 
 /// Passed decisions, from the governance zome of this cell.

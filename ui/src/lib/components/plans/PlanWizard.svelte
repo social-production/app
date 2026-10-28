@@ -127,7 +127,7 @@
           <PlanWizardStep
             {step}
             bind:form
-            subtypes={mode === 'event' ? [] : subtypeOptions(mode)}
+            subtypes={mode === 'event' || mode === 'help-request' ? [] : subtypeOptions(mode)}
             {productionLocation}
             {demand}
             {opposition}

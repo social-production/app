@@ -40,6 +40,7 @@ interface ActivityWire {
     label: string;
     required: number;
     maximum: number | null;
+    description?: string;
     people: AgentPubKey[];
     taken_at: number[];
     suggestion: SuggestionWire | null;
@@ -64,6 +65,8 @@ export interface NewActivityRole {
   maximum: number | null;
   /** web's suggested person for the role, by agent key. */
   suggest: string | null;
+  /** A help request's role description (ADR 0067). */
+  description?: string;
 }
 
 export interface NewActivity {
@@ -100,6 +103,7 @@ function toActivity(w: ActivityWire): Activity {
       label: r.label,
       required: r.required,
       maximum: r.maximum,
+      description: r.description ?? '',
       people: r.people.map(hashToString),
       takenAt: r.taken_at,
       suggestion: r.suggestion && toSuggestion(r.suggestion),
@@ -138,6 +142,7 @@ export async function createActivity(project: ProjectRef, a: NewActivity): Promi
       label: r.label,
       required: r.required,
       maximum: r.maximum,
+      description: r.description ?? '',
       suggest: r.suggest ? stringToHash(r.suggest) : null,
     })),
   });

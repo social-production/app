@@ -33,6 +33,9 @@ pub struct ProjectCard {
     pub latest_update: Option<String>,
     /// Messages in the project chat, up to its page size (web's `commentCount`).
     pub comment_count: u32,
+    /// A help request's time and sign-ups (ADR 0067); absent on other cards.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub help: Option<super::cards::HelpCard>,
 }
 
 #[derive(Clone, Debug, Default)]
@@ -72,7 +75,14 @@ impl ProjectIndex {
         let ranked = query(
             &pairs,
             q,
-            |_| ItemKind::Signalled,
+            // Help requests rank by votes (their Support/Oppose signals, ADR 0067), as on web.
+            |(c, _)| {
+                if c.help.is_some() {
+                    ItemKind::Voted
+                } else {
+                    ItemKind::Signalled
+                }
+            },
             |(_, s)| s,
             |(c, _)| {
                 let mut fields = vec![
@@ -102,7 +112,9 @@ fn stats_of(card: &ProjectCard) -> ItemStats {
         members: card.members,
         created_at: card.created_at,
         last_activity_at: card.last_activity_at,
-        ..ItemStats::default()
+        votes: i32::try_from(card.demand).unwrap_or(i32::MAX)
+            - i32::try_from(card.opposition).unwrap_or(i32::MAX),
+        comments: card.comment_count,
     }
 }
 
@@ -131,6 +143,7 @@ mod tests {
             last_activity_at: at,
             latest_update: None,
             comment_count: 0,
+            help: None,
         }
     }
 

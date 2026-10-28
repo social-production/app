@@ -4,10 +4,9 @@
 
 use hdk::prelude::*;
 use project_integrity::{
-    Activity, ActivityRating, ActivityRole, EntryTypes, LinkTypes, RoleSuggestion,
-    SuggestionDecline,
+    Activity, ActivityRole, EntryTypes, LinkTypes, RoleSuggestion, SuggestionDecline,
 };
-use sp_activity::{check_activity, check_rating, roles_open, ActivitySpec, RoleSpec};
+use sp_activity::{check_activity, roles_open, ActivitySpec, RoleSpec};
 
 use crate::calls;
 use crate::reads::{self, Found};
@@ -23,6 +22,9 @@ pub struct NewRole {
     pub label: String,
     pub required: u32,
     pub maximum: Option<u32>,
+    /// web's help-request role description (ADR 0067).
+    #[serde(default)]
+    pub description: String,
     pub suggest: Option<AgentPubKey>,
 }
 
@@ -43,13 +45,21 @@ fn member() -> ExternResult<ActionHash> {
     calls::my_membership()?.ok_or_else(|| guest("Join the project to take part in activities."))
 }
 
-/// web: members add activities in the Activity phase (the author only, in a personal service).
+/// web: members add activities in the Activity phase (the author only, in a personal service);
+/// a help request's one activity is its asker's, written when it is founded (ADR 0067).
 fn in_activity_phase() -> ExternResult<()> {
     let project = calls::glance()?;
-    let personal = project
-        .charter
-        .as_ref()
-        .is_some_and(|c| c.mode == "personal-service");
+    let mode = project.charter.as_ref().map(|c| c.mode.as_str());
+    if mode == Some(sp_help::MODE) {
+        return if project.creator == agent_info()?.agent_initial_pubkey {
+            Ok(())
+        } else {
+            Err(guest(
+                "Only the person asking adds a help request's activity.",
+            ))
+        };
+    }
+    let personal = mode == Some("personal-service");
     let phase = if personal { "phase-1" } else { "phase-5" };
     if personal && project.creator != agent_info()?.agent_initial_pubkey {
         return Err(guest(
@@ -100,6 +110,7 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
                 label: r.label.trim().to_string(),
                 required: r.required,
                 maximum: r.maximum,
+                description: r.description.trim().to_string(),
             })
             .collect(),
         membership: membership.clone(),
@@ -134,6 +145,7 @@ pub fn spec(a: &Activity) -> ActivitySpec<'_> {
                 label: &r.label,
                 required: r.required,
                 maximum: r.maximum,
+                description: &r.description,
             })
             .collect(),
     }
@@ -143,7 +155,7 @@ fn role_index(i: usize) -> ExternResult<u8> {
     u8::try_from(i).map_err(|_| guest("No such role."))
 }
 
-fn activity(hash: &ActionHash) -> ExternResult<Found<Activity>> {
+pub fn activity(hash: &ActionHash) -> ExternResult<Found<Activity>> {
     reads::found::<Activity>(hash.clone())?
         .ok_or_else(|| guest("This activity hasn't reached your node yet."))
 }
@@ -256,41 +268,6 @@ pub fn decline(suggestion: ActionHash) -> ExternResult<ActionHash> {
         found.entry.activity,
         hash.clone(),
         LinkTypes::ActivityToSuggestions,
-        (),
-    )?;
-    Ok(hash)
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct RateInput {
-    pub activity: ActionHash,
-    /// 1–5, or `None` to remove your rating.
-    pub stars: Option<u8>,
-    pub comment: String,
-}
-
-/// Rate an activity you took part in once it has ended; the latest counts.
-pub fn rate(input: RateInput) -> ExternResult<ActionHash> {
-    let found = activity(&input.activity)?;
-    let me = agent_info()?.agent_initial_pubkey;
-    let Some(assignment) = view::my_take(&input.activity, &me)? else {
-        return Err(guest("Only participants can rate activities"));
-    };
-    let comment = input.comment.trim().to_string();
-    if let Some(stars) = input.stars {
-        let now = sys_time()?.as_micros();
-        check_rating(stars, &comment, found.entry.ends_at.as_micros(), now).map_err(guest)?;
-    }
-    let hash = create_entry(EntryTypes::ActivityRating(ActivityRating {
-        activity: input.activity.clone(),
-        stars: input.stars,
-        comment,
-        assignment,
-    }))?;
-    create_link(
-        input.activity,
-        hash.clone(),
-        LinkTypes::ActivityToRatings,
         (),
     )?;
     Ok(hash)
