@@ -39,11 +39,14 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight (2026-10-28): the commons, PR #66 (`claude/social-production-handoff-dsam61`)
+## Done 2026-10-28: the commons, PR #66 merged 13:43 UTC (12:43 am Melbourne, Oct 29), live
 PR #65 (docs, `/readyz` heap + cells, ADR 0065) merged 10:15 UTC; Railway's build of it failed
-in a Railway incident ("Builds failing in US West", builds die before any step), so live still
-runs PR #64's build. The next merge rebuilds; or Redeploy `seed-node` and `ui` in Railway.
-What PR #66 changes (ADR 0065 "As built"):
+in a Railway incident ("Builds failing in US West"); PR #66's deploy built fine and carries both.
+Live smoke: `/readyz` 941 MB / 66 threads / 1 app, 3 cells at 5 min; `public-chats.mjs` against
+live passed (2 accounts, a project, its chat): 3 apps, 9 cells, 1154 MB, no project clones.
+**Next:** watch `/readyz` as test data grows (it should no longer step up per project); persist
+index cards in `gateway.sqlite`; Phase 4 (private clones cold when idle); then back to M5c/M5d.
+What PR #66 changed (ADR 0065 "As built"):
 - **Project DNA (reset):** every record names its space (the charter's create hash); links hang
   off the space; `recent.<UTC hour>` links mark activity. Private events stay clones.
 - **Coordinators:** calls take `{space, input}`, or a bare input in a private clone
@@ -62,8 +65,6 @@ What PR #66 changes (ADR 0065 "As built"):
   node (accounts, projects, chat, events, private-events, governance, links, guests, rail,
   notifications, public-chats, activities). `memory-projects` (debug build): 8 new projects
   moved RSS 1255 → 1297 MB; 10 projects indexed with 24 cells for 8 accounts (no clones).
-- **To do:** CI green; merge; live smoke (`/readyz` should no longer grow per project); persist index
-  cards in `gateway.sqlite`; Phase 4 (private clones cold when idle).
 
 ## Next for the seed node's memory (open, 2026-10-28)
 - Live costs more per account and project than local (~3.5 MB per project at idle locally,
