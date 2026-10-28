@@ -106,7 +106,10 @@ async fn helpers_commit_to_one_role_each() {
     let net = Net::with_charter(3, 1, "help-requests", help_charter()).await;
     let view: ProjectView = net.call(0, "project", "get_project", ()).await;
     assert_eq!(view.stage, "Help request");
-    assert!(view.phases.is_empty() && view.next_phase.is_none(), "no lifecycle");
+    assert!(
+        view.phases.is_empty() && view.next_phase.is_none(),
+        "no lifecycle"
+    );
 
     let roles = vec![role("Driver", Some(1)), role("Company", None)];
     let other: Result<ActionHash, String> = net
