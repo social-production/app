@@ -99,3 +99,10 @@
   font-weight: 700;
   white-space: nowrap;
 }
+
+/* web's PersonalFeedIdentity `.identity-copy` is component-scoped there, but its port keeps it
+   global (the selector starts with the root `.identity`), and its `justify-content: center`
+   centred the help-request header's grid. Undo it there (ADR 0067). */
+.help-overview .identity-copy {
+  justify-content: stretch;
+}

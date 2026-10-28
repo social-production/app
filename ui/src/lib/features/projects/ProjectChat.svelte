@@ -23,9 +23,24 @@
     /** web's `?comment=` link: the message to show first. */
     highlighted: string | null;
     onWrote: () => void;
+    /** web's wording: EventChatTab and the help request page name their chat differently. */
+    copy?: { title: string; placeholder: string; empty: string } | undefined;
   }
 
-  let { projectId, seed, names, fullscreen, active, highlighted, onWrote }: Props = $props();
+  let {
+    projectId,
+    seed,
+    names,
+    fullscreen,
+    active,
+    highlighted,
+    onWrote,
+    copy = {
+      title: '# project-chat',
+      placeholder: 'Message the project...',
+      empty: 'No project chat yet.',
+    },
+  }: Props = $props();
 
   // The page mounts this once per project, so the first id and names are the ones to keep.
   // svelte-ignore state_referenced_locally
@@ -86,10 +101,10 @@
 >
   <ChatPanel
     lines={chat.lines}
-    title="# project-chat"
-    placeholder="Message the project..."
+    title={copy.title}
+    placeholder={copy.placeholder}
     submitLabel="Send"
-    emptyCopy={chat.loaded ? 'No project chat yet.' : 'Loading chat…'}
+    emptyCopy={chat.loaded ? copy.empty : 'Loading chat…'}
     {embedded}
     fitViewport={embedded}
     paused={chat.paused}

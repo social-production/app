@@ -32,6 +32,8 @@ detail.css        .project-detail web/src/lib/features/projects/ProjectDetailPag
 detail.css        .top-tab-row    web/src/lib/features/detail/DetailTopTabs.svelte
 detail.css        .project-detail web/src/lib/features/projects/detail/ProjectLifecyclePanel.svelte
 detail.css        .help-roles     web/src/lib/features/help-requests/detail/HelpRequestRolesSection.svelte
+detail.css        .help-request-page web/src/lib/features/help-requests/HelpRequestDetailPage.svelte
+detail.css        .help-overview  web/src/lib/features/help-requests/detail/HelpRequestOverviewHeader.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateFlowLayout.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateWizard.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreatePanel.svelte

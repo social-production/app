@@ -28,6 +28,13 @@
    */
   let { id }: { id: string } = $props();
 
+  // web's EventChatTab wording.
+  const EVENT_CHAT = {
+    title: 'Event chat',
+    placeholder: 'Message members...',
+    empty: 'No event chat yet.',
+  };
+
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
   const detail = new DetailState(id);
@@ -188,6 +195,7 @@
               active={tab === 'chat'}
               highlighted={commentLink}
               onWrote={clearCommentLink}
+              copy={event ? EVENT_CHAT : undefined}
             />
           </div>
         {/if}

@@ -4,7 +4,7 @@
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import { localDateTime } from '#lib/domain/helpRequests.ts';
   import type { DetailTabId } from '#lib/domain/projects.ts';
-  import ProjectChat from '#lib/features/projects/ProjectChat.svelte';
+  import ProjectChat from '../ProjectChat.svelte';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import { resolve } from '$app/paths';
@@ -55,7 +55,7 @@
   });
 </script>
 
-<div class="project-detail">
+<div class="help-request-page">
   <section class="page" class:page-chat={chatFull}>
     {#if help.error && !help.project}
       <section class="hero-card"><p class="tab-loading">{help.error}</p></section>
@@ -71,13 +71,8 @@
           ariaLabel="Help request detail tabs"
           onSelect={(t) => (tab = t)}
         />
-        <div
-          class="tab-panel context-tab"
-          class:tab-panel-hidden={tab !== 'context'}
-          hidden={tab !== 'context'}
-          inert={tab !== 'context'}
-        >
-          <div class="project-overview">
+        {#if tab === 'context'}
+          <div class="context-tab help-overview">
             <div class="context-panel">
               <FeedCardTop tags={charter.tags} stage="" />
               <div class="heading overview-heading">
@@ -101,16 +96,11 @@
                 />
               </div>
             </div>
+            <HelpRolesDock {help} />
           </div>
-          {#if tab === 'context'}<HelpRolesDock {help} />{/if}
-        </div>
+        {/if}
         {#if chatOpened}
-          <div
-            class="tab-panel chat-tab"
-            class:tab-panel-hidden={tab !== 'chat'}
-            hidden={tab !== 'chat'}
-            inert={tab !== 'chat'}
-          >
+          <div hidden={tab !== 'chat'} inert={tab !== 'chat'}>
             <ProjectChat
               projectId={id}
               seed={project.networkSeed}
@@ -119,6 +109,11 @@
               active={tab === 'chat'}
               highlighted={commentLink}
               onWrote={() => (commentLink = null)}
+              copy={{
+                title: 'Help request chat',
+                placeholder: 'Write a message...',
+                empty: 'No help request chat yet.',
+              }}
             />
           </div>
         {/if}

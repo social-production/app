@@ -17,7 +17,7 @@ await ann.goto(BASE);
 await ann.getByRole('button', { name: 'Create', exact: true }).click();
 await ann.getByRole('menuitem', { name: /Help request/ }).click();
 const next = () => ann.getByRole('button', { name: 'Continue' }).click();
-await ann.getByLabel('Title', { exact: true }).fill(title);
+await ann.getByLabel(/^Title/).fill(title);
 await ann.getByLabel('What do you need?').fill('Friday morning, with a suitcase.');
 await next(); // → Location (physical)
 await ann.getByLabel('Place').fill('Allotment gate');
