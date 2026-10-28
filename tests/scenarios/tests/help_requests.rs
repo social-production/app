@@ -52,6 +52,12 @@ struct ActivityView {
 #[derive(Deserialize, Debug)]
 struct PhaseStep {}
 
+/// Mirrors the update arm of `project_integrity::ProposalKind`.
+#[derive(Serialize, Debug)]
+enum Kind {
+    Update { body: String },
+}
+
 #[derive(Deserialize, Debug)]
 struct ProjectView {
     stage: String,
@@ -133,10 +139,6 @@ async fn helpers_commit_to_one_role_each() {
     assert_eq!(seen[0].description, "Driver wanted");
     assert_eq!(seen[1].maximum, None, "any number");
 
-    #[derive(Serialize, Debug)]
-    enum Kind {
-        Update { body: String },
-    }
     let proposal: Result<ActionHash, String> = net
         .try_call(
             0,
