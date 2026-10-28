@@ -1,6 +1,6 @@
 # 0005. Three DNAs: directory, project (clone per project), conversation (clone per chat)
 
-Status: accepted (2026-10-18)
+Status: accepted (2026-10-18); **superseded for public spaces by [0065](./0065-public-commons-network.md)** (2026-10-28)
 
 ## Context
 Members should hold their projects' data. DMs must be private. Discovery must be global.

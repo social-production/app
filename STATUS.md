@@ -31,6 +31,14 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
+## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
+Owner: "we could have tens of thousands of projects… major changes can still be made… you have
+control". One network per project cannot reach that (each costs two databases, a gossip space and
+a cell on every archiver). Decided: public spaces become records in the project DNA's base cell
+(one sharded network); private spaces stay clones of the same DNA; the index follows changes via
+time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
+otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
+
 ## Next for the seed node's memory (open, 2026-10-28)
 - Live costs more per account and project than local (~3.5 MB per project at idle locally,
   ADR 0064): live idle went 887 → 1414 MB across a day of test runs. Add allocator stats to
