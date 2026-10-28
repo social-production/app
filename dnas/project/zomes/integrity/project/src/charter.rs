@@ -1,4 +1,5 @@
-//! The charter: written once by the creator; from M3 it changes only through passed `Edit`
+//! The charter founds a space (ADR 0065): anyone may found one in the commons; in a private
+//! clone only the creator its seed names may. From M3 it changes only through passed `Edit`
 //! proposals, applied at read time (ADR 0033).
 
 use hdi::prelude::*;
@@ -7,20 +8,26 @@ use sp_core::project::{check_fields, CharterFields, DESCRIPTION_MAX, MODES, SUBT
 use crate::{creator, invalid, Charter};
 
 pub fn validate_create(c: &Charter, author: &AgentPubKey) -> ExternResult<ValidateCallbackResult> {
-    by_creator(author, || check_charter(c))
-}
-
-/// Only the creator writes the charter (and links it from the "charter" anchor).
-pub fn by_creator(
-    author: &AgentPubKey,
-    then: impl FnOnce() -> Result<(), String>,
-) -> ExternResult<ValidateCallbackResult> {
-    if creator()?.as_ref() != Some(author) {
-        return invalid("only the project's creator can write its charter");
+    if creator()?.is_some_and(|creator| &creator != author) {
+        return invalid("only the creator its seed names can found this private space");
     }
-    match then() {
+    match check_charter(c) {
         Ok(()) => Ok(ValidateCallbackResult::Valid),
         Err(reason) => invalid(&reason),
+    }
+}
+
+/// The "charter" anchor link (how a private clone finds its one space) points at a charter
+/// its author wrote.
+pub fn validate_anchor(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateCallbackResult> {
+    let founder = match action.target_address.clone().into_action_hash() {
+        Some(hash) => crate::space_creator(&hash)?,
+        None => None,
+    };
+    if founder.as_ref() == Some(action.author()) {
+        Ok(ValidateCallbackResult::Valid)
+    } else {
+        invalid("only a space's creator links its charter")
     }
 }
 

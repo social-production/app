@@ -10,7 +10,6 @@ import type { SideStatus } from '#lib/domain/links.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
 import {
   callCell,
-  clonedSeeds,
   hashToString,
   projectCell,
   type ActionHash,
@@ -20,7 +19,7 @@ import {
 import { listActivities } from './activities.ts';
 import { listProposals } from './governance.ts';
 import { listPlans } from './plans.ts';
-import { listingTitle } from './projects.ts';
+import { listingTitle, myProjectSeeds } from './projects.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
@@ -70,11 +69,11 @@ async function railLinks(cell: CellId): Promise<RailLink[]> {
 }
 
 /**
- * web's bootstrap `activityRail` and `activityRailHistory`, built from the projects open on
- * this node, as notifications are (ADR 0046): reading any other project would join its network.
+ * web's bootstrap `activityRail` and `activityRailHistory`, built from the projects this
+ * person is in, as notifications are (ADR 0046, 0065).
  */
 export async function myActivityRail(): Promise<{ items: RailItem[]; history: RailItem[] }> {
-  const seeds = await clonedSeeds('project');
+  const seeds = await myProjectSeeds();
   const settled = await Promise.allSettled(seeds.map(railProject));
   const projects = settled.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []));
   const now = Date.now() * 1000;

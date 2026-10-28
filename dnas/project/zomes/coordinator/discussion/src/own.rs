@@ -2,18 +2,47 @@
 
 use std::collections::BTreeSet;
 
-use discussion_integrity::{LinkTypes, UnitEntryTypes};
+use discussion_integrity::{ChatMessage, LinkTypes, ReadMark, UnitEntryTypes};
 use hdk::prelude::*;
 
-/// Every chat message the caller wrote, deleted or not.
+use crate::anchor;
+
+/// Every chat message the caller wrote in this space, deleted or not.
 pub fn messages() -> ExternResult<Vec<Record>> {
+    let space = anchor()?;
     let messages = EntryType::App(UnitEntryTypes::ChatMessage.try_into()?);
-    query(
+    let mine = query(
         ChainQueryFilter::new()
             .entry_type(messages)
             .action_type(ActionType::Create)
             .include_entries(true),
-    )
+    )?;
+    Ok(mine
+        .into_iter()
+        .filter(|r| {
+            r.entry()
+                .to_app_option::<ChatMessage>()
+                .ok()
+                .flatten()
+                .is_some_and(|m| m.space == space)
+        })
+        .collect())
+}
+
+/// How far the caller has read this space's chat.
+pub fn read_at() -> ExternResult<Option<Timestamp>> {
+    let space = anchor()?;
+    let marks = query(
+        ChainQueryFilter::new()
+            .entry_type(EntryType::App(UnitEntryTypes::ReadMark.try_into()?))
+            .include_entries(true),
+    )?;
+    Ok(marks
+        .iter()
+        .filter_map(|r| r.entry().to_app_option::<ReadMark>().ok().flatten())
+        .filter(|m| m.space == space)
+        .map(|m| m.at)
+        .max())
 }
 
 /// The caller's messages it has deleted.

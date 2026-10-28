@@ -1,5 +1,5 @@
 //! The project feed this node serves (`/index/projects`, ADR 0031): one card per listed project, built
-//! by the archivist from the directory listing plus the project clone's live counts.
+//! by the archivist from the directory listing plus the space's live counts in the commons.
 //! Non-authoritative (ADR 0012): ranking comes from `sp_index`, the data from the DHT.
 
 use std::sync::Arc;
@@ -41,6 +41,16 @@ pub struct ProjectIndex(Arc<RwLock<Vec<ProjectCard>>>);
 impl ProjectIndex {
     pub async fn replace(&self, cards: Vec<ProjectCard>) {
         *self.0.write().await = cards;
+    }
+
+    /// The cards held now, by listing id (kept for spaces nobody wrote to since).
+    pub async fn by_id(&self) -> std::collections::BTreeMap<String, ProjectCard> {
+        self.0
+            .read()
+            .await
+            .iter()
+            .map(|c| (c.id.clone(), c.clone()))
+            .collect()
     }
 
     /// One page of the feed, best first; non-empty `creators` keeps only their projects (a

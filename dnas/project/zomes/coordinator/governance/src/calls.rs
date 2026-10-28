@@ -23,7 +23,7 @@ fn project<T: DeserializeOwned + std::fmt::Debug>(func: &str) -> ExternResult<T>
         ZomeName::from("project"),
         func.into(),
         None,
-        (),
+        space_scope::pass(())?,
     )?;
     decode(response, func)
 }

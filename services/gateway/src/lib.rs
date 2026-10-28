@@ -68,7 +68,7 @@ async fn background(node: node::Node, happ: std::path::PathBuf) {
     }
     let mut last = usize::MAX;
     for round in 0_u64.. {
-        match Box::pin(node.archive_round(&happ)).await {
+        match Box::pin(node.archive_round(&happ, round)).await {
             Ok(count) if count != last => {
                 tracing::info!(projects = count, "project index refreshed");
                 last = count;

@@ -1,33 +1,36 @@
-//! The charter as created (linked from the "charter" anchor); passed edits apply on top (ADR 0033).
+//! The charter founds a space; its create hash is the space's id (ADR 0065). Passed edits
+//! apply on top (ADR 0033).
 
 use hdk::prelude::*;
-use project_integrity::{Charter, EntryTypes, LinkTypes, UnitEntryTypes};
+use project_integrity::{creator, Charter, EntryTypes, LinkTypes};
 
-use crate::{anchor, links, CHARTER};
-
+/// Found a space: in the commons any number; in a private clone its one space, which the
+/// "charter" anchor then points at. The founder joins it.
 pub fn create(charter: Charter) -> ExternResult<ActionHash> {
-    if original()?.is_some() {
+    let private = creator()?.is_some();
+    if private && space_scope::clone_space()?.is_some() {
         return Err(wasm_error!(WasmErrorInner::Guest(
-            "this project already has a charter".into()
+            "this private space already has a charter".into()
         )));
     }
     let hash = create_entry(EntryTypes::Charter(charter))?;
-    create_link(
-        anchor(CHARTER)?,
-        hash.clone(),
-        LinkTypes::ProjectCharter,
-        (),
-    )?;
+    if private {
+        create_link(
+            Path::from(space_scope::CHARTER).path_entry_hash()?,
+            hash.clone(),
+            LinkTypes::ProjectCharter,
+            (),
+        )?;
+    }
+    space_scope::set(hash.clone());
     crate::people::join()?;
+    space_scope::touch()?;
     Ok(hash)
 }
 
-/// The charter as created, and when.
+/// The current space's charter as created, and when.
 pub fn base() -> ExternResult<Option<(Charter, Timestamp)>> {
-    let Some(original) = original()? else {
-        return Ok(None);
-    };
-    let Some(record) = get(original, GetOptions::default())? else {
+    let Some(record) = get(space_scope::current()?, GetOptions::default())? else {
         return Ok(None);
     };
     let charter = record
@@ -35,20 +38,4 @@ pub fn base() -> ExternResult<Option<(Charter, Timestamp)>> {
         .to_app_option::<Charter>()
         .map_err(|e| wasm_error!(e))?;
     Ok(charter.map(|c| (c, record.action().timestamp())))
-}
-
-/// The first charter: own chain first (fresh writes), then the network.
-fn original() -> ExternResult<Option<ActionHash>> {
-    let charters = EntryType::App(UnitEntryTypes::Charter.try_into()?);
-    let own = query(
-        ChainQueryFilter::new()
-            .entry_type(charters)
-            .action_type(ActionType::Create),
-    )?;
-    if let Some(first) = own.first() {
-        return Ok(Some(first.action_address().clone()));
-    }
-    let mut found = links(CHARTER, LinkTypes::ProjectCharter)?;
-    found.sort_by_key(|l| l.timestamp);
-    Ok(found.into_iter().find_map(|l| l.target.into_action_hash()))
 }

@@ -7,12 +7,13 @@ export {
 } from './account.ts';
 export {
   clonedSeeds,
+  commonsCell,
   conversationCell,
   newChatSeed,
   newPrivateEventSeed,
-  newProjectSeed,
   projectCell,
 } from './cells.ts';
+export { spaceInSeed, spaceSeed } from './spaces.ts';
 export { peopleIndex, projectFeed } from './feed.ts';
 export {
   callCell,

@@ -49,8 +49,17 @@ async fn net_with_one_offline(seed: &str) -> Net {
     let mut conductors =
         SweetConductorBatch::from_config_rendezvous(3, SweetConductorConfig::rendezvous(false))
             .await;
-    let cells = common::install_project_with_directory(&mut conductors, 3, seed).await;
-    let net = Net { conductors, cells };
+    let seed = format!("{}{seed}", common::COMMONS);
+    let cells = common::install_project_with_directory(&mut conductors, 3, &seed).await;
+    let mut net = Net {
+        conductors,
+        cells,
+        space: None,
+    };
+    let space: ActionHash = net
+        .call(0, "project", "create_charter", charter("productive"))
+        .await;
+    net.space = Some(space);
     tokio::time::timeout(std::time::Duration::from_secs(10), async {
         while !SweetConductor::exchange_peer_info([&net.conductors[0], &net.conductors[1]]).await {
             tokio::time::sleep(std::time::Duration::from_millis(10)).await;
@@ -90,9 +99,6 @@ async fn vote_yes(net: &Net, i: usize, proposal: &ActionHash) {
 /// Agent 2 joins while offline; agent 0 renames the project counting only itself and agent 1,
 /// who carry it.
 async fn undercounted_rename(net: &Net) -> ActionHash {
-    let _: ActionHash = net
-        .call(0, "project", "create_charter", charter("productive"))
-        .await;
     let _: () = net.call(1, "project", "join", ()).await;
     settle_pair(net).await;
     let _: () = net.call(2, "project", "join", ()).await;

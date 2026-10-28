@@ -1,8 +1,9 @@
-import { CellType, setSigningCredentials, type CellId } from '@holochain/client';
+import { CellType, setSigningCredentials, type ActionHash, type CellId } from '@holochain/client';
 
 import { connect, connection, isGuest } from './connection.ts';
 import { gatewayApi } from './gateway.ts';
 import { guestCell } from './guest.ts';
+import { spaceInSeed, tagSpace } from './spaces.ts';
 
 /** Cell ids resolved (or being resolved) this page view, by network seed. Two reads of a
  * project not opened before arrive together (the Links tab reads its page and its links);
@@ -10,14 +11,43 @@ import { guestCell } from './guest.ts';
 const known = new Map<string, Promise<CellId>>();
 
 /**
- * The person's cell for one project (each project is a clone of the project DNA, seeded
- * `<creator key>.<nonce>`). Opening a project for the first time clones it, which joins
- * its network (not its membership); in a browser the gateway then grants this device.
+ * The person's cell for one project. Public projects, events and help requests all live in
+ * one shared network, the commons (ADR 0065): the project role's base cell, which every
+ * person already has, so opening one starts nothing. Their seed `<creator>.space.<charter
+ * hash>` names the space, and calls through the returned cell id name it (`spaceOf`). A
+ * private event is still its own network (a clone seeded `<creator>.private.<nonce>`).
  */
 export async function projectCell(networkSeed: string, title: string): Promise<CellId> {
   // A guest reads the project through the gateway's archivist instead (guest.ts).
   if (!(await connect()) && isGuest()) return guestCell(networkSeed);
+  const space = spaceInSeed(networkSeed);
+  if (space) return spaceCell(networkSeed, space);
   return cloneOf('project', networkSeed, title);
+}
+
+/** The commons cell itself (the project role's base cell): where public spaces are founded. */
+export async function commonsCell(): Promise<CellId> {
+  const { ws, session } = await connection();
+  const base = (await ws.appInfo())?.cell_info.project?.find(
+    (c) => c.type === CellType.Provisioned,
+  );
+  if (base?.type !== CellType.Provisioned) throw new Error('This account has no project cell.');
+  const cellId = base.value.cell_id;
+  if (session) setSigningCredentials(cellId, session);
+  return cellId;
+}
+
+function spaceCell(networkSeed: string, space: ActionHash): Promise<CellId> {
+  const cached = known.get(networkSeed);
+  if (cached) return cached;
+  const resolving = commonsCell().then((base) => {
+    const cell: CellId = [base[0], base[1]];
+    tagSpace(cell, space);
+    return cell;
+  });
+  known.set(networkSeed, resolving);
+  resolving.catch(() => known.delete(networkSeed));
+  return resolving;
 }
 
 /**
@@ -28,8 +58,8 @@ export function conversationCell(networkSeed: string): Promise<CellId> {
   return cloneOf('conversation', networkSeed, 'chat');
 }
 
-/** The network seeds of every clone of `role` on this node: the projects this person has
- * opened here, or their chats. */
+/** The network seeds of every clone of `role` on this node: the private events this person
+ * has opened here, or their chats. */
 export async function clonedSeeds(role: CloneRole): Promise<string[]> {
   const { ws } = await connection();
   const cells = (await ws.appInfo())?.cell_info[role] ?? [];
@@ -98,11 +128,6 @@ async function retryWhenBusy<T>(write: () => Promise<T>): Promise<T> {
 function nonce(bytes: number): string {
   const random = crypto.getRandomValues(new Uint8Array(bytes));
   return btoa(String.fromCharCode(...random)).replace(/[+/=]/g, '');
-}
-
-/** A fresh network seed naming `creator` (see project_integrity::creator_in_seed). */
-export function newProjectSeed(creator: string): string {
-  return `${creator}.${nonce(9)}`;
 }
 
 /** A fresh private event's seed (sp_event::Audience, ADR 0061): its address is secret, so

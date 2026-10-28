@@ -11,6 +11,8 @@ use sp_core::chat::check_message;
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
 pub struct ChatMessage {
+    /// The space whose chat this is (its charter's create hash, ADR 0065).
+    pub space: ActionHash,
     pub body: String,
     /// The message this one answers (web's `parent_id`), shown as a quote.
     pub reply_to: Option<ActionHash>,
@@ -42,6 +44,7 @@ pub struct Chunk {
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
 pub struct ReadMark {
+    pub space: ActionHash,
     pub at: Timestamp,
 }
 
@@ -59,8 +62,7 @@ pub enum EntryTypes {
 #[derive(Serialize, Deserialize)]
 #[hdk_link_types]
 pub enum LinkTypes {
-    /// A chat anchor → a message, linked by the message's author. The coordinator chooses the
-    /// anchor (one "chat" path today), so bucketing it by time later is a coordinator change.
+    /// The message's space → the message, linked by the message's author (ADR 0065).
     ChatMessages,
 }
 
@@ -147,11 +149,19 @@ fn validate_link(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateC
     let Some(target) = action.target_address.clone().into_action_hash() else {
         return invalid("a chat link points at a message");
     };
-    let signed = must_get_action(target)?;
-    if is_message(signed.action())? && signed.action().author() == action.author() {
-        Ok(ValidateCallbackResult::Valid)
-    } else {
-        invalid("people list only their own messages in the chat")
+    let record = must_get_valid_record(target)?;
+    if !is_message(record.action())? || record.action().author() != action.author() {
+        return invalid("people list only their own messages in the chat");
+    }
+    let message = record
+        .entry()
+        .to_app_option::<ChatMessage>()
+        .map_err(|e| wasm_error!(e))?;
+    match message {
+        Some(m) if AnyLinkableHash::from(m.space.clone()) == action.base_address => {
+            Ok(ValidateCallbackResult::Valid)
+        }
+        _ => invalid("a message is listed in its own space's chat"),
     }
 }
 

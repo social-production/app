@@ -9,7 +9,7 @@ fn project<T: DeserializeOwned + std::fmt::Debug>(func: &str) -> ExternResult<T>
         ZomeName::from("project"),
         func.into(),
         None,
-        (),
+        space_scope::pass(())?,
     )?;
     match response {
         ZomeCallResponse::Ok(io) => io.decode().map_err(|e| wasm_error!(e)),

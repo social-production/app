@@ -1,16 +1,11 @@
 import type { ChatMessage } from '#lib/domain/chat.ts';
 import type { ListPrefs, PublicChat } from '#lib/domain/messages.ts';
 import type { Person } from '#lib/domain/people.ts';
-import {
-  callCell,
-  clonedSeeds,
-  hashToString,
-  projectCell,
-  type AgentPubKey,
-} from '#lib/holo/index.ts';
+import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { chatReadAt, listMessages, markChatRead } from './chat.ts';
 import { getPerson, myAgent } from './people.ts';
+import { myProjectSeeds } from './projects.ts';
 
 /** The part of `get_project` the list shows. */
 interface GlanceWire {
@@ -26,11 +21,10 @@ const PREVIEW_MAX = 200;
 
 /**
  * web's Public tab (linked_chats.py `get_linked_chats`, projects only): the chats of projects
- * you're a member of or have written in. Only projects opened on this node are looked at, since
- * reading any other one would join its network (ADR 0044).
+ * you're a member of (and private events opened on this node; ADR 0044, 0065).
  */
 export async function myProjectChats(): Promise<PublicChat[]> {
-  const seeds = await clonedSeeds('project');
+  const seeds = await myProjectSeeds();
   if (seeds.length === 0) return [];
   const me = await myAgent();
   const settled = await Promise.allSettled(seeds.map((seed) => projectChat(seed, me)));

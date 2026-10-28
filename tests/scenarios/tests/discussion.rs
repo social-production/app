@@ -1,11 +1,14 @@
 //! M4a project chat (ADR 0038): anyone in the project's network posts and replies; only the
-//! author deletes; messages are never edited.
+//! author deletes; messages are never edited. Each space in the commons has its own chat
+//! (ADR 0065).
 
 use holochain::prelude::*;
-use holochain::sweettest::{await_consistency, SweetConductorBatch};
+use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
 use serde::{Deserialize, Serialize};
 
 mod common;
+
+use common::net::Scoped;
 
 /// Mirrors `discussion::PostInput` (integrity crates can't share one test binary).
 #[derive(Serialize, Debug)]
@@ -48,27 +51,65 @@ fn post(body: &str, reply_to: Option<&ActionHash>) -> PostInput {
     }
 }
 
+fn garden() -> Charter {
+    Charter {
+        title: "Garden".into(),
+        description: "Growing food together.".into(),
+        mode: "productive".into(),
+        subtype: "standard".into(),
+        location_label: String::new(),
+        phase: String::new(),
+        tags: Vec::new(),
+    }
+}
+
+/// A commons cell per agent with one space (a garden project agent 0 founded), seen by all.
+async fn space(conductors: &mut SweetConductorBatch, seed: &str) -> (Vec<SweetCell>, ActionHash) {
+    let seed = format!("{}{seed}", common::COMMONS);
+    let cells = common::project_network(conductors, &seed).await;
+    let space: ActionHash = conductors[0]
+        .call(&cells[0].zome("project"), "create_charter", garden())
+        .await;
+    await_consistency(&cells).await.expect("consistency");
+    (cells, space)
+}
+
+fn at<T>(space: &ActionHash, input: T) -> Scoped<T> {
+    Scoped {
+        space: space.clone(),
+        input,
+    }
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn anyone_posts_replies_and_reads() {
     let mut conductors = SweetConductorBatch::standard(2).await;
-    let cells = common::project_network(&mut conductors, "chat-read").await;
+    let (cells, space) = Box::pin(space(&mut conductors, "chat-read")).await;
     let (ann, bob) = (cells[0].zome("discussion"), cells[1].zome("discussion"));
 
     // Bob never joined: as on web, anyone signed in may write in a project's chat.
     let hello: ActionHash = conductors[1]
-        .call(&bob, "post_message", post("  Hello all  ", None))
+        .call(&bob, "post_message", at(&space, post("  Hello all  ", None)))
         .await;
-    let mine: Vec<MessageView> = conductors[1].call(&bob, "list_messages", ()).await;
+    let mine: Vec<MessageView> = conductors[1]
+        .call(&bob, "list_messages", at(&space, ()))
+        .await;
     assert_eq!(mine.len(), 1, "your own message shows before gossip");
     assert_eq!(mine[0].body, "Hello all", "bodies are trimmed");
 
     await_consistency(&cells).await.expect("consistency");
     let reply: ActionHash = conductors[0]
-        .call(&ann, "post_message", post("Welcome, Bob", Some(&hello)))
+        .call(
+            &ann,
+            "post_message",
+            at(&space, post("Welcome, Bob", Some(&hello))),
+        )
         .await;
     await_consistency(&cells).await.expect("consistency");
 
-    let seen: Vec<MessageView> = conductors[1].call(&bob, "list_messages", ()).await;
+    let seen: Vec<MessageView> = conductors[1]
+        .call(&bob, "list_messages", at(&space, ()))
+        .await;
     let ids: Vec<&ActionHash> = seen.iter().map(|m| &m.id).collect();
     assert_eq!(ids, vec![&hello, &reply], "oldest first");
     assert_eq!(&seen[1].author, cells[0].agent_pubkey());
@@ -80,42 +121,43 @@ async fn anyone_posts_replies_and_reads() {
     assert_eq!(quote.author.as_ref(), Some(cells[1].agent_pubkey()));
     assert_eq!(quote.preview, "Hello all");
     assert!(!quote.deleted);
+
+    // Another space in the same cell has its own, empty chat.
+    let other: ActionHash = conductors[1]
+        .call(&cells[1].zome("project"), "create_charter", garden())
+        .await;
+    let elsewhere: Vec<MessageView> = conductors[1]
+        .call(&bob, "list_messages", at(&other, ()))
+        .await;
+    assert!(elsewhere.is_empty(), "each space has its own chat");
     common::shut_down(conductors).await;
 }
 
 #[tokio::test(flavor = "multi_thread")]
 async fn bad_messages_are_rejected() {
     let mut conductors = SweetConductorBatch::standard(1).await;
-    let cells = common::project_network(&mut conductors, "chat-bad").await;
+    let (cells, space) = Box::pin(space(&mut conductors, "chat-bad")).await;
     let ann = cells[0].zome("discussion");
 
     let blank: Result<ActionHash, _> = conductors[0]
-        .call_fallible(&ann, "post_message", post("   ", None))
+        .call_fallible(&ann, "post_message", at(&space, post("   ", None)))
         .await;
     assert!(blank.is_err(), "a message needs text");
     let long: Result<ActionHash, _> = conductors[0]
-        .call_fallible(&ann, "post_message", post(&"x".repeat(4_001), None))
+        .call_fallible(
+            &ann,
+            "post_message",
+            at(&space, post(&"x".repeat(4_001), None)),
+        )
         .await;
     assert!(long.is_err(), "a message is at most 4,000 characters");
 
-    // Integrity: a reply must answer a chat message, not any record.
-    let charter = Charter {
-        title: "Garden".into(),
-        description: "Growing food together.".into(),
-        mode: "productive".into(),
-        subtype: "standard".into(),
-        location_label: String::new(),
-        phase: String::new(),
-        tags: Vec::new(),
-    };
-    let not_a_message: ActionHash = conductors[0]
-        .call(&cells[0].zome("project"), "create_charter", charter)
-        .await;
+    // Integrity: a reply must answer a chat message, not any record (here the charter).
     let odd: Result<ActionHash, _> = conductors[0]
         .call_fallible(
             &ann,
             "post_message",
-            post("Re: the charter", Some(&not_a_message)),
+            at(&space, post("Re: the charter", Some(&space))),
         )
         .await;
     assert!(odd.is_err(), "validation rejects a reply to a non-message");
@@ -125,33 +167,41 @@ async fn bad_messages_are_rejected() {
 #[tokio::test(flavor = "multi_thread")]
 async fn only_the_author_deletes() {
     let mut conductors = SweetConductorBatch::standard(2).await;
-    let cells = common::project_network(&mut conductors, "chat-delete").await;
+    let (cells, space) = Box::pin(space(&mut conductors, "chat-delete")).await;
     let (ann, bob) = (cells[0].zome("discussion"), cells[1].zome("discussion"));
 
     let first: ActionHash = conductors[1]
-        .call(&bob, "post_message", post("Typo here", None))
+        .call(&bob, "post_message", at(&space, post("Typo here", None)))
         .await;
     await_consistency(&cells).await.expect("consistency");
     let _: ActionHash = conductors[0]
-        .call(&ann, "post_message", post("What typo?", Some(&first)))
+        .call(
+            &ann,
+            "post_message",
+            at(&space, post("What typo?", Some(&first))),
+        )
         .await;
 
     let other: Result<(), _> = conductors[0]
-        .call_fallible(&ann, "delete_message", first.clone())
+        .call_fallible(&ann, "delete_message", at(&space, first.clone()))
         .await;
     assert!(other.is_err(), "you can't delete someone else's message");
 
     let (): () = conductors[1]
-        .call(&bob, "delete_message", first.clone())
+        .call(&bob, "delete_message", at(&space, first.clone()))
         .await;
-    let mine: Vec<MessageView> = conductors[1].call(&bob, "list_messages", ()).await;
+    let mine: Vec<MessageView> = conductors[1]
+        .call(&bob, "list_messages", at(&space, ()))
+        .await;
     assert!(
         mine.iter().all(|m| m.id != first),
         "your own deletion shows at once"
     );
     await_consistency(&cells).await.expect("consistency");
 
-    let seen: Vec<MessageView> = conductors[0].call(&ann, "list_messages", ()).await;
+    let seen: Vec<MessageView> = conductors[0]
+        .call(&ann, "list_messages", at(&space, ()))
+        .await;
     assert_eq!(seen.len(), 1, "the deleted message is gone for everyone");
     let quote = seen[0]
         .reply_to

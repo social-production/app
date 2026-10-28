@@ -1,0 +1,15 @@
+[package]
+name = "space_scope"
+description = "Which space a project-DNA call is about (ADR 0065): shared by the project DNA's coordinators."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+project_integrity = { workspace = true }
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+
+[lints]
+workspace = true

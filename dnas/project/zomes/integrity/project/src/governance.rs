@@ -23,6 +23,9 @@ pub fn validate_proposal(
     if let Err(reason) = check_kind(&p.kind) {
         return invalid(&reason);
     }
+    if crate::charter_at(&p.space)?.is_none() {
+        return invalid("a proposal decides for a space");
+    }
     if let ProposalKind::Phase {
         plan: Some(plan), ..
     } = &p.kind
@@ -32,7 +35,7 @@ pub fn validate_proposal(
         }
     }
     if let ProposalKind::Link(link) = &p.kind {
-        if let Err(reason) = crate::link::check(link)? {
+        if let Err(reason) = crate::link::check(link, &p.space)? {
             return invalid(&reason);
         }
     }
@@ -52,7 +55,7 @@ pub fn validate_proposal(
         return invalid("an organizer-controlled event can't return to Proposal");
     }
     match &p.membership {
-        Some(m) if !is_membership(m, action.author(), at)? => {
+        Some(m) if !is_membership(m, action.author(), at, Some(&p.space))? => {
             return invalid("only members can propose");
         }
         None if !mirrored => return invalid("only members can propose"),
@@ -66,7 +69,7 @@ pub fn validate_proposal(
     for hash in &p.members {
         let signed = must_get_action(hash.clone())?;
         let member = signed.action().author().clone();
-        if !seen.insert(member.clone()) || !is_membership(hash, &member, at)? {
+        if !seen.insert(member.clone()) || !is_membership(hash, &member, at, Some(&p.space))? {
             return invalid(
                 "the member snapshot lists one membership per member, made before the proposal",
             );
@@ -130,12 +133,13 @@ pub fn validate_vote(
     v: &Vote,
     action: &TypedAction<CreateData>,
 ) -> ExternResult<ValidateCallbackResult> {
-    let Some(EntryTypes::Proposal(_)) =
+    let Some(EntryTypes::Proposal(proposal)) =
         crate::typed_entry(&must_get_valid_record(v.proposal.clone())?)?
     else {
         return invalid("a vote must be on a proposal");
     };
-    if !is_membership(&v.membership, action.author(), Some(action.timestamp()))? {
+    let at = Some(action.timestamp());
+    if !is_membership(&v.membership, action.author(), at, Some(&proposal.space))? {
         return invalid("only members can vote");
     }
     Ok(ValidateCallbackResult::Valid)

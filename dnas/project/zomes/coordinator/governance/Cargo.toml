@@ -12,6 +12,7 @@ crate-type = ["cdylib", "rlib"]
 hdk = { workspace = true }
 serde = { workspace = true }
 project_integrity = { workspace = true }
+space_scope = { workspace = true }
 sp_governance = { workspace = true }
 
 [lints]

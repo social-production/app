@@ -22,7 +22,8 @@ pub fn validate(
     if action.timestamp() < proposed_at {
         return invalid("a challenge comes after its proposal");
     }
-    if !is_membership(&c.membership, action.author(), Some(action.timestamp()))? {
+    let space = Some(&proposal.space);
+    if !is_membership(&c.membership, action.author(), Some(action.timestamp()), space)? {
         return invalid("only members can challenge a count");
     }
     if c.omitted.is_empty() || c.omitted.len() > SNAPSHOT_MAX {
@@ -33,7 +34,7 @@ pub fn validate(
     for hash in &c.omitted {
         let member = must_get_action(hash.clone())?.action().author().clone();
         let fresh = !counted.contains(&member) && named.insert(member.clone());
-        if !fresh || !is_membership(hash, &member, Some(proposed_at))? {
+        if !fresh || !is_membership(hash, &member, Some(proposed_at), space)? {
             return invalid(
                 "a challenge names memberships from before the proposal that its count left out, once each",
             );

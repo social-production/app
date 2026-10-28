@@ -5,10 +5,14 @@ use std::collections::BTreeMap;
 use hdk::prelude::*;
 use project_integrity::{Challenge, LinkTypes, Outcome, Proposal, Rating, UnitEntryTypes, Vote};
 
-pub const PROPOSALS: &str = "proposals";
-
-pub fn anchor() -> ExternResult<EntryHash> {
-    Path::from(PROPOSALS).path_entry_hash()
+/// Whether the `Members` link at `membership` belongs to the current space (a person's own
+/// records span every space they are in, ADR 0065).
+pub fn in_space(membership: &ActionHash) -> ExternResult<bool> {
+    let Some(record) = get(membership.clone(), GetOptions::default())? else {
+        return Ok(false);
+    };
+    let base = space_scope::base()?;
+    Ok(matches!(&record.action().data, ActionData::CreateLink(l) if l.base_address == base))
 }
 
 fn targets(
@@ -56,7 +60,7 @@ pub fn found<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
 
 /// Every proposal, oldest first.
 pub fn proposals() -> ExternResult<Vec<Found<Proposal>>> {
-    let mut hashes = targets(anchor()?, LinkTypes::Proposals)?;
+    let mut hashes = targets(space_scope::base()?, LinkTypes::Proposals)?;
     hashes.sort();
     hashes.dedup_by(|a, b| a.1 == b.1);
     hashes

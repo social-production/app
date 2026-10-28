@@ -105,7 +105,7 @@ pub fn halves() -> ExternResult<Vec<HalfView>> {
 
 pub fn sides() -> ExternResult<LinkSides> {
     Ok(LinkSides {
-        network_seed: dna_info()?.modifiers.network_seed,
+        network_seed: space_scope::seed()?,
         am_member: calls::my_membership()?.is_some(),
         halves: halves()?,
     })
@@ -124,7 +124,7 @@ fn half(h: &HalfView) -> Half<ActionHash> {
 
 /// Pair this cell's halves with `others` (each project's `link_sides`, any order).
 pub fn view(others: &[LinkSides]) -> ExternResult<LinksView> {
-    let seed = dna_info()?.modifiers.network_seed;
+    let seed = space_scope::seed()?;
     let mine = halves()?;
     let mut theirs: Vec<Option<HalfView>> = vec![None; mine.len()];
     for o in others {

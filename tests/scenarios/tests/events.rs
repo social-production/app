@@ -205,8 +205,12 @@ fn listing(net: &Net, mode: &str, nonce: &str) -> ListingInput {
 #[tokio::test(flavor = "multi_thread")]
 async fn events_are_standard_and_listed_by_kind() {
     let mut conductors = SweetConductorBatch::standard(1).await;
-    let cells = common::project_with_directory(&mut conductors, 1, "event-charter").await;
-    let net = Net { conductors, cells };
+    let cells = common::project_with_directory(&mut conductors, 1, "commons.event-charter").await;
+    let net = Net {
+        conductors,
+        cells,
+        space: None,
+    };
     let mut odd = charter("event");
     odd.subtype = "software".into();
     let refused = net

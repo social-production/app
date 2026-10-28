@@ -4,9 +4,7 @@
 use hdk::prelude::*;
 use project_integrity::{audience, creator, EntryTypes, LinkTypes, Organizer, OrganizerRole};
 
-use crate::{anchor, links};
-
-pub(crate) const ORGANIZERS: &str = "organizers";
+use crate::links;
 
 fn guest(message: &str) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
@@ -15,7 +13,7 @@ fn guest(message: &str) -> WasmError {
 /// Every grant this node can see, with its record hash (one per agent: the earliest).
 pub fn grants() -> ExternResult<Vec<(ActionHash, Organizer)>> {
     let mut out: Vec<(ActionHash, Organizer)> = Vec::new();
-    let mut found = links(ORGANIZERS, LinkTypes::Organizers)?;
+    let mut found = links(LinkTypes::Organizers)?;
     found.sort_by_key(|l| l.timestamp);
     for link in found {
         let Some(hash) = link.target.into_action_hash() else {
@@ -75,6 +73,7 @@ pub fn add(agent: AgentPubKey) -> ExternResult<ActionHash> {
         agent,
         grant: mine.grant(),
     }))?;
-    create_link(anchor(ORGANIZERS)?, hash.clone(), LinkTypes::Organizers, ())?;
+    create_link(space_scope::base()?, hash.clone(), LinkTypes::Organizers, ())?;
+    space_scope::touch()?;
     Ok(hash)
 }

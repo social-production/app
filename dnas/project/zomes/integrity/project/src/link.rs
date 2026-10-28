@@ -7,10 +7,10 @@ use hdi::prelude::*;
 use sp_core::limits::{text_ok, LONG_TEXT_MAX};
 use sp_governance::links::RELATIONSHIP_MAX;
 
-use crate::{creator_in_seed, typed_entry, EntryTypes, ProposalKind};
+use crate::{creator_in_seed, space_in_seed, typed_entry, EntryTypes, ProposalKind};
 
-/// Another project: its directory listing (where the UI opens it) and its network seed
-/// (which cell it is).
+/// Another project: its directory listing (where the UI opens it) and its listing seed (a
+/// private clone's network seed, or `<creator>.space.<id>` for a commons space, ADR 0065).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct ProjectRef {
     pub listing: ActionHash,
@@ -28,15 +28,18 @@ pub struct LinkRequest {
     pub source: Option<ActionHash>,
 }
 
-/// What a validator can check of one half.
-pub fn check(link: &LinkRequest) -> ExternResult<Result<(), String>> {
+/// What a validator can check of one half, proposed in `space`.
+pub fn check(link: &LinkRequest, space: &ActionHash) -> ExternResult<Result<(), String>> {
     if !text_ok(&link.relationship, RELATIONSHIP_MAX) || !text_ok(&link.summary, LONG_TEXT_MAX) {
         return Ok(Err("a link needs a label and a reason".into()));
     }
     if creator_in_seed(&link.other.network_seed).is_none() {
         return Ok(Err("a link names another project's network".into()));
     }
-    if dna_info()?.modifiers.network_seed == link.other.network_seed {
+    // A commons space is named `<creator>.space.<id>` (ADR 0065); a private one by its seed.
+    let itself = space_in_seed(&link.other.network_seed).as_ref() == Some(space)
+        || dna_info()?.modifiers.network_seed == link.other.network_seed;
+    if itself {
         return Ok(Err("a project can't link to itself".into()));
     }
     let Some(created) = &link.sever else {

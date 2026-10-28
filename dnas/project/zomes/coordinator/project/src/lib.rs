@@ -5,17 +5,16 @@ mod charter;
 mod organizers;
 mod own;
 mod people;
+mod spaces;
 
 use hdk::prelude::*;
 use project_integrity::{
-    audience, creator, Applied, AppliedUpdate, Charter, LinkTypes, OrganizerRole,
+    audience, space_creator, Applied, AppliedUpdate, Charter, LinkTypes, OrganizerRole,
 };
+use space_scope::{enter, In};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
 
-pub(crate) const CHARTER: &str = "charter";
-pub(crate) const MEMBERS: &str = "members";
-pub(crate) const SIGNALS: &str = "signals";
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Stance {
@@ -71,53 +70,79 @@ pub fn create_charter(charter: Charter) -> ExternResult<ActionHash> {
 }
 
 #[hdk_extern]
-pub fn base_charter() -> ExternResult<Option<Charter>> {
+pub fn base_charter(call: In<()>) -> ExternResult<Option<Charter>> {
+    enter(call)?;
     Ok(charter::base()?.map(|(c, _)| c))
 }
 
 #[hdk_extern]
-pub fn join() -> ExternResult<()> {
-    people::join()
+pub fn join(call: In<()>) -> ExternResult<()> {
+    enter(call)?;
+    people::join()?;
+    space_scope::touch()
 }
 
 #[hdk_extern]
-pub fn leave() -> ExternResult<()> {
-    people::leave()
+pub fn leave(call: In<()>) -> ExternResult<()> {
+    enter(call)?;
+    people::leave()?;
+    space_scope::touch()
 }
 
 #[hdk_extern]
-pub fn set_signal(stance: Option<Stance>) -> ExternResult<()> {
+pub fn set_signal(call: In<Option<Stance>>) -> ExternResult<()> {
+    let stance = enter(call)?;
     if audience()?.organized() && stance.is_some() {
         return Err(wasm_error!(WasmErrorInner::Guest(
             "Organizer-controlled events don't use proposal signals.".into()
         )));
     }
-    people::set_signal(stance)
+    people::set_signal(stance)?;
+    space_scope::touch()
 }
 
 #[hdk_extern]
-pub fn add_organizer(agent: AgentPubKey) -> ExternResult<ActionHash> {
+pub fn add_organizer(call: In<AgentPubKey>) -> ExternResult<ActionHash> {
+    let agent = enter(call)?;
     organizers::add(agent)
 }
 
 /// What makes the caller an organizer, if anything (governance and activities cite it).
 #[hdk_extern]
-pub fn my_organizer_role() -> ExternResult<Option<OrganizerRole>> {
+pub fn my_organizer_role(call: In<()>) -> ExternResult<Option<OrganizerRole>> {
+    enter(call)?;
     organizers::role_of(&agent_info()?.agent_initial_pubkey)
 }
 
 #[hdk_extern]
-pub fn my_membership() -> ExternResult<Option<ActionHash>> {
+pub fn my_membership(call: In<()>) -> ExternResult<Option<ActionHash>> {
+    enter(call)?;
     people::my_membership()
 }
 
+/// The space a call is about: in a private clone, its one space (other zomes ask this).
 #[hdk_extern]
-pub fn member_snapshot() -> ExternResult<Vec<ActionHash>> {
+pub fn space(call: In<()>) -> ExternResult<ActionHash> {
+    enter(call)?;
+    space_scope::current()
+}
+
+/// Mark the space active this hour, for a write in another zome (chat).
+#[hdk_extern]
+pub fn touch(call: In<()>) -> ExternResult<()> {
+    enter(call)?;
+    space_scope::touch()
+}
+
+#[hdk_extern]
+pub fn member_snapshot(call: In<()>) -> ExternResult<Vec<ActionHash>> {
+    enter(call)?;
     people::snapshot()
 }
 
 #[hdk_extern]
-pub fn signal_counts() -> ExternResult<SignalCounts> {
+pub fn signal_counts(call: In<()>) -> ExternResult<SignalCounts> {
+    enter(call)?;
     let p = people::read()?;
     Ok(SignalCounts {
         demand: p.demand,
@@ -126,8 +151,9 @@ pub fn signal_counts() -> ExternResult<SignalCounts> {
 }
 
 #[hdk_extern]
-pub fn get_project() -> ExternResult<Option<ProjectView>> {
-    let Some(creator) = creator()? else {
+pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
+    enter(call)?;
+    let Some(creator) = space_creator(&space_scope::current()?)? else {
         return Ok(None);
     };
     let base = charter::base()?;
@@ -197,7 +223,7 @@ fn applied() -> ExternResult<Applied> {
         ZomeName::from("governance"),
         "applied".into(),
         None,
-        (),
+        space_scope::pass(())?,
     )? {
         ZomeCallResponse::Ok(io) => io.decode().map_err(|e| wasm_error!(e)),
         other => Err(wasm_error!(WasmErrorInner::Guest(format!(
@@ -223,13 +249,10 @@ fn merge(mut c: Charter, a: &Applied) -> Charter {
     c
 }
 
-pub(crate) fn anchor(name: &str) -> ExternResult<EntryHash> {
-    Path::from(name).path_entry_hash()
-}
-
-pub(crate) fn links(name: &str, link_type: LinkTypes) -> ExternResult<Vec<Link>> {
+/// The current space's links of `link_type` (members, signals, organizers hang off it).
+pub(crate) fn links(link_type: LinkTypes) -> ExternResult<Vec<Link>> {
     get_links(
-        LinkQuery::try_new(anchor(name)?, link_type)?,
+        LinkQuery::try_new(space_scope::base()?, link_type)?,
         GetStrategy::default(),
     )
 }

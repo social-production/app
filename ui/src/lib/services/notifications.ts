@@ -10,13 +10,7 @@ import {
 } from '#lib/domain/notifications.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
-import {
-  callCell,
-  clonedSeeds,
-  hashToString,
-  projectCell,
-  type AgentPubKey,
-} from '#lib/holo/index.ts';
+import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { listActivities } from './activities.ts';
 import { pendingInvites } from './events.ts';
@@ -25,7 +19,7 @@ import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
 import { listProposals } from './governance.ts';
 import { myAgent, namesOf, viewer } from './people.ts';
-import { listingIdOf } from './projects.ts';
+import { listingIdOf, myProjectSeeds } from './projects.ts';
 
 /** The part of `get_project` notifications read. */
 interface GlanceWire {
@@ -36,13 +30,13 @@ interface GlanceWire {
 }
 
 /**
- * web's notifications list, derived on this device (ADR 0046) from the projects opened on its
- * node, as the Public tab is (ADR 0044): reading any other project would join its network.
+ * web's notifications list, derived on this device (ADR 0046) from the projects this person
+ * is in, as the Public tab is (ADR 0044, 0065).
  */
 export async function myNotifications(): Promise<{ items: NotificationItem[] }> {
   const [{ agent: me, name }, seeds, chats] = await Promise.all([
     viewer(),
-    clonedSeeds('project'),
+    myProjectSeeds(),
     myChats(),
   ]);
   const settled = await Promise.allSettled([

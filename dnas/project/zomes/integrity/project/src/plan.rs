@@ -115,9 +115,14 @@ fn check_event_fields(plan: &Plan) -> Result<(), String> {
 
 /// The plan a record proposes, if it is a plan proposal.
 pub fn plan_of(hash: &ActionHash) -> ExternResult<Option<Plan>> {
+    Ok(plan_with_space(hash)?.map(|(plan, _)| plan))
+}
+
+/// The plan proposal at `hash` and the space it is for.
+fn plan_with_space(hash: &ActionHash) -> ExternResult<Option<(Plan, ActionHash)>> {
     match crate::typed_entry(&must_get_valid_record(hash.clone())?)? {
         Some(EntryTypes::Proposal(p)) => Ok(match p.kind {
-            ProposalKind::Plan(plan) => Some(plan),
+            ProposalKind::Plan(plan) => Some((plan, p.space)),
             _ => None,
         }),
         _ => Ok(None),
@@ -128,7 +133,7 @@ pub fn validate_rating(
     r: &Rating,
     action: &TypedAction<CreateData>,
 ) -> ExternResult<ValidateCallbackResult> {
-    let Some(plan) = plan_of(&r.proposal)? else {
+    let Some((plan, space)) = plan_with_space(&r.proposal)? else {
         return invalid("a rating must be on a plan");
     };
     if !criterion_ok(&plan, &r.criterion)? {
@@ -137,7 +142,7 @@ pub fn validate_rating(
     if r.rating.is_some_and(|v| !rating_ok(v)) {
         return invalid("a rating is 1 to 5");
     }
-    if !is_membership(&r.membership, action.author(), Some(action.timestamp()))? {
+    if !is_membership(&r.membership, action.author(), Some(action.timestamp()), Some(&space))? {
         return invalid("only members can rate plans");
     }
     Ok(ValidateCallbackResult::Valid)

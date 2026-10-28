@@ -19,11 +19,6 @@ use crate::reads::{self, Found};
 use crate::roll::Roll;
 use crate::write::guest;
 
-const VALUES: &str = "values";
-
-fn anchor() -> ExternResult<EntryHash> {
-    Path::from(VALUES).path_entry_hash()
-}
 
 /// web's `phaseOne.values` item.
 #[derive(Serialize, Deserialize, Debug)]
@@ -72,7 +67,7 @@ pub fn add(label: String) -> ExternResult<ActionHash> {
         return Err(guest("That value is already listed."));
     }
     let hash = create_entry(EntryTypes::Value(Value { label, membership }))?;
-    create_link(anchor()?, hash.clone(), LinkTypes::Values, ())?;
+    create_link(space_scope::base()?, hash.clone(), LinkTypes::Values, ())?;
     Ok(hash)
 }
 
@@ -107,7 +102,16 @@ fn in_proposal_phase(refusal: &str) -> ExternResult<()> {
 
 /// Every value, oldest first; of two with the same label only the earlier counts.
 pub fn listed() -> ExternResult<Vec<Found<Value>>> {
-    let mut all = reads::linked::<Value>(anchor()?, LinkTypes::Values, UnitEntryTypes::Value)?;
+    let base = space_scope::base()?;
+    let all = reads::linked::<Value>(base, LinkTypes::Values, UnitEntryTypes::Value)?;
+    // Own values from other spaces come along with the own chain.
+    let mut here = Vec::new();
+    for v in all {
+        if reads::in_space(&v.entry.membership)? {
+            here.push(v);
+        }
+    }
+    let mut all = here;
     all.sort_by(|a, b| (a.at, &a.hash).cmp(&(b.at, &b.hash)));
     let mut seen = Vec::new();
     all.retain(|v| {
