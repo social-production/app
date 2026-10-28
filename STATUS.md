@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-28 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-29 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -39,6 +39,32 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
+## In flight 2026-10-29 (cloud session): jemalloc for C code (ADR 0066) + event members sheet, branch `claude/social-production-handoff-dsam61`
+- **Memory (ADR 0066):** live idle at 21:00 UTC 28 Oct was 795 MB RSS but jemalloc resident only
+  311 MB: SQLite (C) still used glibc's per-thread arenas. The gateway now turns on
+  `unprefixed_malloc_on_supported_platforms`, so every allocation goes through jemalloc.
+  `/readyz` gains `maps` (RSS by kind from `/proc/self/smaps`: `anonMb`, `anonExecMb` = wasmer
+  code, `fileMb`, `brkHeapMb`, `stackMb`). Local release, same 4 browser files: idle **788 →
+  601 MB**. **After the deploy:** read `/readyz`; `maps.anonMb` should be close to
+  `heap.residentMb`, and idle should drop well below 795 MB.
+- **Parity:** web's EventMembersPanel (`features/projects/EventMembersSheet.svelte`): private
+  events split Organizers / Members, "Promote to organizer", "Invite +" (web's ShareUserMenu,
+  send half: `components/overlay/ShareUserMenu.svelte`, styles ported to `styles/share.css`).
+  `PeopleSheet` takes web's `sections`, row actions and header actions. The edit sheet uses
+  web's titles ("Propose Edit"; "Edit event"/"Save" when organizer-run; personal services
+  "Save details") and web's vote copy (it wrongly said "applies as soon as you save" for all).
+  Event phase menu uses web's event copy ("Close event", "Organizers decide; members are
+  notified."). **Not done:** web's "Remove organizer" (grants can't be revoked without an
+  integrity change; ride along with the next project-DNA reset).
+- **Checked locally:** UI check/lint, sizes, boundaries; gateway fmt/test/clippy (release,
+  jemalloc); release seed node + `private-events.mjs` (now promotes the invitee), `projects`,
+  `public-chats`, `events` all passed, on both allocators.
+- **Next:** PR → CI → merge → live `/readyz` check; then **help requests** (web:
+  `features/help-requests` 867 lines + `create/help-request` 780 + cards; web-backend
+  `help_requests`, roles with slots, commit/uncommit, share, chat). Start with an ADR: likely a
+  commons space with charter mode `help-request` reusing M5b activities/roles (check whether
+  project integrity accepts a new mode without a reset).
+
 ## Done 2026-10-28: the commons, PR #66 merged 13:43 UTC (12:43 am Melbourne, Oct 29), live
 PR #65 (docs, `/readyz` heap + cells, ADR 0065) merged 10:15 UTC; Railway's build of it failed
 in a Railway incident ("Builds failing in US West"); PR #66's deploy built fine and carries both.
@@ -67,6 +93,8 @@ What PR #66 changed (ADR 0065 "As built"):
   moved RSS 1255 → 1297 MB; 10 projects indexed with 24 cells for 8 accounts (no clones).
 
 ## Next for the seed node's memory (open, 2026-10-28)
+- 2026-10-29: allocator stats are in `/readyz` (`heap`, `maps`); the gap was glibc arenas
+  used by C code, fixed by ADR 0066 (see In flight). The bullets below predate it.
 - Live costs more per account and project than local (~3.5 MB per project at idle locally,
   ADR 0064): live idle went 887 → 1414 MB across a day of test runs. Add allocator stats to
   `/readyz` (jemalloc allocated vs resident vs retained, plus app and cell counts) to see

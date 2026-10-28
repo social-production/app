@@ -3,7 +3,8 @@
 use tracing_subscriber::EnvFilter;
 
 /// jemalloc instead of glibc malloc (ADR 0060): glibc's per-thread arenas kept freed memory,
-/// so an idle seed node sat at ~1.1 GB; with jemalloc it is ~0.7 GB.
+/// so an idle seed node sat at ~1.1 GB; with jemalloc it is ~0.7 GB. It also replaces `malloc`
+/// for C code such as `SQLite` (ADR 0066).
 #[cfg(feature = "jemalloc")]
 #[global_allocator]
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;

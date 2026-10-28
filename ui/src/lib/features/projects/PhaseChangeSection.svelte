@@ -31,6 +31,13 @@
   );
   const gatePasses = $derived(signalGatePasses && !planGate);
   const closing = $derived(project?.nextPhase?.id === 'phase-7');
+  // web's EventPhaseChangeSection words the menu for events (ADR 0057, 0061).
+  const event = $derived(project?.charter?.mode === 'event');
+  const how = $derived(
+    project?.governance === 'organizer_controlled'
+      ? 'Organizers decide; members are notified.'
+      : 'Members vote. Proposing counts as your Yes.',
+  );
 
   // web's embedInToolbar: the menu goes into the phase toolbar's end slot when there is one.
   let endHost = $state<HTMLElement | null>(null);
@@ -70,8 +77,12 @@
           ? {
               id: 'close',
               glyph: '×',
-              label: 'Close project',
-              detail: locked || 'Members vote to finish the project. Proposing counts as your Yes.',
+              label: event ? 'Close event' : 'Close project',
+              detail:
+                locked ||
+                (event
+                  ? `Ends the event and keeps its record. ${how}`
+                  : 'Members vote to finish the project. Proposing counts as your Yes.'),
               disabled: !allowed,
               onSelect,
             }
@@ -79,7 +90,8 @@
               id: 'advance',
               glyph: '›',
               label: `Advance to ${next.label}`,
-              detail: locked || 'Members vote to move on. Proposing counts as your Yes.',
+              detail:
+                locked || (event ? how : 'Members vote to move on. Proposing counts as your Yes.'),
               disabled: !allowed,
               onSelect,
             },
@@ -89,7 +101,11 @@
         id: 'return',
         glyph: '‹',
         label: 'Return to an earlier phase',
-        detail: phaseVoteOpen ? lockReason() : 'Members vote to go back and rework the plans.',
+        detail: phaseVoteOpen
+          ? lockReason()
+          : event
+            ? `Go back and rework the plan. ${how}`
+            : 'Members vote to go back and rework the plans.',
         disabled: phaseVoteOpen || detail.saving,
         onSelect: () => {
           detail.sheetMessage = undefined;
@@ -132,7 +148,11 @@
   </div>
   <AdvanceSheet
     open={advancing}
-    title={closing ? 'Close project' : `Advance to ${project.nextPhase?.label ?? 'the next phase'}`}
+    title={closing
+      ? event
+        ? 'Close event'
+        : 'Close project'
+      : `Advance to ${project.nextPhase?.label ?? 'the next phase'}`}
     {closing}
     pending={detail.saving}
     message={detail.sheetMessage}

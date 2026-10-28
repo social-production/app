@@ -1,0 +1,303 @@
+/* Ported from web/src/lib/components/shared/ShareUserMenu.svelte (ADR 0032, scripts/port-styles.py) */
+.share-sheet .share-out {
+  display: grid;
+  gap: 12px;
+  padding: 4px 16px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
+
+.share-sheet .share-subject {
+  margin: 0;
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-sheet .share-out-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.share-sheet .out-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.share-sheet .out-button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.share-sheet .out-button:hover {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+}
+
+.share-sheet .out-button.primary {
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand, #fff);
+}
+
+.share-sheet .out-button.copied {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+}
+
+.share-sheet .list-label {
+  margin: 4px 16px 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.share-sheet .share-out-row {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+}
+
+.share-sheet .share-tile {
+  display: grid;
+  place-items: center;
+  padding: 2px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.share-sheet .share-tile:hover,
+.share-sheet .share-tile:focus-visible {
+  background: var(--brand-soft);
+}
+
+.share-sheet .tile-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--panel-strong);
+  color: var(--text-main);
+}
+
+.share-sheet .tile-icon.whatsapp {
+  background: #25d366;
+  color: #fff;
+}
+
+.share-sheet .tile-icon.telegram {
+  background: #2aabee;
+  color: #fff;
+}
+
+.share-sheet .tile-icon.x {
+  background: #111;
+  color: #fff;
+}
+
+.share-sheet .tile-icon.facebook {
+  background: #1877f2;
+  color: #fff;
+}
+
+.share-sheet .tile-icon.email {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.share-sheet .share-shell {
+  display: flex;
+  min-width: 0;
+}
+
+.share-sheet .share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.share-sheet .share-button:hover,
+.share-sheet .share-button.active-toggle {
+  background: var(--brand-soft);
+  color: var(--text-main);
+}
+
+.share-sheet .share-search {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px 10px;
+}
+
+.share-sheet .search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-soft);
+}
+
+.share-sheet .search-box:focus-within {
+  border-color: var(--brand);
+}
+
+.share-sheet .search-box input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+}
+
+.share-sheet .contact-list {
+  display: grid;
+  padding: 0 8px;
+}
+
+.share-sheet .contact-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.share-sheet .contact-row:hover {
+  background: var(--panel-strong);
+}
+
+.share-sheet .contact-row.selected {
+  background: color-mix(in srgb, var(--brand-soft) 70%, transparent);
+}
+
+.share-sheet .contact-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.share-sheet .check {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--panel-border);
+  border-radius: 50%;
+  color: #fff;
+}
+
+.share-sheet .contact-row.selected .check {
+  border-color: var(--brand);
+  background: var(--brand);
+}
+
+.share-sheet .selected-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 0 16px 10px;
+}
+
+.share-sheet .selected-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px 3px 3px;
+  border: 1px solid var(--brand);
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.share-sheet .chip-remove {
+  color: var(--text-soft);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.share-sheet .empty-row,
+.share-sheet .feedback {
+  margin: 0;
+  padding: 4px 16px 16px;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.share-sheet .feedback {
+  color: var(--danger, #c0392b);
+}
+
+.share-sheet .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

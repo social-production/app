@@ -4,7 +4,7 @@
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
-  import { isEvent, isPrivateSeed, type DetailTabId } from '#lib/domain/projects.ts';
+  import { isEvent, isPrivateSeed, type DetailTabId, type Project } from '#lib/domain/projects.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import { goto } from '$app/navigation';
@@ -13,6 +13,7 @@
 
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
+  import EventMembersSheet from './EventMembersSheet.svelte';
   import LinksTab from './LinksTab.svelte';
   import ParticipationDock from './ParticipationDock.svelte';
   import ParticipationPanel from './ParticipationPanel.svelte';
@@ -107,6 +108,12 @@
 
   async function filed(ok: Promise<boolean>): Promise<void> {
     if (await ok) sheet = null;
+  }
+
+  /** web's sheet title and button: organizer-run events save; personal services save details. */
+  function editLabel(p: Project, submit: boolean): string {
+    if (p.governance === 'organizer_controlled') return submit ? 'Save' : 'Edit event';
+    return p.charter?.mode === 'personal-service' ? 'Save details' : 'Propose Edit';
   }
 
   /** web: after leaving a private event it can't be opened again, so go home. */
@@ -206,18 +213,23 @@
         {/if}
       </section>
 
-      <PeopleSheet
-        open={sheet === 'members'}
-        title={event ? 'Members' : 'Project members'}
-        description={event
-          ? 'Public event members can propose and vote on update and detail edit decisions.'
-          : 'Members coordinate planning, updates, and activity together.'}
-        emptyCopy="No members listed yet."
-        people={detail.members}
-        onClose={() => (sheet = null)}
-      />
+      {#if event}
+        <EventMembersSheet {detail} open={sheet === 'members'} onClose={() => (sheet = null)} />
+      {:else}
+        <PeopleSheet
+          open={sheet === 'members'}
+          title="Project members"
+          description="Members coordinate planning, updates, and activity together."
+          emptyCopy="No members listed yet."
+          people={detail.members}
+          onClose={() => (sheet = null)}
+        />
+      {/if}
       <EditSheet
         open={sheet === 'edit'}
+        sheetTitle={editLabel(project, false)}
+        submitLabel={editLabel(project, true)}
+        appliesDirectly={project.governance === 'organizer_controlled'}
         draft={{
           title: charter.title,
           description: charter.description,
