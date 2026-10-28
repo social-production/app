@@ -1,7 +1,7 @@
 // M5c private events end to end (ADR 0061). A new person signs up; founder one creates an
 // invite-only, organizer-controlled event inviting them, with its plan up front, so the event
 // opens in Activity. The invitee finds it under Invites (left rail and notification), accepts
-// and lands on the event.
+// and lands on the event; founder one then promotes them in the members sheet.
 //   node tests/e2e/private-events.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
@@ -100,6 +100,27 @@ await guest.goto(`${BASE}/invites`);
 await guest.getByText('No invites waiting.').waitFor({ timeout: 60_000 });
 assert.equal(await rows().count(), 0, 'no Invites row once answered');
 log('the invitee accepted and joined');
+
+// web's EventMembersPanel: founder one promotes the invitee from Members to Organizers.
+await ann.reload();
+await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+const sheet = ann.locator('.people-sheet');
+for (let i = 0; ; i++) {
+  await ann.getByRole('button', { name: /^\d+ members$/ }).click();
+  await sheet.getByRole('heading', { name: 'Organizers' }).waitFor();
+  if (await sheet.getByRole('button', { name: 'Promote to organizer' }).count()) break;
+  if (i >= 20) throw new Error(`${guestName} never appeared under Members`);
+  await sheet.getByRole('button', { name: 'Close' }).click();
+  await ann.waitForTimeout(3000);
+  await ann.reload();
+}
+assert.ok(await sheet.getByRole('button', { name: 'Invite to event' }).count(), 'Invite + shown');
+await sheet.getByRole('button', { name: 'Promote to organizer' }).click();
+await sheet
+  .locator('.person-row', { hasText: guestName })
+  .locator('.badge', { hasText: 'Organizer' })
+  .waitFor({ timeout: 60_000 });
+log('founder one promoted the invitee to organizer');
 
 assert.deepEqual(errors, []);
 await browser.close();

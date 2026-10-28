@@ -23,6 +23,8 @@
     rootClass?: string;
     onClose: () => void;
     subtitle?: Snippet;
+    /** web's header-actions slot (e.g. the event members sheet's Invite +). */
+    headerActions?: Snippet | undefined;
     toolbar?: Snippet;
     footer?: Snippet;
     children: Snippet;
@@ -38,6 +40,7 @@
     rootClass = '',
     onClose,
     subtitle,
+    headerActions,
     toolbar,
     footer,
     children,
@@ -108,6 +111,7 @@
           <h2 id={labelledById} use:fitText={{ min: 13, text: title }}>{title}</h2>
           {@render subtitle?.()}
         </div>
+        {#if headerActions}<div class="overlay-header-actions">{@render headerActions()}</div>{/if}
       </header>
       {#if toolbar}<div class="overlay-toolbar">{@render toolbar()}</div>{/if}
       <div class="overlay-body">{@render children()}</div>

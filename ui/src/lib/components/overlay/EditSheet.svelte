@@ -3,9 +3,15 @@
 
   import OverlaySheet from './OverlaySheet.svelte';
 
-  /** web's ProposeEditSheet: title, description, location label, filed as a proposal (M3). */
+  /**
+   * web's ProposeEditSheet: title, description, location label, filed as a proposal (M3).
+   * Organizer-run events save directly ("Edit event", ADR 0061).
+   */
   interface Props {
     open: boolean;
+    sheetTitle?: string;
+    submitLabel?: string;
+    appliesDirectly?: boolean;
     draft: CharterDraft;
     pending: boolean;
     message: string | undefined;
@@ -13,7 +19,17 @@
     onClose: () => void;
   }
 
-  let { open, draft, pending, message, onSubmit, onClose }: Props = $props();
+  let {
+    open,
+    sheetTitle = 'Propose Edit',
+    submitLabel = 'Propose Edit',
+    appliesDirectly = false,
+    draft,
+    pending,
+    message,
+    onSubmit,
+    onClose,
+  }: Props = $props();
 
   let title = $state('');
   let description = $state('');
@@ -32,14 +48,17 @@
 
 <OverlaySheet
   {open}
-  title="Propose edit"
+  title={sheetTitle}
   labelledById="project-edit-sheet"
   rootClass="edit-sheet"
   {onClose}
 >
   {#snippet subtitle()}
     <p class="sheet-lead">
-      Change the title, description, or location. It applies as soon as you save.
+      Change the title, description, or location.
+      {appliesDirectly
+        ? 'It applies as soon as you save.'
+        : 'Members vote on it, and your proposal counts as your Yes. While few members are active, your Yes alone can be enough, and then it applies straight away.'}
     </p>
   {/snippet}
   <form id="project-edit-sheet-form" class="edit-form" onsubmit={submit}>
@@ -64,7 +83,7 @@
         class="sheet-submit"
         disabled={pending || !title.trim() || !description.trim()}
         form="project-edit-sheet-form"
-        type="submit">{pending ? 'Working...' : 'Propose edit'}</button
+        type="submit">{pending ? 'Working...' : submitLabel}</button
       >
     </div>
   {/snippet}
