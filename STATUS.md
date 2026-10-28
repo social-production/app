@@ -39,25 +39,30 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight (2026-10-28): the commons is built, on `claude/social-production-handoff-dsam61`
-Not yet in a PR (PR #65, docs + ADR 0065, goes first). What changed (ADR 0065 "As built"):
+## In flight (2026-10-28): the commons, PR #66 (`claude/social-production-handoff-dsam61`)
+PR #65 (docs, `/readyz` heap + cells, ADR 0065) merged 10:15 UTC; Railway's build of it failed
+in a Railway incident ("Builds failing in US West", builds die before any step), so live still
+runs PR #64's build. The next merge rebuilds; or Redeploy `seed-node` and `ui` in Railway.
+What PR #66 changes (ADR 0065 "As built"):
 - **Project DNA (reset):** every record names its space (the charter's create hash); links hang
   off the space; `recent.<UTC hour>` links mark activity. Private events stay clones.
 - **Coordinators:** calls take `{space, input}`, or a bare input in a private clone
   (`space_scope` crate; `discussion/src/scope.rs`). New project externs: `space`, `touch`,
-  `my_spaces`, `active_spaces`. Links name a commons space `<creator>.space.<id>`.
+  `my_spaces` (memberships + chats written in), `active_spaces`; discussion `my_chat_spaces`.
+  Links name a commons space `<creator>.space.<id>`. Joining needs the charter locally.
 - **Gateway:** the archivist reads every listed space in its one commons cell (no clones) and
   re-reads only new/recently written ones (full pass every ~15 min); guest reads the same.
+  `DB_MAX_READERS` default 4 → 16: with one shared database, 4 readers stalled reads for 85 s
+  (ADR 0062 amended). **If `DB_MAX_READERS` is set on Railway, it should go.**
 - **UI:** listings keep their ids; `createProject` founds the space in the commons cell and
   lists `<me>.space.<hash>`; `projectCell` returns the commons cell tagged with the space
   (`holo/spaces.ts`), `callCell` wraps calls; rail/notifications/Public tab use `my_spaces`.
-- **Checked so far:** clippy `-D warnings` (project zomes, gateway, scenarios), UI check/lint,
-  boundaries, sizes; scenarios discussion/projects/private_events/events (see below).
-- **To do:** all scenario shards; browser tests against `scripts/cloud-seed.sh`
-  (projects, events, private-events, chat, governance, links, guests, rail, notifications);
-  a commons links scenario (Pair still uses clones); persist index cards in `gateway.sqlite`;
-  Phase 4 (private clones cold when idle). After the deploy: `/readyz` should stop growing per
-  project (the archivist holds no clones).
+- **Checked:** fmt, clippy, workspace unit tests, UI check/lint, boundaries, sizes; scenarios
+  discussion/events/private_events locally; browser tests on a local seed node: projects, chat,
+  events, private-events, governance, links, guests, rail, notifications (after the readers fix).
+- **To do:** public-chats/activities/accounts/memory-projects browser tests on the new build;
+  CI green; merge; live smoke (`/readyz` should no longer grow per project); persist index
+  cards in `gateway.sqlite`; Phase 4 (private clones cold when idle).
 
 ## Next for the seed node's memory (open, 2026-10-28)
 - Live costs more per account and project than local (~3.5 MB per project at idle locally,
