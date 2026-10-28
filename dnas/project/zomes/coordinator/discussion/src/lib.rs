@@ -130,6 +130,12 @@ pub fn read_at(call: In<()>) -> ExternResult<Option<Timestamp>> {
     own::read_at()
 }
 
+/// Every space whose chat the caller wrote in (web's Public tab lists those too).
+#[hdk_extern]
+pub fn my_chat_spaces(_: ()) -> ExternResult<Vec<ActionHash>> {
+    own::spaces()
+}
+
 /// The newest messages (up to `sp_core::chat::PAGE_MAX`), oldest first.
 #[hdk_extern]
 pub fn list_messages(call: In<()>) -> ExternResult<Vec<MessageView>> {

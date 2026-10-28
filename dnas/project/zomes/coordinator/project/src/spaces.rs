@@ -6,22 +6,38 @@ use project_integrity::{space_creator, LinkTypes};
 
 use crate::own;
 
-/// A space the caller is a member of, with its creator (the UI names it `<creator>.space.<id>`).
+/// Spaces whose chat the caller wrote in (the discussion zome of this cell).
+fn chat_spaces() -> ExternResult<Vec<ActionHash>> {
+    match call(
+        CallTargetCell::Local,
+        ZomeName::from("discussion"),
+        "my_chat_spaces".into(),
+        None,
+        (),
+    )? {
+        ZomeCallResponse::Ok(io) => io.decode().map_err(|e| wasm_error!(e)),
+        other => Err(wasm_error!(WasmErrorInner::Guest(format!(
+            "discussion/my_chat_spaces: {other:?}"
+        )))),
+    }
+}
+
+/// One of the caller's spaces, with its creator (the UI names it `<creator>.space.<id>`).
 #[derive(Serialize, Deserialize, Debug)]
 pub struct MySpace {
     pub space: ActionHash,
     pub creator: AgentPubKey,
 }
 
-/// Every space the caller is a member of in this cell, from its own chain (ADR 0065): the
-/// commons' replacement for "the project clones on this node".
+/// Every space the caller is a member of or wrote in the chat of, from its own chain (ADR
+/// 0065): the commons' replacement for "the project clones on this node".
 #[hdk_extern]
 pub fn my_spaces(_: ()) -> ExternResult<Vec<MySpace>> {
+    let members = own::live_anywhere(LinkTypes::Members)?
+        .into_iter()
+        .filter_map(|(_, link)| link.base_address.into_action_hash());
     let mut out: Vec<MySpace> = Vec::new();
-    for (_, link) in own::live_anywhere(LinkTypes::Members)? {
-        let Some(space) = link.base_address.into_action_hash() else {
-            continue;
-        };
+    for space in members.chain(chat_spaces()?) {
         if out.iter().any(|s| s.space == space) {
             continue;
         }

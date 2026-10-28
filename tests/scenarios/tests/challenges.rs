@@ -44,8 +44,9 @@ struct Listed {
     can_challenge: bool,
 }
 
-/// Three founders with bootstrap off; agents 0 and 1 meet, agent 2 stays offline.
-async fn net_with_one_offline(seed: &str) -> Net {
+/// Three founders with bootstrap off, introduced to each other; agent 0 founded a space in the
+/// commons and everyone holds its charter (joining a space needs it, ADR 0065).
+async fn net_of_three(seed: &str) -> Net {
     let mut conductors =
         SweetConductorBatch::from_config_rendezvous(3, SweetConductorConfig::rendezvous(false))
             .await;
@@ -56,18 +57,24 @@ async fn net_with_one_offline(seed: &str) -> Net {
         cells,
         space: None,
     };
+    introduce(&net, &[0, 1, 2]).await;
     let space: ActionHash = net
         .call(0, "project", "create_charter", charter("productive"))
         .await;
     net.space = Some(space);
-    tokio::time::timeout(std::time::Duration::from_secs(10), async {
-        while !SweetConductor::exchange_peer_info([&net.conductors[0], &net.conductors[1]]).await {
+    net.settle().await;
+    net
+}
+
+/// Introduce the running agents `which` to each other (bootstrap is off).
+async fn introduce(net: &Net, which: &[usize]) {
+    tokio::time::timeout(std::time::Duration::from_secs(30), async {
+        while !SweetConductor::exchange_peer_info(which.iter().map(|&i| &net.conductors[i])).await {
             tokio::time::sleep(std::time::Duration::from_millis(10)).await;
         }
     })
     .await
-    .expect("introduce agents 0 and 1");
-    net
+    .expect("introduce agents");
 }
 
 /// Settle the two connected agents' networks.
@@ -96,12 +103,20 @@ async fn vote_yes(net: &Net, i: usize, proposal: &ActionHash) {
     let _: ActionHash = net.call(i, "governance", "vote", input).await;
 }
 
-/// Agent 2 joins while offline; agent 0 renames the project counting only itself and agent 1,
-/// who carry it.
-async fn undercounted_rename(net: &Net) -> ActionHash {
+/// Agent 2 joins while agents 0 and 1 are offline, then goes offline itself; agent 0 renames
+/// the project counting only itself and agent 1, who carry it. Agent 2 is left shut down.
+async fn undercounted_rename(net: &mut Net) -> ActionHash {
     let _: () = net.call(1, "project", "join", ()).await;
-    settle_pair(net).await;
+    net.settle().await;
+    for i in [0, 1] {
+        net.conductors[i].shutdown().await;
+    }
     let _: () = net.call(2, "project", "join", ()).await;
+    net.conductors[2].shutdown().await;
+    for i in [0, 1] {
+        net.conductors[i].startup().await;
+    }
+    introduce(net, &[0, 1]).await;
     let rename = ProposalKind::Edit {
         title: Some("Orchard".into()),
         description: None,
@@ -117,10 +132,11 @@ async fn undercounted_rename(net: &Net) -> ActionHash {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn a_challenge_reopens_a_decision_that_left_members_out() {
-    let net = net_with_one_offline("challenge").await;
-    let id = undercounted_rename(&net).await;
+    let mut net = net_of_three("challenge").await;
+    let id = Box::pin(undercounted_rename(&mut net)).await;
 
-    net.conductors.exchange_peer_info().await;
+    net.conductors[2].startup().await;
+    introduce(&net, &[0, 1, 2]).await;
     net.settle().await;
     let seen = listed(&net, 2, &id).await;
     assert_eq!(

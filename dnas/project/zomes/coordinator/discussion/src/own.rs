@@ -29,6 +29,27 @@ pub fn messages() -> ExternResult<Vec<Record>> {
         .collect())
 }
 
+/// The spaces of every chat message the caller wrote, each once.
+pub fn spaces() -> ExternResult<Vec<ActionHash>> {
+    let messages = EntryType::App(UnitEntryTypes::ChatMessage.try_into()?);
+    let mine = query(
+        ChainQueryFilter::new()
+            .entry_type(messages)
+            .action_type(ActionType::Create)
+            .include_entries(true),
+    )?;
+    let mut out: Vec<ActionHash> = Vec::new();
+    for m in mine
+        .iter()
+        .filter_map(|r| r.entry().to_app_option::<ChatMessage>().ok().flatten())
+    {
+        if !out.contains(&m.space) {
+            out.push(m.space);
+        }
+    }
+    Ok(out)
+}
+
 /// How far the caller has read this space's chat.
 pub fn read_at() -> ExternResult<Option<Timestamp>> {
     let space = anchor()?;
