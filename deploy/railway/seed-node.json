@@ -6,7 +6,7 @@
   },
   "deploy": {
     "healthcheckPath": "/readyz",
-    "healthcheckTimeout": 120,
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "numReplicas": 1
   }
