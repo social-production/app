@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The commons (ADR 0065, PR #66, 2026-10-28; the project network reset):** public projects,
+  events and their chats share one network instead of one each, so an unused project costs
+  rows, not a running network; the seed node's index re-reads only projects with recent
+  activity. Private events stay their own networks. Live after the deploy: 1 app / 3 cells idle
+  (941 MB, 66 threads); two new accounts with a project and chat add only their own 6 cells.
 - **Invite-only and organizer-run events (M5c part 2a, ADR 0061, PR #62, 2026-10-28; the
   project network reset):** web's create-event Audience, Who, Control and Plan steps; private
   events open at `/events/<seed>`, invites arrive under Invites (left rail count and an
