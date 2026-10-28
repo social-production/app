@@ -67,16 +67,23 @@ async fn readyz(State(state): State<AppState>) -> (StatusCode, Json<serde_json::
         "conductor": ready,
         "uptimeSecs": state.started.elapsed().as_secs(),
         "rssMb": resident_mb(),
+        // Thread count and the CPUs Holochain sizes its pools by (ADR 0062).
+        "threads": status_field("Threads:"),
+        "cpus": std::thread::available_parallelism().map_or(0, std::num::NonZero::get),
     });
     (status, Json(body))
 }
 
 /// This process's resident memory in MB (Linux), from `/proc/self/status`.
 fn resident_mb() -> Option<u64> {
+    status_field("VmRSS:").map(|kb| kb / 1024)
+}
+
+/// A numeric field of `/proc/self/status` (Linux).
+fn status_field(name: &str) -> Option<u64> {
     let status = std::fs::read_to_string("/proc/self/status").ok()?;
-    let line = status.lines().find(|l| l.starts_with("VmRSS:"))?;
-    let kb: u64 = line.split_whitespace().nth(1)?.parse().ok()?;
-    Some(kb / 1024)
+    let line = status.lines().find(|l| l.starts_with(name))?;
+    line.split_whitespace().nth(1)?.parse().ok()
 }
 
 /// The `/ws` URL on whatever host the browser used; Railway sets X-Forwarded-Proto.

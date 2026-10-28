@@ -1,13 +1,20 @@
 <script lang="ts">
   import { MediaQuery } from 'svelte/reactivity';
 
+  import PrivateMark from './PrivateMark.svelte';
+
   import { resolve } from '$app/paths';
 
   /**
    * web's FeedCardTop with TagList (plain): tags left (3 on desktop, 1 on phones, "+N" for
-   * the rest), the stage right. Tags link to search until channels arrive (M5).
+   * the rest), the stage right, with web's PrivateMark beside it for private events. Tags
+   * link to search until channels arrive (M5).
    */
-  let { tags, stage }: { tags: string[]; stage: string } = $props();
+  let {
+    tags,
+    stage,
+    isPrivate = false,
+  }: { tags: string[]; stage: string; isPrivate?: boolean } = $props();
 
   const phone = new MediaQuery('(max-width: 760px)');
   let expanded = $state(false);
@@ -23,7 +30,7 @@
   import '#lib/components/styles/cards.css';
 </script>
 
-{#if tags.length > 0 || stage}
+{#if tags.length > 0 || stage || isPrivate}
   <div class="feed-card-top">
     <div class="feed-card-tags">
       {#if tags.length > 0}
@@ -47,6 +54,7 @@
       {/if}
     </div>
     <div class="feed-card-end">
+      {#if isPrivate}<PrivateMark />{/if}
       {#if stage}<span class="feed-card-stage">{stage}</span>{/if}
     </div>
   </div>

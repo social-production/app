@@ -38,6 +38,19 @@ pub fn validate_proposal(
     }
     let at = Some(action.timestamp());
     let mirrored = matches!(&p.kind, ProposalKind::Link(l) if l.source.is_some());
+    if !mirrored {
+        let grant = p.organizer.as_ref();
+        if let Some(refused) =
+            crate::organizer::require_in_organized(action.author(), grant, "propose")?
+        {
+            return Ok(refused);
+        }
+    }
+    if crate::organized()?
+        && matches!(&p.kind, ProposalKind::Return { to, .. } if to.as_str() == Phase::P1.id())
+    {
+        return invalid("an organizer-controlled event can't return to Proposal");
+    }
     match &p.membership {
         Some(m) if !is_membership(m, action.author(), at)? => {
             return invalid("only members can propose");
@@ -138,6 +151,11 @@ pub fn validate_outcome(
     let Some(EntryTypes::Proposal(proposal)) = crate::typed_entry(&proposal_record)? else {
         return invalid("an outcome must close a proposal");
     };
+    // Organizers decide at once (ADR 0061): their proposals pass without votes.
+    let mirrored = matches!(&proposal.kind, ProposalKind::Link(l) if l.source.is_some());
+    if o.passed && o.votes.is_empty() && !mirrored && crate::organized()? {
+        return Ok(ValidateCallbackResult::Valid);
+    }
     let mut voters = BTreeSet::new();
     let mut choices = Vec::new();
     for hash in &o.votes {

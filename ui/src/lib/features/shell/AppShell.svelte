@@ -233,7 +233,11 @@
   <div class="content-grid">
     <aside class="rail left-rail" data-open={leftOpen && !authSurface}>
       {#if !authSurface}
-        <LeftRail closePanels={closeCompact} onDiscover={() => goto(resolve('/'))} />
+        <LeftRail
+          invites={notifications.invites}
+          closePanels={closeCompact}
+          onDiscover={() => goto(resolve('/'))}
+        />
       {/if}
     </aside>
 

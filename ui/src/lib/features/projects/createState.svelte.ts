@@ -7,7 +7,9 @@ import {
 import { explain } from '#lib/services/errors.ts';
 import { createProject, projectAllowance } from '#lib/services/projects.ts';
 
-type Step = { id: 'type' | 'basics' | 'location' | 'scope' | 'overview'; title: string };
+import type { EventStepId } from '#lib/domain/eventCreate.ts';
+
+type Step = { id: 'type' | EventStepId; title: string };
 
 export const CREATE_STEPS: Step[] = [
   { id: 'type', title: 'Type' },
@@ -17,19 +19,12 @@ export const CREATE_STEPS: Step[] = [
   { id: 'overview', title: 'Overview' },
 ];
 
-/** web's public create-event steps. Its Audience step (private events) comes with them. */
-export const EVENT_STEPS: Step[] = [
-  { id: 'basics', title: 'Basics' },
-  { id: 'scope', title: 'Tags' },
-  { id: 'location', title: 'Location' },
-  { id: 'overview', title: 'Overview' },
-];
-
-/** The create-project wizard's draft (web's CreateProjectPage state); events use it too. */
+/** The create-project wizard's draft (web's CreateProjectPage state); `EventCreateState`
+ * extends it for events. */
 export class CreateState {
   step = $state(0);
   mode = $state<CharterMode>('productive');
-  readonly steps = $derived(this.mode === 'event' ? EVENT_STEPS : CREATE_STEPS);
+  readonly steps: Step[] = $derived(CREATE_STEPS);
   title = $state('');
   description = $state('');
   intent = $state<LocationChoice>('later');

@@ -81,6 +81,10 @@
     opening = item.id;
     try {
       await read(item);
+      if (item.subject === 'invites') {
+        await goto(resolve('/invites'));
+        return;
+      }
       if (item.subject === 'profile') {
         await goto(resolve('/profile/[agent]', { agent: item.actor }));
         return;

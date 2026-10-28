@@ -62,3 +62,5 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0058](./0058-places-and-the-map.md) Places and the map: OpenFreeMap tiles, Photon search through gateways, approximate by default (M6)
 - [0059](./0059-types-evolve-through-plans.md) Types evolve through plans; personal services go (after parity)
 - [0060](./0060-jemalloc-on-the-seed-node.md) jemalloc as the gateway allocator (idle 1.1 GB → ~0.7 GB); test founders on the test network
+- [0061](./0061-private-events-and-organizers.md) Invite-only events: the seed says private or organizer-run; organizers are grant records (M5c part 2)
+- [0062](./0062-sqlite-readers-per-database.md) Cap SQLite readers per database on the seed node (memory per project)

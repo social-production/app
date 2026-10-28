@@ -45,7 +45,7 @@
           pending={detail.joining}
           {membersOpen}
           noun={isEvent(project.charter?.mode) ? 'event' : 'project'}
-          onToggleJoin={() => void detail.toggleJoin()}
+          onToggleJoin={() => detail.requestToggleJoin()}
           {onOpenMembers}
         />
       </div>

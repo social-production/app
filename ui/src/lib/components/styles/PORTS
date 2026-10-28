@@ -13,6 +13,7 @@ cards.css         .content-meta-row web/src/lib/components/shared/ContentMetaRow
 cards.css         .project-card   web/src/lib/components/cards/public-feed/ProjectCard.svelte
 cards.css         .event-card     web/src/lib/components/cards/public-feed/EventCard.svelte
 cards.css         .tag-list       web/src/lib/components/cards/shared/TagList.svelte
+cards.css         -               web/src/lib/components/cards/shared/PrivateMark.svelte
 cards.css         .surface        web/src/lib/components/cards/shared/CountPill.svelte
 cards.css         .personal-activity-card web/src/lib/components/cards/personal-feed/PersonalActivityCard.svelte
 cards.css         .identity       web/src/lib/components/cards/personal-feed/PersonalFeedIdentity.svelte
@@ -39,6 +40,9 @@ create.css        .create-sheet   web/src/lib/components/shared/RequiredFieldLab
 create.css        .create-sheet   web/src/lib/components/shared/DirectUsePolicyNotice.svelte
 create.css        .create-sheet   web/src/lib/features/create/project/CreateProjectPage.svelte
 create.css        .create-sheet   web/src/lib/features/create/event/CreateEventPage.svelte
+create.css        .create-sheet   web/src/lib/features/create/event/components/CreateEventVisibilityPanel.svelte
+create.css        .audience-selector web/src/lib/features/create/event/components/CreateEventAudienceSelector.svelte
+create.css        .audience-selector web/src/lib/components/shared/SuggestionList.svelte
 governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
 governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
 governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte
@@ -103,3 +107,4 @@ activities.css    .activity-ui    web/src/lib/features/projects/detail/component
 activities.css    .activity-ui    web/src/lib/features/projects/detail/components/HistoryCompletionSideRow.svelte
 rail.css          .right-rail     web/src/lib/features/right-rail/RightRailPanel.svelte
 rail.css          .surface-type-label web/src/lib/components/cards/shared/SurfaceTypeLabel.svelte
+invites.css       .invites        web/src/lib/features/invites/InvitesPage.svelte

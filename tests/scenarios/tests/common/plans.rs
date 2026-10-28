@@ -47,6 +47,10 @@ pub enum ProposalKind {
         reason: String,
     },
     Plan(Plan),
+    Return {
+        to: String,
+        reason: String,
+    },
 }
 
 #[derive(Serialize, Debug)]

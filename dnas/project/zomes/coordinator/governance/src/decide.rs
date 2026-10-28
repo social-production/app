@@ -41,11 +41,22 @@ impl Standing {
 /// Passed proposals whose recount passes too, in the order they were decided.
 pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision>> {
     let mut passed = Vec::new();
+    let organized = project_integrity::organized()?;
     for proposal in reads::proposals()? {
         let count = count(&proposal, roll)?;
         let Some(outcome) = count.decided.as_ref().filter(|o| o.entry.passed) else {
             continue;
         };
+        // Integrity accepts a vote-less pass only for an organizer's proposal (ADR 0061).
+        if outcome.entry.votes.is_empty() && organized {
+            passed.push(Decision {
+                at: outcome.at,
+                yes: 0,
+                no: 0,
+                proposal,
+            });
+            continue;
+        }
         let mut eligible = Vec::new();
         for vote in reads::votes(&proposal.hash)?
             .into_iter()

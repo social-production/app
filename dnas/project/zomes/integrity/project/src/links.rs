@@ -15,6 +15,9 @@ pub fn validate_create(
     match link_type {
         LinkTypes::ProjectCharter => by_creator(action.author(), || Ok(())),
         LinkTypes::Members if target_is_author => Ok(ValidateCallbackResult::Valid),
+        LinkTypes::Signals if crate::organized()? => {
+            invalid("organizer-controlled events don't use signals")
+        }
         LinkTypes::Signals if target_is_author => match action.tag.0.as_slice() {
             [DEMAND | OPPOSE] => Ok(ValidateCallbackResult::Valid),
             _ => invalid("a signal is demand or opposition"),
@@ -32,7 +35,8 @@ pub fn validate_create(
         | LinkTypes::ValueToImportance
         | LinkTypes::Activities
         | LinkTypes::ActivityToSuggestions
-        | LinkTypes::ActivityToRatings => Ok(ValidateCallbackResult::Valid),
+        | LinkTypes::ActivityToRatings
+        | LinkTypes::Organizers => Ok(ValidateCallbackResult::Valid),
     }
 }
 

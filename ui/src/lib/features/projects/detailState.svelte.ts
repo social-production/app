@@ -38,8 +38,23 @@ export class DetailState {
 
   constructor(readonly id: string) {}
 
+  /** Leaving an event asks first (web's confirmEventMembershipToggle). */
+  confirmingLeave = $state(false);
+
   get canPropose(): boolean {
-    return !!this.project?.amMember && this.project.charter?.mode !== 'personal-service';
+    const p = this.project;
+    // Organizer-controlled events take changes from organizers only (ADR 0061).
+    const organized = p?.governance === 'organizer_controlled';
+    return !!p?.amMember && p.charter?.mode !== 'personal-service' && (!organized || p.amOrganizer);
+  }
+
+  /** Join at once; leaving an event waits for the confirm dialog. */
+  requestToggleJoin(): void {
+    if (this.project?.amMember && this.project.charter?.mode === 'event') {
+      this.confirmingLeave = true;
+      return;
+    }
+    void this.toggleJoin();
   }
 
   /** Open proposals, the viewer's unvoted ones first. */

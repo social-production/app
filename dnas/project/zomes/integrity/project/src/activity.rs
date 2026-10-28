@@ -34,6 +34,9 @@ pub struct Activity {
     pub roles: Vec<ActivityRole>,
     /// The author's own `Members` link.
     pub membership: ActionHash,
+    /// The author's `Organizer` record in an organizer-controlled event (ADR 0061).
+    #[serde(default)]
+    pub organizer: Option<ActionHash>,
 }
 
 /// A member suggests someone else for a role (web's role suggestion); the latest per role
@@ -97,6 +100,12 @@ pub fn validate_activity(
     }
     if !is_membership(&a.membership, action.author(), Some(action.timestamp()))? {
         return invalid("only members can add activities");
+    }
+    let organizer = a.organizer.as_ref();
+    if let Some(refused) =
+        crate::organizer::require_in_organized(action.author(), organizer, "add activities")?
+    {
+        return Ok(refused);
     }
     Ok(ValidateCallbackResult::Valid)
 }

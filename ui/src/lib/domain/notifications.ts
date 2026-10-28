@@ -22,12 +22,14 @@ export type NotificationKind =
   | 'follow-accepted'
   | 'prj-activity'
   | 'prj-role-suggest'
-  | 'prj-role-taken';
+  | 'prj-role-taken'
+  | 'evt-invite';
 
 /** web's notification settings categories the app has kinds for (web-backend
  * `notification_preferences.py` KIND_TO_CATEGORY); shares and plan-leading come with their
  * features. */
-export type NotificationCategory = 'follows' | 'comments' | 'votes_needed' | 'phase_done' | 'roles';
+export type NotificationCategory =
+  'follows' | 'comments' | 'shares_invites' | 'votes_needed' | 'phase_done' | 'roles';
 
 export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   reply: 'comments',
@@ -40,13 +42,15 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'prj-activity': 'roles',
   'prj-role-suggest': 'roles',
   'prj-role-taken': 'roles',
+  'evt-invite': 'shares_invites',
 };
 
 export interface NotificationItem {
   id: string;
   kind: NotificationKind;
-  /** web's subject: a project, a direct or group chat (web's "Thread" card), or a person. */
-  subject: 'project' | 'thread' | 'profile';
+  /** web's subject: a project, a direct or group chat (web's "Thread" card), a person, or
+   * an invite waiting under Invites (web's `href: /invites`). */
+  subject: 'project' | 'thread' | 'profile' | 'invites';
   /** The project's or chat's network seed (empty for follows); a project's page is found by
    *  seed on opening. */
   seed: string;
@@ -261,4 +265,23 @@ export function markRead(marks: ReadMarks, item: { id: string }, items: Unread[]
     all: marks.all,
     ids: [...new Set([...marks.ids, item.id])].filter((id) => after.has(id)),
   };
+}
+
+/** web-backend's `evt-invite`, one per invite still waiting for an answer (ADR 0061). */
+export function inviteNotifications(
+  invites: { seed: string; title: string; from: string; at: number }[],
+): Unread[] {
+  return invites.map((i) => ({
+    id: `evt-invite:${i.seed}`,
+    kind: 'evt-invite' as const,
+    subject: 'invites' as const,
+    seed: i.seed,
+    projectMode: 'event' as const,
+    actor: i.from,
+    title: i.title,
+    body: `You were invited to an event: ${i.title}. Accept or decline it in Invites.`,
+    lead: null,
+    target: null,
+    createdAt: i.at,
+  }));
 }

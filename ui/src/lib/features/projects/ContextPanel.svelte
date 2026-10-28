@@ -34,7 +34,11 @@
 
 <div class="project-overview">
   <div class="context-panel">
-    <FeedCardTop tags={charter.tags} stage={project.stage} />
+    <FeedCardTop
+      tags={charter.tags}
+      stage={project.stage}
+      isPrivate={project.audience !== 'public'}
+    />
     <div class="heading overview-heading">
       <div class="identity-row">
         <div class="identity-copy">

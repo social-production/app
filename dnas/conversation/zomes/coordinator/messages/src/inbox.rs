@@ -1,6 +1,7 @@
 //! The inbox (the base cell of the conversation role, ADR 0043): an invitation is a link on the
 //! invited person's key whose tag is the chat's seed, encrypted from sender to recipient. Only
 //! the recipient can read which chat it is; who invited whom is visible to the network.
+//! Invitations to private events (ADR 0061) travel the same way, carrying the event's seed.
 
 use std::collections::BTreeSet;
 
@@ -13,7 +14,7 @@ use crate::guest;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct InviteInput {
     pub to: AgentPubKey,
-    /// The chat clone's network seed.
+    /// The chat's (or private event's) clone network seed.
     pub seed: String,
 }
 
@@ -37,8 +38,8 @@ fn inbox_only() -> ExternResult<()> {
 #[hdk_extern]
 pub fn send_invite(input: InviteInput) -> ExternResult<()> {
     inbox_only()?;
-    if chat_seed(&input.seed).is_none() {
-        return Err(guest("That isn't a chat."));
+    if !invitable(&input.seed) {
+        return Err(guest("That isn't a chat or a private event."));
     }
     let me = agent_info()?.agent_initial_pubkey;
     let sealed = ed_25519_x_salsa20_poly1305_encrypt(
@@ -58,7 +59,12 @@ fn open(me: &AgentPubKey, from: &AgentPubKey, tag: &[u8]) -> Option<String> {
     let sealed: XSalsa20Poly1305EncryptedData = ExternIO(tag.to_vec()).decode().ok()?;
     let data = ed_25519_x_salsa20_poly1305_decrypt(me.clone(), from.clone(), sealed).ok()?;
     let seed = String::from_utf8(data.as_ref().to_vec()).ok()?;
-    chat_seed(&seed).is_some().then_some(seed)
+    invitable(&seed).then_some(seed)
+}
+
+/// A chat seed, or a private event's (`<creator>.private|organized.<nonce>`).
+fn invitable(seed: &str) -> bool {
+    chat_seed(seed).is_some() || sp_event::Audience::of_seed(seed).is_private()
 }
 
 /// Every chat you were invited to, oldest first, each once. Invitations that don't open

@@ -15,12 +15,14 @@
   interface Props {
     channels?: RailLink[];
     communities?: RailLink[];
+    /** Invites waiting for an answer (web's unreadCounts.invites). */
+    invites?: number;
     closePanels?: () => void;
     onDiscover?: () => void;
   }
 
   /** Ported from web/src/lib/features/left-rail/LeftRailPanel.svelte (same markup and styles). */
-  let { channels = [], communities = [], closePanels, onDiscover }: Props = $props();
+  let { channels = [], communities = [], invites = 0, closePanels, onDiscover }: Props = $props();
 
   let collectiveOpen = $state(true);
   let channelsOpen = $state(true);
@@ -85,6 +87,17 @@
       </span>
     </summary>
     <div class="stack-links">
+      {#if invites > 0}
+        <!-- Invites to private communities and events wait here until answered. -->
+        <RailLinkRow
+          href={resolve('/invites')}
+          icon="community"
+          label="Invites"
+          onclick={closePanels}
+        >
+          {#snippet trailing()}<span class="invite-count">{invites}</span>{/snippet}
+        </RailLinkRow>
+      {/if}
       {#each communities as link (link.href)}
         <RailLinkRow
           href={link.href}
@@ -115,6 +128,17 @@
 </section>
 
 <style>
+  .invite-count {
+    min-width: 20px;
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--brand);
+    color: var(--on-brand, #fff);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+  }
+
   .rail-panel {
     padding: 0 0 12px;
     border-bottom: 1px solid var(--panel-border);

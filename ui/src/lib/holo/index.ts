@@ -9,6 +9,7 @@ export {
   clonedSeeds,
   conversationCell,
   newChatSeed,
+  newPrivateEventSeed,
   newProjectSeed,
   projectCell,
 } from './cells.ts';

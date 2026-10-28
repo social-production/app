@@ -1,12 +1,14 @@
 <script lang="ts">
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
+  import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
-  import { isEvent, type DetailTabId } from '#lib/domain/projects.ts';
+  import { isEvent, isPrivateSeed, type DetailTabId } from '#lib/domain/projects.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
   import ContextPanel from './ContextPanel.svelte';
@@ -105,6 +107,14 @@
 
   async function filed(ok: Promise<boolean>): Promise<void> {
     if (await ok) sheet = null;
+  }
+
+  /** web: after leaving a private event it can't be opened again, so go home. */
+  async function leave(ok: boolean): Promise<void> {
+    detail.confirmingLeave = false;
+    if (!ok) return;
+    await detail.toggleJoin();
+    if (isPrivateSeed(id) && !detail.project?.amMember) await goto(resolve('/'));
   }
 </script>
 
@@ -224,6 +234,16 @@
         message={detail.sheetMessage}
         onSubmit={(body) => void filed(detail.proposeUpdate(body))}
         onClose={() => (sheet = null)}
+      />
+      <ConfirmDialog
+        open={detail.confirmingLeave}
+        title={`Leave ${charter.title}?`}
+        body={isPrivateSeed(id)
+          ? "It's private, so you'll need a new invite to come back."
+          : 'You can join again any time.'}
+        confirmLabel="Leave"
+        danger
+        onSettle={(ok) => void leave(ok)}
       />
     {/if}
   </section>

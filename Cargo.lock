@@ -5439,6 +5439,7 @@ dependencies = [
  "sp_attachment",
  "sp_call",
  "sp_core",
+ "sp_event",
 ]
 
 [[package]]

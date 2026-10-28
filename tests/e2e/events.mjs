@@ -20,7 +20,7 @@ await ann.getByRole('button', { name: 'Create', exact: true }).click();
 await ann.getByRole('menuitem', { name: /Event/ }).click();
 await ann.getByLabel('Event title').fill(title);
 await ann.getByLabel('Description').fill('Weed, mulch and share lunch.');
-for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+for (let i = 0; i < 4; i++) await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByText("Set when members approve the event's plan").waitFor();
 await ann.getByRole('button', { name: 'Publish event' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
@@ -74,7 +74,12 @@ async function advance(page) {
   const sheet = page.getByRole('dialog', { name: /^Advance to / });
   await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
   await sheet.getByRole('button', { name: /^Advance to / }).click();
-  await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+  try {
+    await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+  } catch (e) {
+    log('advance sheet:', await sheet.innerText());
+    throw e;
+  }
 }
 
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');

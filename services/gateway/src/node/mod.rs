@@ -150,6 +150,9 @@ fn conductor_config(data_root: &Path, config: &Config) -> ConductorConfig {
             advanced: Some(advanced),
             ..NetworkConfig::default()
         },
+        db_max_readers: config.db_max_readers,
+        // Holochain's own relation: the readers left once workflows have theirs (ADR 0062).
+        incoming_request_concurrency_limit: config.db_max_readers.saturating_sub(3).max(1),
         ..ConductorConfig::default()
     }
 }

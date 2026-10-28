@@ -13,6 +13,7 @@ mod charter;
 mod governance;
 mod link;
 mod links;
+mod organizer;
 mod plan;
 mod value;
 
@@ -24,6 +25,7 @@ pub use activity::{
 };
 pub use governance::SNAPSHOT_MAX;
 pub use link::{LinkRequest, ProjectRef};
+pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 pub use value::{Importance, Value};
 
@@ -80,6 +82,9 @@ pub struct Proposal {
     pub membership: Option<ActionHash>,
     /// `Members` links counted as the population N (ADR 0033).
     pub members: Vec<ActionHash>,
+    /// The proposer's `Organizer` record in an organizer-controlled event (ADR 0061).
+    #[serde(default)]
+    pub organizer: Option<ActionHash>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
@@ -143,6 +148,7 @@ pub enum EntryTypes {
     SuggestionDecline(SuggestionDecline),
     ActivityRating(ActivityRating),
     ActivityCompletion(ActivityCompletion),
+    Organizer(Organizer),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -174,6 +180,8 @@ pub enum LinkTypes {
     ActivityToSuggestions,
     /// Activity → a participant's rating or completion check-in.
     ActivityToRatings,
+    /// "organizers" anchor → an `Organizer` record (ADR 0061).
+    Organizers,
 }
 
 /// The project's creator, from the network seed; `None` in the (unused) base cell.
@@ -214,6 +222,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::SuggestionDecline(d) => activity::validate_decline(&d, &action),
             EntryTypes::ActivityRating(r) => activity::validate_rating(&r, &action),
             EntryTypes::ActivityCompletion(c) => activity::validate_completion(&c, &action),
+            EntryTypes::Organizer(o) => organizer::validate(&o, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })

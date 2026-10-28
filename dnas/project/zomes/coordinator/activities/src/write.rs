@@ -71,6 +71,16 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
     if input.starts_at <= sys_time()? {
         return Err(guest("An activity has to start in the future."));
     }
+    // web: only the creator or chosen organizers add activities to an organizer-controlled event.
+    let organizer = if project_integrity::organized()? {
+        calls::my_organizer_role()?
+            .ok_or_else(|| {
+                guest("Only the creator or chosen organizers can create activities for this event")
+            })?
+            .grant()
+    } else {
+        None
+    };
     let activity = Activity {
         title: input.title.trim().to_string(),
         starts_at: input.starts_at,
@@ -93,6 +103,7 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
             })
             .collect(),
         membership: membership.clone(),
+        organizer,
     };
     check_activity(&spec(&activity)).map_err(guest)?;
     let hash = create_entry(EntryTypes::Activity(activity))?;
