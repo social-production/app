@@ -31,7 +31,27 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
-## In flight 2026-10-28: M5c part 2a, invite-only events and organizers (ADR 0061), branch `claude/social-production-handoff-dsam61`
+## In flight 2026-10-28: coordinators updated per cell (ADR 0063), fix PR from `claude/social-production-handoff-dsam61`
+**Live private events are broken until this deploys:** creating one fails with "That isn't a
+chat." (the old inbox coordinator). Holochain 0.7 keeps a ribosome per cell; the gateway updated
+one cell per DNA at startup, so cells installed later ran the conversation DNA's old coordinator
+(its hash didn't change). Reproduced and fixed locally (kept data dir, hApp v1 → v2:
+`private-events.mjs` failed, passes with the fix). The gateway now updates every cell at startup,
+after `ensure_hosted`, and for new clones in `grant_new_cells`. Also removes a stray
+`private-events-fail.png` that PR #62 committed at the repo root.
+**After it deploys:** live `private-events.mjs`, `events.mjs` (it failed live on its last step,
+the event card in the feed: re-check, may be index lag), `shell.mjs`.
+**Live memory after PR #62 (01:09 UTC):** `cpus` 8 (Holochain's old default was 17 connections per
+DB there); idle ~1.51 GB with 66 threads, about double the 0.7 GB idle after PR #61. Not yet
+explained: the previous network ran 8 h with all 18 test files, so the next suspect is something
+left from the old version's apps (they are uninstalled at startup, after the conductor started
+them; Holochain drops their databases and spaces, so look at kitsune spaces and the wasm/module
+caches). Check whether a plain restart brings idle down (needs Railway, or a local kept-data
+experiment, below). Smoke runs took it 1509 → 1666 MB.
+Local kept-data experiments: `scripts/kept-seed.sh` (`KEEP=<dir>`, `EXTRA_FOUNDER=1` for a new
+hApp version; header has the cloud-session command).
+
+## Done 2026-10-28: M5c part 2a, invite-only events and organizers (ADR 0061) + SQLite reader cap (ADR 0062), PR #62 merged (00:55 UTC / 11:55 am Melbourne), seed node live 01:09 UTC
 **Merging resets the project network** (integrity change; directory and conversation DNA
 hashes unchanged: directory has no changed deps, conversation `uhC0kUmCMHl…` as on main).
 Done on the branch (pushed):
@@ -57,8 +77,8 @@ Done on the branch (pushed):
    Lessons: event plans need a place, so the up-front plan writes "TBD" when the location is
    decided later (web-backend does too); the first Invites read joins the event's network and
    takes a while; after many runs, project creation hung again until `cloud-seed.sh` restarted.
-6. [ ] PR #62 open (2026-10-28 ~10:16 am Melbourne); merge when CI is green, then live smoke (`private-events.mjs`, `events.mjs`,
-   `shell.mjs`), read `/readyz` `cpus`/`threads`, README Status.
+6. [x] PR #62 merged when CI was green (check 5 min, shards 24–97 min); live smoke: `shell.mjs`
+   passed; `private-events.mjs` hit the stale coordinator (see In flight).
 **Seed-node memory (ADR 0062, same branch):** per project the conductor opens two SQLite
 DBs, and sqlx runs each connection on its own thread with its own page cache; Holochain's
 default pool is 2 × CPUs (≥ 8) + 1 per DB. The gateway now sets `DB_MAX_READERS` (default 4 →

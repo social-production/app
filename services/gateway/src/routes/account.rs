@@ -176,10 +176,12 @@ async fn session(
         .map_err(|e| anyhow::anyhow!("stored agent key: {e}"))?;
     let signing_key = AgentPubKey::try_from_raw_39(signing_key.to_vec())
         .map_err(|_| ApiError::bad_request("signingKey must be 39 bytes"))?;
-    let app = state
-        .node
-        .ensure_hosted(&agent_key, &state.config.happ_path, restore)
-        .await?;
+    let app = Box::pin(
+        state
+            .node
+            .ensure_hosted(&agent_key, &state.config.happ_path, restore),
+    )
+    .await?;
     let opened = Box::pin(state.node.open_session(&app, signing_key.clone())).await?;
     let mut device_secret = vec![0_u8; 32];
     rand::thread_rng().fill_bytes(&mut device_secret);

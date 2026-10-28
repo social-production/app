@@ -4,7 +4,7 @@
 // and lands on the event.
 //   node tests/e2e/private-events.mjs http://localhost:4174
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 
 import { BASE, browser, device, errors, log, phraseSignIn, signUp } from './lib.mjs';
 
@@ -63,7 +63,9 @@ try {
 } catch (e) {
   // Say why publishing stopped (the create sheet's status line) before failing.
   log('status:', await ann.locator('.status-note').allInnerTexts(), 'errors:', errors);
-  await ann.screenshot({ path: 'private-events-fail.png', fullPage: true });
+  const shots = process.env.E2E_OUT ?? 'screens';
+  mkdirSync(shots, { recursive: true });
+  await ann.screenshot({ path: `${shots}/private-events-fail.png`, fullPage: true });
   throw e;
 }
 assert.match(ann.url(), /\/events\/[^/]+\.organized\./);

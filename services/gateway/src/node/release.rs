@@ -2,9 +2,8 @@
 //! versions are removed (a new network), and coordinator-only changes are swapped into running
 //! cells. Reinstalling instead would re-run genesis on an existing chain.
 
-use std::collections::BTreeSet;
-
-use holochain::conductor::api::{AdminRequest, AdminResponse, CellInfo};
+use holochain::conductor::api::{AdminRequest, AdminResponse, AppInfo, CellInfo};
+use holochain::prelude::DnaHash;
 use holochain_types::app::{CoordinatorSource, UpdateCoordinatorsPayload};
 
 use super::Node;
@@ -38,8 +37,9 @@ impl Node {
         Ok(removed)
     }
 
-    /// Give every running cell of this hApp version the bundle's coordinators. Cheap when
-    /// nothing changed (the WASM is cached by hash); returns how many DNAs were updated.
+    /// Give every cell of this hApp version the bundle's coordinators; returns how many cells
+    /// were updated. Holochain 0.7 keeps a ribosome per cell, not per DNA, so each cell is
+    /// updated on its own (ADR 0063).
     pub async fn update_coordinators(&self) -> anyhow::Result<usize> {
         let AdminResponse::AppsListed(apps) = self
             .admin(AdminRequest::ListApps {
@@ -49,34 +49,47 @@ impl Node {
         else {
             return Ok(0);
         };
-        let mut done = BTreeSet::new();
+        let mut updated = 0;
         for app in apps
             .iter()
             .filter(|a| a.installed_app_id.ends_with(&self.happ_version))
         {
-            for (role, cells) in &app.cell_info {
-                let Some(bundle) = self.coordinators.get(role.as_str()) else {
-                    continue;
+            updated += self.refresh_coordinators(app, None).await?;
+        }
+        Ok(updated)
+    }
+
+    /// Give one app's cells (only those of `dnas`, when given) the bundle's coordinators. A
+    /// DNA whose integrity is unchanged keeps its hash, so a newly installed or cloned cell can
+    /// start with the coordinator the conductor stored before (ADR 0063).
+    pub async fn refresh_coordinators(
+        &self,
+        app: &AppInfo,
+        dnas: Option<&[DnaHash]>,
+    ) -> anyhow::Result<usize> {
+        let mut updated = 0;
+        for (role, cells) in &app.cell_info {
+            let Some(bundle) = self.coordinators.get(role.as_str()) else {
+                continue;
+            };
+            for cell in cells {
+                let cell_id = match cell {
+                    CellInfo::Provisioned(c) => c.cell_id.clone(),
+                    CellInfo::Cloned(c) => c.cell_id.clone(),
+                    CellInfo::Stem(_) => continue,
                 };
-                for cell in cells {
-                    let cell_id = match cell {
-                        CellInfo::Provisioned(c) => c.cell_id.clone(),
-                        CellInfo::Cloned(c) => c.cell_id.clone(),
-                        CellInfo::Stem(_) => continue,
-                    };
-                    // Coordinators belong to the DNA, so one call covers every agent's cell.
-                    if !done.insert(cell_id.dna_hash().clone()) {
-                        continue;
-                    }
-                    let payload = UpdateCoordinatorsPayload {
-                        cell_id,
-                        source: CoordinatorSource::Bundle(Box::new(bundle.clone())),
-                    };
-                    self.admin(AdminRequest::UpdateCoordinators(Box::new(payload)))
-                        .await?;
+                if dnas.is_some_and(|d| !d.contains(cell_id.dna_hash())) {
+                    continue;
                 }
+                let payload = UpdateCoordinatorsPayload {
+                    cell_id,
+                    source: CoordinatorSource::Bundle(Box::new(bundle.clone())),
+                };
+                self.admin(AdminRequest::UpdateCoordinators(Box::new(payload)))
+                    .await?;
+                updated += 1;
             }
         }
-        Ok(done.len())
+        Ok(updated)
     }
 }
