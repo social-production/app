@@ -67,3 +67,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0063](./0063-coordinators-per-cell.md) Update coordinators per cell, on startup, install and new clones
 - [0064](./0064-restart-after-upgrade.md) Restart once after removing old apps; projects stay hot for now (cold projects next)
 - [0065](./0065-public-commons-network.md) Public spaces share one sharded network (the commons); clones only for private ones
+- [0066](./0066-jemalloc-for-c-code-too.md) jemalloc replaces malloc for the whole process (SQLite too); `/readyz` maps

@@ -4,6 +4,7 @@
 pub mod account;
 mod heap;
 pub mod index;
+mod maps;
 pub mod passkey;
 pub mod public;
 pub mod session;
@@ -73,6 +74,8 @@ async fn readyz(State(state): State<AppState>) -> (StatusCode, Json<serde_json::
         "cpus": std::thread::available_parallelism().map_or(0, std::num::NonZero::get),
         // Live data vs allocator overhead, and how many apps and cells run (ADR 0064).
         "heap": heap::heap(),
+        // Where RSS sits: brk heap, wasmer code, other anonymous maps, files (ADR 0066).
+        "maps": maps::resident_by_kind(),
         "cells": state.node.cell_counts().await.ok(),
     });
     (status, Json(body))
