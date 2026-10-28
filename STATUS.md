@@ -58,10 +58,11 @@ What PR #66 changes (ADR 0065 "As built"):
   lists `<me>.space.<hash>`; `projectCell` returns the commons cell tagged with the space
   (`holo/spaces.ts`), `callCell` wraps calls; rail/notifications/Public tab use `my_spaces`.
 - **Checked:** fmt, clippy, workspace unit tests, UI check/lint, boundaries, sizes; scenarios
-  discussion/events/private_events locally; browser tests on a local seed node: projects, chat,
-  events, private-events, governance, links, guests, rail, notifications (after the readers fix).
-- **To do:** public-chats/activities/accounts/memory-projects browser tests on the new build;
-  CI green; merge; live smoke (`/readyz` should no longer grow per project); persist index
+  discussion/events/private_events/challenges locally; every main browser test on a local seed
+  node (accounts, projects, chat, events, private-events, governance, links, guests, rail,
+  notifications, public-chats, activities). `memory-projects` (debug build): 8 new projects
+  moved RSS 1255 → 1297 MB; 10 projects indexed with 24 cells for 8 accounts (no clones).
+- **To do:** CI green; merge; live smoke (`/readyz` should no longer grow per project); persist index
   cards in `gateway.sqlite`; Phase 4 (private clones cold when idle).
 
 ## Next for the seed node's memory (open, 2026-10-28)
