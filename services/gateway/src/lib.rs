@@ -63,7 +63,7 @@ async fn background(node: node::Node, happ: std::path::PathBuf) {
         Err(e) => tracing::warn!(error = %e, "warm-up failed; first signup will be slower"),
     }
     match node.update_coordinators().await {
-        Ok(dnas) => tracing::info!(dnas, "coordinators up to date"),
+        Ok(cells) => tracing::info!(cells, "coordinators up to date"),
         Err(e) => tracing::warn!(error = %e, "coordinator update failed"),
     }
     let mut last = usize::MAX;

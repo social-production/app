@@ -45,7 +45,10 @@ impl Node {
         restore: bool,
     ) -> anyhow::Result<AppInfo> {
         let id = app_id(agent, &self.happ_version);
-        Box::pin(self.install_and_enable(&id, agent, happ, restore)).await
+        let app = Box::pin(self.install_and_enable(&id, agent, happ, restore)).await?;
+        // A cell installed after startup may carry a stale coordinator (ADR 0063).
+        Box::pin(self.refresh_coordinators(&app, None)).await?;
+        Ok(app)
     }
 
     /// Grant `signing_key` every zome function on every cell of the person's app.
@@ -81,6 +84,8 @@ impl Node {
             .filter(|c| dna_hashes.contains(c.dna_hash()))
             .collect();
         self.grant(&cells, signing_key, cap_secret).await?;
+        // New clones (projects, chats) start from the stored coordinator too (ADR 0063).
+        Box::pin(self.refresh_coordinators(app, Some(dna_hashes))).await?;
         Ok(cells.len())
     }
 

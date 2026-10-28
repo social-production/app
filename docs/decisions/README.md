@@ -64,3 +64,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0060](./0060-jemalloc-on-the-seed-node.md) jemalloc as the gateway allocator (idle 1.1 GB → ~0.7 GB); test founders on the test network
 - [0061](./0061-private-events-and-organizers.md) Invite-only events: the seed says private or organizer-run; organizers are grant records (M5c part 2)
 - [0062](./0062-sqlite-readers-per-database.md) Cap SQLite readers per database on the seed node (memory per project)
+- [0063](./0063-coordinators-per-cell.md) Update coordinators per cell, on startup, install and new clones
