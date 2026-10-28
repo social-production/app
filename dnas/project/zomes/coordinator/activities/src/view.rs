@@ -74,6 +74,13 @@ pub fn list() -> ExternResult<Vec<ActivityView>> {
         LinkTypes::Activities,
         UnitEntryTypes::Activity,
     )?;
+    let mut here = Vec::new();
+    for a in all {
+        if reads::in_space(&a.entry.membership)? {
+            here.push(a);
+        }
+    }
+    let all = here;
     let members = calls::glance()?.members;
     let me = agent_info()?.agent_initial_pubkey;
     let now = sys_time()?.as_micros();

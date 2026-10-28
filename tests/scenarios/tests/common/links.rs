@@ -1,14 +1,14 @@
-//! Two projects for the link scenarios (ADR 0042): each founder created one, and both have
-//! a cell of each (opening a project clones it).
+//! Two projects for the link scenarios (ADR 0042): each founder founded one space in the
+//! commons (ADR 0065), so both live in every agent's one project cell.
 
-use holo_hash::AgentPubKeyB64;
+use holo_hash::{ActionHashB64, AgentPubKeyB64};
 use holochain::prelude::*;
-use holochain::sweettest::{await_consistency, SweetAgents, SweetCell, SweetConductorBatch};
+use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
 use serde::{Deserialize, Serialize};
 use sp_governance::links::SideStatus;
 use sp_governance::Verdict;
 
-use super::net::charter;
+use super::net::{charter, Scoped};
 
 /// Mirrors `project_integrity::ProjectRef` and `LinkRequest`.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -93,12 +93,12 @@ pub struct VoteInput {
     pub choice: &'static str,
 }
 
-/// Two Full founders; founder 0 created and joined project A, founder 1 project B. Both
-/// have a cell of both projects (opening a project clones it).
+/// Two Full founders in one commons (ADR 0065); founder 0 founded space A, founder 1 space B.
 pub struct Pair {
     pub conductors: SweetConductorBatch,
-    /// `cells[agent][project]`.
-    pub cells: Vec<[SweetCell; 2]>,
+    /// Each agent's commons cell (both spaces live in it).
+    pub cells: Vec<SweetCell>,
+    pub spaces: [ActionHash; 2],
     pub refs: [ProjectRef; 2],
 }
 
@@ -110,55 +110,40 @@ impl Pair {
 
     pub async fn new() -> Self {
         let mut conductors = SweetConductorBatch::standard(2).await;
-        let mut agents = Vec::new();
-        for i in 0..2 {
-            agents.push(SweetAgents::one(conductors[i].keystore()).await);
-        }
-        let directory = super::directory_with_founders(&agents).await;
-        let seeds: Vec<String> = ["a", "b"]
-            .iter()
-            .zip(&agents)
-            .map(|(s, a)| format!("{}.{s}", AgentPubKeyB64::from(a.clone())))
+        let seed = format!("{}links", super::COMMONS);
+        let cells: Vec<SweetCell> = super::project_with_directory(&mut conductors, 2, &seed)
+            .await
+            .into_iter()
+            .map(|(_, project)| project)
             .collect();
-        let mut projects = Vec::new();
-        for seed in &seeds {
-            let modifiers =
-                DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(seed.clone());
-            projects.push(super::project_dna_with(modifiers).await);
+        let mut spaces = Vec::new();
+        for (i, cell) in cells.iter().enumerate() {
+            let space: ActionHash = Box::pin(conductors[i].call(
+                &cell.zome("project"),
+                "create_charter",
+                charter("productive"),
+            ))
+            .await;
+            spaces.push(space);
         }
-        let mut cells = Vec::new();
-        for (i, agent) in agents.into_iter().enumerate() {
-            let roles = [
-                ("directory".to_string(), directory.clone()),
-                ("project".to_string(), projects[0].clone()),
-                ("project_b".to_string(), projects[1].clone()),
-            ];
-            let app = conductors[i]
-                .setup_app_for_agent("sp", agent, &roles)
-                .await
-                .expect("install app");
-            let mut by_dna = app.into_cells();
-            let mut take = |dna: &DnaHash| {
-                let at = by_dna.iter().position(|c| c.cell_id().dna_hash() == dna);
-                by_dna.remove(at.expect("cell"))
-            };
-            cells.push([take(projects[0].dna_hash()), take(projects[1].dna_hash())]);
-        }
-        conductors.exchange_peer_info().await;
-        let refs = [0u8, 1].map(|i| ProjectRef {
-            listing: ActionHash::from_raw_36(vec![i; 36]),
-            network_seed: seeds[usize::from(i)].clone(),
+        let spaces: [ActionHash; 2] = [spaces[0].clone(), spaces[1].clone()];
+        let refs = [0u8, 1].map(|i| {
+            let p = usize::from(i);
+            ProjectRef {
+                listing: ActionHash::from_raw_36(vec![i; 36]),
+                network_seed: format!(
+                    "{}.space.{}",
+                    AgentPubKeyB64::from(cells[p].agent_pubkey().clone()),
+                    ActionHashB64::from(spaces[p].clone())
+                ),
+            }
         });
         let pair = Self {
             conductors,
             cells,
+            spaces,
             refs,
         };
-        for p in 0..2 {
-            let _: ActionHash = pair
-                .call(p, p, "project", "create_charter", charter("productive"))
-                .await;
-        }
         pair.settle().await;
         pair
     }
@@ -175,23 +160,29 @@ impl Pair {
         I: Serialize + std::fmt::Debug,
         O: serde::de::DeserializeOwned + std::fmt::Debug,
     {
-        let zome = self.cells[agent][project].zome(zome);
-        Box::pin(self.conductors[agent].call(&zome, func, payload)).await
+        let zome = self.cells[agent].zome(zome);
+        let input = Scoped {
+            space: self.spaces[project].clone(),
+            input: payload,
+        };
+        Box::pin(self.conductors[agent].call(&zome, func, input)).await
     }
 
     pub async fn refused(&self, agent: usize, project: usize, request: LinkRequest, why: &str) {
-        let zome = self.cells[agent][project].zome("governance");
-        let kind = ProposalKind::Link(request);
+        let zome = self.cells[agent].zome("governance");
+        let input = Scoped {
+            space: self.spaces[project].clone(),
+            input: ProposalKind::Link(request),
+        };
         let result: Result<ActionHash, _> =
-            Box::pin(self.conductors[agent].call_fallible(&zome, "propose", kind)).await;
+            Box::pin(self.conductors[agent].call_fallible(&zome, "propose", input)).await;
         assert!(result.is_err(), "{why}");
     }
 
     pub async fn settle(&self) {
-        for p in 0..2 {
-            let cells: Vec<&SweetCell> = self.cells.iter().map(|c| &c[p]).collect();
-            await_consistency(cells).await.expect("project consistency");
-        }
+        await_consistency(&self.cells)
+            .await
+            .expect("commons consistency");
     }
 
     /// `agent` files a request in `from` and mirrors it into the other project, as the UI does.

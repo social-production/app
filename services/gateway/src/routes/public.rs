@@ -20,7 +20,7 @@ pub async fn read(
             "Too many reads from this address today. Sign in to keep going.".into(),
         ));
     }
-    match state.node.public_read(read).await? {
+    match Box::pin(state.node.public_read(read)).await? {
         Ok(bytes) => Ok(([(header::CONTENT_TYPE, "application/msgpack")], bytes).into_response()),
         Err(Refused::NotAllowed) => Err(ApiError(
             StatusCode::FORBIDDEN,

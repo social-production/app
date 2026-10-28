@@ -4,10 +4,19 @@
 use hdk::prelude::*;
 use project_integrity::{LinkTypes, UnitEntryTypes};
 
-const ACTIVITIES: &str = "activities";
+/// The current space's base: activities hang off it (ADR 0065).
+pub fn anchor() -> ExternResult<AnyLinkableHash> {
+    space_scope::base()
+}
 
-pub fn anchor() -> ExternResult<EntryHash> {
-    Path::from(ACTIVITIES).path_entry_hash()
+/// Whether the `Members` link at `membership` belongs to the current space (own records span
+/// every space a person is in).
+pub fn in_space(membership: &ActionHash) -> ExternResult<bool> {
+    let Some(record) = get(membership.clone(), GetOptions::default())? else {
+        return Ok(false);
+    };
+    let base = space_scope::base()?;
+    Ok(matches!(&record.action().data, ActionData::CreateLink(l) if l.base_address == base))
 }
 
 #[derive(Debug)]

@@ -6,9 +6,6 @@ use std::collections::BTreeMap;
 use hdk::prelude::*;
 use project_integrity::LinkTypes;
 
-/// The project zome's members anchor (`project` coordinator, `MEMBERS`).
-const MEMBERS: &str = "members";
-
 pub struct Span {
     pub hash: ActionHash,
     pub agent: AgentPubKey,
@@ -27,7 +24,7 @@ pub struct Roll(Vec<Span>);
 
 impl Roll {
     pub fn load() -> ExternResult<Self> {
-        let base = Path::from(MEMBERS).path_entry_hash()?;
+        let base = space_scope::base()?;
         let details = get_links_details(
             LinkQuery::try_new(base, LinkTypes::Members)?,
             GetStrategy::default(),

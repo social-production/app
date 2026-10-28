@@ -6,13 +6,13 @@ use hdk::prelude::*;
 use project_integrity::{EntryTypes, LinkRequest, LinkTypes, Proposal, ProposalKind};
 use sp_governance::links::{DEFAULT_RELATIONSHIP, RELATIONSHIP_MAX, SEVER_SUMMARY};
 
+use crate::calls;
 use crate::link_view::halves;
 use crate::write::guest;
-use crate::{calls, reads};
 
 pub fn propose(link: LinkRequest) -> ExternResult<ActionHash> {
     let link = tidy(link)?;
-    if dna_info()?.modifiers.network_seed == link.other.network_seed {
+    if space_scope::seed()? == link.other.network_seed {
         return Err(guest("Cannot link a record to itself."));
     }
     let membership = calls::my_membership()?;
@@ -55,12 +55,13 @@ pub fn propose(link: LinkRequest) -> ExternResult<ActionHash> {
         None
     };
     let hash = create_entry(EntryTypes::Proposal(Proposal {
+        space: space_scope::current()?,
         kind: ProposalKind::Link(link),
         membership,
         members: calls::member_snapshot()?,
         organizer,
     }))?;
-    create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;
+    create_link(space_scope::base()?, hash.clone(), LinkTypes::Proposals, ())?;
     if decides {
         crate::write::decide_now(&hash)?;
     }

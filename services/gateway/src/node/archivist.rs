@@ -1,18 +1,24 @@
-//! The archivist (ADR 0031): an agent of this node that joins every listed
-//! project's network, so projects stay available while their members are offline, and
-//! that reads each project's counts for the feed index. Community nodes can run the same.
+//! The archivist (ADR 0031): an agent of this node that holds the commons (every public
+//! space, ADR 0065), so projects stay available while their members are offline, and that
+//! reads each listed space's counts for the feed index. Community nodes can run the same.
 
-use std::collections::BTreeMap;
+use std::collections::BTreeSet;
 use std::path::Path;
 
 use anyhow::anyhow;
 use holo_hash::{ActionHashB64, AgentPubKeyB64};
 use holochain::conductor::api::{AdminRequest, AppInfo, CellInfo};
 use holochain::prelude::*;
-use holochain_types::app::{AppBundleSource, CreateCloneCellPayload, InstallAppPayload};
+use holochain_types::app::{AppBundleSource, InstallAppPayload};
 use serde::Deserialize;
 
+use super::spaces::{space_of_seed, Scoped};
 use super::{Node, ProjectCard};
+
+/// Every this many rounds (15 s each) every space is re-read: about every 15 minutes.
+const FULL_EVERY: u64 = 60;
+/// Every this many rounds the recently written spaces are: about once a minute.
+const ACTIVE_EVERY: u64 = 4;
 
 /// Mirrors the directory zome's `ListingView`.
 #[derive(Debug, Deserialize)]
@@ -69,68 +75,100 @@ struct Charter {
 }
 
 impl Node {
-    /// One pass: join new projects, then rebuild the feed index. Returns projects indexed.
-    pub async fn archive_round(&self, happ: &Path) -> anyhow::Result<usize> {
+    /// One pass over the listed public spaces (ADR 0065): all of them live in the archivist's
+    /// one commons cell, so nothing is joined per project. A space is re-read when it is new
+    /// to the index or was written to lately (its `recent.<hour>` bucket); every
+    /// `FULL_EVERY` rounds all are. Returns the spaces indexed.
+    pub async fn archive_round(&self, happ: &Path, round: u64) -> anyhow::Result<usize> {
         let app = self.archivist_app(happ).await?;
         let agent = app.agent_pub_key.clone();
         let directory = provisioned(&app, "directory")?;
+        let commons = provisioned(&app, "project")?;
         let listings: Vec<ListingView> = self
             .call(&agent, directory.clone(), "identity", "list_projects", ())
             .await?;
-
-        let mut joined = clones_by_seed(&app);
-        for view in &listings {
-            let seed = &view.listing.network_seed;
-            if joined.contains_key(seed) {
-                continue;
-            }
-            let payload = CreateCloneCellPayload {
-                role_name: "project".into(),
-                modifiers: DnaModifiersOpt::none().with_network_seed(seed.clone()),
-                membrane_proof: None,
-                name: Some(view.listing.title.clone()),
-            };
-            let cell = self
-                .conductor
-                .clone()
-                .create_clone_cell(&app.installed_app_id, payload)
-                .await?;
-            joined.insert(seed.clone(), cell.cell_id);
-        }
-
-        let mut cards = Vec::with_capacity(listings.len());
-        for view in listings {
-            let Some(cell) = joined.get(&view.listing.network_seed) else {
-                continue;
-            };
-            let project: Option<ProjectView> = self
-                .call(&agent, cell.clone(), "project", "get_project", ())
-                .await
-                .unwrap_or(None);
-            // The username comes with the card, so guests see it without a session.
-            let profile: Option<Profile> = self
+        let full = round.is_multiple_of(FULL_EVERY);
+        // Spaces written to this hour or the last; a writer marks a space once an hour, so a
+        // marked space is re-read (once a minute) until its hour has passed.
+        let active: BTreeSet<ActionHash> = if full || !round.is_multiple_of(ACTIVE_EVERY) {
+            BTreeSet::new()
+        } else {
+            let hour = Timestamp::now().as_micros() / 3_600_000_000;
+            let found: Vec<ActionHash> = self
                 .call(
                     &agent,
-                    directory.clone(),
-                    "identity",
-                    "get_profile",
-                    view.creator.clone(),
+                    commons.clone(),
+                    "project",
+                    "active_spaces",
+                    vec![hour - 1, hour],
                 )
-                .await
-                .unwrap_or(None);
-            // Only the count is used; each message is skipped, not decoded.
-            let messages: Vec<serde::de::IgnoredAny> = self
-                .call(&agent, cell.clone(), "discussion", "list_messages", ())
-                .await
-                .unwrap_or_default();
-            let mut card = card(view, project);
-            card.creator_name = profile.map(|p| p.name).unwrap_or_default();
-            card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
-            cards.push(card);
+                .await?;
+            found.into_iter().collect()
+        };
+        let before = self.index.by_id().await;
+        let mut cards = Vec::with_capacity(listings.len());
+        for view in listings {
+            let Some(space) = space_of_seed(&view.listing.network_seed) else {
+                continue; // not a commons space (a listing from before ADR 0065)
+            };
+            let id = ActionHashB64::from(view.id.clone()).to_string();
+            if let Some(card) = before
+                .get(&id)
+                .filter(|_| !full && !active.contains(&space))
+            {
+                cards.push(card.clone());
+                continue;
+            }
+            cards.push(Box::pin(self.read_card(&agent, &directory, &commons, view, space)).await);
         }
         let count = cards.len();
         self.index.replace(cards).await;
         Ok(count)
+    }
+
+    /// A space's card: its listing, its live counts and its creator's name.
+    async fn read_card(
+        &self,
+        agent: &AgentPubKey,
+        directory: &CellId,
+        commons: &CellId,
+        view: ListingView,
+        space: ActionHash,
+    ) -> ProjectCard {
+        let at = |input| Scoped {
+            space: space.clone(),
+            input,
+        };
+        let project: Option<ProjectView> = self
+            .call(agent, commons.clone(), "project", "get_project", at(()))
+            .await
+            .unwrap_or(None);
+        // The username comes with the card, so guests see it without a session.
+        let profile: Option<Profile> = self
+            .call(
+                agent,
+                directory.clone(),
+                "identity",
+                "get_profile",
+                view.creator.clone(),
+            )
+            .await
+            .unwrap_or(None);
+        // Only the count is used; each message is skipped, not decoded.
+        let messages: Vec<serde::de::IgnoredAny> = self
+            .call(
+                agent,
+                commons.clone(),
+                "discussion",
+                "list_messages",
+                at(()),
+            )
+            .await
+            .unwrap_or_default();
+        let mut card = card(view, project);
+        card.creator_name = profile.map(|p| p.name).unwrap_or_default();
+        card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
+        card
     }
 
     pub(super) async fn archivist_app(&self, happ: &Path) -> anyhow::Result<AppInfo> {
@@ -175,13 +213,13 @@ impl Node {
                 (),
             )
             .await?;
-        let _: Option<serde::de::IgnoredAny> = self
+        let _: Vec<serde::de::IgnoredAny> = self
             .call(
                 &agent,
                 provisioned(&app, "project")?,
                 "project",
-                "get_project",
-                (),
+                "active_spaces",
+                Vec::<i64>::new(),
             )
             .await?;
         Ok(())
@@ -217,18 +255,6 @@ pub(super) fn provisioned(app: &AppInfo, role: &str) -> anyhow::Result<CellId> {
             _ => None,
         })
         .ok_or_else(|| anyhow!("archivist has no {role} cell"))
-}
-
-pub(super) fn clones_by_seed(app: &AppInfo) -> BTreeMap<String, CellId> {
-    app.cell_info
-        .get("project")
-        .into_iter()
-        .flatten()
-        .filter_map(|c| match c {
-            CellInfo::Cloned(c) => Some((c.dna_modifiers.network_seed.clone(), c.cell_id.clone())),
-            _ => None,
-        })
-        .collect()
 }
 
 fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {

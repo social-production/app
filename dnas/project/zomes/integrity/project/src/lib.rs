@@ -1,7 +1,8 @@
-//! Rules for one project (each project is its own clone of this DNA, ADR 0030).
-//! The creator is named in the clone's network seed (`<creator key>.<nonce>`), so every member
-//! agrees who it is and every node derives the same DNA hash from one plain string.
-//! Membership and signals are links whose target is their author, so they need no entries.
+//! Rules for spaces (projects, events…). Public spaces share one network, the commons: this
+//! DNA's base cell, where a space is its charter record and everything of the space hangs off
+//! the charter's hash (ADR 0065). A private space is a clone whose seed names its creator
+//! (ADR 0030, 0061) and holds that one space under the same rules.
+//! Membership and signals are links from the space to their author, so they need no entries.
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
 //! importance votes are records too (ADR 0041); links to other projects are proposals (ADR 0042).
 //! Activities and their roles, suggestions and ratings are records; taking a role is a link
@@ -15,10 +16,10 @@ mod link;
 mod links;
 mod organizer;
 mod plan;
+mod space;
 mod value;
 
 use hdi::prelude::*;
-use holo_hash::AgentPubKeyB64;
 
 pub use activity::{
     Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
@@ -27,6 +28,9 @@ pub use governance::SNAPSHOT_MAX;
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
+pub use space::{
+    charter_at, creator, creator_in_seed, space_creator, space_in_seed, SPACE_SEED_WORD,
+};
 pub use value::{Importance, Value};
 
 #[hdk_entry_helper]
@@ -76,6 +80,8 @@ pub enum ProposalKind {
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
 pub struct Proposal {
+    /// The space it decides for: its charter's create hash (ADR 0065).
+    pub space: ActionHash,
     pub kind: ProposalKind,
     /// The proposer's own `Members` link. Only a link request mirrored from another project
     /// may come from someone who isn't a member here (ADR 0042).
@@ -154,13 +160,13 @@ pub enum EntryTypes {
 #[derive(Serialize, Deserialize)]
 #[hdk_link_types]
 pub enum LinkTypes {
-    /// "charter" anchor → the charter's create action.
+    /// "charter" anchor → the charter (private clones find their one space through it).
     ProjectCharter,
-    /// "members" anchor → member agent.
+    /// Space → member agent.
     Members,
-    /// "signals" anchor → signalling agent; tag `[DEMAND]` or `[OPPOSE]`.
+    /// Space → signalling agent; tag `[DEMAND]` or `[OPPOSE]`.
     Signals,
-    /// "proposals" anchor → proposal.
+    /// Space → proposal.
     Proposals,
     ProposalToVotes,
     ProposalToOutcomes,
@@ -168,11 +174,11 @@ pub enum LinkTypes {
     ProposalToRatings,
     /// Proposal → a challenge to its count.
     ProposalToChallenges,
-    /// "values" anchor → value.
+    /// Space → value.
     Values,
     /// Value → a member's importance vote.
     ValueToImportance,
-    /// "activities" anchor → activity.
+    /// Space → activity.
     Activities,
     /// Activity → the member taking a role; tag `[role index]` + their `Members` link hash.
     Assignments,
@@ -180,22 +186,11 @@ pub enum LinkTypes {
     ActivityToSuggestions,
     /// Activity → a participant's rating or completion check-in.
     ActivityToRatings,
-    /// "organizers" anchor → an `Organizer` record (ADR 0061).
+    /// Space → an `Organizer` record (ADR 0061).
     Organizers,
-}
-
-/// The project's creator, from the network seed; `None` in the (unused) base cell.
-pub fn creator() -> ExternResult<Option<AgentPubKey>> {
-    Ok(creator_in_seed(&dna_info()?.modifiers.network_seed))
-}
-
-/// `<creator key>.<nonce>` → the creator key.
-pub fn creator_in_seed(seed: &str) -> Option<AgentPubKey> {
-    let (key, nonce) = seed.split_once('.')?;
-    if nonce.is_empty() {
-        return None;
-    }
-    AgentPubKeyB64::from_b64_str(key).ok().map(Into::into)
+    /// `recent.<UTC hour>` path → a space with activity in that hour, so indexes re-read only
+    /// what changed (ADR 0065).
+    Recent,
 }
 
 #[hdk_extern]

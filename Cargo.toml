@@ -42,6 +42,7 @@ sp_index = { path = "crates/sp_index" }
 health_integrity = { path = "zomes/health/integrity" }
 identity_integrity = { path = "dnas/directory/zomes/integrity/identity" }
 project_integrity = { path = "dnas/project/zomes/integrity/project" }
+space_scope = { path = "dnas/project/zomes/coordinator/space_scope" }
 discussion_integrity = { path = "dnas/project/zomes/integrity/discussion" }
 messages_integrity = { path = "dnas/conversation/zomes/integrity/messages" }
 

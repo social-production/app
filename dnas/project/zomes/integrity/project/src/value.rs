@@ -38,7 +38,13 @@ pub fn validate_value(
     if !text_ok(&v.label, LABEL_MAX) || v.label.trim() != v.label {
         return invalid("a value is 1–160 characters, trimmed");
     }
-    if !is_membership(&v.membership, action.author(), Some(action.timestamp()))? {
+    // The membership chooses the value's space.
+    if !is_membership(
+        &v.membership,
+        action.author(),
+        Some(action.timestamp()),
+        None,
+    )? {
         return invalid("only members can add values");
     }
     Ok(ValidateCallbackResult::Valid)
@@ -51,23 +57,33 @@ pub fn validate_importance(
     if crate::organized()? {
         return invalid("organizer-controlled events don't use values");
     }
-    if !is_value(&i.value)? {
+    let Some(space) = value_space(&i.value)? else {
         return invalid("an importance vote must be on a value");
-    }
+    };
     if !importance_ok(i.importance) {
         return invalid("importance is 1 to 10");
     }
-    if !is_membership(&i.membership, action.author(), Some(action.timestamp()))? {
+    if !is_membership(
+        &i.membership,
+        action.author(),
+        Some(action.timestamp()),
+        Some(&space),
+    )? {
         return invalid("only members can rate values");
     }
     Ok(ValidateCallbackResult::Valid)
 }
 
-/// `hash` is a `Value` record of this project.
+/// `hash` is a `Value` record.
 pub fn is_value(hash: &ActionHash) -> ExternResult<bool> {
+    Ok(value_space(hash)?.is_some())
+}
+
+/// The space of the `Value` record at `hash` (its author's membership's), or `None`.
+fn value_space(hash: &ActionHash) -> ExternResult<Option<ActionHash>> {
     let record = must_get_valid_record(hash.clone())?;
-    Ok(matches!(
-        crate::typed_entry(&record)?,
-        Some(EntryTypes::Value(_))
-    ))
+    match crate::typed_entry(&record)? {
+        Some(EntryTypes::Value(v)) => crate::links::membership_space(&v.membership),
+        _ => Ok(None),
+    }
 }

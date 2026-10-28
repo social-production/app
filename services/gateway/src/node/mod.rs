@@ -10,6 +10,7 @@ mod public;
 mod release;
 mod restore;
 mod seeds;
+mod spaces;
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -38,7 +39,7 @@ pub struct Node {
     pub happ_version: String,
     /// Each role's coordinator zomes from the bundle, for in-place updates.
     coordinators: Arc<BTreeMap<String, CoordinatorBundle>>,
-    /// Feed index over every project the archivist holds (refreshed in the background).
+    /// Feed index over every listed public space (refreshed in the background).
     pub index: ProjectIndex,
     /// Names and bios of everyone in the directory, for search (refreshed every minute).
     pub people: PeopleIndex,

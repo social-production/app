@@ -13,10 +13,12 @@ import {
 import {
   callCell,
   callZome,
+  clonedSeeds,
+  commonsCell,
   hashToString,
-  newProjectSeed,
   projectCell,
   projectFeed,
+  spaceSeed,
   stringToHash,
   type ActionHash,
   type AgentPubKey,
@@ -80,16 +82,36 @@ export async function projectAllowance(): Promise<number | null> {
   return (await directory<{ remaining: number | null }>('project_allowance')).remaining;
 }
 
-/** Start a project: its own network (clone), its charter, then its directory listing. */
+/** Start a project: its charter founds a space in the commons (ADR 0065), then its
+ * directory listing names that space. */
 export async function createProject(charter: Charter): Promise<string> {
   if ((await projectAllowance()) === 0) {
     throw new Error('New members can start 2 projects per 7 days; full members have no limit.');
   }
-  const seed = newProjectSeed(await myAgent());
-  const cell = await projectCell(seed, charter.title);
-  await callCell<ActionHash>(cell, 'project', 'create_charter', charter);
+  const space = await callCell<ActionHash>(
+    await commonsCell(),
+    'project',
+    'create_charter',
+    charter,
+  );
+  const seed = spaceSeed(await myAgent(), space);
   const id = await directory<ActionHash>('create_listing', listingOf(seed, charter));
   return hashToString(id);
+}
+
+/** Seeds of the projects this person is in: the spaces they joined in the commons, and the
+ * private events opened on this node (the rail, notifications and the Public tab read them). */
+export async function myProjectSeeds(): Promise<string[]> {
+  const [mine, clones] = await Promise.all([
+    callCell<{ space: ActionHash; creator: AgentPubKey }[]>(
+      await commonsCell(),
+      'project',
+      'my_spaces',
+      null,
+    ),
+    clonedSeeds('project'),
+  ]);
+  return [...mine.map((s) => spaceSeed(hashToString(s.creator), s.space)), ...clones];
 }
 
 async function listing(id: string): Promise<ListingWire> {
@@ -104,8 +126,8 @@ export async function listingTitle(id: string): Promise<string | null> {
   return found?.listing.title ?? null;
 }
 
-/** A project's cell on this node (cloned on first use, which joins its network). A private
- * event isn't listed: its id is its seed (ADR 0061). */
+/** A project's cell on this node (the commons cell for a public space; a private event's
+ * clone is created on first use). A private event isn't listed: its id is its seed. */
 export async function cellOf(id: string) {
   if (isPrivateSeed(id)) return { cell: await projectCell(id, 'Event'), seed: id };
   const l = await listing(id);
@@ -116,7 +138,7 @@ export async function cellOf(id: string) {
 }
 
 /** A project by its listing id (project pages), or by its network seed (lists built from the
- * clones on this node: Messages' Public tab, notifications). */
+ * person's own spaces: Messages' Public tab, notifications). */
 export type ProjectRef = string | { seed: string };
 
 export async function cellFor(project: ProjectRef) {

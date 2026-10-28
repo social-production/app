@@ -44,6 +44,26 @@ membership comes for free" turns out to shard the wrong way.
    0043), so chats stop costing a network each; and hosted accounts get a home gateway, so
    hosting spreads across seed nodes (any gateway can already restore an account by phrase).
 
+## As built (2026-10-28)
+- **Listings stay** (changes point 4): a public space keeps its directory listing, whose seed
+  `<creator>.space.<charter hash>` names the space instead of a network. The directory's rules
+  (creator in the seed) are unchanged, so the directory network is not reset, and every page,
+  link and route that knows a project by its listing id or seed keeps working.
+- **Calls name their space:** every project-DNA call about a space takes `{space, input}`. A
+  bare input means "this clone's one space", so private events (and anything written before)
+  call exactly as before. Founding (`create_charter`) and file parts are not about one space.
+  The project zome resolves a clone's space (`space`) and marks activity (`touch`) for the
+  chat zome, which can't read the project rules itself.
+- **Chat** messages and read marks name their space; a message is listed only under its own.
+- **The person's own spaces** (`my_spaces`: their live memberships) replace "clones on this
+  node" for the rail, notifications and the Public tab.
+- **The archivist** reads every listed space in its one commons cell; it re-reads a space
+  when it is new, written to in this or the last hour (`active_spaces`, once a minute), or every
+  15 minutes; other cards are kept. Guest reads go to the commons cell the same way.
+- **Measured (clones, before):** one conductor creating project clones went from 52 threads and
+  100 open files at 1 project to 1,177/2,537 at 100 and 2,522/5,427 at 200 (about 12 threads and
+  27 files per project; RSS 1.09 → 1.38 GB). With the commons a project adds rows, not threads.
+
 ## Consequences
 - One reset of the project network (and the directory, for listings); test data only.
 - The rewrite touches the project zomes (~5,400 lines), the archivist and index, the scenarios

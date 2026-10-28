@@ -1,5 +1,5 @@
-//! Membership and signals: links whose target is their author (ADR 0030). Reads merge the
-//! network's view with the caller's own chain, so your own join/leave/signal shows at once.
+//! Membership and signals: links from the space to their author (ADR 0030, 0065). Reads merge
+//! the network's view with the caller's own chain, so your own join/leave/signal shows at once.
 
 use std::collections::BTreeMap;
 
@@ -7,12 +7,12 @@ use hdk::prelude::*;
 use project_integrity::{LinkTypes, DEMAND, OPPOSE};
 
 use crate::own::live_links;
-use crate::{anchor, links, Stance, MEMBERS, SIGNALS};
+use crate::{links, Stance};
 
 pub fn join() -> ExternResult<()> {
     if live_links(LinkTypes::Members)?.is_empty() {
         let me = agent_info()?.agent_initial_pubkey;
-        create_link(anchor(MEMBERS)?, me, LinkTypes::Members, ())?;
+        create_link(space_scope::base()?, me, LinkTypes::Members, ())?;
     }
     Ok(())
 }
@@ -36,7 +36,7 @@ pub fn set_signal(stance: Option<Stance>) -> ExternResult<()> {
             Stance::Oppose => OPPOSE,
         };
         create_link(
-            anchor(SIGNALS)?,
+            space_scope::base()?,
             me,
             LinkTypes::Signals,
             LinkTag::new([tag]),
@@ -57,7 +57,7 @@ pub fn my_membership() -> ExternResult<Option<ActionHash>> {
 pub fn snapshot() -> ExternResult<Vec<ActionHash>> {
     let me = agent_info()?.agent_initial_pubkey;
     let mut earliest: BTreeMap<AgentPubKey, (Timestamp, ActionHash)> = BTreeMap::new();
-    for l in links(MEMBERS, LinkTypes::Members)? {
+    for l in links(LinkTypes::Members)? {
         let entry = earliest
             .entry(l.author.clone())
             .or_insert((l.timestamp, l.create_link_hash.clone()));
@@ -82,8 +82,8 @@ pub struct People {
 
 pub fn read() -> ExternResult<People> {
     let me = agent_info()?.agent_initial_pubkey;
-    let member_links = links(MEMBERS, LinkTypes::Members)?;
-    let signal_links = links(SIGNALS, LinkTypes::Signals)?;
+    let member_links = links(LinkTypes::Members)?;
+    let signal_links = links(LinkTypes::Signals)?;
 
     let am_member = my_membership()?.is_some();
     let mut members: Vec<AgentPubKey> = member_links

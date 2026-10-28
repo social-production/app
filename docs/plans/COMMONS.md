@@ -4,13 +4,13 @@ Goal: tens of thousands of public projects, events, help requests, communities a
 with any full node able to archive all of them. Public spaces become records in the project
 DNA's base cell; private spaces stay clones of the same DNA. Each phase ends green and measured.
 
-## Phase 0: measure (before rewriting)
+## Phase 0: measure (before rewriting) — done 2026-10-28 (ADR 0065 "As built")
 - `/readyz` has jemalloc figures and app/cell counts (2026-10-28).
 - A bench on a local release seed node (`scripts/kept-seed.sh`): create 100, 300 and 1,000
   projects through the zomes (not the browser), recording RSS, threads, open files and CPU.
   Repeat with the commons after Phase 2. Kept in `docs/NETWORK.md`.
 
-## Phase 1: integrity (project DNA, one reset)
+## Phase 1: integrity (project DNA, one reset) — built 2026-10-28
 - Every entry and link names its space: `space: ActionHash` (the charter's create hash).
   Bases: the charter hash for members, signals, proposals, values, activities, organizers, chat
   and links between spaces; no global anchors.
@@ -24,17 +24,17 @@ DNA's base cell; private spaces stay clones of the same DNA. Each phase ends gre
 - Crate rules stay in `sp_governance`/`sp_event`; `sp_core` untouched if possible (it would also
   reset the conversation network).
 
-## Phase 2: coordinators, gateway, index
+## Phase 2: coordinators, gateway, index — built 2026-10-28 (cards not yet persisted)
 - Coordinators take `space` on every call (the cell is the commons for public spaces).
 - Archivist: one cell for the commons; reads `recent.*` buckets since its last round, re-reads
   those spaces only; cards persisted in `gateway.sqlite`, so a restart serves the feed at once.
 - Guest reads (`public.rs`) and the people index read the commons cell.
-- Directory listings: no longer written for public spaces; the index comes from the commons.
+- Directory listings stay, seeded `<creator>.space.<charter hash>` (no directory reset).
 - Scenarios: `Net` creates spaces in one shared cell instead of one clone per test project.
 
-## Phase 3: UI
-- Public spaces are addressed by their charter hash (`/projects/<hash>`, `/events/<hash>`);
-  private events keep `/events/<seed>`. `services/projects.ts` resolves either to (cell, space).
+## Phase 3: UI — built 2026-10-28 (addressing kept: listing ids and seeds)
+- Routes unchanged. `holo/cells.ts` `projectCell(seed)` returns the commons cell tagged with
+  the space (`holo/spaces.ts`) and `callCell` wraps calls as `{space, input}`.
 - Notifications, the rail and Messages' Public tab read spaces from the commons instead of
   "clones on this node".
 

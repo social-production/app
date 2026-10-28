@@ -6,16 +6,14 @@
 mod files;
 mod own;
 mod reads;
+mod scope;
 
-use discussion_integrity::{
-    Attachment, ChatMessage, EntryTypes, LinkTypes, ReadMark, UnitEntryTypes,
-};
+use discussion_integrity::{Attachment, ChatMessage, EntryTypes, LinkTypes, ReadMark};
 use hdk::prelude::*;
 use sp_attachment::check_body;
 
 pub use files::Bytes;
-
-pub(crate) const CHAT: &str = "chat";
+use scope::{enter, In};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PostInput {
@@ -47,8 +45,9 @@ pub struct ReplyRef {
     pub deleted: bool,
 }
 
-pub(crate) fn anchor() -> ExternResult<EntryHash> {
-    Path::from(CHAT).path_entry_hash()
+/// A space's chat hangs off the space itself (its charter hash, ADR 0065).
+pub(crate) fn anchor() -> ExternResult<ActionHash> {
+    scope::current()
 }
 
 fn guest(reason: &str) -> WasmError {
@@ -56,7 +55,8 @@ fn guest(reason: &str) -> WasmError {
 }
 
 #[hdk_extern]
-pub fn post_message(input: PostInput) -> ExternResult<ActionHash> {
+pub fn post_message(call: In<PostInput>) -> ExternResult<ActionHash> {
+    let input = enter(call)?;
     let body = input.body.trim().to_string();
     check_body(&body, input.attachments.len()).map_err(|reason| guest(&reason))?;
     files::check(&input.attachments)?;
@@ -68,18 +68,21 @@ pub fn post_message(input: PostInput) -> ExternResult<ActionHash> {
         }
     }
     let message = ChatMessage {
+        space: anchor()?,
         body,
         reply_to: input.reply_to,
         attachments: input.attachments,
     };
     let hash = create_entry(EntryTypes::ChatMessage(message))?;
     create_link(anchor()?, hash.clone(), LinkTypes::ChatMessages, ())?;
+    scope::touch()?;
     Ok(hash)
 }
 
 /// Take back your own message: its chat link and the entry go (web's `delete_own_comment`).
 #[hdk_extern]
-pub fn delete_message(id: ActionHash) -> ExternResult<()> {
+pub fn delete_message(call: In<ActionHash>) -> ExternResult<()> {
+    let id = enter(call)?;
     let mine = own::messages()?;
     if !mine.iter().any(|r| r.action_address() == &id) {
         return Err(guest("You can only delete your own message."));
@@ -111,30 +114,31 @@ pub fn get_chunk(hash: ActionHash) -> ExternResult<Option<Bytes>> {
 
 /// Mark the chat read up to `at` (private to you, on every device you sign in on).
 #[hdk_extern]
-pub fn mark_read(at: Timestamp) -> ExternResult<()> {
-    if read_at(())?.is_none_or(|old| at > old) {
-        create_entry(EntryTypes::ReadMark(ReadMark { at }))?;
+pub fn mark_read(call: In<Timestamp>) -> ExternResult<()> {
+    let at = enter(call)?;
+    if own::read_at()?.is_none_or(|old| at > old) {
+        let space = anchor()?;
+        create_entry(EntryTypes::ReadMark(ReadMark { space, at }))?;
     }
     Ok(())
 }
 
 /// How far you've read this chat, from your own chain.
 #[hdk_extern]
-pub fn read_at(_: ()) -> ExternResult<Option<Timestamp>> {
-    let marks = query(
-        ChainQueryFilter::new()
-            .entry_type(EntryType::App(UnitEntryTypes::ReadMark.try_into()?))
-            .include_entries(true),
-    )?;
-    Ok(marks
-        .iter()
-        .filter_map(|r| r.entry().to_app_option::<ReadMark>().ok().flatten())
-        .map(|m| m.at)
-        .max())
+pub fn read_at(call: In<()>) -> ExternResult<Option<Timestamp>> {
+    enter(call)?;
+    own::read_at()
+}
+
+/// Every space whose chat the caller wrote in (web's Public tab lists those too).
+#[hdk_extern]
+pub fn my_chat_spaces(_: ()) -> ExternResult<Vec<ActionHash>> {
+    own::spaces()
 }
 
 /// The newest messages (up to `sp_core::chat::PAGE_MAX`), oldest first.
 #[hdk_extern]
-pub fn list_messages() -> ExternResult<Vec<MessageView>> {
+pub fn list_messages(call: In<()>) -> ExternResult<Vec<MessageView>> {
+    enter(call)?;
     reads::list()
 }

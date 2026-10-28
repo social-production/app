@@ -10,6 +10,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_activity",
+ "space_scope",
 ]
 
 [[package]]
@@ -3032,6 +3033,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_governance",
+ "space_scope",
 ]
 
 [[package]]
@@ -7176,6 +7178,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_governance",
+ "space_scope",
 ]
 
 [[package]]
@@ -8800,6 +8803,16 @@ dependencies = [
 [[package]]
 name = "sp_index"
 version = "0.0.1"
+
+[[package]]
+name = "space_scope"
+version = "0.0.1"
+dependencies = [
+ "hdk",
+ "holo_hash",
+ "project_integrity",
+ "serde",
+]
 
 [[package]]
 name = "spez"

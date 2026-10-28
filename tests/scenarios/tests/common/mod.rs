@@ -101,6 +101,19 @@ pub async fn directory_with_founders(founders: &[AgentPubKey]) -> DnaFile {
         .expect("load directory dna")
 }
 
+/// Seeds starting with this make a commons cell (no creator in the seed, ADR 0065), the way
+/// the base cell (no seed) is the commons in the app; a seed still keeps tests apart.
+pub const COMMONS: &str = "commons.";
+
+/// The seed a project cell gets: the commons' own, or a clone's named after its creator.
+fn project_seed(creator: &AgentPubKey, seed: &str) -> String {
+    if seed.starts_with(COMMONS) {
+        seed.to_string()
+    } else {
+        format!("{}.{seed}", AgentPubKeyB64::from(creator.clone()))
+    }
+}
+
 /// One agent per conductor; the first `founders` agents are founders. Returns the
 /// directory cells in conductor order.
 pub async fn directory_network(
@@ -124,24 +137,17 @@ pub async fn directory_network(
     cells
 }
 
-/// The project DNA with `modifiers` (a network seed names its creator).
-pub async fn project_dna_with(modifiers: DnaModifiersOpt<SerializedBytes>) -> DnaFile {
-    SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
-        .await
-        .expect("load project dna")
-}
-
-/// One project clone (seed `<first agent>.<seed>`) installed for each conductor's agent,
-/// as the gateway and UI do with `createCloneCell`. Returns the cells in conductor order.
+/// One project cell per conductor's agent: a clone named after the first agent (seed
+/// `<first agent>.<seed>`), or a commons cell when `seed` starts with `COMMONS`. Returns the
+/// cells in conductor order.
 pub async fn project_network(conductors: &mut SweetConductorBatch, seed: &str) -> Vec<SweetCell> {
     let mut agents = Vec::new();
     for i in 0..conductors.len() {
         agents.push(SweetAgents::one(conductors[i].keystore()).await);
     }
-    // The creator is named in the seed (project_integrity::creator_in_seed).
-    let creator = AgentPubKeyB64::from(agents[0].clone());
-    let modifiers =
-        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(format!("{creator}.{seed}"));
+    // A clone's creator is named in the seed (project_integrity::creator_in_seed).
+    let modifiers = DnaModifiersOpt::<SerializedBytes>::none()
+        .with_network_seed(project_seed(&agents[0], seed));
     let dna = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
         .await
         .expect("load project dna");
@@ -158,8 +164,8 @@ pub async fn project_network(conductors: &mut SweetConductorBatch, seed: &str) -
 }
 
 /// Each agent gets one app with both roles, named as in happ.yaml ("directory", "project"):
-/// the directory with the first `founders` agents as founders, and one project clone created by
-/// the first agent. Returns `(directory, project)` cells per conductor.
+/// the directory with the first `founders` agents as founders, and one project cell (a clone
+/// created by the first agent, or a commons cell, as `project_network`). Returns `(directory, project)` cells per conductor.
 pub async fn project_with_directory(
     conductors: &mut SweetConductorBatch,
     founders: usize,
@@ -182,9 +188,8 @@ pub async fn install_project_with_directory(
         agents.push(SweetAgents::one(conductors[i].keystore()).await);
     }
     let directory = directory_with_founders(&agents[..founders]).await;
-    let creator = AgentPubKeyB64::from(agents[0].clone());
-    let modifiers =
-        DnaModifiersOpt::<SerializedBytes>::none().with_network_seed(format!("{creator}.{seed}"));
+    let modifiers = DnaModifiersOpt::<SerializedBytes>::none()
+        .with_network_seed(project_seed(&agents[0], seed));
     let project = SweetDnaFile::from_bundle_with_overrides(&dna_path("project"), modifiers)
         .await
         .expect("load project dna");

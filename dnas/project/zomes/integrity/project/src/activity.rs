@@ -8,7 +8,7 @@
 use hdi::prelude::*;
 use sp_activity::{check_activity, check_rating, roles_open, ActivitySpec, RoleSpec};
 
-use crate::links::is_membership;
+use crate::links::{is_membership, membership_space};
 use crate::{invalid, EntryTypes};
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
@@ -98,7 +98,13 @@ pub fn validate_activity(
     if let Err(reason) = check_activity(&spec(a)) {
         return invalid(&reason);
     }
-    if !is_membership(&a.membership, action.author(), Some(action.timestamp()))? {
+    // The membership chooses the activity's space.
+    if !is_membership(
+        &a.membership,
+        action.author(),
+        Some(action.timestamp()),
+        None,
+    )? {
         return invalid("only members can add activities");
     }
     let organizer = a.organizer.as_ref();
@@ -123,7 +129,13 @@ pub fn validate_suggestion(
     if &s.person == action.author() {
         return invalid("suggest someone else for this role");
     }
-    if !is_membership(&s.membership, action.author(), Some(action.timestamp()))? {
+    let space = membership_space(&activity.membership)?;
+    if !is_membership(
+        &s.membership,
+        action.author(),
+        Some(action.timestamp()),
+        space.as_ref(),
+    )? {
         return invalid("only project members can suggest a role");
     }
     Ok(ValidateCallbackResult::Valid)
@@ -227,7 +239,13 @@ pub fn validate_assignment(
     let Ok(membership) = ActionHash::try_from_raw_39(membership.to_vec()) else {
         return invalid("an assignment cites its author's membership");
     };
-    if !is_membership(&membership, action.author(), Some(action.timestamp()))? {
+    let space = membership_space(&activity.membership)?;
+    if !is_membership(
+        &membership,
+        action.author(),
+        Some(action.timestamp()),
+        space.as_ref(),
+    )? {
         return invalid("only members can take roles");
     }
     open_at(&activity, action.timestamp())

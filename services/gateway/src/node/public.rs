@@ -1,11 +1,12 @@
 //! Guest reads (ADR 0052): signed-out people open project pages, as on web. The
-//! archivist answers a short list of read-only calls on the directory and on the projects it
-//! has joined. Chats (the conversation DNA) and anything about devices are never served.
+//! archivist answers a short list of read-only calls on the directory and on the public
+//! spaces in its commons cell (ADR 0065). Chats (the conversation DNA) and anything about devices are never served.
 
 use anyhow::anyhow;
 use serde::Deserialize;
 
-use super::archivist::{clones_by_seed, provisioned};
+use super::archivist::provisioned;
+use super::spaces::{space_of_seed, Scoped};
 use super::Node;
 
 /// Read-only calls a guest may make, by zome. Every one is public to any member of the
@@ -38,6 +39,9 @@ const PROJECT: &[(&str, &[&str])] = &[
     ("activities", &["list_activities"]),
     ("discussion", &["list_messages", "get_chunk"]),
 ];
+
+/// Calls not about one space (file parts are found by their own hash).
+const UNSCOPED: &[&str] = &["get_chunk"];
 
 /// One guest call: `seed` names the project (none means the directory).
 #[derive(Debug, Deserialize)]
@@ -73,10 +77,11 @@ impl Node {
         let Some(app) = self.find_app(&id).await? else {
             return Ok(Err(Refused::NotHere));
         };
-        let cell = match &read.seed {
-            None => provisioned(&app, "directory")?,
-            Some(seed) => match clones_by_seed(&app).remove(seed) {
-                Some(cell) => cell,
+        let space = match &read.seed {
+            None => None,
+            // Private spaces are never served; only listed public ones.
+            Some(seed) => match space_of_seed(seed) {
+                Some(space) => Some(space),
                 None => return Ok(Err(Refused::NotHere)),
             },
         };
@@ -87,9 +92,27 @@ impl Node {
                 .map_err(|e| anyhow!("payload: {e}"))?
         };
         let agent = app.agent_pub_key.clone();
-        let out: rmpv::Value = self
-            .call(&agent, cell, &read.zome, &read.func, payload)
-            .await?;
+        let out: rmpv::Value = match space {
+            None => {
+                let directory = provisioned(&app, "directory")?;
+                self.call(&agent, directory, &read.zome, &read.func, payload)
+                    .await?
+            }
+            Some(space) => {
+                let commons = provisioned(&app, "project")?;
+                if UNSCOPED.contains(&read.func.as_str()) {
+                    self.call(&agent, commons, &read.zome, &read.func, payload)
+                        .await?
+                } else {
+                    let input = Scoped {
+                        space,
+                        input: payload,
+                    };
+                    self.call(&agent, commons, &read.zome, &read.func, input)
+                        .await?
+                }
+            }
+        };
         let mut bytes = Vec::new();
         rmpv::encode::write_value(&mut bytes, &out).map_err(|e| anyhow!("result: {e}"))?;
         Ok(Ok(bytes))

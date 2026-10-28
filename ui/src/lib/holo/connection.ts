@@ -13,6 +13,7 @@ import { gatewayApi, GatewayError } from './gateway.ts';
 import { guestRead, guestSeedOf } from './guest.ts';
 import { forgetSession, loadSession, type DeviceSession } from './keys.ts';
 import { describeGateway, homeGateway, inNativeApp } from './nodes.ts';
+import { spaceOf } from './spaces.ts';
 
 export type Role = 'directory' | 'project' | 'conversation';
 
@@ -174,7 +175,11 @@ export async function connection(): Promise<{ ws: AppWebsocket; session?: Device
   return deviceSession ? { ws, session: deviceSession } : { ws };
 }
 
-/** A zome call on a specific cell (a project or conversation clone). */
+/** Calls not about one space: founding one, and file parts (found by their own hash). */
+const UNSCOPED = new Set(['create_charter', 'upload_chunk', 'get_chunk']);
+
+/** A zome call on a specific cell (a space in the commons, or a private or chat clone). A
+ * call about a space in the commons names it: `{ space, input }` (ADR 0065). */
 export async function callCell<T>(
   cellId: CellId,
   zome: string,
@@ -184,5 +189,7 @@ export async function callCell<T>(
   const seed = guestSeedOf(cellId);
   if (seed !== undefined) return guestRead<T>(seed, zome, fn, payload);
   const { ws } = await connection();
-  return ws.callZome<T>({ cell_id: cellId, zome_name: zome, fn_name: fn, payload });
+  const space = spaceOf(cellId);
+  const input = space && !UNSCOPED.has(fn) ? { space, input: payload ?? null } : payload;
+  return ws.callZome<T>({ cell_id: cellId, zome_name: zome, fn_name: fn, payload: input });
 }

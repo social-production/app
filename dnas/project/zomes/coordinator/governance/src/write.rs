@@ -66,12 +66,13 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     let proposer_votes = !matches!(kind, ProposalKind::Plan(_) | ProposalKind::Return { .. });
     let members = calls::member_snapshot()?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
+        space: space_scope::current()?,
         kind,
         membership: Some(membership),
         members,
         organizer,
     }))?;
-    create_link(reads::anchor()?, hash.clone(), LinkTypes::Proposals, ())?;
+    create_link(space_scope::base()?, hash.clone(), LinkTypes::Proposals, ())?;
     if organized {
         decide_now(&hash)?;
     } else if proposer_votes {
