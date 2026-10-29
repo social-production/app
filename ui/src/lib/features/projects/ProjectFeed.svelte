@@ -2,10 +2,8 @@
   import { untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
-  import EventCard from '#lib/components/cards/EventCard.svelte';
-  import HelpRequestCard from '#lib/components/cards/HelpRequestCard.svelte';
   import PersonalActivityCard from '#lib/components/cards/PersonalActivityCard.svelte';
-  import ProjectCard from '#lib/components/cards/ProjectCard.svelte';
+  import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
@@ -136,24 +134,8 @@
             authorName={row.card.creatorName || 'Unnamed'}
             onSignal={(next) => feed.signal(row.card, next)}
           />
-        {:else if row.card.mode === 'help-request'}
-          <HelpRequestCard
-            card={row.card}
-            authorName={row.card.creatorName || 'Unnamed'}
-            onSignal={(next) => feed.signal(row.card, next)}
-          />
-        {:else if row.card.mode === 'event'}
-          <EventCard
-            card={row.card}
-            authorName={row.card.creatorName || 'Unnamed'}
-            onSignal={(next) => feed.signal(row.card, next)}
-          />
         {:else}
-          <ProjectCard
-            card={row.card}
-            authorName={row.card.creatorName || 'Unnamed'}
-            onSignal={(next) => feed.signal(row.card, next)}
-          />
+          <SpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
         {/if}
       {/each}
       <InfiniteSentinel disabled={!feed.hasMore || feed.loading} onMore={() => void feed.more()} />

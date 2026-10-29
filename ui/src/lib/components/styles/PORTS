@@ -114,3 +114,6 @@ rail.css          .right-rail     web/src/lib/features/right-rail/RightRailPanel
 rail.css          .surface-type-label web/src/lib/components/cards/shared/SurfaceTypeLabel.svelte
 invites.css       .invites        web/src/lib/features/invites/InvitesPage.svelte
 share.css         .share-sheet    web/src/lib/components/shared/ShareUserMenu.svelte
+scopes.css        .directory-page web/src/lib/features/shared-directory/DirectoryFeedLayout.svelte
+scopes.css        .scope-header   web/src/lib/features/shared-directory/ScopeDirectoryHeader.svelte
+scopes.css        .scope-avatar   web/src/lib/features/shared-directory/ScopeAvatar.svelte

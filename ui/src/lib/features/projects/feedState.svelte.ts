@@ -16,10 +16,12 @@ export class FeedState {
 
   readonly hasMore = $derived(this.items.length < this.total);
 
-  /** Only these people's projects (comma-separated keys): a profile, or the people you follow. */
+  /** Only these people's projects (comma-separated keys): a profile, or the people you follow;
+   * `tag`: only items tagged with a channel or community (ADR 0068). */
   constructor(
     readonly search: () => string,
     public creator?: string,
+    public tag?: string,
   ) {}
 
   async reload(): Promise<void> {
@@ -38,6 +40,7 @@ export class FeedState {
         q: this.search(),
         offset: this.items.length,
         ...(this.creator ? { creator: this.creator } : {}),
+        ...(this.tag ? { tag: this.tag } : {}),
       });
       this.items = [...this.items, ...page.items.slice(0, PAGE)];
       this.total = page.total;

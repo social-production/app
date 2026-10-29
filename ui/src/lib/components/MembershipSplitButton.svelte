@@ -9,8 +9,8 @@
     count: number;
     pending?: boolean;
     membersOpen?: boolean;
-    /** web's `joinAriaLabel`: "Join event" on event pages. */
-    noun?: 'project' | 'event';
+    /** web's `joinAriaLabel`: "Join event" on event pages, "Join <name>" on scope pages. */
+    noun?: string;
     onToggleJoin: () => void;
     onOpenMembers: () => void;
   }
