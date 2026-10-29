@@ -157,7 +157,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
     };
     let base = charter::base()?;
     let applied = applied()?;
-    let people = people::read()?;
+    let people = people::read_without(&applied.removed)?;
     let created_at = base.as_ref().map(|(_, at)| *at);
     let charter = base.map(|(c, _)| merge(c, &applied));
 

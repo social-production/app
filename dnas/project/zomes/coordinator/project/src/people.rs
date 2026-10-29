@@ -81,11 +81,28 @@ pub struct People {
 }
 
 pub fn read() -> ExternResult<People> {
+    read_without(&[])
+}
+
+/// As `read`, leaving out memberships made before a passed removal of their member (a
+/// channel's or community's `RemoveMember`, ADR 0068); joining again afterwards counts.
+pub fn read_without(removed: &[(AgentPubKey, Timestamp)]) -> ExternResult<People> {
     let me = agent_info()?.agent_initial_pubkey;
-    let member_links = links(LinkTypes::Members)?;
+    let gone = |l: &Link| {
+        removed
+            .iter()
+            .any(|(agent, at)| agent == &l.author && l.timestamp <= *at)
+    };
+    let member_links: Vec<Link> = links(LinkTypes::Members)?
+        .into_iter()
+        .filter(|l| !gone(l))
+        .collect();
     let signal_links = links(LinkTypes::Signals)?;
 
-    let am_member = my_membership()?.is_some();
+    // Your own join shows at once (your chain); after a removal only a later join counts.
+    let removed_me = removed.iter().any(|(agent, _)| agent == &me);
+    let am_member =
+        my_membership()?.is_some() && (!removed_me || member_links.iter().any(|l| l.author == me));
     let mut members: Vec<AgentPubKey> = member_links
         .iter()
         .map(|l| l.author.clone())
