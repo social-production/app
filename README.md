@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Channels and communities (M5d a–c, ADR 0068, PR #71, 2026-10-29 8:34 pm Melbourne; the
+  project network reset):** web's create-channel/community forms, channel and community pages
+  with their tagged items, the create flows' scope step (primary channel, more channels and
+  communities), and members can vote someone out. Closed communities, settings and Discover come
+  next. Live `help-requests.mjs` passed; `projects.mjs` waits on a channel-picker fix.
 - **Seed-node memory sorted (PR #70, 2026-10-29 3:10 pm Melbourne; ADR 0066):** transparent
   huge pages off for the gateway. Live idle 498 MB at 10 min (was ~790–1000 MB); after a
   browser test run 645 MB (was 1112 MB).
