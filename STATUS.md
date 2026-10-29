@@ -44,11 +44,30 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): channel picker lists just-created channels
-Branch `claude/social-production-handoff-dsam61` (after #71). `services/scopes.ts` `listScopes`
-adds this device's just-created scopes (the `justCreated` cache) until the index lists them, so
-creating a channel and then a project tagged with it doesn't wait on the index. UI checks pass
-(check, lint, boundaries, sizes); verify live with `projects.mjs` after merge.
+## In flight 2026-10-29 (cloud session): PR #73, web's required channel tag + test fixes
+PR #73 (branch `claude/social-production-handoff-dsam61`): the `projects.mjs` race fix below, plus
+**web's scope requirement**: a project needs a channel tag; a public event or a help request a
+channel or community tag (`CreateState.scopeNeeded()`, overridden for events; help's
+`problems.scope`). The Continue button stays disabled with "Still needed: a channel tag."
+- Browser tests: `tests/e2e/lib.mjs` `continueSteps(page, n)` clicks Continue and tags the
+  shared `#testing` channel on a scope step (`tagTestChannel`; founder one creates it once per
+  run, so New members' 2-a-week listing allowance isn't spent on it). 13 tests use it.
+- Checked: UI check/lint/boundaries/sizes; live `events`, `activities` (with the helper);
+  the local UI (`VITE_SP_GATEWAYS=<live seed node> npm run dev -w ui -- --port 5199`) against
+  the live gateway: the gate (disabled → enabled), `events`, `help-requests` (one unexplained
+  timeout on the first run, passed on re-run). Not run: the other 10 updated tests.
+- After merge: smoke `projects`, `help-requests`, `events` live.
+- **Next M5d:** tag chips with scope icons linking to scope pages, Discover sheet, (d) closed
+  communities + invites, (e) settings/votes sheets and removal UI.
+
+## Done 2026-10-29: channel picker, PR #72 merged 11:24 UTC (10:24 pm Melbourne) + test fix
+- `services/scopes.ts` `listScopes` adds this device's just-created scopes (`justCreated`) until
+  the index lists them (a new channel takes ~1–2.5 min to reach `/index/scopes` live).
+- The live `projects.mjs` failures were a **test race**, not the app: the tag loop filled the box
+  and called `option.count()` before the async search answered, then cleared it. It now waits
+  for the option (5 s per try) and starts from the channel page (no reload). **Live
+  `projects.mjs` passed** (11:40 UTC). `private-events.mjs` has the same `count()` pattern for
+  the people search; it passes live, but fix it the same way if it flakes.
 
 ## Done 2026-10-29: M5d channels and communities, parts (a)–(c) (ADR 0068), PR #71
 **PR #71** merged 09:34 UTC (8:34 pm Melbourne); seed node live 09:55 UTC. It reset the

@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -26,7 +26,7 @@ await ann.getByRole('radio', { name: /Personal service/ }).click();
 await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('I fix bikes on weekends.');
-for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish project' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url().split('?')[0];

@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, rail, railButton, railShows, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, rail, railButton, railShows, signUp, continueSteps } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -24,7 +24,7 @@ async function create(page, title, personal) {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Proposal description').fill('Made by the rail test.');
-  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();
+  await continueSteps(page, 3);
   await page.getByRole('button', { name: 'Publish project' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];

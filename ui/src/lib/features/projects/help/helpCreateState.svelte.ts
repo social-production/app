@@ -67,6 +67,7 @@ export class HelpCreateState {
         !endsAfter(this.neededAt, this.endsAt) &&
         'End time must be after the start time.',
     ],
+    scope: [this.tags.length === 0 && 'Choose at least one channel or community tag.'],
     roles: [this.namedRoles.length === 0 && 'Add at least one role (for example, Driver).'],
   }));
   readonly missing = $derived(

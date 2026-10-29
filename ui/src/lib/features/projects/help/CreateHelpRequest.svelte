@@ -99,7 +99,11 @@
     </div>
   {:else if s.stepId === 'scope'}
     <div class="form-stack">
-      <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} helperText="" />
+      <ScopeTagsStep
+        tags={s.tags}
+        onChange={(t) => (s.tags = t)}
+        helperText="Required. Help requests must be tagged like threads."
+      />
     </div>
   {:else if s.stepId === 'roles'}
     <section class="roles-block">

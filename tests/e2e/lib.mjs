@@ -1,5 +1,7 @@
 // Shared browser-test helpers: devices (fresh browser profiles), sign-up and sign-in,
 // against a local seed node (see accounts.mjs for how to run).
+import { readFileSync } from 'node:fs';
+
 import { chromium } from 'playwright';
 
 export const BASE = process.argv[2] ?? 'http://localhost:4174';
@@ -96,4 +98,51 @@ export async function railShows(page, locator, what) {
     await railButton(page).click(); // close, then reopen to reload it
   }
   throw new Error(`timed out waiting for ${what} in the rail`);
+}
+
+/** The channel browser tests tag their projects, events and help requests with (web requires
+ * one, ADR 0068). Founder one makes it once per run; a taken handle means it already exists. */
+export const TEST_CHANNEL = 'testing';
+let testChannel;
+function ensureTestChannel() {
+  testChannel ??= (async () => {
+    const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
+    const page = await device();
+    await phraseSignIn(page, one.phrase.split(' '));
+    await page.goto(`${BASE}/create/channel`);
+    await page.getByLabel(/Channel handle/).fill(TEST_CHANNEL);
+    await page.getByLabel(/Description/).fill('Made by the browser tests.');
+    await page.getByRole('button', { name: 'Create channel' }).click();
+    await page
+      .getByRole('heading', { name: TEST_CHANNEL })
+      .or(page.getByText('already used'))
+      .first()
+      .waitFor({ timeout: 120_000 });
+    await page.context().close();
+  })();
+  return testChannel;
+}
+
+/** On a create flow's scope step: picks the test channel as the primary tag. The index lists a
+ * new channel within a few minutes, so keep searching until it does. */
+export async function tagTestChannel(page) {
+  await ensureTestChannel();
+  const field = page.getByLabel('Primary channel tag');
+  const option = page.getByRole('option', { name: TEST_CHANNEL, exact: true });
+  for (let i = 0; ; i++) {
+    await field.fill(TEST_CHANNEL);
+    if (await option.waitFor({ timeout: 5000 }).then(() => true, () => false)) break;
+    if (i >= 60) throw new Error(`#${TEST_CHANNEL} never appeared in the tag search`);
+    await field.fill('');
+    await page.waitForTimeout(2000);
+  }
+  await option.click();
+}
+
+/** Clicks Continue `n` times, tagging the test channel first whenever it is on a scope step. */
+export async function continueSteps(page, n = 1) {
+  for (let i = 0; i < n; i++) {
+    if (await page.getByLabel('Primary channel tag').count()) await tagTestChannel(page);
+    await page.getByRole('button', { name: 'Continue' }).click();
+  }
 }

@@ -4,6 +4,7 @@ import {
   type LocationChoice,
   type CharterMode,
 } from '#lib/domain/projects.ts';
+import { tagScope } from '#lib/domain/scopes.ts';
 import { explain } from '#lib/services/errors.ts';
 import { createProject, projectAllowance } from '#lib/services/projects.ts';
 
@@ -52,8 +53,14 @@ export class CreateState {
     }
     if (this.stepId === 'location' && this.intent === 'physical' && !this.place.trim())
       return ['place'];
+    if (this.stepId === 'scope' && this.scopeNeeded()) return [this.scopeNeeded()];
     return [];
   });
+
+  /** web: a project needs a channel tag (events override it); '' when nothing is needed. */
+  protected scopeNeeded(): string {
+    return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : 'a channel tag';
+  }
 
   constructor(mode: CharterMode = 'productive') {
     this.mode = mode;

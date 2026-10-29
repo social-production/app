@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, signUp, tagTestChannel } from './lib.mjs';
 
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -23,6 +23,7 @@ await next(); // → Location (physical)
 await ann.getByLabel('Place').fill('Allotment gate');
 await next(); // → Timing (two hours from now, for two hours)
 await next(); // → Scope
+await tagTestChannel(ann);
 await next(); // → Roles
 await ann.getByLabel('Role title').fill('Driver');
 await ann.getByLabel('Role details').fill('A car with a big boot.');
