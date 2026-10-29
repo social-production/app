@@ -7198,6 +7198,7 @@ dependencies = [
  "sp_event",
  "sp_governance",
  "sp_help",
+ "sp_scope",
 ]
 
 [[package]]
