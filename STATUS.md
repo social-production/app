@@ -47,6 +47,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 ## In flight: nothing open. Next is M5d (pick from below)
 - **Next M5d:** Discover sheet, (d) closed communities + invites, (e) settings/votes sheets and
   removal UI (ADR 0068; web's `ScopeDiscoverSheet`, `CommunityInvitePanel`, scope settings).
+- This STATUS/README update sits on branch `claude/social-production-handoff-dsam61` (docs
+  only, not merged): ship it with the next PR from that branch.
 
 ## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece), PR #74 merged 23:16 UTC (10:16 am Melbourne, Oct 30), live 23:29 UTC
 web's `TagList` (plain) in `components/cards/FeedCardTop.svelte`: each `#channel`/`@community`
