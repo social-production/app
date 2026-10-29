@@ -38,9 +38,13 @@ scenario + browser tests, as M1–M4 did.
   (detail page, lifecycle phases, create flow, cards), as M3 did for projects.
 - Help requests (`features/help-requests`, ~870 lines) after events.
 
-## M5d — communities and channels (scopes)
-- Decide DOMAIN_MODEL open question 2 in an ADR (project-DNA clones with `kind: community`, or a
-  scope DNA). Web: `features/communities`, `channels`, `shared-directory`, the left rail's lists,
+## M5d — communities and channels (scopes) — ADR 0068 proposed (2026-10-29)
+- Decided by ADR 0065 + 0068: public channels/communities are commons spaces (modes `channel`,
+  `community`), closed communities are clones; handles claimed first come first served in the
+  directory; tags `#channel` / `@community`; scope proposals reuse the project DNA's. Parts:
+  (a) DNA + scenarios (one project + directory reset), (b) create flows, scope pages, join,
+  left rail, Discover, (c) tagging + tag icons, (d) closed communities + invites, (e) settings
+  and votes. Web: `features/communities`, `channels`, `shared-directory`, the left rail's lists,
   scope tags with icons on cards, private (closed) communities hiding their items.
 - Unblocks: the card tag icons, the left rail, "Join channels / communities" copy, the scope
   menu's options.
