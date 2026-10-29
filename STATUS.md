@@ -39,32 +39,23 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight 2026-10-29 (cloud session): two pieces of work, one after the other
-**1. PR #68** (branch `claude/social-production-handoff-dsam61`, opened 21:58 UTC 28 Oct):
-jemalloc for C code (ADR 0066) + web's event members sheet. No integrity change. CI `check`
-passed; scenario shards were running. **Merge when green, then read live `/readyz`.**
-- **Memory (ADR 0066):** live idle at 21:00 UTC 28 Oct was 795 MB RSS but jemalloc resident only
-  311 MB: SQLite (C) still used glibc's per-thread arenas. The gateway now turns on
-  `unprefixed_malloc_on_supported_platforms`, so every allocation goes through jemalloc.
-  `/readyz` gains `maps` (RSS by kind from `/proc/self/smaps`: `anonMb`, `anonExecMb` = wasmer
-  code, `fileMb`, `brkHeapMb`, `stackMb`). Local release, same 4 browser files: idle **788 →
-  601 MB**. **After the deploy:** `maps.anonMb` should be close to `heap.residentMb`, and idle
-  should drop well below 795 MB.
-- **Parity:** web's EventMembersPanel (`features/projects/EventMembersSheet.svelte`): private
-  events split Organizers / Members, "Promote to organizer", "Invite +" (web's ShareUserMenu,
-  send half: `components/overlay/ShareUserMenu.svelte`, `styles/share.css`). `PeopleSheet`
-  takes web's `sections`, row actions and header actions. Edit sheet: web's titles ("Propose
-  Edit"; "Edit event"/"Save" when organizer-run) and vote copy. Event phase menu: web's event
-  copy. Not done: "Remove organizer" (needs revocable grants, an integrity change).
-- Checked: UI check/lint, sizes, boundaries; gateway fmt/test/clippy (release, jemalloc);
-  release seed node + `private-events.mjs` (now promotes the invitee), `projects`,
-  `public-chats`, `events`, on both allocators.
+## In flight 2026-10-29 (cloud session): PR #68 done, PR #69 open
+**1. Done: PR #68 merged 23:31 UTC 28 Oct (10:31 am Melbourne), all three services deployed
+(seed node live ~23:53 UTC).** jemalloc for C code (ADR 0066) + web's event members sheet.
+- **Live result, not the full win:** `/readyz` at 10 min: RSS 781 MB (after the commons deploy
+  it was 941 MB at 5 min), jemalloc resident 359 MB, `maps.anonMb` 662 MB, wasmer code 66 MB.
+  So ~300 MB of anonymous memory is still outside jemalloc on the 8-CPU node, though locally
+  (4 CPUs) the gap was ~0. After one live `private-events.mjs` run: RSS 1112 MB, anon 959 vs
+  jemalloc 528 (gap ~430 MB and growing with use). **Next:** PR #69 adds `maps.anonBySize`
+  (RSS by mapping size: 2–8 MB = thread stacks, 64 MB = glibc arena heaps, ≥1 GB = wasm
+  memories). Read it live after #69 deploys to see what the gap is, then fix that.
+- Live smoke: `private-events.mjs` passed (promotes the invitee in the members sheet).
+- What #68 changed: see ADR 0066 and the PR; edit sheet titles/copy and event phase-menu copy
+  follow web; "Remove organizer" not done (needs revocable grants, an integrity change).
 
-**2. Help requests (ADR 0067)**, local branch `local/help-requests` (on top of #68; **not pushed
-while #68 is open** because it resets the project network). Once #68 merges: `git checkout
-claude/social-production-handoff-dsam61 && git merge --ff-only local/help-requests` (or merge
-`main` first), push, open a PR. If this session ended first, the commits only exist in this
-container: redo from ADR 0067 (it lists every piece).
+**2. Help requests (ADR 0067): PR #69** (branch `claude/social-production-handoff-dsam61`,
+opened 23:32 UTC 28 Oct). **Merging resets the project network.** Merge when CI is green, then
+smoke `help-requests.mjs` live and read `/readyz` `maps.anonBySize` (item 1).
 - **DNA:** a help request is a commons space with charter mode `help-request` (new crate
   `sp_help`; `sp_core`/`sp_governance` untouched, so directory and conversation keep their
   hashes) plus one `Activity` written by the asker (integrity: only the space's creator adds it

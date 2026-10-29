@@ -8,12 +8,18 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-28)
+## Status (2026-10-29)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Event members sheet + allocator change (PR #68, 2026-10-29 10:31 am Melbourne):** private
+  events' members sheet splits Organizers and Members, organizers promote members and invite
+  people (web's EventMembersPanel); organizer-run events say "Edit event"/"Close event".
+  The seed node's jemalloc now also serves C code (ADR 0066); `/readyz` shows `maps`. Live
+  smoke: `private-events.mjs` passed. Live idle 781 MB at 10 min (was 941 MB after the last
+  deploy), but ~300 MB of anonymous memory is still outside jemalloc (STATUS has the follow-up).
 - **The commons (ADR 0065, PR #66, 2026-10-28; the project network reset):** public projects,
   events and their chats share one network instead of one each, so an unused project costs
   rows, not a running network; the seed node's index re-reads only projects with recent
