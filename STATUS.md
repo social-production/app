@@ -950,7 +950,7 @@ ProductiveLifecyclePhaseOne / ProjectValueCard / DiscreteScale / AddValueSheet:
 - **Integrity change** (new `Value`/`Importance` entries, two link types, value criteria in
   `Rating`): merging resets projects again (people stay).
 - **CI split**: `scripts/check-fast.sh` (everything but scenarios) + `scripts/check-scenarios.sh
-  [<shard> <shards>]`; CI runs the scenarios as 6 parallel shards (`ci.yml` job `scenarios`).
+  [<shard> <shards>]`; CI runs the scenarios as 8 parallel shards (`ci.yml` job `scenarios`).
   `check-all.sh` still runs everything. New scenario files are picked up automatically.
 - `scripts/port-styles.py` now dedents web's `<style>` blocks. Regenerating everything today
   also pulls ~500 lines of web's newer styles into the other stylesheets; that drift was left
