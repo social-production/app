@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -20,7 +20,7 @@ await ann.goto(`${BASE}/create/project`);
 await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('Fix bikes together on Saturdays.');
-for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish project' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();

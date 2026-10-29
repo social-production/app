@@ -17,7 +17,7 @@ What works today:
 - **Channels and communities (M5d a–c, ADR 0068, PR #71, 2026-10-29 8:34 pm Melbourne; the
   project network reset):** web's create-channel/community forms, channel and community pages
   with their tagged items, the create flows' scope step (primary channel, more channels and
-  communities), and members can vote someone out. Closed communities, settings and Discover come
+  communities; web requires a channel tag), and members can vote someone out. Closed communities, settings and Discover come
   next. Live `help-requests.mjs` and `projects.mjs` passed.
 - **Seed-node memory sorted (PR #70, 2026-10-29 3:10 pm Melbourne; ADR 0066):** transparent
   huge pages off for the gateway. Live idle 498 MB at 10 min (was ~790–1000 MB); after a

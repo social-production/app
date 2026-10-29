@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -103,7 +103,7 @@ await ann.goto(`${BASE}/create/project`);
 await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(`Seed swap ${stamp}`);
 await ann.getByLabel('Proposal description').fill('Swap seeds in spring.');
-for (let i = 0; i < 3; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish project' }).click();
 await ann.getByRole('heading', { name: `Seed swap ${stamp}` }).waitFor({ timeout: 120_000 });
 const chatUrl = `${ann.url()}?tab=chat`;

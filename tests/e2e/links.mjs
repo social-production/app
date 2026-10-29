@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -19,7 +19,7 @@ async function create(page, title) {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Proposal description').fill('Lend and fix tools together.');
-  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();
+  await continueSteps(page, 3);
   await page.getByRole('button', { name: 'Publish project' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url();

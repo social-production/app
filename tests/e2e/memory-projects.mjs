@@ -4,7 +4,7 @@
 //   MEM_PROJECTS=6 bash scripts/e2e-local.sh tests/e2e/memory-projects.mjs
 import { readFileSync } from 'node:fs';
 
-import { BASE, browser, device, log, phraseSignIn } from './lib.mjs';
+import { BASE, browser, device, log, phraseSignIn, continueSteps } from './lib.mjs';
 
 const count = Number(process.env.MEM_PROJECTS ?? 6);
 const gateway = process.env.MEM_GATEWAY ?? 'http://localhost:8080';
@@ -25,7 +25,7 @@ for (let i = 0; i < count; i++) {
   await ann.getByRole('button', { name: 'Continue' }).click();
   await ann.getByLabel('Title').fill(`Memory ${stamp} ${i}`);
   await ann.getByLabel('Proposal description').fill('Measuring the seed node.');
-  for (let s = 0; s < 3; s++) await ann.getByRole('button', { name: 'Continue' }).click();
+  await continueSteps(ann, 3);
   await ann.getByRole('button', { name: 'Publish project' }).click();
   await ann.getByRole('heading', { name: `Memory ${stamp} ${i}` }).waitFor({ timeout: 180_000 });
   // The archivist joins on its next round (each minute).

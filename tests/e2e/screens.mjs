@@ -3,7 +3,7 @@
 //   node tests/e2e/screens.mjs http://localhost:4174 <out dir>
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -24,7 +24,7 @@ for (const [tag, viewport] of Object.entries(sizes)) {
   await page.getByLabel('Title').fill(`Tool library (${tag})`);
   await page.getByLabel('Proposal description').fill('Lend and borrow tools across the street.');
   await shot(page, `${tag}-create-basics`);
-  for (let i = 0; i < 3; i++) await page.getByRole('button', { name: 'Continue' }).click();
+  await continueSteps(page, 3);
   await shot(page, `${tag}-create-overview`);
   await page.getByRole('button', { name: 'Publish project' }).click();
   await page.locator('.project-detail h1').waitFor({ timeout: 120_000 });

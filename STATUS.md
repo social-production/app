@@ -44,8 +44,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): next is M5d's required channel tag (see "Not yet" below)
-Nothing open. Last session merged #71 (channels/communities) and #72, then fixed `projects.mjs`.
+## In flight 2026-10-29 (cloud session): PR #73, web's required channel tag + test fixes
+PR #73 (branch `claude/social-production-handoff-dsam61`): the `projects.mjs` race fix below, plus
+**web's scope requirement**: a project needs a channel tag; a public event or a help request a
+channel or community tag (`CreateState.scopeNeeded()`, overridden for events; help's
+`problems.scope`). The Continue button stays disabled with "Still needed: a channel tag."
+- Browser tests: `tests/e2e/lib.mjs` `continueSteps(page, n)` clicks Continue and tags the
+  shared `#testing` channel on a scope step (`tagTestChannel`; founder one creates it once per
+  run, so New members' 2-a-week listing allowance isn't spent on it). 13 tests use it.
+- Checked: UI check/lint/boundaries/sizes; live `events`, `activities` (with the helper);
+  the local UI (`VITE_SP_GATEWAYS=<live seed node> npm run dev -w ui -- --port 5199`) against
+  the live gateway: the gate (disabled → enabled), `events`, `help-requests` (one unexplained
+  timeout on the first run, passed on re-run). Not run: the other 10 updated tests.
+- After merge: smoke `projects`, `help-requests`, `events` live.
+- **Next M5d:** tag chips with scope icons linking to scope pages, Discover sheet, (d) closed
+  communities + invites, (e) settings/votes sheets and removal UI.
 
 ## Done 2026-10-29: channel picker, PR #72 merged 11:24 UTC (10:24 pm Melbourne) + test fix
 - `services/scopes.ts` `listScopes` adds this device's just-created scopes (`justCreated`) until

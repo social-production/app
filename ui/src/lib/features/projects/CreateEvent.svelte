@@ -70,6 +70,9 @@
   {:else if s.stepId === 'scope' && !s.isPrivate}
     <div class="form-stack">
       <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} helperText="" />
+      {#if s.tags.length === 0}
+        <p class="status-note">Public events need at least one channel or community tag.</p>
+      {/if}
     </div>
   {:else if s.stepId === 'scope'}
     <div class="form-stack">

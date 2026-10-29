@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, continueSteps } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -20,7 +20,7 @@ await ann.getByRole('button', { name: 'Create', exact: true }).click();
 await ann.getByRole('menuitem', { name: /Event/ }).click();
 await ann.getByLabel('Event title').fill(title);
 await ann.getByLabel('Description').fill('Weed, mulch and share lunch.');
-for (let i = 0; i < 4; i++) await ann.getByRole('button', { name: 'Continue' }).click();
+await continueSteps(ann, 4);
 await ann.getByText("Set when members approve the event's plan").waitFor();
 await ann.getByRole('button', { name: 'Publish event' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
