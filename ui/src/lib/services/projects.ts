@@ -88,9 +88,7 @@ export async function projectAllowance(): Promise<number | null> {
 /** Start a project: its charter founds a space in the commons (ADR 0065), then its
  * directory listing names that space. */
 export async function createProject(charter: Charter): Promise<string> {
-  // Channels and communities don't count against a New member's projects (ADR 0068).
-  const scope = charter.mode === 'channel' || charter.mode === 'community';
-  if (!scope && (await projectAllowance()) === 0) {
+  if ((await projectAllowance()) === 0) {
     throw new Error('New members can start 2 projects per 7 days; full members have no limit.');
   }
   const space = await callCell<ActionHash>(

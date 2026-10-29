@@ -50,6 +50,11 @@ web's scopes (`features/communities`, `channels`, `shared-directory`, ~2,500 lin
 5. **Invite links** carry the clone's seed in the URL fragment (never sent to a server);
    direct invites reuse the inbox invite (ADR 0061's `send_invite`).
 
+## Deviation (2026-10-29)
+web doesn't count channels and communities against a New member's 2 projects a week; here the
+directory's integrity counts every listing, so they do until the next directory reset, when
+`listing.rs`'s cap should skip scope modes (and the coordinator's `allowance` with it).
+
 ## Consequences
 - **Integrity change in the project DNA only** (scope modes, `RemoveMember`): the project
   network resets once; accounts and chats keep theirs.

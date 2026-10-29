@@ -14,7 +14,6 @@ serde = { workspace = true }
 identity_integrity = { workspace = true }
 sp_follow = { workspace = true }
 sp_governance = { workspace = true }
-sp_scope = { workspace = true }
 
 [lints]
 workspace = true

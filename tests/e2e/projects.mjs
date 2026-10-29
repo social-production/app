@@ -1,7 +1,8 @@
 // M2 projects end to end against a local seed node (run it as described in accounts.mjs):
 // create a channel and a project tagged with it through the "+" menu, find it in the feed
 // (archivist + index) and on the channel's page (ADR 0068), join, support, search by tag,
-// and the New-member limit of 2 projects a week (channels don't count).
+// and the New-member limit of 2 listings a week (a channel counts until the next directory
+// reset, ADR 0068).
 //   node tests/e2e/projects.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 
@@ -132,11 +133,9 @@ for (let i = 0; ; i++) {
 }
 log('the channel page lists the project');
 
-await createProject(ann, `Second ${stamp}`, channel);
-await ann.getByRole('heading', { name: `Second ${stamp}` }).waitFor({ timeout: 120_000 });
 await ann.goto(`${BASE}/create/project`);
 await ann.getByText('(0 left)').waitFor({ timeout: 60_000 });
-log('a New member sees 0 projects left after two');
+log('a New member sees 0 projects left after a channel and a project');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all M2 project checks passed');

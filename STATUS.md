@@ -49,8 +49,9 @@ project network only (directory `uhC0k-zll3yâ€¦` and conversation `uhC0kUmCMHlâ€
   edits); governance folds removals into `Applied.removed`; the project view leaves removed
   members out. Scenario `scopes` passes (2 tests; the removal needs a 4-member quorum of 3).
 - **Gateway:** `/index/projects` leaves scopes out and takes `tag=#food`; `/index/scopes?q=`
-  lists them, earliest listing per handle. The directory's New-member project cap no longer
-  counts channels/communities (coordinator only).
+  lists them, earliest listing per handle. Channels/communities still count toward a New
+  member's 2 listings a week (directory integrity counts every listing; ADR 0068 deviation,
+  fix at the next directory reset).
 - **(b) UI:** `/create/channel`, `/create/community` (web's forms; open communities only for
   now), `/channels/<slug>`, `/communities/<slug>` (`features/projects/scopes/ScopePage.svelte`:
   header with join/members, description, the tagged items), create menu "Surfaces" section,
