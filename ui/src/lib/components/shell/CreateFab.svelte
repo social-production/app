@@ -22,10 +22,12 @@
   interface Props {
     signedIn: boolean;
     links: CreateLink[];
+    /** web's "Surfaces" section: Community, Channel (ADR 0068). */
+    surfaces?: CreateLink[];
     signInHref: ResolvedPathname;
   }
 
-  let { signedIn, links, signInHref }: Props = $props();
+  let { signedIn, links, surfaces = [], signInHref }: Props = $props();
 
   let open = $state(false);
 
@@ -68,27 +70,27 @@
         onclick={() => (open = false)}
       ></button>
     {/if}
+    {#snippet item(link: CreateLink)}
+      <a class="create-menu-item" href={link.href} role="menuitem" onclick={() => (open = false)}>
+        <span class="create-menu-icon-wrap"
+          ><SurfaceIcon icon={link.icon} className="create-menu-icon" /></span
+        >
+        <span class="item-copy">
+          <span class="item-label">{link.label}</span>
+          <span class="item-description">{link.description}</span>
+        </span>
+      </a>
+    {/snippet}
     <div class="create-fab-shell" class:menu-open={open}>
       {#if open}
         <div class="create-menu" role="menu" aria-label="Create">
           <div class="create-menu-body">
             <p class="menu-kicker">Content</p>
-            {#each links as link (link.href)}
-              <a
-                class="create-menu-item"
-                href={link.href}
-                role="menuitem"
-                onclick={() => (open = false)}
-              >
-                <span class="create-menu-icon-wrap"
-                  ><SurfaceIcon icon={link.icon} className="create-menu-icon" /></span
-                >
-                <span class="item-copy">
-                  <span class="item-label">{link.label}</span>
-                  <span class="item-description">{link.description}</span>
-                </span>
-              </a>
-            {/each}
+            {#each links as link (link.href)}{@render item(link)}{/each}
+            {#if surfaces.length > 0}
+              <p class="menu-kicker menu-kicker-separated">Surfaces</p>
+              {#each surfaces as link (link.href)}{@render item(link)}{/each}
+            {/if}
           </div>
           <button
             aria-label="Close"

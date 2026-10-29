@@ -2,7 +2,7 @@ import type { ProjectCard } from '#lib/domain/projects.ts';
 import { slugOf, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
 import { scopeIndex } from '#lib/holo/index.ts';
 
-import { createProject } from './projects.ts';
+import { createProject, myProjectSeeds } from './projects.ts';
 
 const toScope = (c: ProjectCard): Scope => ({
   id: c.id,
@@ -50,4 +50,11 @@ export async function createScope(
     tags: [],
   });
   return slug;
+}
+
+/** The scopes you joined: the index's scopes whose space is among yours. */
+export async function myScopes(): Promise<Scope[]> {
+  const [all, mine] = await Promise.all([listScopes('', 200), myProjectSeeds()]);
+  const seeds = new Set(mine);
+  return all.filter((s) => seeds.has(s.networkSeed));
 }

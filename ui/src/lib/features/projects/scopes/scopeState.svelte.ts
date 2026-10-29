@@ -4,8 +4,9 @@ import { scopeTag, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
 import { explain } from '#lib/services/errors.ts';
 import { getPerson } from '#lib/services/people.ts';
 import { getProject, joinProject } from '#lib/services/projects.ts';
-import { findScope } from '#lib/services/scopes.ts';
+import { findScope, myScopes } from '#lib/services/scopes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+import { showMyScopes } from '#lib/stores/myScopes.svelte.ts';
 
 import { FeedState } from '../feedState.svelte.ts';
 
@@ -52,6 +53,8 @@ export class ScopeState {
     try {
       await joinProject(this.scope.id, !this.project.amMember);
       await this.load();
+      // The left rail lists what you joined.
+      showMyScopes(await myScopes().catch(() => []));
     } catch (e) {
       this.error = explain(e);
     } finally {
