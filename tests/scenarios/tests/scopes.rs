@@ -115,6 +115,9 @@ async fn a_closed_community_lives_in_its_own_network() {
             scope("community", "Coburg", "open"),
         )
         .await;
-    assert!(open.is_err(), "only closed communities in a private network");
+    assert!(
+        open.is_err(),
+        "only closed communities in a private network"
+    );
     net.shut_down().await;
 }
