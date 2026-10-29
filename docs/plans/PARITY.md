@@ -123,12 +123,11 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 ## Desktop (1280px, compared with live web signed out)
 - [x] Shell, rails, top bar, intro banner, feed toolbar and cards match.
-- [ ] Card tag row: web prefixes each scope tag with its kind's icon (channel/community/
-  platform, `FeedCardTop` + `ScopeGlyph`) and links it to the scope; the app's chips still
-  show `#slug`/`@slug` text (M5d part c follow-up).
+- [x] Card tag row (2026-10-29): each scope tag has its kind's icon (channel/community/
+  platform, `FeedCardTop` + `ScopeGlyph`) and opens its page; "+N" opens web's `ScopeSheet`.
 - [x] Channels and communities (M5d, ADR 0068, 2026-10-29, parts a–c): create pages, scope
   pages with join/members and their tagged items, create-menu Surfaces, left-rail lists, the
-  scope step in create flows. Still to come: required channel tag, Discover sheet, closed
+  scope step in create flows. Still to come: Discover sheet, closed
   communities and invites, settings and vote sheets.
 
 ## Not compared yet

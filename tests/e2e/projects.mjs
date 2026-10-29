@@ -1,12 +1,12 @@
 // M2 projects end to end against a local seed node (run it as described in accounts.mjs):
 // create a channel and a project tagged with it through the "+" menu, find it in the feed
 // (archivist + index) and on the channel's page (ADR 0068), join, support, search by tag,
-// and the New-member limit of 2 listings a week (a channel counts until the next directory
-// reset, ADR 0068).
+// web's tag chips and their "+N" sheet, and the New-member limit of 2 listings a week (a
+// channel counts until the next directory reset, ADR 0068).
 //   node tests/e2e/projects.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, pickScopeTag, signUp, tagTestChannel } from './lib.mjs';
 
 const stamp = Date.now().toString(36).slice(-4);
 const title = `Seed library ${stamp}`;
@@ -34,20 +34,11 @@ async function createProject(page, name, tag) {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('radio', { name: /Online/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
-  // web's scope step: the primary channel tag, from the channels the index lists.
-  const primary = page.getByLabel('Primary channel tag');
-  for (let i = 0; ; i++) {
-    await primary.fill(tag);
-    const option = page.getByRole('option', { name: tag });
-    // The search answers asynchronously: wait for it, not just count what is there now.
-    if (await option.waitFor({ timeout: 5000 }).then(() => true, () => false)) {
-      await option.click();
-      break;
-    }
-    if (i >= 40) throw new Error(`channel ${tag} never appeared in the tag search`);
-    await primary.fill('');
-    await page.waitForTimeout(3000);
-  }
+  // web's scope step: the primary channel tag, then the shared test channel as a second one
+  // (so the card shows web's "+1" on phones).
+  await pickScopeTag(page, 'Primary channel tag', tag);
+  await page.getByText('Add more channels or communities').click();
+  await tagTestChannel(page, 'Additional channel tags');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Publish project' }).click();
 }
@@ -134,6 +125,24 @@ for (let i = 0; ; i++) {
   await bob.waitForTimeout(3000);
 }
 log('the channel page lists the project');
+
+// web's tag chips: each tag has its scope icon and opens its page; on a phone the card shows
+// one tag and "+1" opens web's ScopeSheet with both.
+await guest.setViewportSize({ width: 390, height: 844 });
+await guest.goto(`${BASE}/channels/${channel}`);
+const tagged = guest.locator('.project-card', { hasText: title });
+await tagged.waitFor({ timeout: 60_000 });
+const firstTag = tagged.locator('a.tag-plain');
+assert.equal(await firstTag.count(), 1, 'one tag shows on a phone');
+assert.equal(await firstTag.getAttribute('href'), `/channels/${channel}`);
+assert.equal(await firstTag.locator('svg').count(), 1, 'the tag has its channel icon');
+await tagged.getByRole('button', { name: 'Show 1 more tags' }).click();
+const sheet = guest.locator('.scope-sheet');
+await sheet.locator('.scope-row', { hasText: 'testing' }).waitFor();
+assert.equal(await sheet.locator('.scope-row').count(), 2, 'the sheet lists both tags');
+await sheet.locator('.scope-row', { hasText: 'testing' }).click();
+await guest.waitForURL(/\/channels\/testing/);
+log('tags show their icons and open their channel; "+1" lists them all');
 
 await ann.goto(`${BASE}/create/project`);
 await ann.getByText('(0 left)').waitFor({ timeout: 60_000 });

@@ -123,20 +123,27 @@ function ensureTestChannel() {
   return testChannel;
 }
 
-/** On a create flow's scope step: picks the test channel as the primary tag. The index lists a
- * new channel within a few minutes, so keep searching until it does. */
-export async function tagTestChannel(page) {
-  await ensureTestChannel();
-  const field = page.getByLabel('Primary channel tag');
-  const option = page.getByRole('option', { name: TEST_CHANNEL, exact: true });
+/** On a create flow's scope step: types `name` into the tag field labelled `label` and picks it.
+ * The index lists a new channel within a few minutes, so keep searching until it does. */
+export async function pickScopeTag(page, label, name) {
+  const field = page.getByLabel(label);
+  const option = page.getByRole('option', { name, exact: true });
   for (let i = 0; ; i++) {
-    await field.fill(TEST_CHANNEL);
+    await field.fill(name);
+    // The search answers asynchronously: wait for it, not just count what is there now.
     if (await option.waitFor({ timeout: 5000 }).then(() => true, () => false)) break;
-    if (i >= 60) throw new Error(`#${TEST_CHANNEL} never appeared in the tag search`);
+    if (i >= 60) throw new Error(`${name} never appeared in the "${label}" search`);
     await field.fill('');
     await page.waitForTimeout(2000);
   }
   await option.click();
+}
+
+/** On a create flow's scope step: picks the test channel as the primary tag (or, with `label`,
+ * in another tag field). */
+export async function tagTestChannel(page, label = 'Primary channel tag') {
+  await ensureTestChannel();
+  await pickScopeTag(page, label, TEST_CHANNEL);
 }
 
 /** Clicks Continue `n` times, tagging the test channel first whenever it is on a scope step. */

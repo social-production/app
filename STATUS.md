@@ -44,7 +44,28 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): PR #73, web's required channel tag + test fixes
+## In flight: tag chips PR (branch `claude/social-production-handoff-dsam61`)
+- **Tag chips with web's scope icons** (below): **PR #74** open (CI ~2 h); merge once CI is green, then
+  smoke live `projects.mjs` and update README Status.
+- **Next M5d after it:** Discover sheet, (d) closed communities + invites, (e) settings/votes
+  sheets and removal UI.
+
+## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece)
+web's `TagList` (plain) in `components/cards/FeedCardTop.svelte`: each `#channel`/`@community`
+tag shows its icon (`ScopeGlyph`; `#platform` → platform icon, `/platform`) and opens its page;
+free tags from before channels still search. "+N" now opens web's `ScopeSheet`
+(`components/overlay/ScopeSheet.svelte`, styles ported into `scopes.css` under `.scope-sheet`)
+instead of expanding inline. Helpers: `domain/scopes.ts` `tagRef`, `components/cards/tagLinks.ts`.
+- `tests/e2e/projects.mjs` tags its project with its own channel plus `#testing` (`lib.mjs`
+  `pickScopeTag`, `tagTestChannel(page, label)`), then at 390px checks the icon, the link, the
+  "+1" sheet and that a row opens `/channels/testing`.
+- Checked: UI check/lint/boundaries/sizes; `projects.mjs` **passed** with a production build
+  of this branch (`VITE_SP_GATEWAYS=<live seed node> npm run build -w ui`, `npm run preview -w
+  ui`) against the live gateway; 390px screenshots of feed and sheet match web. **Use the
+  preview, not `npm run dev`, for browser tests:** the dev server's unbundled modules made
+  Chromium fail reloads with `ERR_INSUFFICIENT_RESOURCES`. Not run: scenarios (no Rust change).
+
+## Done 2026-10-29: web's required channel tag + test fixes, PR #73 merged 13:16 UTC (12:16 am Melbourne, Oct 30)
 PR #73 (branch `claude/social-production-handoff-dsam61`): the `projects.mjs` race fix below, plus
 **web's scope requirement**: a project needs a channel tag; a public event or a help request a
 channel or community tag (`CreateState.scopeNeeded()`, overridden for events; help's
@@ -56,9 +77,8 @@ channel or community tag (`CreateState.scopeNeeded()`, overridden for events; he
   the local UI (`VITE_SP_GATEWAYS=<live seed node> npm run dev -w ui -- --port 5199`) against
   the live gateway: the gate (disabled → enabled), `events`, `help-requests` (one unexplained
   timeout on the first run, passed on re-run). Not run: the other 10 updated tests.
-- After merge: smoke `projects`, `help-requests`, `events` live.
-- **Next M5d:** tag chips with scope icons linking to scope pages, Discover sheet, (d) closed
-  communities + invites, (e) settings/votes sheets and removal UI.
+- **Live after merge (13:17 UTC):** `projects`, `events`, `help-requests` passed. `/readyz`
+  742 MB, 218 threads after ~10 browser-test runs since the 09:55 UTC restart.
 
 ## Done 2026-10-29: channel picker, PR #72 merged 11:24 UTC (10:24 pm Melbourne) + test fix
 - `services/scopes.ts` `listScopes` adds this device's just-created scopes (`justCreated`) until
