@@ -8,7 +8,7 @@
     type PlanStepType,
   } from '#lib/domain/planForm.ts';
   import { PLAN_KIND_NAMES, subtypeOptions, type Plan, type PlanKind } from '#lib/domain/plans.ts';
-  import type { CharterMode, ProjectSubtype } from '#lib/domain/projects.ts';
+  import { isProjectMode, type CharterMode, type ProjectSubtype } from '#lib/domain/projects.ts';
 
   import PlanReview from './PlanReview.svelte';
   import PlanWizardShell from './PlanWizardShell.svelte';
@@ -127,7 +127,7 @@
           <PlanWizardStep
             {step}
             bind:form
-            subtypes={mode === 'event' || mode === 'help-request' ? [] : subtypeOptions(mode)}
+            subtypes={isProjectMode(mode) ? subtypeOptions(mode) : []}
             {productionLocation}
             {demand}
             {opposition}

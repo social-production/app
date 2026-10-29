@@ -12,9 +12,15 @@
     'personal-service': 'Personal Service',
     event: 'Event',
     'help-request': 'Help request',
+    channel: 'Channel',
+    community: 'Community',
   };
   const icon = $derived(
-    projectMode === 'event' ? 'event' : projectMode === 'help-request' ? 'help-request' : 'project',
+    projectMode === 'event' || projectMode === 'help-request' || projectMode === 'channel'
+      ? projectMode
+      : projectMode === 'community'
+        ? 'community'
+        : 'project',
   );
 </script>
 

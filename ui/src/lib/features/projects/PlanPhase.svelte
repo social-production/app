@@ -4,6 +4,7 @@
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { PlanKind, Plan } from '#lib/domain/plans.ts';
+  import { projectSubtype } from '#lib/domain/projects.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
@@ -48,7 +49,7 @@
         open={composing}
         {kind}
         mode={project.charter.mode}
-        subtype={project.charter.subtype}
+        subtype={projectSubtype(project.charter.subtype)}
         {productionLocation}
         demand={project.demand}
         opposition={project.opposition}

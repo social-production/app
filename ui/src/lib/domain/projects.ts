@@ -3,8 +3,9 @@
 import type { ProjectUpdate } from './governance.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
-/** A charter's mode: a project's, "event" (ADR 0057) or "help-request" (ADR 0067). */
-export type CharterMode = ProjectMode | 'event' | 'help-request';
+/** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), or a
+ * channel's or community's (ADR 0068). */
+export type CharterMode = ProjectMode | 'event' | 'help-request' | 'channel' | 'community';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
@@ -14,7 +15,8 @@ export interface Charter {
   title: string;
   description: string;
   mode: CharterMode;
-  subtype: ProjectSubtype;
+  /** A project's subtype; a channel's or community's join policy (`open`/`closed`). */
+  subtype: ProjectSubtype | 'open' | 'closed';
   location_label: string;
   phase: string;
   tags: string[];
@@ -113,6 +115,16 @@ export const MODE_LABELS: Record<ProjectMode, string> = {
 export function summaryOf(description: string): string {
   const first = description.trim().split(/\n\s*\n/)[0] ?? '';
   return first.length > SUMMARY_MAX ? `${first.slice(0, SUMMARY_MAX - 1)}…` : first;
+}
+
+/** A project proper (not an event, help request, channel or community): it has subtypes. */
+export function isProjectMode(mode: CharterMode): mode is ProjectMode {
+  return mode === 'productive' || mode === 'collective-service' || mode === 'personal-service';
+}
+
+/** A charter's subtype as a project subtype (a scope's join policy isn't one). */
+export function projectSubtype(subtype: Charter['subtype']): ProjectSubtype {
+  return subtype === 'open' || subtype === 'closed' ? 'standard' : subtype;
 }
 
 /** Events are project clones whose charter mode is "event" (ADR 0057). */

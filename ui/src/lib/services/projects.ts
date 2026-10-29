@@ -64,16 +64,19 @@ export interface FeedQuery {
   offset: number;
   /** Only this person's projects (their profile's feed). */
   creator?: string;
+  /** Only items tagged with this channel or community (`#food`, ADR 0068). */
+  tag?: string;
 }
 
 export function feed(query: FeedQuery): Promise<{ items: ProjectCard[]; total: number }> {
   const tzOffset = String(-new Date().getTimezoneOffset());
-  const { creator, ...rest } = query;
+  const { creator, tag, ...rest } = query;
   return projectFeed({
     ...rest,
     offset: String(query.offset),
     tzOffset,
     ...(creator ? { creator } : {}),
+    ...(tag ? { tag } : {}),
   });
 }
 
