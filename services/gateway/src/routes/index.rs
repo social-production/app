@@ -32,6 +32,9 @@ pub struct FeedParams {
     /// the people someone follows for web's Home feed.
     #[serde(default)]
     creator: String,
+    /// Only items tagged with this channel or community (`#food`, `@brunswick`, ADR 0068).
+    #[serde(default)]
+    tag: String,
 }
 
 #[derive(Serialize)]
@@ -68,7 +71,13 @@ pub async fn projects(
     let (items, total) = state
         .node
         .index
-        .page(&query, &creators, p.offset, limit)
+        .page(
+            &query,
+            &creators,
+            Some(p.tag.as_str()).filter(|t| !t.is_empty()),
+            p.offset,
+            limit,
+        )
         .await;
     Ok(Json(FeedPage { items, total }))
 }
@@ -87,4 +96,13 @@ pub async fn people(
 ) -> ApiResult<Vec<PersonCard>> {
     let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
     Ok(Json(state.node.people.search(&p.q, limit).await))
+}
+
+/// `GET /index/scopes?q=`: channels and communities for Discover and tag search (ADR 0068).
+pub async fn scopes(
+    State(state): State<AppState>,
+    Query(p): Query<PeopleParams>,
+) -> ApiResult<Vec<ProjectCard>> {
+    let limit = p.limit.unwrap_or(20).min(PAGE_MAX);
+    Ok(Json(state.node.index.scopes(&p.q, limit).await))
 }
