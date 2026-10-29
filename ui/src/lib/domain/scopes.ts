@@ -53,3 +53,18 @@ export function checkHandle(
     return { ok: false, error: 'That channel name is reserved' };
   return { ok: true, slug: slugOf(display) };
 }
+
+/** web's TagRef for a card's tag: a scope (icon + its page) or a free word (search). */
+export interface TagRef {
+  tag: string;
+  kind: ScopeKind | 'free';
+  slug: string;
+  label: string;
+}
+
+export function tagRef(tag: string): TagRef {
+  const scope = tagScope(tag);
+  return scope
+    ? { tag, ...scope, label: scope.slug }
+    : { tag, kind: 'free', slug: tag, label: tag };
+}
