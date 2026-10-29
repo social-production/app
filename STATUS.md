@@ -45,7 +45,7 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: tag chips PR (branch `claude/social-production-handoff-dsam61`)
-- **Tag chips with web's scope icons** (below): pushed, PR open; merge once CI is green, then
+- **Tag chips with web's scope icons** (below): **PR #74** open (CI ~2 h); merge once CI is green, then
   smoke live `projects.mjs` and update README Status.
 - **Next M5d after it:** Discover sheet, (d) closed communities + invites, (e) settings/votes
   sheets and removal UI.
