@@ -57,9 +57,10 @@ async fn members(net: &Net, i: usize) -> Vec<AgentPubKey> {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn members_vote_someone_out_of_a_channel() {
-    // Agents 0 and 1 are founders (Full); agent 2 is New. Agent 0 creates #food.
-    let net = Net::with_charter(3, 2, "scopes", scope("channel", "Food", "open")).await;
-    assert_eq!(members(&net, 0).await.len(), 3);
+    // Agents 0–2 are founders (Full); agent 3 is New. Agent 0 creates #food. With 4 members
+    // a decision needs 3 votes (sp_governance quorum).
+    let net = Net::with_charter(4, 3, "scopes", scope("channel", "Food", "open")).await;
+    assert_eq!(members(&net, 0).await.len(), 4);
 
     for bad in [
         scope("channel", "Food", "closed"),
@@ -81,19 +82,21 @@ async fn members_vote_someone_out_of_a_channel() {
     assert!(renamed.is_err(), "a handle stays");
 
     let out = ProposalKind::RemoveMember {
-        agent: agent(&net, 2),
+        agent: agent(&net, 3),
     };
     let proposal: ActionHash = net.call(0, "governance", "propose", out).await;
     net.settle().await;
-    let vote = VoteInput {
-        proposal,
-        choice: VoteChoice::Yes,
-    };
-    let _: ActionHash = net.call(1, "governance", "vote", vote).await;
-    net.settle().await;
+    for voter in [1, 2] {
+        let vote = VoteInput {
+            proposal: proposal.clone(),
+            choice: VoteChoice::Yes,
+        };
+        let _: ActionHash = net.call(voter, "governance", "vote", vote).await;
+        net.settle().await;
+    }
     let left = members(&net, 0).await;
-    assert_eq!(left.len(), 2, "removed: {left:?}");
-    assert!(!left.contains(&agent(&net, 2)));
+    assert_eq!(left.len(), 3, "removed: {left:?}");
+    assert!(!left.contains(&agent(&net, 3)));
     net.shut_down().await;
 }
 
