@@ -42,7 +42,7 @@ scenario + browser tests, as M1–M4 did.
 - Decided by ADR 0065 + 0068: public channels/communities are commons spaces (modes `channel`,
   `community`), closed communities are clones; handles claimed first come first served in the
   directory; tags `#channel` / `@community`; scope proposals reuse the project DNA's. Parts:
-  (a) DNA + scenarios (one project + directory reset), (b) create flows, scope pages, join,
+  (a) DNA + scenarios (one project reset), (b) create flows, scope pages, join,
   left rail, Discover, (c) tagging + tag icons, (d) closed communities + invites, (e) settings
   and votes. Web: `features/communities`, `channels`, `shared-directory`, the left rail's lists,
   scope tags with icons on cards, private (closed) communities hiding their items.
