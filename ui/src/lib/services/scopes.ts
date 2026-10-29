@@ -24,7 +24,15 @@ const toScope = (c: ProjectCard): Scope => ({
 /** Channels and communities whose handle or description matches, first handle first. */
 export async function listScopes(q = '', limit = 50): Promise<Scope[]> {
   const cards = await scopeIndex<ProjectCard[]>({ q, limit: String(limit) });
-  return cards.map(toScope);
+  const listed = cards.map(toScope);
+  // Until the index reads them, this device's new scopes still show (e.g. as tag choices).
+  const wanted = q.trim().toLowerCase();
+  const pending = [...justCreated.values()].filter(
+    (s) =>
+      !listed.some((l) => l.slug === s.slug) &&
+      (s.handle.toLowerCase().includes(wanted) || s.description.toLowerCase().includes(wanted)),
+  );
+  return [...pending, ...listed].slice(0, limit);
 }
 
 /** The scope a handle names (web: handles are unique across channels and communities). */

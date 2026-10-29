@@ -39,15 +39,19 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## OUTAGE 2026-10-29 ~05–07 UTC: every Railway URL returns "Application not found" (404)
-The P2P UI, the seed node and the FastAPI site (`web-production-885ec`, a separate project)
-all 404 at 07:33 UTC; the last good check was 04:40 UTC (`/readyz` 498–645 MB,
-`private-events.mjs` passed). Railway's status page shows no new incident. Likely account-level
-(billing/suspension/projects or domains removed): **the owner must check the Railway dashboard.**
-Don't merge PR #71 until the site is back (merging deploys, and nothing can be smoked).
+## Railway outage 2026-10-29 ~05–07:35 UTC: resolved
+Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
+raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
+If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): M5d channels and communities, parts (a)–(c) (ADR 0068)
-**PR #71** (branch `claude/social-production-handoff-dsam61`, opened ~07:00 UTC 29 Oct). Merging resets the
+## In flight 2026-10-29 (cloud session): channel picker lists just-created channels
+Branch `claude/social-production-handoff-dsam61` (after #71). `services/scopes.ts` `listScopes`
+adds this device's just-created scopes (the `justCreated` cache) until the index lists them, so
+creating a channel and then a project tagged with it doesn't wait on the index. UI checks pass
+(check, lint, boundaries, sizes); verify live with `projects.mjs` after merge.
+
+## Done 2026-10-29: M5d channels and communities, parts (a)–(c) (ADR 0068), PR #71
+**PR #71** merged 09:34 UTC (8:34 pm Melbourne); seed node live 09:55 UTC. It reset the
 project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl…` unchanged).
 - **(a) DNA:** `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
   slugs); project integrity accepts `channel`/`community` charters (title = handle, subtype =
@@ -73,7 +77,10 @@ project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl�
   Discover sheet, closed communities + invites (d), settings/votes sheets and removal UI (e).
 - **Checked locally:** release seed node, `projects` (channel → tagged project → channel page),
   `help-requests`, `events`, `private-events` all passed; scenario `scopes` passed.
-- **Next:** CI green → merge → live smoke (`projects.mjs`, `help-requests.mjs`) → README.
+- **Live smoke:** `help-requests.mjs` passed. `projects.mjs` failed twice at "channel never
+  appeared in the tag search": the search works (an indexed channel shows), but a new channel
+  took over ~2 min to reach `/index/scopes` on the freshly reset node. Fixed in the follow-up
+  above. `/readyz` 569 MB at 2 min, 611 MB after the runs (4 apps / 12 cells).
 
 ## Done 2026-10-29: memory sorted, PR #70 merged 04:10 UTC (3:10 pm Melbourne), live
 **Transparent huge pages off (ADR 0066 addendum).** Railway's kernel has THP `always`; every
