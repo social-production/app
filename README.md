@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Help requests (M5c, ADR 0067, PR #69, 2026-10-29 12:33 pm Melbourne; the project network
+  reset):** web's create flow, the request page (roles with Sign up / Leave / Full, votes, chat)
+  and its feed card. Live `help-requests.mjs` passed.
 - **Event members sheet + allocator change (PR #68, 2026-10-29 10:31 am Melbourne):** private
   events' members sheet splits Organizers and Members, organizers promote members and invite
   people (web's EventMembersPanel); organizer-run events say "Edit event"/"Close event".

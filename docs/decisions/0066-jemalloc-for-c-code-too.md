@@ -35,3 +35,21 @@ Measured locally (release, 4 CPUs, `scripts/cloud-seed.sh`), the same four brows
   same data; compare RSS across deploys, not `allocatedMb`.
 - What remains: wasmer's compiled code (~94 MB, one copy per DNA, ADR 0053), the binary, and
   live data. Cold projects (ADR 0064) stay the next lever as data grows.
+
+## Addendum (2026-10-29): transparent huge pages
+Live after this ADR: idle 781–789 MB, and anonymous memory still ~200–430 MB above jemalloc's
+resident, growing with the thread count (`maps.anonBySize`: 2–8 MB mappings went 117 → 271
+and 180 → 411 MB as threads went 59 → 143); no 64 MB mappings, so glibc's arenas were gone.
+The cloud container's kernel uses THP `madvise`; with it set to `always` (as Railway's kernel
+evidently is), each thread stack's and each jemalloc extent's first touch can take a whole 2 MB
+page. Measured locally with THP `always`, the same four browser files, idle 100 s after:
+
+| | RSS | `anonHugeMb` | anon outside jemalloc |
+|---|---|---|---|
+| THP left on (`KEEP_THP=1`) | 701 MB | 424 MB | ~83 MB |
+| THP off for the process | **607 MB** | 4 MB | ~0 |
+
+Decision: the gateway calls `prctl(PR_SET_THP_DISABLE)` (the `nix` crate's safe wrapper) before
+its runtime starts; `KEEP_THP=1` skips it. `/readyz` `maps.anonHugeMb` shows what huge pages
+back, so the live effect can be read. Huge pages only speed up big hot heaps; the conductor's
+memory is many small caches and stacks, where they mostly waste RAM.

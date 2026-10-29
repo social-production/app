@@ -4,7 +4,7 @@
 //! file-backed maps (the binary and libraries). Subtract `heap.residentMb` from `anonMb` to
 //! see what lives outside jemalloc. `anonBySize` splits `anonMb` by each mapping's size:
 //! thread stacks are 2–8 MB, glibc's arena heaps exactly 64 MB, jemalloc's extents vary, and
-//! wasm memories reserve gigabytes.
+//! wasm memories reserve gigabytes. `anonHugeMb` is what transparent huge pages back.
 
 use std::collections::BTreeMap;
 
@@ -14,8 +14,11 @@ pub fn resident_by_kind() -> Option<serde_json::Value> {
     let mut by_size: BTreeMap<&str, (u64, u32)> = BTreeMap::new();
     let mut kind = "anonMb";
     let mut size = "";
+    let mut huge_kb = 0;
     for line in smaps.lines() {
-        if let Some(rss) = line.strip_prefix("Rss:") {
+        if let Some(huge) = line.strip_prefix("AnonHugePages:") {
+            huge_kb += huge.split_whitespace().next()?.parse::<u64>().ok()?;
+        } else if let Some(rss) = line.strip_prefix("Rss:") {
             let value = rss.split_whitespace().next()?.parse::<u64>().ok()?;
             *kb.entry(kind).or_default() += value;
             if kind == "anonMb" {
@@ -37,6 +40,9 @@ pub fn resident_by_kind() -> Option<serde_json::Value> {
         .map(|(k, (rss, n))| (k, serde_json::json!({ "rssMb": rss / 1024, "maps": n })))
         .collect();
     out.insert("anonBySize", serde_json::json!(sizes));
+    // Transparent huge pages (ADR 0066): with THP "always", every thread stack's first touch
+    // can take a whole 2 MB page.
+    out.insert("anonHugeMb", (huge_kb / 1024).into());
     Some(serde_json::json!(out))
 }
 
