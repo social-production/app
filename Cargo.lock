@@ -8814,6 +8814,13 @@ name = "sp_index"
 version = "0.0.1"
 
 [[package]]
+name = "sp_scope"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
+]
+
+[[package]]
 name = "space_scope"
 version = "0.0.1"
 dependencies = [
