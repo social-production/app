@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Seed-node memory sorted (PR #70, 2026-10-29 3:10 pm Melbourne; ADR 0066):** transparent
+  huge pages off for the gateway. Live idle 498 MB at 10 min (was ~790–1000 MB); after a
+  browser test run 645 MB (was 1112 MB).
 - **Help requests (M5c, ADR 0067, PR #69, 2026-10-29 12:33 pm Melbourne; the project network
   reset):** web's create flow, the request page (roles with Sign up / Leave / Full, votes, chat)
   and its feed card. Live `help-requests.mjs` passed.

@@ -1,6 +1,8 @@
 // M2 projects end to end against a local seed node (run it as described in accounts.mjs):
-// create through the "+" menu, find in the feed (archivist + index), join, support,
-// search by tag, and the New-member limit of 2 projects a week.
+// create a channel and a project tagged with it through the "+" menu, find it in the feed
+// (archivist + index) and on the channel's page (ADR 0068), join, support, search by tag,
+// and the New-member limit of 2 listings a week (a channel counts until the next directory
+// reset, ADR 0068).
 //   node tests/e2e/projects.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 
@@ -8,6 +10,17 @@ import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
 
 const stamp = Date.now().toString(36).slice(-4);
 const title = `Seed library ${stamp}`;
+const channel = `seeds${stamp}`;
+
+async function createChannel(page, handle) {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await page.getByRole('menuitem', { name: /Channel/ }).click();
+  await page.getByLabel(/Channel handle/).fill(handle);
+  await page.getByLabel(/Description/).fill('Seed saving and swaps.');
+  await page.getByRole('button', { name: 'Create channel' }).click();
+  await page.getByRole('heading', { name: handle }).waitFor({ timeout: 120_000 });
+}
 
 async function createProject(page, name, tag) {
   await page.goto(BASE);
@@ -20,8 +33,19 @@ async function createProject(page, name, tag) {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('radio', { name: /Online/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByPlaceholder('Type a tag, then Enter').fill(tag);
-  await page.keyboard.press('Enter');
+  // web's scope step: the primary channel tag, from the channels the index lists.
+  const primary = page.getByLabel('Primary channel tag');
+  for (let i = 0; ; i++) {
+    await primary.fill(tag);
+    const option = page.getByRole('option', { name: tag });
+    if (await option.count()) {
+      await option.click();
+      break;
+    }
+    if (i >= 40) throw new Error(`channel ${tag} never appeared in the tag search`);
+    await primary.fill('');
+    await page.waitForTimeout(3000);
+  }
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Publish project' }).click();
 }
@@ -43,7 +67,9 @@ async function waitInFeed(page, text, path = '/') {
 
 const ann = await device();
 await signUp(ann, `ann_${stamp}`);
-await createProject(ann, title, 'seeds');
+await createChannel(ann, channel);
+log('created a channel');
+await createProject(ann, title, channel);
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await ann.getByRole('button', { name: 'Leave project' }).waitFor();
 assert.equal((await ann.getByRole('button', { name: '1 members' }).count()), 1, 'creator is the first member');
@@ -95,11 +121,21 @@ for (let i = 0; ; i++) {
 }
 log('search by tag finds the project');
 
-await createProject(ann, `Second ${stamp}`, 'x');
-await ann.getByRole('heading', { name: `Second ${stamp}` }).waitFor({ timeout: 120_000 });
+// The channel's page lists what is tagged with it.
+for (let i = 0; ; i++) {
+  await bob.goto(`${BASE}/channels/${channel}`);
+  await bob.getByRole('heading', { name: channel }).waitFor({ timeout: 60_000 });
+  const card = bob.locator('.project-card', { hasText: title });
+  await bob.getByText(/Loading feed/).waitFor({ state: 'detached', timeout: 60_000 });
+  if (await card.count()) break;
+  if (i >= 20) throw new Error('the project never showed on its channel page');
+  await bob.waitForTimeout(3000);
+}
+log('the channel page lists the project');
+
 await ann.goto(`${BASE}/create/project`);
 await ann.getByText('(0 left)').waitFor({ timeout: 60_000 });
-log('a New member sees 0 projects left after two');
+log('a New member sees 0 projects left after a channel and a project');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all M2 project checks passed');

@@ -7,7 +7,7 @@
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
-  import CreateFab, { type CreateLink } from '#lib/components/shell/CreateFab.svelte';
+  import CreateFab from '#lib/components/shell/CreateFab.svelte';
   import LeftRail from '#lib/components/shell/LeftRail.svelte';
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
   import MobileMoreSheet from '#lib/components/shell/MobileMoreSheet.svelte';
@@ -22,6 +22,7 @@
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
+  import { myScopes } from '#lib/stores/myScopes.svelte.ts';
   import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { countActionable } from '#lib/domain/activityRail.ts';
@@ -29,6 +30,8 @@
 
   import { refreshActivityRail, startActivityRail } from './activityRailLoop.ts';
   import AuthActionNotice from './AuthActionNotice.svelte';
+  import { createLinks, surfaceLinks } from './createLinks.ts';
+  import { startMyScopes } from './myScopesLoop.ts';
   import RightRailPanel from './RightRailPanel.svelte';
 
   import '#lib/components/shell/shell.css';
@@ -119,6 +122,11 @@
     };
   });
 
+  // web's left rail lists the channels and communities you joined (ADR 0068).
+  $effect(() => {
+    if (signedIn) return untrack(() => startMyScopes());
+  });
+
   // web's activity rail: its badge counts cards you haven't opened or cleared, and the first
   // desktop load opens it when there is something to do (until you toggle it yourself).
   $effect(() => {
@@ -153,26 +161,6 @@
       (['/', '/platform', '/profile'].includes(page.url.pathname) ||
         /^\/(profile|channels|communities)\/[^/]+$/.test(page.url.pathname)),
   );
-  const createLinks: CreateLink[] = [
-    {
-      href: resolve('/create/help-request'),
-      label: 'Help request',
-      description: 'Ask for help with roles and schedule',
-      icon: 'help-request',
-    },
-    {
-      href: resolve('/create/project'),
-      label: 'Project',
-      description: 'Start a productive or service project',
-      icon: 'project',
-    },
-    {
-      href: resolve('/create/event'),
-      label: 'Event',
-      description: 'Plan a scheduled gathering',
-      icon: 'event',
-    },
-  ];
 
   function isActive(href: string): boolean {
     const path = page.url.pathname;
@@ -240,6 +228,14 @@
     <aside class="rail left-rail" data-open={leftOpen && !authSurface}>
       {#if !authSurface}
         <LeftRail
+          channels={myScopes.channels.map((c) => ({
+            href: resolve('/channels/[slug]', { slug: c.slug }),
+            label: c.handle,
+          }))}
+          communities={myScopes.communities.map((c) => ({
+            href: resolve('/communities/[slug]', { slug: c.slug }),
+            label: c.handle,
+          }))}
           invites={notifications.invites}
           closePanels={closeCompact}
           onDiscover={() => goto(resolve('/'))}
@@ -258,7 +254,12 @@
         {@render children()}
       </div>
       {#if showCreateFab}
-        <CreateFab {signedIn} links={createLinks} signInHref={resolve('/onboarding')} />
+        <CreateFab
+          {signedIn}
+          links={createLinks}
+          surfaces={surfaceLinks}
+          signInHref={resolve('/onboarding')}
+        />
       {/if}
     </main>
 

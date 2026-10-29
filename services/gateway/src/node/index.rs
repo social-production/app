@@ -57,18 +57,23 @@ impl ProjectIndex {
     }
 
     /// One page of the feed, best first; non-empty `creators` keeps only their projects (a
-    /// profile's feed, or the people someone follows for web's Home feed).
+    /// profile's feed, or the people someone follows for web's Home feed), and `tag` only the
+    /// items tagged with one channel or community (`#food`, ADR 0068). Channels and
+    /// communities themselves aren't feed items.
     pub async fn page(
         &self,
         q: &FeedQuery<'_>,
         creators: &[&str],
+        tag: Option<&str>,
         offset: usize,
         limit: usize,
     ) -> (Vec<ProjectCard>, usize) {
         let all = self.0.read().await;
         let cards: Vec<&ProjectCard> = all
             .iter()
+            .filter(|c| !sp_scope::is_scope(&c.mode))
             .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))
+            .filter(|c| tag.is_none_or(|t| c.tags.iter().any(|have| have == t)))
             .collect();
         let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
         let pairs: Vec<(&ProjectCard, &ItemStats)> = cards.into_iter().zip(&stats).collect();
@@ -102,6 +107,33 @@ impl ProjectIndex {
             .map(|(c, _)| (*c).clone())
             .collect();
         (page, total)
+    }
+
+    /// Channels and communities (ADR 0068) whose handle or summary matches `q`, the earliest
+    /// listing of each handle only (first come, first served), by handle.
+    pub async fn scopes(&self, q: &str, limit: usize) -> Vec<ProjectCard> {
+        let needle = q.trim().to_lowercase();
+        let all = self.0.read().await;
+        let mut first = std::collections::BTreeMap::<String, &ProjectCard>::new();
+        for c in all.iter().filter(|c| sp_scope::is_scope(&c.mode)) {
+            let key = format!("{}:{}", c.mode, sp_scope::slug(&c.title));
+            let earlier = first
+                .get(&key)
+                .is_some_and(|f| (f.created_at, &f.id) <= (c.created_at, &c.id));
+            if !earlier {
+                first.insert(key, c);
+            }
+        }
+        first
+            .into_values()
+            .filter(|c| {
+                needle.is_empty()
+                    || c.title.to_lowercase().contains(&needle)
+                    || c.summary.to_lowercase().contains(&needle)
+            })
+            .take(limit)
+            .cloned()
+            .collect()
     }
 }
 
@@ -164,7 +196,7 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, &[], 0, 2).await;
+        let (page, total) = index.page(&q, &[], None, 0, 2).await;
         assert_eq!(total, 3);
         assert_eq!(
             page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -174,7 +206,7 @@ mod tests {
             search: "FOOD garden",
             ..q
         };
-        assert_eq!(index.page(&q, &[], 0, 10).await.1, 1);
+        assert_eq!(index.page(&q, &[], None, 0, 10).await.1, 1);
     }
 
     #[tokio::test]
@@ -192,15 +224,53 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, &["ann"], 0, 10).await;
+        let (page, total) = index.page(&q, &["ann"], None, 0, 10).await;
         assert_eq!((page[0].title.as_str(), total), ("Garden", 1));
-        let (page, total) = index.page(&q, &["ann", "bob"], 0, 10).await;
+        let (page, total) = index.page(&q, &["ann", "bob"], None, 0, 10).await;
         assert_eq!(
             (
                 page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
                 total
             ),
             (vec!["Tools", "Garden"], 2)
+        );
+    }
+
+    #[tokio::test]
+    async fn scopes_stay_out_of_the_feed_and_the_first_handle_wins() {
+        let index = ProjectIndex::default();
+        let scope = |id: &str, title: &str, at: i64| ProjectCard {
+            id: id.into(),
+            mode: "channel".into(),
+            ..card(title, 0, at)
+        };
+        let mut tagged = card("Seed swap", 0, 3);
+        tagged.tags = vec!["#food".into()];
+        index
+            .replace(vec![
+                scope("late", "Food", 5),
+                scope("first", "food", 1),
+                card("Bikes", 0, 2),
+                tagged,
+            ])
+            .await;
+        let q = FeedQuery {
+            sort: Sort::Recent,
+            window: Window::All,
+            search: "",
+            now: 10,
+            utc_offset_minutes: 0,
+        };
+        assert_eq!(index.page(&q, &[], None, 0, 10).await.1, 2, "no scopes");
+        let (page, _) = index.page(&q, &[], Some("#food"), 0, 10).await;
+        assert_eq!(
+            page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
+            ["Seed swap"]
+        );
+        let scopes = index.scopes("", 10).await;
+        assert_eq!(
+            scopes.iter().map(|c| c.id.as_str()).collect::<Vec<_>>(),
+            ["first"]
         );
     }
 }

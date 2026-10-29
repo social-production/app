@@ -1,0 +1,12 @@
+[package]
+name = "sp_scope"
+description = "Rules for channels and communities, spaces with modes \"channel\" and \"community\" (ADR 0068). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sp_core = { workspace = true }
+
+[lints]
+workspace = true

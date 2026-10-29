@@ -114,6 +114,7 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
             // An approved plan changes nothing by itself; phase moves cite it. A link needs
             // both projects' approval, which the Links tab pairs (ADR 0042).
             ProposalKind::Plan(_) | ProposalKind::Link(_) => {}
+            ProposalKind::RemoveMember { agent } => out.removed.push((agent, d.at)),
         }
     }
     out.updates.reverse(); // newest first, as web lists them

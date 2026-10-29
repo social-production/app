@@ -2713,6 +2713,7 @@ dependencies = [
  "sodoken",
  "sp_core",
  "sp_index",
+ "sp_scope",
  "sqlx",
  "tikv-jemalloc-ctl",
  "tikv-jemallocator",
@@ -7198,6 +7199,7 @@ dependencies = [
  "sp_event",
  "sp_governance",
  "sp_help",
+ "sp_scope",
 ]
 
 [[package]]
@@ -8812,6 +8814,13 @@ version = "0.0.1"
 [[package]]
 name = "sp_index"
 version = "0.0.1"
+
+[[package]]
+name = "sp_scope"
+version = "0.0.1"
+dependencies = [
+ "sp_core",
+]
 
 [[package]]
 name = "space_scope"

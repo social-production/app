@@ -47,6 +47,9 @@ fn check_charter(c: &Charter) -> Result<(), String> {
     } else if c.mode == sp_help::MODE {
         sp_help::check_kind(&c.mode, &c.subtype)?;
         (MODES[0], SUBTYPES[0])
+    } else if sp_scope::is_scope(&c.mode) {
+        check_scope_charter(c)?;
+        (MODES[0], SUBTYPES[0])
     } else {
         (c.mode.as_str(), c.subtype.as_str())
     };
@@ -58,4 +61,16 @@ fn check_charter(c: &Charter) -> Result<(), String> {
         phase: &c.phase,
         tags: &c.tags,
     })
+}
+
+/// A channel or community (ADR 0068): the title is its handle, the subtype its join policy.
+/// A closed community lives in its own clone (a private seed); public scopes in the commons.
+fn check_scope_charter(c: &Charter) -> Result<(), String> {
+    sp_scope::check_scope(&c.mode, &c.title, &c.subtype)?;
+    let in_clone = creator().map_err(|e| e.to_string())?.is_some();
+    match (c.subtype == "closed", in_clone) {
+        (true, true) | (false, false) => Ok(()),
+        (true, false) => Err("a closed community has its own private network".into()),
+        (false, true) => Err("only a closed community lives in a private network".into()),
+    }
 }

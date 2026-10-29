@@ -39,20 +39,53 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight 2026-10-29 (cloud session): transparent huge pages off (ADR 0066 addendum), PR #70
-- **Why:** after PR #68 live idle was still ~790 MB with anonymous memory ~200–430 MB above
-  jemalloc's resident, growing with threads (2–8 MB mappings 117 → 271, 180 → 411 MB as
-  threads went 59 → 143). Railway's kernel evidently has THP `always` (the cloud container has
-  `madvise`, which hid it): each stack's and jemalloc extent's first touch took a 2 MB page.
-- **Fix:** `services/gateway/src/main.rs` calls `nix::sys::prctl::set_thp_disable(true)` before
-  the tokio runtime starts (`KEEP_THP=1` skips it); `/readyz` `maps.anonHugeMb` shows huge-page
-  RSS. Locally with THP set to `always` (`echo always > /sys/kernel/mm/transparent_hugepage/
-  enabled` works as root in the cloud container), same 4 browser files, idle: **701 → 607 MB**,
-  `anonHugeMb` 424 → 4.
-- **After the deploy:** `/readyz` `maps.anonHugeMb` should be ~0 and `maps.anonMb` close to
-  `heap.residentMb`; compare idle with 789 MB (PR #69's deploy, 10 min, empty network).
-- Also: `help-requests.mjs` now sorts the feed by Most recent and waits for it to render
-  before looking for the card (it failed live twice without it; passed live after).
+## OUTAGE 2026-10-29 ~05–07 UTC: every Railway URL returns "Application not found" (404)
+The P2P UI, the seed node and the FastAPI site (`web-production-885ec`, a separate project)
+all 404 at 07:33 UTC; the last good check was 04:40 UTC (`/readyz` 498–645 MB,
+`private-events.mjs` passed). Railway's status page shows no new incident. Likely account-level
+(billing/suspension/projects or domains removed): **the owner must check the Railway dashboard.**
+Don't merge PR #71 until the site is back (merging deploys, and nothing can be smoked).
+
+## In flight 2026-10-29 (cloud session): M5d channels and communities, parts (a)–(c) (ADR 0068)
+**PR #71** (branch `claude/social-production-handoff-dsam61`, opened ~07:00 UTC 29 Oct). Merging resets the
+project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl…` unchanged).
+- **(a) DNA:** `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
+  slugs); project integrity accepts `channel`/`community` charters (title = handle, subtype =
+  join policy; a closed community only in a private-seed clone, reusing private events'
+  `private.`/`organized.` seeds) and `ProposalKind::RemoveMember` (scopes only; no handle
+  edits); governance folds removals into `Applied.removed`; the project view leaves removed
+  members out. Scenario `scopes` passes (2 tests; the removal needs a 4-member quorum of 3).
+- **Gateway:** `/index/projects` leaves scopes out and takes `tag=#food`; `/index/scopes?q=`
+  lists them, earliest listing per handle. Channels/communities still count toward a New
+  member's 2 listings a week (directory integrity counts every listing; ADR 0068 deviation,
+  fix at the next directory reset).
+- **(b) UI:** `/create/channel`, `/create/community` (web's forms; open communities only for
+  now), `/channels/<slug>`, `/communities/<slug>` (`features/projects/scopes/ScopePage.svelte`:
+  header with join/members, description, the tagged items), create menu "Surfaces" section,
+  left rail lists the scopes you joined (`stores/myScopes`, `features/shell/myScopesLoop.ts`).
+  `components/cards/SpaceCard.svelte` picks the card by mode for every feed.
+- **(c) Tagging:** web's scope step (`ScopeTagsStep`: primary channel, then more channels and
+  communities) replaces free tags in the project, event and help-request flows.
+  `tests/e2e/projects.mjs` now creates a channel, tags the project and finds it on the
+  channel page.
+- **Not yet:** web's required channel tag (13 browser tests create projects: add a shared
+  "ensure a channel" helper first), tag chips with web's scope icons linking to scope pages,
+  Discover sheet, closed communities + invites (d), settings/votes sheets and removal UI (e).
+- **Checked locally:** release seed node, `projects` (channel → tagged project → channel page),
+  `help-requests`, `events`, `private-events` all passed; scenario `scopes` passed.
+- **Next:** CI green → merge → live smoke (`projects.mjs`, `help-requests.mjs`) → README.
+
+## Done 2026-10-29: memory sorted, PR #70 merged 04:10 UTC (3:10 pm Melbourne), live
+**Transparent huge pages off (ADR 0066 addendum).** Railway's kernel has THP `always`; every
+thread stack and jemalloc extent took 2 MB pages. The gateway now calls
+`prctl(PR_SET_THP_DISABLE)` before its runtime starts (`KEEP_THP=1` skips it).
+| Live `/readyz` | RSS | outside jemalloc | thread-stack maps |
+|---|---|---|---|
+| Before #70, 2.4 h, 5 apps | 1002 MB | ~375 MB | 350 MB |
+| After #70, 10 min, 5 apps | **498 MB** | ~0 | 63 MB |
+| After a live `private-events.mjs` | **645 MB** (was 1112 MB for the same run) | ~0 | 104 MB |
+`maps.anonHugeMb` is 2 MB. Live smoke: `private-events.mjs` passed. Watch `/readyz` as data
+grows; growth should now follow live data (jemalloc `heap.residentMb`), not threads.
 
 ## Done 2026-10-29: help requests (ADR 0067), PR #69 merged 01:33 UTC (12:33 pm Melbourne), live
 **The project network reset.** Live: `help-requests.mjs` passed (after the test fix above);
@@ -950,7 +983,7 @@ ProductiveLifecyclePhaseOne / ProjectValueCard / DiscreteScale / AddValueSheet:
 - **Integrity change** (new `Value`/`Importance` entries, two link types, value criteria in
   `Rating`): merging resets projects again (people stay).
 - **CI split**: `scripts/check-fast.sh` (everything but scenarios) + `scripts/check-scenarios.sh
-  [<shard> <shards>]`; CI runs the scenarios as 6 parallel shards (`ci.yml` job `scenarios`).
+  [<shard> <shards>]`; CI runs the scenarios as 8 parallel shards (`ci.yml` job `scenarios`).
   `check-all.sh` still runs everything. New scenario files are picked up automatically.
 - `scripts/port-styles.py` now dedents web's `<style>` blocks. Regenerating everything today
   also pulls ~500 lines of web's newer styles into the other stylesheets; that drift was left

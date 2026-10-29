@@ -24,7 +24,7 @@ use hdi::prelude::*;
 pub use activity::{
     Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
 };
-pub use governance::SNAPSHOT_MAX;
+pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
@@ -75,6 +75,10 @@ pub enum ProposalKind {
     },
     /// One project's half of a link to another project (ADR 0042).
     Link(LinkRequest),
+    /// Remove a member from a channel or community (web's `remove_member`, ADR 0068).
+    RemoveMember {
+        agent: AgentPubKey,
+    },
 }
 
 #[hdk_entry_helper]
@@ -278,6 +282,9 @@ pub struct Applied {
     pub subtype: Option<String>,
     pub updates: Vec<AppliedUpdate>,
     pub last_decision_at: Option<Timestamp>,
+    /// Members removed by passed `RemoveMember` proposals, and when (ADR 0068).
+    #[serde(default)]
+    pub removed: Vec<(AgentPubKey, Timestamp)>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

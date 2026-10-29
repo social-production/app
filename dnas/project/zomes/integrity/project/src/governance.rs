@@ -23,8 +23,11 @@ pub fn validate_proposal(
     if let Err(reason) = check_kind(&p.kind) {
         return invalid(&reason);
     }
-    if crate::charter_at(&p.space)?.is_none() {
+    let Some((charter, _)) = crate::charter_at(&p.space)? else {
         return invalid("a proposal decides for a space");
+    };
+    if let Err(reason) = check_scope_kind(&charter.mode, &p.kind) {
+        return invalid(&reason);
     }
     if let ProposalKind::Phase {
         plan: Some(plan), ..
@@ -124,8 +127,9 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             }
             Ok(())
         }
-        // Needs the DNA's seed and the cited create half: `link::check`.
-        ProposalKind::Link(_) => Ok(()),
+        // A link needs the DNA's seed and the cited create half (`link::check`); a removal
+        // needs the space's mode (`check_scope_kind`).
+        ProposalKind::Link(_) | ProposalKind::RemoveMember { .. } => Ok(()),
     }
 }
 
@@ -192,5 +196,20 @@ pub fn validate_outcome(
         Ok(ValidateCallbackResult::Valid)
     } else {
         invalid("the outcome's result doesn't match its votes")
+    }
+}
+
+/// Channels and communities (ADR 0068) take removals; their handle (the title) never changes,
+/// since items name them by it. Nothing else takes removals.
+pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
+    let scope = sp_scope::is_scope(mode);
+    match kind {
+        ProposalKind::RemoveMember { .. } if !scope => {
+            Err("only channels and communities remove members".into())
+        }
+        ProposalKind::Edit { title: Some(_), .. } if scope => {
+            Err("a channel's or community's name is its handle and stays".into())
+        }
+        _ => Ok(()),
     }
 }
