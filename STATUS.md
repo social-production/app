@@ -39,6 +39,13 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
+## OUTAGE 2026-10-29 ~05–07 UTC: every Railway URL returns "Application not found" (404)
+The P2P UI, the seed node and the FastAPI site (`web-production-885ec`, a separate project)
+all 404 at 07:33 UTC; the last good check was 04:40 UTC (`/readyz` 498–645 MB,
+`private-events.mjs` passed). Railway's status page shows no new incident. Likely account-level
+(billing/suspension/projects or domains removed): **the owner must check the Railway dashboard.**
+Don't merge PR #71 until the site is back (merging deploys, and nothing can be smoked).
+
 ## In flight 2026-10-29 (cloud session): M5d channels and communities, parts (a)–(c) (ADR 0068)
 **PR #71** (branch `claude/social-production-handoff-dsam61`, opened ~07:00 UTC 29 Oct). Merging resets the
 project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl…` unchanged).
