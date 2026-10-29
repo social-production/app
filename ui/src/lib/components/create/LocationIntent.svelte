@@ -10,9 +10,19 @@
     place: string;
     onIntent: (intent: LocationChoice) => void;
     onPlace: (place: string) => void;
+    /** web's `allowLater` and `helperText` (help requests need a place now). */
+    allowLater?: boolean;
+    helperText?: string;
   }
 
-  let { intent, place, onIntent, onPlace }: Props = $props();
+  let {
+    intent,
+    place,
+    onIntent,
+    onPlace,
+    allowLater = true,
+    helperText = 'A physical location helps people discover this on the map. You can change it later.',
+  }: Props = $props();
 
   const choices: { value: LocationChoice; title: string; hint: string }[] = [
     {
@@ -30,11 +40,9 @@
 </script>
 
 <div class="location-intent">
-  <p class="helper">
-    A physical location helps people discover this on the map. You can change it later.
-  </p>
+  <p class="helper">{helperText}</p>
   <div class="intent-row" role="radiogroup" aria-label="Location intent">
-    {#each choices as choice (choice.value)}
+    {#each choices.filter((c) => allowLater || c.value !== 'later') as choice (choice.value)}
       <label class="intent-option">
         <input
           type="radio"

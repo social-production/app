@@ -155,6 +155,12 @@
   );
   const createLinks: CreateLink[] = [
     {
+      href: resolve('/create/help-request'),
+      label: 'Help request',
+      description: 'Ask for help with roles and schedule',
+      icon: 'help-request',
+    },
+    {
       href: resolve('/create/project'),
       label: 'Project',
       description: 'Start a productive or service project',

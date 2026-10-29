@@ -3,6 +3,7 @@
 
 mod archivist;
 mod bundle;
+mod cards;
 mod hosting;
 mod index;
 mod people;

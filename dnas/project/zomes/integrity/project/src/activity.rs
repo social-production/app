@@ -16,6 +16,9 @@ pub struct ActivityRole {
     pub label: String,
     pub required: u32,
     pub maximum: Option<u32>,
+    /// web's help-request role description (ADR 0067); empty elsewhere.
+    #[serde(default)]
+    pub description: String,
 }
 
 #[hdk_entry_helper]
@@ -86,6 +89,7 @@ fn spec(a: &Activity) -> ActivitySpec<'_> {
                 label: &r.label,
                 required: r.required,
                 maximum: r.maximum,
+                description: &r.description,
             })
             .collect(),
     }
@@ -106,6 +110,14 @@ pub fn validate_activity(
         None,
     )? {
         return invalid("only members can add activities");
+    }
+    // A help request's one activity is its creator's (ADR 0067).
+    if let Some(space) = membership_space(&a.membership)? {
+        if let Some((charter, creator)) = crate::charter_at(&space)? {
+            if charter.mode == sp_help::MODE && &creator != action.author() {
+                return invalid("only the person asking adds a help request's activity");
+            }
+        }
     }
     let organizer = a.organizer.as_ref();
     if let Some(refused) =

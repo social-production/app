@@ -1,0 +1,11 @@
+[package]
+name = "sp_help"
+description = "Rules for help requests, commons spaces with mode \"help-request\" (ADR 0067). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

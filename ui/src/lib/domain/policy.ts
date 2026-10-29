@@ -9,6 +9,9 @@ export const DIRECT_USE_CREATE =
 export const DIRECT_USE_EVENT_CREATE =
   'Events must stay free to join. Do not plan ticket sales, paid entry, or paid facilitation through this platform.';
 
+export const DIRECT_USE_REQUEST =
+  'Help and service activity here is voluntary mutual aid. No payment is expected, accepted, or offered for the work.';
+
 export const DIRECT_USE_PLAN =
   'Plans must describe work for direct use only. Do not plan to sell outputs, charge for access, or run paid facilitation.';
 

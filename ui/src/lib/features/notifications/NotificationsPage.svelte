@@ -18,7 +18,7 @@
 
   import '#lib/components/styles/messages.css';
   import '#lib/components/styles/notifications.css';
-  import { isEvent } from '#lib/domain/projects.ts';
+  import { spaceHref } from '#lib/components/cards/spaceHref.ts';
 
   /** web's NotificationsPage: the list, newest first, with "Mark all read". */
   let names = $state<Record<string, string>>({});
@@ -97,9 +97,7 @@
       }
       const id = await projectPageOf(item.seed);
       if (!id) return;
-      const page = isEvent(item.projectMode ?? undefined)
-        ? resolve('/events/[id]', { id })
-        : resolve('/projects/[id]', { id });
+      const page = spaceHref(item.projectMode, id);
       const query = !t
         ? ''
         : 'tab' in t

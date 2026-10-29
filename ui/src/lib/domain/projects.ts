@@ -3,8 +3,8 @@
 import type { ProjectUpdate } from './governance.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
-/** A charter's mode: a project's, or "event" for an event (a project clone, ADR 0057). */
-export type CharterMode = ProjectMode | 'event';
+/** A charter's mode: a project's, "event" (ADR 0057) or "help-request" (ADR 0067). */
+export type CharterMode = ProjectMode | 'event' | 'help-request';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
@@ -43,6 +43,13 @@ export interface ProjectCard {
   latestUpdate: string | null;
   /** Messages in the project chat (web's `commentCount`; counts up to the chat's page size). */
   commentCount: number;
+  /** A help request's time and sign-ups (ADR 0067; times in Holochain microseconds). */
+  help?: {
+    neededAt: number | null;
+    endsAt: number | null;
+    signupCount: number;
+    slotsNeeded: number;
+  };
 }
 
 export interface Project {
@@ -116,6 +123,7 @@ export function isEvent(mode: CharterMode | undefined): boolean {
 /** The left accent bar colour per mode (web's surfaceTypeAccent). */
 export function modeAccent(mode: CharterMode): string {
   if (mode === 'event') return 'var(--type-accent-event)';
+  if (mode === 'help-request') return 'var(--type-accent-help-request)';
   if (mode === 'productive') return 'var(--type-accent-project-production)';
   return mode === 'personal-service'
     ? 'var(--type-accent-project-personal-service)'

@@ -17,6 +17,7 @@ cards.css         -               web/src/lib/components/cards/shared/PrivateMar
 cards.css         .surface        web/src/lib/components/cards/shared/CountPill.svelte
 cards.css         .personal-activity-card web/src/lib/components/cards/personal-feed/PersonalActivityCard.svelte
 cards.css         .identity       web/src/lib/components/cards/personal-feed/PersonalFeedIdentity.svelte
+cards.css         .help-request-card web/src/lib/components/cards/public-feed/HelpRequestCard.svelte
 feed.css          .feed-page      web/src/lib/features/public-feed/PublicFeed.svelte
 icon-menu.css     .icon-menu-shell web/src/lib/components/shared/IconMenuButton.svelte
 fab.css           .create-fab     web/src/lib/app/shell/CreateFab.svelte
@@ -30,6 +31,9 @@ detail.css        .project-overview web/src/lib/features/projects/detail/Project
 detail.css        .project-detail web/src/lib/features/projects/ProjectDetailPage.svelte
 detail.css        .top-tab-row    web/src/lib/features/detail/DetailTopTabs.svelte
 detail.css        .project-detail web/src/lib/features/projects/detail/ProjectLifecyclePanel.svelte
+detail.css        .help-roles     web/src/lib/features/help-requests/detail/HelpRequestRolesSection.svelte
+detail.css        .help-request-page web/src/lib/features/help-requests/HelpRequestDetailPage.svelte
+detail.css        .help-overview  web/src/lib/features/help-requests/detail/HelpRequestOverviewHeader.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateFlowLayout.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreateWizard.svelte
 create.css        .create-sheet   web/src/lib/features/create/shared/CreatePanel.svelte
@@ -43,6 +47,7 @@ create.css        .create-sheet   web/src/lib/features/create/event/CreateEventP
 create.css        .create-sheet   web/src/lib/features/create/event/components/CreateEventVisibilityPanel.svelte
 create.css        .audience-selector web/src/lib/features/create/event/components/CreateEventAudienceSelector.svelte
 create.css        .audience-selector web/src/lib/components/shared/SuggestionList.svelte
+create.css        .create-sheet   web/src/lib/features/create/help-request/CreateHelpRequestPage.svelte
 governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
 governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
 governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte

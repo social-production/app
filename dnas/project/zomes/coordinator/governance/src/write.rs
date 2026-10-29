@@ -18,6 +18,10 @@ pub fn guest(message: impl Into<String>) -> WasmError {
 }
 
 pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
+    // Help requests have no lifecycle, plans or links (ADR 0067).
+    if calls::base_charter()?.is_some_and(|c| c.mode == sp_help::MODE) {
+        return Err(guest("Help requests don't take proposals."));
+    }
     if let ProposalKind::Link(link) = kind {
         return link_write::propose(link);
     }

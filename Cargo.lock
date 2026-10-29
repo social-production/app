@@ -10,6 +10,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_activity",
+ "sp_help",
  "space_scope",
 ]
 
@@ -3033,6 +3034,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_governance",
+ "sp_help",
  "space_scope",
 ]
 
@@ -7178,6 +7180,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_governance",
+ "sp_help",
  "space_scope",
 ]
 
@@ -7193,6 +7196,7 @@ dependencies = [
  "sp_core",
  "sp_event",
  "sp_governance",
+ "sp_help",
 ]
 
 [[package]]
@@ -8799,6 +8803,10 @@ version = "0.0.1"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "sp_help"
+version = "0.0.1"
 
 [[package]]
 name = "sp_index"

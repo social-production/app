@@ -1075,3 +1075,417 @@
   border-radius: 0;
   background: transparent;
 }
+
+/* Ported from web/src/lib/features/help-requests/detail/HelpRequestRolesSection.svelte (ADR 0032, scripts/port-styles.py) */
+.help-roles .context-dock {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+.help-roles .role-stack {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.help-roles .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 12px 10px 16px;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel);
+}
+
+.help-roles .role-copy {
+  display: grid;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.help-roles .role-copy strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.help-roles .role-copy p,
+.help-roles .role-copy span {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.help-roles .signup {
+  display: grid;
+  place-items: center;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  padding: 4px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.05;
+  text-align: center;
+  white-space: normal;
+  cursor: pointer;
+}
+
+.help-roles .signup.selected {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset 0 0 0 1px var(--panel-border);
+}
+
+.help-roles .signup:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--brand) 78%, white);
+  color: var(--page-bg);
+  filter: none;
+  transform: none;
+}
+
+.help-roles .signup.selected:hover:not(:disabled) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+  transform: none;
+}
+
+.help-roles .signup:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.help-roles .signal-row {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+}
+
+.help-roles .signal-row .share-shell {
+  flex: 0 0 56px;
+  border-right: 1px solid var(--panel-border);
+}
+
+.help-roles .signal-row .vote-strip.docked {
+  flex: 1 1 auto;
+  width: auto;
+}
+
+.help-roles .role-message {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/features/help-requests/HelpRequestDetailPage.svelte (ADR 0032, scripts/port-styles.py) */
+.help-request-page .page {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
+  padding-bottom: calc(var(--detail-action-dock-height, 0px) + 12px);
+}
+
+.help-request-page .page:has(> .hero-card > .context-tab) {
+  padding-bottom: 0;
+}
+
+.help-request-page .hero-card {
+  position: relative;
+  display: grid;
+  gap: 0;
+  padding: 32px 16px 16px;
+  margin-top: 24px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  min-width: 0;
+  overflow: visible;
+}
+
+.help-request-page .context-tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: visible;
+}
+
+.help-request-page .hero-card:has(> .context-tab) {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-height: calc(
+    100dvh - var(--topbar-height, 56px) - var(--shell-bottom-nav-offset, 0px) - 32px
+  );
+  margin-bottom: -16px;
+  padding-bottom: var(--detail-action-dock-height, 0px);
+}
+
+.help-request-page .top-tab-row {
+  display: inline-flex;
+  gap: 8px;
+  padding: 2px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  width: fit-content;
+  position: absolute;
+  top: 0;
+  left: 16px;
+  transform: translateY(-44%);
+  z-index: 1;
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--page-bg) 82%, transparent);
+}
+
+.help-request-page .tab-icon {
+  display: none;
+  width: 18px;
+  height: 18px;
+}
+
+.help-request-page .tab-icon .toolbar-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.help-request-page .chat-shell {
+  margin-top: 16px;
+}
+
+.help-request-page .chat-shell-compact {
+  margin: 0;
+  min-height: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.help-request-page .chat-shell-compact .chat-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 100%;
+}
+
+.help-request-page .top-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 108px;
+  padding: 9px 12px;
+  border-radius: calc(var(--radius-sm) - 2px);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+@media (max-width: 1080px) {
+  .help-request-page .page {
+    min-width: 0;
+    overflow-x: clip;
+    overflow-y: clip;
+  }
+
+  .help-request-page .page-chat {
+    position: fixed;
+    z-index: 2;
+    top: var(--topbar-height, 0px);
+    right: 0;
+    bottom: var(--shell-bottom-nav-offset, 0px);
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    height: auto;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--page-background);
+  }
+
+  .help-request-page .hero-card {
+    min-width: 0;
+    overflow: visible;
+    padding-top: 0;
+    margin-top: 0;
+    border-radius: 0;
+  }
+
+  .help-request-page .hero-card:has(> .context-tab) {
+    min-height: calc(100dvh - var(--topbar-height, 56px) - var(--shell-scroll-pad, 0px));
+    margin-bottom: -4px;
+  }
+
+  .help-request-page .hero-card.chat-tab-active {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    height: auto;
+    min-height: 0;
+    margin-top: 0;
+    padding: 8px 0 0;
+    border: none;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  .help-request-page .chat-tab-active .top-tab-row {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    margin: 0 8px 8px;
+    background: var(--panel);
+    flex-shrink: 0;
+  }
+
+  .help-request-page .top-tab-row.chat-immersive {
+    padding-top: calc(8px + var(--shell-safe-top, 0px));
+  }
+
+  .help-request-page .chat-tab-active > .chat-shell {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .help-request-page .chat-tab-active .chat-panel {
+    flex: 1 1 auto;
+    height: 100%;
+    min-height: 0;
+    max-height: 100%;
+  }
+
+  .help-request-page .top-tab-row {
+    position: sticky;
+    top: var(--topbar-height, 0px);
+    z-index: var(--z-detail-tabs);
+    width: auto;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    transform: none;
+    margin: 0 -16px 12px;
+    padding: 8px 16px;
+    border: 0;
+    border-bottom: 1px solid var(--panel-border);
+    border-radius: 0;
+    background: var(--toolbar-background, var(--panel));
+    box-shadow: 0 8px 16px color-mix(in srgb, var(--page-bg) 55%, transparent);
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.22s ease;
+    will-change: transform;
+  }
+
+  .help-request-page .feed-chrome-collapsed .top-tab-row:not(.chat-immersive) {
+    padding-top: calc(8px + var(--shell-safe-top, 0px));
+    margin-bottom: calc(12px - var(--shell-safe-top, 0px));
+    transform: translate3d(0, calc(-1 * var(--topbar-height, 0px)), 0);
+  }
+
+  .help-request-page .top-tab {
+    min-width: 0;
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .help-request-page .tab-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .help-request-page .tab-label {
+    display: inline;
+  }
+
+  .help-request-page .top-tab.active-tab {
+    border-color: transparent;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: inset 0 -2px 0 var(--brand);
+  }
+}
+
+/* Ported from web/src/lib/features/help-requests/detail/HelpRequestOverviewHeader.svelte (ADR 0032, scripts/port-styles.py) */
+.help-overview .context-meta {
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
+  min-width: 0;
+  margin-top: auto;
+  padding-top: 12px;
+}
+
+.help-overview .context-meta .content-meta-row {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.help-overview .context-meta .content-meta-row .inline-link {
+  min-width: auto;
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.help-overview .context-panel {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.help-overview .report-control {
+  flex: 0 0 auto;
+}
+
+.help-overview .heading {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 4px;
+  padding-bottom: 12px;
+}
+
+.help-overview .identity-copy {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.help-overview h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.help-overview .live-fact {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.help-overview .overview-copy {
+  margin: 0;
+  max-width: 78ch;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}

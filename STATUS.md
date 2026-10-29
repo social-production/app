@@ -39,31 +39,43 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight 2026-10-29 (cloud session): jemalloc for C code (ADR 0066) + event members sheet, branch `claude/social-production-handoff-dsam61`
-- **Memory (ADR 0066):** live idle at 21:00 UTC 28 Oct was 795 MB RSS but jemalloc resident only
-  311 MB: SQLite (C) still used glibc's per-thread arenas. The gateway now turns on
-  `unprefixed_malloc_on_supported_platforms`, so every allocation goes through jemalloc.
-  `/readyz` gains `maps` (RSS by kind from `/proc/self/smaps`: `anonMb`, `anonExecMb` = wasmer
-  code, `fileMb`, `brkHeapMb`, `stackMb`). Local release, same 4 browser files: idle **788 →
-  601 MB**. **After the deploy:** read `/readyz`; `maps.anonMb` should be close to
-  `heap.residentMb`, and idle should drop well below 795 MB.
-- **Parity:** web's EventMembersPanel (`features/projects/EventMembersSheet.svelte`): private
-  events split Organizers / Members, "Promote to organizer", "Invite +" (web's ShareUserMenu,
-  send half: `components/overlay/ShareUserMenu.svelte`, styles ported to `styles/share.css`).
-  `PeopleSheet` takes web's `sections`, row actions and header actions. The edit sheet uses
-  web's titles ("Propose Edit"; "Edit event"/"Save" when organizer-run; personal services
-  "Save details") and web's vote copy (it wrongly said "applies as soon as you save" for all).
-  Event phase menu uses web's event copy ("Close event", "Organizers decide; members are
-  notified."). **Not done:** web's "Remove organizer" (grants can't be revoked without an
-  integrity change; ride along with the next project-DNA reset).
-- **Checked locally:** UI check/lint, sizes, boundaries; gateway fmt/test/clippy (release,
-  jemalloc); release seed node + `private-events.mjs` (now promotes the invitee), `projects`,
-  `public-chats`, `events` all passed, on both allocators.
-- **Next:** PR → CI → merge → live `/readyz` check; then **help requests** (web:
-  `features/help-requests` 867 lines + `create/help-request` 780 + cards; web-backend
-  `help_requests`, roles with slots, commit/uncommit, share, chat). Start with an ADR: likely a
-  commons space with charter mode `help-request` reusing M5b activities/roles (check whether
-  project integrity accepts a new mode without a reset).
+## In flight 2026-10-29 (cloud session): PR #68 done, PR #69 open
+**1. Done: PR #68 merged 23:31 UTC 28 Oct (10:31 am Melbourne), all three services deployed
+(seed node live ~23:53 UTC).** jemalloc for C code (ADR 0066) + web's event members sheet.
+- **Live result, not the full win:** `/readyz` at 10 min: RSS 781 MB (after the commons deploy
+  it was 941 MB at 5 min), jemalloc resident 359 MB, `maps.anonMb` 662 MB, wasmer code 66 MB.
+  So ~300 MB of anonymous memory is still outside jemalloc on the 8-CPU node, though locally
+  (4 CPUs) the gap was ~0. After one live `private-events.mjs` run: RSS 1112 MB, anon 959 vs
+  jemalloc 528 (gap ~430 MB and growing with use). **Next:** PR #69 adds `maps.anonBySize`
+  (RSS by mapping size: 2–8 MB = thread stacks, 64 MB = glibc arena heaps, ≥1 GB = wasm
+  memories). Read it live after #69 deploys to see what the gap is, then fix that.
+- Live smoke: `private-events.mjs` passed (promotes the invitee in the members sheet).
+- What #68 changed: see ADR 0066 and the PR; edit sheet titles/copy and event phase-menu copy
+  follow web; "Remove organizer" not done (needs revocable grants, an integrity change).
+
+**2. Help requests (ADR 0067): PR #69** (branch `claude/social-production-handoff-dsam61`,
+opened 23:32 UTC 28 Oct). **Merging resets the project network.** Merge when CI is green, then
+smoke `help-requests.mjs` live and read `/readyz` `maps.anonBySize` (item 1).
+- **DNA:** a help request is a commons space with charter mode `help-request` (new crate
+  `sp_help`; `sp_core`/`sp_governance` untouched, so directory and conversation keep their
+  hashes) plus one `Activity` written by the asker (integrity: only the space's creator adds it
+  there). `ActivityRole.description` (serde default). Coordinators: the view gives it no
+  phases ("Help request" stage), governance refuses proposals, activities let only the asker
+  write it; activity ratings moved to `activities/src/rate.rs` (write.rs was over 300 lines).
+- **Gateway:** cards carry `help {neededAt, endsAt, signupCount, slotsNeeded}`
+  (`node/cards.rs`, moved out of archivist.rs); help requests rank as Voted; every card's
+  ranking now counts comments (as web's formula does).
+- **UI:** `/create/help-request` (web's six steps; tags until channels exist), `/help-requests/
+  <id>` (`features/projects/help/`: web's Details with roles Sign up / Leave / Full and the vote
+  strip, Chat with web's wording), `HelpRequestCard` in the feed, "Help request" in the create
+  menu, `components/cards/spaceHref.ts` picks a space's page by mode. Styles ported via PORTS
+  (HelpRequestCard, CreateHelpRequestPage, HelpRequestDetailPage, OverviewHeader, RolesSection).
+  Event chats now use web's "Event chat" wording. `additions.css` undoes a leaked global
+  `.identity-copy` rule (port-styles keeps selectors that merely start with the root name).
+- **Checked:** scenario `help_requests` passed (17 min); browser `help-requests.mjs` passed on
+  a release seed node; 390px compared with live web's help-request page.
+- **Not done:** web's Share menu on the request, the required channel/community tag (M5d),
+  `PersonalHelpRequestCard`, help-request notifications.
 
 ## Done 2026-10-28: the commons, PR #66 merged 13:43 UTC (12:43 am Melbourne, Oct 29), live
 PR #65 (docs, `/readyz` heap + cells, ADR 0065) merged 10:15 UTC; Railway's build of it failed

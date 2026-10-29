@@ -38,6 +38,7 @@ sp_call = { path = "crates/sp_call" }
 sp_follow = { path = "crates/sp_follow" }
 sp_event = { path = "crates/sp_event" }
 sp_governance = { path = "crates/sp_governance" }
+sp_help = { path = "crates/sp_help" }
 sp_index = { path = "crates/sp_index" }
 health_integrity = { path = "zomes/health/integrity" }
 identity_integrity = { path = "dnas/directory/zomes/integrity/identity" }

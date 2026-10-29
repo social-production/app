@@ -71,9 +71,16 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Event cards (M5c, ADR 0057): web's `EventCard` (place line, signals, comments) linking to
   `/events/<id>` (as do the rail, notifications, search and personal cards). Still to come:
   the time on the card (the index needs the leading plan's schedule).
-- [ ] Events, later parts (ADR 0057): web's Audience step (private events: invite-only and
-  private-community), organizer-controlled governance with co-organizers, activities limited
-  to the plan's days, History tab.
+- [x] Events, part 2 (ADR 0061): Audience step, invite-only events, organizer-controlled
+  governance with co-organizers; web's EventMembersPanel (Organizers/Members, Promote to
+  organizer, Invite +), "Edit event"/Save and web's event phase-menu copy (2026-10-29).
+- [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change),
+  private-community audience (M5d), activities limited to the plan's days, History tab.
+- [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
+  channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
+  Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
+- [ ] Help requests, later: web's Share menu on the request (copy link + send to people), the
+  required channel/community tag (M5d), `PersonalHelpRequestCard` in the personal feed.
 - [ ] web's project-activity cards (`ProjectActivityCard`: activity title,
   parent project, time, place, distance) come only from web-backend's Region feed
   (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.

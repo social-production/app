@@ -4,6 +4,7 @@
 
 mod calls;
 mod history;
+mod rate;
 mod reads;
 mod view;
 mod write;
@@ -12,8 +13,9 @@ use hdk::prelude::*;
 use space_scope::{enter, touch, In};
 
 pub use history::{CheckInInput, CompletionView};
+pub use rate::RateInput;
 pub use view::{ActivityView, RatingView, RoleView, SuggestionView};
-pub use write::{NewActivity, NewRole, RateInput, RoleInput, SuggestInput};
+pub use write::{NewActivity, NewRole, RoleInput, SuggestInput};
 
 /// web's "Create activity" (Activity phase; members only).
 #[hdk_extern]
@@ -69,7 +71,7 @@ pub fn decline_suggestion(call: In<ActionHash>) -> ExternResult<ActionHash> {
 #[hdk_extern]
 pub fn rate_activity(call: In<RateInput>) -> ExternResult<ActionHash> {
     let input = enter(call)?;
-    let out = write::rate(input)?;
+    let out = rate::rate(input)?;
     touch()?;
     Ok(out)
 }
