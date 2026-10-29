@@ -39,20 +39,27 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight 2026-10-29 (cloud session): transparent huge pages off (ADR 0066 addendum), PR #70
-- **Why:** after PR #68 live idle was still ~790 MB with anonymous memory ~200–430 MB above
-  jemalloc's resident, growing with threads (2–8 MB mappings 117 → 271, 180 → 411 MB as
-  threads went 59 → 143). Railway's kernel evidently has THP `always` (the cloud container has
-  `madvise`, which hid it): each stack's and jemalloc extent's first touch took a 2 MB page.
-- **Fix:** `services/gateway/src/main.rs` calls `nix::sys::prctl::set_thp_disable(true)` before
-  the tokio runtime starts (`KEEP_THP=1` skips it); `/readyz` `maps.anonHugeMb` shows huge-page
-  RSS. Locally with THP set to `always` (`echo always > /sys/kernel/mm/transparent_hugepage/
-  enabled` works as root in the cloud container), same 4 browser files, idle: **701 → 607 MB**,
-  `anonHugeMb` 424 → 4.
-- **After the deploy:** `/readyz` `maps.anonHugeMb` should be ~0 and `maps.anonMb` close to
-  `heap.residentMb`; compare idle with 789 MB (PR #69's deploy, 10 min, empty network).
-- Also: `help-requests.mjs` now sorts the feed by Most recent and waits for it to render
-  before looking for the card (it failed live twice without it; passed live after).
+## In flight 2026-10-29 (cloud session): M5d channels and communities, part (a) (ADR 0068)
+Branch `claude/social-production-handoff-dsam61` (pushed, no PR yet). Done so far: ADR 0068
+(proposed), `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
+slugs), project integrity accepts `channel`/`community` charters (title = handle, subtype =
+join policy; closed communities only in private-seed clones, reusing private events'
+`private.`/`organized.` seeds) and `ProposalKind::RemoveMember` (scopes only; no handle
+edits), governance folds removals into `Applied.removed`, the project view leaves removed
+members out, CI runs 8 scenario shards. **Next:** scenario `scopes` (was running locally);
+then PR (project network resets), then parts (b)–(e) per ADR 0068.
+
+## Done 2026-10-29: memory sorted, PR #70 merged 04:10 UTC (3:10 pm Melbourne), live
+**Transparent huge pages off (ADR 0066 addendum).** Railway's kernel has THP `always`; every
+thread stack and jemalloc extent took 2 MB pages. The gateway now calls
+`prctl(PR_SET_THP_DISABLE)` before its runtime starts (`KEEP_THP=1` skips it).
+| Live `/readyz` | RSS | outside jemalloc | thread-stack maps |
+|---|---|---|---|
+| Before #70, 2.4 h, 5 apps | 1002 MB | ~375 MB | 350 MB |
+| After #70, 10 min, 5 apps | **498 MB** | ~0 | 63 MB |
+| After a live `private-events.mjs` | **645 MB** (was 1112 MB for the same run) | ~0 | 104 MB |
+`maps.anonHugeMb` is 2 MB. Live smoke: `private-events.mjs` passed. Watch `/readyz` as data
+grows; growth should now follow live data (jemalloc `heap.residentMb`), not threads.
 
 ## Done 2026-10-29: help requests (ADR 0067), PR #69 merged 01:33 UTC (12:33 pm Melbourne), live
 **The project network reset.** Live: `help-requests.mjs` passed (after the test fix above);
