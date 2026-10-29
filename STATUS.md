@@ -40,7 +40,7 @@ time-bucket links. **This comes before M5d and the rest of M5c** (communities/ch
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
 ## In flight 2026-10-29 (cloud session): M5d channels and communities, parts (a)–(c) (ADR 0068)
-Branch `claude/social-production-handoff-dsam61` (pushed, **no PR yet**). Merging resets the
+**PR #71** (branch `claude/social-production-handoff-dsam61`, opened ~07:00 UTC 29 Oct). Merging resets the
 project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl…` unchanged).
 - **(a) DNA:** `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
   slugs); project integrity accepts `channel`/`community` charters (title = handle, subtype =
@@ -64,8 +64,9 @@ project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl�
 - **Not yet:** web's required channel tag (13 browser tests create projects: add a shared
   "ensure a channel" helper first), tag chips with web's scope icons linking to scope pages,
   Discover sheet, closed communities + invites (d), settings/votes sheets and removal UI (e).
-- **Running:** a local release seed node with `projects`, `help-requests`, `events`,
-  `private-events`. Then: PR, CI, merge, live smoke (`projects.mjs` now needs a channel).
+- **Checked locally:** release seed node, `projects` (channel → tagged project → channel page),
+  `help-requests`, `events`, `private-events` all passed; scenario `scopes` passed.
+- **Next:** CI green → merge → live smoke (`projects.mjs`, `help-requests.mjs`) → README.
 
 ## Done 2026-10-29: memory sorted, PR #70 merged 04:10 UTC (3:10 pm Melbourne), live
 **Transparent huge pages off (ADR 0066 addendum).** Railway's kernel has THP `always`; every
