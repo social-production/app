@@ -2,7 +2,12 @@ import type { ProjectCard } from '#lib/domain/projects.ts';
 import { slugOf, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
 import { scopeIndex } from '#lib/holo/index.ts';
 
+import { myAgent } from './people.ts';
 import { createProject, myProjectSeeds } from './projects.ts';
+
+/** Scopes created on this device, until the node's index lists them (it reads new spaces
+ * within a minute or so). */
+const justCreated = new Map<string, Scope>();
 
 const toScope = (c: ProjectCard): Scope => ({
   id: c.id,
@@ -28,7 +33,10 @@ export async function findScope(slug: string, kind?: ScopeKind): Promise<Scope |
   const found = (await listScopes(wanted)).filter(
     (s) => s.slug === wanted && (!kind || s.kind === kind),
   );
-  return found.sort((a, b) => a.createdAt - b.createdAt)[0] ?? null;
+  const first = found.sort((a, b) => a.createdAt - b.createdAt)[0];
+  if (first) return first;
+  const mine = justCreated.get(wanted);
+  return mine && (!kind || mine.kind === kind) ? mine : null;
 }
 
 /** web's createChannel / createCommunity: refuses a taken handle, then founds the space. */
@@ -40,7 +48,7 @@ export async function createScope(
   const slug = slugOf(handle);
   if (await findScope(slug))
     throw new Error('That handle is already used by a channel or community');
-  await createProject({
+  const id = await createProject({
     title: handle.trim(),
     description: description.trim(),
     mode: kind,
@@ -48,6 +56,17 @@ export async function createScope(
     location_label: '',
     phase: '',
     tags: [],
+  });
+  justCreated.set(slug, {
+    id,
+    kind,
+    handle: handle.trim(),
+    slug,
+    description: description.trim(),
+    members: 1,
+    creator: await myAgent(),
+    createdAt: Date.now() * 1000,
+    networkSeed: '',
   });
   return slug;
 }
