@@ -44,7 +44,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): PR #73, web's required channel tag + test fixes
+## In flight: nothing open. Next is M5d (pick from below)
+- **Next M5d:** tag chips with scope icons linking to scope pages, Discover sheet, (d) closed
+  communities + invites, (e) settings/votes sheets and removal UI.
+- This STATUS update sits on branch `claude/social-production-handoff-dsam61` (docs only, not
+  merged yet): merge main into it and ship it with the next PR.
+
+## Done 2026-10-29: web's required channel tag + test fixes, PR #73 merged 13:16 UTC (12:16 am Melbourne, Oct 30)
 PR #73 (branch `claude/social-production-handoff-dsam61`): the `projects.mjs` race fix below, plus
 **web's scope requirement**: a project needs a channel tag; a public event or a help request a
 channel or community tag (`CreateState.scopeNeeded()`, overridden for events; help's
@@ -56,9 +62,8 @@ channel or community tag (`CreateState.scopeNeeded()`, overridden for events; he
   the local UI (`VITE_SP_GATEWAYS=<live seed node> npm run dev -w ui -- --port 5199`) against
   the live gateway: the gate (disabled → enabled), `events`, `help-requests` (one unexplained
   timeout on the first run, passed on re-run). Not run: the other 10 updated tests.
-- After merge: smoke `projects`, `help-requests`, `events` live.
-- **Next M5d:** tag chips with scope icons linking to scope pages, Discover sheet, (d) closed
-  communities + invites, (e) settings/votes sheets and removal UI.
+- **Live after merge (13:17 UTC):** `projects`, `events`, `help-requests` passed. `/readyz`
+  742 MB, 218 threads after ~10 browser-test runs since the 09:55 UTC restart.
 
 ## Done 2026-10-29: channel picker, PR #72 merged 11:24 UTC (10:24 pm Melbourne) + test fix
 - `services/scopes.ts` `listScopes` adds this device's just-created scopes (`justCreated`) until
