@@ -8,12 +8,15 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-29)
+## Status (2026-10-30)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Tag chips (PR #74, 2026-10-30 10:16 am Melbourne):** channel and community tags on cards
+  show web's icons and open their page; "+N" opens web's sheet of every tag. Live
+  `projects.mjs` passed.
 - **Channels and communities (M5d a–c, ADR 0068, PR #71, 2026-10-29 8:34 pm Melbourne; the
   project network reset):** web's create-channel/community forms, channel and community pages
   with their tagged items, the create flows' scope step (primary channel, more channels and

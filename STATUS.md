@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-29 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,13 +44,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: tag chips PR (branch `claude/social-production-handoff-dsam61`)
-- **Tag chips with web's scope icons** (below): **PR #74** open (CI ~2 h); merge once CI is green, then
-  smoke live `projects.mjs` and update README Status.
-- **Next M5d after it:** Discover sheet, (d) closed communities + invites, (e) settings/votes
-  sheets and removal UI.
+## In flight: nothing open. Next is M5d (pick from below)
+- **Next M5d:** Discover sheet, (d) closed communities + invites, (e) settings/votes sheets and
+  removal UI (ADR 0068; web's `ScopeDiscoverSheet`, `CommunityInvitePanel`, scope settings).
 
-## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece)
+## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece), PR #74 merged 23:16 UTC (10:16 am Melbourne, Oct 30), live 23:29 UTC
 web's `TagList` (plain) in `components/cards/FeedCardTop.svelte`: each `#channel`/`@community`
 tag shows its icon (`ScopeGlyph`; `#platform` → platform icon, `/platform`) and opens its page;
 free tags from before channels still search. "+N" now opens web's `ScopeSheet`
@@ -64,6 +62,8 @@ instead of expanding inline. Helpers: `domain/scopes.ts` `tagRef`, `components/c
   ui`) against the live gateway; 390px screenshots of feed and sheet match web. **Use the
   preview, not `npm run dev`, for browser tests:** the dev server's unbundled modules made
   Chromium fail reloads with `ERR_INSUFFICIENT_RESOURCES`. Not run: scenarios (no Rust change).
+- **Live after merge (23:31 UTC):** `projects.mjs` passed (icons, links, "+1" sheet). `/readyz`
+  668 MB at 2.5 min (seed node redeployed with the merge).
 
 ## Done 2026-10-29: web's required channel tag + test fixes, PR #73 merged 13:16 UTC (12:16 am Melbourne, Oct 30)
 PR #73 (branch `claude/social-production-handoff-dsam61`): the `projects.mjs` race fix below, plus
