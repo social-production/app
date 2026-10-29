@@ -39,15 +39,32 @@ a cell on every archiver). Decided: public spaces become records in the project 
 time-bucket links. **This comes before M5d and the rest of M5c** (communities/channels would
 otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators/gateway, UI.
 
-## In flight 2026-10-29 (cloud session): M5d channels and communities, part (a) (ADR 0068)
-Branch `claude/social-production-handoff-dsam61` (pushed, no PR yet). Done so far: ADR 0068
-(proposed), `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
-slugs), project integrity accepts `channel`/`community` charters (title = handle, subtype =
-join policy; closed communities only in private-seed clones, reusing private events'
-`private.`/`organized.` seeds) and `ProposalKind::RemoveMember` (scopes only; no handle
-edits), governance folds removals into `Applied.removed`, the project view leaves removed
-members out, CI runs 8 scenario shards. **Next:** scenario `scopes` (was running locally);
-then PR (project network resets), then parts (b)–(e) per ADR 0068.
+## In flight 2026-10-29 (cloud session): M5d channels and communities, parts (a)–(c) (ADR 0068)
+Branch `claude/social-production-handoff-dsam61` (pushed, **no PR yet**). Merging resets the
+project network only (directory `uhC0k-zll3y…` and conversation `uhC0kUmCMHl…` unchanged).
+- **(a) DNA:** `crates/sp_scope` (handles, `#channel`/`@community` tags, join policies, reserved
+  slugs); project integrity accepts `channel`/`community` charters (title = handle, subtype =
+  join policy; a closed community only in a private-seed clone, reusing private events'
+  `private.`/`organized.` seeds) and `ProposalKind::RemoveMember` (scopes only; no handle
+  edits); governance folds removals into `Applied.removed`; the project view leaves removed
+  members out. Scenario `scopes` passes (2 tests; the removal needs a 4-member quorum of 3).
+- **Gateway:** `/index/projects` leaves scopes out and takes `tag=#food`; `/index/scopes?q=`
+  lists them, earliest listing per handle. The directory's New-member project cap no longer
+  counts channels/communities (coordinator only).
+- **(b) UI:** `/create/channel`, `/create/community` (web's forms; open communities only for
+  now), `/channels/<slug>`, `/communities/<slug>` (`features/projects/scopes/ScopePage.svelte`:
+  header with join/members, description, the tagged items), create menu "Surfaces" section,
+  left rail lists the scopes you joined (`stores/myScopes`, `features/shell/myScopesLoop.ts`).
+  `components/cards/SpaceCard.svelte` picks the card by mode for every feed.
+- **(c) Tagging:** web's scope step (`ScopeTagsStep`: primary channel, then more channels and
+  communities) replaces free tags in the project, event and help-request flows.
+  `tests/e2e/projects.mjs` now creates a channel, tags the project and finds it on the
+  channel page.
+- **Not yet:** web's required channel tag (13 browser tests create projects: add a shared
+  "ensure a channel" helper first), tag chips with web's scope icons linking to scope pages,
+  Discover sheet, closed communities + invites (d), settings/votes sheets and removal UI (e).
+- **Running:** a local release seed node with `projects`, `help-requests`, `events`,
+  `private-events`. Then: PR, CI, merge, live smoke (`projects.mjs` now needs a channel).
 
 ## Done 2026-10-29: memory sorted, PR #70 merged 04:10 UTC (3:10 pm Melbourne), live
 **Transparent huge pages off (ADR 0066 addendum).** Railway's kernel has THP `always`; every
