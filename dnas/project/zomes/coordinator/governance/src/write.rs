@@ -29,9 +29,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         calls::my_membership()?.ok_or_else(|| guest("Join the project to propose changes."))?;
     let charter =
         calls::base_charter()?.ok_or_else(|| guest("This project has no charter yet."))?;
-    if charter.mode == "personal-service" {
-        return Err(guest("Personal services don't take proposals."));
-    }
+    accepts(&charter.mode, &kind)?;
     // Organizer-controlled events (ADR 0061): only organizers propose, and it applies at once.
     let organized = project_integrity::organized()?;
     let organizer =
@@ -83,6 +81,15 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         vote(hash.clone(), VoteChoice::Yes)?;
     }
     Ok(hash)
+}
+
+/// Personal services take no proposals; channels and communities take removals but keep
+/// their handle (ADR 0068).
+fn accepts(mode: &str, kind: &ProposalKind) -> ExternResult<()> {
+    if mode == "personal-service" {
+        return Err(guest("Personal services don't take proposals."));
+    }
+    project_integrity::check_scope_kind(mode, kind).map_err(guest)
 }
 
 pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash> {

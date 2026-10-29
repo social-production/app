@@ -201,7 +201,7 @@ pub fn validate_outcome(
 
 /// Channels and communities (ADR 0068) take removals; their handle (the title) never changes,
 /// since items name them by it. Nothing else takes removals.
-fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
+pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
     let scope = sp_scope::is_scope(mode);
     match kind {
         ProposalKind::RemoveMember { .. } if !scope => {

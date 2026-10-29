@@ -24,7 +24,7 @@ use hdi::prelude::*;
 pub use activity::{
     Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
 };
-pub use governance::SNAPSHOT_MAX;
+pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
