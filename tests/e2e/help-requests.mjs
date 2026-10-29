@@ -44,6 +44,9 @@ await signUp(helper, `Helper${stamp}`);
 // The feed card: when, where and sign-ups (the index reads new spaces within a minute).
 for (let i = 0; ; i++) {
   await helper.goto(BASE);
+  await helper.getByRole('button', { name: 'Sort public feed by' }).click();
+  await helper.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await helper.locator('.surface').first().waitFor({ timeout: 60_000 }).catch(() => {});
   const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
     await card.getByText('0 signed up · 1 needed').waitFor();

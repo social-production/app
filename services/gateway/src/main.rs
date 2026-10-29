@@ -9,8 +9,24 @@ use tracing_subscriber::EnvFilter;
 #[global_allocator]
 static ALLOC: tikv_jemallocator::Jemalloc = tikv_jemallocator::Jemalloc;
 
-#[tokio::main]
-async fn main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> {
+    // Before any thread starts (ADR 0066): with the kernel's transparent huge pages set to
+    // "always", as on Railway, each thread stack's first touch took a whole 2 MB page, so
+    // every one of the conductor's 50–300 threads cost ~2 MB. The flag covers the process.
+    // `KEEP_THP=1` leaves huge pages on (to measure the difference).
+    #[cfg(target_os = "linux")]
+    if std::env::var("KEEP_THP").as_deref() != Ok("1") {
+        if let Err(e) = nix::sys::prctl::set_thp_disable(true) {
+            eprintln!("could not turn off transparent huge pages: {e}");
+        }
+    }
+    tokio::runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()?
+        .block_on(run())
+}
+
+async fn run() -> anyhow::Result<()> {
     // A hosted person's publish retries warn on every attempt when nobody else holds that part
     // of a network (NoPeersForLocation): on Railway that flooded past 500 lines/s and hid the
     // lines that matter. Kept quiet whatever RUST_LOG says; real failures still log as errors.
