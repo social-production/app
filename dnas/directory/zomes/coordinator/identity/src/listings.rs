@@ -8,7 +8,7 @@ use sp_governance::projects::{
 
 use crate::guest_error;
 use crate::records::{action_targets, decode, latest, links};
-use crate::standing::{own_entry_times, own_proof};
+use crate::standing::own_proof;
 
 const ALL_PROJECTS: &str = "all_projects";
 
@@ -42,8 +42,9 @@ pub struct Allowance {
 
 pub fn create(input: ListingInput) -> ExternResult<ActionHash> {
     let creator_standing = own_proof()?;
-    if creator_standing.is_none() {
-        let earlier = own_entry_times(UnitEntryTypes::ProjectListing)?;
+    // Channels and communities don't count against a New member's projects (ADR 0068).
+    if creator_standing.is_none() && !sp_scope::is_scope(&input.mode) {
+        let earlier = own_project_times()?;
         check_new_member_project_cap(&earlier, sys_time()?.as_micros()).map_err(guest_error)?;
     }
     let hash = create_entry(&EntryTypes::ProjectListing(to_listing(
@@ -117,7 +118,7 @@ pub fn allowance() -> ExternResult<Allowance> {
         return Ok(Allowance { remaining: None });
     }
     let now = sys_time()?.as_micros();
-    let recent = own_entry_times(UnitEntryTypes::ProjectListing)?
+    let recent = own_project_times()?
         .into_iter()
         .filter(|t| *t > now - NEW_PROJECT_WINDOW_US)
         .count();
@@ -163,4 +164,22 @@ fn to_listing(
         tags: input.tags,
         creator_standing,
     }
+}
+
+/// When this person listed each project (not channels or communities, ADR 0068).
+fn own_project_times() -> ExternResult<Vec<i64>> {
+    let entry_type = EntryType::App(UnitEntryTypes::ProjectListing.try_into()?);
+    let filter = ChainQueryFilter::new()
+        .entry_type(entry_type)
+        .action_type(ActionType::Create)
+        .include_entries(true);
+    let mut out = Vec::new();
+    for record in query(filter)? {
+        let is_scope =
+            decode::<ProjectListing>(&record)?.is_some_and(|l| sp_scope::is_scope(&l.mode));
+        if !is_scope {
+            out.push(record.action().timestamp().as_micros());
+        }
+    }
+    Ok(out)
 }

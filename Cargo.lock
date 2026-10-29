@@ -4278,6 +4278,7 @@ dependencies = [
  "serde",
  "sp_follow",
  "sp_governance",
+ "sp_scope",
 ]
 
 [[package]]

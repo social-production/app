@@ -3,9 +3,9 @@
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
-  import TagSelector from '#lib/components/create/TagSelector.svelte';
   import TypeSelector from '#lib/components/create/TypeSelector.svelte';
   import { PROJECT_TYPES } from '#lib/domain/projects.ts';
+  import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -74,7 +74,7 @@
     />
   {:else if s.stepId === 'scope'}
     <div class="form-stack">
-      <TagSelector label="Tags" tags={s.tags} onChange={(t) => (s.tags = t)} />
+      <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} helperText="" />
     </div>
   {:else}
     <div class="form-stack overview">
