@@ -44,11 +44,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-10-29 (cloud session): channel picker lists just-created channels
-Branch `claude/social-production-handoff-dsam61` (after #71). `services/scopes.ts` `listScopes`
-adds this device's just-created scopes (the `justCreated` cache) until the index lists them, so
-creating a channel and then a project tagged with it doesn't wait on the index. UI checks pass
-(check, lint, boundaries, sizes); verify live with `projects.mjs` after merge.
+## In flight 2026-10-29 (cloud session): next is M5d's required channel tag (see "Not yet" below)
+Nothing open. Last session merged #71 (channels/communities) and #72, then fixed `projects.mjs`.
+
+## Done 2026-10-29: channel picker, PR #72 merged 11:24 UTC (10:24 pm Melbourne) + test fix
+- `services/scopes.ts` `listScopes` adds this device's just-created scopes (`justCreated`) until
+  the index lists them (a new channel takes ~1–2.5 min to reach `/index/scopes` live).
+- The live `projects.mjs` failures were a **test race**, not the app: the tag loop filled the box
+  and called `option.count()` before the async search answered, then cleared it. It now waits
+  for the option (5 s per try) and starts from the channel page (no reload). **Live
+  `projects.mjs` passed** (11:40 UTC). `private-events.mjs` has the same `count()` pattern for
+  the people search; it passes live, but fix it the same way if it flakes.
 
 ## Done 2026-10-29: M5d channels and communities, parts (a)–(c) (ADR 0068), PR #71
 **PR #71** merged 09:34 UTC (8:34 pm Melbourne); seed node live 09:55 UTC. It reset the

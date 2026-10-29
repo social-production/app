@@ -22,8 +22,9 @@ async function createChannel(page, handle) {
   await page.getByRole('heading', { name: handle }).waitFor({ timeout: 120_000 });
 }
 
+// Starts from the page you are on: right after making the channel, it is offered from this
+// device's memory before the index lists it (a reload would wait on the index, ~1–3 min live).
 async function createProject(page, name, tag) {
-  await page.goto(BASE);
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await page.getByRole('menuitem', { name: /Project/ }).click();
   await page.getByRole('radio', { name: /Productive project/ }).click();
@@ -38,7 +39,8 @@ async function createProject(page, name, tag) {
   for (let i = 0; ; i++) {
     await primary.fill(tag);
     const option = page.getByRole('option', { name: tag });
-    if (await option.count()) {
+    // The search answers asynchronously: wait for it, not just count what is there now.
+    if (await option.waitFor({ timeout: 5000 }).then(() => true, () => false)) {
       await option.click();
       break;
     }
