@@ -43,8 +43,10 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Search: web's own page (`features/search/SearchPage.svelte`, live suggestions, kind
   filter, result rows, empty-query chips). Kinds today: Projects (from `/index/projects?q=`)
   and Users (new gateway people index, `/index/people?q=`, refreshed every minute), so guests
-  search too. The filter lists only those two until the others land; web's filter options
-  show icons, the app's `IconMenuButton` has none yet.
+  search too. Since 2026-10-30 (PR #79) also Channels and Communities (`/index/scopes`; your
+  own private communities for members), Events and Help requests, in web-backend's order
+  (scopes, then people, then items) and web's filter with icons (`tests/e2e/search.mjs`).
+  Threads, Activities and Posts wait on those features.
 - [x] The "+" button follows web's `isFeedDiscoveryPath` (feed, platform, profiles), not search.
 
 - [x] Profiles open for guests (name, standing, no actions), as on web; the device count is

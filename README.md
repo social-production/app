@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Rejoining after a removal (PR #78, 2026-10-30 7:33 pm Melbourne):** someone removed from
+  a channel or community who joins again (link, invite or Join) counts as a member at once.
+  Live `closed-communities.mjs` passed.
 - **Private communities (M5d d, PR #77, 2026-10-30 4:56 pm Melbourne):** web's Openness
   "Private" and Who decides when creating a community (its own network, never listed), the
   lock mark, web's invite panel (link, code, invite by name), "Private community" invites,
