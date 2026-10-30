@@ -6,14 +6,16 @@
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
+  import ScopeSettingsSheet from './ScopeSettingsSheet.svelte';
   import { ScopeState } from './scopeState.svelte.ts';
+  import ScopeVoteSheet from './ScopeVoteSheet.svelte';
 
   import '#lib/components/styles/scopes.css';
 
   /**
    * web's DirectoryFeedLayout + ScopeDirectoryHeader for a channel or community (ADR 0068):
-   * name, join/members, description, then the items tagged with it. Settings and votes come
-   * in M5d part (e); private communities' invites in part (d).
+   * name, join/members, settings, description, then the items tagged with it; a Vote button
+   * while a decision waits for you. Private communities' invites come in part (d).
    */
   let { kind, slug }: { kind: ScopeKind; slug: string } = $props();
 
@@ -21,6 +23,9 @@
   // svelte-ignore state_referenced_locally
   const s = new ScopeState(kind, slug);
   let membersOpen = $state(false);
+  let settingsOpen = $state(false);
+  let votesOpen = $state(false);
+  const waiting = $derived(s.gov?.votable.length ?? 0);
   const noun = $derived(kind === 'channel' ? 'channel' : 'community');
 
   $effect(() => {
@@ -55,9 +60,38 @@
             onToggleJoin={() => void s.toggleJoin()}
             onOpenMembers={() => (membersOpen = true)}
           />
+          <button
+            aria-label="Settings"
+            title="Settings"
+            class="icon-action"
+            class:menu-active={settingsOpen}
+            type="button"
+            onclick={() => (settingsOpen = true)}
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+              <path
+                d="M10.3 2h3.4l.5 2.4c.5.2 1 .4 1.5.6l2.1-1.2 2.4 2.4-1.2 2.1c.2.5.4 1 .6 1.5L22 10.3v3.4l-2.4.5c-.2.5-.4 1-.6 1.5l1.2 2.1-2.4 2.4-2.1-1.2c-.5.2-1 .4-1.5.6L13.7 22h-3.4l-.5-2.4c-.5-.2-1-.4-1.5-.6l-2.1 1.2-2.4-2.4 1.2-2.1c-.2-.5-.4-1-.6-1.5L2 13.7v-3.4l2.4-.5c.2-.5.4-1 .6-1.5L3.8 6.2l2.4-2.4 2.1 1.2c.5-.2 1-.4 1.5-.6L10.3 2Zm1.7 6.2A3.8 3.8 0 1 0 12 15.8 3.8 3.8 0 0 0 12 8.2Z"
+                fill="currentColor"
+              ></path>
+            </svg>
+          </button>
         </div>
       </div>
-      <div class="scope-intro-prose"><p>{scope.description}</p></div>
+      <div class="scope-intro-prose">
+        <p>{s.project?.charter?.description ?? scope.description}</p>
+      </div>
+      {#if waiting > 0}
+        <!-- Sits just left of the + button while a decision is waiting for this viewer. -->
+        <button
+          class="vote-fab"
+          type="button"
+          aria-label={`Vote: ${waiting} waiting for your vote`}
+          onclick={() => (votesOpen = true)}
+        >
+          Vote
+          <span class="vote-fab-count">{waiting}</span>
+        </button>
+      {/if}
     </section>
 
     <div class="stack">
@@ -89,5 +123,23 @@
       people={s.members}
       onClose={() => (membersOpen = false)}
     />
+    {#if s.gov}
+      <ScopeSettingsSheet
+        open={settingsOpen}
+        {kind}
+        handle={scope.handle}
+        description={s.project?.charter?.description ?? scope.description}
+        isMember={!!s.project?.amMember}
+        gov={s.gov}
+        memberName={s.memberName}
+        onClose={() => (settingsOpen = false)}
+      />
+      <ScopeVoteSheet
+        open={votesOpen}
+        gov={s.gov}
+        memberName={s.memberName}
+        onClose={() => (votesOpen = false)}
+      />
+    {/if}
   {/if}
 </section>

@@ -31,8 +31,8 @@ jobs:
       - name: Everything but the scenarios (scripts/check-fast.sh)
         run: nix develop --accept-flake-config --command bash scripts/check-fast.sh
 
-  # The multi-conductor scenarios took ~130 min in one job; each shard runs an eighth of the
-  # files (scripts/check-scenarios.sh picks them, so new files need no change here).
+  # The multi-conductor scenarios take ~380 min in one job; scripts/check-scenarios.sh deals the
+  # files into 8 shards of ~48 min by their measured times (new files need no change here).
   scenarios:
     name: scenarios (${{ matrix.shard }}/8)
     runs-on: ubuntu-latest
