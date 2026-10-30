@@ -44,7 +44,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Discover sheet (M5d part b, last piece), PR from `claude/social-production-handoff-dsam61`
+## In flight: scenario shards balanced by time, PR from `claude/social-production-handoff-dsam61`
+PR #75's shard 0 took 104.6 of its 120 min (PR #74's: 118.5): files went to shards by name
+order, and `governance` (45 min), `private_events` (40) and `activities` (30) all landed in
+shard 0. `scripts/check-scenarios.sh` now deals files heaviest first to the lightest shard,
+using each file's CI minutes (a table in the script, from PR #75's logs; a new file counts 15
+until measured). Dry run: every shard ~47–48 min of tests (+ ~3 min build). **When a file's
+time changes a lot, update its minutes there.** CI on that PR shows whether it holds.
+- **Next M5d:** (d) closed communities + invites, (e) settings/votes sheets and removal UI
+  (ADR 0068; web's `CommunityInvitePanel`, `ScopeSettingsSheet`, `ScopeVoteSheet`).
+
+## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne)
 web's `ScopeDiscoverSheet`: the left rail's **Discover** button (it went to `/` before) opens
 `features/shell/ScopeDiscoverSheet.svelte`: every channel and community from `/index/scopes`
 (`listScopes(q, 200)`), search, web's All/Channels/Communities filter (`IconMenuButton` gained
@@ -59,9 +69,6 @@ No "· Private" yet: closed communities don't exist (part d).
 - Checked: UI check/lint, boundaries, sizes. Not run: scenarios (no Rust change).
 - Live `/readyz` before this PR (00:05 UTC Oct 30, 39 min after PR #74's deploy): RSS 624 MB,
   28 apps.
-- After merge: smoke `discover.mjs` live, update README Status.
-- **Next M5d:** (d) closed communities + invites, (e) settings/votes sheets and removal UI
-  (ADR 0068; web's `CommunityInvitePanel`, `ScopeSettingsSheet`, `ScopeVoteSheet`).
 
 ## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece), PR #74 merged 23:16 UTC (10:16 am Melbourne, Oct 30), live 23:29 UTC
 web's `TagList` (plain) in `components/cards/FeedCardTop.svelte`: each `#channel`/`@community`
@@ -1172,8 +1179,9 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
    its ADR.
 3. Resilience (ADR 0036/0037): a fallback bootstrap/relay list for devices (today one Railway
    URL); archivist + index into a crate any full node runs; desktop Storage setting.
-4. CI: scenarios run in 5 shards since 2026-10-27 (with 4, PR #55's shard 0 took 102 of its
-   120 min after the `activities` file landed); add more if one nears 120 min.
+4. CI: scenarios run in 8 shards, balanced by each file's measured minutes
+   (`scripts/check-scenarios.sh`, 2026-10-30); add shards or update the minutes if one nears
+   120 min.
 
 ## How to work (things learned the hard way)
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
