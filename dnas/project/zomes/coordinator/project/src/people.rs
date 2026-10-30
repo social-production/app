@@ -6,14 +6,27 @@ use std::collections::BTreeMap;
 use hdk::prelude::*;
 use project_integrity::{LinkTypes, DEMAND, OPPOSE};
 
-use crate::own::live_links;
+use crate::own::{live_links, live_links_at};
 use crate::{links, Stance};
 
-pub fn join() -> ExternResult<()> {
-    if live_links(LinkTypes::Members)?.is_empty() {
-        let me = agent_info()?.agent_initial_pubkey;
-        create_link(space_scope::base()?, me, LinkTypes::Members, ())?;
+/// Join once; after a passed removal of you (ADR 0068), a membership made before it no longer
+/// counts, so joining again replaces it with a new one.
+pub fn join(removed: &[(AgentPubKey, Timestamp)]) -> ExternResult<()> {
+    let me = agent_info()?.agent_initial_pubkey;
+    let removed_at = removed
+        .iter()
+        .filter(|(agent, _)| agent == &me)
+        .map(|(_, at)| *at)
+        .max();
+    let mine = live_links_at(LinkTypes::Members)?;
+    let stale = |at: &Timestamp| removed_at.is_some_and(|r| *at <= r);
+    if mine.iter().any(|(_, at)| !stale(at)) {
+        return Ok(());
     }
+    for (hash, _) in mine {
+        delete_link(hash, GetOptions::default())?;
+    }
+    create_link(space_scope::base()?, me, LinkTypes::Members, ())?;
     Ok(())
 }
 

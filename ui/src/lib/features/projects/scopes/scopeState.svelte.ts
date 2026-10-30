@@ -5,7 +5,7 @@ import { parseInvite, scopeTag, type Scope, type ScopeKind } from '#lib/domain/s
 import { closedCommunity, inviteToCommunity } from '#lib/services/closedCommunities.ts';
 import { explain } from '#lib/services/errors.ts';
 import { getPerson, myAgent } from '#lib/services/people.ts';
-import { getProject, joinProject, joinScope } from '#lib/services/projects.ts';
+import { getProject, joinProject } from '#lib/services/projects.ts';
 import { findScope, myScopes } from '#lib/services/scopes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 import { showMyScopes } from '#lib/stores/myScopes.svelte.ts';
@@ -96,8 +96,7 @@ export class ScopeState {
     if (!requireViewer(`Sign in to join ${this.scope.handle}.`)) return;
     this.joining = true;
     try {
-      if (this.project.amMember) await joinProject(this.scope.id, false);
-      else await joinScope(this.scope.id);
+      await joinProject(this.scope.id, !this.project.amMember);
       await this.load();
       // The left rail lists what you joined.
       showMyScopes(await myScopes().catch(() => []));
@@ -123,7 +122,7 @@ export async function redeemInvite(s: ScopeState): Promise<Scope | null> {
   try {
     const scope = await closedCommunity(seed);
     if (!scope) throw new Error('That invite link or code is invalid or expired.');
-    await joinScope(seed);
+    await joinProject(seed, true);
     showMyScopes(await myScopes().catch(() => []));
     if (seed === s.scope?.id) await s.reload();
     return scope;

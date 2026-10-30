@@ -77,7 +77,7 @@ pub fn base_charter(call: In<()>) -> ExternResult<Option<Charter>> {
 #[hdk_extern]
 pub fn join(call: In<()>) -> ExternResult<()> {
     enter(call)?;
-    people::join()?;
+    people::join(&applied()?.removed)?;
     space_scope::touch()
 }
 

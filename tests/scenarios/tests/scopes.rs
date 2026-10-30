@@ -97,6 +97,13 @@ async fn members_vote_someone_out_of_a_channel() {
     let left = members(&net, 0).await;
     assert_eq!(left.len(), 3, "removed: {left:?}");
     assert!(!left.contains(&agent(&net, 3)));
+
+    // Joining again after the removal makes a new membership, which counts.
+    let _: () = net.call(3, "project", "join", ()).await;
+    assert!(members(&net, 3).await.contains(&agent(&net, 3)), "at once");
+    net.settle().await;
+    let back = members(&net, 0).await;
+    assert_eq!(back.len(), 4, "rejoined: {back:?}");
     net.shut_down().await;
 }
 

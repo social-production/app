@@ -23,7 +23,7 @@ pub fn create(charter: Charter) -> ExternResult<ActionHash> {
         )?;
     }
     space_scope::set(hash.clone());
-    crate::people::join()?;
+    crate::people::join(&[])?;
     space_scope::touch()?;
     Ok(hash)
 }

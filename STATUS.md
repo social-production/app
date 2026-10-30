@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 ~5:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,13 +44,15 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing. Next: fix `people::join` (below), then the parity pass (`docs/plans/PARITY.md`)
-The branch `claude/social-production-handoff-dsam61` carries this README/STATUS update (docs
-only, not on `main`): ship it with the next PR. M5d is done (parts a–e). The one follow-up from part (d) is a coordinator-only change in the
-project DNA: `people::join` should create a new `Members` link when your live one predates your
-latest passed removal (pass `applied()?.removed` from `lib.rs`'s `join`), with a scenario in
-`scopes` (remove → join → member again); then `services/projects.ts` `joinScope` can call
-`join` alone. After that, work through `docs/plans/PARITY.md` (M5d unblocked its scope items).
+## In flight (2026-10-30, evening Melbourne): `people::join` rejoin fix, branch `claude/social-production-handoff-dsam61`
+Coordinator-only change in the project DNA (no integrity change, so no network reset):
+`people::join(removed)` (`dnas/project/zomes/coordinator/project/src/people.rs`, called from
+`lib.rs`'s `join` with `applied()?.removed`) keeps your live `Members` link unless it predates
+your latest passed removal; then it deletes it and creates a new one. The UI's `joinScope`
+(leave, then join) is gone: callers use `joinProject(id, true)`. Scenario `scopes` gained
+remove → join → member again. ADR 0068 "Rejoining after a removal" updated. Also carries the
+earlier README/STATUS docs commits. **Next:** open the PR, wait for CI, merge, live smoke
+(`closed-communities.mjs`), then the parity pass (`docs/plans/PARITY.md`).
 
 ## Done 2026-10-30: M5d part (d), private (closed) communities, PR #77 merged 05:56 UTC (4:56 pm Melbourne), live ~06:08 UTC
 - **Live after merge (06:11 UTC):** `closed-communities.mjs` and `scope-settings.mjs` passed.
