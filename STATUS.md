@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 ~4 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 ~5:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,7 +44,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M5d part (d), private (closed) communities, PR #77 (opened 2026-10-30 ~4:00 pm Melbourne; CI ~2 h; merge when green, then smoke `closed-communities.mjs` live and update README Status)
+## In flight: nothing. Next: fix `people::join` (below), then the parity pass (`docs/plans/PARITY.md`)
+M5d is done (parts a–e). The one follow-up from part (d) is a coordinator-only change in the
+project DNA: `people::join` should create a new `Members` link when your live one predates your
+latest passed removal (pass `applied()?.removed` from `lib.rs`'s `join`), with a scenario in
+`scopes` (remove → join → member again); then `services/projects.ts` `joinScope` can call
+`join` alone. After that, work through `docs/plans/PARITY.md` (M5d unblocked its scope items).
+
+## Done 2026-10-30: M5d part (d), private (closed) communities, PR #77 merged 05:56 UTC (4:56 pm Melbourne), live ~06:08 UTC
+- **Live after merge (06:11 UTC):** `closed-communities.mjs` and `scope-settings.mjs` passed.
+  CI took 58 min (slowest shard 1). The seed node restarted twice after the deploy (ADR 0064's
+  restart-once); `/readyz` showed 1067 MB at 149 s, right after both test runs.
 UI only (no Rust change, so no network reset). Details and deviations: ADR 0068 "Part (d)".
 - **Create:** `CreateScope.svelte` has web's Openness + Who decides; Private →
   `services/closedCommunities.ts` `createClosedCommunity` (a clone, `private.`/`organized.`
