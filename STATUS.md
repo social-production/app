@@ -44,13 +44,30 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #76 (scenario shards balanced by time + scope settings sheets) from `claude/social-production-handoff-dsam61`
+## In flight: M5d part (d), closed communities (not started in code yet)
+Plan (ADR 0068 decisions 1 and 5; the DNA already takes closed communities, scenario `scopes`
+`a_closed_community_lives_in_its_own_network`): web's `CreateCommunityPage` Openness "Private" +
+governance (collaborative / organizer) → a clone with private events' seeds
+(`newPrivateEventSeed`, `services/events.ts` createEvent pattern); find your closed communities
+from your own memberships (the index can't list them) for the left rail and
+`/communities/<slug>`; web's `CommunityInvitePanel` (invite link carrying the seed in the URL
+fragment, invite by username via the inbox `send_invite`); closed communities in `/invites`;
+the private part of `ScopeSettingsSheet` ("Who decides", remove a member: collaborative →
+`RemoveMember` proposal, organizer → direct). The branch `claude/social-production-handoff-dsam61`
+carries this STATUS/README update (docs only): ship it with that PR.
+
+## Done 2026-10-30: scenario shards by time + scope Settings/Vote sheets, PR #76 merged 03:35 UTC (2:35 pm Melbourne), live ~03:47 UTC
+- **Live after merge (03:51 UTC):** `scope-settings.mjs` and `discover.mjs` passed. `/readyz`
+  744 MB, 28 apps / 84 cells, 3 min after the deploy.
+- **Shard times on PR #76:** 31–57 min, except shard 5 (events, links, scopes) at 74 min:
+  `scopes` took 38 min there vs 25 on PR #75. A file's time varies by up to ~50% between runs,
+  so the table's balance is approximate; still far under 120 (was 105–118 for shard 0).
 PR #75's shard 0 took 104.6 of its 120 min (PR #74's: 118.5): files went to shards by name
 order, and `governance` (45 min), `private_events` (40) and `activities` (30) all landed in
 shard 0. `scripts/check-scenarios.sh` now deals files heaviest first to the lightest shard,
 using each file's CI minutes (a table in the script, from PR #75's logs; a new file counts 15
 until measured). Dry run: every shard ~47–48 min of tests (+ ~3 min build). **When a file's
-time changes a lot, update its minutes there.** CI on that PR shows whether it holds.
+time changes a lot, update its minutes there.**
 - **Same PR: scope Settings and Vote sheets (M5d part e).** The scope page has web's gear
   (`features/projects/scopes/ScopeSettingsSheet.svelte`: Settings tab with the read-only name,
   description and "Propose change"; Decisions tab with open/past decisions and Yes/No) and, while
@@ -62,8 +79,6 @@ time changes a lot, update its minutes there.** CI on that PR shows whether it h
   New browser test `tests/e2e/scope-settings.mjs` (two founders, 390px: propose → Vote button →
   Yes → description changes → Decisions lists it as passed) **passed** with a production build
   against the live gateway. Checked: UI check/lint, boundaries, sizes.
-- **Next M5d:** (d) closed communities + invites + removal ("Who decides"), web's
-  `CommunityInvitePanel` and the private part of `ScopeSettingsSheet` (ADR 0068).
 
 ## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne), live ~02:07 UTC
 - **Live after merge (02:08 UTC):** `discover.mjs` passed. `/readyz` 707 MB, 28 apps / 84 cells,

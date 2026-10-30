@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Scope settings and votes (PR #76, 2026-10-30 2:35 pm Melbourne):** channel and community
+  pages have web's gear (Settings: propose a new description; Decisions: open and past votes)
+  and web's Vote button while a decision waits for you. Live `scope-settings.mjs` passed.
 - **Discover (PR #75, 2026-10-30 12:55 pm Melbourne):** the left rail's Discover button opens
   web's sheet of every channel and community (search, filter, member counts, "Joined"). Live
   `discover.mjs` passed.
@@ -23,8 +26,7 @@ What works today:
 - **Channels and communities (M5d a–c, ADR 0068, PR #71, 2026-10-29 8:34 pm Melbourne; the
   project network reset):** web's create-channel/community forms, channel and community pages
   with their tagged items, the create flows' scope step (primary channel, more channels and
-  communities; web requires a channel tag), and members can vote someone out. Closed communities and settings come
-  next. Live `help-requests.mjs` and `projects.mjs` passed.
+  communities; web requires a channel tag), and members can vote someone out. Closed communities come next. Live `help-requests.mjs` and `projects.mjs` passed.
 - **Seed-node memory sorted (PR #70, 2026-10-29 3:10 pm Melbourne; ADR 0066):** transparent
   huge pages off for the gateway. Live idle 498 MB at 10 min (was ~790–1000 MB); after a
   browser test run 645 MB (was 1112 MB).
