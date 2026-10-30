@@ -2,6 +2,7 @@ import type { ProjectCard } from '#lib/domain/projects.ts';
 import { slugOf, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
 import { scopeIndex } from '#lib/holo/index.ts';
 
+import { createClosedCommunity, myClosedCommunities } from './closedCommunities.ts';
 import { myAgent } from './people.ts';
 import { createProject, myProjectSeeds } from './projects.ts';
 
@@ -35,9 +36,14 @@ export async function listScopes(q = '', limit = 50): Promise<Scope[]> {
   return [...pending, ...listed].slice(0, limit);
 }
 
-/** The scope a handle names (web: handles are unique across channels and communities). */
+/** The scope a handle names (web: handles are unique across channels and communities). A
+ * closed community you're in comes first: nobody outside it can see its handle to avoid it. */
 export async function findScope(slug: string, kind?: ScopeKind): Promise<Scope | null> {
   const wanted = slugOf(slug);
+  if (kind !== 'channel') {
+    const closed = (await myClosedCommunities().catch(() => [])).find((s) => s.slug === wanted);
+    if (closed) return closed;
+  }
   const found = (await listScopes(wanted)).filter(
     (s) => s.slug === wanted && (!kind || s.kind === kind),
   );
@@ -47,15 +53,20 @@ export async function findScope(slug: string, kind?: ScopeKind): Promise<Scope |
   return mine && (!kind || mine.kind === kind) ? mine : null;
 }
 
-/** web's createChannel / createCommunity: refuses a taken handle, then founds the space. */
+/** web's createChannel / createCommunity: refuses a taken handle, then founds the space; a
+ * private community (`closed`) gets its own network instead of a listing. */
 export async function createScope(
   kind: ScopeKind,
   handle: string,
   description: string,
+  closed?: { organized: boolean },
 ): Promise<string> {
   const slug = slugOf(handle);
   if (await findScope(slug))
     throw new Error('That handle is already used by a channel or community');
+  if (kind === 'community' && closed) {
+    return (await createClosedCommunity(handle, description, closed.organized)).slug;
+  }
   const id = await createProject({
     title: handle.trim(),
     description: description.trim(),
@@ -79,9 +90,14 @@ export async function createScope(
   return slug;
 }
 
-/** The scopes you joined: the index's scopes whose space is among yours. */
+/** The scopes you joined: the index's scopes whose space is among yours, then your closed
+ * communities. */
 export async function myScopes(): Promise<Scope[]> {
-  const [all, mine] = await Promise.all([listScopes('', 200), myProjectSeeds()]);
+  const [all, mine, closed] = await Promise.all([
+    listScopes('', 200),
+    myProjectSeeds(),
+    myClosedCommunities().catch(() => []),
+  ]);
   const seeds = new Set(mine);
-  return all.filter((s) => seeds.has(s.networkSeed));
+  return [...all.filter((s) => seeds.has(s.networkSeed)), ...closed];
 }

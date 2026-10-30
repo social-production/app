@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 ~4 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,13 +44,50 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #76 (scenario shards balanced by time + scope settings sheets) from `claude/social-production-handoff-dsam61`
+## In flight: M5d part (d), private (closed) communities, PR #77 (opened 2026-10-30 ~4:00 pm Melbourne; CI ~2 h; merge when green, then smoke `closed-communities.mjs` live and update README Status)
+UI only (no Rust change, so no network reset). Details and deviations: ADR 0068 "Part (d)".
+- **Create:** `CreateScope.svelte` has web's Openness + Who decides; Private →
+  `services/closedCommunities.ts` `createClosedCommunity` (a clone, `private.`/`organized.`
+  seed, closed charter, self-invite through the inbox).
+- **Finding them:** `myClosedCommunities()` reads your project clones; `services/scopes.ts`
+  `findScope` (a private one you're in wins its slug), `myScopes` (left rail), Discover
+  ("· Private"). The route passes `page.url.hash`; `#invite=<seed>` opens a community by seed.
+- **Scope page:** lock mark; web's invite popover (`components/IconPopoverMenu.svelte`,
+  `features/projects/scopes/CommunityInvitePanel.svelte`): link + code + invite by name for
+  members, "Join with invite" for others. No feed for private ones (nothing can tag them).
+- **Settings:** `ScopeWhoDecides.svelte` (organizers: add organizer, remove at once with a
+  confirm; collaborative: propose a removal). Organizers' description edits say Save.
+- **Invites/notifications:** `pendingInvites` has `kind`; `/invites` says "Private community"
+  and opens it; notifications use web-backend's `community-invite` kind.
+- **Rejoin fix (UI):** `services/projects.ts` `joinScope` leaves, then joins, because the
+  zome's `join` keeps a removed member's stale `Members` link. **Follow-up:** fix
+  `people::join` in the project coordinator (compare with your latest removal), then drop
+  the extra `leave`.
+- **Checked:** UI check/lint, boundaries, sizes; new `tests/e2e/closed-communities.mjs`
+  (create organizer-run → invite a new account by name → accept in Invites → remove →
+  rejoin with the link) **passed twice** with a production build against the live gateway
+  (`VITE_SP_GATEWAYS=<live seed node> npm run build -w ui`, then `npx vite preview --port
+  4174` from `ui/`; **rebuilding kills a running preview, restart it**). One earlier run
+  passed every step but caught a `ClientClosedWithPendingRequests` page error while the test
+  navigated away mid-request; not seen again. Not run: scenarios (no Rust change).
+- **Live dev founders have no profile names** ("Unnamed"), so tests that search people by
+  name must sign up a named account (as this test and `private-events.mjs` do).
+- **Disk:** this session found `/tmp` full of ~350 stale `nix-shell.*` dirs (8 GB) and
+  `target/debug` (11 GB); it removed `target/debug`. Delete the `/tmp/nix-shell.*` dirs if
+  the disk fills again (the session's sandbox refused to sweep `/tmp`).
+
+## Done 2026-10-30: scenario shards by time + scope Settings/Vote sheets, PR #76 merged 03:35 UTC (2:35 pm Melbourne), live ~03:47 UTC
+- **Live after merge (03:51 UTC):** `scope-settings.mjs` and `discover.mjs` passed. `/readyz`
+  744 MB, 28 apps / 84 cells, 3 min after the deploy.
+- **Shard times on PR #76:** 31–57 min, except shard 5 (events, links, scopes) at 74 min:
+  `scopes` took 38 min there vs 25 on PR #75. A file's time varies by up to ~50% between runs,
+  so the table's balance is approximate; still far under 120 (was 105–118 for shard 0).
 PR #75's shard 0 took 104.6 of its 120 min (PR #74's: 118.5): files went to shards by name
 order, and `governance` (45 min), `private_events` (40) and `activities` (30) all landed in
 shard 0. `scripts/check-scenarios.sh` now deals files heaviest first to the lightest shard,
 using each file's CI minutes (a table in the script, from PR #75's logs; a new file counts 15
 until measured). Dry run: every shard ~47–48 min of tests (+ ~3 min build). **When a file's
-time changes a lot, update its minutes there.** CI on that PR shows whether it holds.
+time changes a lot, update its minutes there.**
 - **Same PR: scope Settings and Vote sheets (M5d part e).** The scope page has web's gear
   (`features/projects/scopes/ScopeSettingsSheet.svelte`: Settings tab with the read-only name,
   description and "Propose change"; Decisions tab with open/past decisions and Yes/No) and, while
@@ -62,8 +99,6 @@ time changes a lot, update its minutes there.** CI on that PR shows whether it h
   New browser test `tests/e2e/scope-settings.mjs` (two founders, 390px: propose → Vote button →
   Yes → description changes → Decisions lists it as passed) **passed** with a production build
   against the live gateway. Checked: UI check/lint, boundaries, sizes.
-- **Next M5d:** (d) closed communities + invites + removal ("Who decides"), web's
-  `CommunityInvitePanel` and the private part of `ScopeSettingsSheet` (ADR 0068).
 
 ## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne), live ~02:07 UTC
 - **Live after merge (02:08 UTC):** `discover.mjs` passed. `/readyz` 707 MB, 28 apps / 84 cells,

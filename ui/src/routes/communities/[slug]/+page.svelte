@@ -6,7 +6,7 @@
 </script>
 
 <AccountGate guests>
-  {#key page.params.slug}
-    <ScopePage kind="community" slug={page.params.slug ?? ''} />
+  {#key `${page.params.slug}${page.url.hash}`}
+    <ScopePage kind="community" slug={page.params.slug ?? ''} hash={page.url.hash} />
   {/key}
 </AccountGate>

@@ -1,5 +1,6 @@
 import type { EventSchedule } from '#lib/domain/eventSchedule.ts';
 import type { Plan } from '#lib/domain/plans.ts';
+import type { InviteKind } from '#lib/domain/notifications.ts';
 import { isPrivateSeed, type Charter } from '#lib/domain/projects.ts';
 import {
   callCell,
@@ -14,7 +15,7 @@ import { propose } from './governance.ts';
 import { inboxInvitations } from './messages.ts';
 import { myAgent, namesOf } from './people.ts';
 import { listPlans, submitPlan } from './plans.ts';
-import { createProject, getProject, joinProject } from './projects.ts';
+import { createProject, getProject, joinScope } from './projects.ts';
 
 /** web's create-event form, once its steps are filled in (ADR 0057, 0061). */
 export interface EventDraft {
@@ -73,9 +74,11 @@ export async function eventInvitations(): Promise<{ seed: string; from: string; 
     .sort((a, b) => b.at - a.at);
 }
 
-/** web's PendingInvite for an event: waiting until you accept (join) or decline. */
+/** web's PendingInvite for an event or a private community: waiting until you accept (join)
+ * or decline. */
 export interface PendingInvite {
   seed: string;
+  kind: InviteKind;
   title: string;
   description: string;
   /** The inviter's key, and their name once found. */
@@ -99,7 +102,8 @@ function declined(me: string): string[] {
   }
 }
 
-/** Invites you haven't answered: reading each event joins its network, not the event. */
+/** Invites you haven't answered: reading each one joins its network, not the event or
+ * community. */
 export async function pendingInvites(): Promise<PendingInvite[]> {
   const me = await myAgent();
   const skip = new Set(declined(me));
@@ -108,10 +112,12 @@ export async function pendingInvites(): Promise<PendingInvite[]> {
     open.map(async (i): Promise<PendingInvite | null> => {
       const p = await getProject(i.seed);
       if (p.amMember || !p.charter) return null;
-      const board = await listPlans({ seed: i.seed }).catch(() => null);
+      const kind = p.charter.mode === 'community' ? 'community' : 'event';
+      const board = kind === 'event' ? await listPlans({ seed: i.seed }).catch(() => null) : null;
       const leading = board?.plans.find((v) => v.approved && v.leader === 'Leading');
       return {
         seed: i.seed,
+        kind,
         title: p.charter.title,
         description: p.charter.description,
         from: i.from,
@@ -126,10 +132,11 @@ export async function pendingInvites(): Promise<PendingInvite[]> {
   return invites.map((i) => ({ ...i, invitedBy: names[i.from] ?? null }));
 }
 
-/** web's answerInvite: accepting joins the event; declining hides the invite on this device. */
+/** web's answerInvite: accepting joins the event or community; declining hides the invite on this device. */
 export async function answerInvite(seed: string, accept: boolean): Promise<void> {
   if (accept) {
-    await joinProject(seed, true);
+    // joinScope: someone removed from a private community may be invited back (ADR 0068).
+    await joinScope(seed);
     return;
   }
   const me = await myAgent();

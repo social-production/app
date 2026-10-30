@@ -1,28 +1,37 @@
 <script lang="ts">
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
+  import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
-  import type { ScopeKind } from '#lib/domain/scopes.ts';
+  import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
 
+  import CommunityInvitePanel from './CommunityInvitePanel.svelte';
   import ScopeSettingsSheet from './ScopeSettingsSheet.svelte';
-  import { ScopeState } from './scopeState.svelte.ts';
+  import { ScopeState, redeemInvite, sendInvite } from './scopeState.svelte.ts';
   import ScopeVoteSheet from './ScopeVoteSheet.svelte';
+
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   import '#lib/components/styles/scopes.css';
 
   /**
    * web's DirectoryFeedLayout + ScopeDirectoryHeader for a channel or community (ADR 0068):
    * name, join/members, settings, description, then the items tagged with it; a Vote button
-   * while a decision waits for you. Private communities' invites come in part (d).
+   * while a decision waits for you. A private community (ADR 0068 part d) shows web's lock
+   * and invite panel; an invite link opens it by the seed in its fragment.
    */
-  let { kind, slug }: { kind: ScopeKind; slug: string } = $props();
+  let { kind, slug, hash = '' }: { kind: ScopeKind; slug: string; hash?: string } = $props();
 
-  // The route re-creates this page per slug ({#key}), so reading the props once is intended.
+  // The route re-creates this page per slug and fragment ({#key}), so reading the props once
+  // is intended. A private community's invite link carries its seed in the fragment (ADR 0068).
   // svelte-ignore state_referenced_locally
-  const s = new ScopeState(kind, slug);
+  const s = new ScopeState(kind, slug, parseInvite(hash));
   let membersOpen = $state(false);
+  let inviteOpen = $state(!!s.invite);
   let settingsOpen = $state(false);
   let votesOpen = $state(false);
   const waiting = $derived(s.gov?.votable.length ?? 0);
@@ -31,7 +40,25 @@
   $effect(() => {
     void s.open();
   });
+
+  async function redeem(): Promise<void> {
+    const joined = await redeemInvite(s);
+    if (!joined) return;
+    inviteOpen = false;
+    if (joined.id === s.scope?.id) return;
+    const page = resolve('/communities/[slug]', { slug: joined.slug });
+    // eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved above
+    await goto(`${page}#invite=${joined.id}`);
+  }
 </script>
+
+{#snippet invitePanel()}
+  <CommunityInvitePanel
+    {s}
+    onRedeem={() => void redeem()}
+    onInvite={(c) => void sendInvite(s, c)}
+  />
+{/snippet}
 
 <section class="directory-page">
   {#if !s.loaded}
@@ -49,17 +76,61 @@
             <SurfaceIcon icon={kind} size="md" />
           </span>
           <h1>{scope.handle}</h1>
+          {#if scope.isPrivate}
+            <span class="private-mark" title="Private: members only" aria-label="Private">
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
+                <path
+                  d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </span>
+          {/if}
         </div>
         <div class="action-row">
-          <MembershipSplitButton
-            joined={!!s.project?.amMember}
-            count={s.project?.members.length ?? scope.members}
-            pending={s.joining || !s.project}
-            {membersOpen}
-            noun={scope.handle}
-            onToggleJoin={() => void s.toggleJoin()}
-            onOpenMembers={() => (membersOpen = true)}
-          />
+          {#if scope.isPrivate && !s.project?.amMember}
+            <IconPopoverMenu
+              open={inviteOpen}
+              active={inviteOpen}
+              chip
+              ariaLabel={`Join ${scope.handle} with invite, ${s.project?.members.length ?? scope.members} members`}
+              menuLabel="Join with invite"
+              minWidth={300}
+              onOpenChange={(o) => (inviteOpen = o)}
+            >
+              {#snippet icon()}
+                <ToolbarIcon name="person-plus" />
+                <span>{s.project?.members.length ?? scope.members}</span>
+              {/snippet}
+              {@render invitePanel()}
+            </IconPopoverMenu>
+          {:else}
+            <MembershipSplitButton
+              joined={!!s.project?.amMember}
+              count={s.project?.members.length ?? scope.members}
+              pending={s.joining || !s.project}
+              {membersOpen}
+              noun={scope.handle}
+              onToggleJoin={() => void s.toggleJoin()}
+              onOpenMembers={() => (membersOpen = true)}
+            />
+          {/if}
+          {#if scope.isPrivate && s.project?.amMember}
+            <IconPopoverMenu
+              open={inviteOpen}
+              active={inviteOpen}
+              ariaLabel={`Invite people to ${scope.handle}`}
+              menuLabel="Invite people"
+              minWidth={300}
+              onOpenChange={(o) => (inviteOpen = o)}
+            >
+              {#snippet icon()}<ToolbarIcon name="person-plus" />{/snippet}
+              {@render invitePanel()}
+            </IconPopoverMenu>
+          {/if}
           <button
             aria-label="Settings"
             title="Settings"
@@ -95,7 +166,7 @@
     </section>
 
     <div class="stack">
-      {#if s.feed.loading && s.feed.items.length === 0}
+      {#if !scope.isPrivate && s.feed.loading && s.feed.items.length === 0}
         <section class="info-card"><p>Loading feed…</p></section>
       {:else if s.feed.items.length === 0}
         <section class="info-card">
@@ -132,6 +203,12 @@
         isMember={!!s.project?.amMember}
         gov={s.gov}
         memberName={s.memberName}
+        isPrivate={!!scope.isPrivate}
+        organized={s.project?.governance === 'organizer_controlled'}
+        amOrganizer={!!s.project?.amOrganizer}
+        organizerNames={(s.project?.organizers ?? []).map(s.memberName)}
+        members={s.others}
+        onChanged={() => void s.reload()}
         onClose={() => (settingsOpen = false)}
       />
       <ScopeVoteSheet

@@ -37,7 +37,7 @@ let latest: NotificationItem[] = [];
 
 export function showNotifications(items: NotificationItem[]): void {
   latest = items;
-  notifications.invites = items.filter((n) => n.kind === 'evt-invite').length;
+  notifications.invites = items.filter((n) => n.subject === 'invites').length;
   const shown = items.filter((n) => !notificationsOff.categories.includes(categoryOf[n.kind]));
   notifications.items = shown;
   notifications.unread = shown.filter((n) => n.isUnread).length;

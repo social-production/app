@@ -3,16 +3,19 @@
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { APPROVAL_PERCENT } from '#lib/domain/governance.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
+  import type { Contact } from '#lib/domain/messages.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
   import { describeDecision, type ScopeGovernance } from './scopeGovernance.svelte.ts';
+  import ScopeWhoDecides from './ScopeWhoDecides.svelte';
 
   import '#lib/components/styles/scopes.css';
 
   /**
    * web's ScopeSettingsSheet (the gear): Settings (name, description) and Decisions (open and
    * past votes). Public scopes are collaborative, so a change goes to a member vote. The name
-   * is the handle tags use, so it stays (ADR 0068); scopes have no picture yet.
+   * is the handle tags use, so it stays (ADR 0068); scopes have no picture yet. A private
+   * community adds web's "Who decides"; an organizer-run one's organizers edit directly.
    */
   interface Props {
     open: boolean;
@@ -22,10 +25,37 @@
     isMember: boolean;
     gov: ScopeGovernance;
     memberName: (agent: string) => string;
+    /** A private community's governance (ADR 0068 part d). */
+    isPrivate?: boolean;
+    organized?: boolean;
+    amOrganizer?: boolean;
+    organizerNames?: string[];
+    members?: Contact[];
+    /** After a change that applied at once (an organizer's edit, removal or new organizer). */
+    onChanged?: () => void;
     onClose: () => void;
   }
 
-  let { open, kind, handle, description, isMember, gov, memberName, onClose }: Props = $props();
+  let {
+    open,
+    kind,
+    handle,
+    description,
+    isMember,
+    gov,
+    memberName,
+    isPrivate = false,
+    organized = false,
+    amOrganizer = false,
+    organizerNames = [],
+    members = [],
+    onChanged = () => {},
+    onClose,
+  }: Props = $props();
+
+  /** web's viewerEditsDirectly; others in an organizer-run community see a read-only form. */
+  const direct = $derived(organized && amOrganizer);
+  const canEdit = $derived(isMember && (!organized || direct));
 
   let tab = $state<'settings' | 'decisions'>('settings');
   let draft = $state('');
@@ -51,8 +81,9 @@
 
   async function save(): Promise<void> {
     if (await gov.proposeDescription(draft.trim())) {
-      notice = 'Vote started';
-      tab = 'decisions';
+      notice = direct ? 'Saved' : 'Vote started';
+      if (direct) onChanged();
+      else tab = 'decisions';
     }
   }
 </script>
@@ -179,18 +210,40 @@
       </label>
       <label class="field">
         <span>Description</span>
-        <textarea bind:value={draft} rows="4" maxlength="2000" disabled={!isMember}></textarea>
+        <textarea bind:value={draft} rows="4" maxlength="2000" disabled={!canEdit}></textarea>
       </label>
 
       <p class="how">
-        Collaborative: changes go to a member vote ({APPROVAL_PERCENT}% yes, with quorum based on
-        members).
+        {#if direct}
+          You're an organizer, so changes apply straight away.
+        {:else if organized}
+          Read only. Organizers ({organizerNames.join(', ')}) look after these settings.
+        {:else}
+          Collaborative: changes go to a member vote ({APPROVAL_PERCENT}% yes, with quorum based on
+          members).
+        {/if}
       </p>
 
-      {#if isMember}
+      {#if canEdit}
         <button class="primary" type="button" disabled={gov.busy || !changed} onclick={save}>
-          Propose change
+          {direct ? 'Save' : 'Propose change'}
         </button>
+      {/if}
+
+      {#if isPrivate}
+        <ScopeWhoDecides
+          {organized}
+          {direct}
+          {isMember}
+          {organizerNames}
+          {members}
+          {gov}
+          onChanged={(n) => {
+            notice = n;
+            if (direct) onChanged();
+            else tab = 'decisions';
+          }}
+        />
       {/if}
     {/if}
   </div>

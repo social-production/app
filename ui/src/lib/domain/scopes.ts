@@ -14,6 +14,9 @@ export interface Scope {
   creator: string;
   createdAt: number;
   networkSeed: string;
+  /** A closed (private) community: its own network, found from your memberships, never
+   * listed; its id is its seed (ADR 0068 decision 1). */
+  isPrivate?: boolean;
 }
 
 /** web's canonicalizeHandle. */
@@ -67,4 +70,24 @@ export function tagRef(tag: string): TagRef {
   return scope
     ? { tag, ...scope, label: scope.slug }
     : { tag, kind: 'free', slug: tag, label: tag };
+}
+
+/** A closed community's invite link (ADR 0068 decision 5): the seed rides in the fragment,
+ * which browsers never send to a server. */
+export const inviteLink = (origin: string, slug: string, seed: string): string =>
+  `${origin}/communities/${encodeURIComponent(slug)}#invite=${encodeURIComponent(seed)}`;
+
+const PRIVATE_SEED = /^[^.\s#&]+\.(private|organized)\.[^.\s#&]+$/;
+
+/** web's parseInviteToken: the seed from a pasted invite link, or the code itself. */
+export function parseInvite(raw: string): string | null {
+  const value = raw.trim();
+  const match = value.match(/[#?&]invite=([^&#\s]+)/);
+  let seed = match?.[1] ?? value;
+  try {
+    seed = decodeURIComponent(seed);
+  } catch {
+    return null;
+  }
+  return PRIVATE_SEED.test(seed) ? seed : null;
 }
