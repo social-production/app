@@ -51,9 +51,9 @@ Coordinator-only change in the project DNA (no integrity change, so no network r
 your latest passed removal; then it deletes it and creates a new one. The UI's `joinScope`
 (leave, then join) is gone: callers use `joinProject(id, true)`. Scenario `scopes` gained
 remove → join → member again. ADR 0068 "Rejoining after a removal" updated. Also carries the
-earlier README/STATUS docs commits. **Checked:** zomes build + pack, `cargo clippy -p project`,
+earlier README/STATUS docs commits. **PR #78** opened 07:20 UTC (6:20 pm Melbourne). **Checked:** zomes build + pack, `cargo clippy -p project`,
 scenario `scopes` **passed** (both tests, 39 min in this cloud session), UI check/lint,
-boundaries, sizes. Not run: the other scenarios (CI runs them), browser tests. **Next:** open the PR, wait for CI, merge, live smoke
+boundaries, sizes. Not run: the other scenarios (CI runs them), browser tests. **Next:** wait for #78's CI, merge, live smoke
 (`closed-communities.mjs`), then the parity pass (`docs/plans/PARITY.md`).
 
 ## Done 2026-10-30: M5d part (d), private (closed) communities, PR #77 merged 05:56 UTC (4:56 pm Melbourne), live ~06:08 UTC
