@@ -118,3 +118,4 @@ scopes.css        .directory-page web/src/lib/features/shared-directory/Director
 scopes.css        .scope-header   web/src/lib/features/shared-directory/ScopeDirectoryHeader.svelte
 scopes.css        .scope-avatar   web/src/lib/features/shared-directory/ScopeAvatar.svelte
 scopes.css        .scope-sheet    web/src/lib/components/shared/ScopeSheet.svelte
+scopes.css        .scope-discover web/src/lib/components/shared/ScopeDiscoverSheet.svelte

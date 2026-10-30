@@ -104,7 +104,7 @@ export async function railShows(page, locator, what) {
  * one, ADR 0068). Founder one makes it once per run; a taken handle means it already exists. */
 export const TEST_CHANNEL = 'testing';
 let testChannel;
-function ensureTestChannel() {
+export function ensureTestChannel() {
   testChannel ??= (async () => {
     const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
     const page = await device();

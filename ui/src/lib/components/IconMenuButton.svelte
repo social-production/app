@@ -1,6 +1,8 @@
 <script lang="ts" generics="V extends string">
   import { tick, type Snippet } from 'svelte';
 
+  import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import '#lib/components/styles/icon-menu.css';
 
   /**
@@ -10,10 +12,11 @@
   interface Props {
     value: V;
     ariaLabel: string;
-    options: { value: V; label: string }[];
+    options: { value: V; label: string; icon?: SurfaceIconId }[];
     /** The "no filter" value; any other value marks the trigger active. */
     defaultValue?: V;
     showTriggerLabel?: boolean;
+    showOptionIcons?: boolean;
     onChange: (value: V) => void;
     children: Snippet;
   }
@@ -24,6 +27,7 @@
     options,
     defaultValue,
     showTriggerLabel = false,
+    showOptionIcons = false,
     onChange,
     children,
   }: Props = $props();
@@ -112,6 +116,7 @@
           class:selected={option.value === value}
           onclick={() => choose(option.value)}
         >
+          {#if showOptionIcons && option.icon}<SurfaceIcon icon={option.icon} size="sm" />{/if}
           <span class="item-label">{option.label}</span>
           {#if option.value === value}<span aria-hidden="true" class="check">✓</span>{/if}
         </button>

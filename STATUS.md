@@ -44,11 +44,24 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing open. Next is M5d (pick from below)
-- **Next M5d:** Discover sheet, (d) closed communities + invites, (e) settings/votes sheets and
-  removal UI (ADR 0068; web's `ScopeDiscoverSheet`, `CommunityInvitePanel`, scope settings).
-- This STATUS/README update sits on branch `claude/social-production-handoff-dsam61` (docs
-  only, not merged): ship it with the next PR from that branch.
+## In flight: Discover sheet (M5d part b, last piece), PR from `claude/social-production-handoff-dsam61`
+web's `ScopeDiscoverSheet`: the left rail's **Discover** button (it went to `/` before) opens
+`features/shell/ScopeDiscoverSheet.svelte`: every channel and community from `/index/scopes`
+(`listScopes(q, 200)`), search, web's All/Channels/Communities filter (`IconMenuButton` gained
+`icon` per option + `showOptionIcons`), member counts, a "Joined" badge (from `myScopes`); a row
+opens the scope page and closes the phone rails. Styles ported via PORTS (`scopes.css`
+`.scope-discover`). `myScopesLoop.ts` has `scopeHref`/`railLinks` (kept AppShell under 300 lines).
+No "· Private" yet: closed communities don't exist (part d).
+- New browser test `tests/e2e/discover.mjs` (guest, 390px; `lib.mjs` now exports
+  `ensureTestChannel`). **Passed** with a production build of this branch (`VITE_SP_GATEWAYS=
+  <live seed node> npm run build -w ui`, `npm run preview -w ui -- --port 4174`) against the live
+  gateway; screenshot matches live web's Discover sheet at 390px.
+- Checked: UI check/lint, boundaries, sizes. Not run: scenarios (no Rust change).
+- Live `/readyz` before this PR (00:05 UTC Oct 30, 39 min after PR #74's deploy): RSS 624 MB,
+  28 apps.
+- After merge: smoke `discover.mjs` live, update README Status.
+- **Next M5d:** (d) closed communities + invites, (e) settings/votes sheets and removal UI
+  (ADR 0068; web's `CommunityInvitePanel`, `ScopeSettingsSheet`, `ScopeVoteSheet`).
 
 ## Done 2026-10-29: tag chips link to their channel or community (M5d part c, last piece), PR #74 merged 23:16 UTC (10:16 am Melbourne, Oct 30), live 23:29 UTC
 web's `TagList` (plain) in `components/cards/FeedCardTop.svelte`: each `#channel`/`@community`
