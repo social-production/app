@@ -44,15 +44,26 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: scenario shards balanced by time, PR from `claude/social-production-handoff-dsam61`
+## In flight: PR #76 (scenario shards balanced by time + scope settings sheets) from `claude/social-production-handoff-dsam61`
 PR #75's shard 0 took 104.6 of its 120 min (PR #74's: 118.5): files went to shards by name
 order, and `governance` (45 min), `private_events` (40) and `activities` (30) all landed in
 shard 0. `scripts/check-scenarios.sh` now deals files heaviest first to the lightest shard,
 using each file's CI minutes (a table in the script, from PR #75's logs; a new file counts 15
 until measured). Dry run: every shard ~47–48 min of tests (+ ~3 min build). **When a file's
 time changes a lot, update its minutes there.** CI on that PR shows whether it holds.
-- **Next M5d:** (d) closed communities + invites, (e) settings/votes sheets and removal UI
-  (ADR 0068; web's `CommunityInvitePanel`, `ScopeSettingsSheet`, `ScopeVoteSheet`).
+- **Same PR: scope Settings and Vote sheets (M5d part e).** The scope page has web's gear
+  (`features/projects/scopes/ScopeSettingsSheet.svelte`: Settings tab with the read-only name,
+  description and "Propose change"; Decisions tab with open/past decisions and Yes/No) and, while
+  a decision waits for you, web's Vote button (`ScopeVoteSheet.svelte`, one at a time).
+  `scopeGovernance.svelte.ts` lists the scope's proposals (closing settled ones as projects do),
+  proposes description edits and votes. `ProposalKind` gained `RemoveMember` in the UI types.
+  Styles via PORTS (`scopes.css` `.scope-settings`, `.scope-vote`). Differences from web are in
+  ADR 0068 "Deviations in the settings sheets" (no rename, no picture, final votes, removal in d).
+  New browser test `tests/e2e/scope-settings.mjs` (two founders, 390px: propose → Vote button →
+  Yes → description changes → Decisions lists it as passed) **passed** with a production build
+  against the live gateway. Checked: UI check/lint, boundaries, sizes.
+- **Next M5d:** (d) closed communities + invites + removal ("Who decides"), web's
+  `CommunityInvitePanel` and the private part of `ScopeSettingsSheet` (ADR 0068).
 
 ## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne), live ~02:07 UTC
 - **Live after merge (02:08 UTC):** `discover.mjs` passed. `/readyz` 707 MB, 28 apps / 84 cells,

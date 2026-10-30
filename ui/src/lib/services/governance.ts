@@ -10,8 +10,9 @@ import {
 import { cellFor, type ProjectRef } from './projects.ts';
 
 type KindWire =
-  | Exclude<ProposalKind, { Phase: unknown }>
-  | { Phase: { to: string; plan: ActionHash | null; reason: string } };
+  | Exclude<ProposalKind, { Phase: unknown } | { RemoveMember: unknown }>
+  | { Phase: { to: string; plan: ActionHash | null; reason: string } }
+  | { RemoveMember: { agent: AgentPubKey } };
 
 interface ProposalWire {
   id: ActionHash;
@@ -37,6 +38,8 @@ const governance = async <T>(project: ProjectRef, fn: string, payload?: unknown)
   callCell<T>(await cellFor(project), 'governance', fn, payload);
 
 function kindOf(kind: KindWire): ProposalKind {
+  if ('RemoveMember' in kind)
+    return { RemoveMember: { agent: hashToString(kind.RemoveMember.agent) } };
   if (!('Phase' in kind)) return kind;
   const { to, plan, reason } = kind.Phase;
   return { Phase: { to, plan: plan ? hashToString(plan) : null, reason } };
@@ -72,7 +75,9 @@ export async function propose(projectId: string, kind: ProposalKind): Promise<vo
   const wire: KindWire =
     'Phase' in kind
       ? { Phase: { to: kind.Phase.to, plan: null, reason: kind.Phase.reason } }
-      : kind;
+      : 'RemoveMember' in kind
+        ? { RemoveMember: { agent: stringToHash(kind.RemoveMember.agent) } }
+        : kind;
   await governance<ActionHash>(projectId, 'propose', wire);
 }
 

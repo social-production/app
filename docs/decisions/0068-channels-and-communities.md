@@ -55,6 +55,17 @@ web doesn't count channels and communities against a New member's 2 projects a w
 directory's integrity counts every listing, so they do until the next directory reset, when
 `listing.rs`'s cap should skip scope modes (and the coordinator's `allowance` with it).
 
+## Deviations in the settings sheets (2026-10-30, part e)
+web's gear sheet (`ScopeSettingsSheet`) and `ScopeVoteSheet` are ported with these differences:
+- **Name:** shown read-only with "Tags use this name, so it stays as it is." (decision 4: the
+  handle is the title, and integrity refuses a scope `Edit` with a title).
+- **Picture:** no "Add a picture": charters have no image, and adding one is an integrity
+  change. The row keeps web's placeholder avatar and caption.
+- **Votes are final** (ADR 0033), so the sheets drop web's "Tap the other to change it".
+- **Removal:** web offers "Username to remove" only in private communities' "Who decides"
+  section, so it arrives with closed communities in part (d); the DNA and the sheets' Decisions
+  list already handle `RemoveMember`.
+
 ## Consequences
 - **Integrity change in the project DNA only** (scope modes, `RemoveMember`): the project
   network resets once; accounts and chats keep theirs.
