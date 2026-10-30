@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 ~9:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~2:00 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,13 +44,16 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Search kinds, PR #79 (branch `claude/social-production-handoff-dsam61`). Next: the parity pass (`docs/plans/PARITY.md`)
+## In flight: nothing (this branch only carries docs commits; they ride the next PR). Next: the parity pass (`docs/plans/PARITY.md`)
 Work through PARITY.md's unticked items (M5d unblocked its scope items), porting each from web
 at 390px; tick items with their PR number. Candidates not blocked on M6: the help request's
 Share menu, `PersonalHelpRequestCard` in the personal feed, "Plan became leading"
 notifications, private-community audience for events, "copy link" in the card ⋮ menu.
 
-## 2026-10-30: Search finds channels, communities, events and help requests (PR #79)
+## Done 2026-10-30: Search finds channels, communities, events and help requests, PR #79 merged 14:53 UTC (1:53 am Melbourne, Oct 31), live ~14:55 UTC
+- **Live after merge (14:55 UTC):** `search.mjs` passed. CI took 60 min (slowest shard 4).
+  UI-only merges don't restart the seed node: `/readyz` 951 MB at 6.2 h uptime, 34 apps /
+  118 cells.
 UI only (no Rust change, no network reset). `services/search.ts` follows web-backend's
 `search_documents`: channels and communities first (`listScopes`, plus your private
 communities from `myClosedCommunities`; handle/slug contains a query of 2+ letters, ranked by
