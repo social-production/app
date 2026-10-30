@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
 
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
+  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import SearchSuggestionsList from '#lib/components/search/SearchSuggestionsList.svelte';
   import {
@@ -25,11 +26,16 @@
   let { query, typeParam }: { query: string; typeParam: string | null } = $props();
   const type = $derived(readSearchType(typeParam));
 
-  // web lists every kind it has; the app has projects and people so far (PARITY.md).
-  const typeOptions: { value: SearchType; label: string }[] = [
+  // web's options, in its order, for the kinds the app has (no threads, activities or
+  // posts yet; PARITY.md).
+  const typeOptions: { value: SearchType; label: string; icon?: SurfaceIconId }[] = [
     { value: 'all', label: 'All' },
-    { value: 'project', label: 'Projects' },
-    { value: 'user', label: 'Users' },
+    { value: 'project', label: 'Projects', icon: 'project' },
+    { value: 'event', label: 'Events', icon: 'event' },
+    { value: 'help_request', label: 'Help requests', icon: 'help-request' },
+    { value: 'channel', label: 'Channels', icon: 'channel' },
+    { value: 'community', label: 'Communities', icon: 'community' },
+    { value: 'user', label: 'Users', icon: 'user' },
   ];
 
   const liveSearch = createLiveSearchScheduler();
@@ -123,6 +129,7 @@
           ariaLabel="Filter search"
           defaultValue="all"
           options={typeOptions}
+          showOptionIcons
           showTriggerLabel
           onChange={(next) => open(searchHref(draft.trim() || query.trim(), next))}
         >

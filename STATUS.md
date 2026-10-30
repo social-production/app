@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 ~7:55 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 ~9:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,9 +44,22 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing. Next: the parity pass (`docs/plans/PARITY.md`)
+## In flight: Search kinds, PR #79 (branch `claude/social-production-handoff-dsam61`). Next: the parity pass (`docs/plans/PARITY.md`)
 Work through PARITY.md's unticked items (M5d unblocked its scope items), porting each from web
-at 390px; tick items with their PR number.
+at 390px; tick items with their PR number. Candidates not blocked on M6: the help request's
+Share menu, `PersonalHelpRequestCard` in the personal feed, "Plan became leading"
+notifications, private-community audience for events, "copy link" in the card ⋮ menu.
+
+## 2026-10-30: Search finds channels, communities, events and help requests (PR #79)
+UI only (no Rust change, no network reset). `services/search.ts` follows web-backend's
+`search_documents`: channels and communities first (`listScopes`, plus your private
+communities from `myClosedCommunities`; handle/slug contains a query of 2+ letters, ranked by
+`domain/search.ts` `scopeMatchRank` = web-backend's `_scope_match_rank`), then people, then
+the project feed's items as Project / Event / Help request (a one-kind filter reads 50 and
+keeps that kind; the index has no mode filter). The filter has web's options in web's order
+for the kinds the app has, with icons (`showOptionIcons`). New `tests/e2e/search.mjs`
+(guest, 390px) **passed** with a production build against the live gateway. **Checked:** UI
+check/lint, boundaries, sizes. Not run: scenarios (no Rust change).
 
 ## Done 2026-10-30: rejoin after a removal (`people::join`), PR #78 merged 08:33 UTC (7:33 pm Melbourne), live ~08:45 UTC
 - **Live after merge (08:50 UTC):** `closed-communities.mjs` passed (remove → rejoin with the
