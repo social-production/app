@@ -15,7 +15,7 @@ import { propose } from './governance.ts';
 import { inboxInvitations } from './messages.ts';
 import { myAgent, namesOf } from './people.ts';
 import { listPlans, submitPlan } from './plans.ts';
-import { createProject, getProject, joinScope } from './projects.ts';
+import { createProject, getProject, joinProject } from './projects.ts';
 
 /** web's create-event form, once its steps are filled in (ADR 0057, 0061). */
 export interface EventDraft {
@@ -135,8 +135,8 @@ export async function pendingInvites(): Promise<PendingInvite[]> {
 /** web's answerInvite: accepting joins the event or community; declining hides the invite on this device. */
 export async function answerInvite(seed: string, accept: boolean): Promise<void> {
   if (accept) {
-    // joinScope: someone removed from a private community may be invited back (ADR 0068).
-    await joinScope(seed);
+    // `join` renews a membership from before a removal, so a removed person can come back.
+    await joinProject(seed, true);
     return;
   }
   const me = await myAgent();

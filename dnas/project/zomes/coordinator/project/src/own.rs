@@ -14,8 +14,25 @@ pub fn live_links(link_type: LinkTypes) -> ExternResult<Vec<(ActionHash, u8)>> {
         .collect())
 }
 
+/// `(create action, when)` for each own live link of `link_type` in the current space.
+pub fn live_links_at(link_type: LinkTypes) -> ExternResult<Vec<(ActionHash, Timestamp)>> {
+    let base = space_scope::base()?;
+    Ok(live_timed(link_type)?
+        .into_iter()
+        .filter(|(_, link, _)| link.base_address == base)
+        .map(|(hash, _, at)| (hash, at))
+        .collect())
+}
+
 /// Each own live link of `link_type` in any space, with its create action.
 pub fn live_anywhere(link_type: LinkTypes) -> ExternResult<Vec<(ActionHash, CreateLinkData)>> {
+    Ok(live_timed(link_type)?
+        .into_iter()
+        .map(|(hash, link, _)| (hash, link))
+        .collect())
+}
+
+fn live_timed(link_type: LinkTypes) -> ExternResult<Vec<(ActionHash, CreateLinkData, Timestamp)>> {
     let scoped: ScopedLinkType = link_type.try_into()?;
     let actions = query(
         ChainQueryFilter::new()
@@ -36,10 +53,14 @@ pub fn live_anywhere(link_type: LinkTypes) -> ExternResult<Vec<(ActionHash, Crea
             ActionData::CreateLink(c)
                 if c.zome_index == scoped.zome_index && c.link_type == scoped.zome_type =>
             {
-                Some((r.action_address().clone(), c.clone()))
+                Some((
+                    r.action_address().clone(),
+                    c.clone(),
+                    r.action().timestamp(),
+                ))
             }
             _ => None,
         })
-        .filter(|(hash, _)| !deleted.contains(hash))
+        .filter(|(hash, _, _)| !deleted.contains(hash))
         .collect())
 }

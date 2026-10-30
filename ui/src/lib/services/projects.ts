@@ -196,14 +196,6 @@ export async function joinProject(id: string, join: boolean): Promise<void> {
   await callCell<null>(cell, 'project', join ? 'join' : 'leave');
 }
 
-/** Join a channel or community. After a passed removal (ADR 0068) your old membership link
- * is still live and `join` would keep it, so it's cleared first and the new one counts. */
-export async function joinScope(id: string): Promise<void> {
-  const { cell } = await cellOf(id);
-  await callCell<null>(cell, 'project', 'leave');
-  await callCell<null>(cell, 'project', 'join');
-}
-
 export async function setSignal(id: string, stance: Stance | null): Promise<void> {
   const { cell } = await cellOf(id);
   await callCell<null>(cell, 'project', 'set_signal', stance);

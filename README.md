@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Private communities (M5d d, PR #77, 2026-10-30 4:56 pm Melbourne):** web's Openness
+  "Private" and Who decides when creating a community (its own network, never listed), the
+  lock mark, web's invite panel (link, code, invite by name), "Private community" invites,
+  and Who decides in Settings (organizers remove at once; members vote). Live
+  `closed-communities.mjs` and `scope-settings.mjs` passed.
 - **Scope settings and votes (PR #76, 2026-10-30 2:35 pm Melbourne):** channel and community
   pages have web's gear (Settings: propose a new description; Decisions: open and past votes)
   and web's Vote button while a decision waits for you. Live `scope-settings.mjs` passed.
@@ -26,7 +31,7 @@ What works today:
 - **Channels and communities (M5d a–c, ADR 0068, PR #71, 2026-10-29 8:34 pm Melbourne; the
   project network reset):** web's create-channel/community forms, channel and community pages
   with their tagged items, the create flows' scope step (primary channel, more channels and
-  communities; web requires a channel tag), and members can vote someone out. Closed communities come next. Live `help-requests.mjs` and `projects.mjs` passed.
+  communities; web requires a channel tag), and members can vote someone out. Live `help-requests.mjs` and `projects.mjs` passed.
 - **Seed-node memory sorted (PR #70, 2026-10-29 3:10 pm Melbourne; ADR 0066):** transparent
   huge pages off for the gateway. Live idle 498 MB at 10 min (was ~790–1000 MB); after a
   browser test run 645 MB (was 1112 MB).
@@ -168,7 +173,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M2** | Projects | `web/`'s design system + shell; project clones, membership, signals, archivist, feed/search (`sp_index`), project screens ([plan](docs/plans/M2-projects.md)) | ✅ live |
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
 | M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
-| M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail (with link and plan votes). ✅ M5c first part: public events (ADR 0057, live 2026-10-27). Seed node idles at ~0.7 GB (jemalloc, ADR 0060); every browser test runs live with test founders. Next: private events and help requests (feed activity cards wait on Region, M6), communities and channels (M5d) | in progress |
+| M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail (with link and plan votes). ✅ M5c: public and private events, help requests (feed activity cards wait on Region, M6). ✅ M5d: channels and communities, private communities with invites, settings and votes (ADR 0068). Every browser test runs live with test founders. Next: parity pass | in progress |
 | M6 | Platform | moderation + bot reviews, calls, map/places, push relay, software PR/merge flow, board receipts | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
 

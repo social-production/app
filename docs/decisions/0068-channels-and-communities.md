@@ -92,10 +92,10 @@ Ported from web's `CreateCommunityPage` (Openness, Who decides), `CommunityInvit
   read what it gossips and join again with the link. The confirm says so instead of web's
   "will need a new invite". A real lock needs a new seed (moving the community) or a
   membrane proof.
-- **Rejoining after a removal:** the coordinator's `join` keeps an existing live `Members`
-  link, and a removed member's old link is still live, so a rejoin would not count. The UI
-  (`joinScope`) leaves first, then joins. Fix `people::join` to compare against your latest
-  removal at the next coordinator change.
+- **Rejoining after a removal:** a removed member's old `Members` link stays live, so
+  `people::join` compares your live link with your latest passed removal: if it predates it,
+  `join` deletes it and creates a new one (coordinator only, 2026-10-30; scenario `scopes`).
+  Until then the UI left first, then joined.
 - **Invite by username** picks a person from the suggestions (names aren't unique in the
   app), so web's separate "Send invite" button isn't there; picking sends, as on web.
 - **Who decides** leaves out web's `to_organizer` / `to_collaborative` buttons (decision 4),
