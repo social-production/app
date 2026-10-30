@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 ~6:20 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -51,7 +51,9 @@ Coordinator-only change in the project DNA (no integrity change, so no network r
 your latest passed removal; then it deletes it and creates a new one. The UI's `joinScope`
 (leave, then join) is gone: callers use `joinProject(id, true)`. Scenario `scopes` gained
 remove → join → member again. ADR 0068 "Rejoining after a removal" updated. Also carries the
-earlier README/STATUS docs commits. **Next:** open the PR, wait for CI, merge, live smoke
+earlier README/STATUS docs commits. **Checked:** zomes build + pack, `cargo clippy -p project`,
+scenario `scopes` **passed** (both tests, 39 min in this cloud session), UI check/lint,
+boundaries, sizes. Not run: the other scenarios (CI runs them), browser tests. **Next:** open the PR, wait for CI, merge, live smoke
 (`closed-communities.mjs`), then the parity pass (`docs/plans/PARITY.md`).
 
 ## Done 2026-10-30: M5d part (d), private (closed) communities, PR #77 merged 05:56 UTC (4:56 pm Melbourne), live ~06:08 UTC
