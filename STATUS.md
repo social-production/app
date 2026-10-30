@@ -54,7 +54,9 @@ time changes a lot, update its minutes there.** CI on that PR shows whether it h
 - **Next M5d:** (d) closed communities + invites, (e) settings/votes sheets and removal UI
   (ADR 0068; web's `CommunityInvitePanel`, `ScopeSettingsSheet`, `ScopeVoteSheet`).
 
-## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne)
+## Done 2026-10-30: Discover sheet (M5d part b, last piece), PR #75 merged 01:55 UTC (12:55 pm Melbourne), live ~02:07 UTC
+- **Live after merge (02:08 UTC):** `discover.mjs` passed. `/readyz` 707 MB, 28 apps / 84 cells,
+  39 s after the seed node's restart-once-after-upgrade (ADR 0064).
 web's `ScopeDiscoverSheet`: the left rail's **Discover** button (it went to `/` before) opens
 `features/shell/ScopeDiscoverSheet.svelte`: every channel and community from `/index/scopes`
 (`listScopes(q, 200)`), search, web's All/Channels/Communities filter (`IconMenuButton` gained
