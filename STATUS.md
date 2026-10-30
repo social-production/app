@@ -44,7 +44,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M5d part (d), private (closed) communities, PR on `claude/social-production-handoff-dsam61` (opened 2026-10-30 ~4:00 pm Melbourne)
+## In flight: M5d part (d), private (closed) communities, PR #77 (opened 2026-10-30 ~4:00 pm Melbourne; CI ~2 h; merge when green, then smoke `closed-communities.mjs` live and update README Status)
 UI only (no Rust change, so no network reset). Details and deviations: ADR 0068 "Part (d)".
 - **Create:** `CreateScope.svelte` has web's Openness + Who decides; Private →
   `services/closedCommunities.ts` `createClosedCommunity` (a clone, `private.`/`organized.`
