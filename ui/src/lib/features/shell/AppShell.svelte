@@ -31,8 +31,9 @@
   import { refreshActivityRail, startActivityRail } from './activityRailLoop.ts';
   import AuthActionNotice from './AuthActionNotice.svelte';
   import { createLinks, surfaceLinks } from './createLinks.ts';
-  import { startMyScopes } from './myScopesLoop.ts';
+  import { railLinks, startMyScopes } from './myScopesLoop.ts';
   import RightRailPanel from './RightRailPanel.svelte';
+  import ScopeDiscoverSheet from './ScopeDiscoverSheet.svelte';
 
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
@@ -44,6 +45,7 @@
   let leftOpen = $state(false);
   let rightOpen = $state(false);
   let moreOpen = $state(false);
+  let discoverOpen = $state(false);
 
   const signedIn = $derived(connection.current.status === 'connected');
   // web's isAuthSurface: onboarding shows only the brand (no rails, bottom nav or "+").
@@ -228,17 +230,11 @@
     <aside class="rail left-rail" data-open={leftOpen && !authSurface}>
       {#if !authSurface}
         <LeftRail
-          channels={myScopes.channels.map((c) => ({
-            href: resolve('/channels/[slug]', { slug: c.slug }),
-            label: c.handle,
-          }))}
-          communities={myScopes.communities.map((c) => ({
-            href: resolve('/communities/[slug]', { slug: c.slug }),
-            label: c.handle,
-          }))}
+          channels={railLinks(myScopes.channels)}
+          communities={railLinks(myScopes.communities)}
           invites={notifications.invites}
           closePanels={closeCompact}
-          onDiscover={() => goto(resolve('/'))}
+          onDiscover={() => (discoverOpen = true)}
         />
       {/if}
     </aside>
@@ -291,5 +287,10 @@
       onClose={() => (moreOpen = false)}
     />
   {/if}
+  <ScopeDiscoverSheet
+    open={discoverOpen}
+    onClose={() => (discoverOpen = false)}
+    onNavigate={closeCompact}
+  />
   <AuthActionNotice />
 </div>
