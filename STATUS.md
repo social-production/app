@@ -45,7 +45,8 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: nothing. Next: fix `people::join` (below), then the parity pass (`docs/plans/PARITY.md`)
-M5d is done (parts a–e). The one follow-up from part (d) is a coordinator-only change in the
+The branch `claude/social-production-handoff-dsam61` carries this README/STATUS update (docs
+only, not on `main`): ship it with the next PR. M5d is done (parts a–e). The one follow-up from part (d) is a coordinator-only change in the
 project DNA: `people::join` should create a new `Members` link when your live one predates your
 latest passed removal (pass `applied()?.removed` from `lib.rs`'s `join`), with a scenario in
 `scopes` (remove → join → member again); then `services/projects.ts` `joinScope` can call
