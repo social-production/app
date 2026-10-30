@@ -11,7 +11,8 @@
 
   import '#lib/components/styles/scopes.css';
 
-  /** web's ScopeDiscoverSheet (left rail "Discover"): every channel and community, searchable. */
+  /** web's ScopeDiscoverSheet (left rail "Discover"): every channel and community, searchable;
+   * the private communities you're in are added from your own (nothing lists them). */
   interface Props {
     open: boolean;
     onClose: () => void;
@@ -65,11 +66,12 @@
     new Set([...myScopes.channels, ...myScopes.communities].map((s) => s.id)),
   );
   const needle = $derived(query.trim().toLowerCase());
+  const listed = $derived([...scopes, ...myScopes.communities.filter((s) => s.isPrivate)]);
   // web lists channels then communities, or both by member count under "All".
   const filtered = $derived(
     (activeFilter === 'all'
-      ? [...scopes].sort((a, b) => b.members - a.members)
-      : scopes.filter((s) => s.kind === activeFilter)
+      ? [...listed].sort((a, b) => b.members - a.members)
+      : listed.filter((s) => s.kind === activeFilter)
     ).filter((s) => !needle || s.handle.toLowerCase().includes(needle) || s.slug.includes(needle)),
   );
   const emptyNoun = $derived(
@@ -128,7 +130,10 @@
           </span>
           <span class="scope-copy">
             <strong>{scope.handle}</strong>
-            <span class="scope-meta">{memberLabel(scope.members)}</span>
+            <span class="scope-meta"
+              >{memberLabel(scope.members)}{#if scope.isPrivate}
+                · Private{/if}</span
+            >
           </span>
           {#if joined.has(scope.id)}
             <span class="badge">Joined</span>

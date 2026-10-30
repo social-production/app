@@ -10,7 +10,8 @@
 
   /**
    * web's CreateChannelPage and CreateCommunityPage: a handle (its URL) and a description
-   * (ADR 0068). Private communities (web's Openness "Private") come with invites, M5d part (d).
+   * (ADR 0068). A community's Openness "Private" gets its own network, run by its members or
+   * by organizers (web's "Who decides"; part d).
    */
   let { kind }: { kind: ScopeKind } = $props();
 
@@ -18,6 +19,8 @@
   const noun = $derived(channel ? 'Channel' : 'Community');
   let name = $state('');
   let description = $state('');
+  let openness = $state<'open' | 'invite_only'>('open');
+  let governance = $state<'collaborative' | 'organizer'>('collaborative');
   let message = $state('');
   let submitting = $state(false);
   const check = $derived(checkHandle(name, `${noun} name`, kind));
@@ -32,7 +35,11 @@
     submitting = true;
     message = '';
     try {
-      const slug = await createScope(kind, name, description);
+      const closed =
+        !channel && openness === 'invite_only'
+          ? { organized: governance === 'organizer' }
+          : undefined;
+      const slug = await createScope(kind, name, description, closed);
       // eslint-disable-next-line svelte/no-navigation-without-resolve -- path() resolves it
       await goto(path(slug));
     } catch (e) {
@@ -71,6 +78,31 @@
         <p class="status-note">{check.error}</p>
       {:else}
         <p class="helper-text">URL: <code>{path(check.slug)}</code></p>
+      {/if}
+    {/if}
+    {#if !channel}
+      <label>
+        <span class="field-label">Openness</span>
+        <select bind:value={openness}>
+          <option value="open">Open</option>
+          <option value="invite_only">Private</option>
+        </select>
+      </label>
+
+      {#if openness === 'invite_only'}
+        <label>
+          <span class="field-label">Who decides</span>
+          <select bind:value={governance}>
+            <option value="collaborative">Collaborative: all members vote on changes</option>
+            <option value="organizer">Organizer controlled: you and organizers you choose</option>
+          </select>
+          <span class="helper-text">
+            <!-- web's copy, less what isn't ported (renames, pictures, switching; ADR 0068). -->
+            {governance === 'organizer'
+              ? 'Organizers edit settings and remove members directly. This stays as it is.'
+              : 'Members vote on the description and on removing members. This stays as it is.'}
+          </span>
+        </label>
       {/if}
     {/if}
     <label>

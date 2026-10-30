@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-30 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-30 ~4 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,17 +44,37 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M5d part (d), closed communities (not started in code yet)
-Plan (ADR 0068 decisions 1 and 5; the DNA already takes closed communities, scenario `scopes`
-`a_closed_community_lives_in_its_own_network`): web's `CreateCommunityPage` Openness "Private" +
-governance (collaborative / organizer) → a clone with private events' seeds
-(`newPrivateEventSeed`, `services/events.ts` createEvent pattern); find your closed communities
-from your own memberships (the index can't list them) for the left rail and
-`/communities/<slug>`; web's `CommunityInvitePanel` (invite link carrying the seed in the URL
-fragment, invite by username via the inbox `send_invite`); closed communities in `/invites`;
-the private part of `ScopeSettingsSheet` ("Who decides", remove a member: collaborative →
-`RemoveMember` proposal, organizer → direct). The branch `claude/social-production-handoff-dsam61`
-carries this STATUS/README update (docs only): ship it with that PR.
+## In flight: M5d part (d), private (closed) communities, PR on `claude/social-production-handoff-dsam61` (opened 2026-10-30 ~4:00 pm Melbourne)
+UI only (no Rust change, so no network reset). Details and deviations: ADR 0068 "Part (d)".
+- **Create:** `CreateScope.svelte` has web's Openness + Who decides; Private →
+  `services/closedCommunities.ts` `createClosedCommunity` (a clone, `private.`/`organized.`
+  seed, closed charter, self-invite through the inbox).
+- **Finding them:** `myClosedCommunities()` reads your project clones; `services/scopes.ts`
+  `findScope` (a private one you're in wins its slug), `myScopes` (left rail), Discover
+  ("· Private"). The route passes `page.url.hash`; `#invite=<seed>` opens a community by seed.
+- **Scope page:** lock mark; web's invite popover (`components/IconPopoverMenu.svelte`,
+  `features/projects/scopes/CommunityInvitePanel.svelte`): link + code + invite by name for
+  members, "Join with invite" for others. No feed for private ones (nothing can tag them).
+- **Settings:** `ScopeWhoDecides.svelte` (organizers: add organizer, remove at once with a
+  confirm; collaborative: propose a removal). Organizers' description edits say Save.
+- **Invites/notifications:** `pendingInvites` has `kind`; `/invites` says "Private community"
+  and opens it; notifications use web-backend's `community-invite` kind.
+- **Rejoin fix (UI):** `services/projects.ts` `joinScope` leaves, then joins, because the
+  zome's `join` keeps a removed member's stale `Members` link. **Follow-up:** fix
+  `people::join` in the project coordinator (compare with your latest removal), then drop
+  the extra `leave`.
+- **Checked:** UI check/lint, boundaries, sizes; new `tests/e2e/closed-communities.mjs`
+  (create organizer-run → invite a new account by name → accept in Invites → remove →
+  rejoin with the link) **passed twice** with a production build against the live gateway
+  (`VITE_SP_GATEWAYS=<live seed node> npm run build -w ui`, then `npx vite preview --port
+  4174` from `ui/`; **rebuilding kills a running preview, restart it**). One earlier run
+  passed every step but caught a `ClientClosedWithPendingRequests` page error while the test
+  navigated away mid-request; not seen again. Not run: scenarios (no Rust change).
+- **Live dev founders have no profile names** ("Unnamed"), so tests that search people by
+  name must sign up a named account (as this test and `private-events.mjs` do).
+- **Disk:** this session found `/tmp` full of ~350 stale `nix-shell.*` dirs (8 GB) and
+  `target/debug` (11 GB); it removed `target/debug`. Delete the `/tmp/nix-shell.*` dirs if
+  the disk fills again (the session's sandbox refused to sweep `/tmp`).
 
 ## Done 2026-10-30: scenario shards by time + scope Settings/Vote sheets, PR #76 merged 03:35 UTC (2:35 pm Melbourne), live ~03:47 UTC
 - **Live after merge (03:51 UTC):** `scope-settings.mjs` and `discover.mjs` passed. `/readyz`

@@ -2,6 +2,7 @@
   import { endedAgo } from '#lib/domain/activityHistory.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
+  import { slugOf } from '#lib/domain/scopes.ts';
   import { explain } from '#lib/services/errors.ts';
   import { answerInvite, pendingInvites, type PendingInvite } from '#lib/services/events.ts';
   import { notifications } from '#lib/stores/notifications.svelte.ts';
@@ -11,7 +12,8 @@
 
   import '#lib/components/styles/invites.css';
 
-  /** web's InvitesPage: invites to private events; nobody joins until they accept (ADR 0061). */
+  /** web's InvitesPage: invites to private events and communities; nobody joins until they
+   * accept (ADR 0061, 0068). */
   let invites = $state<PendingInvite[]>([]);
   let loading = $state(true);
   let error = $state('');
@@ -31,7 +33,11 @@
       await answerInvite(invite.seed, accept);
       invites = invites.filter((i) => i.seed !== invite.seed);
       notifications.invites = invites.length;
-      if (accept) await goto(resolve('/events/[id]', { id: invite.seed }));
+      if (accept && invite.kind === 'community') {
+        const page = resolve('/communities/[slug]', { slug: slugOf(invite.title) });
+        // eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved above
+        await goto(`${page}#invite=${invite.seed}`);
+      } else if (accept) await goto(resolve('/events/[id]', { id: invite.seed }));
     } catch (e) {
       error = explain(e);
     } finally {
@@ -56,7 +62,9 @@
         {@const when = invite.schedule ? scheduleLine(invite.schedule, zoneOf) : ''}
         <li>
           <p class="kind">
-            Private event{#if invite.invitedBy}
+            {invite.kind === 'community'
+              ? 'Private community'
+              : 'Private event'}{#if invite.invitedBy}
               · from {invite.invitedBy}{/if} · {endedAgo(invite.at)}
           </p>
           <strong>{invite.title}</strong>

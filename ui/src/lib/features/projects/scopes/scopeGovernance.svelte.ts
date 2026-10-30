@@ -1,6 +1,7 @@
 import type { Proposal, VoteChoice } from '#lib/domain/governance.ts';
 import { displayName } from '#lib/domain/people.ts';
 import { explain } from '#lib/services/errors.ts';
+import { addCommunityOrganizer } from '#lib/services/closedCommunities.ts';
 import { castVote, closeProposal, listProposals, propose } from '#lib/services/governance.ts';
 import { getPerson } from '#lib/services/people.ts';
 
@@ -54,6 +55,16 @@ export class ScopeGovernance {
   /** web's "Propose change": a description edit (the name is the handle and stays). */
   proposeDescription(description: string): Promise<boolean> {
     return this.run(() => propose(this.id, { Edit: { title: null, description, location: null } }));
+  }
+
+  /** web's "Username to remove": a member vote, or at once in an organizer-run community. */
+  removeMember(agent: string): Promise<boolean> {
+    return this.run(() => propose(this.id, { RemoveMember: { agent } }));
+  }
+
+  /** web's "Username to make organizer" (organizer-run private communities). */
+  addOrganizer(agent: string): Promise<boolean> {
+    return this.run(() => addCommunityOrganizer(this.id, agent));
   }
 
   vote(proposal: string, choice: VoteChoice): Promise<boolean> {

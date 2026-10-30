@@ -816,3 +816,28 @@
   color: var(--text-soft);
   font-size: 13px;
 }
+
+/* Ported from web/src/lib/features/create/community/CreateCommunityPage.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .form-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-sheet .helper-text {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .status-note {
+  margin: 0;
+  color: var(--danger, #b42318);
+  font-size: 13px;
+}

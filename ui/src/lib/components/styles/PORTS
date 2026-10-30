@@ -48,6 +48,7 @@ create.css        .create-sheet   web/src/lib/features/create/event/components/C
 create.css        .audience-selector web/src/lib/features/create/event/components/CreateEventAudienceSelector.svelte
 create.css        .audience-selector web/src/lib/components/shared/SuggestionList.svelte
 create.css        .create-sheet   web/src/lib/features/create/help-request/CreateHelpRequestPage.svelte
+create.css        .create-sheet   web/src/lib/features/create/community/CreateCommunityPage.svelte
 governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
 governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
 governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte
@@ -121,3 +122,5 @@ scopes.css        .scope-sheet    web/src/lib/components/shared/ScopeSheet.svelt
 scopes.css        .scope-discover web/src/lib/components/shared/ScopeDiscoverSheet.svelte
 scopes.css        .scope-settings web/src/lib/features/shared-directory/ScopeSettingsSheet.svelte
 scopes.css        .scope-vote     web/src/lib/features/shared-directory/ScopeVoteSheet.svelte
+scopes.css        -               web/src/lib/components/shared/IconPopoverMenu.svelte
+scopes.css        .invite-card    web/src/lib/features/communities/CommunityInvitePanel.svelte

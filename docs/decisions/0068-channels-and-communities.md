@@ -66,6 +66,41 @@ web's gear sheet (`ScopeSettingsSheet`) and `ScopeVoteSheet` are ported with the
   section, so it arrives with closed communities in part (d); the DNA and the sheets' Decisions
   list already handle `RemoveMember`.
 
+## Part (d): private communities (2026-10-30)
+Ported from web's `CreateCommunityPage` (Openness, Who decides), `CommunityInvitePanel`,
+`IconPopoverMenu`, `InvitesPage` and the private half of `ScopeSettingsSheet`:
+- **Create:** Openness "Private" founds a clone with `<creator>.private.<nonce>` (Collaborative)
+  or `<creator>.organized.<nonce>` (Organizer controlled) and a `closed` charter; it is never
+  listed. You're invited through your own inbox, as private events are, for your other devices.
+- **Finding it:** your private communities come from the project clones on your node
+  (`services/closedCommunities.ts`); they join the left rail, Discover (with "· Private") and
+  `/communities/<slug>`. A private community you're in wins its slug there over a public one
+  (outsiders can't see its handle to avoid it). Creating refuses a handle used by a public
+  scope or by one of your private ones.
+- **Invites:** members get web's invite panel: the link is `/communities/<slug>#invite=<seed>`
+  and the code is the seed; "Invite by username" sends the seed to that person's inbox
+  (`send_invite`), which `/invites` lists as "Private community" (and a `community-invite`
+  notification). Accepting, or pasting a link or code into "Join with invite", joins.
+- **Who decides:** organizers add organizers and remove members at once (confirmed first);
+  in a collaborative community removal is a member vote (`RemoveMember`).
+
+### Deviations
+- **No feed on a private community's page yet:** the create flows' scope step lists only what
+  the index lists, so nothing can be tagged with a private community. Items inside its network
+  come with posts/threads.
+- **Removal doesn't lock someone out:** the removed member still knows the seed, so they can
+  read what it gossips and join again with the link. The confirm says so instead of web's
+  "will need a new invite". A real lock needs a new seed (moving the community) or a
+  membrane proof.
+- **Rejoining after a removal:** the coordinator's `join` keeps an existing live `Members`
+  link, and a removed member's old link is still live, so a rejoin would not count. The UI
+  (`joinScope`) leaves first, then joins. Fix `people::join` to compare against your latest
+  removal at the next coordinator change.
+- **Invite by username** picks a person from the suggestions (names aren't unique in the
+  app), so web's separate "Send invite" button isn't there; picking sends, as on web.
+- **Who decides** leaves out web's `to_organizer` / `to_collaborative` buttons (decision 4),
+  and the create form's helper text drops what isn't ported (renames, pictures, switching).
+
 ## Consequences
 - **Integrity change in the project DNA only** (scope modes, `RemoveMember`): the project
   network resets once; accounts and chats keep theirs.
