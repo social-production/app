@@ -2,7 +2,7 @@
   import { untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
-  import PersonalActivityCard from '#lib/components/cards/PersonalActivityCard.svelte';
+  import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -129,11 +129,7 @@
     {:else}
       {#each feed.rows as row (row.key)}
         {#if row.source === 'personal'}
-          <PersonalActivityCard
-            card={row.card}
-            authorName={row.card.creatorName || 'Unnamed'}
-            onSignal={(next) => feed.signal(row.card, next)}
-          />
+          <PersonalSpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
         {:else}
           <SpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
         {/if}

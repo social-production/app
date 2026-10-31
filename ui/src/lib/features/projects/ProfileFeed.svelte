@@ -1,7 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
-  import PersonalActivityCard from '#lib/components/cards/PersonalActivityCard.svelte';
+  import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
@@ -72,11 +72,7 @@
     <section class="empty-card"><p>No activity matches this view yet.</p></section>
   {:else}
     {#each feed.items as card (card.id)}
-      <PersonalActivityCard
-        {card}
-        authorName={card.creatorName || 'Unnamed'}
-        onSignal={(next) => feed.signal(card, next)}
-      />
+      <PersonalSpaceCard {card} onSignal={(next) => feed.signal(card, next)} />
     {/each}
     <InfiniteSentinel disabled={!feed.hasMore || feed.loading} onMore={() => void feed.more()} />
     {#if !feed.hasMore}<p class="end-copy">You're caught up.</p>{/if}

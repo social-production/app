@@ -18,6 +18,7 @@ cards.css         .surface        web/src/lib/components/cards/shared/CountPill.
 cards.css         .personal-activity-card web/src/lib/components/cards/personal-feed/PersonalActivityCard.svelte
 cards.css         .identity       web/src/lib/components/cards/personal-feed/PersonalFeedIdentity.svelte
 cards.css         .help-request-card web/src/lib/components/cards/public-feed/HelpRequestCard.svelte
+cards.css         .personal-help-request-card web/src/lib/components/cards/personal-feed/PersonalHelpRequestCard.svelte
 feed.css          .feed-page      web/src/lib/features/public-feed/PublicFeed.svelte
 icon-menu.css     .icon-menu-shell web/src/lib/components/shared/IconMenuButton.svelte
 fab.css           .create-fab     web/src/lib/app/shell/CreateFab.svelte
