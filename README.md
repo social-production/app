@@ -8,12 +8,17 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-31)
+## Status (2026-11-01)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Threads and posts (PR #84, 2026-11-01 12:13 am Melbourne, ADR 0070):** web's Post and
+  Thread in the + menu; thread and post pages with nested comments, comment votes and web's
+  sort; threads in the feed and Search, posts on profiles and Home's personal rows. This reset
+  the test network for projects, events, help requests, channels and communities. Live
+  `threads.mjs` passed (after the follow-up fix that queues the thread vote with comments).
 - **Home scope and updates (PR #83, 2026-10-31 9:38 pm Melbourne):** Home lists the items
   tagged with the channels and communities you joined and your private communities' events,
   as on web. Project and event pages show the newest update on one line under the description,
