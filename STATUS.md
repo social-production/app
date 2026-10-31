@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~2:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~3:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,7 +44,18 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #81, help requests on web's personal card (opened 2026-10-31). Then: the parity pass (`docs/plans/PARITY.md`)
+## In flight: nothing (this branch only carries docs commits; they ride the next PR). Next: the parity pass (`docs/plans/PARITY.md`)
+Work through PARITY.md's unticked items, porting each from web at 390px; tick items with
+their PR number. Candidates not blocked on M6:
+private-community audience for events,
+"copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` + `ReportMenu`; copy link alone
+would be a one-item menu until moderation), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first).
+
+## Done 2026-10-31: help requests on web's personal card, PR #81 merged 03:52 UTC (2:52 pm Melbourne), live ~03:53 UTC
+- **Live after merge:** `help-requests.mjs` passed against the live UI (profile → personal
+  card included). CI took 60 min (slowest shard 4). `/readyz` 711 MB at 2.5 h uptime.
 **PR #81** (branch `claude/social-production-handoff-dsam61`): UI only. Personal-feed rows
 (Home's followed/joined items) and profile feeds now pick their card by mode
 (`components/cards/PersonalSpaceCard.svelte`, web's `PersonalFeedCard`): a help request gets
@@ -54,16 +65,7 @@ votes and comments, the clock); everything else keeps `PersonalActivityCard`. St
 asker's profile from the feed card's author link (it reads the href: clicking raced the feed's
 re-render) and checks the personal card. **Checked:** UI check/lint, boundaries, sizes;
 `help-requests.mjs` **passed** with a production build against the live gateway. Not run:
-scenarios (no Rust change). **After merge:** smoke `help-requests.mjs` live, update README
-Status and this file.
-
-Work through PARITY.md's unticked items, porting each from web at 390px; tick items with
-their PR number. Candidates not blocked on M6:
-private-community audience for events,
-"copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` + `ReportMenu`; copy link alone
-would be a one-item menu until moderation), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first).
+scenarios (no Rust change).
 
 ## Done 2026-10-31: the help request's Share menu, PR #80 merged 01:11 UTC (12:11 pm Melbourne), live ~01:13 UTC
 - **Live after merge:** `help-requests.mjs` passed against the live UI (share → notification →

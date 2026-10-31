@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Personal help-request card (PR #81, 2026-10-31 2:52 pm Melbourne):** help requests in the
+  Home feed's personal rows and on profiles use web's personal help-request card (when, where,
+  sign-ups). Live `help-requests.mjs` passed.
 - **Help request Share menu (PR #80, 2026-10-31 12:11 pm Melbourne):** web's Share button on a
   help request: copy or share the link, or send it to people, who get it in a direct chat and
   as a "shared with you" notification. Live `help-requests.mjs` passed.
