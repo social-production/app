@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~9:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~10:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -35,8 +35,7 @@ and continue from Next."
 - **Parity with web is the goal; asset management is not part of it** (platform assets, attached
   assets, the platform board, asset-use requests come later). The parity list is
   `docs/plans/PARITY.md` ("Whole web pages the app doesn't have yet").
-- Owner noticed updates on project and event pages look different from web's: fixed in PR #83
-  (see In flight).
+- Owner noticed updates on project and event pages look different from web's: fixed in PR #83.
 
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
@@ -51,7 +50,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #83, Home's joined channels and communities + updates as on web (branch `claude/social-production-handoff-dsam61`)
+## In flight: nothing (this branch restarts from `main` after PR #83).
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
+leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
+changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
+give: work that out first). Then the big pieces in PARITY's "Whole web pages the app doesn't
+have yet" (posts and threads, moderation, map/places, service requests, software PR flow);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-10-31: Home's joined channels and communities + updates as on web, PR #83 merged 10:38 UTC (9:38 pm Melbourne), live ~10:58 UTC
+- **Live after merge (~11:05 UTC):** `closed-communities.mjs` (community event on Home) and
+  `governance.mjs` (update line + Update button) passed against the live UI. CI took 75 min
+  (slowest shard 5). `/readyz` 750 MB at 4.5 min uptime. No network reset (no DNA change).
 **Updates (owner, 2026-10-31):** web's current `ProjectOverviewHeader`/`EventOverviewHeader`
 show only the newest update, one line under the description ("Update: …", a leading "update:"
 stripped), with an **Update** button in the dock beside Edit; web's `ProjectUpdatesSection`
@@ -73,15 +86,7 @@ channel or community you joined, plus `private_community` events of communities 
   on Home; `follows.mjs`'s "no public rows" assertion says why (bob joined nothing).
 - **Checked:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway --lib
   index` (3 passed); `closed-communities.mjs` and `follows.mjs` **passed** against a local seed
-  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them). PR #83 open; after
-  CI is green: merge, smoke `closed-communities.mjs` live, move this to "Done".
-
-## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
-`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
-leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
-changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
-give: work that out first).
+  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them).
 
 ## Done 2026-10-31: events for a private community (ADR 0069), PR #82 merged 07:47 UTC (6:47 pm Melbourne), live ~08:04 UTC
 - **Live after merge (08:06 UTC):** `closed-communities.mjs` passed against the live UI
