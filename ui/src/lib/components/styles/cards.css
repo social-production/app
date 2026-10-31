@@ -1589,3 +1589,89 @@
   text-align: right;
   white-space: nowrap;
 }
+
+/* Ported from web/src/lib/components/cards/personal-feed/PersonalHelpRequestCard.svelte (ADR 0032, scripts/port-styles.py) */
+.personal-help-request-card .card-header {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.personal-help-request-card .header-row,
+.personal-help-request-card .footer,
+.personal-help-request-card .engagement-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.personal-help-request-card .header-row,
+.personal-help-request-card .footer {
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.personal-help-request-card .header-row {
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.personal-help-request-card .footer {
+  flex-wrap: nowrap;
+}
+
+.personal-help-request-card .body {
+  margin: 0;
+  color: var(--text-soft);
+}
+
+.personal-help-request-card .title {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.personal-help-request-card .body {
+  margin-top: 6px;
+  line-height: 1.4;
+}
+
+.personal-help-request-card .location,
+.personal-help-request-card .signup-summary {
+  margin: 8px 0 0;
+  font-size: 13px;
+  color: var(--text-soft);
+}
+
+.personal-help-request-card .signup-summary {
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.personal-help-request-card .footer {
+  margin-top: 12px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.personal-help-request-card .engagement-row {
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+.personal-help-request-card .comment-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-sm);
+}
+
+.personal-help-request-card .footer-meta {
+  margin-left: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  white-space: nowrap;
+}

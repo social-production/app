@@ -84,7 +84,8 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Help requests' Share menu (2026-10-31, PR #80): copy link, device share, share links, and send to
   people (a direct-chat message plus web's `hr-share` notification, ADR 0067 "Sharing").
   The required channel tag came with M5d (PR #73).
-- [ ] Help requests, later: `PersonalHelpRequestCard` in the personal feed.
+- [x] Help requests on web's `PersonalHelpRequestCard` in the Home feed's personal rows and on
+  profiles (2026-10-31, PR #81; `components/cards/PersonalSpaceCard.svelte` picks the card by mode).
 - [ ] web's project-activity cards (`ProjectActivityCard`: activity title,
   parent project, time, place, distance) come only from web-backend's Region feed
   (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.

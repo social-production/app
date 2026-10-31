@@ -1,9 +1,10 @@
 // M5c help requests end to end (ADR 0067). Founder one asks for help with two roles (one
-// place for a driver, any number of helpers); a new person opens it from the feed card, signs
-// up as driver (which joins the request), sees the role full for others, and leaves again.
+// place for a driver, any number of helpers); a new person finds its feed card.
+// The feed card's author link opens the asker's profile, with web's personal help-request card;
+// they sign up as driver (which joins the request), see the role full for others, and leave again.
 // Then founder one shares it with them from web's Share menu: they get the link in a direct
 // chat and web's "A help request was shared with you." notification, which opens it.
-//   node tests/e2e/help-requests.mjs http://localhost:4174
+//   node tests/e2e/help-requests.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
@@ -44,6 +45,7 @@ log('founder one asked for help');
 
 const helper = await device();
 await signUp(helper, `Helper${stamp}`);
+let profile = '';
 // The feed card: when, where and sign-ups (the index reads new spaces within a minute).
 for (let i = 0; ; i++) {
   await helper.goto(BASE);
@@ -53,12 +55,25 @@ for (let i = 0; ; i++) {
   const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
     await card.getByText('0 signed up · 1 needed').waitFor();
+    // web's personal feed: the author link opens the asker's profile, which lists the request
+    // on web's PersonalHelpRequestCard.
+    // (Read the href: the feed re-renders its cards while it refreshes.)
+    profile = await card.locator('.content-meta-row a').first().getAttribute('href');
     break;
   }
   if (i >= 40) throw new Error('the help request never reached the feed');
   await helper.waitForTimeout(3000);
 }
 log('the feed shows its card');
+assert.match(profile, /^\/profile\//);
+await helper.goto(`${BASE}${profile}`);
+const personal = helper.locator('.feed-stack .personal-help-request-card', { hasText: title });
+await personal.waitFor({ timeout: 60_000 });
+await personal.getByText('0 signed up · 1 needed').waitFor();
+await personal.getByText('Allotment gate', { exact: false }).waitFor();
+await personal.locator('.identity .header-name').waitFor();
+if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/profile-help-request.png` });
+log('the asker\'s profile shows it on the personal help-request card');
 await helper.goto(url);
 const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
