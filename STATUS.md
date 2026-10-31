@@ -1350,6 +1350,10 @@ Port each screen from web (Owner decisions); compare at 390px with live web firs
 - **Commands:** run them inside nix, `nix develop --accept-flake-config --command bash -c '…'` (PATH may need `/nix/var/nix/profiles/default/bin`). The path has a space; quote it.
 - **Fast checks:** `bash scripts/check-boundaries.sh`, `bash scripts/check-sizes.sh`, `npm run check -w ui`, `npm run lint -w ui`, `cargo fmt --all --check`, `cargo clippy --workspace --all-targets -- -D warnings`, `cargo test --workspace --exclude scenarios`. Look for `error: test failed`, not just `FAILED`.
 - **Scenarios:** `bash scripts/build-happ.sh`, then `bash scripts/check-scenarios.sh` (slow: ~10–15 min per file; `cargo test -p scenarios --test <file> -- --test-threads=1` for one). In a cloud session use `bash scripts/cloud-scenarios.sh`: without its no-IPv6 shim every conductor fails with "Address family not supported by protocol".
+  - **Disk (2026-10-31):** each scenario run leaves its conductors' databases in
+    `/tmp/nix-shell.*/holochain-test-environments*` (365 folders, ~8 GB, found this session).
+    With nothing running, `rm -rf /tmp/nix-shell.*` frees them (needs the owner's OK in auto
+    mode); `rm -rf target/debug/incremental` frees ~1 GB more. Check `du -sh /tmp` first.
   - **Disk:** a debug build of the whole workspace is ~24 GB and fills a cloud session's disk. Build with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (the cloud scripts do), and never mix the stock `cargo` with the Nix one in one `target/` (two full builds); `rm -rf target/debug` if `df` shows the disk filling.
   - Settle each DNA's cells separately with `await_consistency`.
   - Never depend on two integrity crates in one test binary; mirror types with serde instead.
