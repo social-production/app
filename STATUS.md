@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~11 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~12:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,7 +44,19 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-10-31): the help request's Share menu, PR #80 (opened ~00:10 UTC, 11:10 am Melbourne; CI ~1 h, then merge, smoke `help-requests.mjs` live, move this to Done)
+## In flight: nothing (this branch only carries docs commits; they ride the next PR). Next: the parity pass (`docs/plans/PARITY.md`)
+Work through PARITY.md's unticked items, porting each from web at 390px; tick items with
+their PR number. Candidates not blocked on M6:
+`PersonalHelpRequestCard` in the personal feed, private-community audience for events,
+"copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` + `ReportMenu`; copy link alone
+would be a one-item menu until moderation), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first).
+
+## Done 2026-10-31: the help request's Share menu, PR #80 merged 01:11 UTC (12:11 pm Melbourne), live ~01:13 UTC
+- **Live after merge:** `help-requests.mjs` passed against the live UI (share → notification →
+  open). CI took 59 min (slowest shard 4). UI-only: the seed node didn't restart (`/readyz`
+  682 MB at 10 h uptime).
 UI only (no Rust change, no network reset). web's Share menu left of the help request's vote
 strip, signed in (`features/projects/help/HelpRolesDock.svelte`). `ShareUserMenu` gained
 web's share-outside half (`components/overlay/ShareOutside.svelte`: Share via…, Copy link,
@@ -59,12 +71,6 @@ labelled "Help request", which opens the request. `span.share-sheet` is `display
 helper's notification → opens the request) with a production build against the live gateway;
 390px screenshots of the dock and the sheet match web's layout. Not run: scenarios (no Rust
 change).
-**Next after it:** the other unticked PARITY items. Candidates not blocked on M6:
-`PersonalHelpRequestCard` in the personal feed, private-community audience for events,
-"copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` + `ReportMenu`; copy link alone
-would be a one-item menu until moderation), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first).
 
 ## Done 2026-10-30: Search finds channels, communities, events and help requests, PR #79 merged 14:53 UTC (1:53 am Melbourne, Oct 31), live ~14:55 UTC
 - **Live after merge (14:55 UTC):** `search.mjs` passed. CI took 60 min (slowest shard 4).

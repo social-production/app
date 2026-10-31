@@ -8,12 +8,15 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-10-30)
+## Status (2026-10-31)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Help request Share menu (PR #80, 2026-10-31 12:11 pm Melbourne):** web's Share button on a
+  help request: copy or share the link, or send it to people, who get it in a direct chat and
+  as a "shared with you" notification. Live `help-requests.mjs` passed.
 - **Search kinds (PR #79, 2026-10-31 1:53 am Melbourne):** web's Search finds channels and
   communities (your private ones too), events and help requests as well as projects and
   people, with web's filter and its icons. Live `search.mjs` passed.
