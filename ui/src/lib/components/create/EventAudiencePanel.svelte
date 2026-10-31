@@ -3,18 +3,28 @@
 
   /**
    * web's CreateEventVisibilityPanel: the Audience step, or the Control step for a private
-   * event. "Private community" waits for communities (M5d, ADR 0061).
+   * event (ADR 0061, 0069).
    */
   interface Props {
     mode: 'audience' | 'control';
     audience: EventAudience;
     governance: EventGovernance;
     inviteeCount: number;
+    /** The chosen private community's handle. */
+    communityLabel?: string | null;
     onAudience: (audience: EventAudience) => void;
     onGovernance: (governance: EventGovernance) => void;
   }
 
-  let { mode, audience, governance, inviteeCount, onAudience, onGovernance }: Props = $props();
+  let {
+    mode,
+    audience,
+    governance,
+    inviteeCount,
+    communityLabel = null,
+    onAudience,
+    onGovernance,
+  }: Props = $props();
 </script>
 
 {#if mode === 'audience'}
@@ -34,6 +44,21 @@
           <strong>Public</strong>
           <span class="hint"
             >Discoverable through channel/community tags. Always collaborative.</span
+          >
+        </span>
+      </label>
+      <label class="control-option">
+        <input
+          type="radio"
+          name="event-audience"
+          value="private_community"
+          checked={audience === 'private_community'}
+          onchange={() => onAudience('private_community')}
+        />
+        <span>
+          <strong>Private community</strong>
+          <span class="hint"
+            >Only members of one private community can find it on feeds and the map.</span
           >
         </span>
       </label>
@@ -70,7 +95,15 @@
     <h2>Control</h2>
     <p class="description">How this private event is run.</p>
     <div class="body">
-      <p class="helper-text">Invite-only ({inviteeCount} invited).</p>
+      <p class="helper-text">
+        {#if audience === 'private_community' && communityLabel}
+          Private community: <strong>{communityLabel}</strong>.
+        {:else if audience === 'invite_only'}
+          Invite-only ({inviteeCount} invited).
+        {:else}
+          Private audience selected.
+        {/if}
+      </p>
       <label class="control-option">
         <input
           type="radio"

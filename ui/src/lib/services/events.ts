@@ -1,7 +1,9 @@
 import type { EventSchedule } from '#lib/domain/eventSchedule.ts';
 import type { Plan } from '#lib/domain/plans.ts';
+import type { EventAudience } from '#lib/domain/projects.ts';
 import type { InviteKind } from '#lib/domain/notifications.ts';
 import { isPrivateSeed, type Charter } from '#lib/domain/projects.ts';
+import { scopeTag, type Scope } from '#lib/domain/scopes.ts';
 import {
   callCell,
   callZome,
@@ -20,8 +22,10 @@ import { createProject, getProject, joinProject } from './projects.ts';
 /** web's create-event form, once its steps are filled in (ADR 0057, 0061). */
 export interface EventDraft {
   charter: Charter;
-  audience: 'public' | 'invite_only';
+  audience: EventAudience;
   organized: boolean;
+  /** A `private_community` event's community (ADR 0069). */
+  community: Scope | null;
   /** People to invite and co-organizers (agent keys); co-organizers are invited too. */
   invitees: string[];
   organizers: string[];
@@ -39,13 +43,20 @@ export async function sendEventInvite(to: string, seed: string): Promise<void> {
 /**
  * Publish an event. A public one is listed like a project; a private one isn't: its seed is
  * its address, its organizers are granted, everyone (yourself too, for your other devices)
- * is invited, and an organizer-controlled one starts in Activity with its plan.
+ * is invited, and an organizer-controlled one starts in Activity with its plan. A private
+ * community's event carries the community's tag and is listed on it for every member
+ * (ADR 0069).
  */
 export async function createEvent(d: EventDraft): Promise<string> {
   if (d.audience === 'public') return createProject(d.charter);
   const seed = newPrivateEventSeed(await myAgent(), d.organized);
   const cell = await projectCell(seed, d.charter.title);
-  await callCell<ActionHash>(cell, 'project', 'create_charter', d.charter);
+  const community = d.audience === 'private_community' ? d.community : null;
+  if (d.audience === 'private_community' && !community) {
+    throw new Error('Choose one private community.');
+  }
+  const tags = community ? [scopeTag('community', community.slug)] : d.charter.tags;
+  await callCell<ActionHash>(cell, 'project', 'create_charter', { ...d.charter, tags });
   for (const agent of d.organizers) {
     await callCell<ActionHash>(cell, 'project', 'add_organizer', stringToHash(agent));
   }
@@ -54,9 +65,23 @@ export async function createEvent(d: EventDraft): Promise<string> {
     await submitPlan(seed, d.plan);
     await propose(seed, { Phase: { to: 'phase-5', plan: null, reason: READY } });
   }
+  if (community) await listOnCommunity(community.id, seed);
   const everyone = new Set([await myAgent(), ...d.organizers, ...d.invitees]);
   for (const agent of everyone) await sendEventInvite(agent, seed);
   return seed;
+}
+
+/** List your private event on a private community you're in (ADR 0069). */
+export async function listOnCommunity(community: string, seed: string): Promise<void> {
+  const cell = await projectCell(community, 'Community');
+  await callCell<null>(cell, 'project', 'add_scope_item', seed);
+}
+
+/** The private events listed on a private community, newest first (seeds). */
+export async function communityEvents(community: string): Promise<string[]> {
+  const cell = await projectCell(community, 'Community');
+  const items = await callCell<{ seed: string }[]>(cell, 'project', 'scope_items', null);
+  return items.map((i) => i.seed).filter(isPrivateSeed);
 }
 
 /** Make someone a co-organizer of a private event and invite them. */

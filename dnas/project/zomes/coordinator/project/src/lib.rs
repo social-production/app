@@ -5,6 +5,7 @@ mod charter;
 mod organizers;
 mod own;
 mod people;
+mod scope_items;
 mod spaces;
 
 use hdk::prelude::*;
@@ -104,6 +105,20 @@ pub fn set_signal(call: In<Option<Stance>>) -> ExternResult<()> {
 pub fn add_organizer(call: In<AgentPubKey>) -> ExternResult<ActionHash> {
     let agent = enter(call)?;
     organizers::add(agent)
+}
+
+/// List one of your private events on this private community, for its members (ADR 0069).
+#[hdk_extern]
+pub fn add_scope_item(call: In<String>) -> ExternResult<()> {
+    let seed = enter(call)?;
+    scope_items::add(seed)
+}
+
+/// The private events listed on this community, newest first.
+#[hdk_extern]
+pub fn scope_items(call: In<()>) -> ExternResult<Vec<scope_items::ScopeItem>> {
+    enter(call)?;
+    scope_items::list()
 }
 
 /// What makes the caller an organizer, if anything (governance and activities cite it).

@@ -2,7 +2,11 @@ import type { Contact } from '#lib/domain/messages.ts';
 import { displayName, type Person } from '#lib/domain/people.ts';
 import type { Project } from '#lib/domain/projects.ts';
 import { parseInvite, scopeTag, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
-import { closedCommunity, inviteToCommunity } from '#lib/services/closedCommunities.ts';
+import {
+  closedCommunity,
+  communityEventCards,
+  inviteToCommunity,
+} from '#lib/services/closedCommunities.ts';
 import { explain } from '#lib/services/errors.ts';
 import { getPerson, myAgent } from '#lib/services/people.ts';
 import { getProject, joinProject } from '#lib/services/projects.ts';
@@ -50,7 +54,7 @@ export class ScopeState {
       this.loaded = true;
       if (!this.scope) return;
       this.gov = new ScopeGovernance(this.scope.id, () => !!this.project?.amMember);
-      // Nothing can be tagged with a closed community yet, and the index can't read it.
+      // The index can't read a closed community: its feed is the events listed on it.
       await Promise.all([this.load(), this.scope.isPrivate ? null : this.feed.reload()]);
       await this.gov.load();
     } catch (e) {
@@ -58,6 +62,21 @@ export class ScopeState {
         ? `That invite link or code is invalid, or the community hasn't reached you yet. ${explain(e)}`
         : explain(e);
       this.loaded = true;
+    }
+  }
+
+  /** A closed community's events (ADR 0069), for members only, in the feed's list. */
+  private async loadPrivateFeed(): Promise<void> {
+    const feed = this.feed;
+    feed.loading = true;
+    try {
+      const scope = this.scope;
+      feed.items = scope && this.project?.amMember ? await communityEventCards(scope.id) : [];
+      feed.total = feed.items.length;
+    } catch (e) {
+      feed.error = explain(e);
+    } finally {
+      feed.loading = false;
     }
   }
 
@@ -75,6 +94,7 @@ export class ScopeState {
     this.project = await getProject(this.scope.id);
     this.me ||= await myAgent().catch(() => '');
     this.members = await Promise.all(this.project.members.map(getPerson));
+    if (this.scope.isPrivate) await this.loadPrivateFeed();
   }
 
   /** Members other than you, by name (whom a private community's settings act on). */

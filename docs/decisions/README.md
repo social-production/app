@@ -70,3 +70,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0066](./0066-jemalloc-for-c-code-too.md) jemalloc replaces malloc for the whole process (SQLite too); transparent huge pages off; `/readyz` maps
 - [0067](./0067-help-requests.md) Help requests are commons spaces with one activity (M5c)
 - [0068](./0068-channels-and-communities.md) Channels and communities are spaces; tags name them by handle (M5d, proposed)
+- [0069](./0069-private-community-events.md) Events for a private community: a private event listed on the community by its seed

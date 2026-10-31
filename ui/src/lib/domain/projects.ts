@@ -84,13 +84,20 @@ export interface Project {
   amOrganizer: boolean;
 }
 
-export type EventAudience = 'public' | 'invite_only';
+export type EventAudience = 'public' | 'private_community' | 'invite_only';
 export type EventGovernance = 'collaborative' | 'organizer_controlled';
 
 /** A private event's page id is its seed (`<creator>.private|organized.<nonce>`); a listed
  * project's is its listing id, which has no dot. */
 export const isPrivateSeed = (id: string): boolean =>
   /^[^.]+\.(private|organized)\.[^.]+$/.test(id);
+
+/** web's audience: the DNA reads only "private or not" from the seed (ADR 0061); a private
+ * event tagged with a community is that community's (ADR 0069). */
+export function audienceOf(wire: string, charter: Charter | null): EventAudience {
+  if (wire === 'public') return 'public';
+  return charter?.tags.some((t) => t.startsWith('@')) ? 'private_community' : 'invite_only';
+}
 
 export interface PhaseStep {
   id: string;

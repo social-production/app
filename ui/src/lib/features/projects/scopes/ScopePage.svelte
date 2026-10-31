@@ -22,7 +22,8 @@
    * web's DirectoryFeedLayout + ScopeDirectoryHeader for a channel or community (ADR 0068):
    * name, join/members, settings, description, then the items tagged with it; a Vote button
    * while a decision waits for you. A private community (ADR 0068 part d) shows web's lock
-   * and invite panel; an invite link opens it by the seed in its fragment.
+   * and invite panel; an invite link opens it by the seed in its fragment. Its feed is the
+   * events listed on it, for members (ADR 0069).
    */
   let { kind, slug, hash = '' }: { kind: ScopeKind; slug: string; hash?: string } = $props();
 
@@ -166,7 +167,7 @@
     </section>
 
     <div class="stack">
-      {#if !scope.isPrivate && s.feed.loading && s.feed.items.length === 0}
+      {#if s.feed.loading && s.feed.items.length === 0}
         <section class="info-card"><p>Loading feed…</p></section>
       {:else if s.feed.items.length === 0}
         <section class="info-card">

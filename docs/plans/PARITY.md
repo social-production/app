@@ -62,6 +62,9 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Toolbar: web's scope menu (Home / Global) first, then the audience menu (Following
   only / Following + popular) signed in (ADR 0055). Home = joined channels/communities (none
   until M5d) merged with the projects of people you follow, on web's personal cards.
+- [ ] Home scope: web's Home rows are the items tagged with your joined channels and
+  communities (plus private-community events); the app's Home still shows only the personal
+  rows (`homeFeedState.svelte.ts` leaves the public rows empty on Home). Found 2026-10-31.
 - [ ] Toolbar: Region in the scope menu (needs place coordinates, M6); "Following + popular"
   adds web's discovery posts and threads once they exist.
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
@@ -76,8 +79,11 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Events, part 2 (ADR 0061): Audience step, invite-only events, organizer-controlled
   governance with co-organizers; web's EventMembersPanel (Organizers/Members, Promote to
   organizer, Invite +), "Edit event"/Save and web's event phase-menu copy (2026-10-29).
+- [x] Events' private-community audience (2026-10-31, ADR 0069): web's Audience option and
+  Who step (one private community + organizers); the event is listed on the community, whose
+  page shows it to members, who join without an invite.
 - [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change),
-  private-community audience (M5d), activities limited to the plan's days, History tab.
+  activities limited to the plan's days, History tab.
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.

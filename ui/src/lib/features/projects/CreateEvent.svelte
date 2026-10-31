@@ -8,6 +8,7 @@
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
   import { EventCreateState } from './eventCreateState.svelte.ts';
+  import type { EventAudience } from '#lib/domain/projects.ts';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -18,6 +19,11 @@
    * an organizer-controlled one starts in Activity with its plan (ADR 0057, 0061).
    */
   const s = new EventCreateState();
+  const AUDIENCE_LABELS: Record<EventAudience, string> = {
+    public: 'Public',
+    private_community: 'Private community',
+    invite_only: 'Invite only',
+  };
 
   const organizerHelp = $derived(
     s.upfrontPlan
@@ -25,8 +31,13 @@
       : 'You keep full organizer authority. Chosen organizers can invite people; other invitees can create activities, plans, and proposals, but only organizers can invite.',
   );
   const missing = $derived(
-    s.canContinue ? s.missing : [...s.missing, s.stepId === 'plan' ? 'plan details' : 'invites'],
+    s.canContinue ? s.missing : [...s.missing, blocker(s.stepId, s.audience)],
   );
+
+  function blocker(step: string, audience: EventAudience): string {
+    if (step === 'plan') return 'plan details';
+    return audience === 'private_community' ? 'a private community' : 'invites';
+  }
 
   async function publish(): Promise<void> {
     const id = await s.submit();
@@ -64,6 +75,7 @@
       audience={s.audience}
       governance={s.governance}
       inviteeCount={s.invitees.length}
+      communityLabel={s.community?.handle ?? null}
       onAudience={(a) => (s.audience = a)}
       onGovernance={(g) => (s.chosenGovernance = g)}
     />
@@ -73,6 +85,32 @@
       {#if s.tags.length === 0}
         <p class="status-note">Public events need at least one channel or community tag.</p>
       {/if}
+    </div>
+  {:else if s.stepId === 'scope' && s.audience === 'private_community'}
+    <div class="form-stack">
+      <PeoplePicker
+        label="Private community"
+        placeholder="Type to choose one private community"
+        helperText="Pick exactly one private community. Its members can discover this event."
+        selected={s.community
+          ? [{ agent: s.community.id, name: `${s.community.handle} (Private)` }]
+          : []}
+        search={(q) => s.searchCommunities(q)}
+        onAdd={(c) => s.chooseCommunity(c.agent)}
+        onRemove={() => s.chooseCommunity(null)}
+      />
+      {#if !s.community}
+        <p class="status-note">Choose one private community.</p>
+      {/if}
+      <PeoplePicker
+        label="Organizers (optional)"
+        placeholder="People with organizer authority"
+        helperText={organizerHelp}
+        selected={s.organizers}
+        search={(q) => s.search(q)}
+        onAdd={(c) => s.addOrganizer(c)}
+        onRemove={(a) => (s.organizers = s.organizers.filter((c) => c.agent !== a))}
+      />
     </div>
   {:else if s.stepId === 'scope'}
     <div class="form-stack">
@@ -113,12 +151,15 @@
         <strong>Basics</strong><span>{s.title.trim() || 'Untitled event'}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('audience'))}>
-        <strong>Audience</strong><span>{s.isPrivate ? 'Invite only' : 'Public'}</span>
+        <strong>Audience</strong><span>{AUDIENCE_LABELS[s.audience]}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
         <strong>{s.isPrivate ? 'Who' : 'Tags'}</strong>
         <span>
-          {#if s.isPrivate}
+          {#if s.audience === 'private_community'}
+            {s.community?.handle ?? 'No community'}{#if s.organizers.length}
+              · {s.organizers.length} organizers{/if}
+          {:else if s.isPrivate}
             {s.invitees.length} invites{#if s.organizers.length}
               · {s.organizers.length} organizers{/if}
           {:else}
