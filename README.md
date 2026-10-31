@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Private-community events (PR #82, 2026-10-31 6:47 pm Melbourne, ADR 0069):** web's
+  "Private community" event audience: pick one of your private communities; its members see
+  the event on the community's page and join without an invite. This reset the test network
+  for projects, events, help requests, channels and communities. Live `closed-communities.mjs`
+  passed.
 - **Personal help-request card (PR #81, 2026-10-31 2:52 pm Melbourne):** help requests in the
   Home feed's personal rows and on profiles use web's personal help-request card (when, where,
   sign-ups). Live `help-requests.mjs` passed.

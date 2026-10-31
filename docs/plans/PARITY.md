@@ -79,7 +79,7 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Events, part 2 (ADR 0061): Audience step, invite-only events, organizer-controlled
   governance with co-organizers; web's EventMembersPanel (Organizers/Members, Promote to
   organizer, Invite +), "Edit event"/Save and web's event phase-menu copy (2026-10-29).
-- [x] Events' private-community audience (2026-10-31, ADR 0069): web's Audience option and
+- [x] Events' private-community audience (2026-10-31, PR #82, ADR 0069): web's Audience option and
   Who step (one private community + organizers); the event is listed on the community, whose
   page shows it to members, who join without an invite.
 - [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change),

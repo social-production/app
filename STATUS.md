@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~5 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~7:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,9 +44,24 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-10-31, cloud session): events for a private community (ADR 0069), **PR #82** (opened 06:29 UTC, 5:29 pm Melbourne), branch `claude/social-production-handoff-dsam61`
+## In flight: nothing (this branch carries only docs commits; they ride the next PR).
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+Candidates: **Home scope's joined-channel/community rows** (found 2026-10-31: the app's Home
+leaves the public rows empty), "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
+leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
+changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
+give: work that out first).
+
+## Done 2026-10-31: events for a private community (ADR 0069), PR #82 merged 07:47 UTC (6:47 pm Melbourne), live ~08:04 UTC
+- **Live after merge (08:06 UTC):** `closed-communities.mjs` passed against the live UI
+  (community event found and joined). CI took 77 min (slowest shard 5). Deploy statuses green
+  ~08:03 UTC; the seed node restarted once (ADR 0064); `/readyz` 649 MB at 3 min uptime.
+  **The project network was reset** (integrity change): live test projects, events, help
+  requests, channels and communities from before ~08:04 UTC are gone.
 web's third event audience, **Private community**. **Integrity change in the project DNA**
-(new `ScopeItems` link): merging resets the live project network (test data only).
+(new `ScopeItems` link).
 - **DNA:** `dnas/project/zomes/integrity/project/src/scope_item.rs` (community space → lister,
   tag = a private event's seed; only in a private clone, on a community, by the event's
   creator). Coordinator `add_scope_item` / `scope_items` (`coordinator/project/src/scope_items.rs`).
@@ -59,25 +74,16 @@ web's third event audience, **Private community**. **Integrity change in the pro
   it as private, as web does.
 - `tests/e2e/closed-communities.mjs` now ends with one creating a community event and two
   finding it on the community page and joining. It needs the new DNA: run it against a local
-  seed node (`bash scripts/cloud-seed.sh`), not live, until merged.
+  seed node or live.
 - **Checked:** zomes build + pack, `cargo clippy -p project -p project_integrity -p scenarios
   --all-targets`, cargo fmt, UI check/lint, boundaries, sizes; scenario `scopes` **passed**
   (both tests, 23 min); `closed-communities.mjs` **passed** against a local seed node
   (`cloud-seed.sh`) with the new DNA. Not run: the other scenarios (CI runs them).
-  Next: PR → CI → merge → live smoke (`closed-communities.mjs` against the live UI).
 - **Disk lesson (2026-10-31):** `cloud-seed.sh` builds the gateway with debug info unless you
   export `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (as the scenarios do); without
   them it rebuilds holochain separately and filled the disk to 2 GB free. With them it reuses
   the scenario build and starts in ~3 min. This session also removed a stale `target/release`
   (3.8 GB).
-
-## Next after this: the parity pass (`docs/plans/PARITY.md`)
-Candidates: **Home scope's joined-channel/community rows** (found 2026-10-31: the app's Home
-leaves the public rows empty), "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
-`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
-leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
-changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
-give: work that out first).
 
 ## Done 2026-10-31: help requests on web's personal card, PR #81 merged 03:52 UTC (2:52 pm Melbourne), live ~03:53 UTC
 - **Live after merge:** `help-requests.mjs` passed against the live UI (profile → personal
