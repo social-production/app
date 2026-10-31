@@ -1,4 +1,5 @@
 import type { ChatMessage } from '#lib/domain/chat.ts';
+import { POST_MODE, THREAD_MODE } from '#lib/domain/discussions.ts';
 import type { ListPrefs, PublicChat } from '#lib/domain/messages.ts';
 import type { Person } from '#lib/domain/people.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
@@ -9,7 +10,7 @@ import { myProjectSeeds } from './projects.ts';
 
 /** The part of `get_project` the list shows. */
 interface GlanceWire {
-  charter: { title: string } | null;
+  charter: { title: string; mode: string } | null;
   members: AgentPubKey[];
   am_member: boolean;
   created_at: number | null;
@@ -39,6 +40,8 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
     chatReadAt({ seed }),
   ]);
   if (!project?.charter) return null;
+  // Thread and post comments aren't chats (web's Public tab: projects, events, help requests).
+  if (project.charter.mode === THREAD_MODE || project.charter.mode === POST_MODE) return null;
   if (!project.am_member && !messages.some((m) => m.author === me)) return null;
   const last = messages.at(-1);
   const prefs = prefsOf(me, seed);
