@@ -44,7 +44,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-10-31, cloud session): events for a private community (ADR 0069), branch `claude/social-production-handoff-dsam61`
+## In flight (2026-10-31, cloud session): events for a private community (ADR 0069), **PR #82** (opened 06:29 UTC, 5:29 pm Melbourne), branch `claude/social-production-handoff-dsam61`
 web's third event audience, **Private community**. **Integrity change in the project DNA**
 (new `ScopeItems` link): merging resets the live project network (test data only).
 - **DNA:** `dnas/project/zomes/integrity/project/src/scope_item.rs` (community space → lister,
