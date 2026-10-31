@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-01 ~1 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-01 ~2 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the follow-up PR after #84 (the thread vote shares the write queue; these docs).
+## In flight: nothing (this branch restarts from `main` after PR #85).
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
@@ -71,6 +71,8 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   fast enough to miss it). Fixed in the follow-up PR: `DiscussionState.vote` goes through
   `services/chat.ts`'s `queued`. With that fix, a production build against the live gateway
   passed `threads.mjs`. The test now prints the page's error note when the reply never shows.
+- **PR #85** (that fix + docs) merged 14:54 UTC (1:54 am Melbourne); CI 69 min. Live
+  `threads.mjs` **passed** against the deployed UI at 15:05 UTC (seed node 687 MB).
 web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
 yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
 discussion zome): merging resets the project network (test data only).
