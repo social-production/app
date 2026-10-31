@@ -81,7 +81,7 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
-- [x] Help requests' Share menu (2026-10-31): copy link, device share, share links, and send to
+- [x] Help requests' Share menu (2026-10-31, PR #80): copy link, device share, share links, and send to
   people (a direct-chat message plus web's `hr-share` notification, ADR 0067 "Sharing").
   The required channel tag came with M5d (PR #73).
 - [ ] Help requests, later: `PersonalHelpRequestCard` in the personal feed.

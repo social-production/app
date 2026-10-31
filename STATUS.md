@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~12 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~11 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,7 +44,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-10-31): the help request's Share menu (parity pass, `docs/plans/PARITY.md`)
+## In flight (2026-10-31): the help request's Share menu, PR #80 (opened ~00:10 UTC, 11:10 am Melbourne; CI ~1 h, then merge, smoke `help-requests.mjs` live, move this to Done)
 UI only (no Rust change, no network reset). web's Share menu left of the help request's vote
 strip, signed in (`features/projects/help/HelpRolesDock.svelte`). `ShareUserMenu` gained
 web's share-outside half (`components/overlay/ShareOutside.svelte`: Share via…, Copy link,
