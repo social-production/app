@@ -3,6 +3,7 @@
 
   import PersonalActivityCard from './PersonalActivityCard.svelte';
   import PersonalHelpRequestCard from './PersonalHelpRequestCard.svelte';
+  import PersonalPostCard from './PersonalPostCard.svelte';
 
   /** web's PersonalFeedCard: the personal-feed card for a space's mode. */
   interface Props {
@@ -16,6 +17,8 @@
 
 {#if card.mode === 'help-request'}
   <PersonalHelpRequestCard {card} {authorName} {onSignal} />
+{:else if card.mode === 'post'}
+  <PersonalPostCard {card} {authorName} {onSignal} />
 {:else}
   <PersonalActivityCard {card} {authorName} {onSignal} />
 {/if}

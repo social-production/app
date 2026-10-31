@@ -3,6 +3,8 @@
 //! Messages are never edited (web's project chat has no edit); only their author deletes one.
 //! Photos and files ride along since ADR 0056 (rules from `sp_attachment`, as ADR 0049), and
 //! a private read mark keeps "unread" per person rather than per device (ADR 0044).
+//! A thread's or post's chat is its comments (ADR 0070): replies nest under `reply_to`, and
+//! anyone signed in votes a comment up or down with a `MessageVotes` link.
 
 use hdi::prelude::*;
 use sp_attachment::{check_attachment, check_body, check_chunk};
@@ -64,6 +66,8 @@ pub enum EntryTypes {
 pub enum LinkTypes {
     /// The message's space → the message, linked by the message's author (ADR 0065).
     ChatMessages,
+    /// A message → the agent voting on it; tag `[sp_discussion::UP]` or `[DOWN]` (ADR 0070).
+    MessageVotes,
 }
 
 #[hdk_extern]
@@ -95,8 +99,10 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 invalid("only a message's author can delete it")
             }
         }
-        FlatOp::Link(OpLink::CreateLink { action, .. })
-        | FlatOp::CreateRecord(OpRecord::CreateLink { action, .. }) => validate_link(&action),
+        FlatOp::Link(OpLink::CreateLink { link_type, action })
+        | FlatOp::CreateRecord(OpRecord::CreateLink { link_type, action }) => {
+            validate_create_link(link_type, &action)
+        }
         FlatOp::Link(OpLink::DeleteLink {
             original_action,
             action,
@@ -142,6 +148,35 @@ fn validate_message(m: &ChatMessage, author: &AgentPubKey) -> ExternResult<Valid
         }
     }
     Ok(ValidateCallbackResult::Valid)
+}
+
+fn validate_create_link(
+    link_type: LinkTypes,
+    action: &TypedAction<CreateLinkData>,
+) -> ExternResult<ValidateCallbackResult> {
+    match link_type {
+        LinkTypes::ChatMessages => validate_link(action),
+        LinkTypes::MessageVotes => validate_vote(action),
+    }
+}
+
+/// People vote as themselves, up or down, on a chat message (ADR 0070).
+fn validate_vote(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateCallbackResult> {
+    if action.target_address.clone().into_agent_pub_key().as_ref() != Some(action.author()) {
+        return invalid("people vote as themselves");
+    }
+    if !sp_discussion::is_vote_tag(&action.tag.0) {
+        return invalid("a vote is up or down");
+    }
+    let Some(base) = action.base_address.clone().into_action_hash() else {
+        return invalid("a vote is on a comment");
+    };
+    let record = must_get_valid_record(base)?;
+    if is_message(record.action())? {
+        Ok(ValidateCallbackResult::Valid)
+    } else {
+        invalid("a vote is on a comment")
+    }
 }
 
 /// Only a message's author lists it, so deleting their link takes it out of the chat for good.

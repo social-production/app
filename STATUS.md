@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~10:15 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-01 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,28 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch restarts from `main` after PR #83).
+## In flight: posts and threads (ADR 0070), branch `claude/social-production-handoff-dsam61`
+web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
+yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
+discussion zome): merging resets the project network (test data only).
+- **DNA:** new crate `sp_discussion` (modes `thread`/`post`, vote tags, post titles). Charter
+  accepts the modes; the discussion integrity zome gains `MessageVotes` (message → voter, tag
+  up/down, only on a chat message). Coordinators: no phases (stage "Thread"/"Post"), no
+  proposals, no activities; `discussion::vote_message` / `message_votes` (guests may read
+  votes: gateway allowlist).
+- **Gateway:** posts only on creator-filtered pages (Home's personal rows, profiles); threads
+  and posts rank by votes. Index tests moved to `node/index_tests.rs` (size rule).
+- **UI:** `features/projects/discussions/` (DiscussionPage for `/threads/<id>` and
+  `/posts/<id>`, CreateThread, CreatePost, DiscussionTools: Share + Sort),
+  `components/discussion/` (DiscussionPanel, DiscussionComment, CommentComposer), ThreadCard,
+  PersonalPostCard, Threads in Search, Post + Thread first in the create menu.
+  `ScopeTagsStep` gained web's thread option (primary tag type). `CreateSheet` hides the step
+  rail for one step and takes `submittingLabel`/`canSubmit`. Styles via PORTS
+  (`discussion.css`, cards/create appends). `scripts/port-styles.py` now keeps web's
+  `:global(html:has(…))` selectors unscoped (it used to prefix them, making them dead).
+- **Tests:** scenario `threads` (no lifecycle, no proposals, nested comments, one vote each,
+  votes only on comments); `tests/e2e/threads.mjs`.
+- **Checked so far:** see the PR / the Done entry once merged.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
@@ -1322,6 +1343,12 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 13. **Right rail lists personal services' activities** (2026-10-27): web-backend's rail only
     reads projects in `phase-5`, so on web a personal service's activities (its Activity phase
     is `phase-1`) never reach the rail. The app lists them; say if it should copy web exactly.
+
+14. **New members' posts and threads count against the 2-listings-per-7-days cap** (ADR 0070):
+    the cap lives in directory integrity and counts every listing (projects, events, help
+    requests, channels, threads, posts). web lets anyone who can participate post freely.
+    Lifting it for posts and threads needs a directory integrity change (an account reset).
+    Say if that is worth it now.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).

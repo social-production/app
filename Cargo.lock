@@ -10,6 +10,7 @@ dependencies = [
  "project_integrity",
  "serde",
  "sp_activity",
+ "sp_discussion",
  "sp_help",
  "space_scope",
 ]
@@ -2004,6 +2005,7 @@ dependencies = [
  "serde_bytes",
  "sp_attachment",
  "sp_core",
+ "sp_discussion",
 ]
 
 [[package]]
@@ -2016,6 +2018,7 @@ dependencies = [
  "serde_bytes",
  "sp_attachment",
  "sp_core",
+ "sp_discussion",
 ]
 
 [[package]]
@@ -2712,6 +2715,7 @@ dependencies = [
  "sha2 0.10.9",
  "sodoken",
  "sp_core",
+ "sp_discussion",
  "sp_index",
  "sp_scope",
  "sqlx",
@@ -3035,6 +3039,7 @@ dependencies = [
  "hdk",
  "project_integrity",
  "serde",
+ "sp_discussion",
  "sp_governance",
  "sp_help",
  "space_scope",
@@ -7181,6 +7186,7 @@ dependencies = [
  "hdk",
  "project_integrity",
  "serde",
+ "sp_discussion",
  "sp_governance",
  "sp_help",
  "space_scope",
@@ -7196,6 +7202,7 @@ dependencies = [
  "serde",
  "sp_activity",
  "sp_core",
+ "sp_discussion",
  "sp_event",
  "sp_governance",
  "sp_help",
@@ -8788,6 +8795,10 @@ version = "0.0.1"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "sp_discussion"
+version = "0.0.1"
 
 [[package]]
 name = "sp_event"

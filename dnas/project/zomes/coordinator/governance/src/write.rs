@@ -17,11 +17,19 @@ pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
 }
 
-pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
-    // Help requests have no lifecycle, plans or links (ADR 0067).
-    if calls::base_charter()?.is_some_and(|c| c.mode == sp_help::MODE) {
-        return Err(guest("Help requests don't take proposals."));
+/// Help requests, threads and posts have no lifecycle, plans or links (ADR 0067, 0070).
+fn takes_proposals() -> ExternResult<()> {
+    match calls::base_charter()?.map(|c| c.mode) {
+        Some(m) if m == sp_help::MODE => Err(guest("Help requests don't take proposals.")),
+        Some(m) if sp_discussion::is_discussion(&m) => {
+            Err(guest("Threads and posts don't take proposals."))
+        }
+        _ => Ok(()),
     }
+}
+
+pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
+    takes_proposals()?;
     if let ProposalKind::Link(link) = kind {
         return link_write::propose(link);
     }

@@ -5,6 +5,18 @@ import { resolve } from '$app/paths';
 /** web's createMenuItems: the content the app has so far, in web's order. */
 export const createLinks: CreateLink[] = [
   {
+    href: resolve('/create/post'),
+    label: 'Post',
+    description: 'Share to your personal feed',
+    icon: 'post',
+  },
+  {
+    href: resolve('/create/thread'),
+    label: 'Thread',
+    description: 'Start a discussion thread',
+    icon: 'thread',
+  },
+  {
     href: resolve('/create/help-request'),
     label: 'Help request',
     description: 'Ask for help with roles and schedule',

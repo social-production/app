@@ -4,8 +4,9 @@
   import EventCard from './EventCard.svelte';
   import HelpRequestCard from './HelpRequestCard.svelte';
   import ProjectCard from './ProjectCard.svelte';
+  import ThreadCard from './ThreadCard.svelte';
 
-  /** web's PublicFeedCard: the card for a space's mode (project, event, help request). */
+  /** web's PublicFeedCard: the card for a space's mode (project, event, help request, thread). */
   interface Props {
     card: Card;
     onSignal: (next: Stance | null) => Promise<void>;
@@ -17,6 +18,8 @@
 
 {#if card.mode === 'help-request'}
   <HelpRequestCard {card} {authorName} {onSignal} />
+{:else if card.mode === 'thread'}
+  <ThreadCard {card} {authorName} {onSignal} />
 {:else if card.mode === 'event'}
   <EventCard {card} {authorName} {onSignal} />
 {:else}

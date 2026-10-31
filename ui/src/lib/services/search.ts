@@ -24,10 +24,12 @@ interface PersonWire {
 const ITEM_KIND: Partial<Record<CharterMode, SearchResultKind>> = {
   event: 'event',
   'help-request': 'help-request',
+  thread: 'thread',
 };
 
 const ITEM_TYPE: Partial<Record<SearchType, SearchResultKind>> = {
   project: 'project',
+  thread: 'thread',
   event: 'event',
   help_request: 'help-request',
 };
@@ -37,6 +39,7 @@ const itemKind = (mode: CharterMode): SearchResultKind => ITEM_KIND[mode] ?? 'pr
 const ITEM_PATH: Record<string, string> = {
   event: '/events',
   'help-request': '/help-requests',
+  thread: '/threads',
   project: '/projects',
 };
 

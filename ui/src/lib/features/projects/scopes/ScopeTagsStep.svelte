@@ -5,19 +5,30 @@
 
   /**
    * web's create-flow scope step: a primary channel tag, then (on request) more channels and
-   * communities (ADR 0068). Tags are `#channel` / `@community`; the first channel leads.
+   * communities (ADR 0068). Tags are `#channel` / `@community`; the primary tag leads. Threads
+   * (`choosePrimary`, ADR 0070) pick the primary tag's type and always show the extra fields.
    */
   interface Props {
     tags: string[];
     onChange: (tags: string[]) => void;
     helperText?: string;
+    choosePrimary?: boolean;
   }
 
-  let { tags, onChange, helperText = 'At least one channel tag is required.' }: Props = $props();
+  let {
+    tags,
+    onChange,
+    helperText = 'At least one channel tag is required.',
+    choosePrimary = false,
+  }: Props = $props();
 
   let showMore = $state(false);
-  const channels = $derived(tags.filter((t) => tagScope(t)?.kind === 'channel'));
-  const communities = $derived(tags.filter((t) => tagScope(t)?.kind === 'community'));
+  let primaryKind = $state<ScopeKind>('channel');
+  const kindOf = (t: string) => tagScope(t)?.kind;
+  const primary = $derived(tags[0] && kindOf(tags[0]) === primaryKind ? tags[0] : null);
+  const rest = $derived(tags.filter((t) => t !== primary));
+  const channels = $derived(rest.filter((t) => kindOf(t) === 'channel'));
+  const communities = $derived(rest.filter((t) => kindOf(t) === 'community'));
   const item = (tag: string) => ({ key: tag, label: tag.slice(1) });
 
   const search = (kind: ScopeKind) => async (q: string) =>
@@ -33,30 +44,44 @@
 </script>
 
 <div class="form-stack">
+  {#if choosePrimary}
+    <p class="helper-text">Choose one primary tag so people can discover this thread.</p>
+    <label>
+      <span class="field-label">Primary tag type</span>
+      <select bind:value={primaryKind}>
+        <option value="channel">Channel</option>
+        <option value="community">Community</option>
+      </select>
+    </label>
+  {/if}
   <ScopeTagSelector
-    label="Primary channel tag"
-    placeholder="Type to search channels"
+    label={primaryKind === 'community' ? 'Primary community tag' : 'Primary channel tag'}
+    placeholder={primaryKind === 'community'
+      ? 'Type to search communities'
+      : 'Type to search channels'}
     {helperText}
-    selected={channels.slice(0, 1).map(item)}
-    search={search('channel')}
+    selected={primary ? [item(primary)] : []}
+    search={search(primaryKind)}
     onAdd={(t) => add(t, true)}
     onRemove={remove}
   />
-  <label class="scope-more-toggle">
-    <input bind:checked={showMore} type="checkbox" />
-    <span>Add more channels or communities</span>
-  </label>
-  {#if showMore}
+  {#if !choosePrimary}
+    <label class="scope-more-toggle">
+      <input bind:checked={showMore} type="checkbox" />
+      <span>Add more channels or communities</span>
+    </label>
+  {/if}
+  {#if showMore || choosePrimary}
     <ScopeTagSelector
       label="Additional channel tags"
       placeholder="Optional"
-      selected={channels.slice(1).map(item)}
+      selected={channels.map(item)}
       search={search('channel')}
       onAdd={(t) => add(t)}
       onRemove={remove}
     />
     <ScopeTagSelector
-      label="Community tags"
+      label={choosePrimary ? 'Additional community tags' : 'Community tags'}
       placeholder="Optional"
       selected={communities.map(item)}
       search={search('community')}

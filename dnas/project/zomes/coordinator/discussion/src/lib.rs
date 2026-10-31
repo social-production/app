@@ -7,13 +7,16 @@ mod files;
 mod own;
 mod reads;
 mod scope;
+mod votes;
 
 use discussion_integrity::{Attachment, ChatMessage, EntryTypes, LinkTypes, ReadMark};
 use hdk::prelude::*;
 use sp_attachment::check_body;
+use sp_core::chat::PAGE_MAX;
 
 pub use files::Bytes;
 use scope::{enter, In};
+pub use votes::{VoteInput, VoteView};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PostInput {
@@ -141,4 +144,21 @@ pub fn my_chat_spaces(_: ()) -> ExternResult<Vec<ActionHash>> {
 pub fn list_messages(call: In<()>) -> ExternResult<Vec<MessageView>> {
     enter(call)?;
     reads::list()
+}
+
+/// Vote a comment up or down, or take your vote back (ADR 0070).
+#[hdk_extern]
+pub fn vote_message(call: In<VoteInput>) -> ExternResult<()> {
+    let input = enter(call)?;
+    votes::set(&input)
+}
+
+/// Each comment's score and your own vote, in the order asked.
+#[hdk_extern]
+pub fn message_votes(call: In<Vec<ActionHash>>) -> ExternResult<Vec<VoteView>> {
+    let ids = enter(call)?;
+    if ids.len() > PAGE_MAX {
+        return Err(guest("Too many comments at once."));
+    }
+    votes::of(&ids)
 }

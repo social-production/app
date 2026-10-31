@@ -19,6 +19,9 @@ cards.css         .personal-activity-card web/src/lib/components/cards/personal-
 cards.css         .identity       web/src/lib/components/cards/personal-feed/PersonalFeedIdentity.svelte
 cards.css         .help-request-card web/src/lib/components/cards/public-feed/HelpRequestCard.svelte
 cards.css         .personal-help-request-card web/src/lib/components/cards/personal-feed/PersonalHelpRequestCard.svelte
+cards.css         .thread-card    web/src/lib/components/cards/public-feed/ThreadCard.svelte
+cards.css         .personal-post-card web/src/lib/components/cards/personal-feed/PersonalPostCard.svelte
+cards.css         .surface        web/src/lib/components/shared/LinkedPostBody.svelte
 feed.css          .feed-page      web/src/lib/features/public-feed/PublicFeed.svelte
 icon-menu.css     .icon-menu-shell web/src/lib/components/shared/IconMenuButton.svelte
 fab.css           .create-fab     web/src/lib/app/shell/CreateFab.svelte
@@ -50,6 +53,8 @@ create.css        .audience-selector web/src/lib/features/create/event/component
 create.css        .audience-selector web/src/lib/components/shared/SuggestionList.svelte
 create.css        .create-sheet   web/src/lib/features/create/help-request/CreateHelpRequestPage.svelte
 create.css        .create-sheet   web/src/lib/features/create/community/CreateCommunityPage.svelte
+create.css        .create-sheet   web/src/lib/features/create/post/CreatePostPage.svelte
+create.css        .create-sheet   web/src/lib/features/create/thread/CreateThreadPage.svelte
 governance.css    .vote-sheet     web/src/lib/components/shared/VoteDecisionBody.svelte
 governance.css    .choice-bar     web/src/lib/components/shared/VoteChoiceBar.svelte
 governance.css    .round-plus-button web/src/lib/components/shared/RoundPlusButton.svelte
@@ -123,3 +128,9 @@ scopes.css        .scope-settings web/src/lib/features/shared-directory/ScopeSet
 scopes.css        .scope-vote     web/src/lib/features/shared-directory/ScopeVoteSheet.svelte
 scopes.css        -               web/src/lib/components/shared/IconPopoverMenu.svelte
 scopes.css        .invite-card    web/src/lib/features/communities/CommunityInvitePanel.svelte
+discussion.css    .discussion-shell web/src/lib/components/discussion/DiscussionPanel.svelte
+discussion.css    .comment-card   web/src/lib/components/discussion/DiscussionComment.svelte
+discussion.css    .composer-field web/src/lib/components/shared/CommentComposer.svelte
+discussion.css    .overview-shell web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte
+discussion.css    .discussion-page web/src/lib/features/threads/ThreadDetailPage.svelte
+discussion.css    .discussion-page web/src/lib/features/posts/PostDetailPage.svelte

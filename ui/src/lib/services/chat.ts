@@ -53,7 +53,7 @@ const discussion = async <T>(project: ProjectRef, fn: string, payload?: unknown)
 
 /** A project's chain takes one write at a time: chat writes (and read marks) wait their turn. */
 let tail: Promise<unknown> = Promise.resolve();
-function queued<T>(write: () => Promise<T>): Promise<T> {
+export function queued<T>(write: () => Promise<T>): Promise<T> {
   const run = tail.then(write, write);
   tail = run.catch(() => undefined);
   return run;

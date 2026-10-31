@@ -36,7 +36,7 @@ def scope_selectors(selectors: str, root: str) -> str:
     for s in (part.strip() for part in split_top_level(selectors)):
         if not s:
             continue
-        keep = s in (":root", "html", "body") or s.startswith((root, "from", "to")) or re.fullmatch(r"\d+%", s)
+        keep = s in (":root", "html", "body") or s.startswith((root, "from", "to", "html:", "html ")) or re.fullmatch(r"\d+%", s)
         out.append(s if keep else f"{root} {s}")
     return ", ".join(out)
 

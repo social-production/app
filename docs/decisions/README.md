@@ -71,3 +71,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0067](./0067-help-requests.md) Help requests are commons spaces with one activity (M5c)
 - [0068](./0068-channels-and-communities.md) Channels and communities are spaces; tags name them by handle (M5d, proposed)
 - [0069](./0069-private-community-events.md) Events for a private community: a private event listed on the community by its seed
+- [0070](./0070-threads-and-posts.md) Threads and posts are commons spaces; comments are their chat, with votes

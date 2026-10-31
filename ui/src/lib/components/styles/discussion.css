@@ -1,0 +1,483 @@
+/* Ported from web/src/lib/components/discussion/DiscussionPanel.svelte (ADR 0032, scripts/port-styles.py) */
+.discussion-shell .composer-paused {
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.discussion-shell,
+.discussion-shell .stack,
+.discussion-shell .composer-card {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.discussion-shell {
+  padding-top: 0;
+}
+
+.discussion-shell.embedded {
+  padding-top: 0;
+}
+
+.discussion-shell .composer-card {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  min-width: 0;
+}
+
+.discussion-shell:has(.comment-card.reply-open) > .composer-card {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  html:has(.discussion-shell) {
+    --detail-action-dock-height: 72px;
+  }
+
+  html:has(.discussion-shell:has(.comment-card.reply-open)) {
+    --detail-action-dock-height: 0px;
+  }
+
+  .discussion-shell {
+    padding-bottom: 72px;
+  }
+
+  .discussion-shell:has(.comment-card.reply-open) {
+    padding-bottom: 0;
+  }
+
+  .discussion-shell .composer-card {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: var(--shell-bottom-nav-height);
+    z-index: 40;
+    padding: 8px 12px calc(8px + var(--shell-dock-safe-bottom, 0px));
+    border-top: 1px solid var(--panel-border);
+    background: var(--panel);
+    transform: translate3d(0, 0, 0);
+    transition: transform 0.22s ease;
+    will-change: transform;
+  }
+
+  .discussion-shell .feed-chrome-collapsed .composer-card {
+    transform: translate3d(0, var(--shell-bottom-nav-height), 0);
+  }
+}
+
+/* Ported from web/src/lib/components/discussion/DiscussionComment.svelte (ADR 0032, scripts/port-styles.py) */
+.comment-card,
+.comment-card .composer-card,
+.comment-card .reply-stack {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.comment-card {
+  padding: 6px 0 8px;
+  border: none;
+  border-radius: 0;
+  background: var(--panel);
+  min-width: 0;
+}
+
+.comment-card .comment-self {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+  scroll-margin-top: calc(var(--topbar-height, 84px) + 8px);
+  scroll-margin-bottom: calc(
+    var(--shell-bottom-nav-offset, 0px) + var(--detail-action-dock-height, 0px) + 16px
+  );
+  transition:
+    background 140ms ease,
+    box-shadow 140ms ease;
+}
+
+.comment-card.embedded {
+  background: transparent;
+}
+
+.comment-card .comment-self.highlighted {
+  background: color-mix(in srgb, var(--brand-soft) 30%, var(--panel));
+  box-shadow: inset -2px 0 0 var(--brand);
+}
+
+.comment-card.embedded .comment-self.highlighted {
+  background: color-mix(in srgb, var(--brand-soft) 45%, transparent);
+}
+
+.comment-card .topline,
+.comment-card .actions-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.comment-card .topline,
+.comment-card .actions-row {
+  justify-content: flex-start;
+}
+
+.comment-card .topline {
+  flex-wrap: nowrap;
+}
+
+.comment-card .author-link {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.comment-card .comment-time {
+  flex: 0 0 auto;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.comment-card .collapse-hit {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 8px;
+  min-width: 44px;
+  min-height: 28px;
+  margin: 0;
+  padding: 0 0 0 8px;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+  text-align: right;
+}
+
+.comment-card .collapsed-mark {
+  font-weight: 800;
+}
+
+.comment-card .comment-body-block {
+  display: grid;
+  gap: 10px;
+  min-width: 0;
+}
+
+.comment-card .comment-body-block[hidden],
+.comment-card .reply-stack[hidden] {
+  display: none;
+}
+
+.comment-card .author-link {
+  font-weight: 800;
+  color: var(--text-main);
+}
+
+.comment-card .topline span {
+  color: var(--text-soft);
+  line-height: 1.5;
+}
+
+.comment-card .body {
+  margin: 0;
+  color: var(--text-main);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.comment-card .body.moderated {
+  font-style: italic;
+}
+
+.comment-card .body a.mention,
+.comment-card .body a.mention:hover {
+  color: #5b9dff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.comment-card .body a.mention:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.comment-card .reply-stack {
+  margin-left: 14px;
+  padding-left: 12px;
+  border-left: 2px solid var(--panel-border);
+  min-width: 0;
+}
+
+.comment-card .reply-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.comment-card .reply-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.comment-card .reply-button:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  filter: none;
+}
+
+.comment-card .hidden-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.comment-card .hidden-plus {
+  display: inline-grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  border: 1px solid var(--panel-border);
+  border-radius: 50%;
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Ported from web/src/lib/components/shared/CommentComposer.svelte (ADR 0032, scripts/port-styles.py) */
+.composer-field {
+  position: relative;
+  min-width: 0;
+}
+
+.composer-field .composer-input {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 40px;
+  max-height: 240px;
+  padding: 10px 56px 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  resize: none;
+  overflow-x: hidden;
+  overflow-y: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.composer-field .composer-input.scrollable {
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+
+.composer-field button.composer-signin {
+  color: var(--text-soft);
+  text-align: left;
+  cursor: pointer;
+}
+
+.composer-field .composer-send {
+  position: absolute;
+  right: 10px;
+  bottom: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: var(--brand);
+  color: var(--page-bg);
+  transition: background-color 120ms ease;
+}
+
+.composer-field .composer-send:hover {
+  background: var(--brand-strong);
+}
+
+.composer-field .composer-send svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+}
+
+/* Ported from web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte (ADR 0032, scripts/port-styles.py) */
+.overview-shell {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.overview-shell .footer,
+.overview-shell .engagement-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.overview-shell .footer {
+  justify-content: space-between;
+  flex-wrap: nowrap;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overview-shell .engagement-row {
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  gap: 0;
+}
+
+.overview-shell h1 {
+  margin: 0;
+  font-size: 24px;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.overview-shell .overview-copy {
+  margin: 0;
+  padding-bottom: 4px;
+  color: var(--text-soft);
+  line-height: 1.55;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+  .overview-shell h1 {
+    font-size: 20px;
+  }
+}
+
+/* Ported from web/src/lib/features/threads/ThreadDetailPage.svelte (ADR 0032, scripts/port-styles.py) */
+.discussion-page .page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  min-height: calc(100dvh - var(--topbar-height, 0px) - var(--shell-scroll-pad, 0px));
+}
+
+.discussion-page .page .surface.has-accent {
+  --surface-pad-x: 12px;
+  flex: 1 0 auto;
+  border-left: 0;
+  padding-left: 16px;
+  background:
+    linear-gradient(var(--row-accent), var(--row-accent)) left center / 4px 100% no-repeat,
+    var(--panel);
+}
+
+/* Ported from web/src/lib/features/posts/PostDetailPage.svelte (ADR 0032, scripts/port-styles.py) */
+.discussion-page .page {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+  min-height: calc(100dvh - var(--topbar-height, 0px) - var(--shell-scroll-pad, 0px));
+}
+
+.discussion-page .page .surface.has-accent {
+  --surface-pad-x: 12px;
+  flex: 1 0 auto;
+  border-left: 0;
+  padding-left: 16px;
+  background:
+    linear-gradient(var(--row-accent), var(--row-accent)) left center / 4px 100% no-repeat,
+    var(--panel);
+}
+
+.discussion-page .card-header {
+  display: grid;
+  min-width: 0;
+}
+
+.discussion-page .header-row,
+.discussion-page .identity-row,
+.discussion-page .footer,
+.discussion-page .engagement-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.discussion-page .header-row,
+.discussion-page .footer {
+  gap: 8px;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.discussion-page .identity-row {
+  gap: 0.6rem;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.discussion-page .header-name {
+  overflow: hidden;
+  color: var(--text-main);
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.discussion-page .footer {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.discussion-page .engagement-row {
+  gap: 0;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+@media (max-width: 760px) {
+  .discussion-page .header-name {
+    font-size: 15px;
+  }
+}
