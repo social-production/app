@@ -57,14 +57,15 @@ impl ProjectIndex {
     }
 
     /// One page of the feed, best first; non-empty `creators` keeps only their projects (a
-    /// profile's feed, or the people someone follows for web's Home feed), and `tag` only the
-    /// items tagged with one channel or community (`#food`, ADR 0068). Channels and
-    /// communities themselves aren't feed items.
+    /// profile's feed, or the people someone follows for web's Home feed), and non-empty
+    /// `tags` only the items tagged with any of those channels or communities (`#food`, ADR
+    /// 0068; several for web's Home scope). Channels and communities themselves aren't feed
+    /// items.
     pub async fn page(
         &self,
         q: &FeedQuery<'_>,
         creators: &[&str],
-        tag: Option<&str>,
+        tags: &[&str],
         offset: usize,
         limit: usize,
     ) -> (Vec<ProjectCard>, usize) {
@@ -73,7 +74,7 @@ impl ProjectIndex {
             .iter()
             .filter(|c| !sp_scope::is_scope(&c.mode))
             .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))
-            .filter(|c| tag.is_none_or(|t| c.tags.iter().any(|have| have == t)))
+            .filter(|c| tags.is_empty() || c.tags.iter().any(|have| tags.contains(&have.as_str())))
             .collect();
         let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
         let pairs: Vec<(&ProjectCard, &ItemStats)> = cards.into_iter().zip(&stats).collect();
@@ -196,7 +197,7 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, &[], None, 0, 2).await;
+        let (page, total) = index.page(&q, &[], &[], 0, 2).await;
         assert_eq!(total, 3);
         assert_eq!(
             page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -206,7 +207,7 @@ mod tests {
             search: "FOOD garden",
             ..q
         };
-        assert_eq!(index.page(&q, &[], None, 0, 10).await.1, 1);
+        assert_eq!(index.page(&q, &[], &[], 0, 10).await.1, 1);
     }
 
     #[tokio::test]
@@ -224,9 +225,9 @@ mod tests {
             now: 30,
             utc_offset_minutes: 0,
         };
-        let (page, total) = index.page(&q, &["ann"], None, 0, 10).await;
+        let (page, total) = index.page(&q, &["ann"], &[], 0, 10).await;
         assert_eq!((page[0].title.as_str(), total), ("Garden", 1));
-        let (page, total) = index.page(&q, &["ann", "bob"], None, 0, 10).await;
+        let (page, total) = index.page(&q, &["ann", "bob"], &[], 0, 10).await;
         assert_eq!(
             (
                 page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -261,12 +262,14 @@ mod tests {
             now: 10,
             utc_offset_minutes: 0,
         };
-        assert_eq!(index.page(&q, &[], None, 0, 10).await.1, 2, "no scopes");
-        let (page, _) = index.page(&q, &[], Some("#food"), 0, 10).await;
+        assert_eq!(index.page(&q, &[], &[], 0, 10).await.1, 2, "no scopes");
+        let (page, _) = index.page(&q, &[], &["#food"], 0, 10).await;
         assert_eq!(
             page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
             ["Seed swap"]
         );
+        let (page, _) = index.page(&q, &[], &["@elsewhere", "#food"], 0, 10).await;
+        assert_eq!(page.len(), 1, "any of several tags (web's Home scope)");
         let scopes = index.scopes("", 10).await;
         assert_eq!(
             scopes.iter().map(|c| c.id.as_str()).collect::<Vec<_>>(),

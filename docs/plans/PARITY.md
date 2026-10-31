@@ -60,11 +60,12 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 ## Feed
 - [x] Toolbar: web's scope menu (Home / Global) first, then the audience menu (Following
-  only / Following + popular) signed in (ADR 0055). Home = joined channels/communities (none
-  until M5d) merged with the projects of people you follow, on web's personal cards.
-- [ ] Home scope: web's Home rows are the items tagged with your joined channels and
-  communities (plus private-community events); the app's Home still shows only the personal
-  rows (`homeFeedState.svelte.ts` leaves the public rows empty on Home). Found 2026-10-31.
+  only / Following + popular) signed in (ADR 0055). Home = joined channels/communities
+  merged with the projects of people you follow, on web's personal cards.
+- [x] Home scope: web's Home rows are the items tagged with your joined channels and
+  communities, plus the events listed on your private communities (2026-10-31: the index's
+  `tag` takes several, comma-separated; `homeFeedState.svelte.ts`). The private-community
+  events ignore the time window (the index's cards carry no schedule either).
 - [ ] Toolbar: Region in the scope menu (needs place coordinates, M6); "Following + popular"
   adds web's discovery posts and threads once they exist.
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from

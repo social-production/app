@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~7:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~9:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,11 +44,22 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch carries only docs commits; they ride the next PR).
+## In flight: Home scope's joined channels and communities (branch `claude/social-production-handoff-dsam61`)
+web-backend's home feed (`services/feeds/builder.py`, `selects.py`): items tagged with any
+channel or community you joined, plus `private_community` events of communities you're in.
+- **Gateway (no DNA change):** `/index/projects?tag=` takes several tags, comma-separated (any
+  of them; `TAGS_MAX` 500); `Index::page` takes `tags: &[&str]` (unit test covers two tags).
+- **UI:** `features/projects/homeFeedState.svelte.ts`: on Home, `myScopes()` → the public
+  scopes' tags go to the index; private communities' events come from `communityEventCards`
+  (filtered by the search box, not by the time window) and join the public rows.
+- **Tests:** `tests/e2e/closed-communities.mjs` now ends with two seeing the community event
+  on Home; `follows.mjs`'s "no public rows" assertion says why (bob joined nothing).
+- **Checked so far:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway
+  --lib index` (3 passed). Then: `closed-communities.mjs` against a local seed node
+  (`cloud-seed.sh`, with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0`), push, PR.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: **Home scope's joined-channel/community rows** (found 2026-10-31: the app's Home
-leaves the public rows empty), "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
 `ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
 leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
 changes the leader; deriving it needs the time the lead changed, which the plan list doesn't

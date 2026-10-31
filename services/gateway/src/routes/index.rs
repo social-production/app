@@ -12,6 +12,8 @@ use crate::node::{PersonCard, ProjectCard};
 const PAGE_MAX: usize = 50;
 /// The most creators one feed request may filter by (a Home feed of everyone someone follows).
 const CREATORS_MAX: usize = 500;
+/// Joined channels and communities Home asks for at once.
+const TAGS_MAX: usize = 500;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -32,7 +34,8 @@ pub struct FeedParams {
     /// the people someone follows for web's Home feed.
     #[serde(default)]
     creator: String,
-    /// Only items tagged with this channel or community (`#food`, `@brunswick`, ADR 0068).
+    /// Only items tagged with one of these channels or communities, comma-separated (`#food`,
+    /// `@brunswick`, ADR 0068): one for a scope's page, your joined ones for web's Home scope.
     #[serde(default)]
     tag: String,
 }
@@ -68,16 +71,16 @@ pub async fn projects(
         .filter(|c| !c.is_empty())
         .take(CREATORS_MAX)
         .collect();
+    let tags: Vec<&str> = p
+        .tag
+        .split(',')
+        .filter(|t| !t.is_empty())
+        .take(TAGS_MAX)
+        .collect();
     let (items, total) = state
         .node
         .index
-        .page(
-            &query,
-            &creators,
-            Some(p.tag.as_str()).filter(|t| !t.is_empty()),
-            p.offset,
-            limit,
-        )
+        .page(&query, &creators, &tags, p.offset, limit)
         .await;
     Ok(Json(FeedPage { items, total }))
 }
