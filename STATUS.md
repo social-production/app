@@ -54,9 +54,10 @@ channel or community you joined, plus `private_community` events of communities 
   (filtered by the search box, not by the time window) and join the public rows.
 - **Tests:** `tests/e2e/closed-communities.mjs` now ends with two seeing the community event
   on Home; `follows.mjs`'s "no public rows" assertion says why (bob joined nothing).
-- **Checked so far:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway
-  --lib index` (3 passed). Then: `closed-communities.mjs` against a local seed node
-  (`cloud-seed.sh`, with `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0`), push, PR.
+- **Checked:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway --lib
+  index` (3 passed); `closed-communities.mjs` and `follows.mjs` **passed** against a local seed
+  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them). PR open; after
+  CI is green: merge, smoke `closed-communities.mjs` live, move this to "Done".
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
