@@ -1,6 +1,6 @@
 # 0070. Threads and posts are commons spaces; comments are their chat, with votes
 
-Status: **accepted** (2026-11-01). Follows [0065](./0065-public-commons-network.md),
+Status: **accepted** (2026-10-31). Follows [0065](./0065-public-commons-network.md),
 [0067](./0067-help-requests.md) and [0068](./0068-channels-and-communities.md). Parity item
 "Posts and threads" (`docs/plans/PARITY.md`).
 

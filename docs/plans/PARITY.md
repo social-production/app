@@ -143,7 +143,7 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   communities and invites, settings and vote sheets.
 
 ## Whole web pages the app doesn't have yet (route diff, 2026-10-31)
-- [x] Posts and threads (2026-11-01, ADR 0070): `create/post`, `create/thread`, `/posts/<id>`,
+- [x] Posts and threads (2026-10-31, ADR 0070): `create/post`, `create/thread`, `/posts/<id>`,
   `/threads/<id>` (commons spaces; web's DiscussionPanel with nested replies, comment votes and
   the Oldest/Newest/Top sort; Share; ThreadCard in the public feed, PersonalPostCard on
   personal rows and profiles; Threads in Search; Post and Thread in the create menu).

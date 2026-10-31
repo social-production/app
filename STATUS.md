@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-01 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~11 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -71,7 +71,7 @@ discussion zome): merging resets the project network (test data only).
   `:global(html:has(…))` selectors unscoped (it used to prefix them, making them dead).
 - **Tests:** scenario `threads` (no lifecycle, no proposals, nested comments, one vote each,
   votes only on comments); `tests/e2e/threads.mjs`.
-- **Checked (cloud session, 2026-11-01):** zomes build + pack; `cargo clippy` (project zomes,
+- **Checked (cloud session, 2026-10-31):** zomes build + pack; `cargo clippy` (project zomes,
   gateway) and `cargo fmt`; `cargo test -p sp_discussion`, gateway index tests; scenarios
   `threads` and `help_requests` **passed** (`cloud-scenarios`-style run, ~12 min each); UI
   check + lint, boundaries, sizes; against a local seed node (`cloud-seed.sh`):
