@@ -142,6 +142,20 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   scope step in create flows. Still to come: Discover sheet, closed
   communities and invites, settings and vote sheets.
 
+## Whole web pages the app doesn't have yet (route diff, 2026-10-31)
+- [ ] Posts and threads: `create/post`, `create/thread`, `posts/[id]`, `threads/[slug]`
+  (web's standalone discussion items; NOT tabs on project/event pages, see STATUS Owner
+  decisions). Also feed "Following + popular" discovery rows.
+- [ ] Platform assets: `platform/assets`, `[assetSlug]`, attached assets; platform board.
+- [ ] Service requests (`features/requests`: asset use, borrowing, delivery frames; the right
+  rail's Requests section).
+- [ ] Moderation: ⋮ Report menu, bot reviews (web-backend `bot_reviews.py`), paused badge.
+- [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
+  project-activity cards.
+- [ ] Software project governance (pull requests / merge flow) in the Activity phase.
+- web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the
+  app's Home scope, onboarding and `/invites`; `profile/[username]` by `profile/[agent]`.
+
 ## Not compared yet
 Signed-in screens other than Settings and Notifications (compare from web's source; don't create
 accounts on the FastAPI site). Everything left above waits on features: the personal feed, channels and
