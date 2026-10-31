@@ -32,6 +32,13 @@ struct VoteInput {
     choice: VoteChoice,
 }
 
+/// One event listed on a closed community (ADR 0069).
+#[derive(Deserialize, Debug)]
+struct ScopeItem {
+    seed: String,
+    author: AgentPubKey,
+}
+
 #[derive(Deserialize, Debug)]
 struct ProjectView {
     members: Vec<AgentPubKey>,
@@ -129,5 +136,25 @@ async fn a_closed_community_lives_in_its_own_network() {
         open.is_err(),
         "only closed communities in a private network"
     );
+
+    // A member lists their private event for every member; nobody lists someone else's
+    // event, and public seeds aren't listed (ADR 0069).
+    let key = |i: usize| holo_hash::AgentPubKeyB64::from(agent(&net, i)).to_string();
+    let event = format!("{}.private.street-party", key(1));
+    let _: () = net
+        .call(1, "project", "add_scope_item", event.clone())
+        .await;
+    for seed in [
+        format!("{}.organized.not-mine", key(0)),
+        format!("{}.public-project", key(1)),
+    ] {
+        let refused: Result<(), String> = net.try_call(1, "project", "add_scope_item", seed).await;
+        assert!(refused.is_err(), "{refused:?}");
+    }
+    net.settle().await;
+    let listed: Vec<ScopeItem> = net.call(0, "project", "scope_items", ()).await;
+    assert_eq!(listed.len(), 1, "{listed:?}");
+    assert_eq!(listed[0].seed, event);
+    assert_eq!(listed[0].author, agent(&net, 1));
     net.shut_down().await;
 }

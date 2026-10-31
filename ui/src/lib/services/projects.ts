@@ -1,7 +1,7 @@
 import {
+  audienceOf,
   isPrivateSeed,
   summaryOf,
-  type EventAudience,
   type EventGovernance,
   type Charter,
   type FeedSort,
@@ -48,7 +48,7 @@ interface ProjectWire {
   next_phase: { id: string; label: string } | null;
   returns: { id: string; label: string }[];
   updates: { proposal: ActionHash; author: AgentPubKey; body: string; at: number }[];
-  audience: EventAudience;
+  audience: string;
   governance: EventGovernance;
   organizers: AgentPubKey[];
   am_organizer: boolean;
@@ -184,7 +184,7 @@ export async function getProject(id: string): Promise<Project> {
       body: u.body,
       at: u.at,
     })),
-    audience: p.audience,
+    audience: audienceOf(p.audience, p.charter),
     governance: p.governance,
     organizers: p.organizers.map(hashToString),
     amOrganizer: p.am_organizer,

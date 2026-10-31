@@ -1,4 +1,10 @@
-import { isPrivateSeed } from '#lib/domain/projects.ts';
+import {
+  isPrivateSeed,
+  projectSubtype,
+  summaryOf,
+  type Project,
+  type ProjectCard,
+} from '#lib/domain/projects.ts';
 import { slugOf, type Scope } from '#lib/domain/scopes.ts';
 import {
   callCell,
@@ -9,8 +15,8 @@ import {
   type ActionHash,
 } from '#lib/holo/index.ts';
 
-import { sendEventInvite } from './events.ts';
-import { myAgent } from './people.ts';
+import { communityEvents, sendEventInvite } from './events.ts';
+import { myAgent, namesOf } from './people.ts';
 import { getProject } from './projects.ts';
 
 /**
@@ -105,4 +111,42 @@ export const inviteToCommunity = (agent: string, seed: string): Promise<void> =>
 export async function addCommunityOrganizer(seed: string, agent: string): Promise<void> {
   const cell = await projectCell(seed, 'Community');
   await callCell<ActionHash>(cell, 'project', 'add_organizer', stringToHash(agent));
+}
+
+/** A private community's feed (ADR 0069): the events listed on it, read from their own
+ * networks (the index never sees them). Ones that haven't reached this node yet are skipped. */
+export async function communityEventCards(community: string): Promise<ProjectCard[]> {
+  const seeds = await communityEvents(community);
+  const found = await Promise.allSettled(seeds.map((seed) => getProject(seed)));
+  const events = found.flatMap((r) =>
+    r.status === 'fulfilled' && r.value.charter ? [r.value] : [],
+  );
+  const names = await namesOf([...new Set(events.map((p) => p.creator))]).catch(
+    () => ({}) as Record<string, string>,
+  );
+  return events.map((p) => eventCard(p, names[p.creator] ?? ''));
+}
+
+function eventCard(p: Project, creatorName: string): ProjectCard {
+  const c = p.charter as NonNullable<Project['charter']>;
+  return {
+    id: p.id,
+    networkSeed: p.networkSeed,
+    creator: p.creator,
+    creatorName,
+    title: c.title,
+    summary: summaryOf(c.description),
+    mode: c.mode,
+    subtype: projectSubtype(c.subtype),
+    locationLabel: c.location_label,
+    phase: p.stage,
+    tags: c.tags,
+    members: p.members.length,
+    demand: p.demand,
+    opposition: p.opposition,
+    createdAt: p.createdAt,
+    lastActivityAt: p.lastActivityAt ?? p.createdAt,
+    latestUpdate: p.updates.at(-1)?.body ?? null,
+    commentCount: 0,
+  };
 }

@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~3:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~5 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -44,14 +44,32 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch only carries docs commits; they ride the next PR). Next: the parity pass (`docs/plans/PARITY.md`)
-Work through PARITY.md's unticked items, porting each from web at 390px; tick items with
-their PR number. Candidates not blocked on M6:
-private-community audience for events,
-"copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` + `ReportMenu`; copy link alone
-would be a one-item menu until moderation), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first).
+## In flight (2026-10-31, cloud session): events for a private community (ADR 0069), branch `claude/social-production-handoff-dsam61`
+web's third event audience, **Private community**. **Integrity change in the project DNA**
+(new `ScopeItems` link): merging resets the live project network (test data only).
+- **DNA:** `dnas/project/zomes/integrity/project/src/scope_item.rs` (community space → lister,
+  tag = a private event's seed; only in a private clone, on a community, by the event's
+  creator). Coordinator `add_scope_item` / `scope_items` (`coordinator/project/src/scope_items.rs`).
+  Scenario `scopes` (closed-community test) checks listing, refusals and reading.
+- **UI:** Audience step has web's three options; Who step picks one of your private
+  communities (+ organizers); the event is a private event tagged `@<slug>` and listed on the
+  community (`services/events.ts` `createEvent`, `listOnCommunity`); the private community's
+  page shows listed events to members (`closedCommunities.ts` `communityEventCards`,
+  `scopeState.svelte.ts`). `audienceOf` reports `private_community`; the members sheet treats
+  it as private, as web does.
+- `tests/e2e/closed-communities.mjs` now ends with one creating a community event and two
+  finding it on the community page and joining. It needs the new DNA: run it against a local
+  seed node (`bash scripts/cloud-seed.sh`), not live, until merged.
+- **Checked so far:** zomes build + pack, UI check/lint, boundaries, sizes, cargo fmt.
+  Pending: scenario `scopes`, browser test, native clippy, then PR + CI + merge + live smoke.
+
+## Next after this: the parity pass (`docs/plans/PARITY.md`)
+Candidates: **Home scope's joined-channel/community rows** (found 2026-10-31: the app's Home
+leaves the public rows empty), "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
+leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
+changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
+give: work that out first).
 
 ## Done 2026-10-31: help requests on web's personal card, PR #81 merged 03:52 UTC (2:52 pm Melbourne), live ~03:53 UTC
 - **Live after merge:** `help-requests.mjs` passed against the live UI (profile → personal

@@ -24,7 +24,7 @@
   let { detail, open, onClose }: Props = $props();
 
   const project = $derived(detail.project);
-  const isPrivate = $derived(project?.audience === 'invite_only');
+  const isPrivate = $derived(!!project && project.audience !== 'public');
   const organized = $derived(project?.governance === 'organizer_controlled');
   const canManage = $derived(isPrivate && !!project?.amOrganizer);
   /** Grants written here but not yet in the network read (a write lags its own reads). */

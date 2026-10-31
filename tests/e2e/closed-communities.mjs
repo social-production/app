@@ -1,10 +1,12 @@
 // web's private communities (ADR 0068 part d), at 390px. Founder one creates an
 // organizer-run private community: the lock shows. One invites a new member by name; they
 // accept under Invites and land in it. One removes them from Settings' "Who decides"; they
-// then join again with the invite link.
+// then join again with the invite link. One makes an event for the community's members
+// (web's "Private community" audience, ADR 0069); two finds it on the community's page and
+// joins it without an invite.
 //   node tests/e2e/closed-communities.mjs http://localhost:4174 [screens dir]
 // It uses dev founder one (a founder on the live test network too), makes one community and
-// signs up one account.
+// one event, and signs up one account.
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
@@ -103,6 +105,45 @@ await b.screenshot({ path: `${out}/phone390-community-join-invite.png` });
 await b.getByRole('button', { name: 'Join', exact: true }).click();
 await b.getByRole('button', { name: `Leave ${handle}` }).waitFor({ timeout: 120_000 });
 log('two joined again with the link');
+
+// One makes a collaborative event for the community (no up-front plan).
+const title = `Picnic ${stamp}`;
+await a.goto(`${BASE}/create/event`);
+const next = () => a.getByRole('button', { name: 'Continue' }).click();
+await a.getByLabel('Event title').fill(title);
+await a.getByLabel('Description').fill('Made by the closed-communities test.');
+await next(); // → Audience
+await a.getByText('Private community', { exact: true }).click();
+await next(); // → Who
+await a.getByLabel('Private community').fill(handle);
+await a.getByRole('option', { name: `${handle} (Private)` }).click({ timeout: 60_000 });
+await a.screenshot({ path: `${out}/phone390-community-event-who.png` });
+await next(); // → Control
+await a.getByText(`Private community: ${handle}.`).waitFor();
+await a.getByText('Collaborative', { exact: true }).click();
+await next(); // → Location (decide later)
+await next(); // → Overview
+await a.locator('.overview-row', { hasText: 'Private community' }).waitFor();
+await a.getByRole('button', { name: 'Publish event' }).click();
+await a.getByRole('heading', { name: title }).waitFor({ timeout: 180_000 });
+assert.match(a.url(), /\/events\/[^/]+\.private\./);
+log('one made an event for the community');
+
+// Two finds it on the community's page and joins it.
+const eventCard = b.locator('.event-card', { hasText: title });
+await retry('the event never reached the community page', async () => {
+  await b.goto('about:blank');
+  await b.goto(url);
+  await b.getByRole('heading', { name: handle }).waitFor({ timeout: 60_000 });
+  await eventCard.waitFor({ timeout: 30_000 });
+  return true;
+});
+await b.screenshot({ path: `${out}/phone390-community-event-card.png` });
+await eventCard.getByRole('link', { name: title }).first().click();
+await b.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+await b.getByRole('button', { name: 'Join event' }).click();
+await b.getByRole('button', { name: 'Leave event' }).waitFor({ timeout: 120_000 });
+log('two joined the community event');
 
 assert.deepEqual(errors, []);
 await browser.close();

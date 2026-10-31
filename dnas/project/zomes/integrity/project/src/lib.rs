@@ -16,6 +16,7 @@ mod link;
 mod links;
 mod organizer;
 mod plan;
+mod scope_item;
 mod space;
 mod value;
 
@@ -28,6 +29,7 @@ pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
+pub use scope_item::SEED_MAX as SCOPE_ITEM_SEED_MAX;
 pub use space::{
     charter_at, creator, creator_in_seed, space_creator, space_in_seed, SPACE_SEED_WORD,
 };
@@ -195,6 +197,8 @@ pub enum LinkTypes {
     /// `recent.<UTC hour>` path → a space with activity in that hour, so indexes re-read only
     /// what changed (ADR 0065).
     Recent,
+    /// A private community → a private event for its members; tag: the event's seed (ADR 0069).
+    ScopeItems,
 }
 
 #[hdk_extern]
