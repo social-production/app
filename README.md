@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Search kinds (PR #79, 2026-10-31 1:53 am Melbourne):** web's Search finds channels and
+  communities (your private ones too), events and help requests as well as projects and
+  people, with web's filter and its icons. Live `search.mjs` passed.
 - **Rejoining after a removal (PR #78, 2026-10-30 7:33 pm Melbourne):** someone removed from
   a channel or community who joins again (link, invite or Join) counts as a member at once.
   Live `closed-communities.mjs` passed.

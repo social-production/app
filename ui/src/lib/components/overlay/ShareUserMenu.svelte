@@ -3,16 +3,22 @@
   import type { Contact } from '#lib/domain/messages.ts';
 
   import OverlaySheet from './OverlaySheet.svelte';
+  import ShareOutside from './ShareOutside.svelte';
 
   import '#lib/components/styles/share.css';
 
   /**
-   * web's ShareUserMenu, the "send to people here" half: a Share button opening a sheet that
-   * searches people, collects chips and sends to each. The share-outside half (copy link,
-   * device share) comes when a caller needs it; the private event's Invite + doesn't.
+   * web's ShareUserMenu: a Share button opening a sheet that shares outside the app (when
+   * `copyLinkUrl` is set; `ShareOutside`), then searches people, collects chips and sends to
+   * each. The private event's Invite + has no link to share.
    */
   interface Props {
     menuTitle: string;
+    /** Icon only, for tight action strips; the label stays as the accessible name. */
+    compact?: boolean;
+    copyLinkUrl?: string | null;
+    /** Title for the device share sheet and share links; defaults to the page title. */
+    shareTitle?: string | null;
     placeholder?: string;
     submitLabel?: string;
     recipientHint?: string;
@@ -25,6 +31,9 @@
 
   let {
     menuTitle,
+    compact = false,
+    copyLinkUrl = null,
+    shareTitle = null,
     placeholder = 'Type a username',
     submitLabel = 'Send',
     recipientHint = 'They get it as a message and a notification.',
@@ -129,7 +138,7 @@
           stroke-linejoin="round"
         /></svg
       >
-      <span class="share-button-label">Share</span>
+      {#if !compact}<span class="share-button-label">Share</span>{/if}
     </button>
   </div>
 </span>
@@ -142,6 +151,9 @@
   onClose={close}
 >
   {#snippet toolbar()}
+    {#if copyLinkUrl}
+      <ShareOutside url={copyLinkUrl} title={shareTitle ?? document.title} />
+    {/if}
     <div class="share-search">
       <span class="share-out-label">Send to people here</span>
       <label class="search-box" for="share-people-search">

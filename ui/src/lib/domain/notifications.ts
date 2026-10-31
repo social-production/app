@@ -9,7 +9,8 @@ import type { CharterMode } from './projects.ts';
  * the app has so far: phase votes (`prj-phase-vote`), phase changes (`prj-phase-done`), chat
  * replies (`reply`), @mentions in project, direct and group chats (`mention`, ADR 0047) and
  * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054) and activities
- * (`prj-activity`, `prj-role-suggest`, `prj-role-taken`, ADR 0056).
+ * (`prj-activity`, `prj-role-suggest`, `prj-role-taken`, ADR 0056) and shared help requests
+ * (`hr-share`, `domain/share.ts`).
  * Times are Holochain micros.
  */
 export type NotificationKind =
@@ -24,7 +25,8 @@ export type NotificationKind =
   | 'prj-role-suggest'
   | 'prj-role-taken'
   | 'evt-invite'
-  | 'community-invite';
+  | 'community-invite'
+  | 'hr-share';
 
 /** web's notification settings categories the app has kinds for (web-backend
  * `notification_preferences.py` KIND_TO_CATEGORY); shares and plan-leading come with their
@@ -45,6 +47,7 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'prj-role-taken': 'roles',
   'evt-invite': 'shares_invites',
   'community-invite': 'shares_invites',
+  'hr-share': 'shares_invites',
 };
 
 export interface NotificationItem {
@@ -69,6 +72,7 @@ export interface NotificationItem {
     | { open: 'vote'; voteTarget: string }
     | { conversation: string }
     | { activity: string }
+    | { helpRequest: string }
     | null;
   createdAt: number;
   isUnread: boolean;

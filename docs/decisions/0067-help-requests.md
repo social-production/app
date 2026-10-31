@@ -42,3 +42,16 @@ signals, ADR 0065) and activities with roles and `Assignments` links (ADR 0056).
 - Help requests come with ratings, check-ins and history for free (activity history), which web
   doesn't show for them; the UI leaves them out.
 - When channels/communities land, help requests get web's required scope tag.
+
+## Sharing (2026-10-31)
+web's Share menu sits left of the vote strip for signed-in people (`HelpRolesDock`, with
+`ShareUserMenu`'s share-outside half in `ShareOutside.svelte`: Share via…, Copy link, links to
+WhatsApp/Telegram/Email/X/Facebook). Sending to a person does what web-backend's
+`share_help_request_with_user` does, without a server:
+- The link goes into your direct chat with them (started if there is none) as shares.py's
+  text, "Shared a help request: <title>\nOpen help request: <url>" (`domain/share.ts`).
+- Their device derives web's `hr-share` notification ("A help request was shared with you.",
+  Shares & invites category) from that message in a direct chat, as mentions are derived
+  (ADR 0046); it opens the request. Someone could fake one by typing the same text in a direct
+  chat; it only links to a page, so nothing is gained by it.
+- web's "Sent to <name>" toast is left out: the app has no toast host yet; the sheet closes.

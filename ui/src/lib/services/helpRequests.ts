@@ -1,7 +1,10 @@
 import type { Activity } from '#lib/domain/activities.ts';
 import { HELP_MODE, roleCounts, type HelpRoleDraft } from '#lib/domain/helpRequests.ts';
+import type { Contact } from '#lib/domain/messages.ts';
+import { shareMessage } from '#lib/domain/share.ts';
 
 import { createActivity, listActivities, setCommitment } from './activities.ts';
+import { sendNewChat } from './messages.ts';
 import { createProject, joinProject } from './projects.ts';
 
 /** What web's create-help-request page sends. */
@@ -73,4 +76,17 @@ export async function commitToRole(
 ): Promise<void> {
   if (role !== null && !member) await joinProject(id, true);
   await setCommitment(id, activity, role);
+}
+
+/**
+ * shares.py `share_help_request_with_user`: the link goes into your direct chat with them
+ * (started if you have none), and their device shows it as an `hr-share` notification.
+ */
+export async function shareHelpRequest(to: Contact, title: string, url: string): Promise<void> {
+  await sendNewChat({
+    kind: 'direct',
+    members: [to],
+    title: '',
+    body: shareMessage('help request', title, url),
+  });
 }

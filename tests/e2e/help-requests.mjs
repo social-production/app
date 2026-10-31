@@ -1,6 +1,8 @@
 // M5c help requests end to end (ADR 0067). Founder one asks for help with two roles (one
 // place for a driver, any number of helpers); a new person opens it from the feed card, signs
 // up as driver (which joins the request), sees the role full for others, and leaves again.
+// Then founder one shares it with them from web's Share menu: they get the link in a direct
+// chat and web's "A help request was shared with you." notification, which opens it.
 //   node tests/e2e/help-requests.mjs http://localhost:4174
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -78,6 +80,40 @@ log('the asker sees the driver role full');
 await driver.getByRole('button', { name: 'Leave' }).click();
 await driver.getByRole('button', { name: 'Sign up' }).waitFor({ timeout: 60_000 });
 log('the helper left the role');
+
+// web's Share menu: share outside the app (Copy link), then send to the helper by name.
+await ann.goto(url);
+await ann.getByRole('button', { name: 'Share help request' }).click();
+await ann.getByRole('button', { name: 'Copy link' }).waitFor();
+const search = ann.locator('#share-people-search');
+// The directory may take a moment to list someone who just signed up.
+for (let i = 0; ; i++) {
+  await search.fill('');
+  await search.fill(`Helper${stamp}`);
+  const row = ann.locator('.contact-row', { hasText: `Helper${stamp}` }).first();
+  if (await row.waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
+    await row.click();
+    break;
+  }
+  if (i >= 30) throw new Error('the helper never appeared in the share search');
+}
+await ann.getByRole('button', { name: 'Send', exact: true }).click();
+await search.waitFor({ state: 'detached', timeout: 120_000 });
+log('founder one shared it with the helper');
+
+const shared = helper.locator('.notification-card', { hasText: 'A help request was shared with you.' });
+for (let i = 0; ; i++) {
+  await helper.goto(`${BASE}/notifications`);
+  await helper.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
+  if (await shared.first().waitFor({ timeout: 9_000 }).then(() => true, () => false)) break;
+  if (i >= 40) throw new Error('the share never reached the helper');
+}
+await shared.first().getByText(title).waitFor();
+await shared.first().getByText('Help request', { exact: true }).waitFor();
+await shared.first().click();
+await helper.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);
+log('the helper opened it from the notification');
 
 assert.deepEqual(errors, []);
 await browser.close();

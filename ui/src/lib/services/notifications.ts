@@ -9,6 +9,7 @@ import {
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
+import { helpShareNotifications } from '#lib/domain/share.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
@@ -80,18 +81,23 @@ async function fromProject(seed: string, me: string, myName: string) {
   ];
 }
 
-/** Mentions in a direct or group chat you're still in (web notifies only its members). */
+/** Mentions in a direct or group chat you're still in (web notifies only its members), and
+ * help requests shared with you in a direct one. */
 async function fromChat(seed: string, at: number, me: string, myName: string) {
   const [summary, messages] = await Promise.all([chatSummary(seed, at), listChatMessages(seed)]);
   if (!summary.member) return [];
+  const shares = summary.kind === 'direct' ? helpShareNotifications(seed, messages, me) : [];
   const found = chatMentionNotifications(
     { seed, title: summary.title, messages, names: {} },
     me,
     myName,
   );
-  if (found.length === 0) return [];
+  if (found.length === 0) return shares;
   const names = await namesOf([...new Set(found.map((n) => n.actor))]);
-  return chatMentionNotifications({ seed, title: summary.title, messages, names }, me, myName);
+  return [
+    ...shares,
+    ...chatMentionNotifications({ seed, title: summary.title, messages, names }, me, myName),
+  ];
 }
 
 /** Read one card (web's "Mark read"). */
