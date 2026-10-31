@@ -95,6 +95,10 @@
         await goto(`${resolve('/messages')}?conversation=${encodeURIComponent(t.conversation)}`);
         return;
       }
+      if (t && 'helpRequest' in t) {
+        await goto(resolve('/help-requests/[id]', { id: t.helpRequest }));
+        return;
+      }
       const id = await projectPageOf(item.seed);
       if (!id) return;
       const page = spaceHref(item.projectMode, id);

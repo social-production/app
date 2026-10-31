@@ -72,7 +72,9 @@
             ? 'Thread'
             : item.projectMode === 'event'
               ? 'Event'
-              : 'Project'}</span
+              : item.projectMode === 'help-request'
+                ? 'Help request'
+                : 'Project'}</span
         >
       </div>
     {/if}

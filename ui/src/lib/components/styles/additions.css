@@ -28,6 +28,12 @@
   font-size: inherit;
 }
 
+/* app/ui: ShareUserMenu wraps its trigger in a scope span for the ported .share-sheet styles;
+   web's .share-shell is the flex child itself (the help request's dock gives it 56px). */
+span.share-sheet {
+  display: contents;
+}
+
 /* app/ui: PhaseMenu wraps its trigger in a scope span for the ported .phase-menu styles; web's
    trigger is a direct child, so the span must not become a box (PhaseWorkToolbar packs it). */
 .phase-menu-scope {

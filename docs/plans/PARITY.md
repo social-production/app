@@ -81,8 +81,10 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
-- [ ] Help requests, later: web's Share menu on the request (copy link + send to people), the
-  required channel/community tag (M5d), `PersonalHelpRequestCard` in the personal feed.
+- [x] Help requests' Share menu (2026-10-31): copy link, device share, share links, and send to
+  people (a direct-chat message plus web's `hr-share` notification, ADR 0067 "Sharing").
+  The required channel tag came with M5d (PR #73).
+- [ ] Help requests, later: `PersonalHelpRequestCard` in the personal feed.
 - [ ] web's project-activity cards (`ProjectActivityCard`: activity title,
   parent project, time, place, distance) come only from web-backend's Region feed
   (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.
