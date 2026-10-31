@@ -5,7 +5,8 @@ import type { ProjectUpdate } from './governance.ts';
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
 /** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), or a
  * channel's or community's (ADR 0068). */
-export type CharterMode = ProjectMode | 'event' | 'help-request' | 'channel' | 'community';
+export type CharterMode =
+  ProjectMode | 'event' | 'help-request' | 'thread' | 'post' | 'channel' | 'community';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
@@ -143,6 +144,8 @@ export function isEvent(mode: CharterMode | undefined): boolean {
 export function modeAccent(mode: CharterMode): string {
   if (mode === 'event') return 'var(--type-accent-event)';
   if (mode === 'help-request') return 'var(--type-accent-help-request)';
+  if (mode === 'thread') return 'var(--type-accent-thread)';
+  if (mode === 'post') return 'var(--type-accent-post)';
   if (mode === 'productive') return 'var(--type-accent-project-production)';
   return mode === 'personal-service'
     ? 'var(--type-accent-project-personal-service)'

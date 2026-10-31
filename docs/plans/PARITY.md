@@ -46,7 +46,7 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   search too. Since 2026-10-30 (PR #79) also Channels and Communities (`/index/scopes`; your
   own private communities for members), Events and Help requests, in web-backend's order
   (scopes, then people, then items) and web's filter with icons (`tests/e2e/search.mjs`).
-  Threads, Activities and Posts wait on those features.
+  Threads since ADR 0070; Activities and Posts wait (PARITY "Posts and threads, later parts").
 - [x] The "+" button follows web's `isFeedDiscoveryPath` (feed, platform, profiles), not search.
 
 - [x] Profiles open for guests (name, standing, no actions), as on web; the device count is
@@ -143,9 +143,15 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   communities and invites, settings and vote sheets.
 
 ## Whole web pages the app doesn't have yet (route diff, 2026-10-31)
-- [ ] Posts and threads: `create/post`, `create/thread`, `posts/[id]`, `threads/[slug]`
-  (web's standalone discussion items; NOT tabs on project/event pages, see STATUS Owner
-  decisions). Also feed "Following + popular" discovery rows.
+- [x] Posts and threads (2026-10-31, ADR 0070): `create/post`, `create/thread`, `/posts/<id>`,
+  `/threads/<id>` (commons spaces; web's DiscussionPanel with nested replies, comment votes and
+  the Oldest/Newest/Top sort; Share; ThreadCard in the public feed, PersonalPostCard on
+  personal rows and profiles; Threads in Search; Post and Thread in the create menu).
+- [ ] Posts and threads, later parts: @mentions in the comment composer, linked subjects in
+  post bodies (`LinkedPostBody`), Posts in Search (the index keeps posts out of non-personal
+  pages), web's scope-page create menu (`ScopeCreateMenu`), "Post an update" prefill from
+  project/event pages, thread/post share notifications, feed "Following + popular" discovery
+  rows, ⋮ Report (moderation).
 - [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's
   Requests section). Asset-use requests come with asset management, after parity.
 - [ ] Moderation: ⋮ Report menu, bot reviews (web-backend `bot_reviews.py`), paused badge.

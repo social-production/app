@@ -841,3 +841,47 @@
   color: var(--danger, #b42318);
   font-size: 13px;
 }
+
+/* Ported from web/src/lib/features/create/post/CreatePostPage.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .composer {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .audience-cue {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .status-note {
+  margin: 0;
+  color: var(--danger, #c0392b);
+}
+
+/* Ported from web/src/lib/features/create/thread/CreateThreadPage.svelte (ADR 0032, scripts/port-styles.py) */
+.create-sheet .form-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .field-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-sheet .helper-text,
+.create-sheet .status-note {
+  margin: 0;
+}
+
+.create-sheet .helper-text {
+  color: var(--text-soft);
+  line-height: 1.45;
+}
+
+.create-sheet .status-note {
+  color: var(--danger, #c0392b);
+}

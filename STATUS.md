@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~9:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-10-31 ~11 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -35,8 +35,7 @@ and continue from Next."
 - **Parity with web is the goal; asset management is not part of it** (platform assets, attached
   assets, the platform board, asset-use requests come later). The parity list is
   `docs/plans/PARITY.md` ("Whole web pages the app doesn't have yet").
-- Owner noticed updates on project and event pages look different from web's: fixed in PR #83
-  (see In flight).
+- Owner noticed updates on project and event pages look different from web's: fixed in PR #83.
 
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
@@ -51,7 +50,50 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #83, Home's joined channels and communities + updates as on web (branch `claude/social-production-handoff-dsam61`)
+## In flight: posts and threads (ADR 0070), PR #84 (branch `claude/social-production-handoff-dsam61`)
+web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
+yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
+discussion zome): merging resets the project network (test data only).
+- **DNA:** new crate `sp_discussion` (modes `thread`/`post`, vote tags, post titles). Charter
+  accepts the modes; the discussion integrity zome gains `MessageVotes` (message → voter, tag
+  up/down, only on a chat message). Coordinators: no phases (stage "Thread"/"Post"), no
+  proposals, no activities; `discussion::vote_message` / `message_votes` (guests may read
+  votes: gateway allowlist).
+- **Gateway:** posts only on creator-filtered pages (Home's personal rows, profiles); threads
+  and posts rank by votes. Index tests moved to `node/index_tests.rs` (size rule).
+- **UI:** `features/projects/discussions/` (DiscussionPage for `/threads/<id>` and
+  `/posts/<id>`, CreateThread, CreatePost, DiscussionTools: Share + Sort),
+  `components/discussion/` (DiscussionPanel, DiscussionComment, CommentComposer), ThreadCard,
+  PersonalPostCard, Threads in Search, Post + Thread first in the create menu.
+  `ScopeTagsStep` gained web's thread option (primary tag type). `CreateSheet` hides the step
+  rail for one step and takes `submittingLabel`/`canSubmit`. Styles via PORTS
+  (`discussion.css`, cards/create appends). `scripts/port-styles.py` now keeps web's
+  `:global(html:has(…))` selectors unscoped (it used to prefix them, making them dead).
+- **Tests:** scenario `threads` (no lifecycle, no proposals, nested comments, one vote each,
+  votes only on comments); `tests/e2e/threads.mjs`.
+- **Checked (cloud session, 2026-10-31):** zomes build + pack; `cargo clippy` (project zomes,
+  gateway) and `cargo fmt`; `cargo test -p sp_discussion`, gateway index tests; scenarios
+  `threads` and `help_requests` **passed** (`cloud-scenarios`-style run, ~12 min each); UI
+  check + lint, boundaries, sizes; against a local seed node (`cloud-seed.sh`):
+  `threads.mjs`, `closed-communities.mjs`, `events.mjs`, `search.mjs` (now expects Threads in the filter; its events check reads links
+  only, since an empty network shows "No results") and `help-requests.mjs` **passed**. Not run
+  locally: the other scenarios (CI runs them all).
+- Messages' Public tab leaves thread/post comments out (web lists projects, events and help
+  requests there); notification cards say "Thread"/"Post".
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
+leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
+changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
+give: work that out first). Then the big pieces in PARITY's "Whole web pages the app doesn't
+have yet" (posts and threads, moderation, map/places, service requests, software PR flow);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-10-31: Home's joined channels and communities + updates as on web, PR #83 merged 10:38 UTC (9:38 pm Melbourne), live ~10:58 UTC
+- **Live after merge (~11:05 UTC):** `closed-communities.mjs` (community event on Home) and
+  `governance.mjs` (update line + Update button) passed against the live UI. CI took 75 min
+  (slowest shard 5). `/readyz` 750 MB at 4.5 min uptime. No network reset (no DNA change).
 **Updates (owner, 2026-10-31):** web's current `ProjectOverviewHeader`/`EventOverviewHeader`
 show only the newest update, one line under the description ("Update: …", a leading "update:"
 stripped), with an **Update** button in the dock beside Edit; web's `ProjectUpdatesSection`
@@ -73,15 +115,7 @@ channel or community you joined, plus `private_community` events of communities 
   on Home; `follows.mjs`'s "no public rows" assertion says why (bob joined nothing).
 - **Checked:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway --lib
   index` (3 passed); `closed-communities.mjs` and `follows.mjs` **passed** against a local seed
-  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them). PR #83 open; after
-  CI is green: merge, smoke `closed-communities.mjs` live, move this to "Done".
-
-## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
-`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
-leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
-changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
-give: work that out first).
+  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them).
 
 ## Done 2026-10-31: events for a private community (ADR 0069), PR #82 merged 07:47 UTC (6:47 pm Melbourne), live ~08:04 UTC
 - **Live after merge (08:06 UTC):** `closed-communities.mjs` passed against the live UI
@@ -1317,6 +1351,12 @@ All merged and deployed; the live smoke (`tests/e2e/projects.mjs` against the li
 13. **Right rail lists personal services' activities** (2026-10-27): web-backend's rail only
     reads projects in `phase-5`, so on web a personal service's activities (its Activity phase
     is `phase-1`) never reach the rail. The app lists them; say if it should copy web exactly.
+
+14. **New members' posts and threads count against the 2-listings-per-7-days cap** (ADR 0070):
+    the cap lives in directory integrity and counts every listing (projects, events, help
+    requests, channels, threads, posts). web lets anyone who can participate post freely.
+    Lifting it for posts and threads needs a directory integrity change (an account reset).
+    Say if that is worth it now.
 
 ## Live (test network, Railway project `social-production-p2p`)
 - UI https://ui-production-333c.up.railway.app · seed node https://seed-node-production.up.railway.app (`/readyz`, `/index/projects`).

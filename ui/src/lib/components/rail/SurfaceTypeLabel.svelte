@@ -12,11 +12,17 @@
     'personal-service': 'Personal Service',
     event: 'Event',
     'help-request': 'Help request',
+    thread: 'Thread',
+    post: 'Post',
     channel: 'Channel',
     community: 'Community',
   };
   const icon = $derived(
-    projectMode === 'event' || projectMode === 'help-request' || projectMode === 'channel'
+    projectMode === 'event' ||
+      projectMode === 'help-request' ||
+      projectMode === 'channel' ||
+      projectMode === 'thread' ||
+      projectMode === 'post'
       ? projectMode
       : projectMode === 'community'
         ? 'community'

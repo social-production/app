@@ -26,11 +26,12 @@
   let { query, typeParam }: { query: string; typeParam: string | null } = $props();
   const type = $derived(readSearchType(typeParam));
 
-  // web's options, in its order, for the kinds the app has (no threads, activities or
-  // posts yet; PARITY.md).
+  // web's options, in its order, for the kinds the app has (no activities or posts yet;
+  // PARITY.md).
   const typeOptions: { value: SearchType; label: string; icon?: SurfaceIconId }[] = [
     { value: 'all', label: 'All' },
     { value: 'project', label: 'Projects', icon: 'project' },
+    { value: 'thread', label: 'Threads', icon: 'thread' },
     { value: 'event', label: 'Events', icon: 'event' },
     { value: 'help_request', label: 'Help requests', icon: 'help-request' },
     { value: 'channel', label: 'Channels', icon: 'channel' },

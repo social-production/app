@@ -17,6 +17,10 @@
     /** Empty required fields on this step; Continue waits and a line names them. */
     missing: string[];
     submitLabel: string;
+    /** web's `submittingLabel` ("Posting..." for posts). */
+    submittingLabel?: string;
+    /** One-step forms (web's non-wizard CreateFlowLayout) just disable Publish. */
+    canSubmit?: boolean;
     submitting: boolean;
     onStep: (index: number) => void;
     onSubmit: () => void;
@@ -62,17 +66,17 @@
     {#if p.stepIndex === 0}<p class="sheet-description">{p.description}</p>{/if}
   {/snippet}
   {#snippet toolbar()}
-    <nav class="step-rail" aria-label="Create steps">
-      {#each p.steps as step, index (step.id)}
-        <button
-          class="step-chip"
-          class:active={index === p.stepIndex}
-          class:complete={index < p.stepIndex}
-          type="button"
-          onclick={() => go(index)}>{step.title}</button
-        >
-      {/each}
-    </nav>
+    {#if p.steps.length > 1}<nav class="step-rail" aria-label="Create steps">
+        {#each p.steps as step, index (step.id)}
+          <button
+            class="step-chip"
+            class:active={index === p.stepIndex}
+            class:complete={index < p.stepIndex}
+            type="button"
+            onclick={() => go(index)}>{step.title}</button
+          >
+        {/each}
+      </nav>{/if}
   {/snippet}
   <div class="sheet-form">
     <div class="sheet-fields" bind:this={fields}>
@@ -99,9 +103,13 @@
       <button
         class="sheet-submit"
         type="button"
-        disabled={p.missing.length > 0 || p.submitting}
+        disabled={p.missing.length > 0 || p.canSubmit === false || p.submitting}
         onclick={() => (last ? p.onSubmit() : go(p.stepIndex + 1))}
-        >{last ? (p.submitting ? 'Creating...' : p.submitLabel) : 'Continue'}</button
+        >{last
+          ? p.submitting
+            ? (p.submittingLabel ?? 'Creating...')
+            : p.submitLabel
+          : 'Continue'}</button
       >
     </div>
   {/snippet}

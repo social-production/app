@@ -1675,3 +1675,140 @@
   text-align: right;
   white-space: nowrap;
 }
+
+/* Ported from web/src/lib/components/cards/public-feed/ThreadCard.svelte (ADR 0032, scripts/port-styles.py) */
+.thread-card .footer {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: nowrap;
+}
+
+.thread-card .body,
+.thread-card .footer {
+  color: var(--text-soft);
+}
+
+.thread-card .body {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.thread-card .footer {
+  font-size: 13px;
+}
+
+.thread-card .engagement-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: nowrap;
+}
+
+.thread-card .comment-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-sm);
+}
+
+.thread-card .footer-meta {
+  margin-left: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+  .thread-card .title {
+    font-size: 17px;
+  }
+
+  .thread-card .body {
+    font-size: 15px;
+  }
+}
+
+/* Ported from web/src/lib/components/cards/personal-feed/PersonalPostCard.svelte (ADR 0032, scripts/port-styles.py) */
+.personal-post-card .card-header {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.personal-post-card .header-row,
+.personal-post-card .footer,
+.personal-post-card .engagement-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.personal-post-card .header-row,
+.personal-post-card .footer {
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.personal-post-card .header-row {
+  flex-wrap: nowrap;
+  align-items: center;
+}
+
+.personal-post-card .footer {
+  flex-wrap: nowrap;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.personal-post-card .engagement-row {
+  gap: 8px;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+}
+
+.personal-post-card .comment-link {
+  text-decoration: none;
+  color: inherit;
+  border-radius: var(--radius-sm);
+}
+
+.personal-post-card .footer-meta {
+  margin-left: auto;
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Ported from web/src/lib/components/shared/LinkedPostBody.svelte (ADR 0032, scripts/port-styles.py) */
+.surface .linked-body {
+  margin: 0;
+  color: var(--text-main);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.surface .linked-body.feed {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  white-space: normal;
+}
+
+.surface .linked-body.detail {
+  margin-top: 14px;
+  margin-bottom: 18px;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.surface .linked-subject {
+  color: var(--brand-strong);
+  font-weight: 700;
+  text-decoration: underline;
+}

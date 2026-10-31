@@ -37,7 +37,10 @@ const PROJECT: &[(&str, &[&str])] = &[
         ],
     ),
     ("activities", &["list_activities"]),
-    ("discussion", &["list_messages", "get_chunk"]),
+    (
+        "discussion",
+        &["list_messages", "get_chunk", "message_votes"],
+    ),
 ];
 
 /// Calls not about one space (file parts are found by their own hash).

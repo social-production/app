@@ -39,13 +39,17 @@ fn check_charter(c: &Charter) -> Result<(), String> {
             "description must be 1–{DESCRIPTION_MAX} characters"
         ));
     }
-    // An event (ADR 0057) or help request (ADR 0067) checks its kind here and the shared
+    // An event (ADR 0057), help request (ADR 0067), thread or post (ADR 0070) checks its kind here and the shared
     // field limits below.
     let (mode, subtype) = if c.mode == sp_event::MODE {
         sp_event::check_kind(&c.mode, &c.subtype)?;
         (MODES[0], SUBTYPES[0])
     } else if c.mode == sp_help::MODE {
         sp_help::check_kind(&c.mode, &c.subtype)?;
+        (MODES[0], SUBTYPES[0])
+    } else if sp_discussion::is_discussion(&c.mode) {
+        // A thread or post (ADR 0070).
+        sp_discussion::check_kind(&c.mode, &c.subtype)?;
         (MODES[0], SUBTYPES[0])
     } else if sp_scope::is_scope(&c.mode) {
         check_scope_charter(c)?;

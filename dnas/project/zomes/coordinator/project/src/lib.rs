@@ -216,7 +216,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
 }
 
 /// The stepper's phases, the next phase, the returns and the stage label for this mode. A help
-/// request never moves (ADR 0067); `sp_governance` doesn't know its mode.
+/// request, thread or post never moves (ADR 0067, 0070); `sp_governance` doesn't know its mode.
 fn lifecycle(
     mode: &str,
     subtype: &str,
@@ -224,6 +224,13 @@ fn lifecycle(
 ) -> (Vec<PhaseStep>, Option<PhaseStep>, Vec<PhaseStep>, String) {
     if mode == sp_help::MODE {
         return (Vec::new(), None, Vec::new(), "Help request".into());
+    }
+    // Threads and posts never move either (ADR 0070).
+    if mode == sp_discussion::THREAD {
+        return (Vec::new(), None, Vec::new(), "Thread".into());
+    }
+    if mode == sp_discussion::POST {
+        return (Vec::new(), None, Vec::new(), "Post".into());
     }
     let shape = Shape {
         mode,

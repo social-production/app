@@ -50,6 +50,9 @@ fn member() -> ExternResult<ActionHash> {
 fn in_activity_phase() -> ExternResult<()> {
     let project = calls::glance()?;
     let mode = project.charter.as_ref().map(|c| c.mode.as_str());
+    if mode.is_some_and(sp_discussion::is_discussion) {
+        return Err(guest("Threads and posts don't have activities."));
+    }
     if mode == Some(sp_help::MODE) {
         return if project.creator == agent_info()?.agent_initial_pubkey {
             Ok(())

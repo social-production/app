@@ -1,0 +1,11 @@
+[package]
+name = "sp_discussion"
+description = "Rules for threads and posts, commons spaces with modes \"thread\" and \"post\", and comment votes (ADR 0070). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

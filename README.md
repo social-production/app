@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Home scope and updates (PR #83, 2026-10-31 9:38 pm Melbourne):** Home lists the items
+  tagged with the channels and communities you joined and your private communities' events,
+  as on web. Project and event pages show the newest update on one line under the description,
+  with web's Update button beside Edit. Live `closed-communities.mjs` and `governance.mjs`
+  passed.
 - **Private-community events (PR #82, 2026-10-31 6:47 pm Melbourne, ADR 0069):** web's
   "Private community" event audience: pick one of your private communities; its members see
   the event on the community's page and join without an invite. This reset the test network
