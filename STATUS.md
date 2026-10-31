@@ -31,6 +31,13 @@ and continue from Next."
 - UI gaps (e.g. phone "More" opens the left rail instead of web's `MobileMoreSheet` with
   profile/settings/about) get fixed during the parity pass, from web's existing screens.
 
+## Owner direction (2026-10-31)
+- **Parity with web is the goal; asset management is not part of it** (platform assets, attached
+  assets, the platform board, asset-use requests come later). The parity list is
+  `docs/plans/PARITY.md` ("Whole web pages the app doesn't have yet").
+- Owner noticed updates on project and event pages look different from web's: fixed in PR #83
+  (see In flight).
+
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
 control". One network per project cannot reach that (each costs two databases, a gossip space and
@@ -44,7 +51,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Home scope's joined channels and communities (branch `claude/social-production-handoff-dsam61`)
+## In flight: PR #83, Home's joined channels and communities + updates as on web (branch `claude/social-production-handoff-dsam61`)
+**Updates (owner, 2026-10-31):** web's current `ProjectOverviewHeader`/`EventOverviewHeader`
+show only the newest update, one line under the description ("Update: …", a leading "update:"
+stripped), with an **Update** button in the dock beside Edit; web's `ProjectUpdatesSection`
+is no longer imported anywhere. The app had kept that old list (+ the line, whose template
+whitespace showed through `white-space: pre-line`). Now: `ContextPanel` one line,
+`ProjectDock` Update button, `UpdatesSection.svelte` and its PORTS rows removed;
+`closedCommunities.ts` cards' "Latest" was the oldest update (fixed: newest first).
+`governance.mjs` checks the line and the button and **passed** locally (one earlier run timed
+out later on, at the feed card, and passed on the rerun).
+
 web-backend's home feed (`services/feeds/builder.py`, `selects.py`): items tagged with any
 channel or community you joined, plus `private_community` events of communities you're in.
 - **Gateway (no DNA change):** `/index/projects?tag=` takes several tags, comma-separated (any

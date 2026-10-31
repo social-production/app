@@ -8,12 +8,13 @@
 
   import type { DetailState } from './detailState.svelte.ts';
 
-  /** web's Details dock: signals, join/members, Vote on edits and updates, and Edit for members. */
+  /** web's Details dock: signals, join/members, Vote on edits and updates, and Edit and Update for members. */
   interface Props {
     detail: DetailState;
     membersOpen: boolean;
     onOpenMembers: () => void;
     onEdit: () => void;
+    onUpdate: () => void;
     /** An edit or update a link asks to open (web's `?open=vote&voteKind=edit|update`). */
     revealVote?: string | null;
     onRevealDone?: () => void;
@@ -24,6 +25,7 @@
     membersOpen,
     onOpenMembers,
     onEdit,
+    onUpdate,
     revealVote = null,
     onRevealDone,
   }: Props = $props();
@@ -70,6 +72,7 @@
           {/if}
           {#if detail.canPropose}
             <button type="button" class="quiet-control" onclick={onEdit}>Edit</button>
+            <button type="button" class="quiet-control" onclick={onUpdate}>Update</button>
           {/if}
         </div>
       </div>
