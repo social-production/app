@@ -56,7 +56,7 @@ channel or community you joined, plus `private_community` events of communities 
   on Home; `follows.mjs`'s "no public rows" assertion says why (bob joined nothing).
 - **Checked:** UI check + lint, boundaries, sizes; `cargo fmt`, `cargo test -p gateway --lib
   index` (3 passed); `closed-communities.mjs` and `follows.mjs` **passed** against a local seed
-  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them). PR open; after
+  node (`cloud-seed.sh`). Not run: scenarios (no zome change; CI runs them). PR #83 open; after
   CI is green: merge, smoke `closed-communities.mjs` live, move this to "Done".
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
