@@ -34,7 +34,7 @@ await filter.click();
 const options = await guest.getByRole('menuitemradio').allInnerTexts();
 assert.deepEqual(
   options.map((o) => o.replace('✓', '').trim()),
-  ['All', 'Projects', 'Events', 'Help requests', 'Channels', 'Communities', 'Users'],
+  ['All', 'Projects', 'Threads', 'Events', 'Help requests', 'Channels', 'Communities', 'Users'],
 );
 await guest.locator('.icon-menu-item .surface-icon').nth(5).waitFor({ timeout: 5_000 }); // web's option icons
 await guest.getByRole('menuitemradio', { name: 'Communities' }).click();
@@ -53,9 +53,11 @@ await guest.goto(`${BASE}/search?q=e&type=event`);
 await guest.getByRole('heading', { name: 'Search', exact: true }).waitFor();
 await guest.waitForTimeout(3_000);
 for (const kind of await results.locator('.kind-chip').allInnerTexts()) assert.equal(kind, 'Event');
-for (const href of await results.evaluateAll((as) => as.map((a) => a.getAttribute('href'))))
+// (Links only: an empty network shows web's "No results" card instead.)
+const rows = guest.locator('.stack a.result-card');
+for (const href of await rows.evaluateAll((as) => as.map((a) => a.getAttribute('href'))))
   assert.match(href, /^\/events\//);
-log(`events filter: ${await results.count()} event rows`);
+log(`events filter: ${await rows.count()} event rows`);
 
 await guest.goto(`${BASE}/search?q=${TEST_CHANNEL}&type=channel`);
 await channelRow.first().click();

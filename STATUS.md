@@ -71,7 +71,15 @@ discussion zome): merging resets the project network (test data only).
   `:global(html:has(…))` selectors unscoped (it used to prefix them, making them dead).
 - **Tests:** scenario `threads` (no lifecycle, no proposals, nested comments, one vote each,
   votes only on comments); `tests/e2e/threads.mjs`.
-- **Checked so far:** see the PR / the Done entry once merged.
+- **Checked (cloud session, 2026-11-01):** zomes build + pack; `cargo clippy` (project zomes,
+  gateway) and `cargo fmt`; `cargo test -p sp_discussion`, gateway index tests; scenarios
+  `threads` and `help_requests` **passed** (`cloud-scenarios`-style run, ~12 min each); UI
+  check + lint, boundaries, sizes; against a local seed node (`cloud-seed.sh`):
+  `threads.mjs`, `search.mjs` (now expects Threads in the filter; its events check reads links
+  only, since an empty network shows "No results") and `help-requests.mjs` **passed**. Not run
+  locally: the other scenarios (CI runs them all).
+- Messages' Public tab leaves thread/post comments out (web lists projects, events and help
+  requests there); notification cards say "Thread"/"Post".
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
