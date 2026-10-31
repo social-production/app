@@ -60,8 +60,16 @@ web's third event audience, **Private community**. **Integrity change in the pro
 - `tests/e2e/closed-communities.mjs` now ends with one creating a community event and two
   finding it on the community page and joining. It needs the new DNA: run it against a local
   seed node (`bash scripts/cloud-seed.sh`), not live, until merged.
-- **Checked so far:** zomes build + pack, UI check/lint, boundaries, sizes, cargo fmt.
-  Pending: scenario `scopes`, browser test, native clippy, then PR + CI + merge + live smoke.
+- **Checked:** zomes build + pack, `cargo clippy -p project -p project_integrity -p scenarios
+  --all-targets`, cargo fmt, UI check/lint, boundaries, sizes; scenario `scopes` **passed**
+  (both tests, 23 min); `closed-communities.mjs` **passed** against a local seed node
+  (`cloud-seed.sh`) with the new DNA. Not run: the other scenarios (CI runs them).
+  Next: PR → CI → merge → live smoke (`closed-communities.mjs` against the live UI).
+- **Disk lesson (2026-10-31):** `cloud-seed.sh` builds the gateway with debug info unless you
+  export `CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0` (as the scenarios do); without
+  them it rebuilds holochain separately and filled the disk to 2 GB free. With them it reuses
+  the scenario build and starts in ~3 min. This session also removed a stale `target/release`
+  (3.8 GB).
 
 ## Next after this: the parity pass (`docs/plans/PARITY.md`)
 Candidates: **Home scope's joined-channel/community rows** (found 2026-10-31: the app's Home
