@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: posts and threads (ADR 0070), branch `claude/social-production-handoff-dsam61`
+## In flight: posts and threads (ADR 0070), PR #84 (branch `claude/social-production-handoff-dsam61`)
 web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
 yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
 discussion zome): merging resets the project network (test data only).
@@ -75,7 +75,7 @@ discussion zome): merging resets the project network (test data only).
   gateway) and `cargo fmt`; `cargo test -p sp_discussion`, gateway index tests; scenarios
   `threads` and `help_requests` **passed** (`cloud-scenarios`-style run, ~12 min each); UI
   check + lint, boundaries, sizes; against a local seed node (`cloud-seed.sh`):
-  `threads.mjs`, `search.mjs` (now expects Threads in the filter; its events check reads links
+  `threads.mjs`, `closed-communities.mjs`, `events.mjs`, `search.mjs` (now expects Threads in the filter; its events check reads links
   only, since an empty network shows "No results") and `help-requests.mjs` **passed**. Not run
   locally: the other scenarios (CI runs them all).
 - Messages' Public tab leaves thread/post comments out (web lists projects, events and help
