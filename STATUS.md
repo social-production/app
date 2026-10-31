@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-10-31 ~11 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-01 ~1 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,27 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: posts and threads (ADR 0070), PR #84 (branch `claude/social-production-handoff-dsam61`)
+## In flight: the follow-up PR after #84 (the thread vote shares the write queue; these docs).
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
+`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
+leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
+changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
+give: work that out first). Then the big pieces in PARITY's "Whole web pages the app doesn't
+have yet" (moderation, map/places, service requests, software PR flow; posts and threads are
+done, with their later parts listed in PARITY);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-01: threads and posts (ADR 0070), PR #84 merged 13:13 UTC (12:13 am Melbourne), live ~13:35 UTC
+- **Live after merge:** CI took 72 min (slowest shard 3). The seed node restarted at ~13:35
+  UTC; `/readyz` 603 MB at 5 min. **The project network was reset** (integrity change): live
+  test projects, events, help requests, channels and communities from before ~13:35 UTC are
+  gone. Live `threads.mjs` **failed** at the reply: the thread's vote (`setSignal`) and the
+  queued comment writes raced on one chain ("source chain head has moved"; local runs were
+  fast enough to miss it). Fixed in the follow-up PR: `DiscussionState.vote` goes through
+  `services/chat.ts`'s `queued`. With that fix, a production build against the live gateway
+  passed `threads.mjs`. The test now prints the page's error note when the reply never shows.
 web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
 yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
 discussion zome): merging resets the project network (test data only).
@@ -81,14 +101,6 @@ discussion zome): merging resets the project network (test data only).
 - Messages' Public tab leaves thread/post comments out (web lists projects, events and help
   requests there); notification cards say "Thread"/"Post".
 
-## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
-`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
-leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
-changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
-give: work that out first). Then the big pieces in PARITY's "Whole web pages the app doesn't
-have yet" (posts and threads, moderation, map/places, service requests, software PR flow);
-asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
 ## Done 2026-10-31: Home's joined channels and communities + updates as on web, PR #83 merged 10:38 UTC (9:38 pm Melbourne), live ~10:58 UTC
 - **Live after merge (~11:05 UTC):** `closed-communities.mjs` (community event on Home) and

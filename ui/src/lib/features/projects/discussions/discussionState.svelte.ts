@@ -1,5 +1,6 @@
 import type { CommentSort, DiscussionComment, VoteDirection } from '#lib/domain/discussions.ts';
 import type { Project, Stance } from '#lib/domain/projects.ts';
+import { queued } from '#lib/services/chat.ts';
 import { addComment, listComments, voteComment } from '#lib/services/discussions.ts';
 import { explain } from '#lib/services/errors.ts';
 import { getPerson } from '#lib/services/people.ts';
@@ -65,7 +66,8 @@ export class DiscussionState {
   /** web's vote on the thread or post: its Support/Oppose signal. */
   async vote(next: Stance | null): Promise<void> {
     if (!requireViewer('Sign in to vote.')) throw new Error('signed out');
-    await setSignal(this.id, next);
+    // One write at a time per chain: comments and comment votes share this queue.
+    await queued(() => setSignal(this.id, next));
     void this.fetch().catch(() => undefined);
   }
 

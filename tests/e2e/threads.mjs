@@ -67,7 +67,13 @@ await comment.getByRole('button', { name: 'Reply' }).first().click();
 const reply = bob.getByLabel('Write a reply...');
 await reply.fill('Which kind of tomato?');
 await reply.press('Enter');
-await comment.locator('.reply-stack .comment-card', { hasText: 'Which kind' }).waitFor({ timeout: 60_000 });
+await comment
+  .locator('.reply-stack .comment-card', { hasText: 'Which kind' })
+  .waitFor({ timeout: 60_000 })
+  .catch(async (e) => {
+    const note = await bob.locator('.status-note').allInnerTexts();
+    throw new Error(`the reply never showed (page says: ${note.join(' | ') || 'nothing'}): ${e}`);
+  });
 await bob.getByText('2 comments').waitFor();
 log('a new person voted, replied and voted the comment up');
 
