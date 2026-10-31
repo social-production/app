@@ -135,7 +135,7 @@ await until(
 );
 const homeCard = bob.locator('.personal-activity-card', { hasText: seedSwap });
 assert.equal((await homeCard.locator('.identity .header-name').innerText()).trim(), `ann${stamp}`);
-assert.equal(await bob.locator('.project-card').count(), 0, 'Home has no public rows yet');
+assert.equal(await bob.locator('.project-card').count(), 0, 'bob joined no channel or community, so Home has no public rows');
 await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
 await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
 await bob.getByRole('menuitemradio', { name: 'Global' }).click();

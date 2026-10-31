@@ -155,14 +155,7 @@
           hidden={tab !== 'context'}
           inert={tab !== 'context'}
         >
-          <ContextPanel
-            {project}
-            {charter}
-            plans={detail.plans}
-            names={detail.names}
-            canPropose={detail.canPropose}
-            onAddUpdate={() => (sheet = 'update')}
-          />
+          <ContextPanel {project} {charter} plans={detail.plans} names={detail.names} />
         </div>
         <div
           class="tab-panel participation-tab"
@@ -215,6 +208,7 @@
             membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
             onEdit={() => (sheet = 'edit')}
+            onUpdate={() => (sheet = 'update')}
             revealVote={detailsVote ? voteLink : null}
             onRevealDone={clearVoteLink}
           />

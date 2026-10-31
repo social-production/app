@@ -60,11 +60,12 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 
 ## Feed
 - [x] Toolbar: web's scope menu (Home / Global) first, then the audience menu (Following
-  only / Following + popular) signed in (ADR 0055). Home = joined channels/communities (none
-  until M5d) merged with the projects of people you follow, on web's personal cards.
-- [ ] Home scope: web's Home rows are the items tagged with your joined channels and
-  communities (plus private-community events); the app's Home still shows only the personal
-  rows (`homeFeedState.svelte.ts` leaves the public rows empty on Home). Found 2026-10-31.
+  only / Following + popular) signed in (ADR 0055). Home = joined channels/communities
+  merged with the projects of people you follow, on web's personal cards.
+- [x] Home scope: web's Home rows are the items tagged with your joined channels and
+  communities, plus the events listed on your private communities (2026-10-31: the index's
+  `tag` takes several, comma-separated; `homeFeedState.svelte.ts`). The private-community
+  events ignore the time window (the index's cards carry no schedule either).
 - [ ] Toolbar: Region in the scope menu (needs place coordinates, M6); "Following + popular"
   adds web's discovery posts and threads once they exist.
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
@@ -79,7 +80,7 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 - [x] Events, part 2 (ADR 0061): Audience step, invite-only events, organizer-controlled
   governance with co-organizers; web's EventMembersPanel (Organizers/Members, Promote to
   organizer, Invite +), "Edit event"/Save and web's event phase-menu copy (2026-10-29).
-- [x] Events' private-community audience (2026-10-31, ADR 0069): web's Audience option and
+- [x] Events' private-community audience (2026-10-31, PR #82, ADR 0069): web's Audience option and
   Who step (one private community + organizers); the event is listed on the community, whose
   page shows it to members, who join without an invite.
 - [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change),
@@ -140,6 +141,21 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   pages with join/members and their tagged items, create-menu Surfaces, left-rail lists, the
   scope step in create flows. Still to come: Discover sheet, closed
   communities and invites, settings and vote sheets.
+
+## Whole web pages the app doesn't have yet (route diff, 2026-10-31)
+- [ ] Posts and threads: `create/post`, `create/thread`, `posts/[id]`, `threads/[slug]`
+  (web's standalone discussion items; NOT tabs on project/event pages, see STATUS Owner
+  decisions). Also feed "Following + popular" discovery rows.
+- [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's
+  Requests section). Asset-use requests come with asset management, after parity.
+- [ ] Moderation: ⋮ Report menu, bot reviews (web-backend `bot_reviews.py`), paused badge.
+- [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
+  project-activity cards.
+- [ ] Software project governance (pull requests / merge flow) in the Activity phase.
+- Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
+  the platform board, asset-use requests) comes later.
+- web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the
+  app's Home scope, onboarding and `/invites`; `profile/[username]` by `profile/[agent]`.
 
 ## Not compared yet
 Signed-in screens other than Settings and Notifications (compare from web's source; don't create

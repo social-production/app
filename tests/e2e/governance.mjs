@@ -85,12 +85,17 @@ await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'th
 log('an edit passed with both founders and applied');
 
 await ann.reload();
-await ann.getByRole('button', { name: 'Add update' }).click();
+await ann.getByRole('button', { name: 'Update', exact: true }).click();
 await ann.locator('.update-sheet textarea').fill('First repair night went well.');
 await ann.getByRole('button', { name: 'Post update' }).click();
 await voteYes(bob);
-await until(bob, () => bob.locator('.update-card', { hasText: 'First repair night' }), 'the update');
-log('an update passed and is listed');
+// web's header shows only the newest update, on one line under the description.
+const updateLine = () => bob.locator('.overview-update', { hasText: 'First repair night' });
+await until(bob, updateLine, 'the update');
+assert.equal((await updateLine().innerText()).trim(), 'Update: First repair night went well.');
+assert.equal(await bob.locator('.update-card').count(), 0, 'no separate updates list (web)');
+await bob.locator('.context-panel').screenshot({ path: `${shots}/update-line-390.png` });
+log('an update passed and shows in the header');
 // web's feed card shows the newest update ("Latest: …") once the index refreshes.
 const latest = bob.locator('.project-card', { hasText: title }).getByText('Latest: First repair night went well.');
 for (let i = 0; i < 20 && !(await latest.count()); i++) {

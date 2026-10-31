@@ -3,7 +3,7 @@
 // accept under Invites and land in it. One removes them from Settings' "Who decides"; they
 // then join again with the invite link. One makes an event for the community's members
 // (web's "Private community" audience, ADR 0069); two finds it on the community's page and
-// joins it without an invite.
+// joins it without an invite, and sees it on their Home feed.
 //   node tests/e2e/closed-communities.mjs http://localhost:4174 [screens dir]
 // It uses dev founder one (a founder on the live test network too), makes one community and
 // one event, and signs up one account.
@@ -144,6 +144,14 @@ await b.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await b.getByRole('button', { name: 'Join event' }).click();
 await b.getByRole('button', { name: 'Leave event' }).waitFor({ timeout: 120_000 });
 log('two joined the community event');
+
+// Home lists it too: web-backend's home feed includes your private communities' events.
+await b.goto(`${BASE}/`);
+await b.getByRole('button', { name: 'Choose public feed scope' }).click();
+await b.getByRole('menuitemradio', { name: 'Home' }).click();
+await b.locator('.event-card', { hasText: title }).waitFor({ timeout: 120_000 });
+await b.screenshot({ path: `${out}/phone390-community-event-home.png` });
+log('two sees the community event on Home');
 
 assert.deepEqual(errors, []);
 await browser.close();

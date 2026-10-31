@@ -146,7 +146,7 @@ function eventCard(p: Project, creatorName: string): ProjectCard {
     opposition: p.opposition,
     createdAt: p.createdAt,
     lastActivityAt: p.lastActivityAt ?? p.createdAt,
-    latestUpdate: p.updates.at(-1)?.body ?? null,
+    latestUpdate: p.updates[0]?.body ?? null, // newest first
     commentCount: 0,
   };
 }
