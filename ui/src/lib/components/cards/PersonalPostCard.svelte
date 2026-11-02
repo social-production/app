@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
   import { resolve } from '$app/paths';
@@ -28,13 +29,19 @@
 </script>
 
 <div class="personal-post-card">
-  <FeedSurface {href} tone="personal" accent={modeAccent(card.mode)}>
+  <FeedSurface
+    {href}
+    tone="personal"
+    accent={modeAccent(card.mode)}
+    contentRestricted={card.moderation === 'hidden'}
+  >
     <div class="card-header">
       <div class="header-row">
         <PersonalFeedIdentity
           name={authorName}
           href={resolve('/profile/[agent]', { agent: card.creator })}
         />
+        <CardReport {card} />
       </div>
     </div>
     <p class="linked-body feed">{card.summary}</p>

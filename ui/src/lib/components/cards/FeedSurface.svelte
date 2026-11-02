@@ -17,6 +17,8 @@
     compact?: boolean;
     /** Feed cards clamp body/summary; notifications show it whole. */
     clampExcerpts?: boolean;
+    /** web's serious-harm restriction (ADR 0071): blurred behind a warning until revealed. */
+    contentRestricted?: boolean;
     children: Snippet;
   }
 
@@ -26,21 +28,45 @@
     accent,
     compact = false,
     clampExcerpts = true,
+    contentRestricted = false,
     children,
   }: Props = $props();
+
+  let revealed = $state(false);
 </script>
 
 <article
   class="surface clickable tone-{tone}"
   class:compact
   class:has-accent={!!accent}
+  class:content-restricted={contentRestricted}
   style={accent ? `--row-accent: ${accent};` : undefined}
 >
   {#if href}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
     <a aria-label="Open item" class="surface-link" {href}></a>
   {/if}
-  <div class="content" class:clamp-excerpts={clampExcerpts} class:content-interactive={!href}>
+  {#if contentRestricted}
+    <div class="restriction-banner">
+      <span>Serious harm report — content blurred until you choose to reveal it.</span>
+      <button
+        class="reveal-btn"
+        type="button"
+        onclick={(event) => {
+          event.stopPropagation();
+          revealed = !revealed;
+        }}
+      >
+        {revealed ? 'Hide again' : 'Reveal'}
+      </button>
+    </div>
+  {/if}
+  <div
+    class="content"
+    class:blurred={contentRestricted && !revealed}
+    class:clamp-excerpts={clampExcerpts}
+    class:content-interactive={!href}
+  >
     {@render children()}
   </div>
 </article>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { localDateTime, signupSummary } from '#lib/domain/helpRequests.ts';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
@@ -34,9 +35,14 @@
 </script>
 
 <div class="personal-help-request-card">
-  <FeedSurface {href} tone="personal" accent={modeAccent(card.mode)}>
+  <FeedSurface
+    {href}
+    tone="personal"
+    accent={modeAccent(card.mode)}
+    contentRestricted={card.moderation === 'hidden'}
+  >
     <div class="card-header">
-      <FeedCardTop tags={card.tags} stage="" />
+      <FeedCardTop tags={card.tags} stage=""><CardReport {card} /></FeedCardTop>
       <div class="header-row">
         <PersonalFeedIdentity
           name={authorName}

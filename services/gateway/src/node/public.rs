@@ -39,7 +39,7 @@ const PROJECT: &[(&str, &[&str])] = &[
     ("activities", &["list_activities"]),
     (
         "discussion",
-        &["list_messages", "get_chunk", "message_votes"],
+        &["list_messages", "get_chunk", "message_votes", "moderation"],
     ),
 ];
 

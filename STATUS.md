@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-01 ~1 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-03 ~12:30 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,16 +50,47 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the follow-up PR after #84 (the thread vote shares the write queue; these docs).
+## In flight: moderation part (a), web's ⋮ Report (ADR 0071), branch `claude/social-production-handoff-dsam61`
+**Integrity change in the project DNA** (discussion zome): merging resets the project network.
+- **Crate `sp_moderation`:** web-backend's `thresholds.py` (whole percentages) and
+  `advance_resolution`, replayed over the counted votes in time order (`replay`); `audience`
+  (members other than the author, commenters, signallers, counted report voters; floor 3).
+- **DNA (discussion zome):** `Report` entry, `Reports` link (item → report) and `ReportVotes`
+  links (report → voter, yes/no); no reporting or voting on your own item; reports and their
+  links are never deleted. Coordinator `reports.rs`: `report_space`, `vote_report`,
+  `moderation` (state + report to show); only Full-standing votes count (directory's
+  `full_standing_before`). Scenario `tests/scenarios/tests/reports.rs` (23 min here; added to
+  `check-scenarios.sh`'s minutes table).
+- **Gateway:** the archivist reads `moderation` per card; cards carry `moderation`
+  (`under_review`/`hidden`), removed items leave `page()`; guests may call `moderation`.
+  Index test `removed_items_leave_the_feed_and_reviewed_ones_stay`.
+- **UI:** `components/moderation/` (ReportControl, ReportMenu, CardReport, `reportActions.ts`
+  context; the shell provides the service calls in `features/shell/reportActionsProvider.ts`),
+  `report.css` via PORTS, `FeedSurface` blur banner, `FeedCardTop` slot; ⋮ on every card and on
+  project/event, help request, thread and post pages; removed pages say "Removed for spam".
+  A refused vote reopens the menu with the reason (web toasts it). `PersonalActivityCard` now
+  always shows web's FeedCardTop (stage + ⋮), as web does.
+- **Found by the browser test:** sized only from the people involved (web uses the site's
+  weekly actives for public items), a new post's audience was 1 and web's "deletion still
+  reachable?" rule dismissed the report at its second vote. Fixed with the floor of 3 and
+  counting report voters (ADR 0071 "Audience", for the owner to review).
+- **Checked (2026-11-03, cloud session):** `cargo test -p sp_moderation` (14), `cargo clippy
+  -p sp_moderation -p discussion -p discussion_integrity -p gateway --all-targets -D warnings`,
+  `cargo fmt`, gateway index tests (5), zomes build + pack, UI check + lint, boundaries, sizes;
+  scenario `reports` **passed** (twice, the second time with the audience fix, 25 min); against a local seed
+  node (`cloud-seed.sh`): `reports.mjs` (new), `threads.mjs`, `projects.mjs`,
+  `help-requests.mjs`, `follows.mjs` **passed**. Not run locally: the other scenarios (CI).
+- **PR #86** opened 2026-11-02 ~14:30 UTC (1:30 am Melbourne, Nov 3). **Next:** wait for CI (~70 min), merge, smoke live
+  (`reports.mjs` against the live UI; the project network resets on deploy), then README/STATUS.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +
-`ReportMenu`; copy link alone would be a one-item menu until moderation), "Plan became
-leading" (web-backend sends `prj-plan-lead` to the new leader's author when a plan vote
-changes the leader; deriving it needs the time the lead changed, which the plan list doesn't
-give: work that out first). Then the big pieces in PARITY's "Whole web pages the app doesn't
-have yet" (moderation, map/places, service requests, software PR flow; posts and threads are
-done, with their later parts listed in PARITY);
+Candidates: moderation's later parts (PARITY "Moderation, later parts": reports on comments
+and chat messages first, since threads and posts lean on comments; then a removed project's
+side effects, bot reviews and the paused badge), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first). Then
+the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
+requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
 ## Done 2026-11-01: threads and posts (ADR 0070), PR #84 merged 13:13 UTC (12:13 am Melbourne), live ~13:35 UTC
@@ -71,6 +102,8 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   fast enough to miss it). Fixed in the follow-up PR: `DiscussionState.vote` goes through
   `services/chat.ts`'s `queued`. With that fix, a production build against the live gateway
   passed `threads.mjs`. The test now prints the page's error note when the reply never shows.
+- **PR #85** (that fix + docs) merged 14:54 UTC (1:54 am Melbourne); CI 69 min. Live
+  `threads.mjs` **passed** against the deployed UI at 15:05 UTC (seed node 687 MB).
 web's standalone discussion items, the first of PARITY's "Whole web pages the app doesn't have
 yet". **Integrity change in the project DNA** (new charter modes + `MessageVotes` link in the
 discussion zome): merging resets the project network (test data only).

@@ -63,6 +63,11 @@ pub fn touch() -> ExternResult<()> {
     project("touch")
 }
 
+/// A read from the project zome about this call's space (members, signals).
+pub fn call_project<O: DeserializeOwned + std::fmt::Debug>(name: &str) -> ExternResult<O> {
+    project(name)
+}
+
 fn project<O: DeserializeOwned + std::fmt::Debug>(name: &str) -> ExternResult<O> {
     let space = CURRENT.with(|c| c.borrow().clone());
     match call(

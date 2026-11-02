@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { localDateTime, signupSummary } from '#lib/domain/helpRequests.ts';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
@@ -32,8 +33,12 @@
 </script>
 
 <div class="help-request-card">
-  <FeedSurface {href} accent={modeAccent(card.mode)}>
-    <FeedCardTop tags={card.tags} stage="" />
+  <FeedSurface
+    {href}
+    accent={modeAccent(card.mode)}
+    contentRestricted={card.moderation === 'hidden'}
+  >
+    <FeedCardTop tags={card.tags} stage=""><CardReport {card} {href} /></FeedCardTop>
     <a class="title" href={resolve('/help-requests/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>
     {#if when || card.locationLabel}

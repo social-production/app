@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
   import { resolve } from '$app/paths';
@@ -29,8 +30,12 @@
 </script>
 
 <div class="event-card">
-  <FeedSurface {href} accent={modeAccent(card.mode)}>
-    <FeedCardTop tags={card.tags} stage={card.phase} />
+  <FeedSurface
+    {href}
+    accent={modeAccent(card.mode)}
+    contentRestricted={card.moderation === 'hidden'}
+  >
+    <FeedCardTop tags={card.tags} stage={card.phase}><CardReport {card} {href} /></FeedCardTop>
     <a class="title" href={resolve('/events/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>
     {#if card.latestUpdate}

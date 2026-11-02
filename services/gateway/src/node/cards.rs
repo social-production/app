@@ -47,6 +47,17 @@ pub struct Update {
     pub at: Timestamp,
 }
 
+/// Mirrors the discussion zome's `ModerationView` (the state only, ADR 0071).
+#[derive(Debug, Deserialize)]
+pub struct ModerationView {
+    pub state: String,
+}
+
+/// The card's moderation field: nothing while the item is visible.
+pub fn moderation_of(view: Option<ModerationView>) -> Option<String> {
+    view.map(|m| m.state).filter(|s| s != "visible")
+}
+
 /// The profile field the feed shows (mirrors the identity zome's `Profile`).
 #[derive(Debug, Deserialize)]
 pub struct Profile {
@@ -147,5 +158,6 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
             .map(|u| u.body),
         comment_count: 0,
         help: None,
+        moderation: None,
     }
 }

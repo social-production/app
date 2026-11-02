@@ -5,6 +5,7 @@ import { commitToRole, helpActivity } from '#lib/services/helpRequests.ts';
 import { getPerson } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+import { ModerationLoader } from '../moderationState.svelte.ts';
 
 /** One help request page (web's HelpRequestPageData): the space, its activity and names. */
 export class HelpState {
@@ -16,10 +17,16 @@ export class HelpState {
   pending = $state<number | null>(null);
   roleMessage = $state('');
 
-  constructor(readonly id: string) {}
+  /** web's ⋮ report menu and the removed notice (ADR 0071). */
+  readonly moderation: ModerationLoader;
+
+  constructor(readonly id: string) {
+    this.moderation = new ModerationLoader(id);
+  }
 
   /** First load: a request just created may take a few seconds to reach this node. */
   async open(): Promise<void> {
+    void this.moderation.load();
     for (let attempt = 1; ; attempt++) {
       try {
         await this.fetch();
