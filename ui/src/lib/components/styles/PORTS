@@ -134,3 +134,6 @@ discussion.css    .composer-field web/src/lib/components/shared/CommentComposer.
 discussion.css    .overview-shell web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte
 discussion.css    .discussion-page web/src/lib/features/threads/ThreadDetailPage.svelte
 discussion.css    .discussion-page web/src/lib/features/posts/PostDetailPage.svelte
+report.css        .report-control web/src/lib/components/shared/ReportControl.svelte
+report.css        .report-ui      web/src/lib/components/shared/ReportMenu.svelte
+report.css        .report-composer web/src/lib/components/shared/ReportComposerModal.svelte

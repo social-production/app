@@ -16,6 +16,7 @@ serde_bytes = "0.11"
 sp_attachment = { workspace = true }
 sp_core = { workspace = true }
 sp_discussion = { workspace = true }
+sp_moderation = { workspace = true }
 
 [lints]
 workspace = true

@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-01 ~2 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-03 ~12:30 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,29 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch restarts from `main` after PR #85).
+## In flight: moderation part (a), web's ⋮ Report (ADR 0071), branch `claude/social-production-handoff-dsam61`
+**Integrity change in the project DNA** (discussion zome): merging resets the project network.
+- **Crate `sp_moderation`:** web-backend's `thresholds.py` (whole percentages) and
+  `advance_resolution`, replayed over the counted votes in time order (`replay`). 13 unit tests.
+- **DNA (discussion zome):** `Report` entry, `Reports` link (item → report) and `ReportVotes`
+  links (report → voter, yes/no); no reporting or voting on your own item; reports and their
+  links are never deleted. Coordinator `reports.rs`: `report_space`, `vote_report`,
+  `moderation` (state + report to show); only Full-standing votes count (directory's
+  `full_standing_before`); audience = max(members, commenters, signallers), floor 3, minus the
+  author. Scenario `tests/scenarios/tests/reports.rs`.
+- **Gateway:** the archivist reads `moderation` per card; cards carry `moderation`
+  (`under_review`/`hidden`), removed items leave `page()`; guests may call `moderation`.
+  Index test `removed_items_leave_the_feed_and_reviewed_ones_stay`.
+- **UI:** `components/moderation/` (ReportControl, ReportMenu, CardReport, `reportActions.ts`
+  context; the shell provides the service calls in `features/shell/reportActionsProvider.ts`),
+  `report.css` via PORTS, `FeedSurface` blur banner, `FeedCardTop` slot; ⋮ on every card and on
+  project/event, help request, thread and post pages; removed pages say "Removed for spam".
+  `PersonalActivityCard` now always shows web's FeedCardTop (stage + ⋮), as web does.
+  Browser test `tests/e2e/reports.mjs` (post → own ⋮ → founder one reports → founder two votes
+  yes → profile card "Under review"; removal needs 3 Full votes and the dev network has 2).
+- **Checked so far:** `cargo test -p sp_moderation`, `cargo clippy` (sp_moderation, discussion
+  zomes), gateway index tests (5 passed), zomes build + pack, UI check + lint, boundaries, sizes.
+  Running: scenario `reports`; then a local seed node + `reports.mjs`, `threads.mjs`.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: "copy link" in the card ⋮ menu (web's ⋮ is `ReportControl` +

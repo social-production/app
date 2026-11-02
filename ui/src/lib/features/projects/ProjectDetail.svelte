@@ -4,6 +4,7 @@
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
+  import { removedLabel } from '#lib/domain/moderation.ts';
   import { isEvent, isPrivateSeed, type DetailTabId, type Project } from '#lib/domain/projects.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
@@ -15,6 +16,7 @@
   import { DetailState } from './detailState.svelte.ts';
   import EventMembersSheet from './EventMembersSheet.svelte';
   import LinksTab from './LinksTab.svelte';
+  import { ModerationLoader } from './moderationState.svelte.ts';
   import ParticipationDock from './ParticipationDock.svelte';
   import ParticipationPanel from './ParticipationPanel.svelte';
   import ProjectChat from './ProjectChat.svelte';
@@ -38,6 +40,11 @@
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
   // svelte-ignore state_referenced_locally
   const detail = new DetailState(id);
+  // svelte-ignore state_referenced_locally
+  const moderation = new ModerationLoader(id);
+  $effect(() => {
+    void moderation.load();
+  });
   // web's links into a project: `?tab=…`, `?comment=…` (the chat), `?open=vote&voteTarget=…`,
   // `?activity=…` (the Take part tab, ADR 0056) and `?linkRequest=…` (the Links tab).
   const params = page.url.searchParams;
@@ -136,6 +143,11 @@
   <section class="page" class:page-chat={chatFull}>
     {#if detail.error && !detail.project}
       <section class="hero-card"><p class="tab-loading">{detail.error}</p></section>
+    {:else if moderation.value.state === 'removed'}
+      <!-- web answers "not found" once a report removes it; the app says why. -->
+      <section class="hero-card">
+        <p class="tab-loading">{removedLabel(moderation.value.report?.reason)}</p>
+      </section>
     {:else if !detail.project?.charter}
       <section class="hero-card"><p class="tab-loading">Loading project…</p></section>
     {:else}
@@ -155,7 +167,14 @@
           hidden={tab !== 'context'}
           inert={tab !== 'context'}
         >
-          <ContextPanel {project} {charter} plans={detail.plans} names={detail.names} />
+          <ContextPanel
+            {project}
+            {charter}
+            plans={detail.plans}
+            names={detail.names}
+            moderation={moderation.value}
+            onModeration={(next) => moderation.set(next)}
+          />
         </div>
         <div
           class="tab-panel participation-tab"

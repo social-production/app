@@ -2006,6 +2006,7 @@ dependencies = [
  "sp_attachment",
  "sp_core",
  "sp_discussion",
+ "sp_moderation",
 ]
 
 [[package]]
@@ -2019,6 +2020,7 @@ dependencies = [
  "sp_attachment",
  "sp_core",
  "sp_discussion",
+ "sp_moderation",
 ]
 
 [[package]]
@@ -8825,6 +8827,13 @@ version = "0.0.1"
 [[package]]
 name = "sp_index"
 version = "0.0.1"
+
+[[package]]
+name = "sp_moderation"
+version = "0.0.1"
+dependencies = [
+ "sp_governance",
+]
 
 [[package]]
 name = "sp_scope"

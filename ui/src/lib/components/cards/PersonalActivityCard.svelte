@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { modeAccent, takesSignals, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
   import { resolve } from '$app/paths';
@@ -29,21 +30,19 @@
 </script>
 
 <div class="personal-activity-card">
-  <FeedSurface {href} tone="personal" accent={modeAccent(card.mode)}>
+  <FeedSurface
+    {href}
+    tone="personal"
+    accent={modeAccent(card.mode)}
+    contentRestricted={card.moderation === 'hidden'}
+  >
     <div class="card-header">
-      {#if card.tags.length > 0}
-        <FeedCardTop stage={card.phase} tags={card.tags} />
-      {/if}
-      <!-- Without tags the stage joins the author's row (web's header-row + header-end, as its
-           private items use), rather than sitting alone above it. -->
+      <FeedCardTop stage={card.phase} tags={card.tags}><CardReport {card} /></FeedCardTop>
       <div class="header-row">
         <PersonalFeedIdentity
           name={authorName}
           href={resolve('/profile/[agent]', { agent: card.creator })}
         />
-        {#if card.tags.length === 0 && card.phase}
-          <div class="header-end"><span class="feed-card-stage">{card.phase}</span></div>
-        {/if}
       </div>
     </div>
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it -->

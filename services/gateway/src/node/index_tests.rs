@@ -24,6 +24,7 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         latest_update: None,
         comment_count: 0,
         help: None,
+        moderation: None,
     }
 }
 
@@ -143,4 +144,26 @@ async fn scopes_stay_out_of_the_feed_and_the_first_handle_wins() {
         scopes.iter().map(|c| c.id.as_str()).collect::<Vec<_>>(),
         ["first"]
     );
+}
+
+#[tokio::test]
+async fn removed_items_leave_the_feed_and_reviewed_ones_stay() {
+    let index = ProjectIndex::default();
+    let mut removed = card("Spam", 9, 1);
+    removed.moderation = Some(REMOVED.into());
+    let mut reviewed = card("Odd", 0, 2);
+    reviewed.moderation = Some("under_review".into());
+    index
+        .replace(vec![removed, reviewed, card("Bikes", 0, 3)])
+        .await;
+    let q = FeedQuery {
+        sort: Sort::Recent,
+        window: Window::All,
+        search: "",
+        now: 10,
+        utc_offset_minutes: 0,
+    };
+    let (page, total) = index.page(&q, &[], &[], 0, 10).await;
+    assert_eq!(total, 2);
+    assert!(page.iter().all(|c| c.title != "Spam"));
 }

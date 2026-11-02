@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
   import PrivateMark from './PrivateMark.svelte';
@@ -12,13 +13,15 @@
    * web's FeedCardTop with TagList (plain): tags left (3 on desktop, 1 on phones; "+N" opens
    * web's ScopeSheet with them all), the stage right, with web's PrivateMark beside it for
    * private events. Channel and community tags carry their icon and open their page; free
-   * tags from before channels search for themselves.
+   * tags from before channels search for themselves. web's slot (the ⋮ report menu) sits
+   * after the stage.
    */
   let {
     tags,
     stage,
     isPrivate = false,
-  }: { tags: string[]; stage: string; isPrivate?: boolean } = $props();
+    children,
+  }: { tags: string[]; stage: string; isPrivate?: boolean; children?: Snippet } = $props();
 
   const phone = new MediaQuery('(max-width: 760px)');
   let sheetOpen = $state(false);
@@ -35,7 +38,7 @@
   import '#lib/components/styles/cards.css';
 </script>
 
-{#if tags.length > 0 || stage || isPrivate}
+{#if tags.length > 0 || stage || isPrivate || children}
   <div class="feed-card-top">
     <div class="feed-card-tags">
       {#if tags.length > 0}
@@ -66,6 +69,7 @@
     <div class="feed-card-end">
       {#if isPrivate}<PrivateMark />{/if}
       {#if stage}<span class="feed-card-stage">{stage}</span>{/if}
+      {@render children?.()}
     </div>
   </div>
 {/if}

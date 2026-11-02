@@ -1,0 +1,12 @@
+[package]
+name = "sp_moderation"
+description = "Content reports (web's ⋮ Report): reasons, vote tags and web-backend's hide/delete thresholds, replayed from the votes (ADR 0071). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sp_governance = { workspace = true }
+
+[lints]
+workspace = true

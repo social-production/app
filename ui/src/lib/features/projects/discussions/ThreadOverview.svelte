@@ -2,6 +2,7 @@
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import CountPill from '#lib/components/cards/CountPill.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
+  import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import { countComments } from '#lib/domain/discussions.ts';
 
@@ -20,7 +21,16 @@
 
 {#if project && charter}
   <section class="overview-shell">
-    <FeedCardTop tags={charter.tags} stage="" />
+    <FeedCardTop tags={charter.tags} stage="">
+      <ReportControl
+        id={state.id}
+        itemLabel="thread"
+        moderation={state.moderation.value}
+        owner={project.creator}
+        copyUrl={`${location.origin}${location.pathname}`}
+        onChange={(next) => state.moderation.set(next)}
+      />
+    </FeedCardTop>
     <h1>{charter.title}</h1>
     <p class="overview-copy">{charter.description}</p>
     <div class="footer detail-footer no-truncate">

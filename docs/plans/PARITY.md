@@ -72,8 +72,9 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   the gateway index (`commentCount` counts up to the chat's 200-message page).
 - [x] Cards: layout already matched (channel/community tags top-left, author + members + date
   bottom-right).
-- [ ] Cards: web's ⋮ `ReportControl` (copy link, report) top-right. Comes with M6 moderation;
-  "copy link" alone could come sooner.
+- [x] Cards: web's ⋮ `ReportControl` (Copy link, Report, the open report with No / Yes) on
+  every card and detail header; "Under review" / "Hidden" beside it; hidden cards blur behind
+  web's serious-harm banner; removed items leave the feed (2026-11-02, ADR 0071 part a).
 - [x] Event cards (M5c, ADR 0057): web's `EventCard` (place line, signals, comments) linking to
   `/events/<id>` (as do the rail, notifications, search and personal cards). Still to come:
   the time on the card (the index needs the leading plan's schedule).
@@ -151,10 +152,15 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   post bodies (`LinkedPostBody`), Posts in Search (the index keeps posts out of non-personal
   pages), web's scope-page create menu (`ScopeCreateMenu`), "Post an update" prefill from
   project/event pages, thread/post share notifications, feed "Following + popular" discovery
-  rows, ⋮ Report (moderation).
+  rows (⋮ Report came with ADR 0071).
 - [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's
   Requests section). Asset-use requests come with asset management, after parity.
-- [ ] Moderation: ⋮ Report menu, bot reviews (web-backend `bot_reviews.py`), paused badge.
+- [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
+  threads and posts (web's thresholds, Full members' votes, replayed by every reader).
+- [ ] Moderation, later parts: reports on comments and chat messages (web's hidden/removed
+  bodies, the 1:1 DM fast path), a removed project's side effects (memberships, votes and
+  sign-ups end, `prj-removed`, the author's warm-up penalty), the blur on hidden detail pages,
+  bot reviews (web-backend `bot_reviews.py`) and the paused badge.
 - [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
   project-activity cards.
 - [ ] Software project governance (pull requests / merge flow) in the Activity phase.

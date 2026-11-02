@@ -5,6 +5,9 @@
 //! a private read mark keeps "unread" per person rather than per device (ADR 0044).
 //! A thread's or post's chat is its comments (ADR 0070): replies nest under `reply_to`, and
 //! anyone signed in votes a comment up or down with a `MessageVotes` link.
+//! Reports (web's ⋮ Report, ADR 0071) live here too: rules in `report.rs`.
+
+mod report;
 
 use hdi::prelude::*;
 use sp_attachment::{check_attachment, check_body, check_chunk};
@@ -59,7 +62,10 @@ pub enum EntryTypes {
     Chunk(Chunk),
     #[entry_type(visibility = "private")]
     ReadMark(ReadMark),
+    Report(Report),
 }
+
+pub use report::Report;
 
 #[derive(Serialize, Deserialize)]
 #[hdk_link_types]
@@ -68,6 +74,11 @@ pub enum LinkTypes {
     ChatMessages,
     /// A message → the agent voting on it; tag `[sp_discussion::UP]` or `[DOWN]` (ADR 0070).
     MessageVotes,
+    /// A reported item (a space's charter hash) → a report, by its reporter (ADR 0071).
+    Reports,
+    /// A report → the agent voting on it; tag `[sp_moderation::YES]` or `[NO]`. Never deleted:
+    /// a changed vote is a newer link, so every reader replays the same history.
+    ReportVotes,
 }
 
 #[hdk_extern]
@@ -86,6 +97,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 Err(reason) => invalid(&reason),
             },
             EntryTypes::ReadMark(_) => Ok(ValidateCallbackResult::Valid),
+            EntryTypes::Report(r) => report::validate_report(&r, action.author()),
         },
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })
         | FlatOp::CreateRecord(OpRecord::UpdateEntry { .. })
@@ -93,7 +105,9 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         FlatOp::CreateRecord(OpRecord::DeleteEntry { action })
         | FlatOp::Delete(OpDelete { action }) => {
             let original = must_get_action(action.deletes_address.clone())?;
-            if original.action().author() == action.author() {
+            if is_type(original.action(), UnitEntryTypes::Report)? {
+                invalid("reports are never taken back")
+            } else if original.action().author() == action.author() {
                 Ok(ValidateCallbackResult::Valid)
             } else {
                 invalid("only a message's author can delete it")
@@ -106,9 +120,12 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         FlatOp::Link(OpLink::DeleteLink {
             original_action,
             action,
+            link_type,
             ..
         }) => {
-            if original_action.author() == action.author() {
+            if matches!(link_type, LinkTypes::Reports | LinkTypes::ReportVotes) {
+                invalid("reports and their votes are never taken back")
+            } else if original_action.author() == action.author() {
                 Ok(ValidateCallbackResult::Valid)
             } else {
                 invalid("only the link's author can remove it")
@@ -157,6 +174,8 @@ fn validate_create_link(
     match link_type {
         LinkTypes::ChatMessages => validate_link(action),
         LinkTypes::MessageVotes => validate_vote(action),
+        LinkTypes::Reports => report::validate_listing(action),
+        LinkTypes::ReportVotes => report::validate_vote(action),
     }
 }
 
@@ -215,6 +234,6 @@ pub fn is_type(action: &Action, kind: UnitEntryTypes) -> ExternResult<bool> {
     ))
 }
 
-fn invalid(reason: &str) -> ExternResult<ValidateCallbackResult> {
+pub(crate) fn invalid(reason: &str) -> ExternResult<ValidateCallbackResult> {
     Ok(ValidateCallbackResult::Invalid(reason.to_string()))
 }

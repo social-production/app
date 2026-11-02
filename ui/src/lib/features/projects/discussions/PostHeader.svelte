@@ -3,6 +3,7 @@
   import CountPill from '#lib/components/cards/CountPill.svelte';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import { countComments } from '#lib/domain/discussions.ts';
 
   import { resolve } from '$app/paths';
@@ -12,7 +13,7 @@
 
   /**
    * web's PostDetailPage header: the author, the body, votes, comments, the clock, Share and
-   * Sort. web's ⋮ report menu comes with moderation.
+   * Sort, with web's ⋮ report menu beside the author (ADR 0071).
    */
   let { state }: { state: DiscussionState } = $props();
 
@@ -33,6 +34,14 @@
           title={name}>{name}</a
         >
       </div>
+      <ReportControl
+        id={state.id}
+        itemLabel="post"
+        moderation={state.moderation.value}
+        owner={project.creator}
+        copyUrl={`${location.origin}${location.pathname}`}
+        onChange={(next) => state.moderation.set(next)}
+      />
     </div>
   </div>
 

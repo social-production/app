@@ -11,7 +11,9 @@ use holochain::conductor::api::{AdminRequest, AppInfo, CellInfo};
 use holochain::prelude::*;
 use holochain_types::app::{AppBundleSource, InstallAppPayload};
 
-use super::cards::{card, help_of, ActivityView, ListingView, Profile, ProjectView};
+use super::cards::{
+    card, help_of, moderation_of, ActivityView, ListingView, ModerationView, Profile, ProjectView,
+};
 use super::spaces::{space_of_seed, Scoped};
 use super::{Node, ProjectCard};
 
@@ -124,7 +126,12 @@ impl Node {
         } else {
             Vec::new()
         };
+        let moderation: Option<ModerationView> = self
+            .call(agent, commons.clone(), "discussion", "moderation", at(()))
+            .await
+            .ok();
         let mut card = card(view, project);
+        card.moderation = moderation_of(moderation);
         card.help = help.then(|| help_of(&activities));
         card.creator_name = profile.map(|p| p.name).unwrap_or_default();
         card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);

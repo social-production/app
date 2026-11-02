@@ -36,7 +36,14 @@ pub struct ProjectCard {
     /// A help request's time and sign-ups (ADR 0067); absent on other cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub help: Option<super::cards::HelpCard>,
+    /// web's `moderationState` when a report is open: `under_review` or `hidden` (ADR 0071).
+    /// Removed items leave the feed; absent while nothing is reported.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub moderation: Option<String>,
 }
+
+/// The moderation state of an item a report took down.
+pub const REMOVED: &str = "removed";
 
 #[derive(Clone, Debug, Default)]
 pub struct ProjectIndex(Arc<RwLock<Vec<ProjectCard>>>);
@@ -73,6 +80,8 @@ impl ProjectIndex {
         let cards: Vec<&ProjectCard> = all
             .iter()
             .filter(|c| !sp_scope::is_scope(&c.mode))
+            // Removed after a report (ADR 0071): web unlists them everywhere.
+            .filter(|c| c.moderation.as_deref() != Some(REMOVED))
             // Posts live on personal feeds only (web's personal feed and profiles, ADR 0070).
             .filter(|c| c.mode != sp_discussion::POST || !creators.is_empty())
             .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))

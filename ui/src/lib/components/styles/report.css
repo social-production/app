@@ -1,0 +1,383 @@
+/* Ported from web/src/lib/components/shared/ReportControl.svelte (ADR 0032, scripts/port-styles.py) */
+.report-control {
+  display: inline-grid;
+  justify-items: start;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+/* Ported from web/src/lib/components/shared/ReportMenu.svelte (ADR 0032, scripts/port-styles.py) */
+.report-ui .report-menu-shell {
+  display: inline-grid;
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.report-ui .report-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 120ms ease,
+    color 120ms ease,
+    border-color 120ms ease;
+}
+
+.report-ui .report-trigger:not(.read-only):hover,
+.report-ui .report-trigger:not(.read-only):focus-visible {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  border-color: transparent;
+  filter: none;
+  transform: none;
+}
+
+.report-ui .report-trigger.active-report {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  border: 1px solid color-mix(in srgb, var(--brand) 45%, var(--panel-border));
+}
+
+.report-ui .report-trigger.active-report:not(.read-only):hover,
+.report-ui .report-trigger.active-report:not(.read-only):focus-visible {
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel));
+  border-color: var(--brand);
+}
+
+.report-ui .report-trigger.under-review {
+  border: 1px solid var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.report-ui .report-trigger.hidden-state {
+  border: 1px solid color-mix(in srgb, var(--brand) 55%, var(--panel-border));
+  background: var(--brand-badge);
+  color: var(--brand-strong);
+}
+
+.report-ui .report-trigger.read-only {
+  cursor: default;
+}
+
+.report-ui .status-token {
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.report-ui .menu-dots {
+  display: inline-block;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow:
+    0 -5px 0 currentColor,
+    0 5px 0 currentColor;
+}
+
+.report-ui .report-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.report-ui .report-menu-backdrop {
+  isolation: isolate;
+}
+
+.report-ui .report-menu {
+  display: grid;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  box-shadow: 0 14px 30px color-mix(in srgb, var(--text-main) 10%, transparent);
+}
+
+.report-ui .menu-label,
+.report-ui .review-value,
+.report-ui .review-meta p,
+.report-ui .report-message {
+  margin: 0;
+}
+
+.report-ui .menu-label {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.report-ui .review-field {
+  display: grid;
+  gap: 6px;
+  align-content: start;
+}
+
+.report-ui .field-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.report-ui .review-value {
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.report-ui .report-message {
+  min-height: 96px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--panel-border);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.report-ui .review-meta {
+  display: grid;
+  gap: 4px;
+}
+
+.report-ui .review-meta p {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.report-ui .menu-actions {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+}
+
+.report-ui .menu-actions > button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 0;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 0;
+  border-right: 1px solid var(--panel-border);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.report-ui .menu-actions > button:last-child {
+  border-right: 0;
+}
+
+.report-ui .menu-actions > .menu-dismiss {
+  flex: 0 0 44px;
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.report-ui .menu-actions.votes .menu-dismiss {
+  background: transparent;
+  color: var(--text-main);
+}
+
+.report-ui .vote-chip {
+  background: var(--panel);
+  color: var(--text-main);
+}
+
+.report-ui .vote-chip.yes {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.report-ui .vote-chip.active-vote {
+  background: color-mix(in srgb, var(--danger) 18%, var(--panel));
+  color: var(--danger);
+}
+
+.report-ui .vote-chip.yes.active-vote {
+  background: var(--brand);
+  color: var(--page-bg);
+  box-shadow: inset 0 0 0 2px var(--text-main);
+}
+
+.report-ui .vote-chip:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.report-ui .menu-item {
+  width: 100%;
+  padding-left: 0;
+  padding-right: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  text-align: left;
+}
+
+.report-ui .menu-item:hover,
+.report-ui .menu-item:focus-visible {
+  color: var(--brand-strong);
+}
+
+.report-ui .report-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-sheet);
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: var(--shell-scrim);
+}
+
+.report-ui .report-menu {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0;
+  width: min(420px, calc(100vw - 40px));
+  max-height: min(720px, calc(100dvh - 48px));
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--panel);
+}
+
+.report-ui .menu-header {
+  display: flex;
+  align-items: center;
+  min-height: 52px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.report-ui .menu-title {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.report-ui .menu-body {
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding: 16px;
+}
+
+.report-ui .menu-item,
+.report-ui .vote-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-ui .menu-item svg,
+.report-ui .vote-chip svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.report-ui .menu-item {
+  min-height: 44px;
+}
+
+@media (max-width: 760px) {
+  .report-ui .report-menu-backdrop {
+    place-items: stretch;
+    padding: 0;
+  }
+
+  .report-ui .report-menu {
+    width: 100%;
+    height: 100dvh;
+    max-height: 100dvh;
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+
+  .report-ui .menu-header {
+    min-height: calc(52px + var(--shell-safe-top, 0px));
+    padding-top: var(--shell-safe-top, 0px);
+  }
+
+  .report-ui .menu-actions > button {
+    min-height: calc(56px + var(--shell-safe-bottom, 0px));
+    padding-bottom: var(--shell-safe-bottom, 0px);
+    font-size: 16px;
+  }
+}
+
+/* Ported from web/src/lib/components/shared/ReportComposerModal.svelte (ADR 0032, scripts/port-styles.py) */
+.report-composer .report-body {
+  display: grid;
+  gap: 14px;
+  padding: 8px 16px 4px;
+}
+
+.report-composer .field-stack {
+  display: grid;
+  gap: 6px;
+}
+
+.report-composer .field-label {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.report-composer textarea,
+.report-composer select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.report-composer textarea {
+  resize: vertical;
+}

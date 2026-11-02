@@ -53,6 +53,8 @@ export interface ProjectCard {
     signupCount: number;
     slotsNeeded: number;
   };
+  /** web's moderationState while a report is open: `under_review` or `hidden` (ADR 0071). */
+  moderation?: string;
 }
 
 export interface Project {

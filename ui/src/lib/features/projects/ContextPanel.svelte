@@ -1,6 +1,8 @@
 <script lang="ts">
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
+  import ReportControl from '#lib/components/moderation/ReportControl.svelte';
+  import type { Moderation } from '#lib/domain/moderation.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import type { PlanBoard } from '#lib/domain/plans.ts';
@@ -19,9 +21,12 @@
     charter: Charter;
     plans: PlanBoard | undefined;
     names: Record<string, string>;
+    /** web's ReportControl in the header (ADR 0071). */
+    moderation: Moderation;
+    onModeration: (next: Moderation) => void;
   }
 
-  let { project, charter, plans, names }: Props = $props();
+  let { project, charter, plans, names, moderation, onModeration }: Props = $props();
 
   const leading = $derived(
     plans?.plans.find((p) => p.plan.kind === 'Event' && p.leader === 'Leading' && p.approved)?.plan,
@@ -38,7 +43,16 @@
       tags={charter.tags}
       stage={project.stage}
       isPrivate={project.audience !== 'public'}
-    />
+    >
+      <ReportControl
+        id={project.id}
+        itemLabel={charter.mode === 'event' ? 'event' : 'project'}
+        {moderation}
+        owner={project.creator}
+        copyUrl={`${location.origin}${location.pathname}`}
+        onChange={onModeration}
+      />
+    </FeedCardTop>
     <div class="heading overview-heading">
       <div class="identity-row">
         <div class="identity-copy">

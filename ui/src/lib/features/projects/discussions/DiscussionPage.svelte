@@ -1,6 +1,7 @@
 <script lang="ts">
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
   import DiscussionPanel from '#lib/components/discussion/DiscussionPanel.svelte';
+  import { removedLabel } from '#lib/domain/moderation.ts';
   import { modeAccent } from '#lib/domain/projects.ts';
   import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -37,6 +38,8 @@
   <section class="page">
     {#if state.error && !state.project}
       <p class="tab-loading">{state.error}</p>
+    {:else if state.moderation.value.state === 'removed'}
+      <p class="tab-loading">{removedLabel(state.moderation.value.report?.reason)}</p>
     {:else if !state.project?.charter}
       <p class="tab-loading">Loading {kind}…</p>
     {:else}
@@ -44,6 +47,7 @@
         tone={kind === 'post' ? 'personal' : 'public'}
         accent={modeAccent(kind)}
         clampExcerpts={false}
+        contentRestricted={state.moderation.value.state === 'hidden'}
       >
         {#if kind === 'thread'}
           <ThreadOverview {state} />

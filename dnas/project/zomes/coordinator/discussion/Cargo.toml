@@ -10,6 +10,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 sp_discussion = { workspace = true }
+sp_moderation = { workspace = true }
 hdk = { workspace = true }
 serde = { workspace = true }
 discussion_integrity = { workspace = true }

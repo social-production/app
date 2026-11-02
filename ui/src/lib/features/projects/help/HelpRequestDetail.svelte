@@ -1,6 +1,8 @@
 <script lang="ts">
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
+  import ReportControl from '#lib/components/moderation/ReportControl.svelte';
+  import { removedLabel } from '#lib/domain/moderation.ts';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import { localDateTime } from '#lib/domain/helpRequests.ts';
   import type { DetailTabId } from '#lib/domain/projects.ts';
@@ -59,6 +61,10 @@
   <section class="page" class:page-chat={chatFull}>
     {#if help.error && !help.project}
       <section class="hero-card"><p class="tab-loading">{help.error}</p></section>
+    {:else if help.moderation.value.state === 'removed'}
+      <section class="hero-card">
+        <p class="tab-loading">{removedLabel(help.moderation.value.report?.reason)}</p>
+      </section>
     {:else if !help.project?.charter}
       <section class="hero-card"><p class="tab-loading">Loading help request…</p></section>
     {:else}
@@ -74,7 +80,16 @@
         {#if tab === 'context'}
           <div class="context-tab help-overview">
             <div class="context-panel">
-              <FeedCardTop tags={charter.tags} stage="" />
+              <FeedCardTop tags={charter.tags} stage="">
+                <ReportControl
+                  id={help.id}
+                  itemLabel="help request"
+                  moderation={help.moderation.value}
+                  owner={project.creator}
+                  copyUrl={`${location.origin}${location.pathname}`}
+                  onChange={(next) => help.moderation.set(next)}
+                />
+              </FeedCardTop>
               <div class="heading overview-heading">
                 <div class="identity-copy">
                   <h1>{charter.title}</h1>

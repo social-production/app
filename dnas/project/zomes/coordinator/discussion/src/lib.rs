@@ -6,6 +6,8 @@
 mod files;
 mod own;
 mod reads;
+mod report_links;
+mod reports;
 mod scope;
 mod votes;
 
@@ -15,6 +17,7 @@ use sp_attachment::check_body;
 use sp_core::chat::PAGE_MAX;
 
 pub use files::Bytes;
+pub use reports::{ModerationView, ReportInput, ReportView, ReportVoteInput};
 use scope::{enter, In};
 pub use votes::{VoteInput, VoteView};
 
@@ -161,4 +164,25 @@ pub fn message_votes(call: In<Vec<ActionHash>>) -> ExternResult<Vec<VoteView>> {
         return Err(guest("Too many comments at once."));
     }
     votes::of(&ids)
+}
+
+/// Report the space (web's ⋮ Report, ADR 0071): spam or serious harm, with what's wrong.
+#[hdk_extern]
+pub fn report_space(call: In<ReportInput>) -> ExternResult<ModerationView> {
+    let input = enter(call)?;
+    reports::submit(&input)
+}
+
+/// Vote yes (take it down) or no on the space's open report.
+#[hdk_extern]
+pub fn vote_report(call: In<ReportVoteInput>) -> ExternResult<ModerationView> {
+    let input = enter(call)?;
+    reports::vote(&input)
+}
+
+/// The space's moderation state and the report to show (guests and the index read it too).
+#[hdk_extern]
+pub fn moderation(call: In<()>) -> ExternResult<ModerationView> {
+    enter(call)?;
+    reports::status()
 }
