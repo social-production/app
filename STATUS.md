@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-03 ~12:30 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-03 ~4 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,23 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: moderation part (a), web's ⋮ Report (ADR 0071), branch `claude/social-production-handoff-dsam61`
+## In flight: nothing (this branch restarts from `main` after PR #86; this docs PR only).
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+Candidates: moderation's later parts (PARITY "Moderation, later parts": reports on comments
+and chat messages first, since threads and posts lean on comments; then a removed project's
+side effects, bot reviews and the paused badge), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first). Then
+the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
+requests, software PR flow; posts and threads are done, with their later parts in PARITY);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-03: moderation part (a), web's ⋮ Report (ADR 0071), PR #86 merged 16:14 UTC (3:14 am Melbourne), live ~16:38 UTC
+- **Live after merge:** CI took 71 min (slowest shard 4). The seed node restarted at ~16:38
+  UTC; `/readyz` 661 MB at 7.5 min. **The project network was reset** (integrity change): live
+  test projects, events, help requests, threads, posts, channels and communities from before
+  ~16:38 UTC are gone. Live `reports.mjs` and `projects.mjs` **passed** (16:42–16:46 UTC).
 **Integrity change in the project DNA** (discussion zome): merging resets the project network.
 - **Crate `sp_moderation`:** web-backend's `thresholds.py` (whole percentages) and
   `advance_resolution`, replayed over the counted votes in time order (`replay`); `audience`
@@ -80,18 +96,6 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   scenario `reports` **passed** (twice, the second time with the audience fix, 25 min); against a local seed
   node (`cloud-seed.sh`): `reports.mjs` (new), `threads.mjs`, `projects.mjs`,
   `help-requests.mjs`, `follows.mjs` **passed**. Not run locally: the other scenarios (CI).
-- **PR #86** opened 2026-11-02 ~14:30 UTC (1:30 am Melbourne, Nov 3). **Next:** wait for CI (~70 min), merge, smoke live
-  (`reports.mjs` against the live UI; the project network resets on deploy), then README/STATUS.
-
-## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: moderation's later parts (PARITY "Moderation, later parts": reports on comments
-and chat messages first, since threads and posts lean on comments; then a removed project's
-side effects, bot reviews and the paused badge), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first). Then
-the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
-requests, software PR flow; posts and threads are done, with their later parts in PARITY);
-asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
 ## Done 2026-11-01: threads and posts (ADR 0070), PR #84 merged 13:13 UTC (12:13 am Melbourne), live ~13:35 UTC
 - **Live after merge:** CI took 72 min (slowest shard 3). The seed node restarted at ~13:35
