@@ -37,6 +37,25 @@ pub fn popularity_boost_percent(score: u32) -> u32 {
     }
 }
 
+/// The smallest audience a report is measured against: web's 3-vote floor stays reachable.
+pub const MIN_AUDIENCE: u32 = 3;
+
+/// The eligible audience (ADR 0071 "Audience"), as web's `_hybrid_engaged_size` without the
+/// author: the members other than the author, the item's commenters and signallers, and the
+/// people whose votes on this report count, whichever is largest, and never under
+/// `MIN_AUDIENCE`. web sizes public items from the site's weekly actives instead; with only
+/// the people involved, a report on a new post would otherwise be dismissed by its second vote
+/// (deletion out of reach in an audience of one).
+#[must_use]
+pub fn audience(members: u32, commenters: u32, signallers: u32, voters: u32) -> u32 {
+    members
+        .saturating_sub(1)
+        .max(commenters)
+        .max(signallers)
+        .max(voters)
+        .max(MIN_AUDIENCE)
+}
+
 /// web's `_popularity_score`: each distinct voter counts 1, each distinct commenter 2.
 #[must_use]
 pub fn popularity_score(voters: u32, commenters: u32) -> u32 {
@@ -167,6 +186,13 @@ mod tests {
         assert_eq!(delete_quorum(20, Reason::Spam), 15);
         assert_eq!(delete_quorum(20, Reason::SeriousHarm), 10);
         assert_eq!(hide_quorum(20), 5);
+    }
+
+    #[test]
+    fn the_audience_leaves_the_author_out_and_has_a_floor() {
+        assert_eq!(audience(1, 0, 0, 2), 3);
+        assert_eq!(audience(5, 1, 2, 2), 4);
+        assert_eq!(audience(2, 7, 3, 1), 7);
     }
 
     #[test]

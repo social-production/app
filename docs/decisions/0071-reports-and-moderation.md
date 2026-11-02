@@ -34,12 +34,15 @@ boosts for the item's age and popularity; once deletion is out of reach the repo
   directory's `full_standing_before`, as proposals, ADR 0033). The coordinator refuses votes
   from others. web counts anyone who can view the item; an open network can't, because new
   accounts are cheap.
-- **Audience** (web's `electorate_size_for_target`): the larger of the space's members, its
-  distinct commenters and its signallers, at least 3 once more than one person is involved,
-  minus the author. Popularity = signallers + 2 × commenters. **Deviation:** web sizes
-  threads, posts and help requests from the site's weekly active users; a P2P network has no
-  global activity count, so they use the same engaged audience as projects (smaller, so fewer
-  votes decide). For the owner to review.
+- **Audience** (web's `electorate_size_for_target`, `sp_moderation::audience`): the largest
+  of the members other than the author, the item's commenters, its signallers and the people
+  whose votes on this report count, and never under 3. Popularity = signallers + 2 ×
+  commenters. **Deviation:** web sizes threads, posts and help requests from the site's
+  weekly active users; a P2P network has no global activity count. Sized only from the people
+  involved, a new post's audience is its author alone, and web's "can deletion still be
+  reached?" rule dismissed every report at its second vote (found by `reports.mjs`); hence the
+  voters and the floor of 3, which keeps web's 3-vote minimum reachable. Fewer votes decide
+  than on web's public items. For the owner to review.
 - **Coordinator** (`discussion`): `report_space`, `vote_report` and `moderation` (the state
   and the report to show: a removing report wins, else the earliest open one). One open
   report per item, as web's unique index. Writes mark the space active, so the index re-reads

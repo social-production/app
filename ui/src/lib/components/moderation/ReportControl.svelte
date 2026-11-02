@@ -51,6 +51,7 @@
   let reason = $state<ReportReason>('spam');
   let description = $state('');
   let error = $state('');
+  let voteError = $state('');
 
   const current = $derived(loaded ?? moderation ?? { ...VISIBLE, state: known });
 
@@ -74,6 +75,7 @@
   function toggle(): void {
     if (!actions.requireViewer(`Sign in to report this ${itemLabel}.`)) return;
     menuOpen = !menuOpen;
+    voteError = '';
     if (menuOpen) void load();
   }
 
@@ -111,11 +113,13 @@
     if (!report) return;
     menuOpen = false;
     pending = true;
+    voteError = '';
     try {
       apply(await actions.vote(id, report.id, yes));
-    } catch {
-      // web's vote failures leave the menu as it was; the next open re-reads it.
-      loaded = null;
+    } catch (e) {
+      // The menu reopens with the reason (web toasts it).
+      voteError = actions.explain(e);
+      menuOpen = true;
     } finally {
       pending = false;
     }
@@ -130,6 +134,7 @@
     open={menuOpen}
     {pending}
     {loading}
+    error={voteError}
     {copyUrl}
     blocked={!!owner && owner === actions.me()}
     onToggle={toggle}

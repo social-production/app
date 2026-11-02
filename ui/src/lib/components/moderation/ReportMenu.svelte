@@ -27,6 +27,8 @@
     /** "You can't report yourself" (the parent shows it instead of the Report item). */
     blocked: boolean;
     loading: boolean;
+    /** Why the last report or vote was refused (web toasts it). */
+    error?: string;
     onToggle: () => void;
     onClose: () => void;
     /** Copies the link; true when it worked. */
@@ -44,6 +46,7 @@
     copyUrl,
     blocked,
     loading,
+    error = '',
     onToggle,
     onClose,
     onCopy,
@@ -130,6 +133,7 @@
           <h2 class="menu-title" id="report-menu-title">{title}</h2>
         </header>
         <div class="menu-body">
+          {#if error}<p class="menu-label" role="alert">{error}</p>{/if}
           {#if copyUrl && !report}
             <button class="menu-item" role="menuitem" type="button" onclick={() => void copy()}>
               <svg aria-hidden="true" viewBox="0 0 24 24"

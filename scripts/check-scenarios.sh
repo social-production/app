@@ -17,6 +17,7 @@ declare -A minutes=(
   [scopes]=25 [projects]=22 [identity]=21 [health]=21 [groups]=18 [events]=14
   [follows]=12 [values]=11 [challenges]=11 [links]=9 [help_requests]=9 [attachments]=9
   [messages]=8 [reverts]=7 [receipts]=6 [calls]=5 [feedback]=3 [scale]=0
+  [reports]=23
 )
 NEW_FILE_MINUTES=15
 

@@ -7,7 +7,8 @@ use std::collections::{BTreeMap, BTreeSet};
 use discussion_integrity::{EntryTypes, LinkTypes, Report};
 use hdk::prelude::*;
 use sp_moderation::{
-    check_report, popularity_score, replay, Ballot, Reason, Resolution, Thresholds, NO, YES,
+    audience, check_report, popularity_score, replay, Ballot, Reason, Resolution, Thresholds, NO,
+    YES,
 };
 
 use crate::report_links::{self, Seen};
@@ -61,7 +62,9 @@ pub struct ModerationView {
 struct Engagement {
     author: AgentPubKey,
     created_at: i64,
-    audience: u32,
+    members: u32,
+    commenters: u32,
+    signallers: u32,
     score: u32,
 }
 
@@ -76,23 +79,26 @@ fn engagement() -> ExternResult<Engagement> {
     let charter = must_get_action(space.clone())?;
     let members: Vec<ActionHash> = scope::call_project("member_snapshot")?;
     let signals: SignalCounts = scope::call_project("signal_counts")?;
+    let author = charter.action().author().clone();
     let commenters: BTreeSet<AgentPubKey> = report_links::on(&space, LinkTypes::ChatMessages)?
         .into_iter()
         .map(|s| s.author)
+        .filter(|a| *a != author)
         .collect();
-    let voters = signals.demand + signals.opposition;
-    let commenters = u32::try_from(commenters.len()).unwrap_or(u32::MAX);
-    let members = u32::try_from(members.len()).unwrap_or(u32::MAX);
-    let mut engaged = members.max(commenters).max(voters);
-    if engaged > 1 {
-        engaged = engaged.max(3);
-    }
+    let signallers = signals.demand + signals.opposition;
+    let commenters = count(commenters.len());
     Ok(Engagement {
-        author: charter.action().author().clone(),
+        author,
         created_at: charter.action().timestamp().as_micros(),
-        audience: engaged.saturating_sub(1).max(1),
-        score: popularity_score(voters, commenters),
+        members: count(members.len()),
+        commenters,
+        signallers,
+        score: popularity_score(signallers, commenters),
     })
+}
+
+fn count(n: usize) -> u32 {
+    u32::try_from(n).unwrap_or(u32::MAX)
 }
 
 fn decode(hash: &ActionHash) -> ExternResult<Option<(Record, Report)>> {
@@ -166,11 +172,13 @@ fn view(record: &Record, report: &Report, e: &Engagement) -> ExternResult<Report
             });
         }
     }
-    let out = replay(reason, e.audience, e.score, e.created_at, &ballots);
+    let voters: BTreeSet<&AgentPubKey> = ballots.iter().map(|b| &b.voter).collect();
+    let audience = audience(e.members, e.commenters, e.signallers, count(voters.len()));
+    let out = replay(reason, audience, e.score, e.created_at, &ballots);
     let now = sys_time()?.as_micros();
     let t = Thresholds::at(
         reason,
-        e.audience,
+        audience,
         sp_moderation::age_days(e.created_at, now),
         e.score,
     );
