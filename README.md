@@ -8,12 +8,18 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-01)
+## Status (2026-11-03)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Reports, web's ⋮ menu (PR #86, 2026-11-03 3:14 am Melbourne, ADR 0071):** every card and
+  the project, event, help request, thread and post pages have web's ⋮ with Copy link and
+  Report (spam or serious harm); Full members vote No / Yes on the open report with web's
+  thresholds; "Under review" / "Hidden" show beside the ⋮, hidden cards blur, removed items
+  leave the feed. This reset the test network for projects, events, help requests, threads,
+  posts, channels and communities. Live `reports.mjs` and `projects.mjs` passed.
 - **Threads and posts (PR #84, 2026-11-01 12:13 am Melbourne, ADR 0070):** web's Post and
   Thread in the + menu; thread and post pages with nested comments, comment votes and web's
   sort; threads in the feed and Search, posts on profiles and Home's personal rows. This reset
@@ -201,7 +207,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
 | M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail (with link and plan votes). ✅ M5c: public and private events, help requests (feed activity cards wait on Region, M6). ✅ M5d: channels and communities, private communities with invites, settings and votes (ADR 0068). Every browser test runs live with test founders. Next: parity pass | in progress |
-| M6 | Platform | moderation + bot reviews, map/places, posts and threads, service requests, push relay, software PR/merge flow (asset management and board receipts come after parity) | |
+| M6 | Platform | ✅ posts and threads, ✅ reports part (a) (ADR 0071); moderation later parts + bot reviews, map/places, service requests, push relay, software PR/merge flow (asset management and board receipts come after parity) | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
 
 ## License
