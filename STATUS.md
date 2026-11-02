@@ -77,10 +77,10 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 - **Checked (2026-11-03, cloud session):** `cargo test -p sp_moderation` (14), `cargo clippy
   -p sp_moderation -p discussion -p discussion_integrity -p gateway --all-targets -D warnings`,
   `cargo fmt`, gateway index tests (5), zomes build + pack, UI check + lint, boundaries, sizes;
-  scenario `reports` **passed** (before the audience fix; re-run below); against a local seed
+  scenario `reports` **passed** (twice, the second time with the audience fix, 25 min); against a local seed
   node (`cloud-seed.sh`): `reports.mjs` (new), `threads.mjs`, `projects.mjs`,
   `help-requests.mjs`, `follows.mjs` **passed**. Not run locally: the other scenarios (CI).
-- **Next for this branch:** open the PR, wait for CI (~70 min), merge, smoke live
+- **PR #86** opened 2026-11-02 ~14:30 UTC (1:30 am Melbourne, Nov 3). **Next:** wait for CI (~70 min), merge, smoke live
   (`reports.mjs` against the live UI; the project network resets on deploy), then README/STATUS.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
