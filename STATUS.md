@@ -50,7 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch restarts from `main` after PR #86; this docs PR only).
+## In flight: nothing (PR #87, the docs after PR #86, merged 18:50 UTC Nov 2 / 5:50 am Melbourne Nov 3).
+- **CI note (PR #87):** shard 6 failed once in the new `reports` scenario's *setup*
+  (`Net::with_charter` → `project/join`: `Unauthorized(BadNonce("Expired"))`, i.e. the call
+  waited over 5 minutes inside a loaded runner's conductor before its nonce was checked,
+  `vendor/holochain/src/core/ribosome.rs` `verify_nonce`). The one re-run passed. If it
+  recurs, make `Net` setup robust (fewer agents in `reports`, or retry a setup call refused
+  with an expired nonce) rather than re-running.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 Candidates: moderation's later parts (PARITY "Moderation, later parts": reports on comments
