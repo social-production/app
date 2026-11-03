@@ -50,7 +50,32 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-11-03): moderation part (b), reports on comments and chat messages (ADR 0071)
+## In flight: nothing (PR #88 merged; this docs PR follows it).
+- **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
+  (`Unauthorized(BadNonce("Expired"))` on a loaded runner); PR #88's run passed. If it
+  recurs, make `Net` setup robust (retry a setup call refused with an expired nonce) rather
+  than re-running.
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
+the **History tab** on project and event pages (found 2026-11-03: web has it, the app has
+only the tab entry), moderation's later parts (DM/group reports with the 1:1 path, a
+conversation-DNA integrity change; a removed project's side effects, bot reviews and the
+paused badge), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first). Then
+the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
+requests, software PR flow; posts and threads are done, with their later parts in PARITY);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-03: moderation part (b), reports on comments and chat messages (ADR 0071), PR #88 merged 02:23 UTC (1:23 pm Melbourne), live ~02:35 UTC
+- **Live after merge:** CI took ~64 min on the second push (the first failed `cargo fmt
+  --check` on the scenario test: run `cargo fmt --all` after the last edit). The seed node
+  restarted at ~02:36 UTC; `/readyz` 662 MB at 7 min. No network reset. Live
+  `message-reports.mjs` **passed** (02:44 UTC) and `chat.mjs` **passed**. The first live
+  `message-reports.mjs` run, 4 min after the restart, timed out creating its project (120 s)
+  after its comment checks had passed; `chat.mjs` and the rerun passed right after, so it was
+  the freshly restarted node.
 Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no network reset**
 (the `Report` entry already accepts any action as its target).
 - **DNA (discussion coordinator):** `message_reports.rs` (`report_message`,
@@ -68,23 +93,7 @@ Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no ne
   --all-targets -D warnings`, `cargo fmt`, zomes build + pack, UI check + lint, boundaries,
   sizes; scenario `reports` **passed** (21 min, with the message case); against a local seed
   node (`cloud-seed.sh`): `message-reports.mjs` (new), `reports.mjs`, `threads.mjs`,
-  `chat.mjs` **passed**. Not run locally: the other scenarios (CI). After merge: smoke
-  `message-reports.mjs` live (no network reset expected: coordinator-only).
-- **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
-  (`Unauthorized(BadNonce("Expired"))` on a loaded runner). If it recurs, make `Net` setup
-  robust (retry a setup call refused with an expired nonce) rather than re-running.
-
-## Next: the parity pass (`docs/plans/PARITY.md`)
-**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
-the **History tab** on project and event pages (found 2026-11-03: web has it, the app has
-only the tab entry), moderation's later parts (DM/group reports with the 1:1 path, a
-conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first). Then
-the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
-requests, software PR flow; posts and threads are done, with their later parts in PARITY);
-asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+  `chat.mjs` **passed**. Not run locally: the other scenarios (CI, all green).
 
 ## Done 2026-11-03: moderation part (a), web's ⋮ Report (ADR 0071), PR #86 merged 16:14 UTC (3:14 am Melbourne), live ~16:38 UTC
 - **Live after merge:** CI took 71 min (slowest shard 4). The seed node restarted at ~16:38
