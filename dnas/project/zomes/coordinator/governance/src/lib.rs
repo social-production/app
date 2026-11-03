@@ -10,6 +10,7 @@ mod decide;
 mod link_view;
 mod link_write;
 mod moves;
+mod plan_lead;
 mod plan_view;
 mod plan_write;
 mod plans;
@@ -24,6 +25,7 @@ use project_integrity::{Applied, ProposalKind, VoteChoice};
 use space_scope::{enter, touch, In};
 
 pub use link_view::{HalfView, LinkSides, LinkView, LinksView, RequestView};
+pub use plan_lead::LeadChange;
 pub use plan_view::{CriterionKind, CriterionView, LeaderStatus, PlanBoard, PlanView};
 pub use plan_write::RateInput;
 pub use values::{ImportanceInput, ValueView};
@@ -139,4 +141,11 @@ pub fn list_links(call: In<Vec<LinkSides>>) -> ExternResult<LinksView> {
 pub fn list_plans(call: In<()>) -> ExternResult<PlanBoard> {
     enter(call)?;
     plan_view::board()
+}
+
+/// Every time a plan took its kind's lead, oldest first (`prj-plan-lead`, ADR 0072).
+#[hdk_extern]
+pub fn plan_lead_changes(call: In<()>) -> ExternResult<Vec<LeadChange>> {
+    enter(call)?;
+    plan_lead::lead_changes()
 }

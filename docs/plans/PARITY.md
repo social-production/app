@@ -11,11 +11,12 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
    1:1 one-vote path; conversation-DNA integrity change, a chat reset); a removed project's
    side effects (memberships, votes and sign-ups end, `prj-removed`, the author's warm-up
-   penalty); the blur on hidden detail pages; bot reviews and the paused badge.
+   penalty); bot reviews and the paused badge. (The blur on hidden detail pages: done
+   2026-11-03.)
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
-3. **"Plan became leading"** notification (+ its Settings switch); shares/invites and roles
-   notification kinds still missing from Settings.
+3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
+   the app still lacks: shares of projects/events/threads/posts, bot reviews, `prj-removed`.
 4. **Posts and threads, later parts:** @mentions in the comment composer, linked subjects in
    post bodies, Posts in Search, the scope page's create menu, "Post an update" prefill,
    share notifications, "Following + popular" discovery rows.
@@ -130,8 +131,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [ ] Regional (default location, device GPS, network location): needs places (M6).
 - [x] Notifications: web's switches for the categories the app has kinds for (Comments, Votes
   needed, Phase finished), per device; off hides those cards and their bell count.
-- [ ] Notifications still to come: web's "Plan became leading" (off by default; the app could now
-  derive `prj-plan-lead`, ADR 0046 left it out for lack of settings), shares/invites, roles.
+- [x] "Plan became leading" (`prj-plan-lead` / `evt-plan-lead`, off by default as on web), from
+  the governance zome's `plan_lead_changes` (ADR 0072, 2026-11-03). Shares/invites and Roles
+  switches exist; their remaining kinds come with their features.
 - [x] Follows notifications switch (M5a).
 - [x] Follow requests and Privacy's "Require approval to follow you" (M5a). Privacy's three
   "hide … from non-followers / personal feeds" switches wait for personal posts and the
@@ -189,8 +191,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
   integrity change in the conversation DNA), a removed project's side effects (memberships, votes and
-  sign-ups end, `prj-removed`, the author's warm-up penalty), the blur on hidden detail pages,
-  bot reviews (web-backend `bot_reviews.py`) and the paused badge.
+  sign-ups end, `prj-removed`, the author's warm-up penalty), bot reviews (web-backend
+  `bot_reviews.py`) and the paused badge.
+- [x] The blur on hidden detail pages (2026-11-03): web's `ModerationRestrictionNotice`
+  (`components/moderation/RestrictionNotice.svelte`) over the title of project, event and help
+  request pages, a thread's title and body and a post's body; Reveal / Hide again.
 - [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
   project-activity cards.
 - [ ] Software project governance (pull requests / merge flow) in the Activity phase.

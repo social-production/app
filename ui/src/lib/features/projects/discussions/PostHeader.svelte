@@ -4,7 +4,9 @@
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
+  import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
   import { countComments } from '#lib/domain/discussions.ts';
+  import { isHidden } from '#lib/domain/moderation.ts';
 
   import { resolve } from '$app/paths';
 
@@ -45,7 +47,9 @@
     </div>
   </div>
 
-  <p class="linked-body detail">{charter.description}</p>
+  <RestrictionNotice active={isHidden(state.moderation.value)}>
+    <p class="linked-body detail">{charter.description}</p>
+  </RestrictionNotice>
 
   <div class="footer detail-footer no-truncate">
     <div class="engagement-row feed-corner-actions">

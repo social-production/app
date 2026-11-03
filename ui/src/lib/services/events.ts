@@ -1,7 +1,7 @@
 import type { EventSchedule } from '#lib/domain/eventSchedule.ts';
 import type { Plan } from '#lib/domain/plans.ts';
 import type { EventAudience } from '#lib/domain/projects.ts';
-import type { InviteKind } from '#lib/domain/notifications.ts';
+import type { InviteKind } from '#lib/domain/inviteNotifications.ts';
 import { isPrivateSeed, type Charter } from '#lib/domain/projects.ts';
 import { scopeTag, type Scope } from '#lib/domain/scopes.ts';
 import {

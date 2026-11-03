@@ -243,6 +243,18 @@ await bob.screenshot({ path: `${shots}/history-390.png` });
 await decided.getByRole('button', { name: 'Close' }).click();
 log('the History tab lists the resolved edit, update, plan and return');
 
+// web's "Plan became leading" (off by default): once founder one switches it on in Settings,
+// their notifications say the plan they filed took the lead (ADR 0072).
+await ann.goto(`${BASE}/settings`);
+const leading = ann.getByRole('switch', { name: 'Plan became leading' });
+assert.equal(await leading.getAttribute('aria-checked'), 'false', 'off by default, as on web');
+await leading.click();
+await ann.goto(`${BASE}/notifications`);
+await ann
+  .getByText('A vote passed and your plan is now leading.')
+  .waitFor({ timeout: 120_000 });
+log('with the switch on, founder one is told their plan became leading');
+
 assert.deepEqual(errors, [], 'no page errors');
 log('all M3a + M3b + M3c + M3d governance checks passed');
 await browser.close();

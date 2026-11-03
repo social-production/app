@@ -24,6 +24,13 @@ struct ProjectView {
 }
 
 #[derive(Deserialize, Debug)]
+struct LeadChange {
+    plan: ActionHash,
+    author: AgentPubKey,
+    at: Timestamp,
+}
+
+#[derive(Deserialize, Debug)]
 struct Listed {
     id: ActionHash,
 }
@@ -217,6 +224,19 @@ async fn ratings_pick_the_leader_and_its_subtype_shapes_the_phases() {
         .find(|p| p.leader.is_some())
         .expect("a leader");
     assert_eq!(leader.id, app, "same approval; the better rated plan leads");
+    // web's `prj-plan-lead`: the plain plan led once it closed, then the app plan took over.
+    let changes: Vec<LeadChange> = net.call(0, "governance", "plan_lead_changes", ()).await;
+    let authors: Vec<_> = (0..2)
+        .map(|i| net.cells[i].1.agent_pubkey().clone())
+        .collect();
+    assert_eq!(
+        changes
+            .iter()
+            .map(|c| (&c.plan, &c.author))
+            .collect::<Vec<_>>(),
+        vec![(&plain, &authors[0]), (&app, &authors[1])]
+    );
+    assert!(changes[0].at <= changes[1].at);
     assert_eq!(
         leader.criteria.len(),
         4,

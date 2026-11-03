@@ -14,12 +14,14 @@ use crate::reads::{self, Found};
 /// A plan members approved (its recount passed).
 pub struct Approved {
     pub hash: ActionHash,
+    pub author: AgentPubKey,
     pub kind: PlanKind,
     pub subtype: Option<String>,
     pub yes: u32,
     pub no: u32,
-    /// When its Outcome closed it.
+    /// When its Outcome closed it, and who closed it.
     pub at: Timestamp,
+    pub closed_by: AgentPubKey,
     pub score: Score,
 }
 
@@ -40,11 +42,13 @@ pub fn approved(
         let ratings = rated(&d.proposal.hash, d.proposal.at, standing)?;
         out.push(Approved {
             hash: d.proposal.hash.clone(),
+            author: d.proposal.author.clone(),
             kind: plan.kind,
             subtype: plan.subtype.clone(),
             yes: d.yes,
             no: d.no,
             at: d.at,
+            closed_by: d.closed_by.clone(),
             score: score(&ratings),
         });
     }

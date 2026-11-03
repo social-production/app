@@ -23,7 +23,11 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { myScopes } from '#lib/stores/myScopes.svelte.ts';
-  import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
+  import {
+    notifications,
+    notificationsOff,
+    showNotifications,
+  } from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { countActionable } from '#lib/domain/activityRail.ts';
   import { activityRail } from '#lib/stores/activityRail.svelte.ts';
@@ -109,7 +113,7 @@
     const refresh = async (): Promise<void> => {
       const onMessages = page.url.pathname.startsWith('/messages');
       const [items, unread] = await Promise.allSettled([
-        myNotifications(),
+        myNotifications(notificationsOff.categories),
         onMessages ? null : unreadMessageCount(),
       ]);
       // A failed round keeps the old count; the next round tries again.

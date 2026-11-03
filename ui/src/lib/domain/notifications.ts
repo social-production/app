@@ -10,7 +10,8 @@ import type { CharterMode } from './projects.ts';
  * replies (`reply`), @mentions in project, direct and group chats (`mention`, ADR 0047) and
  * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054) and activities
  * (`prj-activity`, `prj-role-suggest`, `prj-role-taken`, ADR 0056) and shared help requests
- * (`hr-share`, `domain/share.ts`).
+ * (`hr-share`, `domain/share.ts`) and plans taking the lead (`prj-plan-lead`, `evt-plan-lead`,
+ * `domain/planLeadNotifications.ts`).
  * Times are Holochain micros.
  */
 export type NotificationKind =
@@ -26,13 +27,23 @@ export type NotificationKind =
   | 'prj-role-taken'
   | 'evt-invite'
   | 'community-invite'
-  | 'hr-share';
+  | 'hr-share'
+  | 'prj-plan-lead'
+  | 'evt-plan-lead';
 
-/** web's notification settings categories the app has kinds for (web-backend
- * `notification_preferences.py` KIND_TO_CATEGORY); shares and plan-leading come with their
- * features. */
+/** web's notification settings categories (web-backend `notification_preferences.py`
+ * KIND_TO_CATEGORY). */
 export type NotificationCategory =
-  'follows' | 'comments' | 'shares_invites' | 'votes_needed' | 'phase_done' | 'roles';
+  | 'follows'
+  | 'comments'
+  | 'shares_invites'
+  | 'votes_needed'
+  | 'phase_done'
+  | 'roles'
+  | 'plan_leading';
+
+/** web's `DEFAULT_NOTIFICATION_CATEGORIES` leaves these off until switched on. */
+export const OFF_BY_DEFAULT: NotificationCategory[] = ['plan_leading'];
 
 export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   reply: 'comments',
@@ -48,6 +59,8 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'evt-invite': 'shares_invites',
   'community-invite': 'shares_invites',
   'hr-share': 'shares_invites',
+  'prj-plan-lead': 'plan_leading',
+  'evt-plan-lead': 'plan_leading',
 };
 
 export interface NotificationItem {
@@ -271,30 +284,4 @@ export function markRead(marks: ReadMarks, item: { id: string }, items: Unread[]
     all: marks.all,
     ids: [...new Set([...marks.ids, item.id])].filter((id) => after.has(id)),
   };
-}
-
-/** What a private invite is to. */
-export type InviteKind = 'event' | 'community';
-
-/** web-backend's `evt-invite` / `community-invite`, one per invite still waiting for an
- * answer (ADR 0061, 0068). */
-export function inviteNotifications(
-  invites: { seed: string; title: string; from: string; at: number; kind: InviteKind }[],
-): Unread[] {
-  return invites.map((i) => ({
-    id: `evt-invite:${i.seed}`,
-    kind: i.kind === 'community' ? ('community-invite' as const) : ('evt-invite' as const),
-    subject: 'invites' as const,
-    seed: i.seed,
-    projectMode: i.kind,
-    actor: i.from,
-    title: i.title,
-    body:
-      i.kind === 'community'
-        ? `You were invited to join ${i.title}. Accept or decline it in Invites.`
-        : `You were invited to an event: ${i.title}. Accept or decline it in Invites.`,
-    lead: null,
-    target: null,
-    createdAt: i.at,
-  }));
 }

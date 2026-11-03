@@ -2,7 +2,8 @@
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
-  import { removedLabel } from '#lib/domain/moderation.ts';
+  import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
+  import { isHidden, removedLabel } from '#lib/domain/moderation.ts';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import { localDateTime } from '#lib/domain/helpRequests.ts';
   import type { DetailTabId } from '#lib/domain/projects.ts';
@@ -92,7 +93,9 @@
               </FeedCardTop>
               <div class="heading overview-heading">
                 <div class="identity-copy">
-                  <h1>{charter.title}</h1>
+                  <RestrictionNotice active={isHidden(help.moderation.value)}>
+                    <h1>{charter.title}</h1>
+                  </RestrictionNotice>
                   {#if help.activity}
                     <p class="live-fact">{localDateTime(help.activity.startsAt)}</p>
                   {/if}

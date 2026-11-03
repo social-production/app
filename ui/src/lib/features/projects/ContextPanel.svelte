@@ -2,7 +2,8 @@
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
-  import type { Moderation } from '#lib/domain/moderation.ts';
+  import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
+  import { isHidden, type Moderation } from '#lib/domain/moderation.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import type { PlanBoard } from '#lib/domain/plans.ts';
@@ -56,7 +57,9 @@
     <div class="heading overview-heading">
       <div class="identity-row">
         <div class="identity-copy">
-          <h1>{charter.title}</h1>
+          <RestrictionNotice active={isHidden(moderation)}>
+            <h1>{charter.title}</h1>
+          </RestrictionNotice>
           {#if timeLabel}<p class="live-fact">{timeLabel}</p>{/if}
           {#if place}<p class="live-fact">{place}</p>{/if}
           <p class="overview-copy">{charter.description}</p>

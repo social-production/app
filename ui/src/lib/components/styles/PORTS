@@ -137,5 +137,6 @@ discussion.css    .discussion-page web/src/lib/features/posts/PostDetailPage.sve
 report.css        .report-control web/src/lib/components/shared/ReportControl.svelte
 report.css        .report-ui      web/src/lib/components/shared/ReportMenu.svelte
 report.css        .report-composer web/src/lib/components/shared/ReportComposerModal.svelte
+report.css        -               web/src/lib/components/shared/ModerationRestrictionNotice.svelte
 history.css       .history-shell  web/src/lib/components/shared/DecisionHistoryList.svelte
 history.css       .history-shell  web/src/lib/components/shared/DecisionHistoryCard.svelte
