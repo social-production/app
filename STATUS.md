@@ -64,9 +64,12 @@ Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no ne
   keep (`components/chat/{chatReports.ts,reportingState.svelte.ts,ChatReportComposer.svelte}`).
 - **Tests:** scenario `reports` gains the message case (same `Net`, no extra setup);
   new `tests/e2e/message-reports.mjs`.
-- **Checked so far:** `cargo clippy -p discussion -p gateway --all-targets -D warnings`,
-  `cargo fmt`, zomes build + pack, UI check + lint, boundaries, sizes. Pending: the
-  `reports` scenario and `message-reports.mjs` against a local seed node (see below once run).
+- **Checked (cloud session, 2026-11-03):** `cargo clippy -p discussion -p gateway
+  --all-targets -D warnings`, `cargo fmt`, zomes build + pack, UI check + lint, boundaries,
+  sizes; scenario `reports` **passed** (21 min, with the message case); against a local seed
+  node (`cloud-seed.sh`): `message-reports.mjs` (new), `reports.mjs`, `threads.mjs`,
+  `chat.mjs` **passed**. Not run locally: the other scenarios (CI). After merge: smoke
+  `message-reports.mjs` live (no network reset expected: coordinator-only).
 - **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
   (`Unauthorized(BadNonce("Expired"))` on a loaded runner). If it recurs, make `Net` setup
   robust (retry a setup call refused with an expired nonce) rather than re-running.
