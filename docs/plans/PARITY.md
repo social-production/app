@@ -184,7 +184,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   Requests section). Asset-use requests come with asset management, after parity.
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
   threads and posts (web's thresholds, Full members' votes, replayed by every reader).
-- [x] Moderation part (b), 2026-11-03 (ADR 0071): reports on comments (threads, posts) and on
+- [x] Moderation part (b), 2026-11-03 (PR #88, ADR 0071): reports on comments (threads, posts) and on
   project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an

@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Reports on comments and chat messages (PR #88, 2026-11-03 1:23 pm Melbourne, ADR 0071
+  part b):** thread and post comments have web's ⋮; project, event and help request chats
+  have Report / Vote to remove / Vote to keep in the bubble menu; removed ones read "Removed
+  for …" and serious-harm ones hide behind a reveal. No network reset. Live
+  `message-reports.mjs` and `chat.mjs` passed.
 - **Reports, web's ⋮ menu (PR #86, 2026-11-03 3:14 am Melbourne, ADR 0071):** every card and
   the project, event, help request, thread and post pages have web's ⋮ with Copy link and
   Report (spam or serious harm); Full members vote No / Yes on the open report with web's
