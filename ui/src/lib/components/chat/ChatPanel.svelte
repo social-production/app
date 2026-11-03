@@ -10,18 +10,16 @@
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
   import ChatNote from './ChatNote.svelte';
+  import ChatReportComposer from './ChatReportComposer.svelte';
+  import type { ChatReports } from './chatReports.ts';
+  import { ReportingState } from './reportingState.svelte.ts';
   import { messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
   import { BubbleMenuState } from './bubbleMenuState.svelte.ts';
   import { centerIn, scrollToEnd, syncPanelHeight } from './chatViewport.ts';
 
   import '#lib/components/styles/chat.css';
 
-  /**
-   * web's LiveChatPanel for text chats: day dividers, author runs, reply quotes, the bubble
-   * menu (profile, reply, copy, pin, edit and delete your own), "left the group" and call lines and
-   * the composer, with @mentions where web has them, and photos and files in direct and
-   * group chats (`fileUrl`, ADR 0049). Reports come later.
-   */
+  /** web's LiveChatPanel for text chats (ADR 0038, 0049; reports: ADR 0071 part b). */
   interface Props {
     lines: ChatLine[];
     title: string;
@@ -54,6 +52,8 @@
     mentionAgent?: ((name: string) => string | null) | undefined;
     /** Set for guests: the composer's button is web's "Sign in" (LiveChatPanel's promptChatSignIn). */
     signIn?: (() => void) | null;
+    /** A space's chat: web's Report and report votes in the bubble menu. */
+    reports?: ChatReports | undefined;
   }
 
   let p: Props = $props();
@@ -65,12 +65,12 @@
   let editing = $state<ChatLine | null>(null);
   const menu = new BubbleMenuState();
   let confirming = $state<ChatLine | null>(null);
+  const reporting = new ReportingState(() => p.reports, menu.close);
   let copyError = $state('');
   let flashed = $state<string | null>(null);
   let flashTimer: ReturnType<typeof setTimeout> | undefined;
   let photo = $state<{ url: string; name: string; from: HTMLElement | null } | null>(null);
-  // Bubbles by message id, for reply jumps (not reactive state).
-  const elements: Record<string, HTMLElement | undefined> = {};
+  const elements: Record<string, HTMLElement | undefined> = {}; // bubbles by id, for jumps
 
   function sync(): void {
     if (panel) keyboardOpen = syncPanelHeight(panel, p);
@@ -254,6 +254,8 @@
       onPin={pin}
       onEdit={beginEdit}
       onDelete={(m) => ((confirming = m), menu.close())}
+      onReport={p.reports ? reporting.open : undefined}
+      onVote={p.reports ? reporting.vote : undefined}
       onClose={menu.close}
     />
   {/if}
@@ -264,7 +266,7 @@
     {replyTarget}
     {editing}
     paused={p.paused}
-    error={p.error || copyError}
+    error={p.error || copyError || reporting.note}
     onSubmit={send}
     onCancelReply={() => (replyTarget = null)}
     onCancelEdit={() => (editing = null)}
@@ -283,6 +285,10 @@
     photo = null;
   }}
 />
+
+{#if p.reports}
+  <ChatReportComposer target={reporting.target} reports={p.reports} onClose={reporting.dismiss} />
+{/if}
 
 <ConfirmDialog
   open={confirming !== null}

@@ -1,5 +1,4 @@
 <script lang="ts">
-  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import {
     VISIBLE,
     type Moderation,
@@ -7,6 +6,7 @@
     type ReportReason,
   } from '#lib/domain/moderation.ts';
 
+  import ReportComposer from './ReportComposer.svelte';
   import ReportMenu from './ReportMenu.svelte';
   import { reportActions } from './reportActions.ts';
 
@@ -19,6 +19,8 @@
   interface Props {
     /** The space's listing id. */
     id: string;
+    /** One of the space's chat messages or comments, when that is what is reported. */
+    message?: string;
     itemLabel: string;
     /** The state the card or page already knows (`visible` when nothing is reported). */
     known?: ModerationState;
@@ -34,6 +36,7 @@
 
   let {
     id,
+    message,
     itemLabel,
     known = 'visible',
     moderation = null,
@@ -55,16 +58,17 @@
 
   const current = $derived(loaded ?? moderation ?? { ...VISIBLE, state: known });
 
+  /** A parent told of changes keeps the state (and re-reads it); otherwise this menu does. */
   function apply(next: Moderation): void {
-    loaded = next;
-    onChange?.(next);
+    if (onChange) onChange(next);
+    else loaded = next;
   }
 
   async function load(): Promise<void> {
     if (loaded || moderation || known === 'visible') return;
     loading = true;
     try {
-      loaded = await actions.load(id);
+      loaded = await actions.load(id, message);
     } catch {
       // The menu still offers Copy link and Report; a report already open refuses a second.
     } finally {
@@ -99,7 +103,7 @@
     pending = true;
     error = '';
     try {
-      apply(await actions.report(id, reason, description));
+      apply(await actions.report(id, reason, description, message));
       closeComposer();
     } catch (e) {
       error = actions.explain(e);
@@ -148,39 +152,13 @@
   />
 </div>
 
-<OverlaySheet
+<ReportComposer
   open={composerOpen}
-  title={`Report ${itemLabel}`}
-  labelledById="report-composer-title"
-  rootClass="report-composer"
-  elevated
+  {itemLabel}
+  {pending}
+  {error}
+  bind:reason
+  bind:description
   onClose={closeComposer}
->
-  <div class="report-body">
-    {#if error}<div class="warning-card" role="alert">{error}</div>{/if}
-    <label class="field-stack">
-      <span class="field-label">Reason</span>
-      <select bind:value={reason}>
-        <option value="spam">Spam</option>
-        <option value="serious-harm">Serious harm</option>
-      </select>
-    </label>
-    <label class="field-stack">
-      <span class="field-label">What's wrong?</span>
-      <textarea bind:value={description} placeholder="Add context for the report..." rows="4"
-      ></textarea>
-    </label>
-  </div>
-  {#snippet footer()}
-    <div class="sheet-actions">
-      <button
-        class="sheet-submit"
-        disabled={pending || !description.trim()}
-        type="button"
-        onclick={() => void submit()}
-      >
-        {pending ? 'Sending…' : 'Submit report'}
-      </button>
-    </div>
-  {/snippet}
-</OverlaySheet>
+  onSubmit={() => void submit()}
+/>

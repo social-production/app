@@ -13,6 +13,7 @@ import {
 import { callCell, hashToString, stringToHash, type ActionHash } from '#lib/holo/index.ts';
 
 import { listMessages, postMessage, queued } from './chat.ts';
+import { getMessageModeration } from './moderation.ts';
 import { sendNewChat } from './messages.ts';
 import { cellFor, createProject } from './projects.ts';
 
@@ -45,20 +46,19 @@ interface VoteWire {
   mine: VoteDirection;
 }
 
-/** The comments (newest 200) as web's tree, each with its score and your vote. */
+/** The comments (newest 200) as web's tree, each with its score, your vote and its report. */
 export async function listComments(id: string): Promise<DiscussionComment[]> {
   const messages = await listMessages(id);
   const votes: Record<string, CommentVotes> = {};
-  if (messages.length) {
-    const wire = await callCell<VoteWire[]>(
-      await cellFor(id),
-      'discussion',
-      'message_votes',
-      messages.map((m) => stringToHash(m.id)),
-    );
-    for (const v of wire) votes[hashToString(v.id)] = { count: v.count, mine: v.mine };
-  }
-  return commentTree(messages, votes);
+  if (!messages.length) return [];
+  const ids = messages.map((m) => m.id);
+  const [wire, moderation] = await Promise.all([
+    callCell<VoteWire[]>(await cellFor(id), 'discussion', 'message_votes', ids.map(stringToHash)),
+    // An unreadable report leaves the comments shown as they are.
+    getMessageModeration(id, ids).catch(() => ({})),
+  ]);
+  for (const v of wire) votes[hashToString(v.id)] = { count: v.count, mine: v.mine };
+  return commentTree(messages, votes, moderation);
 }
 
 /** web's addComment: a comment, or a reply to one. */

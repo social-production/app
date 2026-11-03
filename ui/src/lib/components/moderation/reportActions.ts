@@ -11,8 +11,14 @@ export interface ReportActions {
   me: () => string;
   /** web's requireViewer: true when signed in, else shows the sign-in notice. */
   requireViewer: (message: string) => boolean;
-  load: (id: string) => Promise<Moderation>;
-  report: (id: string, reason: ReportReason, description: string) => Promise<Moderation>;
+  /** `message`: one of the space's chat messages or comments (ADR 0071 part b). */
+  load: (id: string, message?: string) => Promise<Moderation>;
+  report: (
+    id: string,
+    reason: ReportReason,
+    description: string,
+    message?: string,
+  ) => Promise<Moderation>;
   vote: (id: string, report: string, yes: boolean) => Promise<Moderation>;
   explain: (error: unknown) => string;
 }

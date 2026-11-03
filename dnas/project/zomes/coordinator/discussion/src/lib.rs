@@ -4,11 +4,13 @@
 //! Photos and files and a private read mark came with ADR 0056.
 
 mod files;
+mod message_reports;
 mod own;
 mod reads;
 mod report_links;
 mod reports;
 mod scope;
+mod standing;
 mod votes;
 
 use discussion_integrity::{Attachment, ChatMessage, EntryTypes, LinkTypes, ReadMark};
@@ -17,6 +19,7 @@ use sp_attachment::check_body;
 use sp_core::chat::PAGE_MAX;
 
 pub use files::Bytes;
+pub use message_reports::{MessageModeration, MessageReportInput};
 pub use reports::{ModerationView, ReportInput, ReportView, ReportVoteInput};
 use scope::{enter, In};
 pub use votes::{VoteInput, VoteView};
@@ -185,4 +188,19 @@ pub fn vote_report(call: In<ReportVoteInput>) -> ExternResult<ModerationView> {
 pub fn moderation(call: In<()>) -> ExternResult<ModerationView> {
     enter(call)?;
     reports::status()
+}
+
+/// Report one of the space's chat messages or comments (ADR 0071 part b); `vote_report`
+/// votes on it.
+#[hdk_extern]
+pub fn report_message(call: In<MessageReportInput>) -> ExternResult<ModerationView> {
+    let input = enter(call)?;
+    message_reports::submit(&input)
+}
+
+/// The reported messages among those asked, each with its state (guests read it too).
+#[hdk_extern]
+pub fn message_moderation(call: In<Vec<ActionHash>>) -> ExternResult<Vec<MessageModeration>> {
+    let ids = enter(call)?;
+    message_reports::of(&ids)
 }

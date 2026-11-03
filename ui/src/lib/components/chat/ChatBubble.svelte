@@ -1,12 +1,13 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
   import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
+  import { removedLabel } from '#lib/domain/moderation.ts';
 
   import { bodyParts, formatByteSize, formatMessageTime } from './chatFormat.ts';
 
   /**
    * One message of web's LiveChatPanel (text, photos and files, reply quote, time, read
-   * receipt, hover reply). Reports arrive with their milestone.
+   * receipt, hover reply), with web's "Removed for …" and serious-harm reveal (ADR 0071).
    */
   interface Props {
     message: ChatLine;
@@ -41,9 +42,19 @@
     onViewPhoto,
   }: Props = $props();
 
-  const photos = $derived(message.attachments.filter((a) => a.kind === 'image'));
-  const files = $derived(message.attachments.filter((a) => a.kind !== 'image'));
-  const caption = $derived(Boolean(message.body.trim()));
+  // web's shouldHideModeratedBody / supportsHiddenToggle / messageBodyIsHidden (ADR 0071):
+  // a removed or unrevealed message shows none of its text, photos or files.
+  const removed = $derived(message.moderation?.state === 'removed');
+  const canReveal = $derived(
+    !removed &&
+      (message.moderation?.report?.reason === 'serious-harm' ||
+        message.moderation?.state === 'hidden'),
+  );
+  let revealed = $state(false);
+  const shown = $derived(!removed && (!canReveal || revealed));
+  const photos = $derived(shown ? message.attachments.filter((a) => a.kind === 'image') : []);
+  const files = $derived(shown ? message.attachments.filter((a) => a.kind !== 'image') : []);
+  const caption = $derived(shown && Boolean(message.body.trim()));
 
   /** Shows the photo once its parts arrive (a copy being sent has them locally). */
   function photoSrc(node: HTMLImageElement, a: ChatAttachment): void {
@@ -127,6 +138,28 @@
         <span>{message.replyPreview || ''}</span>
       </button>
     {/if}
+    {#if canReveal}
+      <button
+        aria-expanded={revealed}
+        class="hidden-toggle"
+        type="button"
+        onclick={(event) => {
+          event.stopPropagation();
+          revealed = !revealed;
+        }}
+      >
+        <span class="hidden-plus">{revealed ? '−' : '+'}</span>
+        <span>{revealed ? 'Hide again' : 'Hidden for serious harm report — reveal to read'}</span>
+      </button>
+    {/if}
+    {#if removed}
+      <div class="caption-block">
+        <p class="moderated">
+          {removedLabel(message.moderation?.report?.reason)}
+          <span class="message-footer">{@render stamp()}</span>
+        </p>
+      </div>
+    {/if}
     {#if photos.length > 0}
       <div class="photo-row">
         {#each photos as photo, i (i)}
@@ -182,7 +215,7 @@
         </p>
       </div>
     {/if}
-    {#if photos.length > 0 || (!caption && files.length === 0)}
+    {#if photos.length > 0 || (!caption && files.length === 0 && !removed)}
       <div class="message-footer photo-footer">{@render stamp()}</div>
     {/if}
     {#if canReply && !message.own}

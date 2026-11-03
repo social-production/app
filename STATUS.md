@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-03 ~4 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-03 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,12 +50,36 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (this branch restarts from `main` after PR #86; this docs PR only).
+## In flight (2026-11-03): moderation part (b), reports on comments and chat messages (ADR 0071)
+Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no network reset**
+(the `Report` entry already accepts any action as its target).
+- **DNA (discussion coordinator):** `message_reports.rs` (`report_message`,
+  `message_moderation(ids)`: only reported ones come back); `vote_report` decides on the
+  space or the message from the report's target; `standing.rs` (Full-standing check, moved
+  out of `reports.rs` for the size rule). Gateway: guests may call `message_moderation`.
+- **UI:** `ReportComposer.svelte` (web's ReportComposerModal, now shared); `ReportControl`
+  takes `message`; `DiscussionComment` has web's ⋮, "Removed for …" and the serious-harm
+  reveal; project/event/help-request chats read reports (`features/projects/chatModeration.svelte.ts`,
+  on new messages and every 30 s) and the bubble menu gains Report / Vote to remove / Vote to
+  keep (`components/chat/{chatReports.ts,reportingState.svelte.ts,ChatReportComposer.svelte}`).
+- **Tests:** scenario `reports` gains the message case (same `Net`, no extra setup);
+  new `tests/e2e/message-reports.mjs`.
+- **Checked (cloud session, 2026-11-03):** `cargo clippy -p discussion -p gateway
+  --all-targets -D warnings`, `cargo fmt`, zomes build + pack, UI check + lint, boundaries,
+  sizes; scenario `reports` **passed** (21 min, with the message case); against a local seed
+  node (`cloud-seed.sh`): `message-reports.mjs` (new), `reports.mjs`, `threads.mjs`,
+  `chat.mjs` **passed**. Not run locally: the other scenarios (CI). After merge: smoke
+  `message-reports.mjs` live (no network reset expected: coordinator-only).
+- **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
+  (`Unauthorized(BadNonce("Expired"))` on a loaded runner). If it recurs, make `Net` setup
+  robust (retry a setup call refused with an expired nonce) rather than re-running.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
-Candidates: moderation's later parts (PARITY "Moderation, later parts": reports on comments
-and chat messages first, since threads and posts lean on comments; then a removed project's
-side effects, bot reviews and the paused badge), "Plan became leading" (web-backend sends
+**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
+the **History tab** on project and event pages (found 2026-11-03: web has it, the app has
+only the tab entry), moderation's later parts (DM/group reports with the 1:1 path, a
+conversation-DNA integrity change; a removed project's side effects, bot reviews and the
+paused badge), "Plan became leading" (web-backend sends
 `prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
 needs the time the lead changed, which the plan list doesn't give: work that out first). Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service

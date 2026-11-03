@@ -10,7 +10,11 @@ import {
 import { queued } from './chat.ts';
 import { cellFor } from './projects.ts';
 
-/** Reports on a space (ADR 0071): the discussion zome's `report_space`, `vote_report`, `moderation`. */
+/**
+ * Reports on a space (ADR 0071): the discussion zome's `report_space`, `vote_report`,
+ * `moderation`; on its chat messages and comments (part b): `report_message`,
+ * `message_moderation`.
+ */
 interface ReportWire {
   id: ActionHash;
   reporter: AgentPubKey;
@@ -86,6 +90,44 @@ export async function voteOnReport(id: string, report: string, yes: boolean): Pr
     callCell<ModerationWire>(cell, 'discussion', 'vote_report', {
       report: stringToHash(report),
       yes,
+    }),
+  );
+  return toModeration(wire);
+}
+
+interface MessageModerationWire {
+  id: ActionHash;
+  moderation: ModerationWire;
+}
+
+/** The reported ones among a space's messages, by id (the rest are visible). */
+export async function getMessageModeration(
+  id: string,
+  messages: string[],
+): Promise<Record<string, Moderation>> {
+  if (messages.length === 0) return {};
+  const wire = await callCell<MessageModerationWire[]>(
+    await cellFor(id),
+    'discussion',
+    'message_moderation',
+    messages.map(stringToHash),
+  );
+  return Object.fromEntries(wire.map((m) => [hashToString(m.id), toModeration(m.moderation)]));
+}
+
+/** web's `submitReport` on a comment or chat message, with your yes vote. */
+export async function reportMessage(
+  id: string,
+  message: string,
+  reason: ReportReason,
+  description: string,
+): Promise<Moderation> {
+  const cell = await cellFor(id);
+  const wire = await queued(() =>
+    callCell<ModerationWire>(cell, 'discussion', 'report_message', {
+      message: stringToHash(message),
+      reason,
+      description: description.trim(),
     }),
   );
   return toModeration(wire);

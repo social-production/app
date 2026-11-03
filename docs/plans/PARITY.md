@@ -5,6 +5,31 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
+## What's left for full parity (summary, 2026-11-03)
+The open boxes below, grouped by size. Asset management is not part of parity (owner,
+2026-10-31). Order is the cloud session's (STATUS "Next").
+1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
+   1:1 one-vote path; conversation-DNA integrity change, a chat reset); a removed project's
+   side effects (memberships, votes and sign-ups end, `prj-removed`, the author's warm-up
+   penalty); the blur on hidden detail pages; bot reviews and the paused badge.
+2. **History tab** on project and event pages (web's `ProjectHistoryTab` /
+   `DecisionHistoryList`: past phase moves, edits, updates and their votes). Found
+   2026-11-03: the app's `DetailTopTabs` knows the tab but no page offers it.
+3. **"Plan became leading"** notification (+ its Settings switch); shares/invites and roles
+   notification kinds still missing from Settings.
+4. **Posts and threads, later parts:** @mentions in the comment composer, linked subjects in
+   post bodies, Posts in Search, the scope page's create menu, "Post an update" prefill,
+   share notifications, "Following + popular" discovery rows.
+5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
+   days, the event card's time.
+6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
+7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
+   project-activity cards, distances.
+8. **Software projects:** pull requests and the merge flow in the Activity phase.
+9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
+   three personal-feed switches.
+10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
+
 ## Shell (phone)
 - [x] More opens web's `MobileMoreSheet` (profile or Sign in, Settings, About), not the left
   rail. Pixel-identical at 390px signed out (`tests/e2e/shell.mjs`).
@@ -124,6 +149,8 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   the activity's author), Settings' Roles switch, and web's "<role> suggestion declined" card
   to the suggester (the activities view lists declines per role; coordinator only).
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
+- [ ] History tab (web's `ProjectHistoryTab`: decided phase moves, edits and updates with their
+  votes), on projects and events. `DetailTopTabs` has the entry; no page lists it yet.
 - [x] Photos and files in project chats (ADR 0056 ride-along).
 
 ## Notifications and Messages pages
@@ -157,8 +184,11 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
   Requests section). Asset-use requests come with asset management, after parity.
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
   threads and posts (web's thresholds, Full members' votes, replayed by every reader).
-- [ ] Moderation, later parts: reports on comments and chat messages (web's hidden/removed
-  bodies, the 1:1 DM fast path), a removed project's side effects (memberships, votes and
+- [x] Moderation part (b), 2026-11-03 (ADR 0071): reports on comments (threads, posts) and on
+  project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
+  Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
+- [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
+  integrity change in the conversation DNA), a removed project's side effects (memberships, votes and
   sign-ups end, `prj-removed`, the author's warm-up penalty), the blur on hidden detail pages,
   bot reviews (web-backend `bot_reviews.py`) and the paused badge.
 - [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,

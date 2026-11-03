@@ -2,7 +2,12 @@
   import { resolve } from '$app/paths';
   import type { ChatLine } from '#lib/domain/chat.ts';
 
-  /** web LiveChatPanel's bubble menu: profile, reply, copy, pin, edit and delete your own. */
+  import { openReport } from './chatReports.ts';
+
+  /**
+   * web LiveChatPanel's bubble menu: profile, reply, copy, pin, edit and delete your own, and
+   * in a space's chat Report and the open report's votes (ADR 0071 part b).
+   */
   interface Props {
     message: ChatLine;
     x: number;
@@ -15,12 +20,16 @@
     onPin: (m: ChatLine) => void;
     onEdit: (m: ChatLine) => void;
     onDelete: (m: ChatLine) => void;
+    /** Set in a space's chat (web's `subjectId`). */
+    onReport?: ((m: ChatLine) => void) | undefined;
+    onVote?: ((m: ChatLine, report: string, yes: boolean) => void) | undefined;
     onClose: () => void;
   }
 
   let p: Props = $props();
   const m = $derived(p.message);
   const sent = $derived(!m.pending);
+  const report = $derived(openReport(m.moderation));
 </script>
 
 <div class="bubble-menu" role="menu" style="left: {p.x}px; top: {p.y}px">
@@ -41,5 +50,16 @@
   {/if}
   {#if m.own && sent}
     <button type="button" role="menuitem" onclick={() => p.onDelete(m)}>Delete</button>
+  {/if}
+  {#if !m.own && sent && p.onReport}
+    <button type="button" role="menuitem" onclick={() => p.onReport?.(m)}>Report</button>
+  {/if}
+  {#if report && p.onVote}
+    <button type="button" role="menuitem" onclick={() => p.onVote?.(m, report, true)}
+      >Vote to remove</button
+    >
+    <button type="button" role="menuitem" onclick={() => p.onVote?.(m, report, false)}
+      >Vote to keep</button
+    >
   {/if}
 </div>

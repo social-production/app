@@ -1,6 +1,7 @@
-//! Reports (ADR 0071): web's ⋮ Report on a space (project, event, help request, thread, post).
-//! The state is replayed from the votes (`sp_moderation::replay`); only voters with Full
-//! standing at the time of their vote count, as for proposals (ADR 0033).
+//! Reports (ADR 0071): web's ⋮ Report on a space (project, event, help request, thread, post)
+//! or on one of its chat messages and comments (`message_reports.rs`). The state is replayed
+//! from the votes (`sp_moderation::replay`); only voters with Full standing at the time of
+//! their vote count, as for proposals (ADR 0033).
 
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -12,7 +13,8 @@ use sp_moderation::{
 };
 
 use crate::report_links::{self, Seen};
-use crate::{anchor, guest, reads, scope};
+use crate::standing::full_before;
+use crate::{anchor, guest, message_reports, reads, scope};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ReportInput {
@@ -59,13 +61,14 @@ pub struct ModerationView {
 
 /// The item's audience and popularity, as web's `electorate_size_for_target` and
 /// `load_target_engagement` (members, commenters and signallers; ADR 0071 "Audience").
-struct Engagement {
-    author: AgentPubKey,
-    created_at: i64,
-    members: u32,
-    commenters: u32,
-    signallers: u32,
-    score: u32,
+#[derive(Clone)]
+pub(crate) struct Engagement {
+    pub author: AgentPubKey,
+    pub created_at: i64,
+    pub members: u32,
+    pub commenters: u32,
+    pub signallers: u32,
+    pub score: u32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -74,7 +77,7 @@ struct SignalCounts {
     opposition: u32,
 }
 
-fn engagement() -> ExternResult<Engagement> {
+pub(crate) fn engagement() -> ExternResult<Engagement> {
     let space = anchor()?;
     let charter = must_get_action(space.clone())?;
     let members: Vec<ActionHash> = scope::call_project("member_snapshot")?;
@@ -97,7 +100,7 @@ fn engagement() -> ExternResult<Engagement> {
     })
 }
 
-fn count(n: usize) -> u32 {
+pub(crate) fn count(n: usize) -> u32 {
     u32::try_from(n).unwrap_or(u32::MAX)
 }
 
@@ -109,10 +112,10 @@ fn decode(hash: &ActionHash) -> ExternResult<Option<(Record, Report)>> {
     Ok(report.map(|r| (record, r)))
 }
 
-/// The space's reports, oldest first.
-fn reports() -> ExternResult<Vec<(Record, Report)>> {
+/// The reports on `base` (the space, or one of its messages), oldest first.
+pub(crate) fn reports_on(base: &ActionHash) -> ExternResult<Vec<(Record, Report)>> {
     let mut out = Vec::new();
-    for seen in report_links::on(&anchor()?, LinkTypes::Reports)? {
+    for seen in report_links::on(base, LinkTypes::Reports)? {
         if let Some(hash) = seen.target.into_action_hash() {
             if let Some(found) = decode(&hash)? {
                 out.push(found);
@@ -122,29 +125,6 @@ fn reports() -> ExternResult<Vec<(Record, Report)>> {
     out.sort_by_key(|(r, _)| r.action().timestamp());
     out.dedup_by(|a, b| a.0.action_address() == b.0.action_address());
     Ok(out)
-}
-
-#[derive(Serialize, Debug)]
-struct StandingAt {
-    agent: AgentPubKey,
-    at: Timestamp,
-}
-
-fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
-    let query = StandingAt {
-        agent: agent.clone(),
-        at,
-    };
-    match call(
-        CallTargetCell::OtherRole("directory".into()),
-        ZomeName::from("identity"),
-        "full_standing_before".into(),
-        None,
-        query,
-    )? {
-        ZomeCallResponse::Ok(io) => io.decode().map_err(|e| wasm_error!(e)),
-        other => Err(guest(&format!("identity/full_standing_before: {other:?}"))),
-    }
 }
 
 fn view(record: &Record, report: &Report, e: &Engagement) -> ExternResult<ReportView> {
@@ -200,20 +180,31 @@ fn view(record: &Record, report: &Report, e: &Engagement) -> ExternResult<Report
     })
 }
 
-/// web's `moderation_state` and active report: a removing report wins; otherwise the
-/// earliest open one (web keeps one active report per item).
+/// web's `moderation_state` and active report for the space.
 pub fn status() -> ExternResult<ModerationView> {
-    let found = reports()?;
+    let found = reports_on(&anchor()?)?;
     if found.is_empty() {
-        return Ok(ModerationView {
-            state: "visible".into(),
-            report: None,
-        });
+        return Ok(visible());
     }
-    let e = engagement()?;
+    status_of(&found, &engagement()?)
+}
+
+pub(crate) fn visible() -> ModerationView {
+    ModerationView {
+        state: "visible".into(),
+        report: None,
+    }
+}
+
+/// What `found` adds up to: a removing report wins; otherwise the earliest open one (web
+/// keeps one active report per item).
+pub(crate) fn status_of(
+    found: &[(Record, Report)],
+    e: &Engagement,
+) -> ExternResult<ModerationView> {
     let mut active: Option<ReportView> = None;
-    for (record, report) in &found {
-        let v = view(record, report, &e)?;
+    for (record, report) in found {
+        let v = view(record, report, e)?;
         if v.resolution == Resolution::Removed.id() {
             return Ok(ModerationView {
                 state: "removed".into(),
@@ -235,34 +226,49 @@ pub fn status() -> ExternResult<ModerationView> {
     })
 }
 
-/// web's `submit_report`: one active report per item; the reporter's yes comes with it.
+/// web's `submit_report` on the space: one active report per item.
 pub fn submit(input: &ReportInput) -> ExternResult<ModerationView> {
     check_report(&input.reason, &input.description).map_err(|r| guest(&r))?;
     let space = anchor()?;
-    let me = agent_info()?.agent_initial_pubkey;
-    if must_get_action(space.clone())?.action().author() == &me {
+    if must_get_action(space.clone())?.action().author() == &agent_info()?.agent_initial_pubkey {
         return Err(guest("You can't report yourself"));
     }
     if status()?.report.is_some() {
-        return Err(guest(
-            "This is already being reviewed. Vote on that report instead.",
-        ));
+        return Err(guest(ALREADY_OPEN));
     }
+    open(space, input)?;
+    status()
+}
+
+pub(crate) const ALREADY_OPEN: &str =
+    "This is already being reviewed. Vote on that report instead.";
+
+/// Write the report on `target`, list it there, and add the reporter's yes (web's).
+pub(crate) fn open(target: ActionHash, input: &ReportInput) -> ExternResult<()> {
+    let me = agent_info()?.agent_initial_pubkey;
     let report = Report {
-        target: space.clone(),
+        target: target.clone(),
         reason: input.reason.clone(),
         description: input.description.trim().to_string(),
     };
     let hash = create_entry(EntryTypes::Report(report))?;
-    create_link(space, hash.clone(), LinkTypes::Reports, ())?;
+    create_link(target, hash.clone(), LinkTypes::Reports, ())?;
     create_link(hash, me, LinkTypes::ReportVotes, LinkTag::new(vec![YES]))?;
-    scope::touch()?;
-    status()
+    scope::touch()
 }
 
-/// web's `vote_report`: yes or no on the item's open report; a later vote replaces yours.
+/// web's `vote_report`: yes or no on the open report of the space or of one of its messages;
+/// a later vote replaces yours.
 pub fn vote(input: &ReportVoteInput) -> ExternResult<ModerationView> {
-    let current = status()?;
+    let Some((_, report)) = decode(&input.report)? else {
+        return Err(guest("This report isn't here yet. Try again in a moment."));
+    };
+    let on_space = report.target == anchor()?;
+    let current = if on_space {
+        status()?
+    } else {
+        message_reports::status(&report.target)?
+    };
     let Some(open) = current.report.filter(|r| r.id == input.report) else {
         return Err(guest("This report is already resolved."));
     };
@@ -281,5 +287,9 @@ pub fn vote(input: &ReportVoteInput) -> ExternResult<ModerationView> {
         LinkTag::new(vec![tag]),
     )?;
     scope::touch()?;
-    status()
+    if on_space {
+        status()
+    } else {
+        message_reports::status(&report.target)
+    }
 }
