@@ -179,11 +179,19 @@ async fn message_reports(net: &Net) {
     assert!(own.is_err(), "you can't report your own message");
 
     let after: ModerationView = net
-        .call(1, "discussion", "report_message", report_of(&spam, "Adverts"))
+        .call(
+            1,
+            "discussion",
+            "report_message",
+            report_of(&spam, "Adverts"),
+        )
         .await;
     assert_eq!(after.state, "under_review");
     let report = after.report.expect("the message's open report");
-    assert_eq!((report.yes, report.audience, report.delete_quorum), (1, 4, 3));
+    assert_eq!(
+        (report.yes, report.audience, report.delete_quorum),
+        (1, 4, 3)
+    );
     net.settle().await;
 
     let seen = listed(net, 4, &[spam.clone(), fine.clone()]).await;
@@ -194,17 +202,28 @@ async fn message_reports(net: &Net) {
         .try_call(2, "discussion", "report_message", report_of(&spam, "Again"))
         .await;
     assert!(again.is_err(), "one open report per message");
-    assert!(vote(net, 4, &report.id, true).await.is_err(), "only Full members vote");
-    assert!(vote(net, 3, &report.id, false).await.is_err(), "not on your own message");
+    assert!(
+        vote(net, 4, &report.id, true).await.is_err(),
+        "only Full members vote"
+    );
+    assert!(
+        vote(net, 3, &report.id, false).await.is_err(),
+        "not on your own message"
+    );
 
     let two = vote(net, 2, &report.id, true).await.expect("a Full vote");
     assert_eq!(two.state, "under_review");
     net.settle().await;
-    let three = vote(net, 0, &report.id, true).await.expect("the deciding vote");
+    let three = vote(net, 0, &report.id, true)
+        .await
+        .expect("the deciding vote");
     assert_eq!(three.state, "removed");
     net.settle().await;
 
     let seen = listed(net, 4, &[spam, fine]).await;
     assert_eq!(seen.len(), 1);
-    assert_eq!(seen[0].moderation.state, "removed", "every reader replays the votes");
+    assert_eq!(
+        seen[0].moderation.state, "removed",
+        "every reader replays the votes"
+    );
 }
