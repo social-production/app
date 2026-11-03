@@ -50,20 +50,22 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-11-03, started 3 pm Melbourne): the History tab on project and event pages
-Branch `claude/social-production-handoff-dsam61` (restarted from `main` after PR #89). Plan
-(UI only, no DNA change expected: proposals and plans already carry every decision and vote):
-- Port web's `ProjectHistoryTab` → `DecisionHistoryList` (Active Decisions / Resolutions,
-  counts, "No active decisions.", "No decision history yet.") → `DecisionHistoryCard`
-  (kind label, requirement, "x yes · y no … cast out of N quorum", author · time; tap opens
-  the vote sheet: reuse `components/governance/VoteDecisionBody`). Styles via PORTS.
-- Entries from the governance zome's proposals (web-backend `_build_project_history`):
-  Update → "Update decision", Edit → "Edit decision", Phase → "Advance to <stage>" or
-  "Close project", Return → "Return to <stage>"; plans → "Production plan · <title>" /
-  "Distribution plan · <title>" / "Plan · <title>". Newest first. Events use the same tab
-  (web's EventDetailPage has it).
-- Enable `'history'` in `ProjectDetail.svelte`'s `available` tabs; `?tab=history` deep link.
-- Test: extend `tests/e2e/governance.mjs` (a passed edit shows under Resolutions).
+## In flight (2026-11-03): the History tab on project and event pages (PR open)
+Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
+- `domain/history.ts`: web-backend's `_build_project_history` from the governance zome's
+  proposals and plans (Update/Edit decision, Advance to …/Close project, Return to …,
+  Production/Distribution plan · title), web's requirement and vote-summary lines, and
+  `stageBefore` (web stores a phase decision's "from" stage; here the passed moves are
+  replayed from phase-1, so a decided return no longer reads "from <today's stage>").
+- `components/governance/HistoryTab.svelte` (web's DecisionHistoryList + DecisionHistoryCard;
+  `history.css` via PORTS): Active Decisions / Resolutions; a card opens the vote sheet
+  (`VoteDecisionBody`, vote bar only while open); a plan opens its own sheet in Take part.
+  `ProjectDetail` offers the tab on projects and events (`?tab=history`).
+- Not in it yet: web's link create/sever votes in History (the Links tab has them).
+  web prints the raw approval float ("66.666…%"); the app rounds.
+- **Checked:** UI check + lint, boundaries, sizes; against a local seed node
+  `governance.mjs` (now ends on the History tab), `events.mjs`, `projects.mjs` **passed**.
+  No zome change, so no scenarios run locally (CI runs them).
 
 - **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
   (`Unauthorized(BadNonce("Expired"))` on a loaded runner); PR #88's run passed. If it
@@ -72,8 +74,7 @@ Branch `claude/social-production-handoff-dsam61` (restarted from `main` after PR
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
-the **History tab** on project and event pages (found 2026-11-03: web has it, the app has
-only the tab entry), moderation's later parts (DM/group reports with the 1:1 path, a
+moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), "Plan became leading" (web-backend sends
 `prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it

@@ -4,6 +4,7 @@
   import {
     historyEntries,
     requirementLabel,
+    stageBefore,
     statusLabel,
     voteSummaryLabel,
     type HistoryEntry,
@@ -146,7 +147,7 @@
           proposal={sheet}
           authorName={names[sheet.author] ?? '…'}
           {charter}
-          {stage}
+          stage={sheet.status === 'Open' ? stage : phaseLabel(stageBefore(sheet, proposals, ''))}
           {phaseLabel}
         />
       </article>

@@ -234,6 +234,10 @@ for (const label of ['Edit decision', 'Update decision', 'Return to Production P
 await resolutions.getByRole('button', { name: 'Return to Production Plan, Approved' }).click();
 const decided = bob.getByRole('dialog', { name: 'Return to Production Plan' });
 await decided.getByText('The plan needs another look.').waitFor();
+// A decided return moved from the stage it left, not from today's stage.
+const outcome = await decided.locator('.outcome').innerText();
+assert.match(outcome, /to Production Plan\.$/);
+assert.doesNotMatch(outcome, /from Production Plan to/, outcome);
 assert.equal(await decided.getByRole('button', { name: 'Yes', exact: true }).count(), 0, 'decided: no vote');
 await bob.screenshot({ path: `${shots}/history-390.png` });
 await decided.getByRole('button', { name: 'Close' }).click();

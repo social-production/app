@@ -136,3 +136,25 @@ export function statusLabel(status: HistoryStatus): string {
   if (status === 'approved') return 'Approved';
   return status === 'rejected' ? 'Rejected' : 'Active';
 }
+
+/** When a decided proposal took effect (its close), else when it was made. */
+function decidedAt(p: Proposal): number {
+  return p.closedAt ?? p.createdAt;
+}
+
+/**
+ * The stage a phase decision moved from (web stores it; here the passed moves and returns
+ * before it are replayed from the first phase). Open ones move from the current stage.
+ */
+export function stageBefore(p: Proposal, proposals: Proposal[], current: string): string {
+  if (p.status === 'Open') return current;
+  let stage = 'phase-1';
+  const passed = proposals
+    .filter((q) => q.status === 'Passed' && decidedAt(q) < decidedAt(p))
+    .sort((a, b) => decidedAt(a) - decidedAt(b));
+  for (const q of passed) {
+    if ('Phase' in q.kind) stage = q.kind.Phase.to;
+    else if ('Return' in q.kind) stage = q.kind.Return.to;
+  }
+  return stage;
+}
