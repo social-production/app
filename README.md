@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **History tab (PR #90, 2026-11-03 5:42 pm Melbourne):** project and event pages list every
+  decision (edits, updates, phase moves, returns, plans) under Active Decisions and
+  Resolutions, as on web; a card opens its vote sheet. No network reset. Live
+  `governance.mjs` passed.
 - **Reports on comments and chat messages (PR #88, 2026-11-03 1:23 pm Melbourne, ADR 0071
   part b):** thread and post comments have web's ⋮; project, event and help request chats
   have Report / Vote to remove / Vote to keep in the bubble menu; removed ones read "Removed
