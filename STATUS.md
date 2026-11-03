@@ -50,7 +50,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #88 merged; this docs PR follows it).
+## In flight (2026-11-03, started 3 pm Melbourne): the History tab on project and event pages
+Branch `claude/social-production-handoff-dsam61` (restarted from `main` after PR #89). Plan
+(UI only, no DNA change expected: proposals and plans already carry every decision and vote):
+- Port web's `ProjectHistoryTab` → `DecisionHistoryList` (Active Decisions / Resolutions,
+  counts, "No active decisions.", "No decision history yet.") → `DecisionHistoryCard`
+  (kind label, requirement, "x yes · y no … cast out of N quorum", author · time; tap opens
+  the vote sheet: reuse `components/governance/VoteDecisionBody`). Styles via PORTS.
+- Entries from the governance zome's proposals (web-backend `_build_project_history`):
+  Update → "Update decision", Edit → "Edit decision", Phase → "Advance to <stage>" or
+  "Close project", Return → "Return to <stage>"; plans → "Production plan · <title>" /
+  "Distribution plan · <title>" / "Plan · <title>". Newest first. Events use the same tab
+  (web's EventDetailPage has it).
+- Enable `'history'` in `ProjectDetail.svelte`'s `available` tabs; `?tab=history` deep link.
+- Test: extend `tests/e2e/governance.mjs` (a passed edit shows under Resolutions).
+
 - **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
   (`Unauthorized(BadNonce("Expired"))` on a loaded runner); PR #88's run passed. If it
   recurs, make `Net` setup robust (retry a setup call refused with an expired nonce) rather
