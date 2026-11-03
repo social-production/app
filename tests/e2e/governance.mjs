@@ -252,6 +252,7 @@ await leading.click();
 await ann.goto(`${BASE}/notifications`);
 await ann
   .getByText('A vote passed and your plan is now leading.')
+  .first() // a long-lived network keeps earlier runs' cards
   .waitFor({ timeout: 120_000 });
 log('with the switch on, founder one is told their plan became leading');
 

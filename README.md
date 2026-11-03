@@ -8,12 +8,17 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-03)
+## Status (2026-11-04)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **"Plan became leading" and hidden pages blur (PR #92, 2026-11-04 3:19 am Melbourne, ADR
+  0072):** a plan's author can be told their plan took the lead (web's Settings switch, off
+  by default); hidden items' pages blur their title (a thread's and post's body too) behind
+  web's serious-harm notice with Reveal. No network reset. Live
+  `reports.mjs` and `governance.mjs` passed (its last step after a test fix, see STATUS).
 - **History tab (PR #90, 2026-11-03 5:42 pm Melbourne):** project and event pages list every
   decision (edits, updates, phase moves, returns, plans) under Active Decisions and
   Resolutions, as on web; a card opens its vote sheet. No network reset. Live

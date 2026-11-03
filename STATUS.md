@@ -50,13 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR for "Plan became leading" + the hidden-page blur (branch `claude/social-production-handoff-dsam61`)
-See the newest "Done" below for what it holds and what was checked. When its CI is green, merge,
-smoke live (`governance.mjs` ends on the new notification), and move this line to "Done".
+## In flight: nothing (PR #92 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
-  on PR #90 (`project/join` waited over 5 min in a loaded runner's conductor and was refused
-  unrun). Fixed in PR #90 (merged): `Net::join` (tests/scenarios/tests/common/net.rs) retries a join
-  refused with `BadNonce` (up to 3 tries). If other setup calls hit it, route them the same way.
+  on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
+  setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
+  *last* edit (PR #92's first CI run failed on a 302-line AppShell).
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
@@ -68,7 +66,14 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-03 (PR open): "Plan became leading" (ADR 0072) and the blur on hidden detail pages
+## Done 2026-11-04: "Plan became leading" (ADR 0072) and the blur on hidden detail pages, PR #92 merged 16:19 UTC (3:19 am Melbourne)
+- **Live after merge:** CI 78 min on the second push (the first failed the size rule). The seed node
+  restarted at ~16:32 UTC; `/readyz` 550 MB at 4 min. No network reset. Live `reports.mjs`
+  **passed**. Live `governance.mjs` passed every step but its new last one, whose text match
+  found three "Plan became leading" cards (earlier runs' plans on the long-lived network: the
+  replay lists past lead changes too); fixed with `.first()` in the docs PR, and the card
+  checked live by hand (signed in as founder one, switch on). Cards from the dev founders
+  read "Unnamed": they have no profile name on the live network (all their cards do).
 Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no network reset.**
 - **Plan became leading:** governance coordinator `plan_lead_changes()` (`plan_lead.rs`)
   replays the approved plans in the order they closed and returns each close that handed its
