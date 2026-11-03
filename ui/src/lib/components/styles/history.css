@@ -1,0 +1,155 @@
+/* Ported from web/src/lib/components/shared/DecisionHistoryList.svelte (ADR 0032, scripts/port-styles.py) */
+.history-shell,
+.history-shell .history-group {
+  display: grid;
+  gap: 12px;
+}
+
+.history-shell .history-list {
+  display: grid;
+  gap: 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: max-content;
+  align-content: start;
+  align-items: start;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.history-shell .history-rail-card {
+  min-width: 0;
+}
+
+.history-shell .group-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.history-shell .section-copy h2,
+.history-shell .section-copy p,
+.history-shell .group-head h3,
+.history-shell .group-head span,
+.history-shell .empty-card p {
+  margin: 0;
+}
+
+.history-shell .group-head span,
+.history-shell .section-copy p,
+.history-shell .empty-card {
+  color: var(--text-soft);
+}
+
+.history-shell .empty-card {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.history-shell .history-list.scrollable {
+  max-height: min(34rem, 72vh);
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+/* Ported from web/src/lib/components/shared/DecisionHistoryCard.svelte (ADR 0032, scripts/port-styles.py) */
+.history-shell .history-card {
+  position: relative;
+  border: 0;
+  border-bottom: 1px solid var(--panel-border);
+  border-left: 3px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  overflow: hidden;
+}
+
+.history-shell .history-card.open {
+  border-left-color: #e6b325;
+}
+
+.history-shell .history-card.approved {
+  border-left-color: #2f9e44;
+}
+
+.history-shell .history-card.rejected {
+  border-left-color: #e03131;
+}
+
+.history-shell .history-rail-card:last-child .history-card {
+  border-bottom: 0;
+}
+
+.history-shell .history-toggle {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.history-shell .history-toggle:hover,
+.history-shell .history-toggle:focus-visible {
+  background: color-mix(in srgb, var(--panel-strong) 88%, var(--text-main));
+}
+
+.history-shell .history-status-row,
+.history-shell .history-meta-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) max-content;
+  gap: 12px;
+  align-items: center;
+}
+
+.history-shell .history-kicker,
+.history-shell .history-meta-left,
+.history-shell .history-meta-right,
+.history-shell .history-requirement,
+.history-shell .origin-label {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.history-shell .history-kicker {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.history-shell .origin-label,
+.history-shell .history-card p {
+  margin: 0;
+}
+
+.history-shell .history-meta-left {
+  min-width: 0;
+}
+
+.history-shell .history-requirement,
+.history-shell .history-meta-right {
+  text-align: right;
+}
+
+.history-shell .history-card.highlighted .history-toggle {
+  background: color-mix(in srgb, var(--brand-soft) 55%, var(--panel));
+}
+
+@media (max-width: 720px) {
+  .history-shell .history-status-row,
+  .history-shell .history-meta-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .history-shell .history-requirement,
+  .history-shell .history-meta-right {
+    text-align: left;
+  }
+}

@@ -27,11 +27,11 @@
 
   let selected = $state('');
   // web's focusVoteCard: show the plan's phase, then open the plan's sheet.
-  let revealed = false;
+  let revealed: string | null = null;
   $effect(() => {
     const plan = detail.plans?.plans.find((p) => p.id === revealPlan);
-    if (!plan || revealed) return;
-    revealed = true;
+    if (!plan || revealed === plan.id) return;
+    revealed = plan.id;
     selected = planPhaseOf(plan.plan.kind);
   });
   const project = $derived(detail.project);

@@ -219,6 +219,26 @@ const backToPlan = () => bob.locator('.feed-card-stage', { hasText: 'Production 
 await until(bob, backToPlan, 'the return to Production Plan');
 log('a return to Production Plan passed');
 
+// web's History tab (`?tab=history`): every decision in one timeline, resolved ones under
+// Resolutions.
+const historyUrl = `${bob.url().split('?')[0]}?tab=history`;
+const resolutions = bob.locator('.history-group', { hasText: 'Resolutions' });
+for (const label of ['Edit decision', 'Update decision', 'Return to Production Plan', `Production plan · ${planTitle}`]) {
+  for (let i = 0; ; i++) {
+    await bob.goto(historyUrl);
+    const card = resolutions.getByRole('button', { name: `${label}, Approved` }).first();
+    if (await card.waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
+    if (i >= 10) throw new Error(`History never listed ${label}`);
+  }
+}
+await resolutions.getByRole('button', { name: 'Return to Production Plan, Approved' }).click();
+const decided = bob.getByRole('dialog', { name: 'Return to Production Plan' });
+await decided.getByText('The plan needs another look.').waitFor();
+assert.equal(await decided.getByRole('button', { name: 'Yes', exact: true }).count(), 0, 'decided: no vote');
+await bob.screenshot({ path: `${shots}/history-390.png` });
+await decided.getByRole('button', { name: 'Close' }).click();
+log('the History tab lists the resolved edit, update, plan and return');
+
 assert.deepEqual(errors, [], 'no page errors');
 log('all M3a + M3b + M3c + M3d governance checks passed');
 await browser.close();
