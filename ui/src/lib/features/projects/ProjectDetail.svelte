@@ -1,5 +1,6 @@
 <script lang="ts">
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
+  import HistoryTab from '#lib/components/governance/HistoryTab.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
@@ -25,7 +26,7 @@
   import '#lib/components/styles/detail.css';
 
   /**
-   * web's ProjectDetailPage: Details, Participation, Chat and Links tabs (history: M5). Events
+   * web's ProjectDetailPage: Details, Participation, Chat, Links and History tabs. Events
    * are project clones (ADR 0057), so web's EventDetailPage is this page with its event copy.
    */
   let { id }: { id: string } = $props();
@@ -71,6 +72,8 @@
   // As on web, the chat mounts (and starts polling) the first time its tab opens.
   let chatOpened = $state(false);
   let linksOpened = $state(false);
+  // A plan opened from History reveals its sheet in Take part, as a plan vote link does.
+  let revealPlan = $state(planVote);
   const chatFull = $derived(tab === 'chat' && compact);
 
   $effect(() => {
@@ -97,8 +100,8 @@
   });
 
   function tabFromParam(value: string | null): DetailTabId {
-    if (value === 'participation' || value === 'chat' || value === 'links') return value;
-    return 'context';
+    const tabs: DetailTabId[] = ['participation', 'chat', 'links', 'history'];
+    return tabs.find((t) => t === value) ?? 'context';
   }
 
   /** web's clearVoteLink: a vote opened from a link drops the link once its sheet closes. */
@@ -157,7 +160,7 @@
       <section class="hero-card" class:chat-tab-active={chatFull}>
         <DetailTopTabs
           active={tab}
-          available={['context', 'participation', 'chat', 'links']}
+          available={['context', 'participation', 'chat', 'links', 'history']}
           ariaLabel={event ? 'Event detail tabs' : 'Project detail tabs'}
           onSelect={(t) => (tab = t)}
         />
@@ -190,7 +193,7 @@
             revealVote={detailsVote || planVote ? null : voteLink}
             onRevealDone={clearVoteLink}
           />
-          <ParticipationPanel {detail} revealPlan={planVote} onRevealDone={clearVoteLink} />
+          <ParticipationPanel {detail} {revealPlan} onRevealDone={clearVoteLink} />
         </div>
         {#if chatOpened}
           <div
@@ -219,6 +222,20 @@
             inert={tab !== 'links'}
           >
             <LinksTab {detail} highlight={linkRequest} />
+          </div>
+        {/if}
+        {#if tab === 'history'}
+          <div class="tab-panel">
+            <HistoryTab
+              proposals={detail.proposals}
+              plans={detail.plans?.plans}
+              names={detail.names}
+              {charter}
+              stage={project.stage}
+              phaseLabel={detail.phaseLabel}
+              onVote={(p, choice) => detail.vote(p, choice)}
+              onOpenPlan={(plan) => ((revealPlan = plan.id), (tab = 'participation'))}
+            />
           </div>
         {/if}
         {#if tab === 'context'}

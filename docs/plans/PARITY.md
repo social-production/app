@@ -12,9 +12,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    1:1 one-vote path; conversation-DNA integrity change, a chat reset); a removed project's
    side effects (memberships, votes and sign-ups end, `prj-removed`, the author's warm-up
    penalty); the blur on hidden detail pages; bot reviews and the paused badge.
-2. **History tab** on project and event pages (web's `ProjectHistoryTab` /
-   `DecisionHistoryList`: past phase moves, edits, updates and their votes). Found
-   2026-11-03: the app's `DetailTopTabs` knows the tab but no page offers it.
+2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
+   those land in web's history (web lists link create/sever votes there too).
 3. **"Plan became leading"** notification (+ its Settings switch); shares/invites and roles
    notification kinds still missing from Settings.
 4. **Posts and threads, later parts:** @mentions in the comment composer, linked subjects in
@@ -149,8 +148,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   the activity's author), Settings' Roles switch, and web's "<role> suggestion declined" card
   to the suggester (the activities view lists declines per role; coordinator only).
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
-- [ ] History tab (web's `ProjectHistoryTab`: decided phase moves, edits and updates with their
-  votes), on projects and events. `DetailTopTabs` has the entry; no page lists it yet.
+- [x] History tab (web's `ProjectHistoryTab` / `EventHistoryTab`: Active Decisions and
+  Resolutions of edits, updates, phase moves, returns and plans, each opening its vote sheet),
+  on projects and events (2026-11-03, `components/governance/HistoryTab.svelte`).
 - [x] Photos and files in project chats (ADR 0056 ride-along).
 
 ## Notifications and Messages pages
