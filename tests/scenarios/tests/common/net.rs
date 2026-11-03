@@ -78,10 +78,25 @@ impl Net {
             net.space = Some(space);
         }
         for i in 1..n {
-            let _: () = net.call(i, "project", "join", ()).await;
+            net.join(i).await;
         }
         net.settle().await;
         net
+    }
+
+    /// Agent `i` joins. On a loaded CI runner a call can wait in its conductor longer than its
+    /// nonce lives (5 min) and be refused unrun with `BadNonce("Expired")` (PR #87, PR #90's
+    /// `reports`); that refusal is retried with a fresh nonce, anything else fails the test.
+    async fn join(&self, i: usize) {
+        for attempt in 1..=3 {
+            match self.try_call::<(), ()>(i, "project", "join", ()).await {
+                Ok(()) => return,
+                Err(e) if e.contains("BadNonce") && attempt < 3 => {
+                    eprintln!("agent {i}'s join was refused unrun ({e}); retrying");
+                }
+                Err(e) => panic!("agent {i} could not join: {e}"),
+            }
+        }
     }
 
     pub async fn call<I, O>(&self, i: usize, zome: &str, func: &str, payload: I) -> O

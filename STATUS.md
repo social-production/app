@@ -67,10 +67,10 @@ Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
   `governance.mjs` (now ends on the History tab), `events.mjs`, `projects.mjs` **passed**.
   No zome change, so no scenarios run locally (CI runs them).
 
-- **CI note (PR #87):** shard 6 once failed in `reports`' *setup* with an expired nonce
-  (`Unauthorized(BadNonce("Expired"))` on a loaded runner); PR #88's run passed. If it
-  recurs, make `Net` setup robust (retry a setup call refused with an expired nonce) rather
-  than re-running.
+- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
+  on PR #90 (`project/join` waited over 5 min in a loaded runner's conductor and was refused
+  unrun). Fixed on PR #90: `Net::join` (tests/scenarios/tests/common/net.rs) retries a join
+  refused with `BadNonce` (up to 3 tries). If other setup calls hit it, route them the same way.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
