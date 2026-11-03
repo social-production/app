@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-03 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-04 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,9 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #90 merged; this docs PR follows it).
+## In flight: PR for "Plan became leading" + the hidden-page blur (branch `claude/social-production-handoff-dsam61`)
+See the newest "Done" below for what it holds and what was checked. When its CI is green, merge,
+smoke live (`governance.mjs` ends on the new notification), and move this line to "Done".
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90 (`project/join` waited over 5 min in a loaded runner's conductor and was refused
   unrun). Fixed in PR #90 (merged): `Net::join` (tests/scenarios/tests/common/net.rs) retries a join
@@ -60,12 +62,42 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first). Then
+paused badge), events' later parts (the event card's time, activities limited to the plan's
+days), posts/threads' later parts (Posts in Search, the scope page's create menu). Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-03 (PR open): "Plan became leading" (ADR 0072) and the blur on hidden detail pages
+Branch `claude/social-production-handoff-dsam61`. **Coordinator + UI only, no network reset.**
+- **Plan became leading:** governance coordinator `plan_lead_changes()` (`plan_lead.rs`)
+  replays the approved plans in the order they closed and returns each close that handed its
+  kind's lead to another plan (`plan`, its `author`, `kind`, `at`, `by` = the Outcome's
+  author). `Decision`/`Approved` gained `closed_by` (and `Approved` the plan's `author`).
+  UI: `domain/planLeadNotifications.ts` (web's `prj-plan-lead` / `evt-plan-lead` cards to the
+  plan's author), Settings' "Plan became leading" switch, **off by default as on web**
+  (`OFF_BY_DEFAULT` in `domain/notifications.ts`; switched on is kept in
+  `sp_notifications_on`); while off the call isn't made. `inviteNotifications` moved to
+  `domain/inviteNotifications.ts` (size rule).
+- **Hidden pages blur:** web's `ModerationRestrictionNotice` as
+  `components/moderation/RestrictionNotice.svelte` (styles via PORTS into `report.css`), over
+  the title on project/event (`ContextPanel`) and help request pages, a thread's title + body
+  and a post's body. The discussion page no longer blurs its whole surface with the card banner
+  (web's detail pages don't).
+- **Tests:** `governance.mjs` ends by switching the setting on and finding the card;
+  scenario `plans` checks `plan_lead_changes` (plain plan leads, then the better-rated one).
+- **Checked (cloud session):** UI check + lint, boundaries, sizes, `cargo clippy -p governance
+  -D warnings`, `cargo fmt`, zomes build + pack; against a local seed node `governance.mjs`
+  (with the new check), `reports.mjs`, `threads.mjs`, `help-requests.mjs`, `projects.mjs`
+  **passed**; scenario `plans` **passed** (25 min, with the new check); the blur checked by eye with a
+  build that treated "under review" as hidden (two dev founders can't reach the 3 votes hiding
+  needs).
+  Not run locally: the other scenarios (CI). On a freshly started local node the first
+  founder sign-in can take over 2 min (its app is provisioned) and fail a test's 120 s wait;
+  rerun once it's provisioned (`restore` in the seed log).
+- **Cloud disk:** `target/debug` reached 22 GB and the gateway's link failed (bus error, disk
+  full). Run `cloud-seed.sh` with `CARGO_PROFILE_DEV_DEBUG=0` (as `cloud-scenarios.sh` does),
+  and `rm -rf target/debug` if `df` shows the disk full.
 
 ## Done 2026-11-03: the History tab on project and event pages, PR #90 merged 06:42 UTC (5:42 pm Melbourne), live ~06:54 UTC
 - **Live after merge:** CI's first run failed shard 6 on the expired-nonce setup flake (see the

@@ -73,3 +73,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0069](./0069-private-community-events.md) Events for a private community: a private event listed on the community by its seed
 - [0070](./0070-threads-and-posts.md) Threads and posts are commons spaces; comments are their chat, with votes
 - [0071](./0071-reports-and-moderation.md) Reports (web's ⋮ Report): records in the discussion zome, state replayed from Full members' votes (part a: spaces; part b: comments and chat messages in spaces)
+- [0072](./0072-plan-became-leading.md) "Plan became leading": lead changes replayed from the order plans closed (coordinator only)

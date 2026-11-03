@@ -34,6 +34,11 @@
       title: 'Phase finished',
       description: 'When a project or event phase is completed.',
     },
+    {
+      id: 'plan_leading',
+      title: 'Plan became leading',
+      description: 'When a plan becomes the leading option. Off by default.',
+    },
   ];
   const on = (id: NotificationCategory): boolean => !notificationsOff.categories.includes(id);
 </script>

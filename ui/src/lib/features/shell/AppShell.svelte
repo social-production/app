@@ -23,7 +23,7 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { myScopes } from '#lib/stores/myScopes.svelte.ts';
-  import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
+  import * as bell from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { countActionable } from '#lib/domain/activityRail.ts';
   import { activityRail } from '#lib/stores/activityRail.svelte.ts';
@@ -70,7 +70,7 @@
       href: resolve('/notifications'),
       label: 'Notifications',
       icon: 'bell',
-      badge: notifications.unread,
+      badge: bell.notifications.unread,
     },
     { href: resolve('/messages'), label: 'Messages', icon: 'send', badge: messageBadge.unread },
   ]);
@@ -109,11 +109,11 @@
     const refresh = async (): Promise<void> => {
       const onMessages = page.url.pathname.startsWith('/messages');
       const [items, unread] = await Promise.allSettled([
-        myNotifications(),
+        myNotifications(bell.notificationsOff.categories),
         onMessages ? null : unreadMessageCount(),
       ]);
       // A failed round keeps the old count; the next round tries again.
-      if (items.status === 'fulfilled') showNotifications(items.value.items);
+      if (items.status === 'fulfilled') bell.showNotifications(items.value.items);
       if (unread.status === 'fulfilled' && unread.value !== null)
         messageBadge.unread = unread.value;
     };
@@ -121,7 +121,7 @@
     const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
     return () => {
       stop();
-      showNotifications([]);
+      bell.showNotifications([]);
       messageBadge.unread = 0;
     };
   });
@@ -206,7 +206,7 @@
     collapsed={immersive}
     {signedIn}
     viewerName={viewer.name}
-    notificationCount={notifications.unread}
+    notificationCount={bell.notifications.unread}
     messageCount={messageBadge.unread}
     activityCount={railCount}
     {leftOpen}
@@ -234,7 +234,7 @@
         <LeftRail
           channels={railLinks(myScopes.channels)}
           communities={railLinks(myScopes.communities)}
-          invites={notifications.invites}
+          invites={bell.notifications.invites}
           closePanels={closeCompact}
           onDiscover={() => (discoverOpen = true)}
         />

@@ -1,5 +1,6 @@
 import {
   categoryOf,
+  OFF_BY_DEFAULT,
   type NotificationCategory,
   type NotificationItem,
 } from '#lib/domain/notifications.ts';
@@ -19,16 +20,23 @@ export const notifications = $state<{ items: NotificationItem[]; unread: number;
 );
 
 const OFF_KEY = 'sp_notifications_off';
+/** Categories web leaves off by default, once switched on here. */
+const ON_KEY = 'sp_notifications_on';
 
-function readOff(): NotificationCategory[] {
+function read(key: string): NotificationCategory[] {
   try {
-    return JSON.parse(localStorage.getItem(OFF_KEY) ?? '[]') as NotificationCategory[];
+    return JSON.parse(localStorage.getItem(key) ?? '[]') as NotificationCategory[];
   } catch {
     return [];
   }
 }
 
-/** Categories switched off on this device (web's defaults have all of these on). */
+function readOff(): NotificationCategory[] {
+  const on = read(ON_KEY);
+  return [...read(OFF_KEY), ...OFF_BY_DEFAULT.filter((c) => !on.includes(c))];
+}
+
+/** Categories switched off on this device (web's defaults: all on but `OFF_BY_DEFAULT`). */
 export const notificationsOff = $state<{ categories: NotificationCategory[] }>({
   categories: readOff(),
 });
@@ -46,8 +54,10 @@ export function showNotifications(items: NotificationItem[]): void {
 export function setNotificationCategory(category: NotificationCategory, on: boolean): void {
   const rest = notificationsOff.categories.filter((c) => c !== category);
   notificationsOff.categories = on ? rest : [...rest, category];
+  const off = notificationsOff.categories;
   try {
-    localStorage.setItem(OFF_KEY, JSON.stringify(notificationsOff.categories));
+    localStorage.setItem(OFF_KEY, JSON.stringify(off.filter((c) => !OFF_BY_DEFAULT.includes(c))));
+    localStorage.setItem(ON_KEY, JSON.stringify(OFF_BY_DEFAULT.filter((c) => !off.includes(c))));
   } catch {
     // Private windows: the choice holds until the page closes.
   }

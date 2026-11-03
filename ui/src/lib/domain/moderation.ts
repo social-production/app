@@ -32,6 +32,11 @@ export interface Moderation {
 
 export const VISIBLE: Moderation = { state: 'visible', report: null };
 
+/** web's ModerationRestrictionNotice test: the item is hidden, or its report resolved so. */
+export function isHidden(m: Moderation): boolean {
+  return m.state === 'hidden' || m.report?.resolution === 'hidden';
+}
+
 /** A card's moderation field from the index (absent while nothing is reported). */
 export function cardModeration(state: string | undefined): ModerationState {
   return state === 'under_review' || state === 'hidden' || state === 'removed' ? state : 'visible';

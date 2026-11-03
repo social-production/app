@@ -47,7 +47,6 @@
         tone={kind === 'post' ? 'personal' : 'public'}
         accent={modeAccent(kind)}
         clampExcerpts={false}
-        contentRestricted={state.moderation.value.state === 'hidden'}
       >
         {#if kind === 'thread'}
           <ThreadOverview {state} />

@@ -3,8 +3,10 @@
   import CountPill from '#lib/components/cards/CountPill.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
+  import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import { countComments } from '#lib/domain/discussions.ts';
+  import { isHidden } from '#lib/domain/moderation.ts';
 
   import { resolve } from '$app/paths';
 
@@ -31,8 +33,10 @@
         onChange={(next) => state.moderation.set(next)}
       />
     </FeedCardTop>
-    <h1>{charter.title}</h1>
-    <p class="overview-copy">{charter.description}</p>
+    <RestrictionNotice active={isHidden(state.moderation.value)}>
+      <h1>{charter.title}</h1>
+      <p class="overview-copy">{charter.description}</p>
+    </RestrictionNotice>
     <div class="footer detail-footer no-truncate">
       <div class="engagement-row feed-corner-actions">
         <VoteStrip

@@ -1,4 +1,6 @@
 import type { Proposal, ProposalKind, VoteChoice } from '#lib/domain/governance.ts';
+import type { LeadChange } from '#lib/domain/planLeadNotifications.ts';
+import type { PlanKind } from '#lib/domain/plans.ts';
 import {
   callCell,
   hashToString,
@@ -98,4 +100,24 @@ export async function challengeCount(projectId: string, proposal: string): Promi
 /** Write the Outcome of a proposal its votes already decide (anyone may; validators recheck). */
 export async function closeProposal(projectId: string, proposal: string): Promise<void> {
   await governance<ActionHash | null>(projectId, 'close_proposal', stringToHash(proposal));
+}
+
+interface LeadChangeWire {
+  plan: ActionHash;
+  author: AgentPubKey;
+  kind: PlanKind;
+  at: number;
+  by: AgentPubKey;
+}
+
+/** Every time a plan took its kind's lead, oldest first (ADR 0072). */
+export async function planLeadChanges(project: ProjectRef): Promise<LeadChange[]> {
+  const wire = await governance<LeadChangeWire[]>(project, 'plan_lead_changes');
+  return wire.map((c) => ({
+    plan: hashToString(c.plan),
+    author: hashToString(c.author),
+    kind: c.kind,
+    at: c.at,
+    by: hashToString(c.by),
+  }));
 }

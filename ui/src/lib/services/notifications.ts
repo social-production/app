@@ -2,12 +2,14 @@ import {
   markRead,
   chatMentionNotifications,
   followNotifications,
-  inviteNotifications,
   projectNotifications,
   withReadMarks,
+  type NotificationCategory,
   type NotificationItem,
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
+import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
+import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
 import { helpShareNotifications } from '#lib/domain/share.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
@@ -18,7 +20,7 @@ import { pendingInvites } from './events.ts';
 import { listMessages } from './chat.ts';
 import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
-import { listProposals } from './governance.ts';
+import { listProposals, planLeadChanges } from './governance.ts';
 import { myAgent, namesOf, viewer } from './people.ts';
 import { listingIdOf, myProjectSeeds } from './projects.ts';
 
@@ -32,16 +34,20 @@ interface GlanceWire {
 
 /**
  * web's notifications list, derived on this device (ADR 0046) from the projects this person
- * is in, as the Public tab is (ADR 0044, 0065).
+ * is in, as the Public tab is (ADR 0044, 0065). Categories switched `off` aren't read at all
+ * where that saves calls (plan leads).
  */
-export async function myNotifications(): Promise<{ items: NotificationItem[] }> {
+export async function myNotifications(
+  off: NotificationCategory[] = [],
+): Promise<{ items: NotificationItem[] }> {
+  const planLeads = !off.includes('plan_leading');
   const [{ agent: me, name }, seeds, chats] = await Promise.all([
     viewer(),
     myProjectSeeds(),
     myChats(),
   ]);
   const settled = await Promise.allSettled([
-    ...seeds.map((seed) => fromProject(seed, me, name)),
+    ...seeds.map((seed) => fromProject(seed, me, name, planLeads)),
     ...chats.map((c) => fromChat(c.seed, c.at, me, name)),
     followView(me).then(followNotifications),
     pendingInvites().then(inviteNotifications),
@@ -50,13 +56,14 @@ export async function myNotifications(): Promise<{ items: NotificationItem[] }> 
   return { items: withReadMarks(all, marksOf(me)) };
 }
 
-async function fromProject(seed: string, me: string, myName: string) {
+async function fromProject(seed: string, me: string, myName: string, planLeads: boolean) {
   const cell = await projectCell(seed, 'Project');
-  const [project, proposals, messages, activities] = await Promise.all([
+  const [project, proposals, messages, activities, leads] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
     listProposals({ seed }),
     listMessages({ seed }),
     listActivities({ seed }).catch(() => []),
+    planLeads ? planLeadChanges({ seed }).catch(() => []) : [],
   ]);
   if (!project?.charter) return [];
   const labels = new Map(project.phases.map((p) => [p.id, p.label]));
@@ -78,6 +85,7 @@ async function fromProject(seed: string, me: string, myName: string) {
   return [
     ...projectNotifications(glance, me, myName),
     ...activityNotifications(glance, activities, me, names),
+    ...planLeadNotifications(glance, leads, me),
   ];
 }
 

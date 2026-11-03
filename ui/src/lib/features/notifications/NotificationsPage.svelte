@@ -14,7 +14,11 @@
     projectPageOf,
   } from '#lib/services/notifications.ts';
   import { namesOf } from '#lib/services/people.ts';
-  import { notifications, showNotifications } from '#lib/stores/notifications.svelte.ts';
+  import {
+    notifications,
+    notificationsOff,
+    showNotifications,
+  } from '#lib/stores/notifications.svelte.ts';
 
   import '#lib/components/styles/messages.css';
   import '#lib/components/styles/notifications.css';
@@ -33,7 +37,7 @@
 
   async function refresh(): Promise<void> {
     try {
-      showNotifications((await myNotifications()).items);
+      showNotifications((await myNotifications(notificationsOff.categories)).items);
       error = '';
     } catch (e) {
       error = explain(e);

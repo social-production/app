@@ -20,6 +20,8 @@ pub struct Decision {
     pub proposal: Found<Proposal>,
     pub yes: u32,
     pub no: u32,
+    /// Who wrote the Outcome: the vote (or organizer) that closed it.
+    pub closed_by: AgentPubKey,
 }
 
 /// Full-standing answers from the directory cell, asked once per (agent, proposal time).
@@ -51,6 +53,7 @@ pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision
         if outcome.entry.votes.is_empty() && organized {
             passed.push(Decision {
                 at: outcome.at,
+                closed_by: outcome.author.clone(),
                 yes: 0,
                 no: 0,
                 proposal,
@@ -72,6 +75,7 @@ pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision
             };
             passed.push(Decision {
                 at: outcome.at,
+                closed_by: outcome.author.clone(),
                 yes: tally(VoteChoice::Yes),
                 no: tally(VoteChoice::No),
                 proposal,
