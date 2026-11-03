@@ -50,7 +50,27 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (2026-11-03): the History tab on project and event pages (PR open)
+## In flight: nothing (PR #90 merged; this docs PR follows it).
+- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
+  on PR #90 (`project/join` waited over 5 min in a loaded runner's conductor and was refused
+  unrun). Fixed in PR #90 (merged): `Net::join` (tests/scenarios/tests/common/net.rs) retries a join
+  refused with `BadNonce` (up to 3 tries). If other setup calls hit it, route them the same way.
+
+## Next: the parity pass (`docs/plans/PARITY.md`)
+**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
+moderation's later parts (DM/group reports with the 1:1 path, a
+conversation-DNA integrity change; a removed project's side effects, bot reviews and the
+paused badge), "Plan became leading" (web-backend sends
+`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
+needs the time the lead changed, which the plan list doesn't give: work that out first). Then
+the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
+requests, software PR flow; posts and threads are done, with their later parts in PARITY);
+asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-03: the History tab on project and event pages, PR #90 merged 06:42 UTC (5:42 pm Melbourne), live ~06:54 UTC
+- **Live after merge:** CI's first run failed shard 6 on the expired-nonce setup flake (see the
+  CI note below; fixed in this PR); the second run was green (75 min). Seed node 661 MB at 9
+  min. No network reset. Live `governance.mjs` **passed** (06:59–07:03 UTC), History included.
 Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
 - `domain/history.ts`: web-backend's `_build_project_history` from the governance zome's
   proposals and plans (Update/Edit decision, Advance to …/Close project, Return to …,
@@ -65,23 +85,7 @@ Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
   web prints the raw approval float ("66.666…%"); the app rounds.
 - **Checked:** UI check + lint, boundaries, sizes; against a local seed node
   `governance.mjs` (now ends on the History tab), `events.mjs`, `projects.mjs` **passed**.
-  No zome change, so no scenarios run locally (CI runs them).
-
-- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
-  on PR #90 (`project/join` waited over 5 min in a loaded runner's conductor and was refused
-  unrun). Fixed on PR #90: `Net::join` (tests/scenarios/tests/common/net.rs) retries a join
-  refused with `BadNonce` (up to 3 tries). If other setup calls hit it, route them the same way.
-
-## Next: the parity pass (`docs/plans/PARITY.md`)
-**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
-moderation's later parts (DM/group reports with the 1:1 path, a
-conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), "Plan became leading" (web-backend sends
-`prj-plan-lead` to the new leader's author when a plan vote changes the leader; deriving it
-needs the time the lead changed, which the plan list doesn't give: work that out first). Then
-the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
-requests, software PR flow; posts and threads are done, with their later parts in PARITY);
-asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+  `reverts` scenario passed locally with the retrying `Net::join`.
 
 ## Done 2026-11-03: moderation part (b), reports on comments and chat messages (ADR 0071), PR #88 merged 02:23 UTC (1:23 pm Melbourne), live ~02:35 UTC
 - **Live after merge:** CI took ~64 min on the second push (the first failed `cargo fmt

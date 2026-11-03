@@ -150,7 +150,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [ ] Software governance panel (pull requests) in a software project's Activity phase.
 - [x] History tab (web's `ProjectHistoryTab` / `EventHistoryTab`: Active Decisions and
   Resolutions of edits, updates, phase moves, returns and plans, each opening its vote sheet),
-  on projects and events (2026-11-03, `components/governance/HistoryTab.svelte`).
+  on projects and events (2026-11-03, PR #90, `components/governance/HistoryTab.svelte`).
 - [x] Photos and files in project chats (ADR 0056 ride-along).
 
 ## Notifications and Messages pages
