@@ -5,6 +5,7 @@
     type DiscussionComment as Comment,
     type VoteDirection,
   } from '#lib/domain/discussions.ts';
+  import type { Moderation } from '#lib/domain/moderation.ts';
 
   import CommentComposer from './CommentComposer.svelte';
   import DiscussionComment from './DiscussionComment.svelte';
@@ -17,6 +18,8 @@
    */
   interface Props {
     comments: Comment[];
+    /** The thread's or post's listing id. */
+    space: string;
     names: Record<string, string>;
     sortMode: CommentSort;
     highlighted: string | null;
@@ -26,10 +29,12 @@
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
     /** Writes a comment (`parent` null) or a reply; resolves true once written. */
     onComment: (parent: string | null, body: string) => Promise<boolean>;
+    onModeration: (id: string, next: Moderation) => void;
   }
 
   let {
     comments,
+    space,
     names,
     sortMode,
     highlighted,
@@ -38,6 +43,7 @@
     onSignIn,
     onVote,
     onComment,
+    onModeration,
   }: Props = $props();
 
   let draft = $state('');
@@ -57,6 +63,7 @@
     {#each sorted as comment (comment.id)}
       <DiscussionComment
         {comment}
+        {space}
         {names}
         {highlighted}
         {embedded}
@@ -64,6 +71,7 @@
         {onSignIn}
         {onVote}
         onReply={(parent, body) => onComment(parent, body)}
+        {onModeration}
       />
     {/each}
   </div>

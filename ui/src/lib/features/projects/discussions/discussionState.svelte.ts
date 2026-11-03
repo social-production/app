@@ -1,4 +1,5 @@
 import type { CommentSort, DiscussionComment, VoteDirection } from '#lib/domain/discussions.ts';
+import type { Moderation } from '#lib/domain/moderation.ts';
 import type { Project, Stance } from '#lib/domain/projects.ts';
 import { queued } from '#lib/services/chat.ts';
 import { addComment, listComments, voteComment } from '#lib/services/discussions.ts';
@@ -87,6 +88,11 @@ export class DiscussionState {
       activeVote: direction,
       voteCount: c.voteCount - c.activeVote + direction,
     }));
+  }
+
+  /** A report or vote on a comment (ADR 0071 part b) shows at once. */
+  setCommentModeration(comment: string, next: Moderation): void {
+    this.comments = mapTree(this.comments, comment, (c) => ({ ...c, moderation: next }));
   }
 
   /** web's addComment: true once written (the composer then clears). */

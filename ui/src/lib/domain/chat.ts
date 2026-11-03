@@ -1,3 +1,5 @@
+import type { Moderation } from './moderation.ts';
+
 /** Mirrors the project DNA's discussion zome (ADR 0038). Times are Holochain micros. */
 
 /** sp_core::chat::MESSAGE_MAX. */
@@ -69,6 +71,8 @@ export interface ChatLine {
   call: CallLine | null;
   /** Your own message in a direct chat: web's ✓ (sent) or ✓✓ (the other person read it). */
   receipt?: 'sent' | 'read';
+  /** Its report, in a space's chat (ADR 0071 part b). */
+  moderation?: Moderation;
 }
 
 /** web's mention pattern (utils/linkifyMessageBody.ts, web-backend governance.py). */

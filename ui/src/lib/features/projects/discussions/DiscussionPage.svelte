@@ -57,6 +57,7 @@
         {#if state.message}<p class="status-note" role="alert">{state.message}</p>{/if}
         <DiscussionPanel
           comments={state.comments}
+          space={id}
           names={state.names}
           sortMode={state.sortMode}
           {highlighted}
@@ -65,6 +66,7 @@
           onSignIn={(message) => requireViewer(message)}
           onVote={(c, d) => state.voteComment(c, d)}
           onComment={(parent, body) => state.comment(parent, body)}
+          onModeration={(c, next) => state.setCommentModeration(c, next)}
         />
       </FeedSurface>
     {/if}

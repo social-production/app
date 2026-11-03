@@ -1,7 +1,9 @@
 <script lang="ts">
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import { bodyParts } from '#lib/components/chat/chatFormat.ts';
+  import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import type { DiscussionComment as Comment, VoteDirection } from '#lib/domain/discussions.ts';
+  import { VISIBLE, removedLabel, type Moderation } from '#lib/domain/moderation.ts';
   import type { Stance } from '#lib/domain/projects.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
 
@@ -12,11 +14,13 @@
 
   /**
    * web's DiscussionComment: author and time (the row folds the comment and its replies), the
-   * body, a vote strip and Reply, a reply composer, then the replies. web's ⋮ Report menu and
-   * moderated bodies come with moderation.
+   * body (or web's "Removed for …" and serious-harm reveal, ADR 0071 part b), a vote strip,
+   * Reply and the ⋮ report menu, a reply composer, then the replies.
    */
   interface Props {
     comment: Comment;
+    /** The thread's or post's listing id (its reports' space). */
+    space: string;
     names: Record<string, string>;
     highlighted: string | null;
     embedded?: boolean;
@@ -25,10 +29,13 @@
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
     /** Resolves true once the reply is written (the draft then clears). */
     onReply: (parent: string, body: string) => Promise<boolean>;
+    /** A report or vote changed this comment's state. */
+    onModeration: (id: string, next: Moderation) => void;
   }
 
   let {
     comment,
+    space,
     names,
     highlighted,
     embedded = false,
@@ -36,11 +43,19 @@
     onSignIn,
     onVote,
     onReply,
+    onModeration,
   }: Props = $props();
 
   let draft = $state('');
   let replyOpen = $state(false);
   let collapsed = $state(false);
+  let revealed = $state(false);
+  const moderation = $derived(comment.moderation ?? VISIBLE);
+  // web's shouldHideModeratedBody and supportsHiddenToggle.
+  const removed = $derived(moderation.state === 'removed');
+  const canReveal = $derived(
+    !removed && (moderation.report?.reason === 'serious-harm' || moderation.state === 'hidden'),
+  );
   let self = $state<HTMLElement>();
   const isHighlighted = $derived(highlighted === comment.id);
   const name = $derived(names[comment.author] ?? '…');
@@ -86,18 +101,33 @@
     </div>
 
     <div class="comment-body-block" hidden={collapsed}>
-      <p class="body">
-        {#each bodyParts(comment.body) as part, i (i)}
-          {#if part.mention}<span class="mention">{part.text}</span>
-          {:else if part.internal}
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path written in the comment -->
-            <a href={part.href}>{part.text}</a>
-          {:else if part.href}
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
-            <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
-          {:else}{part.text}{/if}
-        {/each}
-      </p>
+      {#if canReveal}
+        <button
+          aria-expanded={revealed}
+          class="hidden-toggle"
+          type="button"
+          onclick={() => (revealed = !revealed)}
+        >
+          <span class="hidden-plus">{revealed ? '−' : '+'}</span>
+          <span>{revealed ? 'Hide again' : 'Hidden for serious harm report — reveal to read'}</span>
+        </button>
+      {/if}
+      {#if removed}
+        <p class="body moderated">{removedLabel(moderation.report?.reason)}</p>
+      {:else if !canReveal || revealed}
+        <p class="body">
+          {#each bodyParts(comment.body) as part, i (i)}
+            {#if part.mention}<span class="mention">{part.text}</span>
+            {:else if part.internal}
+              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path written in the comment -->
+              <a href={part.href}>{part.text}</a>
+            {:else if part.href}
+              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
+              <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
+            {:else}{part.text}{/if}
+          {/each}
+        </p>
+      {/if}
 
       <div class="actions-row">
         <VoteStrip
@@ -135,6 +165,14 @@
             </svg>
           {/if}
         </button>
+        <ReportControl
+          id={space}
+          message={comment.id}
+          itemLabel="comment"
+          {moderation}
+          owner={comment.author}
+          onChange={(next) => onModeration(comment.id, next)}
+        />
       </div>
 
       {#if replyOpen}
@@ -157,6 +195,7 @@
       {#each comment.replies as child (child.id)}
         <Self
           comment={child}
+          {space}
           {names}
           {highlighted}
           {embedded}
@@ -164,6 +203,7 @@
           {onSignIn}
           {onVote}
           {onReply}
+          {onModeration}
         />
       {/each}
     </div>

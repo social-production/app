@@ -1,4 +1,5 @@
 import type { ChatMessage } from './chat.ts';
+import type { Moderation } from './moderation.ts';
 
 /** Threads and posts (ADR 0070): commons spaces with these charter modes. */
 export const THREAD_MODE = 'thread';
@@ -25,6 +26,8 @@ export interface DiscussionComment {
   createdAt: number;
   voteCount: number;
   activeVote: VoteDirection;
+  /** Its report, when someone reported it (ADR 0071 part b). */
+  moderation?: Moderation;
   replies: DiscussionComment[];
 }
 
@@ -35,6 +38,7 @@ export interface DiscussionComment {
 export function commentTree(
   messages: ChatMessage[],
   votes: Record<string, CommentVotes>,
+  moderation: Record<string, Moderation> = {},
 ): DiscussionComment[] {
   const ordered = [...messages].sort((a, b) => a.createdAt - b.createdAt);
   const byId = new Map<string, DiscussionComment>();
@@ -47,6 +51,7 @@ export function commentTree(
       createdAt: m.createdAt,
       voteCount: v?.count ?? 0,
       activeVote: v?.mine ?? 0,
+      ...(moderation[m.id] ? { moderation: moderation[m.id] } : {}),
       replies: [],
     });
   }

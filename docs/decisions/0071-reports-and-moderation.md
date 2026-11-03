@@ -1,6 +1,6 @@
 # 0071. Reports: web's ⋮ Report, replayed from votes by every reader
 
-Status: **accepted** (2026-11-02), part (a). Follows [0033](./0033-project-governance-checks.md) (Full
+Status: **accepted** (2026-11-02), part (a); part (b) added 2026-11-03. Follows [0033](./0033-project-governance-checks.md) (Full
 standing counts), [0065](./0065-public-commons-network.md) and
 [0070](./0070-threads-and-posts.md). Parity item "Moderation" (`docs/plans/PARITY.md`).
 
@@ -57,6 +57,35 @@ boosts for the item's age and popularity; once deletion is out of reach the repo
   "Serious harm report" banner; detail pages show the menu in their header and, once removed,
   "Removed for spam" / "Removed for serious harm" instead of the page (web answers not found).
   web's "Link copied" toast is the menu item's own label (the app has no toasts).
+
+## Part (b), 2026-11-03: comments and chat messages in spaces
+web reports comments (`comment` target: a thread's or post's comments and the chats of
+projects, events and help requests) from the comment's ⋮ (`DiscussionComment`) and from the
+chat bubble menu (`LiveChatPanel`: Report, then "Vote to remove" / "Vote to keep" while the
+report is open). A removed one reads "Removed for spam/serious harm"; a serious-harm one hides
+behind "Hidden for serious harm report — reveal to read".
+- **No integrity change.** The `Report` entry's target is any action, and its rules (not your
+  own item, listed on what it reports, votes as yourself and never on your own item) already
+  fit a chat message. Part (b) is coordinator and UI only, so the project network is not reset.
+- **Coordinator** (`message_reports.rs`): `report_message` (the message must be this space's;
+  one open report per message) and `message_moderation(ids)` (only the reported ones come
+  back, so an unreported chat costs one link read per message and nothing more).
+  `vote_report` reads the report's target and decides on the space or on the message.
+- **Numbers** (web's `electorate_size_for_target` and `load_target_engagement` for comments):
+  the audience is the space's (members, commenters, signallers, plus the counted voters, floor
+  3); the age is the message's; popularity is its voters (comment votes) plus twice the people
+  who replied to it on the chat's newest page.
+- **UI:** `DiscussionComment` has web's ⋮ (`ReportControl` with `message`); the comment tree
+  carries each comment's moderation (`listComments` reads it with the votes). Project, event
+  and help request chats (`ProjectChat`) read the reports when new messages arrive and every
+  30 s (`chatModeration.svelte.ts`) and pass `reports` to `ChatPanel`, whose bubble menu gains
+  Report and the two votes; the composer is web's ReportComposerModal (`ReportComposer.svelte`,
+  shared with the ⋮ menu). A refused vote shows above the composer (web toasts it).
+- **Deviation:** web keeps a hidden message's photos visible behind the reveal and a removed
+  message's files downloadable; the app hides both until revealed (removed: always).
+- **Still to come:** direct and group chats (web's `message` target and its 1:1 fast path:
+  one vote decides in a two-person chat). They live in the conversation DNA, whose messages
+  zome has no reports: an integrity change there (a chat reset).
 
 ## Consequences
 - **Integrity change in the project DNA** (discussion zome): merging resets the project

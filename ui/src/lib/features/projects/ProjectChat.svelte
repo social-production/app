@@ -11,6 +11,8 @@
   import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import { ChatModeration } from './chatModeration.svelte.ts';
+
   /** web's ProjectChatTab: the project's "# project-chat", polled while the tab is open. */
   interface Props {
     projectId: string;
@@ -56,6 +58,23 @@
     },
     names,
   );
+  // svelte-ignore state_referenced_locally
+  const reports = new ChatModeration(projectId);
+  const lines = $derived(
+    chat.lines.map((l) => {
+      const moderation = reports.byId[l.id];
+      return moderation ? { ...l, moderation } : l;
+    }),
+  );
+
+  $effect(() => {
+    const ids = chat.messages.map((m) => m.id);
+    if (!active) return;
+    void reports.refresh(ids);
+    const timer = setInterval(() => void reports.refresh(ids, true), 30_000);
+    return () => clearInterval(timer);
+  });
+
   // Guests read the chat; sending shows web's sign-in notice.
   const guest = $derived(connection.current.status !== 'connected');
   let compact = $state(false);
@@ -100,7 +119,7 @@
   class:chat-shell-fullscreen={fullscreen}
 >
   <ChatPanel
-    lines={chat.lines}
+    {lines}
     title={copy.title}
     placeholder={copy.placeholder}
     submitLabel="Send"
@@ -112,6 +131,12 @@
     onSend={(body, replyTo, files) => chat.send(body, replyTo, files)}
     fileUrl={chat.fileUrl}
     onDelete={(id) => chat.remove(id)}
+    reports={{
+      report: reports.report,
+      vote: reports.vote,
+      explain,
+      signedIn: () => requireViewer('Sign in to report this comment.'),
+    }}
     {highlighted}
     {onWrote}
     mentionSearch={guest ? null : mentions.search}

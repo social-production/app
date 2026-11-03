@@ -42,7 +42,7 @@ fn records(hashes: &[ActionHash]) -> ExternResult<Vec<Option<Record>>> {
     Ok(out)
 }
 
-fn decode(record: &Record) -> ExternResult<Option<ChatMessage>> {
+pub(crate) fn decode(record: &Record) -> ExternResult<Option<ChatMessage>> {
     if !is_message(record.action())? {
         return Ok(None);
     }
