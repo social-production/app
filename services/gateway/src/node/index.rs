@@ -74,9 +74,10 @@ impl Who<'_> {
             } => {
                 let followed = following.contains(&c.creator.as_str());
                 let mine = c.creator == *me;
+                // Not followed past the first test: discovery is everyone else's.
                 followed
                     || (post && mine)
-                    || (*popular && !followed && !mine && sp_discussion::is_discussion(&c.mode))
+                    || (*popular && !mine && sp_discussion::is_discussion(&c.mode))
             }
         }
     }

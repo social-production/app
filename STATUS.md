@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Home's personal feed as web-backend's (own posts, "Following + popular"), on the branch; PR to open once `threads.mjs` passes locally
+## In flight: Home's personal feed as web-backend's (own posts, "Following + popular"), PR #96
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
@@ -69,7 +69,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: Home's personal feed as web-backend's: your own posts and "Following + popular" (not merged yet)
+## Done 2026-11-04: Home's personal feed as web-backend's: your own posts and "Following + popular", PR #96 (not merged yet)
 Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
 - web-backend's `get_personal_feed`: everything the people you follow made, plus your own
   posts; "Following + popular" adds everyone else's posts and threads (its discovery rows).
@@ -83,7 +83,13 @@ Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.
   `setAudience` reloads.
 - **Tests:** `threads.mjs`: the reader sees their own post on Home with "Following only";
   founder one sees it with "Following + popular" and not with "Following only".
-- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, gateway index tests (6).
+- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
+  --all-targets -D warnings`, gateway index tests (6); against a local seed node
+  `threads.mjs` (new Home steps), `follows.mjs`, `closed-communities.mjs` **passed**. Not run
+  locally: scenarios (no zome change).
+- **Cloud container reboots:** this session's container rebooted twice (uptime reset), which
+  kills the local seed node and background runs. Push work as you go; restart
+  `cloud-seed.sh` (it reuses the build, ~1 min) when `e2e-local.sh` says it isn't running.
 
 ## Done 2026-11-04: links in post bodies (web's LinkedPostBody), PR #95 merged 09:18 UTC (8:18 pm Melbourne)
 Branch `claude/social-production-handoff-dsam61`. **UI only.**
