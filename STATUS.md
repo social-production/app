@@ -50,14 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Posts in Search (PR #94), then Share + and comment @mentions (branch `claude/social-production-handoff-dsam61`)
-- Gateway + UI, no DNA change, no network reset. See the newest "Done" entry for what was
-  checked; if the PR is open, watch its CI and merge when green, then smoke live `threads.mjs`
-  and `search.mjs`.
+## In flight: nothing (PR #94 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
   *last* edit (PR #92's first CI run failed on a 302-line AppShell).
+- **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
+  items (pushed together once the later two were tested locally) rather than three PRs.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
@@ -70,8 +69,11 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: @mentions in the comment composer (not merged yet)
-Branch `claude/social-production-handoff-dsam61` (after PR #94 and the Share work). **UI only.**
+## Done 2026-11-04: @mentions in the comment composer, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
+- **Live after merge:** PR #94 merged 07:33 UTC (6:33 pm Melbourne), CI 78 min on its last push. The
+  seed node restarted ~07:45 UTC (497 MB at 2 min). No network reset. Live `search.mjs`,
+  `threads.mjs` (Posts in Search, @mentions) and `projects.mjs` (Share +) **passed** 07:47–07:50 UTC.
+Branch `claude/social-production-handoff-dsam61`. **UI only.**
 - web's CommentComposer `MentionMenu`: typing "@na" offers matching people (the chat's
   `MentionSource`: people in this discussion first, then the directory), Enter/click inserts
   "@name ", Escape closes. Thread and post comments link "@name" to the profile (web's
@@ -84,8 +86,8 @@ Branch `claude/social-production-handoff-dsam61` (after PR #94 and the Share wor
   seed node. Not checked: whether the mentioned person's "You were mentioned." card reaches
   someone who isn't a member of the thread (web notifies anyone mentioned).
 
-## Done 2026-11-04: web's "Share +" on project and event pages, and share notifications (not merged yet)
-Branch `claude/social-production-handoff-dsam61` (after PR #94). **UI only, no DNA change.**
+## Done 2026-11-04: web's "Share +" on project and event pages, and share notifications, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
+Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
 - `features/projects/DetailShare.svelte` in `ProjectDock` after the votes, as web's
   `ProjectOverviewHeader`/`EventOverviewHeader` place it: projects show it to anyone signed in
   (web's `viewerCanShare`) and refuse non-members on Send with web-backend's "Only project
@@ -105,7 +107,7 @@ Branch `claude/social-production-handoff-dsam61` (after PR #94). **UI only, no D
   `projects.mjs` (new share step), `help-requests.mjs`, `events.mjs` **passed**; 390px
   screenshots of the dock and the sheet. Not run: scenarios (no Rust change).
 
-## Done 2026-11-04: Posts in Search, PR #94 (not merged yet)
+## Done 2026-11-04: Posts in Search, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
 Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
 - web's Search has a Posts filter and Post rows (web-backend indexes posts; followers-only
   posts show only to followers, and the app's posts are all Public). Gateway:
