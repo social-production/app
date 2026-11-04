@@ -22,8 +22,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
    Posts in Search, links in post bodies, your own posts on Home and "Following + popular".
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
-5. **Events, later parts:** Remove organizer (integrity), the event card's time. (Activities
-   limited to the plan's days: done 2026-11-04.)
+5. **Events, later parts:** Remove organizer (integrity). (Activities limited to the plan's
+   days and the event card's time: done 2026-11-04/05.)
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
@@ -103,8 +103,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   every card and detail header; "Under review" / "Hidden" beside it; hidden cards blur behind
   web's serious-harm banner; removed items leave the feed (2026-11-02, ADR 0071 part a).
 - [x] Event cards (M5c, ADR 0057): web's `EventCard` (place line, signals, comments) linking to
-  `/events/<id>` (as do the rail, notifications, search and personal cards). Still to come:
-  the time on the card (the index needs the leading plan's schedule).
+  `/events/<id>` (as do the rail, notifications, search and personal cards). The card's time
+  (2026-11-05): the leading approved plan's start and place, as web-backend's
+  `scheduled_at` and `location_label`; placeholder places ("TBD") are left out (web's `isImplementedScheduleLabel`).
 - [x] Events, part 2 (ADR 0061): Audience step, invite-only events, organizer-controlled
   governance with co-organizers; web's EventMembersPanel (Organizers/Members, Promote to
   organizer, Invite +), "Edit event"/Save and web's event phase-menu copy (2026-10-29).

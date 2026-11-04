@@ -53,6 +53,8 @@ export interface ProjectCard {
     signupCount: number;
     slotsNeeded: number;
   };
+  /** An event's start from its leading plan (web's `scheduledAt`; Holochain micros). */
+  scheduledAt?: number;
   /** web's moderationState while a report is open: `under_review` or `hidden` (ADR 0071). */
   moderation?: string;
 }

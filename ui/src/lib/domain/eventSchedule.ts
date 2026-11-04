@@ -159,3 +159,11 @@ export function scheduleSummary(f: ScheduleForm): string {
       : f.scheduledDate || '—';
   return `${days} · ${f.startTime || '—'} – ${f.finishTime || '—'}`;
 }
+
+const PLACEHOLDER_LABELS = new Set(['tbd', 'not specified', 'to be determined']);
+
+/** web's `isImplementedScheduleLabel`: a time or place label that isn't a placeholder. */
+export function implementedLabel(label: string | null | undefined): string {
+  const s = (label ?? '').trim();
+  return s && !PLACEHOLDER_LABELS.has(s.toLowerCase()) ? s : '';
+}

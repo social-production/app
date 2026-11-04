@@ -1,5 +1,7 @@
 <script lang="ts">
   import CardReport from '#lib/components/moderation/CardReport.svelte';
+  import { implementedLabel } from '#lib/domain/eventSchedule.ts';
+  import { localDateTime } from '#lib/domain/helpRequests.ts';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
   import { resolve } from '$app/paths';
@@ -12,8 +14,7 @@
 
   /**
    * web's public-feed EventCard (styles/cards.css, `.event-card`). An event is a listing with
-   * mode "event" (ADR 0057); its time joins the place line once the index carries the
-   * leading plan's schedule.
+   * mode "event" (ADR 0057); the place line starts with the leading plan's start time.
    */
   interface Props {
     card: ProjectCard;
@@ -25,6 +26,8 @@
 
   const href = $derived(resolve('/events/[id]', { id: card.id }));
   const closed = $derived(card.phase === 'Closed');
+  const when = $derived(localDateTime(card.scheduledAt ?? null));
+  const place = $derived([when, implementedLabel(card.locationLabel)].filter(Boolean).join(' · '));
 
   import '#lib/components/styles/cards.css';
 </script>
@@ -41,8 +44,8 @@
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
-    {#if card.locationLabel}
-      <p class="location">{card.locationLabel}</p>
+    {#if place}
+      <p class="location">{place}</p>
     {/if}
     <div class="footer">
       <div class="engagement-row feed-corner-actions">
