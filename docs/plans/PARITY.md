@@ -22,8 +22,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
    Posts in Search, links in post bodies, your own posts on Home and "Following + popular".
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
-5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
-   days, the event card's time.
+5. **Events, later parts:** Remove organizer (integrity), the event card's time. (Activities
+   limited to the plan's days: done 2026-11-04.)
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
@@ -111,8 +111,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] Events' private-community audience (2026-10-31, PR #82, ADR 0069): web's Audience option and
   Who step (one private community + organizers); the event is listed on the community, whose
   page shows it to members, who join without an invite.
-- [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change),
-  activities limited to the plan's days, History tab.
+- [x] Event activities limited to the leading plan's days (2026-11-04): marked plan days,
+  the wizard bounded to the chosen day, no new activities once the plan has ended.
+- [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change).
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
