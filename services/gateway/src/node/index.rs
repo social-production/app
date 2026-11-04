@@ -73,6 +73,7 @@ impl ProjectIndex {
         q: &FeedQuery<'_>,
         creators: &[&str],
         tags: &[&str],
+        with_posts: bool,
         offset: usize,
         limit: usize,
     ) -> (Vec<ProjectCard>, usize) {
@@ -82,8 +83,9 @@ impl ProjectIndex {
             .filter(|c| !sp_scope::is_scope(&c.mode))
             // Removed after a report (ADR 0071): web unlists them everywhere.
             .filter(|c| c.moderation.as_deref() != Some(REMOVED))
-            // Posts live on personal feeds only (web's personal feed and profiles, ADR 0070).
-            .filter(|c| c.mode != sp_discussion::POST || !creators.is_empty())
+            // Posts live on personal feeds only (web's personal feed and profiles, ADR 0070),
+            // and in Search (`with_posts`).
+            .filter(|c| c.mode != sp_discussion::POST || with_posts || !creators.is_empty())
             .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))
             .filter(|c| tags.is_empty() || c.tags.iter().any(|have| tags.contains(&have.as_str())))
             .collect();

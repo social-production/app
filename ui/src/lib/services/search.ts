@@ -25,6 +25,7 @@ const ITEM_KIND: Partial<Record<CharterMode, SearchResultKind>> = {
   event: 'event',
   'help-request': 'help-request',
   thread: 'thread',
+  post: 'post',
 };
 
 const ITEM_TYPE: Partial<Record<SearchType, SearchResultKind>> = {
@@ -32,6 +33,7 @@ const ITEM_TYPE: Partial<Record<SearchType, SearchResultKind>> = {
   thread: 'thread',
   event: 'event',
   help_request: 'help-request',
+  post: 'post',
 };
 
 const itemKind = (mode: CharterMode): SearchResultKind => ITEM_KIND[mode] ?? 'project';
@@ -40,6 +42,7 @@ const ITEM_PATH: Record<string, string> = {
   event: '/events',
   'help-request': '/help-requests',
   thread: '/threads',
+  post: '/posts',
   project: '/projects',
 };
 
@@ -80,6 +83,8 @@ async function itemMatches(q: string, type: SearchType): Promise<SearchResultIte
     q,
     sort: 'trending',
     window: 'all',
+    // Posts stay off public feeds but web's Search lists them (ADR 0070).
+    posts: 'true',
     offset: '0',
     limit: String(only ? WIDE : LIMIT),
   });
@@ -100,8 +105,8 @@ async function itemMatches(q: string, type: SearchType): Promise<SearchResultIte
 
 /**
  * web's search (web-backend `services/search.py`): channels and communities first, then
- * people (exact, prefix, then anywhere), then projects, events and help requests by
- * relevance. All come from the home node's indexes, so guests can search too.
+ * people (exact, prefix, then anywhere), then projects, threads, events, help requests and
+ * posts by relevance. All come from the home node's indexes, so guests can search too.
  */
 export async function search(query: string, type: SearchType): Promise<SearchResultItem[]> {
   const q = query.trim();

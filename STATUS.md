@@ -50,7 +50,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #92 merged; this docs PR follows it).
+## In flight: Posts in Search (branch `claude/social-production-handoff-dsam61`, PR to open)
+- Gateway + UI, no DNA change, no network reset. See the newest "Done" entry for what was
+  checked; if the PR is open, watch its CI and merge when green, then smoke live `threads.mjs`
+  and `search.mjs`.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
@@ -61,10 +64,25 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), events' later parts (the event card's time, activities limited to the plan's
-days), posts/threads' later parts (Posts in Search, the scope page's create menu). Then
+days), posts/threads' later parts ("Post an update" prefill, @mentions, linked subjects).
+(web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-04: Posts in Search (not merged yet)
+Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
+- web's Search has a Posts filter and Post rows (web-backend indexes posts; followers-only
+  posts show only to followers, and the app's posts are all Public). Gateway:
+  `/index/projects?posts=true` keeps posts in the page (`Index::page`'s `with_posts`); public
+  feeds still leave them out (ADR 0070 updated). UI: `domain/search.ts` gains `post`
+  (label "Post"), `services/search.ts` asks for posts and links `/posts/<id>`, SearchPage
+  shows web's "Posts" option after Help requests.
+- Not parity, struck from PARITY: web's `ScopeCreateMenu` (imported nowhere on web).
+- **Tests:** index test `posts_stay_on_personal_feeds` checks `with_posts`; `threads.mjs` ends by
+  finding the post under Search's Posts; `search.mjs` expects Posts in the filter.
+- **Checked (cloud session):** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy
+  -p gateway --all-targets -D warnings`, gateway index tests (5).
 
 ## Done 2026-11-04: "Plan became leading" (ADR 0072) and the blur on hidden detail pages, PR #92 merged 16:19 UTC (3:19 am Melbourne)
 - **Live after merge:** CI 78 min on the second push (the first failed the size rule). The seed node

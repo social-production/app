@@ -1,8 +1,8 @@
 // Threads and posts end to end (ADR 0070). Founder one starts a thread tagged with the test
 // channel and comments on it. A new person finds web's ThreadCard in the feed, votes the thread
 // up, replies to the comment (nested under it) and votes the comment up. They then publish a
-// post, which shows on their profile on web's PersonalPostCard. Founder one sees the reply and
-// the comment's vote.
+// post, which shows on their profile on web's PersonalPostCard and in Search's Posts. Founder
+// one sees the reply and the comment's vote.
 //   node tests/e2e/threads.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -102,6 +102,16 @@ for (let i = 0; ; i++) {
 }
 if (shots) await bob.screenshot({ path: `${shots}/profile-post.png` });
 log('their profile shows it on the personal post card');
+
+// web's Search lists posts (the Posts filter), though public feeds leave them out.
+const postRow = bob.locator('.stack .result-card', { hasText: body });
+for (let i = 0; ; i++) {
+  await bob.goto(`${BASE}/search?q=${encodeURIComponent(`garlic this weekend ${stamp}`)}&type=post`);
+  if (await postRow.waitFor({ timeout: 10_000 }).then(() => true, () => false)) break;
+  if (i >= 15) throw new Error('search never found the post');
+}
+assert.equal(await postRow.locator('.kind-chip').innerText(), 'Post');
+log('search finds the post under Posts');
 
 for (let i = 0; ; i++) {
   await ann.goto(url);

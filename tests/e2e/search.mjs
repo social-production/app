@@ -34,7 +34,7 @@ await filter.click();
 const options = await guest.getByRole('menuitemradio').allInnerTexts();
 assert.deepEqual(
   options.map((o) => o.replace('✓', '').trim()),
-  ['All', 'Projects', 'Threads', 'Events', 'Help requests', 'Channels', 'Communities', 'Users'],
+  ['All', 'Projects', 'Threads', 'Events', 'Help requests', 'Posts', 'Channels', 'Communities', 'Users'],
 );
 await guest.locator('.icon-menu-item .surface-icon').nth(5).waitFor({ timeout: 5_000 }); // web's option icons
 await guest.getByRole('menuitemradio', { name: 'Communities' }).click();

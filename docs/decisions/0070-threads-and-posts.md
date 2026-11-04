@@ -34,7 +34,8 @@ decisions" keeps `claude/m4b-threads` parked):
   link once. Coordinator calls `vote_message` and `message_votes` (the panel asks for one page's
   comments, at most `PAGE_MAX`).
 - Feed: the gateway index already carries every listed space; posts are kept out of the public
-  feed and appear only when the request names creators (Home's personal rows, profiles).
+  feed and appear only when the request names creators (Home's personal rows, profiles) or
+  asks for them (`posts=true`: Search, whose Posts filter web has; added 2026-11-04).
   Threads and posts rank by votes, as on web.
 - Pages: `/threads/<space id>` and `/posts/<space id>` (web uses a slug for threads; the app's
   ids are hashes, as for help requests), `/create/thread`, `/create/post`, `ThreadCard` in the
