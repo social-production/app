@@ -1,17 +1,25 @@
-/** web's search result kinds (types/search.ts) that the app has (no posts or activities
- * yet). */
+/** web's search result kinds (types/search.ts) that the app has (no activities yet). */
 export type SearchResultKind =
-  'project' | 'thread' | 'event' | 'channel' | 'community' | 'profile' | 'help-request';
+  'project' | 'thread' | 'event' | 'channel' | 'community' | 'profile' | 'help-request' | 'post';
 
 /** web's `SearchEntityType` filter values for the kinds the app has. */
 export type SearchType =
-  'all' | 'project' | 'thread' | 'event' | 'help_request' | 'channel' | 'community' | 'user';
+  | 'all'
+  | 'project'
+  | 'thread'
+  | 'event'
+  | 'help_request'
+  | 'post'
+  | 'channel'
+  | 'community'
+  | 'user';
 
 const SEARCH_TYPES: readonly string[] = [
   'project',
   'thread',
   'event',
   'help_request',
+  'post',
   'channel',
   'community',
   'user',
@@ -35,6 +43,7 @@ export const searchKindLabels: Record<SearchResultKind, string> = {
   community: 'Community',
   profile: 'Profile',
   'help-request': 'Help request',
+  post: 'Post',
 };
 
 /** web's DEFAULT_SUGGESTED_QUERIES: chips shown before anything is typed. */

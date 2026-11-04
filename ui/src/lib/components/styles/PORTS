@@ -131,6 +131,7 @@ scopes.css        .invite-card    web/src/lib/features/communities/CommunityInvi
 discussion.css    .discussion-shell web/src/lib/components/discussion/DiscussionPanel.svelte
 discussion.css    .comment-card   web/src/lib/components/discussion/DiscussionComment.svelte
 discussion.css    .composer-field web/src/lib/components/shared/CommentComposer.svelte
+discussion.css    .composer-field web/src/lib/components/shared/MentionMenu.svelte
 discussion.css    .overview-shell web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte
 discussion.css    .discussion-page web/src/lib/features/threads/ThreadDetailPage.svelte
 discussion.css    .discussion-page web/src/lib/features/posts/PostDetailPage.svelte

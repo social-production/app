@@ -50,7 +50,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #92 merged; this docs PR follows it).
+## In flight: Posts in Search (PR #94), then Share + and comment @mentions (branch `claude/social-production-handoff-dsam61`)
+- Gateway + UI, no DNA change, no network reset. See the newest "Done" entry for what was
+  checked; if the PR is open, watch its CI and merge when green, then smoke live `threads.mjs`
+  and `search.mjs`.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
@@ -61,10 +64,68 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), events' later parts (the event card's time, activities limited to the plan's
-days), posts/threads' later parts (Posts in Search, the scope page's create menu). Then
+days), posts/threads' later parts (linked subjects in post bodies, "Following + popular" rows).
+(web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-04: @mentions in the comment composer (not merged yet)
+Branch `claude/social-production-handoff-dsam61` (after PR #94 and the Share work). **UI only.**
+- web's CommentComposer `MentionMenu`: typing "@na" offers matching people (the chat's
+  `MentionSource`: people in this discussion first, then the directory), Enter/click inserts
+  "@name ", Escape closes. Thread and post comments link "@name" to the profile (web's
+  `a.mention`). `components/discussion/commentMentions.ts` (`search`, `agentOf`) is passed
+  from `DiscussionPage` through `DiscussionPanel` and every `DiscussionComment`'s reply
+  composer. Styles: PORTS row `discussion.css .composer-field …/MentionMenu.svelte`.
+- **Tests:** `threads.mjs` ends with founder one picking the reader from the menu and the
+  comment's mention linking to their profile.
+- **Checked:** UI check + lint, boundaries, sizes; `threads.mjs` **passed** against a local
+  seed node. Not checked: whether the mentioned person's "You were mentioned." card reaches
+  someone who isn't a member of the thread (web notifies anyone mentioned).
+
+## Done 2026-11-04: web's "Share +" on project and event pages, and share notifications (not merged yet)
+Branch `claude/social-production-handoff-dsam61` (after PR #94). **UI only, no DNA change.**
+- `features/projects/DetailShare.svelte` in `ProjectDock` after the votes, as web's
+  `ProjectOverviewHeader`/`EventOverviewHeader` place it: projects show it to anyone signed in
+  (web's `viewerCanShare`) and refuse non-members on Send with web-backend's "Only project
+  members can perform this action"; public events show it to members; private events to
+  organizers as "Invite to event" (an invite, no Create post). Send posts shares.py's
+  "Shared a project/event: …" into your direct chat with them (`services/shares.ts`).
+- `ShareUserMenu` gained web's "Create post" (`createPost`): `/create/post?prefill=Check this
+  out: <title>\n<url>` (web's `buildSharePrefill`; `CreatePost` already read `prefill`).
+- `domain/share.ts` `shareNotifications` (was the help-request-only parser) reads every share
+  message: `prj-share` / `evt-share` ("<title> was shared with you."), `hr-share`,
+  `thread-share`, `post-share` ("A thread/post was shared with you."; threads and posts already
+  sent the message, now their recipients get web's card). Notification target `{ space }`
+  (opened by `spaceHref`) replaces `{ helpRequest }`. All under Settings' Shares/invites.
+- **Tests:** `projects.mjs` shares the project with Bob (Copy link, Send), checks Create post's
+  prefill and Bob opens it from the "… was shared with you." card.
+- **Checked (cloud session):** UI check + lint, boundaries, sizes; against a local seed node
+  `projects.mjs` (new share step), `help-requests.mjs`, `events.mjs` **passed**; 390px
+  screenshots of the dock and the sheet. Not run: scenarios (no Rust change).
+
+## Done 2026-11-04: Posts in Search, PR #94 (not merged yet)
+Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
+- web's Search has a Posts filter and Post rows (web-backend indexes posts; followers-only
+  posts show only to followers, and the app's posts are all Public). Gateway:
+  `/index/projects?posts=true` keeps posts in the page (`Index::page`'s `with_posts`); public
+  feeds still leave them out (ADR 0070 updated). UI: `domain/search.ts` gains `post`
+  (label "Post"), `services/search.ts` asks for posts and links `/posts/<id>`, SearchPage
+  shows web's "Posts" option after Help requests.
+- Not parity, struck from PARITY: web's `ScopeCreateMenu` (imported nowhere on web).
+- **Tests:** index test `posts_stay_on_personal_feeds` checks `with_posts`; `threads.mjs` ends by
+  finding the post under Search's Posts; `search.mjs` expects Posts in the filter.
+- **Checked (cloud session):** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy
+  -p gateway --all-targets -D warnings`, gateway index tests (5); against a local seed node
+  (`cloud-seed.sh`) `threads.mjs` (with the new Search step) and `search.mjs` **passed** (the
+  first `threads.mjs` run timed out at the founder's first sign-in: the known provisioning
+  wait on a fresh node). Not run locally: scenarios (no zome change; CI runs them).
+- **Next found:** the app's project and event headers lack web's "Share +" menu
+  (`ShareUserMenu` in `ProjectOverviewHeader`/`EventOverviewHeader`: send to people with
+  web's `prj-share`/`evt-share` notifications, "Create post" → `/create/post?prefill=Check this
+  out: <title>\n<url>`, copy link, share outside). The help request's Share (PR #80) is the
+  pattern; `CreatePost` already reads `prefill`.
 
 ## Done 2026-11-04: "Plan became leading" (ADR 0072) and the blur on hidden detail pages, PR #92 merged 16:19 UTC (3:19 am Melbourne)
 - **Live after merge:** CI 78 min on the second push (the first failed the size rule). The seed node

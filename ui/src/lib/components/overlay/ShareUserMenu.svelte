@@ -27,6 +27,9 @@
     searchContacts: (query: string) => Promise<Contact[]>;
     /** Sends to one person; an error string stops the round and is shown. */
     submitShare: (contact: Contact) => Promise<string | null>;
+    /** web's "Create post" beside Send (project and event pages). */
+    createPost?: (() => void) | null;
+    createPostLabel?: string;
   }
 
   let {
@@ -40,6 +43,8 @@
     contacts = [],
     searchContacts,
     submitShare,
+    createPost = null,
+    createPostLabel = 'Create post',
   }: Props = $props();
 
   let open = $state(false);
@@ -230,6 +235,11 @@
   {#if feedback}<p class="feedback">{feedback}</p>{/if}
   {#snippet footer()}
     <div class="sheet-actions">
+      {#if createPost}
+        <button class="sheet-cancel" type="button" onclick={() => (close(), createPost?.())}>
+          {createPostLabel}
+        </button>
+      {/if}
       <button
         class="sheet-submit"
         disabled={selected.length === 0 || pending}

@@ -16,10 +16,12 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
-   the app still lacks: shares of projects/events/threads/posts, bot reviews, `prj-removed`.
-4. **Posts and threads, later parts:** @mentions in the comment composer, linked subjects in
-   post bodies, Posts in Search, the scope page's create menu, "Post an update" prefill,
-   share notifications, "Following + popular" discovery rows.
+   the app still lacks: bot reviews, `prj-removed`.
+   (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
+   `thread-share`/`post-share` cards: done 2026-11-04.)
+4. **Posts and threads, later parts:** linked subjects in post bodies, "Following + popular"
+   discovery rows. (@mentions in the comment composer and Posts in Search: done 2026-11-04.
+   The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere, so web shows none.)
 5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
    days, the event card's time.
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
@@ -71,7 +73,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   search too. Since 2026-10-30 (PR #79) also Channels and Communities (`/index/scopes`; your
   own private communities for members), Events and Help requests, in web-backend's order
   (scopes, then people, then items) and web's filter with icons (`tests/e2e/search.mjs`).
-  Threads since ADR 0070; Activities and Posts wait (PARITY "Posts and threads, later parts").
+  Threads since ADR 0070, Posts since 2026-11-04; Activities wait (web's activity rows).
 - [x] The "+" button follows web's `isFeedDiscoveryPath` (feed, platform, profiles), not search.
 
 - [x] Profiles open for guests (name, standing, no actions), as on web; the device count is
@@ -177,11 +179,13 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   `/threads/<id>` (commons spaces; web's DiscussionPanel with nested replies, comment votes and
   the Oldest/Newest/Top sort; Share; ThreadCard in the public feed, PersonalPostCard on
   personal rows and profiles; Threads in Search; Post and Thread in the create menu).
-- [ ] Posts and threads, later parts: @mentions in the comment composer, linked subjects in
-  post bodies (`LinkedPostBody`), Posts in Search (the index keeps posts out of non-personal
-  pages), web's scope-page create menu (`ScopeCreateMenu`), "Post an update" prefill from
-  project/event pages, thread/post share notifications, feed "Following + popular" discovery
-  rows (⋮ Report came with ADR 0071).
+- [x] @mentions in the comment composer (2026-11-04): web's MentionMenu, mentions link to
+  profiles.
+- [ ] Posts and threads, later parts: linked subjects in
+  post bodies (`LinkedPostBody`), feed "Following + popular" discovery rows (⋮ Report came
+  with ADR 0071). Not parity: web's `ScopeCreateMenu` (dead code on web, imported nowhere).
+- [x] Posts in Search (2026-11-04): web's Posts filter and Post rows; the index serves posts
+  to Search only (`/index/projects?posts=true`), public feeds still leave them out.
 - [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's
   Requests section). Asset-use requests come with asset management, after parity.
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,

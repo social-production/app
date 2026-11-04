@@ -38,6 +38,9 @@ pub struct FeedParams {
     /// `@brunswick`, ADR 0068): one for a scope's page, your joined ones for web's Home scope.
     #[serde(default)]
     tag: String,
+    /// Posts too (web's Search lists them; feeds keep them to personal pages, ADR 0070).
+    #[serde(default)]
+    posts: bool,
 }
 
 #[derive(Serialize)]
@@ -80,7 +83,7 @@ pub async fn projects(
     let (items, total) = state
         .node
         .index
-        .page(&query, &creators, &tags, p.offset, limit)
+        .page(&query, &creators, &tags, p.posts, p.offset, limit)
         .await;
     Ok(Json(FeedPage { items, total }))
 }

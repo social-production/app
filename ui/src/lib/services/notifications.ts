@@ -11,7 +11,7 @@ import {
 import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
 import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
-import { helpShareNotifications } from '#lib/domain/share.ts';
+import { shareNotifications } from '#lib/domain/share.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
@@ -90,11 +90,11 @@ async function fromProject(seed: string, me: string, myName: string, planLeads: 
 }
 
 /** Mentions in a direct or group chat you're still in (web notifies only its members), and
- * help requests shared with you in a direct one. */
+ * spaces shared with you in a direct one. */
 async function fromChat(seed: string, at: number, me: string, myName: string) {
   const [summary, messages] = await Promise.all([chatSummary(seed, at), listChatMessages(seed)]);
   if (!summary.member) return [];
-  const shares = summary.kind === 'direct' ? helpShareNotifications(seed, messages, me) : [];
+  const shares = summary.kind === 'direct' ? shareNotifications(seed, messages, me) : [];
   const found = chatMentionNotifications(
     { seed, title: summary.title, messages, names: {} },
     me,

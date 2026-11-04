@@ -99,8 +99,9 @@
         await goto(`${resolve('/messages')}?conversation=${encodeURIComponent(t.conversation)}`);
         return;
       }
-      if (t && 'helpRequest' in t) {
-        await goto(resolve('/help-requests/[id]', { id: t.helpRequest }));
+      if (t && 'space' in t) {
+        // eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it
+        await goto(spaceHref(item.projectMode, t.space));
         return;
       }
       const id = await projectPageOf(item.seed);

@@ -7,6 +7,7 @@
   } from '#lib/domain/discussions.ts';
   import type { Moderation } from '#lib/domain/moderation.ts';
 
+  import type { CommentMentions } from './commentMentions.ts';
   import CommentComposer from './CommentComposer.svelte';
   import DiscussionComment from './DiscussionComment.svelte';
 
@@ -30,6 +31,7 @@
     /** Writes a comment (`parent` null) or a reply; resolves true once written. */
     onComment: (parent: string | null, body: string) => Promise<boolean>;
     onModeration: (id: string, next: Moderation) => void;
+    mentions?: CommentMentions | null;
   }
 
   let {
@@ -44,6 +46,7 @@
     onVote,
     onComment,
     onModeration,
+    mentions = null,
   }: Props = $props();
 
   let draft = $state('');
@@ -56,7 +59,13 @@
 
 <section class:embedded class="discussion-shell" id="comments">
   <div class="composer-card">
-    <CommentComposer bind:value={draft} {signedIn} {onSignIn} onSubmit={() => void submit()} />
+    <CommentComposer
+      bind:value={draft}
+      {signedIn}
+      {onSignIn}
+      mentionSearch={mentions?.search}
+      onSubmit={() => void submit()}
+    />
   </div>
 
   <div class="stack">
@@ -72,6 +81,7 @@
         {onVote}
         onReply={(parent, body) => onComment(parent, body)}
         {onModeration}
+        {mentions}
       />
     {/each}
   </div>

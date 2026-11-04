@@ -1,8 +1,8 @@
 // Threads and posts end to end (ADR 0070). Founder one starts a thread tagged with the test
 // channel and comments on it. A new person finds web's ThreadCard in the feed, votes the thread
 // up, replies to the comment (nested under it) and votes the comment up. They then publish a
-// post, which shows on their profile on web's PersonalPostCard. Founder one sees the reply and
-// the comment's vote.
+// post, which shows on their profile on web's PersonalPostCard and in Search's Posts. Founder
+// one sees the reply and the comment's vote, then @mentions the reader from web's menu.
 //   node tests/e2e/threads.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -103,6 +103,16 @@ for (let i = 0; ; i++) {
 if (shots) await bob.screenshot({ path: `${shots}/profile-post.png` });
 log('their profile shows it on the personal post card');
 
+// web's Search lists posts (the Posts filter), though public feeds leave them out.
+const postRow = bob.locator('.stack .result-card', { hasText: body });
+for (let i = 0; ; i++) {
+  await bob.goto(`${BASE}/search?q=${encodeURIComponent(`garlic this weekend ${stamp}`)}&type=post`);
+  if (await postRow.waitFor({ timeout: 10_000 }).then(() => true, () => false)) break;
+  if (i >= 15) throw new Error('search never found the post');
+}
+assert.equal(await postRow.locator('.kind-chip').innerText(), 'Post');
+log('search finds the post under Posts');
+
 for (let i = 0; ; i++) {
   await ann.goto(url);
   const mine = ann.locator('.comment-card', { hasText: 'Tomatoes did best' }).first();
@@ -114,6 +124,21 @@ for (let i = 0; ; i++) {
   await ann.waitForTimeout(3000);
 }
 log('founder one sees the nested reply and the comment vote');
+
+// web's @mention menu in the comment composer: the reader is offered by name, and the posted
+// comment links the mention to their profile.
+const mentionComposer = ann.getByLabel('Write a comment...');
+await mentionComposer.fill('');
+await mentionComposer.pressSequentially('Thanks @Read', { delay: 40 });
+const option = ann.locator('.composer-field .mention-item', { hasText: `Reader${stamp}` }).first();
+await option.waitFor({ timeout: 30_000 });
+await option.click();
+assert.equal(await mentionComposer.inputValue(), `Thanks @Reader${stamp} `);
+await mentionComposer.press('Enter');
+const mentioned = ann.locator('.comment-card a.mention', { hasText: `@Reader${stamp}` }).first();
+await mentioned.waitFor({ timeout: 60_000 });
+assert.equal(await mentioned.getAttribute('href'), profile);
+log('the comment composer offers @mentions and the comment links them');
 
 assert.deepEqual(errors, []);
 await browser.close();

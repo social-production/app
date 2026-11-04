@@ -1,7 +1,7 @@
 // M2 projects end to end against a local seed node (run it as described in accounts.mjs):
 // create a channel and a project tagged with it through the "+" menu, find it in the feed
 // (archivist + index) and on the channel's page (ADR 0068), join, support, search by tag,
-// web's tag chips and their "+N" sheet, and the New-member limit of 2 listings a week (a
+// web's tag chips and their "+N" sheet, web's Share + (prj-share, Create post), and the New-member limit of 2 listings a week (a
 // channel counts until the next directory reset, ADR 0068).
 //   node tests/e2e/projects.mjs http://localhost:4174
 import assert from 'node:assert/strict';
@@ -67,6 +67,7 @@ await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await ann.getByRole('button', { name: 'Leave project' }).waitFor();
 assert.equal((await ann.getByRole('button', { name: '1 members' }).count()), 1, 'creator is the first member');
 log('created; the creator is a member');
+const projectUrl = ann.url();
 
 const bob = await device();
 await signUp(bob, `bob_${stamp}`);
@@ -98,6 +99,44 @@ await ann.getByRole('button', { name: '2 members' }).click();
 await ann.locator('.people-sheet .person-row', { hasText: `bob_${stamp}` }).waitFor();
 await ann.getByRole('button', { name: 'Close' }).last().click();
 log('Ann sees Bob in the members sheet');
+
+// web's "Share +" on the project page: send to Bob (a direct-chat message plus web's
+// `prj-share` notification), and "Create post" starts a post with the link.
+await ann.getByRole('button', { name: 'Share project' }).click();
+await ann.getByRole('button', { name: 'Copy link' }).waitFor();
+const shareSearch = ann.locator('#share-people-search');
+for (let i = 0; ; i++) {
+  await shareSearch.fill('');
+  await shareSearch.fill(`bob_${stamp}`);
+  const row = ann.locator('.contact-row', { hasText: `bob_${stamp}` }).first();
+  if (await row.waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
+    await row.click();
+    break;
+  }
+  if (i >= 30) throw new Error('Bob never appeared in the share search');
+}
+await ann.getByRole('button', { name: 'Send', exact: true }).click();
+await shareSearch.waitFor({ state: 'detached', timeout: 120_000 });
+await ann.getByRole('button', { name: 'Share project' }).click();
+await ann.getByRole('button', { name: 'Create post' }).click();
+await ann.waitForURL(/\/create\/post/);
+const prefilled = await ann.getByLabel(/What's on your mind/).inputValue();
+const link = new URL(projectUrl);
+assert.equal(prefilled, `Check this out: ${title}\n${link.origin}${link.pathname}`);
+log('Ann shared the project with Bob, and Create post starts from its link');
+
+const shared = bob.locator('.notification-card', { hasText: `${title} was shared with you.` });
+for (let i = 0; ; i++) {
+  await bob.goto(`${BASE}/notifications`);
+  await bob.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
+  if (await shared.first().waitFor({ timeout: 9_000 }).then(() => true, () => false)) break;
+  if (i >= 40) throw new Error('the share never reached Bob');
+}
+await shared.first().getByText('Project', { exact: true }).waitFor();
+await shared.first().click();
+await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+assert.equal(new URL(bob.url()).pathname, new URL(projectUrl).pathname);
+log('Bob opened it from the notification');
 
 // Edits are proposals since M3: tests/e2e/governance.mjs covers them.
 // web's Search page: a tag finds the project as a result row.
