@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: an event's activities limited to its plan's days, PR #97
+## In flight: nothing (PR #97 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -69,7 +69,12 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: an event's activities limited to its plan's days, PR #97 (not merged yet)
+## Done 2026-11-04: an event's activities limited to its plan's days, PR #97 merged 13:13 UTC (12:13 am Melbourne, Nov 5)
+- **Live after merge:** CI's first run failed shard 6 on the expired-nonce setup flake, now in
+  `create_charter` (fixed in this PR: `Net::setup_call`); the second run was green (78 min).
+  UI-only: the seed node didn't restart. Live `events.mjs` **passed** at 13:30 UTC with the new
+  plan-day checks (its first try timed out at the older feed-card step: no feed card within
+  60 s).
 Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
 - web's EventActivityPhase: the calendar marks the leading plan's days (`planned-day`, the
   dot), only they can be picked, and it opens on the first plan day's month; the empty agenda
