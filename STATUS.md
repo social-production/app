@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Posts in Search (branch `claude/social-production-handoff-dsam61`, PR to open)
+## In flight: Posts in Search, PR #94 (branch `claude/social-production-handoff-dsam61`)
 - Gateway + UI, no DNA change, no network reset. See the newest "Done" entry for what was
   checked; if the PR is open, watch its CI and merge when green, then smoke live `threads.mjs`
   and `search.mjs`.
@@ -70,7 +70,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: Posts in Search (not merged yet)
+## Done 2026-11-04: Posts in Search, PR #94 (not merged yet)
 Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
 - web's Search has a Posts filter and Post rows (web-backend indexes posts; followers-only
   posts show only to followers, and the app's posts are all Public). Gateway:
@@ -82,7 +82,15 @@ Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.
 - **Tests:** index test `posts_stay_on_personal_feeds` checks `with_posts`; `threads.mjs` ends by
   finding the post under Search's Posts; `search.mjs` expects Posts in the filter.
 - **Checked (cloud session):** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy
-  -p gateway --all-targets -D warnings`, gateway index tests (5).
+  -p gateway --all-targets -D warnings`, gateway index tests (5); against a local seed node
+  (`cloud-seed.sh`) `threads.mjs` (with the new Search step) and `search.mjs` **passed** (the
+  first `threads.mjs` run timed out at the founder's first sign-in: the known provisioning
+  wait on a fresh node). Not run locally: scenarios (no zome change; CI runs them).
+- **Next found:** the app's project and event headers lack web's "Share +" menu
+  (`ShareUserMenu` in `ProjectOverviewHeader`/`EventOverviewHeader`: send to people with
+  web's `prj-share`/`evt-share` notifications, "Create post" → `/create/post?prefill=Check this
+  out: <title>\n<url>`, copy link, share outside). The help request's Share (PR #80) is the
+  pattern; `CreatePost` already reads `prefill`.
 
 ## Done 2026-11-04: "Plan became leading" (ADR 0072) and the blur on hidden detail pages, PR #92 merged 16:19 UTC (3:19 am Melbourne)
 - **Live after merge:** CI 78 min on the second push (the first failed the size rule). The seed node
