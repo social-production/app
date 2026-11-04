@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the event card's time and place (branch `claude/social-production-handoff-dsam61`, PR open)
+## In flight: the event card's time and place (PR #99, branch `claude/social-production-handoff-dsam61`)
 **Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` before the place
 (web-backend copies the leading plan's start *and place* onto the event,
 `_sync_event_schedule_from_leading_plan`; the app's card showed the charter's place, "TBD").
