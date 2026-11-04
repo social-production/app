@@ -19,9 +19,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    the app still lacks: bot reviews, `prj-removed`.
    (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
    `thread-share`/`post-share` cards: done 2026-11-04.)
-4. **Posts and threads, later parts:** "Following + popular" discovery rows. (@mentions in the
-   comment composer, Posts in Search and links in post bodies: done 2026-11-04.
-   The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere, so web shows none.)
+4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
+   Posts in Search, links in post bodies, your own posts on Home and "Following + popular".
+   The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
    days, the event card's time.
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
@@ -93,8 +93,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   communities, plus the events listed on your private communities (2026-10-31: the index's
   `tag` takes several, comma-separated; `homeFeedState.svelte.ts`). The private-community
   events ignore the time window (the index's cards carry no schedule either).
-- [ ] Toolbar: Region in the scope menu (needs place coordinates, M6); "Following + popular"
-  adds web's discovery posts and threads once they exist.
+- [ ] Toolbar: Region in the scope menu (needs place coordinates, M6). ("Following + popular"'s
+  discovery posts and threads: done 2026-11-04.)
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
   the gateway index (`commentCount` counts up to the chat's 200-message page).
 - [x] Cards: layout already matched (channel/community tags top-left, author + members + date
@@ -182,8 +182,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] @mentions in the comment composer (2026-11-04): web's MentionMenu, mentions link to
   profiles.
 - [x] Links in post bodies (2026-11-04): web's `LinkedPostBody` auto-links URLs and app paths.
-- [ ] Posts and threads, later parts: feed "Following + popular" discovery rows (⋮ Report came
-  with ADR 0071). Not parity: web's `ScopeCreateMenu` (dead code on web, imported nowhere).
+- [x] Home's personal feed as web-backend's (2026-11-04): your own posts, and "Following +
+  popular" adds others' posts and threads (web's discovery rows). Not parity: web's
+  `ScopeCreateMenu` (dead code on web, imported nowhere).
 - [x] Posts in Search (2026-11-04): web's Posts filter and Post rows; the index serves posts
   to Search only (`/index/projects?posts=true`), public feeds still leave them out.
 - [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's

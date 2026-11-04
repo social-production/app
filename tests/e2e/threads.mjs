@@ -106,7 +106,27 @@ for (let i = 0; ; i++) {
 if (shots) await bob.screenshot({ path: `${shots}/profile-post.png` });
 log('their profile shows it on the personal post card');
 
-// web's Search lists posts (the Posts filter), though public feeds leave them out.
+// web-backend's personal feed: your own posts are on Home, and "Following + popular" adds
+// posts by people you don't follow; "Following only" leaves those out.
+async function homeShows(page, audience, text) {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Choose personal audience' }).click();
+  await page.getByRole('menuitemradio', { name: audience }).click();
+  await page.getByRole('button', { name: 'Sort public feed by' }).click();
+  await page.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  const card = page.locator('.personal-post-card', { hasText: text });
+  return card.first().waitFor({ timeout: 15_000 }).then(() => true, () => false);
+}
+for (let i = 0; !(await homeShows(bob, 'Following only', body)); i++) {
+  if (i >= 15) throw new Error('their own post never showed on Home');
+}
+for (let i = 0; !(await homeShows(ann, 'Following + popular', body)); i++) {
+  if (i >= 15) throw new Error('"Following + popular" never showed the post');
+}
+assert.equal(await homeShows(ann, 'Following only', body), false, 'not followed: not shown');
+log('Home shows your own posts, and "Following + popular" others\' posts');
+
+
 const postRow = bob.locator('.stack .result-card', { hasText: body });
 for (let i = 0; ; i++) {
   await bob.goto(`${BASE}/search?q=${encodeURIComponent(`garlic this weekend ${stamp}`)}&type=post`);

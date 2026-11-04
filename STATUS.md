@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #95: the PR #94 docs plus web's LinkedPostBody (links in post bodies)
+## In flight: Home's personal feed as web-backend's (own posts, "Following + popular"), PR #96
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
@@ -63,13 +63,35 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), events' later parts (the event card's time, activities limited to the plan's
-days), posts/threads' later parts ("Following + popular" rows).
+days).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: links in post bodies (web's LinkedPostBody), PR #95 (not merged yet)
+## Done 2026-11-04: Home's personal feed as web-backend's: your own posts and "Following + popular", PR #96 (not merged yet)
+Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
+- web-backend's `get_personal_feed`: everything the people you follow made, plus your own
+  posts; "Following + popular" adds everyone else's posts and threads (its discovery rows).
+  The app showed only followed people's items, and the audience menu changed nothing.
+- **Gateway:** `Index::page` takes `Who` (`Anyone { with_posts }`, `Creators`, `Personal {
+  following, me, popular }`) instead of `creators` + `with_posts`; `/index/projects` gains
+  `me` and `popular` (with `me`, `creator` is who `me` follows). Index test
+  `personal_feed_is_web_backends`.
+- **UI:** `FeedQuery.personal`, `FeedState.personal`; `HomeFeedState.reloadPersonal` always
+  asks when signed in (no one followed still shows your posts and discovery rows), and
+  `setAudience` reloads.
+- **Tests:** `threads.mjs`: the reader sees their own post on Home with "Following only";
+  founder one sees it with "Following + popular" and not with "Following only".
+- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
+  --all-targets -D warnings`, gateway index tests (6); against a local seed node
+  `threads.mjs` (new Home steps), `follows.mjs`, `closed-communities.mjs` **passed**. Not run
+  locally: scenarios (no zome change).
+- **Cloud container reboots:** this session's container rebooted twice (uptime reset), which
+  kills the local seed node and background runs. Push work as you go; restart
+  `cloud-seed.sh` (it reuses the build, ~1 min) when `e2e-local.sh` says it isn't running.
+
+## Done 2026-11-04: links in post bodies (web's LinkedPostBody), PR #95 merged 09:18 UTC (8:18 pm Melbourne)
 Branch `claude/social-production-handoff-dsam61`. **UI only.**
 - web-backend sends no `linkedSubjects`, so web always auto-links a post body's URLs and app
   paths (`/projects/…`, `/events/…`, `/threads/…`, `/messages…`, `/posts/…`, `/profile/…`).
@@ -79,7 +101,8 @@ Branch `claude/social-production-handoff-dsam61`. **UI only.**
 - **Tests:** `threads.mjs`'s post carries the thread's URL and checks it is a link. (Not in
   `projects.mjs`: its Ann is a New member who has used both weekly listings, so her post is
   refused; a post counts as a listing.)
-- **Checked:** UI check + lint, sizes; `threads.mjs` **passed** against a local seed node.
+- **Checked:** UI check + lint, sizes; `threads.mjs` **passed** against a local seed node,
+  and live against the deployed UI at 09:22 UTC (UI-only merge: the seed node didn't restart).
 
 ## Done 2026-11-04: @mentions in the comment composer, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
 - **Live after merge:** PR #94 merged 07:33 UTC (6:33 pm Melbourne), CI 78 min on its last push. The

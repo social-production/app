@@ -45,7 +45,9 @@ async fn pages_ranked_cards() {
         now: 30,
         utc_offset_minutes: 0,
     };
-    let (page, total) = index.page(&q, &[], &[], false, 0, 2).await;
+    let (page, total) = index
+        .page(&q, &Who::Anyone { with_posts: false }, &[], 0, 2)
+        .await;
     assert_eq!(total, 3);
     assert_eq!(
         page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -55,7 +57,13 @@ async fn pages_ranked_cards() {
         search: "FOOD garden",
         ..q
     };
-    assert_eq!(index.page(&q, &[], &[], false, 0, 10).await.1, 1);
+    assert_eq!(
+        index
+            .page(&q, &Who::Anyone { with_posts: false }, &[], 0, 10)
+            .await
+            .1,
+        1
+    );
 }
 
 #[tokio::test]
@@ -73,9 +81,11 @@ async fn keeps_the_given_creators() {
         now: 30,
         utc_offset_minutes: 0,
     };
-    let (page, total) = index.page(&q, &["ann"], &[], false, 0, 10).await;
+    let (page, total) = index.page(&q, &Who::Creators(&["ann"]), &[], 0, 10).await;
     assert_eq!((page[0].title.as_str(), total), ("Garden", 1));
-    let (page, total) = index.page(&q, &["ann", "bob"], &[], false, 0, 10).await;
+    let (page, total) = index
+        .page(&q, &Who::Creators(&["ann", "bob"]), &[], 0, 10)
+        .await;
     assert_eq!(
         (
             page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
@@ -100,16 +110,26 @@ async fn posts_stay_on_personal_feeds() {
     };
     let titles = |page: Vec<ProjectCard>| page.into_iter().map(|c| c.title).collect::<Vec<_>>();
     assert_eq!(
-        titles(index.page(&q, &[], &[], false, 0, 10).await.0),
+        titles(
+            index
+                .page(&q, &Who::Anyone { with_posts: false }, &[], 0, 10)
+                .await
+                .0
+        ),
         ["Garden"]
     );
     assert_eq!(
-        titles(index.page(&q, &["ann"], &[], false, 0, 10).await.0),
+        titles(index.page(&q, &Who::Creators(&["ann"]), &[], 0, 10).await.0),
         ["Hello"]
     );
     // Search asks for posts too, as web's Search lists them.
     assert_eq!(
-        titles(index.page(&q, &[], &[], true, 0, 10).await.0),
+        titles(
+            index
+                .page(&q, &Who::Anyone { with_posts: true }, &[], 0, 10)
+                .await
+                .0
+        ),
         ["Hello", "Garden"]
     );
 }
@@ -140,17 +160,28 @@ async fn scopes_stay_out_of_the_feed_and_the_first_handle_wins() {
         utc_offset_minutes: 0,
     };
     assert_eq!(
-        index.page(&q, &[], &[], false, 0, 10).await.1,
+        index
+            .page(&q, &Who::Anyone { with_posts: false }, &[], 0, 10)
+            .await
+            .1,
         2,
         "no scopes"
     );
-    let (page, _) = index.page(&q, &[], &["#food"], false, 0, 10).await;
+    let (page, _) = index
+        .page(&q, &Who::Anyone { with_posts: false }, &["#food"], 0, 10)
+        .await;
     assert_eq!(
         page.iter().map(|c| c.title.as_str()).collect::<Vec<_>>(),
         ["Seed swap"]
     );
     let (page, _) = index
-        .page(&q, &[], &["@elsewhere", "#food"], false, 0, 10)
+        .page(
+            &q,
+            &Who::Anyone { with_posts: false },
+            &["@elsewhere", "#food"],
+            0,
+            10,
+        )
         .await;
     assert_eq!(page.len(), 1, "any of several tags (web's Home scope)");
     let scopes = index.scopes("", 10).await;
@@ -177,7 +208,60 @@ async fn removed_items_leave_the_feed_and_reviewed_ones_stay() {
         now: 10,
         utc_offset_minutes: 0,
     };
-    let (page, total) = index.page(&q, &[], &[], false, 0, 10).await;
+    let (page, total) = index
+        .page(&q, &Who::Anyone { with_posts: false }, &[], 0, 10)
+        .await;
     assert_eq!(total, 2);
     assert!(page.iter().all(|c| c.title != "Spam"));
+}
+
+#[tokio::test]
+async fn personal_feed_is_web_backends() {
+    let index = ProjectIndex::default();
+    let item = |title: &str, mode: &str, creator: &str, at: i64| {
+        let mut c = card(title, 0, at);
+        (c.mode, c.creator) = (mode.into(), creator.into());
+        c
+    };
+    index
+        .replace(vec![
+            item("ann project", "productive", "ann", 7),
+            item("ann post", "post", "ann", 6),
+            item("my post", "post", "me", 5),
+            item("my project", "productive", "me", 4),
+            item("my thread", "thread", "me", 3),
+            item("carl thread", "thread", "carl", 2),
+            item("carl post", "post", "carl", 1),
+            item("carl project", "productive", "carl", 0),
+        ])
+        .await;
+    let q = FeedQuery {
+        sort: Sort::Recent,
+        window: Window::All,
+        search: "",
+        now: 30,
+        utc_offset_minutes: 0,
+    };
+    let titles = |page: Vec<ProjectCard>| page.into_iter().map(|c| c.title).collect::<Vec<_>>();
+    let personal = |popular| Who::Personal {
+        following: &["ann"],
+        me: "me",
+        popular,
+    };
+    // Who you follow, plus your own posts.
+    assert_eq!(
+        titles(index.page(&q, &personal(false), &[], 0, 10).await.0),
+        ["ann project", "ann post", "my post"]
+    );
+    // "Following + popular": everyone else's posts and threads too.
+    assert_eq!(
+        titles(index.page(&q, &personal(true), &[], 0, 10).await.0),
+        [
+            "ann project",
+            "ann post",
+            "my post",
+            "carl thread",
+            "carl post"
+        ]
+    );
 }

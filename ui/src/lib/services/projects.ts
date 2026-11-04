@@ -66,17 +66,21 @@ export interface FeedQuery {
   creator?: string;
   /** Only items tagged with this channel or community (`#food`, ADR 0068). */
   tag?: string;
+  /** web's personal feed for `me` (`creator` = who they follow): their own posts join it, and
+   * with `popular` ("Following + popular") everyone else's posts and threads. */
+  personal?: { me: string; popular: boolean };
 }
 
 export function feed(query: FeedQuery): Promise<{ items: ProjectCard[]; total: number }> {
   const tzOffset = String(-new Date().getTimezoneOffset());
-  const { creator, tag, ...rest } = query;
+  const { creator, tag, personal, ...rest } = query;
   return projectFeed({
     ...rest,
     offset: String(query.offset),
     tzOffset,
     ...(creator ? { creator } : {}),
     ...(tag ? { tag } : {}),
+    ...(personal ? { me: personal.me, popular: String(personal.popular) } : {}),
   });
 }
 

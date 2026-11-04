@@ -8,6 +8,7 @@ import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/proj
 import { scopeTag } from '#lib/domain/scopes.ts';
 import { communityEventCards } from '#lib/services/closedCommunities.ts';
 import { followCircles } from '#lib/services/follows.ts';
+import { myAgent } from '#lib/services/people.ts';
 import { myScopes } from '#lib/services/scopes.ts';
 
 import { FeedState } from './feedState.svelte.ts';
@@ -42,9 +43,9 @@ function matching(cards: ProjectCard[], q: string): ProjectCard[] {
  * web's PublicFeed with its default `combineFeeds` (the app has no setting for it): signed in,
  * the public rows (Global, or Home: items tagged with any channel or community you joined, plus
  * the events listed on your private communities, as web-backend's home feed) merge with the
- * personal feed, which is the projects of people you follow. "Following + popular"
- * adds discovery posts and threads on web; the app has none yet. Scope and audience are kept
- * per device (web keeps them in its settings).
+ * personal feed (web-backend's `get_personal_feed`: what the people you follow made, plus your
+ * own posts; "Following + popular" adds everyone else's posts and threads). Scope and audience
+ * are kept per device (web keeps them in its settings).
  */
 export class HomeFeedState {
   scope = $state<FeedScope>(read(KEYS.scope, ['home', 'global'], 'global'));
@@ -103,9 +104,10 @@ export class HomeFeedState {
     return this.reload(this.signedIn);
   }
 
-  setAudience(audience: HomeAudience): void {
+  setAudience(audience: HomeAudience): Promise<void> {
     this.audience = audience;
     keep(KEYS.audience, audience);
+    return this.signedIn ? this.reloadPersonal() : Promise.resolve();
   }
 
   setSort(sort: FeedSort): Promise<void> {
@@ -154,11 +156,15 @@ export class HomeFeedState {
   }
 
   private async reloadPersonal(): Promise<void> {
-    const following = this.signedIn ? (await followCircles()).following : [];
+    if (!this.signedIn) {
+      this.personal.items = [];
+      this.personal.total = 0;
+      this.personal.loading = false;
+      return;
+    }
+    const [{ following }, me] = await Promise.all([followCircles(), myAgent()]);
     this.personal.creator = following.join(',');
-    if (following.length > 0) return this.personal.reload();
-    this.personal.items = [];
-    this.personal.total = 0;
-    this.personal.loading = false;
+    this.personal.personal = { me, popular: this.audience === 'popular' };
+    return this.personal.reload();
   }
 }

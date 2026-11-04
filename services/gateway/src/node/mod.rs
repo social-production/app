@@ -26,7 +26,7 @@ use holochain_types::prelude::CoordinatorBundle;
 use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
-pub use index::{ProjectCard, ProjectIndex};
+pub use index::{ProjectCard, ProjectIndex, Who};
 pub use people::{PeopleIndex, PersonCard};
 pub use public::{PublicRead, Refused};
 

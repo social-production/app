@@ -1,6 +1,6 @@
 import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
-import { feed, setSignal } from '#lib/services/projects.ts';
+import { feed, setSignal, type FeedQuery } from '#lib/services/projects.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
 const PAGE = 20;
@@ -17,11 +17,13 @@ export class FeedState {
   readonly hasMore = $derived(this.items.length < this.total);
 
   /** Only these people's projects (comma-separated keys): a profile, or the people you follow;
-   * `tag`: only items tagged with a channel or community (ADR 0068). */
+   * `tag`: only items tagged with a channel or community (ADR 0068); `personal`: web's
+   * personal feed (see `FeedQuery`). */
   constructor(
     readonly search: () => string,
     public creator?: string,
     public tag?: string,
+    public personal?: FeedQuery['personal'],
   ) {}
 
   async reload(): Promise<void> {
@@ -41,6 +43,7 @@ export class FeedState {
         offset: this.items.length,
         ...(this.creator ? { creator: this.creator } : {}),
         ...(this.tag ? { tag: this.tag } : {}),
+        ...(this.personal ? { personal: this.personal } : {}),
       });
       this.items = [...this.items, ...page.items.slice(0, PAGE)];
       this.total = page.total;
