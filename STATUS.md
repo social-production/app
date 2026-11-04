@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-04 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-05 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,20 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #97 merged; this docs PR follows it).
+## In flight: the event card's time (branch `claude/social-production-handoff-dsam61`)
+**Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` (web-backend copies the
+leading plan's start onto the event, `_sync_event_schedule_from_leading_plan`) before the place.
+- **Gateway:** `node/event_time.rs` reads the event's plan board (`governance::list_plans`) and
+  takes the leading approved Event plan's start (UTC date + time → micros);
+  `ProjectCard.scheduled_at` (`scheduledAt`, absent on non-events). Archivist
+  `Node::event_start`, only for `mode == "event"`. Unit tests in `event_time.rs`.
+- **UI:** `EventCard` place line is `[time, place]` joined by " · " (`localDateTime`), and
+  placeholder places ("TBD", web's `isImplementedScheduleLabel`) are left out
+  (`eventSchedule.ts` `implementedLabel`).
+- **Tests:** `events.mjs` waits for the feed card's place line to read "<…9:00…> · Allotment 4".
+- **Checked so far:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
+  --all-targets -D warnings`, `cargo test -p gateway`. Next: `events.mjs` against a local seed
+  node, then PR → CI → merge → live `events.mjs`.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -63,7 +76,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), events' later parts (the event card's time; Remove organizer is an integrity change).
+paused badge), events' Remove organizer (an integrity change).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
