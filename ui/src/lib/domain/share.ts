@@ -30,36 +30,62 @@ export function shareMessage(kindLabel: string, title: string, href: string): st
   return `Shared a ${kindLabel}: ${title}\nOpen ${kindLabel}: ${href}`;
 }
 
-const HELP_SHARE =
-  /^Shared a help request: (.+)\nOpen help request: \S*\/help-requests\/([^\s/?#]+)$/;
+/** What web's shares.py sends for each kind it shares: the message's label, the page's path,
+ * and the notification it raises (`prj-share`, `evt-share`, `hr-share`, `thread-share`,
+ * `post-share`). */
+const SHARED = {
+  project: { path: 'projects', kind: 'prj-share', mode: 'productive' },
+  event: { path: 'events', kind: 'evt-share', mode: 'event' },
+  'help request': { path: 'help-requests', kind: 'hr-share', mode: 'help-request' },
+  thread: { path: 'threads', kind: 'thread-share', mode: 'thread' },
+  post: { path: 'posts', kind: 'post-share', mode: 'post' },
+} as const;
 
-/** A help request shared in a message, as `shareMessage` wrote it. */
-export function sharedHelpRequest(body: string): { title: string; id: string } | null {
-  const [, title, id] = HELP_SHARE.exec(body.trim()) ?? [];
-  return title && id ? { title, id: decodeURIComponent(id) } : null;
+type SharedLabel = keyof typeof SHARED;
+
+const SHARE =
+  /^Shared a (project|event|help request|thread|post): (.+)\nOpen \1: \S*\/([a-z-]+)\/([^\s/?#]+)$/;
+
+/** A space shared in a message, as `shareMessage` wrote it. */
+export function sharedSpace(
+  body: string,
+): { label: SharedLabel; title: string; id: string } | null {
+  const [, label, title, path, id] = SHARE.exec(body.trim()) ?? [];
+  if (!label || !title || !id) return null;
+  const known = SHARED[label as SharedLabel];
+  return known.path === path
+    ? { label: label as SharedLabel, title, id: decodeURIComponent(id) }
+    : null;
+}
+
+/** shares.py's notification bodies: projects and events name themselves. */
+function shareBody(label: SharedLabel, title: string): string {
+  return label === 'project' || label === 'event'
+    ? `${title} was shared with you.`
+    : `A ${label} was shared with you.`;
 }
 
 /**
- * shares.py's `hr-share` notification ("A help request was shared with you."), derived from the
- * share message someone else sent you in a direct chat (ADR 0067).
+ * shares.py's share notifications, derived from the share messages someone else sent you in a
+ * direct chat (ADR 0067): web sends the message and the notification together.
  */
-export function helpShareNotifications(seed: string, messages: ChatMessage[], me: string) {
+export function shareNotifications(seed: string, messages: ChatMessage[], me: string) {
   return messages.flatMap((m) => {
-    const shared =
-      m.author === me || (m.kind ?? 'text') !== 'text' ? null : sharedHelpRequest(m.body);
+    const shared = m.author === me || (m.kind ?? 'text') !== 'text' ? null : sharedSpace(m.body);
     if (!shared) return [];
+    const { kind, mode } = SHARED[shared.label];
     return [
       {
-        id: `hr-share:${m.id}`,
-        kind: 'hr-share' as const,
+        id: `${kind}:${m.id}`,
+        kind,
         subject: 'project' as const,
         seed,
-        projectMode: 'help-request' as const,
+        projectMode: mode,
         actor: m.author,
         title: shared.title,
-        body: 'A help request was shared with you.',
+        body: shareBody(shared.label, shared.title),
         lead: null,
-        target: { helpRequest: shared.id },
+        target: { space: shared.id },
         createdAt: m.createdAt,
       },
     ];

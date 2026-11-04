@@ -28,6 +28,10 @@ export type NotificationKind =
   | 'evt-invite'
   | 'community-invite'
   | 'hr-share'
+  | 'prj-share'
+  | 'evt-share'
+  | 'thread-share'
+  | 'post-share'
   | 'prj-plan-lead'
   | 'evt-plan-lead';
 
@@ -59,6 +63,10 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'evt-invite': 'shares_invites',
   'community-invite': 'shares_invites',
   'hr-share': 'shares_invites',
+  'prj-share': 'shares_invites',
+  'evt-share': 'shares_invites',
+  'thread-share': 'shares_invites',
+  'post-share': 'shares_invites',
   'prj-plan-lead': 'plan_leading',
   'evt-plan-lead': 'plan_leading',
 };
@@ -85,7 +93,8 @@ export interface NotificationItem {
     | { open: 'vote'; voteTarget: string }
     | { conversation: string }
     | { activity: string }
-    | { helpRequest: string }
+    /** A shared project, event, help request, thread or post (by `projectMode`). */
+    | { space: string }
     | null;
   createdAt: number;
   isUnread: boolean;

@@ -6,9 +6,11 @@
   import { isPhaseChange } from '#lib/domain/governance.ts';
   import { isEvent, takesSignals } from '#lib/domain/projects.ts';
 
+  import DetailShare from './DetailShare.svelte';
   import type { DetailState } from './detailState.svelte.ts';
 
-  /** web's Details dock: signals, join/members, Vote on edits and updates, and Edit and Update for members. */
+  /** web's Details dock: signals, join/members, Vote on edits and updates, Share +, and Edit and
+   * Update for members. */
   interface Props {
     detail: DetailState;
     membersOpen: boolean;
@@ -70,6 +72,7 @@
               {onRevealDone}
             />
           {/if}
+          <DetailShare {detail} />
           {#if detail.canPropose}
             <button type="button" class="quiet-control" onclick={onEdit}>Edit</button>
             <button type="button" class="quiet-control" onclick={onUpdate}>Update</button>
