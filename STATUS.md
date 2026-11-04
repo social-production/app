@@ -76,8 +76,10 @@ Branch `claude/social-production-handoff-dsam61`. **UI only.**
   `domain/linkedBody.ts` (web's `autoLinksFromText` + `buildSegments`) and
   `components/cards/LinkedPostBody.svelte` on `PersonalPostCard` and the post page
   (`PostHeader`). Styles were already in `cards.css`.
-- **Tests:** `projects.mjs` publishes the "Create post" draft and checks its link to the project.
-- **Checked:** UI check + lint (browser test: see the next line once run).
+- **Tests:** `threads.mjs`'s post carries the thread's URL and checks it is a link. (Not in
+  `projects.mjs`: its Ann is a New member who has used both weekly listings, so her post is
+  refused; a post counts as a listing.)
+- **Checked:** UI check + lint, sizes; `threads.mjs` **passed** against a local seed node.
 
 ## Done 2026-11-04: @mentions in the comment composer, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
 - **Live after merge:** PR #94 merged 07:33 UTC (6:33 pm Melbourne), CI 78 min on its last push. The

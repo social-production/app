@@ -81,15 +81,18 @@ await bob.goto(BASE);
 await bob.getByRole('button', { name: 'Create', exact: true }).click();
 await bob.getByRole('menuitem', { name: /Post/ }).click();
 const body = `Planting garlic this weekend ${stamp}`;
-await bob.getByLabel(/What's on your mind/).fill(body);
+await bob.getByLabel(/What's on your mind/).fill(`${body}\nAs discussed in ${url}`);
 await bob.getByRole('button', { name: 'Publish post' }).click();
 await bob.locator('.linked-body.detail', { hasText: body }).waitFor({ timeout: 120_000 });
 assert.match(bob.url(), /\/posts\//);
+// web's LinkedPostBody: the thread's URL in the body is a link.
+const subject = bob.locator('.linked-body.detail a.linked-subject');
+assert.equal(await subject.getAttribute('href'), url);
 const postComposer = bob.getByLabel('Write a comment...');
 await postComposer.fill('Cloves pointy end up.');
 await postComposer.press('Enter');
 await bob.locator('.comment-card', { hasText: 'pointy end up' }).waitFor({ timeout: 60_000 });
-log('they published a post and commented on it');
+log('they published a post (its link to the thread is live) and commented on it');
 
 const profile = await bob.locator('.discussion-page .header-name').getAttribute('href');
 assert.match(profile, /^\/profile\//);
