@@ -50,22 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the event card's time and place (PR #99, branch `claude/social-production-handoff-dsam61`)
-**Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` before the place
-(web-backend copies the leading plan's start *and place* onto the event,
-`_sync_event_schedule_from_leading_plan`; the app's card showed the charter's place, "TBD").
-- **Gateway:** `node/event_time.rs` reads the event's plan board (`governance::list_plans`) and
-  takes the leading approved Event plan's start (UTC date + time → micros) and place
-  (`EventFacts::apply`: `ProjectCard.scheduled_at` / `scheduledAt`, absent on non-events, and
-  the plan's place over the charter's). Archivist `Node::event_facts`, only for events.
-- **UI:** `EventCard` place line is `[time, place]` joined by " · " (`localDateTime`), and
-  placeholder places ("TBD", web's `isImplementedScheduleLabel`) are left out
-  (`eventSchedule.ts` `implementedLabel`).
-- **Tests:** `events.mjs` waits for the feed card's place line to read "<…9:00…> · Allotment 4".
-- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
-  --all-targets -D warnings`, `cargo test -p gateway`; `events.mjs` **passed** against a local
-  seed node (card: "Wed, Nov 18, 2026, 9:00 AM UTC · Allotment 4"). Not run: scenarios (no
-  zome change). Next: CI → merge → the seed node restarts → live `events.mjs`.
+## In flight: nothing (PR #99 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -83,6 +68,27 @@ paused badge), events' Remove organizer (an integrity change).
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-05: event cards show the leading plan's time and place, PR #99 merged 22:25 UTC Nov 4 (9:25 am Melbourne)
+- **Live after merge:** CI green on the first run (73 min). The seed node restarted (gateway
+  change); the three live events' cards gained `scheduledAt` and "Allotment 4". Live
+  `events.mjs` **passed** at 22:42 UTC (its first live try timed out in the new card step,
+  which reloaded once without retrying; it now reuses the feed loop, `feedUntil`).
+**Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` before the place
+(web-backend copies the leading plan's start *and place* onto the event,
+`_sync_event_schedule_from_leading_plan`; the app's card showed the charter's place, "TBD").
+- **Gateway:** `node/event_time.rs` reads the event's plan board (`governance::list_plans`) and
+  takes the leading approved Event plan's start (UTC date + time → micros) and place
+  (`EventFacts::apply`: `ProjectCard.scheduled_at` / `scheduledAt`, absent on non-events, and
+  the plan's place over the charter's). Archivist `Node::event_facts`, only for events.
+- **UI:** `EventCard` place line is `[time, place]` joined by " · " (`localDateTime`), and
+  placeholder places ("TBD", web's `isImplementedScheduleLabel`) are left out
+  (`eventSchedule.ts` `implementedLabel`).
+- **Tests:** `events.mjs` waits for the feed card's place line to read "<…9:00…> · Allotment 4".
+- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
+  --all-targets -D warnings`, `cargo test -p gateway`; `events.mjs` **passed** against a local
+  seed node (card: "Wed, Nov 18, 2026, 9:00 AM UTC · Allotment 4"). Not run: scenarios (no
+  zome change).
 
 ## Done 2026-11-04: an event's activities limited to its plan's days, PR #97 merged 13:13 UTC (12:13 am Melbourne, Nov 5)
 - **Live after merge:** CI's first run failed shard 6 on the expired-nonce setup flake, now in
