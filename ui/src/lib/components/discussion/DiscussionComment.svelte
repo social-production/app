@@ -9,6 +9,7 @@
 
   import { resolve } from '$app/paths';
 
+  import type { CommentMentions } from './commentMentions.ts';
   import CommentComposer from './CommentComposer.svelte';
   import Self from './DiscussionComment.svelte';
 
@@ -31,6 +32,7 @@
     onReply: (parent: string, body: string) => Promise<boolean>;
     /** A report or vote changed this comment's state. */
     onModeration: (id: string, next: Moderation) => void;
+    mentions?: CommentMentions | null;
   }
 
   let {
@@ -44,6 +46,7 @@
     onVote,
     onReply,
     onModeration,
+    mentions = null,
   }: Props = $props();
 
   let draft = $state('');
@@ -117,7 +120,11 @@
       {:else if !canReveal || revealed}
         <p class="body">
           {#each bodyParts(comment.body) as part, i (i)}
-            {#if part.mention}<span class="mention">{part.text}</span>
+            {#if part.mention}
+              {@const agent = mentions?.agentOf(part.mention)}
+              {#if agent}
+                <a class="mention" href={resolve('/profile/[agent]', { agent })}>{part.text}</a>
+              {:else}<span class="mention">{part.text}</span>{/if}
             {:else if part.internal}
               <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path written in the comment -->
               <a href={part.href}>{part.text}</a>
@@ -183,6 +190,7 @@
             submitLabel="Post reply"
             {signedIn}
             {onSignIn}
+            mentionSearch={mentions?.search}
             onSubmit={() => void reply()}
           />
         </div>
@@ -204,6 +212,7 @@
           {onVote}
           {onReply}
           {onModeration}
+          {mentions}
         />
       {/each}
     </div>

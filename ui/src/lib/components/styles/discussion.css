@@ -336,6 +336,37 @@
   display: block;
 }
 
+/* Ported from web/src/lib/components/shared/MentionMenu.svelte (ADR 0032, scripts/port-styles.py) */
+.composer-field .mention-menu {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 6px);
+  display: grid;
+  max-height: 180px;
+  overflow: auto;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--page-background) 55%, transparent);
+}
+
+.composer-field .mention-item {
+  padding: 8px 12px;
+  border: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-weight: 700;
+  text-align: left;
+}
+
+.composer-field .mention-item:hover,
+.composer-field .mention-item:focus-visible {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
 /* Ported from web/src/lib/features/threads/detail/ThreadOverviewPanel.svelte (ADR 0032, scripts/port-styles.py) */
 .overview-shell {
   display: grid;

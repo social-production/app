@@ -1,8 +1,12 @@
 <script lang="ts">
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
+  import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import DiscussionPanel from '#lib/components/discussion/DiscussionPanel.svelte';
+  import type { DiscussionComment as Comment } from '#lib/domain/discussions.ts';
   import { removedLabel } from '#lib/domain/moderation.ts';
   import { modeAccent } from '#lib/domain/projects.ts';
+  import { mentionPool } from '#lib/services/messages.ts';
+  import { myAgent } from '#lib/services/people.ts';
   import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
@@ -31,6 +35,24 @@
 
   $effect(() => {
     void state.open();
+  });
+
+  // web's comment @mentions: people in this discussion come first (as in project chats).
+  let me = ''; // read when a search runs, so it needn't be reactive
+  const signedIn = $derived(connection.current.status === 'connected');
+  const mentions = new MentionSource(
+    () => mentionPool(),
+    () => ({ me, agents: Object.keys(state.names), names: state.names }),
+  );
+
+  const bodies = (list: Comment[]): string[] => list.flatMap((c) => [c.body, ...bodies(c.replies)]);
+
+  $effect(() => {
+    if (signedIn) void myAgent().then((agent) => (me = agent));
+  });
+
+  $effect(() => {
+    if (signedIn) mentions.watch(bodies(state.comments));
   });
 </script>
 
@@ -61,7 +83,8 @@
           sortMode={state.sortMode}
           {highlighted}
           embedded
-          signedIn={connection.current.status === 'connected'}
+          {signedIn}
+          mentions={signedIn ? mentions : null}
           onSignIn={(message) => requireViewer(message)}
           onVote={(c, d) => state.voteComment(c, d)}
           onComment={(parent, body) => state.comment(parent, body)}

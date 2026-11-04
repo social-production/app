@@ -2,7 +2,7 @@
 // channel and comments on it. A new person finds web's ThreadCard in the feed, votes the thread
 // up, replies to the comment (nested under it) and votes the comment up. They then publish a
 // post, which shows on their profile on web's PersonalPostCard and in Search's Posts. Founder
-// one sees the reply and the comment's vote.
+// one sees the reply and the comment's vote, then @mentions the reader from web's menu.
 //   node tests/e2e/threads.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -124,6 +124,21 @@ for (let i = 0; ; i++) {
   await ann.waitForTimeout(3000);
 }
 log('founder one sees the nested reply and the comment vote');
+
+// web's @mention menu in the comment composer: the reader is offered by name, and the posted
+// comment links the mention to their profile.
+const mentionComposer = ann.getByLabel('Write a comment...');
+await mentionComposer.fill('');
+await mentionComposer.pressSequentially('Thanks @Read', { delay: 40 });
+const option = ann.locator('.composer-field .mention-item', { hasText: `Reader${stamp}` }).first();
+await option.waitFor({ timeout: 30_000 });
+await option.click();
+assert.equal(await mentionComposer.inputValue(), `Thanks @Reader${stamp} `);
+await mentionComposer.press('Enter');
+const mentioned = ann.locator('.comment-card a.mention', { hasText: `@Reader${stamp}` }).first();
+await mentioned.waitFor({ timeout: 60_000 });
+assert.equal(await mentioned.getAttribute('href'), profile);
+log('the comment composer offers @mentions and the comment links them');
 
 assert.deepEqual(errors, []);
 await browser.close();
