@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 use sp_index::{FeedQuery, Sort, Window};
 
 use super::{ApiResult, AppState};
-use crate::node::{PersonCard, ProjectCard};
+use crate::node::{PersonCard, ProjectCard, Who};
 
 const PAGE_MAX: usize = 50;
 /// The most creators one feed request may filter by (a Home feed of everyone someone follows).
@@ -41,6 +41,12 @@ pub struct FeedParams {
     /// Posts too (web's Search lists them; feeds keep them to personal pages, ADR 0070).
     #[serde(default)]
     posts: bool,
+    /// web's personal feed for this agent: `creator` is who they follow, and their own posts
+    /// join it (and with `popular`, everyone else's posts and threads: "Following + popular").
+    #[serde(default)]
+    me: String,
+    #[serde(default)]
+    popular: bool,
 }
 
 #[derive(Serialize)]
@@ -80,10 +86,23 @@ pub async fn projects(
         .filter(|t| !t.is_empty())
         .take(TAGS_MAX)
         .collect();
+    let who = if !p.me.is_empty() {
+        Who::Personal {
+            following: &creators,
+            me: &p.me,
+            popular: p.popular,
+        }
+    } else if !creators.is_empty() {
+        Who::Creators(&creators)
+    } else {
+        Who::Anyone {
+            with_posts: p.posts,
+        }
+    };
     let (items, total) = state
         .node
         .index
-        .page(&query, &creators, &tags, p.posts, p.offset, limit)
+        .page(&query, &who, &tags, p.offset, limit)
         .await;
     Ok(Json(FeedPage { items, total }))
 }

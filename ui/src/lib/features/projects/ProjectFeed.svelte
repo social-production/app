@@ -78,7 +78,7 @@
           ariaLabel="Choose personal audience"
           options={audiences}
           showTriggerLabel={labels.current}
-          onChange={(v) => feed.setAudience(v)}
+          onChange={(v) => void feed.setAudience(v)}
         >
           <ToolbarIcon name={feed.audience === 'following' ? 'people' : 'trending'} />
         </IconMenuButton>

@@ -45,6 +45,43 @@ pub struct ProjectCard {
 /// The moderation state of an item a report took down.
 pub const REMOVED: &str = "removed";
 
+/// Whose items a feed page holds.
+pub enum Who<'a> {
+    /// The public feed: everyone's items but posts, which live on personal feeds (ADR 0070);
+    /// Search asks for posts too (`with_posts`).
+    Anyone { with_posts: bool },
+    /// These people's items, posts included: a profile's feed.
+    Creators(&'a [&'a str]),
+    /// web-backend's `get_personal_feed`: everything from the people `me` follows, `me`'s own
+    /// posts, and with "Following + popular" (`popular`) everyone else's posts and threads.
+    Personal {
+        following: &'a [&'a str],
+        me: &'a str,
+        popular: bool,
+    },
+}
+
+impl Who<'_> {
+    fn keeps(&self, c: &ProjectCard) -> bool {
+        let post = c.mode == sp_discussion::POST;
+        match self {
+            Who::Anyone { with_posts } => !post || *with_posts,
+            Who::Creators(creators) => creators.contains(&c.creator.as_str()),
+            Who::Personal {
+                following,
+                me,
+                popular,
+            } => {
+                let followed = following.contains(&c.creator.as_str());
+                let mine = c.creator == *me;
+                followed
+                    || (post && mine)
+                    || (*popular && !followed && !mine && sp_discussion::is_discussion(&c.mode))
+            }
+        }
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct ProjectIndex(Arc<RwLock<Vec<ProjectCard>>>);
 
@@ -63,17 +100,14 @@ impl ProjectIndex {
             .collect()
     }
 
-    /// One page of the feed, best first; non-empty `creators` keeps only their projects (a
-    /// profile's feed, or the people someone follows for web's Home feed), and non-empty
-    /// `tags` only the items tagged with any of those channels or communities (`#food`, ADR
-    /// 0068; several for web's Home scope). Channels and communities themselves aren't feed
-    /// items.
+    /// One page of the feed, best first, of the items `who` keeps; non-empty `tags` keeps only
+    /// the items tagged with any of those channels or communities (`#food`, ADR 0068; several
+    /// for web's Home scope). Channels and communities themselves aren't feed items.
     pub async fn page(
         &self,
         q: &FeedQuery<'_>,
-        creators: &[&str],
+        who: &Who<'_>,
         tags: &[&str],
-        with_posts: bool,
         offset: usize,
         limit: usize,
     ) -> (Vec<ProjectCard>, usize) {
@@ -83,10 +117,7 @@ impl ProjectIndex {
             .filter(|c| !sp_scope::is_scope(&c.mode))
             // Removed after a report (ADR 0071): web unlists them everywhere.
             .filter(|c| c.moderation.as_deref() != Some(REMOVED))
-            // Posts live on personal feeds only (web's personal feed and profiles, ADR 0070),
-            // and in Search (`with_posts`).
-            .filter(|c| c.mode != sp_discussion::POST || with_posts || !creators.is_empty())
-            .filter(|c| creators.is_empty() || creators.contains(&c.creator.as_str()))
+            .filter(|c| who.keeps(c))
             .filter(|c| tags.is_empty() || c.tags.iter().any(|have| tags.contains(&have.as_str())))
             .collect();
         let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
