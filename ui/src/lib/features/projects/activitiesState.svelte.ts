@@ -1,5 +1,6 @@
 import type { Activity } from '#lib/domain/activities.ts';
 import { defaultTimes } from '#lib/domain/activityCalendar.ts';
+import { withinWindow } from '#lib/domain/eventSchedule.ts';
 import { namedRoles, newActivityForm, type ActivityForm } from '#lib/domain/activityForm.ts';
 import { rankMentions, type MentionPool } from '#lib/domain/mentions.ts';
 import type { PlanBoard, PlanKind } from '#lib/domain/plans.ts';
@@ -79,10 +80,14 @@ export class ActivitiesState {
     return run;
   }
 
-  openComposer(): void {
+  /** An event opens on its plan day (`day`), inside that day's window (web). */
+  openComposer(
+    day = this.selectedDay,
+    planWindow: { min: string; max: string } | null = null,
+  ): void {
     this.form = {
       ...newActivityForm(),
-      ...defaultTimes(this.selectedDay || null, this.activities),
+      ...withinWindow(defaultTimes(day || null, this.activities), planWindow),
     };
     this.error = '';
     this.composing = true;

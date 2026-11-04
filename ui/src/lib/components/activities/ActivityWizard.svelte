@@ -23,6 +23,8 @@
     open: boolean;
     form: ActivityForm;
     planStages: { id: string; label: string; group: string }[];
+    /** An event's plan-day window (web's `scheduleBounds`): the times stay inside it. */
+    planWindow?: { min: string; max: string } | null;
     busy: boolean;
     error: string;
     onSubmit: () => void;
@@ -34,6 +36,7 @@
     open,
     form = $bindable(),
     planStages,
+    planWindow = null,
     busy,
     error,
     onSubmit,
@@ -53,6 +56,10 @@
       else out.push({ label: s.group, stages: [s] });
       return out;
     }, []),
+  );
+  // web's effectiveActivityStartMin: not before now, nor before the plan day's start.
+  const startMin = $derived(
+    planWindow && planWindow.min > localNow() ? planWindow.min : localNow(),
   );
   const stageLabel = $derived(planStages.find((s) => s.id === form.planStage)?.label ?? '—');
 
@@ -96,14 +103,20 @@
           <div class="field-grid">
             <label>
               <span>Start time</span>
-              <input bind:value={form.scheduledAt} type="datetime-local" min={localNow()} />
+              <input
+                bind:value={form.scheduledAt}
+                type="datetime-local"
+                min={startMin}
+                max={planWindow?.max}
+              />
             </label>
             <label>
               <span>Finish time</span>
               <input
                 bind:value={form.endsAt}
                 type="datetime-local"
-                min={form.scheduledAt || localNow()}
+                min={form.scheduledAt || startMin}
+                max={planWindow?.max}
               />
             </label>
           </div>

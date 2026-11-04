@@ -91,8 +91,10 @@ export function monthDays(month: Date, activities: Activity[], now = Date.now())
 
 export const monthStart = (date: Date): Date => new Date(date.getFullYear(), date.getMonth(), 1);
 
-/** web's `defaultVisibleMonthStart`: the next upcoming activity's month, else the first's. */
-export function defaultMonth(activities: Activity[], now = Date.now()): Date {
+/** web's `defaultVisibleMonthStart`: the picked day's month, else the first plan day's (`day`),
+ * else the next upcoming activity's, else the first's. */
+export function defaultMonth(activities: Activity[], now = Date.now(), day?: string): Date {
+  if (day) return monthStart(new Date(`${day}T12:00`));
   const starts = activities.map((a) => a.startsAt / 1000).sort((x, y) => x - y);
   const next = starts.find((t) => t >= now) ?? starts[0];
   return monthStart(next === undefined ? new Date(now) : new Date(next));

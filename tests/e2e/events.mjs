@@ -167,6 +167,25 @@ await card.waitFor();
 assert.match(await card.locator('a.title').getAttribute('href'), /\/events\//);
 log('the feed lists it as an event card');
 
+// web's EventActivityPhase: the plan's day is marked, and the wizard's times stay inside it.
+await bob.goto(eventUrl);
+await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+await bob.getByRole('tab', { name: 'Participation' }).click();
+const planned = bob.locator('.calendar-cell.planned-day');
+await planned.first().waitFor({ timeout: 60_000 });
+assert.equal(await planned.count(), 1, 'one plan day');
+assert.equal(await planned.locator('.calendar-day-number').innerText(), String(day.getDate()));
+await bob.getByText('Click a marked plan day to add the first activity.').waitFor();
+await bob.getByRole('button', { name: 'Add activity' }).click();
+await bob.getByPlaceholder('Activity title').fill('Weeding');
+await bob.getByRole('button', { name: 'Next', exact: true }).click();
+const startField = bob.getByLabel('Start time');
+assert.equal(await startField.getAttribute('min'), `${iso}T09:00`);
+assert.equal(await startField.getAttribute('max'), `${iso}T13:00`);
+assert.equal(await startField.inputValue(), `${iso}T09:00`, 'opens inside the plan day');
+await bob.screenshot({ path: `${shots}/event-activity-wizard-390.png` });
+log('the plan day is marked, and new activities stay inside it');
+
 assert.deepEqual(errors, [], 'no page errors');
 log('all M5c event checks passed');
 await browser.close();

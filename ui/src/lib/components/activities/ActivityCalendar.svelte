@@ -7,11 +7,14 @@
 
   import '#lib/components/styles/activities.css';
 
-  /** web's ProjectActivityCalendarCard: a month of days with activity bars, and Add activity. */
+  /** web's ProjectActivityCalendarCard: a month of days with activity bars (an event's plan days
+   * marked), and Add activity. */
   interface Props {
     activities: Activity[];
     selectedDay: string;
     selectedActivity: string;
+    /** An event's plan days (web's `plannedDayIsos`): marked, and the only days to pick. */
+    planDays?: string[];
     canCreate: boolean;
     createActive: boolean;
     onDay: (iso: string) => void;
@@ -22,8 +25,16 @@
   let p: Props = $props();
 
   // svelte-ignore state_referenced_locally
-  let month = $state(defaultMonth(p.activities));
+  let month = $state(defaultMonth(p.activities, Date.now(), p.selectedDay || p.planDays?.[0]));
   let hoveredDay = $state('');
+  // The plans load after the calendar: the first plan day, once known, picks the month.
+  let seeded = false;
+  $effect(() => {
+    const first = p.planDays?.[0];
+    if (!first || seeded) return;
+    seeded = true;
+    if (!p.selectedDay) month = defaultMonth(p.activities, Date.now(), first);
+  });
   let hoveredActivity = $state('');
 
   const days = $derived(monthDays(month, p.activities));
@@ -45,6 +56,12 @@
   }
 
   const past = (iso: string): boolean => iso < today;
+  const planned = $derived(new Set(p.planDays ?? []));
+  // web's isViewableDay: with plan days, only they can be picked.
+  const pickable = (iso: string): boolean => planned.size === 0 || planned.has(iso);
+  const pick = (iso: string): void => {
+    if (pickable(iso)) p.onDay(iso);
+  };
 </script>
 
 <div class="calendar-shell surface-card">
@@ -106,26 +123,32 @@
         class="calendar-cell"
         class:muted-day={!day.inMonth}
         class:past-day={past(day.iso)}
+        class:planned-day={planned.has(day.iso)}
+        class:unplanned-day={planned.size > 0 && !planned.has(day.iso)}
         class:hovered-day={hoveredDay === day.iso}
         class:selected-day={agendaDay === day.iso}
         class:today-day={today === day.iso}
         role="button"
-        tabindex="0"
+        tabindex={pickable(day.iso) ? 0 : -1}
+        aria-disabled={!pickable(day.iso)}
         aria-label={`${day.day}${day.bars.length ? `, ${day.bars.length} ${day.bars.length === 1 ? 'activity' : 'activities'}` : ''}`}
         onmouseenter={() => (hoveredDay = day.iso)}
         onmouseleave={() => (hoveredDay = '')}
         onfocus={() => (hoveredDay = day.iso)}
         onblur={() => (hoveredDay = '')}
         ontouchstart={() => (hoveredDay = day.iso)}
-        onclick={() => p.onDay(day.iso)}
+        onclick={() => pick(day.iso)}
         onkeydown={(e) => {
           if (e.key === 'Enter' || e.key === ' ') {
             e.preventDefault();
-            p.onDay(day.iso);
+            pick(day.iso);
           }
         }}
       >
         <span class="calendar-day-number">{day.day}</span>
+        {#if planned.has(day.iso) && day.bars.length === 0}
+          <span class="planned-indicator" aria-hidden="true"></span>
+        {/if}
         <div class="activity-dots" aria-hidden="true">
           {#each day.bars.slice(0, 3) as bar (bar.id)}
             <span class={`activity-dot tone-${bar.tone}`}></span>
