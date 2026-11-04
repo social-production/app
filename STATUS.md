@@ -50,20 +50,22 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the event card's time (branch `claude/social-production-handoff-dsam61`)
-**Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` (web-backend copies the
-leading plan's start onto the event, `_sync_event_schedule_from_leading_plan`) before the place.
+## In flight: the event card's time and place (branch `claude/social-production-handoff-dsam61`, PR open)
+**Gateway + UI, no DNA change.** web's `EventCard` shows `scheduledAt` before the place
+(web-backend copies the leading plan's start *and place* onto the event,
+`_sync_event_schedule_from_leading_plan`; the app's card showed the charter's place, "TBD").
 - **Gateway:** `node/event_time.rs` reads the event's plan board (`governance::list_plans`) and
-  takes the leading approved Event plan's start (UTC date + time → micros);
-  `ProjectCard.scheduled_at` (`scheduledAt`, absent on non-events). Archivist
-  `Node::event_start`, only for `mode == "event"`. Unit tests in `event_time.rs`.
+  takes the leading approved Event plan's start (UTC date + time → micros) and place
+  (`EventFacts::apply`: `ProjectCard.scheduled_at` / `scheduledAt`, absent on non-events, and
+  the plan's place over the charter's). Archivist `Node::event_facts`, only for events.
 - **UI:** `EventCard` place line is `[time, place]` joined by " · " (`localDateTime`), and
   placeholder places ("TBD", web's `isImplementedScheduleLabel`) are left out
   (`eventSchedule.ts` `implementedLabel`).
 - **Tests:** `events.mjs` waits for the feed card's place line to read "<…9:00…> · Allotment 4".
-- **Checked so far:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
-  --all-targets -D warnings`, `cargo test -p gateway`. Next: `events.mjs` against a local seed
-  node, then PR → CI → merge → live `events.mjs`.
+- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p gateway
+  --all-targets -D warnings`, `cargo test -p gateway`; `events.mjs` **passed** against a local
+  seed node (card: "Wed, Nov 18, 2026, 9:00 AM UTC · Allotment 4"). Not run: scenarios (no
+  zome change). Next: CI → merge → the seed node restarts → live `events.mjs`.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If

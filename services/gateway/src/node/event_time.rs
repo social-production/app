@@ -1,6 +1,6 @@
-//! An event card's time (web's `EventCard` `scheduledAt`): web-backend copies the leading
-//! plan's start onto the event when that plan leads (`_sync_event_schedule_from_leading_plan`);
-//! the index reads it from the event's plan board instead.
+//! An event card's time and place (web's `EventCard` `scheduledAt` and `locationLabel`):
+//! web-backend copies the leading plan's start and place onto the event when that plan leads
+//! (`_sync_event_schedule_from_leading_plan`); the index reads them from the plan board.
 
 use serde::Deserialize;
 
@@ -20,6 +20,7 @@ pub struct PlanView {
 #[derive(Debug, Deserialize)]
 pub struct Plan {
     pub kind: String,
+    pub location: Option<String>,
     pub schedule: Option<Schedule>,
 }
 
@@ -30,17 +31,47 @@ pub struct Schedule {
     pub start_time: Option<String>,
 }
 
-/// The leading approved event plan's start, in Holochain microseconds.
-pub fn event_start(board: &PlanBoard) -> Option<i64> {
+/// What the leading plan sets on an event's card.
+#[derive(Debug, Default, PartialEq, Eq)]
+pub struct EventFacts {
+    /// The plan's start, in Holochain microseconds.
+    pub start: Option<i64>,
+    /// The plan's place, when it names one.
+    pub place: Option<String>,
+}
+
+impl EventFacts {
+    /// web-backend's sync: the plan's start, and its place over the charter's.
+    pub fn apply(self, card: &mut super::ProjectCard) {
+        card.scheduled_at = self.start;
+        if let Some(place) = self.place {
+            card.location_label = place;
+        }
+    }
+}
+
+/// The leading approved event plan's start and place (nothing without one).
+pub fn event_facts(board: &PlanBoard) -> EventFacts {
     let lead = board
         .plans
         .iter()
-        .find(|p| p.plan.kind == "Event" && p.approved && p.leader.as_deref() == Some("Leading"))?;
-    let s = lead.plan.schedule.as_ref()?;
-    utc_micros(
-        s.start_date.as_deref()?,
-        s.start_time.as_deref().unwrap_or("00:00"),
-    )
+        .find(|p| p.plan.kind == "Event" && p.approved && p.leader.as_deref() == Some("Leading"));
+    let Some(plan) = lead.map(|p| &p.plan) else {
+        return EventFacts::default();
+    };
+    let start = plan.schedule.as_ref().and_then(|s| {
+        utc_micros(
+            s.start_date.as_deref()?,
+            s.start_time.as_deref().unwrap_or("00:00"),
+        )
+    });
+    let place = plan
+        .location
+        .as_deref()
+        .map(str::trim)
+        .filter(|l| !l.is_empty())
+        .map(str::to_owned);
+    EventFacts { start, place }
 }
 
 /// `YYYY-MM-DD` and `HH:MM` in UTC as microseconds since the epoch.
@@ -90,7 +121,7 @@ mod tests {
     fn the_leading_approved_event_plan_sets_the_time() {
         let plan = |approved: bool, leader: &str, date: &str| {
             format!(
-                r#"{{"plan":{{"kind":"Event","schedule":{{"start_date":"{date}","start_time":"09:30"}}}},"approved":{approved},"leader":{leader}}}"#
+                r#"{{"plan":{{"kind":"Event","location":"Hall {date}","schedule":{{"start_date":"{date}","start_time":"09:30"}}}},"approved":{approved},"leader":{leader}}}"#
             )
         };
         let b = board(&format!(
@@ -99,7 +130,12 @@ mod tests {
             plan(true, "null", "2026-11-02"),
             plan(true, r#""Leading""#, "2026-11-14"),
         ));
-        assert_eq!(event_start(&b), Some(1_794_648_600_000_000));
-        assert_eq!(event_start(&board(r#"{"plans":[]}"#)), None);
+        let facts = event_facts(&b);
+        assert_eq!(facts.start, Some(1_794_648_600_000_000));
+        assert_eq!(facts.place.as_deref(), Some("Hall 2026-11-14"));
+        assert_eq!(
+            event_facts(&board(r#"{"plans":[]}"#)),
+            EventFacts::default()
+        );
     }
 }
