@@ -50,10 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Home's personal feed as web-backend's (own posts, "Following + popular"), PR #96
-- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
-  on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
-  setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
+## In flight: an event's activities limited to its plan's days, PR #97
+- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
+  (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
+  unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
+  another setup call hits it, route it through `setup_call` too. Run `bash scripts/check-sizes.sh` after the
   *last* edit (PR #92's first CI run failed on a 302-line AppShell).
 - **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
   items (pushed together once the later two were tested locally) rather than three PRs.
@@ -62,14 +63,33 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), events' later parts (the event card's time, activities limited to the plan's
-days).
+paused badge), events' later parts (the event card's time; Remove organizer is an integrity change).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-04: Home's personal feed as web-backend's: your own posts and "Following + popular", PR #96 (not merged yet)
+## Done 2026-11-04: an event's activities limited to its plan's days, PR #97 (not merged yet)
+Branch `claude/social-production-handoff-dsam61`. **UI only, no DNA change.**
+- web's EventActivityPhase: the calendar marks the leading plan's days (`planned-day`, the
+  dot), only they can be picked, and it opens on the first plan day's month; the empty agenda
+  says "Click a marked plan day to add the first activity."; the wizard's times are bounded
+  to the chosen plan day (web's `eventScheduleDayBounds`: the plan's start and finish times on
+  its first and last day) and its default times move inside that window.
+- web-backend's `viewerCanCreateActivities` for events: only while the leading plan hasn't
+  ended (`_can_propose_event_activity`), and from organizers when organizers run the event.
+- Code: `domain/eventSchedule.ts` (`planOpen`, `dayWindow`, `withinWindow`),
+  `ActivityCalendar` (`planDays`), `ActivityWizard` (`planWindow`), `ActivityPhase`,
+  `ActivitiesState.openComposer(day, window)`, `activityCalendar.defaultMonth(…, day)`.
+- **Tests:** `events.mjs` ends on the Activity phase: one marked plan day, the empty-agenda
+  line, and the wizard's Start time bounded to 09:00–13:00 of that day and opening at 09:00.
+- **Checked:** UI check + lint, boundaries, sizes; `events.mjs` **passed** against a local seed
+  node (its first try hit the fresh-node sign-in wait). Not run: scenarios (no Rust change).
+
+## Done 2026-11-04: Home's personal feed as web-backend's: your own posts and "Following + popular", PR #96 merged 10:53 UTC (9:53 pm Melbourne), live ~11:05 UTC
+- **Live after merge:** CI 78 min. The seed node restarted ~11:05 UTC (789 MB at 4 min). No
+  network reset. Live `threads.mjs` (with the new Home steps) and `follows.mjs` **passed**
+  (11:10–11:11 UTC; two overlapping runs on the fresh node also timed out once each at sign-in).
 Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
 - web-backend's `get_personal_feed`: everything the people you follow made, plus your own
   posts; "Following + popular" adds everyone else's posts and threads (its discovery rows).

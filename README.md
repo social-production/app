@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Home as on web, links in posts (PRs #95–96, 2026-11-04 evening Melbourne):** links and
+  app paths in a post's body are clickable; Home shows your own posts, and "Following +
+  popular" adds posts and threads by people you don't follow. No network reset. Live
+  `threads.mjs` and `follows.mjs` passed.
 - **Posts in Search, Share + and comment @mentions (PR #94, 2026-11-04 6:33 pm Melbourne):**
   Search has web's Posts filter; project and event pages have web's Share + (send to people,
   Create post, copy link; private events: Invite to event) and the recipient gets web's

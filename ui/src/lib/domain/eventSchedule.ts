@@ -93,6 +93,40 @@ export function scheduleDays(s: EventSchedule): string[] {
   return days;
 }
 
+const localStamp = (d: Date): string =>
+  `${localDay(d)}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+
+/** web-backend's `_can_propose_event_activity`: the plan hasn't ended yet. */
+export function planOpen(s: EventSchedule, now = Date.now()): boolean {
+  const bounds = scheduleBounds(s);
+  return !!bounds && bounds.end > now;
+}
+
+/** web's `eventScheduleDayBounds`: a plan day's window for the activity wizard (local
+ * `datetime-local` values; the plan's start and finish times on its first and last day). */
+export function dayWindow(s: EventSchedule, iso: string): { min: string; max: string } | null {
+  const bounds = scheduleBounds(s);
+  if (!bounds || !iso) return null;
+  const [start, end] = [new Date(bounds.start), new Date(bounds.end)];
+  if (iso < localDay(start) || iso > localDay(end)) return null;
+  return {
+    min: iso === localDay(start) ? localStamp(start) : `${iso}T00:00`,
+    max: iso === localDay(end) ? localStamp(end) : `${iso}T23:59`,
+  };
+}
+
+/** The wizard's default times moved inside a plan day's window (web opens the composer on
+ * the plan day). */
+export function withinWindow(
+  times: { scheduledAt: string; endsAt: string },
+  window: { min: string; max: string } | null,
+): { scheduledAt: string; endsAt: string } {
+  if (!window || (times.scheduledAt >= window.min && times.endsAt <= window.max)) return times;
+  const start = new Date(window.min);
+  const end = new Date(Math.min(start.getTime() + 3_600_000, new Date(window.max).getTime()));
+  return { scheduledAt: window.min, endsAt: localStamp(end) };
+}
+
 const dateOptions: Intl.DateTimeFormatOptions = {
   weekday: 'short',
   month: 'short',
