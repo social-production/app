@@ -124,6 +124,12 @@ const prefilled = await ann.getByLabel(/What's on your mind/).inputValue();
 const link = new URL(projectUrl);
 assert.equal(prefilled, `Check this out: ${title}\n${link.origin}${link.pathname}`);
 log('Ann shared the project with Bob, and Create post starts from its link');
+// web's LinkedPostBody: the published post's link to the project is live.
+await ann.getByRole('button', { name: 'Publish post' }).click();
+const subject = ann.locator('.linked-body.detail a.linked-subject').first();
+await subject.waitFor({ timeout: 120_000 });
+assert.equal(await subject.getAttribute('href'), `${link.origin}${link.pathname}`);
+log('the published post links to the project');
 
 const shared = bob.locator('.notification-card', { hasText: `${title} was shared with you.` });
 for (let i = 0; ; i++) {

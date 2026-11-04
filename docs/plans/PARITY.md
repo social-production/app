@@ -19,8 +19,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    the app still lacks: bot reviews, `prj-removed`.
    (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
    `thread-share`/`post-share` cards: done 2026-11-04.)
-4. **Posts and threads, later parts:** linked subjects in post bodies, "Following + popular"
-   discovery rows. (@mentions in the comment composer and Posts in Search: done 2026-11-04.
+4. **Posts and threads, later parts:** "Following + popular" discovery rows. (@mentions in the
+   comment composer, Posts in Search and links in post bodies: done 2026-11-04.
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere, so web shows none.)
 5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
    days, the event card's time.
@@ -181,8 +181,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   personal rows and profiles; Threads in Search; Post and Thread in the create menu).
 - [x] @mentions in the comment composer (2026-11-04): web's MentionMenu, mentions link to
   profiles.
-- [ ] Posts and threads, later parts: linked subjects in
-  post bodies (`LinkedPostBody`), feed "Following + popular" discovery rows (⋮ Report came
+- [x] Links in post bodies (2026-11-04): web's `LinkedPostBody` auto-links URLs and app paths.
+- [ ] Posts and threads, later parts: feed "Following + popular" discovery rows (⋮ Report came
   with ADR 0071). Not parity: web's `ScopeCreateMenu` (dead code on web, imported nowhere).
 - [x] Posts in Search (2026-11-04): web's Posts filter and Post rows; the index serves posts
   to Search only (`/index/projects?posts=true`), public feeds still leave them out.

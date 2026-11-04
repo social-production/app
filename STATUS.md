@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #94 merged; this docs PR follows it).
+## In flight: PR #95: the PR #94 docs plus web's LinkedPostBody (links in post bodies)
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
   on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
   setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
@@ -63,11 +63,21 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), events' later parts (the event card's time, activities limited to the plan's
-days), posts/threads' later parts (linked subjects in post bodies, "Following + popular" rows).
+days), posts/threads' later parts ("Following + popular" rows).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-04: links in post bodies (web's LinkedPostBody), PR #95 (not merged yet)
+Branch `claude/social-production-handoff-dsam61`. **UI only.**
+- web-backend sends no `linkedSubjects`, so web always auto-links a post body's URLs and app
+  paths (`/projects/…`, `/events/…`, `/threads/…`, `/messages…`, `/posts/…`, `/profile/…`).
+  `domain/linkedBody.ts` (web's `autoLinksFromText` + `buildSegments`) and
+  `components/cards/LinkedPostBody.svelte` on `PersonalPostCard` and the post page
+  (`PostHeader`). Styles were already in `cards.css`.
+- **Tests:** `projects.mjs` publishes the "Create post" draft and checks its link to the project.
+- **Checked:** UI check + lint (browser test: see the next line once run).
 
 ## Done 2026-11-04: @mentions in the comment composer, PR #94 merged 07:33 UTC (6:33 pm Melbourne), live ~07:45 UTC
 - **Live after merge:** PR #94 merged 07:33 UTC (6:33 pm Melbourne), CI 78 min on its last push. The
