@@ -16,12 +16,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
-   the app still lacks: shares of projects/events/threads/posts, bot reviews, `prj-removed`.
-   **Project/event pages lack web's whole "Share +" menu** (`ShareUserMenu` in
-   `ProjectOverviewHeader`/`EventOverviewHeader`: send to people, "Create post" with
-   `?prefill=Check this out: <title>\n<url>`, copy link, share outside); found 2026-11-04.
+   the app still lacks: bot reviews, `prj-removed`.
+   (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
+   `thread-share`/`post-share` cards: done 2026-11-04.)
 4. **Posts and threads, later parts:** @mentions in the comment composer, linked subjects in
-   post bodies, share notifications, "Following + popular"
+   post bodies, "Following + popular"
    discovery rows. (Posts in Search: done 2026-11-04. The scope page's create menu is not
    parity: web's `ScopeCreateMenu` is imported nowhere, so web shows none.)
 5. **Events, later parts:** Remove organizer (integrity), activities limited to the plan's
@@ -182,7 +181,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   the Oldest/Newest/Top sort; Share; ThreadCard in the public feed, PersonalPostCard on
   personal rows and profiles; Threads in Search; Post and Thread in the create menu).
 - [ ] Posts and threads, later parts: @mentions in the comment composer, linked subjects in
-  post bodies (`LinkedPostBody`), thread/post share notifications, feed "Following + popular" discovery rows (⋮ Report came
+  post bodies (`LinkedPostBody`), feed "Following + popular" discovery rows (⋮ Report came
   with ADR 0071). Not parity: web's `ScopeCreateMenu` (dead code on web, imported nowhere).
 - [x] Posts in Search (2026-11-04): web's Posts filter and Post rows; the index serves posts
   to Search only (`/index/projects?posts=true`), public feeds still leave them out.

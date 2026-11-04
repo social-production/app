@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: Posts in Search, PR #94 (branch `claude/social-production-handoff-dsam61`)
+## In flight: Posts in Search (PR #94), then web's Share + on project/event pages (branch `claude/social-production-handoff-dsam61`)
 - Gateway + UI, no DNA change, no network reset. See the newest "Done" entry for what was
   checked; if the PR is open, watch its CI and merge when green, then smoke live `threads.mjs`
   and `search.mjs`.
@@ -64,11 +64,32 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
 paused badge), events' later parts (the event card's time, activities limited to the plan's
-days), posts/threads' later parts ("Post an update" prefill, @mentions, linked subjects).
+days), posts/threads' later parts (@mentions in comments, linked subjects in post bodies).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-04: web's "Share +" on project and event pages, and share notifications (not merged yet)
+Branch `claude/social-production-handoff-dsam61` (after PR #94). **UI only, no DNA change.**
+- `features/projects/DetailShare.svelte` in `ProjectDock` after the votes, as web's
+  `ProjectOverviewHeader`/`EventOverviewHeader` place it: projects show it to anyone signed in
+  (web's `viewerCanShare`) and refuse non-members on Send with web-backend's "Only project
+  members can perform this action"; public events show it to members; private events to
+  organizers as "Invite to event" (an invite, no Create post). Send posts shares.py's
+  "Shared a project/event: …" into your direct chat with them (`services/shares.ts`).
+- `ShareUserMenu` gained web's "Create post" (`createPost`): `/create/post?prefill=Check this
+  out: <title>\n<url>` (web's `buildSharePrefill`; `CreatePost` already read `prefill`).
+- `domain/share.ts` `shareNotifications` (was the help-request-only parser) reads every share
+  message: `prj-share` / `evt-share` ("<title> was shared with you."), `hr-share`,
+  `thread-share`, `post-share` ("A thread/post was shared with you."; threads and posts already
+  sent the message, now their recipients get web's card). Notification target `{ space }`
+  (opened by `spaceHref`) replaces `{ helpRequest }`. All under Settings' Shares/invites.
+- **Tests:** `projects.mjs` shares the project with Bob (Copy link, Send), checks Create post's
+  prefill and Bob opens it from the "… was shared with you." card.
+- **Checked (cloud session):** UI check + lint, boundaries, sizes; against a local seed node
+  `projects.mjs` (new share step), `help-requests.mjs`, `events.mjs` **passed**; 390px
+  screenshots of the dock and the sheet. Not run: scenarios (no Rust change).
 
 ## Done 2026-11-04: Posts in Search, PR #94 (not merged yet)
 Branch `claude/social-production-handoff-dsam61`. **Gateway + UI, no DNA change.**
