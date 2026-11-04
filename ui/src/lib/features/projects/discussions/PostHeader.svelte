@@ -1,4 +1,5 @@
 <script lang="ts">
+  import LinkedPostBody from '#lib/components/cards/LinkedPostBody.svelte';
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import CountPill from '#lib/components/cards/CountPill.svelte';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
@@ -48,7 +49,7 @@
   </div>
 
   <RestrictionNotice active={isHidden(state.moderation.value)}>
-    <p class="linked-body detail">{charter.description}</p>
+    <LinkedPostBody body={charter.description} variant="detail" />
   </RestrictionNotice>
 
   <div class="footer detail-footer no-truncate">

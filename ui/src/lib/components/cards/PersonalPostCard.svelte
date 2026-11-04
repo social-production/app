@@ -7,6 +7,7 @@
   import ContentMetaRow from './ContentMetaRow.svelte';
   import CountPill from './CountPill.svelte';
   import FeedSurface from './FeedSurface.svelte';
+  import LinkedPostBody from './LinkedPostBody.svelte';
   import PersonalFeedIdentity from './PersonalFeedIdentity.svelte';
   import VoteStrip from './VoteStrip.svelte';
 
@@ -14,8 +15,8 @@
 
   /**
    * web's PersonalPostCard (personal feed and profiles, ADR 0070): the author's identity row,
-   * the post's body, votes and comments, and the clock. web's ⋮ report menu comes with
-   * moderation; linked subjects in the body (`LinkedPostBody`) come later.
+   * the post's body (`LinkedPostBody`: its links live), web's ⋮, votes and comments, and the
+   * clock.
    */
   interface Props {
     card: ProjectCard;
@@ -44,7 +45,7 @@
         <CardReport {card} />
       </div>
     </div>
-    <p class="linked-body feed">{card.summary}</p>
+    <LinkedPostBody body={card.summary} />
     <div class="footer">
       <div class="engagement-row feed-corner-actions">
         <VoteStrip corner support={card.demand} oppose={card.opposition} mine={null} {onSignal} />

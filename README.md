@@ -14,6 +14,12 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Posts in Search, Share + and comment @mentions (PR #94, 2026-11-04 6:33 pm Melbourne):**
+  Search has web's Posts filter; project and event pages have web's Share + (send to people,
+  Create post, copy link; private events: Invite to event) and the recipient gets web's
+  "… was shared with you." card (threads and posts too); thread and post comments offer
+  web's @mention menu and link mentions to profiles. No network reset. Live `search.mjs`,
+  `threads.mjs` and `projects.mjs` passed.
 - **"Plan became leading" and hidden pages blur (PR #92, 2026-11-04 3:19 am Melbourne, ADR
   0072):** a plan's author can be told their plan took the lead (web's Settings switch, off
   by default); hidden items' pages blur their title (a thread's and post's body too) behind
