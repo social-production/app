@@ -24,6 +24,7 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         latest_update: None,
         comment_count: 0,
         help: None,
+        scheduled_at: None,
         moderation: None,
     }
 }

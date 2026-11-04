@@ -166,6 +166,19 @@ for (let i = 0; i < 20 && !(await card.count()); i++) {
 await card.waitFor();
 assert.match(await card.locator('a.title').getAttribute('href'), /\/events\//);
 log('the feed lists it as an event card');
+// web's EventCard place line: the leading plan's start, then the place (the index re-reads
+// a written space about once a minute).
+const line = card.locator('.location');
+for (let i = 0; i < 30 && !/9:00/.test((await line.allInnerTexts()).join('')); i++) {
+  await bob.waitForTimeout(5000);
+  await bob.reload();
+  await bob.getByRole('button', { name: 'Sort public feed by' }).click();
+  await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await card.waitFor({ timeout: 60_000 });
+}
+const placeLine = await line.innerText();
+assert.match(placeLine, /9:00.* · Allotment 4$/, `card time and place: ${placeLine}`);
+log(`the event card shows its plan's start and place: ${placeLine}`);
 
 // web's EventActivityPhase: the plan's day is marked, and the wizard's times stay inside it.
 await bob.goto(eventUrl);

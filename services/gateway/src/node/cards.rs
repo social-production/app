@@ -158,6 +158,7 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
             .map(|u| u.body),
         comment_count: 0,
         help: None,
+        scheduled_at: None,
         moderation: None,
     }
 }

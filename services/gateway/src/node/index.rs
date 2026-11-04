@@ -36,6 +36,9 @@ pub struct ProjectCard {
     /// A help request's time and sign-ups (ADR 0067); absent on other cards.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub help: Option<super::cards::HelpCard>,
+    /// An event's start, from its leading plan (web's `scheduledAt`); absent on other cards.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub scheduled_at: Option<i64>,
     /// web's `moderationState` when a report is open: `under_review` or `hidden` (ADR 0071).
     /// Removed items leave the feed; absent while nothing is reported.
     #[serde(skip_serializing_if = "Option::is_none")]

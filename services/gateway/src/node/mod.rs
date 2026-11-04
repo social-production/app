@@ -4,6 +4,7 @@
 mod archivist;
 mod bundle;
 mod cards;
+mod event_time;
 mod hosting;
 mod index;
 mod people;

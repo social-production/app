@@ -14,6 +14,7 @@ use holochain_types::app::{AppBundleSource, InstallAppPayload};
 use super::cards::{
     card, help_of, moderation_of, ActivityView, ListingView, ModerationView, Profile, ProjectView,
 };
+use super::event_time::{event_start, PlanBoard};
 use super::spaces::{space_of_seed, Scoped};
 use super::{Node, ProjectCard};
 
@@ -126,6 +127,11 @@ impl Node {
         } else {
             Vec::new()
         };
+        let starts = if view.listing.mode == "event" {
+            self.event_start(agent, commons, &space).await
+        } else {
+            None
+        };
         let moderation: Option<ModerationView> = self
             .call(agent, commons.clone(), "discussion", "moderation", at(()))
             .await
@@ -133,9 +139,28 @@ impl Node {
         let mut card = card(view, project);
         card.moderation = moderation_of(moderation);
         card.help = help.then(|| help_of(&activities));
+        card.scheduled_at = starts;
         card.creator_name = profile.map(|p| p.name).unwrap_or_default();
         card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
         card
+    }
+
+    /// An event's start (web's `scheduledAt`): its leading approved plan's.
+    async fn event_start(
+        &self,
+        agent: &AgentPubKey,
+        commons: &CellId,
+        space: &ActionHash,
+    ) -> Option<i64> {
+        let at = Scoped {
+            space: space.clone(),
+            input: (),
+        };
+        let board: Option<PlanBoard> = self
+            .call(agent, commons.clone(), "governance", "list_plans", at)
+            .await
+            .ok();
+        board.as_ref().and_then(event_start)
     }
 
     pub(super) async fn archivist_app(&self, happ: &Path) -> anyhow::Result<AppInfo> {
