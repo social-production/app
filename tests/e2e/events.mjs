@@ -155,27 +155,25 @@ log('the approved plan let the event move to Activity');
 
 // web's EventCard in the feed, linking to /events/<id>.
 const card = bob.locator('.event-card', { hasText: title });
-for (let i = 0; i < 20 && !(await card.count()); i++) {
-  await bob.goto(BASE);
-  await bob.getByRole('button', { name: 'Sort public feed by' }).click();
-  await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
-  await bob.locator('.surface').first().waitFor({ timeout: 60_000 });
-  if (await card.count()) break;
-  await bob.waitForTimeout(3000);
+/** The public feed, newest first, until `ready` holds (the index catches up within minutes). */
+async function feedUntil(ready, tries) {
+  for (let i = 0; i < tries && !(await ready()); i++) {
+    await bob.goto(BASE);
+    await bob.getByRole('button', { name: 'Sort public feed by' }).click();
+    await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
+    await bob.locator('.surface').first().waitFor({ timeout: 60_000 });
+    if (await ready()) break;
+    await bob.waitForTimeout(5000);
+  }
 }
+await feedUntil(async () => (await card.count()) > 0, 20);
 await card.waitFor();
 assert.match(await card.locator('a.title').getAttribute('href'), /\/events\//);
 log('the feed lists it as an event card');
 // web's EventCard place line: the leading plan's start, then the place (the index re-reads
 // a written space about once a minute).
 const line = card.locator('.location');
-for (let i = 0; i < 30 && !/9:00/.test((await line.allInnerTexts()).join('')); i++) {
-  await bob.waitForTimeout(5000);
-  await bob.reload();
-  await bob.getByRole('button', { name: 'Sort public feed by' }).click();
-  await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
-  await card.waitFor({ timeout: 60_000 });
-}
+await feedUntil(async () => /9:00/.test((await line.allInnerTexts()).join('')), 30);
 const placeLine = await line.innerText();
 assert.match(placeLine, /9:00.* · Allotment 4$/, `card time and place: ${placeLine}`);
 log(`the event card shows its plan's start and place: ${placeLine}`);

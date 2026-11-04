@@ -8,12 +8,15 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-04)
+## Status (2026-11-05)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Event cards show when and where (PR #99, 2026-11-05 9:25 am Melbourne):** an event's
+  feed card reads "<start> · <place>" from its leading plan, as on web; placeholder places
+  such as "TBD" are left out. No network reset. Live `events.mjs` passed.
 - **Event activities on the plan's days (PR #97, 2026-11-05 12:13 am Melbourne):** an
   event's calendar marks its leading plan's days; new activities stay on them and stop once
   the plan has ended. No network reset. Live `events.mjs` passed.
