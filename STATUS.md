@@ -51,9 +51,10 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: an event's activities limited to its plan's days, PR #97
-- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87 and again
-  on PR #90; `Net::join` now retries a join refused with `BadNonce` (up to 3 tries). If other
-  setup calls hit it, route them the same way. Run `bash scripts/check-sizes.sh` after the
+- **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
+  (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
+  unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
+  another setup call hits it, route it through `setup_call` too. Run `bash scripts/check-sizes.sh` after the
   *last* edit (PR #92's first CI run failed on a 302-line AppShell).
 - **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
   items (pushed together once the later two were tested locally) rather than three PRs.

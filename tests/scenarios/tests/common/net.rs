@@ -73,7 +73,9 @@ impl Net {
             cells,
             space: None,
         };
-        let space: ActionHash = net.call(0, "project", "create_charter", charter).await;
+        let space: ActionHash = net
+            .setup_call(0, "project", "create_charter", charter)
+            .await;
         if !is_private(&seed) {
             net.space = Some(space);
         }
@@ -84,19 +86,30 @@ impl Net {
         net
     }
 
-    /// Agent `i` joins. On a loaded CI runner a call can wait in its conductor longer than its
-    /// nonce lives (5 min) and be refused unrun with `BadNonce("Expired")` (PR #87, PR #90's
-    /// `reports`); that refusal is retried with a fresh nonce, anything else fails the test.
+    /// Agent `i` joins (see `setup_call`).
     async fn join(&self, i: usize) {
+        self.setup_call::<(), ()>(i, "project", "join", ()).await;
+    }
+
+    /// A setup call. On a loaded CI runner a call can wait in its conductor longer than its
+    /// nonce lives (5 min) and be refused unrun with `BadNonce("Expired")` (PR #87, PR #90's
+    /// and PR #97's `reports`); that refusal is retried with a fresh nonce, anything else fails
+    /// the test.
+    async fn setup_call<I, O>(&self, i: usize, zome: &str, func: &str, payload: I) -> O
+    where
+        I: Serialize + std::fmt::Debug + Clone,
+        O: serde::de::DeserializeOwned + std::fmt::Debug,
+    {
         for attempt in 1..=3 {
-            match self.try_call::<(), ()>(i, "project", "join", ()).await {
-                Ok(()) => return,
+            match self.try_call::<I, O>(i, zome, func, payload.clone()).await {
+                Ok(out) => return out,
                 Err(e) if e.contains("BadNonce") && attempt < 3 => {
-                    eprintln!("agent {i}'s join was refused unrun ({e}); retrying");
+                    eprintln!("agent {i}'s {func} was refused unrun ({e}); retrying");
                 }
-                Err(e) => panic!("agent {i} could not join: {e}"),
+                Err(e) => panic!("agent {i}'s {func} failed: {e}"),
             }
         }
+        unreachable!("the last attempt returns or panics")
     }
 
     pub async fn call<I, O>(&self, i: usize, zome: &str, func: &str, payload: I) -> O
