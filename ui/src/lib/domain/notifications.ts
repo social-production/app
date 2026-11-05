@@ -33,7 +33,8 @@ export type NotificationKind =
   | 'thread-share'
   | 'post-share'
   | 'prj-plan-lead'
-  | 'evt-plan-lead';
+  | 'evt-plan-lead'
+  | 'prj-removed';
 
 /** web's notification settings categories (web-backend `notification_preferences.py`
  * KIND_TO_CATEGORY). */
@@ -69,6 +70,7 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'post-share': 'shares_invites',
   'prj-plan-lead': 'plan_leading',
   'evt-plan-lead': 'plan_leading',
+  'prj-removed': 'phase_done',
 };
 
 export interface NotificationItem {
@@ -95,6 +97,8 @@ export interface NotificationItem {
     | { activity: string }
     /** A shared project, event, help request, thread or post (by `projectMode`). */
     | { space: string }
+    /** web's `href: "/"` (a removed project, which has no page). */
+    | { home: true }
     | null;
   createdAt: number;
   isUnread: boolean;

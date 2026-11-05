@@ -76,8 +76,17 @@ pub fn list() -> ExternResult<Vec<ActivityView>> {
         LinkTypes::Activities,
         UnitEntryTypes::Activity,
     )?;
+    // What a removed organizer added afterwards doesn't count (ADR 0073).
+    let ends = if project_integrity::organized()? {
+        calls::organizer_ends()?
+    } else {
+        BTreeMap::new()
+    };
     let mut here = Vec::new();
     for a in all {
+        if calls::lapsed(&ends, a.entry.organizer.as_ref(), a.at) {
+            continue;
+        }
         if reads::in_space(&a.entry.membership)? {
             here.push(a);
         }

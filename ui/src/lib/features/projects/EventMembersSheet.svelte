@@ -4,7 +4,7 @@
   import type { Contact } from '#lib/domain/messages.ts';
   import type { Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/errors.ts';
-  import { addOrganizer, sendEventInvite } from '#lib/services/events.ts';
+  import { addOrganizer, removeOrganizer, sendEventInvite } from '#lib/services/events.ts';
   import { contacts } from '#lib/services/messages.ts';
   import { getPerson, myAgent } from '#lib/services/people.ts';
 
@@ -12,8 +12,8 @@
 
   /**
    * web's EventMembersPanel: a public event lists everyone who joined; a private one splits
-   * Organizers from Members, and organizers promote members and invite people (ADR 0061).
-   * web's "Remove organizer" waits on revocable grants (an integrity change).
+   * Organizers from Members, and organizers promote or remove organizers and invite people
+   * (ADR 0061, 0073).
    */
   interface Props {
     detail: DetailState;
@@ -29,11 +29,14 @@
   const canManage = $derived(isPrivate && !!project?.amOrganizer);
   /** Grants written here but not yet in the network read (a write lags its own reads). */
   let promoted = $state<string[]>([]);
+  let removed = $state<string[]>([]);
   let pending = $state<string | null>(null);
   let organizerPeople = $state<Person[]>([]);
   let error = $state('');
 
-  const organizerKeys = $derived([...new Set([...(project?.organizers ?? []), ...promoted])]);
+  const organizerKeys = $derived(
+    [...new Set([...(project?.organizers ?? []), ...promoted])].filter((k) => !removed.includes(k)),
+  );
 
   $effect(() => {
     const keys = organizerKeys;
@@ -72,6 +75,15 @@
             people: organizerPeople,
             badges: (p) =>
               p.agent === project?.creator ? ['Creator', 'Organizer'] : ['Organizer'],
+            action: (p) =>
+              canManage && p.agent !== project?.creator
+                ? {
+                    label: 'Remove organizer',
+                    danger: true,
+                    disabled: pending === p.agent,
+                    run: () => void demote(p.agent),
+                  }
+                : undefined,
           },
           {
             title: 'Members',
@@ -103,6 +115,22 @@
     try {
       await addOrganizer(detail.id, agent);
       promoted = [...promoted, agent];
+      removed = removed.filter((k) => k !== agent);
+      void detail.load();
+    } catch (e) {
+      error = explain(e);
+    } finally {
+      pending = null;
+    }
+  }
+
+  async function demote(agent: string): Promise<void> {
+    pending = agent;
+    error = '';
+    try {
+      await removeOrganizer(detail.id, agent);
+      removed = [...removed, agent];
+      promoted = promoted.filter((k) => k !== agent);
       void detail.load();
     } catch (e) {
       error = explain(e);

@@ -44,13 +44,22 @@ impl Standing {
 pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision>> {
     let mut passed = Vec::new();
     let organized = project_integrity::organized()?;
+    let ends = if organized {
+        calls::organizer_ends()?
+    } else {
+        BTreeMap::new()
+    };
     for proposal in reads::proposals()? {
         let count = count(&proposal, roll)?;
         let Some(outcome) = count.decided.as_ref().filter(|o| o.entry.passed) else {
             continue;
         };
         // Integrity accepts a vote-less pass only for an organizer's proposal (ADR 0061).
+        // What a removed organizer decided afterwards doesn't count (ADR 0073).
         if outcome.entry.votes.is_empty() && organized {
+            if calls::lapsed(&ends, proposal.entry.organizer.as_ref(), proposal.at) {
+                continue;
+            }
             passed.push(Decision {
                 at: outcome.at,
                 closed_by: outcome.author.clone(),

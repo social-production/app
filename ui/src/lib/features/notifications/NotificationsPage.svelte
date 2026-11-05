@@ -60,7 +60,7 @@
 
   $effect(() => {
     const missing = [...new Set(notifications.items.map((n) => n.actor))].filter(
-      (a) => !(a in names),
+      (a) => a && !(a in names),
     );
     if (missing.length === 0) return;
     void namesOf(missing).then((found) => (names = { ...names, ...found }));
@@ -94,6 +94,10 @@
         return;
       }
       const t = item.target;
+      if (t && 'home' in t) {
+        await goto(resolve('/'));
+        return;
+      }
       if (t && 'conversation' in t) {
         // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved here
         await goto(`${resolve('/messages')}?conversation=${encodeURIComponent(t.conversation)}`);

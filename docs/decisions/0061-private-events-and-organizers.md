@@ -47,7 +47,7 @@ web (web-backend `services/events/helpers.py::create_event`, `events/phases/gate
    creator writes them with `grant: None`; any other organizer cites their own `Organizer`
    record as `grant`. `must_get_valid_record` makes the chain of grants valid transitively.
    Revoking waits for its screen (web's members panel); it needs a rule for what a revoked
-   organizer wrote afterwards.
+   organizer wrote afterwards. (Done in ADR 0073: a revoke-tagged link, replayed by readers.)
 5. **Organizer-controlled rules (integrity, `.organized.` seeds):** every proposal except a
    link request mirrored from another project, and every activity, must be by an organizer
    (the creator, or citing their `Organizer` record in the new `organizer` field). An

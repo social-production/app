@@ -91,6 +91,12 @@ export async function addOrganizer(seed: string, agent: string): Promise<void> {
   await sendEventInvite(agent, seed);
 }
 
+/** web's "Remove organizer": end a co-organizer's grant (ADR 0073); they stay a member. */
+export async function removeOrganizer(seed: string, agent: string): Promise<void> {
+  const cell = await projectCell(seed, 'Event');
+  await callCell<null>(cell, 'project', 'remove_organizer', stringToHash(agent));
+}
+
 /** Private events in your inbox from other people, newest first. */
 export async function eventInvitations(): Promise<{ seed: string; from: string; at: number }[]> {
   const me = await myAgent();

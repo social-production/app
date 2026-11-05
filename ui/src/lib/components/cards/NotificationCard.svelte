@@ -124,7 +124,7 @@
       </div>
 
       <div class="footer-meta">
-        {#if social}
+        {#if social || !item.actor}
           <ContentMetaRow
             timeOnly
             authorName={actorName}

@@ -8,7 +8,7 @@ import {
 } from '#lib/holo/index.ts';
 
 import { queued } from './chat.ts';
-import { cellFor } from './projects.ts';
+import { cellFor, type ProjectRef } from './projects.ts';
 
 /**
  * Reports on a space (ADR 0071): the discussion zome's `report_space`, `vote_report`,
@@ -61,7 +61,7 @@ function toModeration(m: ModerationWire): Moderation {
 }
 
 /** The item's moderation state and its open (or removing) report; guests read it too. */
-export async function getModeration(id: string): Promise<Moderation> {
+export async function getModeration(id: ProjectRef): Promise<Moderation> {
   return toModeration(
     await callCell<ModerationWire>(await cellFor(id), 'discussion', 'moderation'),
   );

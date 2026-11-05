@@ -5,25 +5,25 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
-## What's left for full parity (summary, 2026-11-03)
+## What's left for full parity (summary, 2026-11-05)
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
 1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
-   1:1 one-vote path; conversation-DNA integrity change, a chat reset); a removed project's
-   side effects (memberships, votes and sign-ups end, `prj-removed`, the author's warm-up
-   penalty); bot reviews and the paused badge. (The blur on hidden detail pages: done
+   1:1 one-vote path; conversation-DNA integrity change, a chat reset); the author's warm-up
+   penalty after a removal; bot reviews and the paused badge. (A removed project leaving the
+   rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
    2026-11-03.)
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
-   the app still lacks: bot reviews, `prj-removed`.
+   the app still lacks: bot reviews (`prj-removed`: done 2026-11-05).
    (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
    `thread-share`/`post-share` cards: done 2026-11-04.)
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
    Posts in Search, links in post bodies, your own posts on Home and "Following + popular".
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
-5. **Events, later parts:** Remove organizer (integrity). (Activities limited to the plan's
-   days and the event card's time: done 2026-11-04/05.)
+5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
+   time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
@@ -114,7 +114,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   page shows it to members, who join without an invite.
 - [x] Event activities limited to the leading plan's days (2026-11-04): marked plan days,
   the wizard bounded to the chosen day, no new activities once the plan has ended.
-- [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change).
+- [x] Events' "Remove organizer" (2026-11-05, ADR 0073): web's danger button on co-organizer
+  rows; a revoke-tagged `Organizers` link replayed by every reader (no DNA change).
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
@@ -197,9 +198,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
-  integrity change in the conversation DNA), a removed project's side effects (memberships, votes and
-  sign-ups end, `prj-removed`, the author's warm-up penalty), bot reviews (web-backend
-  `bot_reviews.py`) and the paused badge.
+  integrity change in the conversation DNA), the author's warm-up penalty after a removal,
+  bot reviews (web-backend `bot_reviews.py`) and the paused badge.
+- [x] A removed project's side effects (2026-11-05, UI only): it leaves its members' rail and
+  they (and role holders) get web's `prj-removed` card (ADR 0071 Consequences).
 - [x] The blur on hidden detail pages (2026-11-03): web's `ModerationRestrictionNotice`
   (`components/moderation/RestrictionNotice.svelte`) over the title of project, event and help
   request pages, a thread's title and body and a post's body; Reveal / Hide again.
