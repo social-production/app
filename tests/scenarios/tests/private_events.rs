@@ -222,7 +222,11 @@ async fn organizers_remove_organizers() {
 
     let v = view(&net, 1).await;
     assert!(!v.am_organizer, "removed");
-    assert_eq!(v.organizers, vec![agent(0), agent(2)], "agent 2's grant stays");
+    assert_eq!(
+        v.organizers,
+        vec![agent(0), agent(2)],
+        "agent 2's grant stays"
+    );
     assert!(
         propose(&net, 1, move_to("phase-2")).await.is_err(),
         "a removed organizer no longer decides"

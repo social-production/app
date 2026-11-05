@@ -50,9 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: "Remove organizer" (ADR 0073), branch `claude/social-production-handoff-dsam61`
-**Coordinators + UI, no DNA hash change (integrity untouched), no network reset.** See the
-newest "Done" entry below for what it does; its PR number and CI are recorded there once open.
+## In flight: PR #101 (branch `claude/social-production-handoff-dsam61`): "Remove organizer" (ADR 0073) + a removed project's side effects
+**Coordinators + UI, no DNA hash change (integrity untouched), no network reset.** The two
+entries below say what each does. CI's first run failed `check` on `cargo fmt` (the new
+scenario test, written after the last fmt); fixed in the second push, which also carried the
+removed-project commit. When CI is green: merge, smoke live `private-events.mjs`, update README.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -71,7 +73,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Next PR (committed locally on the branch, push after PR #101 merges): a removed project's side effects
+## Also in PR #101: a removed project's side effects
 **UI only.** web-backend's `_end_removed_project`: memberships, open votes and role sign-ups
 end, and members + role holders get `prj-removed` ("This project was removed after a spam
 report.", no actor, href "/"). The app: `activityRail.railProject` drops a project whose
@@ -83,7 +85,7 @@ ContentMetaRow without a name). Category `phase_done`, as web's KIND_TO_CATEGORY
   `notifications.mjs` and `rail.mjs` **passed** locally. Not testable in a browser locally:
   removal needs 3 Full voters and dev-founders has 2.
 
-## Done 2026-11-05: events' "Remove organizer" (ADR 0073), PR pending
+## Events' "Remove organizer" (ADR 0073), PR #101
 **Coordinators + UI only; the project DNA keeps its hash.** web's `EventMembersPanel` shows
 "Remove organizer" (danger) on co-organizer rows; web-backend's `revoke_event_editor` lets any
 organizer revoke any co-organizer, never the creator.
