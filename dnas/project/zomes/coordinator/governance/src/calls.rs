@@ -41,6 +41,23 @@ pub fn my_organizer_role() -> ExternResult<Option<project_integrity::OrganizerRo
     project("my_organizer_role")
 }
 
+/// Removed organizer grants and when each ended (ADR 0073).
+pub fn organizer_ends() -> ExternResult<std::collections::BTreeMap<ActionHash, Timestamp>> {
+    let ends: Vec<(ActionHash, Timestamp)> = project("organizer_ends")?;
+    Ok(ends.into_iter().collect())
+}
+
+/// Whether something cites a grant that had already been removed when it was written.
+pub fn lapsed(
+    ends: &std::collections::BTreeMap<ActionHash, Timestamp>,
+    grant: Option<&ActionHash>,
+    at: Timestamp,
+) -> bool {
+    grant
+        .and_then(|g| ends.get(g))
+        .is_some_and(|end| *end <= at)
+}
+
 pub fn base_charter() -> ExternResult<Option<Charter>> {
     project("base_charter")
 }

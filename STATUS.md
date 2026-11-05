@@ -50,7 +50,9 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #99 merged; this docs PR follows it).
+## In flight: "Remove organizer" (ADR 0073), branch `claude/social-production-handoff-dsam61`
+**Coordinators + UI, no DNA hash change (integrity untouched), no network reset.** See the
+newest "Done" entry below for what it does; its PR number and CI are recorded there once open.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -63,11 +65,27 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
 moderation's later parts (DM/group reports with the 1:1 path, a
 conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge), events' Remove organizer (an integrity change).
+paused badge). (Events' Remove organizer: done 2026-11-05, ADR 0073.)
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-05: events' "Remove organizer" (ADR 0073), PR pending
+**Coordinators + UI only; the project DNA keeps its hash.** web's `EventMembersPanel` shows
+"Remove organizer" (danger) on co-organizer rows; web-backend's `revoke_event_editor` lets any
+organizer revoke any co-organizer, never the creator.
+- **Zomes:** a removal is an `Organizers` link tagged `revoke` to the grant
+  (`project::remove_organizer`). `organizers::ledger` replays grants and removals in link
+  time order, counting each only if its author was an organizer then (grants a removed
+  organizer made earlier stay; promoting again writes a new grant). `organizer_ends` feeds
+  governance's `passed` and the activities list, which drop what cites an ended grant and
+  was written after it ended (`calls::lapsed`).
+- **UI:** `EventMembersSheet` Remove organizer → `removeOrganizer` (`services/events.ts`);
+  the person moves back under Members at once (`removed`, as `promoted` does for grants).
+- **Tests:** scenario `organizers_remove_organizers` (`private_events.rs`); `private-events.mjs`
+  removes the promoted invitee and waits for "Promote to organizer" again.
+- **Checked:** see "Checked" below (filled in at the end of the session).
 
 ## Done 2026-11-05: event cards show the leading plan's time and place, PR #99 merged 22:25 UTC Nov 4 (9:25 am Melbourne)
 - **Live after merge:** CI green on the first run (73 min). The seed node restarted (gateway

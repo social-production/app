@@ -1,7 +1,7 @@
 //! M5c private events (ADR 0061): the seed says invite-only (`.private.`) or organizer-run
 //! (`.organized.`). Organizers are the creator plus `Organizer` grants; in an organizer-run
 //! event only they propose and add activities, their proposals pass at once, and signals and
-//! values are refused.
+//! values are refused. Any organizer removes a co-organizer (ADR 0073).
 
 use holochain::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -205,4 +205,39 @@ async fn private_collaborative_events_still_vote() {
         .await;
     assert!(refused.is_err(), "public events have no co-organizers");
     public.shut_down().await;
+}
+
+/// web's "Remove organizer" (ADR 0073): any organizer ends a co-organizer's grant; grants that
+/// organizer made before stay; the creator can't be removed; promoting again restores it.
+#[tokio::test(flavor = "multi_thread")]
+async fn organizers_remove_organizers() {
+    let net = Net::with_charter(3, 2, "organized.party", charter("event")).await;
+    let agent = |i: usize| net.cells[i].1.agent_pubkey().clone();
+    let _: ActionHash = net.call(0, "project", "add_organizer", agent(1)).await;
+    net.settle().await;
+    let _: ActionHash = net.call(1, "project", "add_organizer", agent(2)).await;
+    net.settle().await;
+    let _: () = net.call(0, "project", "remove_organizer", agent(1)).await;
+    net.settle().await;
+
+    let v = view(&net, 1).await;
+    assert!(!v.am_organizer, "removed");
+    assert_eq!(v.organizers, vec![agent(0), agent(2)], "agent 2's grant stays");
+    assert!(
+        propose(&net, 1, move_to("phase-2")).await.is_err(),
+        "a removed organizer no longer decides"
+    );
+    let refused = net
+        .try_call::<_, ()>(1, "project", "remove_organizer", agent(2))
+        .await;
+    assert!(refused.is_err(), "only organizers remove organizers");
+    let creator = net
+        .try_call::<_, ()>(2, "project", "remove_organizer", agent(0))
+        .await;
+    assert!(creator.is_err(), "the creator stays");
+
+    let _: ActionHash = net.call(2, "project", "add_organizer", agent(1)).await;
+    net.settle().await;
+    assert!(view(&net, 1).await.am_organizer, "promoted again");
+    net.shut_down().await;
 }

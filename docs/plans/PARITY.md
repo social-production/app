@@ -5,7 +5,7 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
-## What's left for full parity (summary, 2026-11-03)
+## What's left for full parity (summary, 2026-11-05)
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
 1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
@@ -22,8 +22,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
    Posts in Search, links in post bodies, your own posts on Home and "Following + popular".
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
-5. **Events, later parts:** Remove organizer (integrity). (Activities limited to the plan's
-   days and the event card's time: done 2026-11-04/05.)
+5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
+   time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
 6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
@@ -114,7 +114,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   page shows it to members, who join without an invite.
 - [x] Event activities limited to the leading plan's days (2026-11-04): marked plan days,
   the wizard bounded to the chosen day, no new activities once the plan has ended.
-- [ ] Events, later parts: "Remove organizer" (revocable grants: an integrity change).
+- [x] Events' "Remove organizer" (2026-11-05, ADR 0073): web's danger button on co-organizer
+  rows; a revoke-tagged `Organizers` link replayed by every reader (no DNA change).
 - [x] Help requests (ADR 0067, 2026-10-29): web's create flow (six steps; tags until
   channels/communities exist), detail page (Details: time, place, roles with Sign up / Leave /
   Full, vote strip; Chat), `HelpRequestCard` in the feed with time, place and sign-ups.
