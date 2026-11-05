@@ -7,13 +7,21 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, keyOf, log, phraseSignIn, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, signUp } from './lib.mjs';
 
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
 const shots = process.argv[3];
 const phone = { viewport: { width: 390, height: 844 } };
 const name = `Maybe${stamp}`;
+
+/** The agent key from Settings (on a phone the Settings link sits in the More sheet). */
+async function keyOf(page) {
+  await page.goto(`${BASE}/settings`);
+  const key = page.locator('#settings-account .key');
+  await key.waitFor({ timeout: 60_000 });
+  return (await key.innerText()).trim();
+}
 
 const bob = await device(phone);
 await signUp(bob, name);

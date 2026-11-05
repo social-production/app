@@ -74,6 +74,36 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
+## Done 2026-11-05: bot reviews and the paused badge (ADR 0074), PR pending CI
+**Directory integrity change: merging resets the directory network** (everyone signs up again).
+Project and conversation DNAs unchanged (no changes to them or their crates; `Cargo.lock` only
+adds `sp_bot_review`). Local hashes: directory `uhC0kUx_esWp…`, conversation `uhC0kUmCMHl…`.
+- **web:** ProfilePage's Bot action (confirm "Mark … as a possible bot?"), the bot review card
+  (Real person / Bot, tally, closes, "Found to be a bot", Ask for a re-review), the Trust
+  sheet from the standing chip (Vouchers / Bot marks tabs); web-backend `bot_reviews.py`.
+- **Records:** directory links `BotMarks`, `BotReviewVotes`, `ReReviews` on the account, as
+  yourself, never on yourself, never deleted. `crates/sp_bot_review` replays them (3 counted
+  marks open; 66% of ≥ max(3, required_votes(people involved)); 7-day expiry; early clear;
+  30-day marker cooldown; one re-review after 30 days; `log` of opens/closes).
+- **Paused:** `get_standing` → `Paused`; `full_standing_before` false while paused (votes
+  before the verdict still count). Coordinator refuses a paused account's vouches, marks and
+  review votes; marking withdraws your vouch, vouching clears your mark; vouch ban 30 days
+  after a vouchee is upheld.
+- **Notifications:** `my_bot_review_notices` → `bot-review` (own) / `bot-review-result`
+  (marked or voted), "Account" cards opening the profile, category Votes needed. Not ported:
+  `bot-review-vote` to everyone sharing a space.
+- **Badge:** gateway people index reads standing, `GET /index/paused`; `PausedBadge` (ported
+  `paused.css`) after author names in `ContentMetaRow` and `DiscussionComment`, via shell
+  context (`features/shell/shellContexts.ts`). `scripts/port-styles.py` now keeps
+  `[data-theme…]` selectors unprefixed.
+- **Warm-up penalty:** not parity (web runs it off; the app has no warm level). ADR 0074.
+- **Checked:** `cargo test -p sp_bot_review` (10), `cargo clippy -p identity -p gateway
+  --all-targets -D warnings`, `cargo fmt`, hApp pack, UI check + lint, boundaries, sizes;
+  scenario `bot_reviews` **passed** (454 s; shard table 10 min); against a local seed node
+  `bot-reviews.mjs` (new: mark, Trust sheet, clear), `follows.mjs`, `notifications.mjs`,
+  `reports.mjs` **passed**. Not run here: the other scenario files and `cargo test -p gateway`
+  (CI). Not testable locally: a review opening (needs 3 Full; dev-founders has 2).
+
 ## Done 2026-11-05: a removed project's side effects, PR #101 (see the entry below for the merge)
 **UI only.** web-backend's `_end_removed_project`: memberships, open votes and role sign-ups
 end, and members + role holders get `prj-removed` ("This project was removed after a spam
