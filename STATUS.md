@@ -85,7 +85,11 @@ organizer revoke any co-organizer, never the creator.
   the person moves back under Members at once (`removed`, as `promoted` does for grants).
 - **Tests:** scenario `organizers_remove_organizers` (`private_events.rs`); `private-events.mjs`
   removes the promoted invitee and waits for "Promote to organizer" again.
-- **Checked:** see "Checked" below (filled in at the end of the session).
+- **Checked:** UI check + lint, boundaries, sizes, `cargo fmt`, `cargo clippy -p project -p
+  governance -p activities --all-targets -D warnings`, hApp pack; scenario
+  `organizers_remove_organizers` **passed** (593 s here; `check-scenarios.sh`'s table now gives
+  `private_events` 50 min); `private-events.mjs` **passed** against a local seed node (its
+  first try hit the fresh-node sign-in wait). Not run here: the other scenario files (CI).
 
 ## Done 2026-11-05: event cards show the leading plan's time and place, PR #99 merged 22:25 UTC Nov 4 (9:25 am Melbourne)
 - **Live after merge:** CI green on the first run (73 min). The seed node restarted (gateway
