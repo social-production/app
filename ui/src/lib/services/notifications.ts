@@ -4,10 +4,10 @@ import {
   followNotifications,
   projectNotifications,
   withReadMarks,
-  type NotificationCategory,
   type NotificationItem,
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
+import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
 import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
 import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
 import { removedNotifications } from '#lib/domain/removedNotifications.ts';

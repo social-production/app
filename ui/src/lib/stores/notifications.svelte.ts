@@ -2,8 +2,8 @@ import {
   categoryOf,
   OFF_BY_DEFAULT,
   type NotificationCategory,
-  type NotificationItem,
-} from '#lib/domain/notifications.ts';
+} from '#lib/domain/notificationCategories.ts';
+import type { NotificationItem } from '#lib/domain/notifications.ts';
 
 /**
  * The notifications list and the bell's unread count (web's unreadCounts.notifications). The
