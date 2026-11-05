@@ -201,7 +201,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
   integrity change in the conversation DNA).
-- [x] Bot reviews and the paused badge (2026-11-05, ADR 0074, directory reset): web's Bot
+- [x] Bot reviews and the paused badge (2026-11-05, PR #103, ADR 0074, directory reset): web's Bot
   action, "Mark … as a possible bot?", the bot review card (Real person / Bot, tally, closes,
   "Found to be a bot", Ask for a re-review), the Trust sheet (Vouchers / Bot marks tabs) from
   the standing chip, Paused standing, the `bot-review` / `bot-review-result` cards and the

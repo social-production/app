@@ -14,6 +14,13 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Bot reviews and the Paused badge (PR #103, 2026-11-05 10:27 pm Melbourne, ADR 0074):**
+  as on web, full members can mark an account as a possible bot from its profile; three marks
+  open a public review where full members vote Real person or Bot, and an account found to be
+  a bot is paused (read-only, votes no longer count) with web's Paused badge after its name.
+  The standing chip opens the Trust sheet (Vouchers / Bot marks). **The directory network was
+  reset: everyone signs up again.** Live `bot-reviews.mjs`, `follows.mjs` and
+  `notifications.mjs` passed.
 - **Remove organizer, and removed projects end for their members (PR #101, 2026-11-05 5:23 pm
   Melbourne, ADR 0073):** any organizer of a private event can remove a co-organizer from
   the members sheet (never the creator), as on web; a project removed by a report leaves its
