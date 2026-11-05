@@ -37,6 +37,30 @@ pub fn replay<K: Ord + Clone>(
     created_at: i64,
     ballots: &[Ballot<K>],
 ) -> Outcome {
+    run(reason, created_at, ballots, |age| {
+        Thresholds::at(reason, audience, age, score)
+    })
+}
+
+/// `replay` for a direct or group chat message (`Thresholds::chat`, web's 1:1 path).
+#[must_use]
+pub fn replay_chat<K: Ord + Clone>(
+    reason: Reason,
+    audience: u32,
+    created_at: i64,
+    ballots: &[Ballot<K>],
+) -> Outcome {
+    run(reason, created_at, ballots, |age| {
+        Thresholds::chat(reason, audience, age)
+    })
+}
+
+fn run<K: Ord + Clone>(
+    reason: Reason,
+    created_at: i64,
+    ballots: &[Ballot<K>],
+    bars: impl Fn(u32) -> Thresholds,
+) -> Outcome {
     let mut sorted: Vec<&Ballot<K>> = ballots.iter().collect();
     sorted.sort_by_key(|b| b.at);
     let mut votes: BTreeMap<K, bool> = BTreeMap::new();
@@ -44,7 +68,7 @@ pub fn replay<K: Ord + Clone>(
     for ballot in sorted {
         votes.insert(ballot.voter.clone(), ballot.yes);
         let (yes, no) = counts(&votes);
-        let t = Thresholds::at(reason, audience, age_days(created_at, ballot.at), score);
+        let t = bars(age_days(created_at, ballot.at));
         state = advance(reason, state, yes, no, &t);
         if !state.active() {
             return Outcome {
@@ -79,27 +103,33 @@ pub fn age_days(created_at: i64, at: i64) -> u32 {
 }
 
 /// web's `advance_resolution`: from `open` a report lands on `under_review` first; serious
-/// harm may go on to `hidden` in the same step; deletion always takes a later vote.
+/// harm may go on to `hidden` in the same step; deletion takes a later vote, except in a
+/// 1:1 chat.
 fn advance(reason: Reason, current: Resolution, yes: u32, no: u32, t: &Thresholds) -> Resolution {
     let next = step(reason, current, yes, no, t);
     if next == current || !next.active() {
         return next;
     }
-    if next == Resolution::UnderReview
-        && step(reason, Resolution::UnderReview, yes, no, t) == Resolution::Hidden
-    {
-        return Resolution::Hidden;
+    if next == Resolution::UnderReview {
+        match step(reason, Resolution::UnderReview, yes, no, t) {
+            Resolution::Hidden => return Resolution::Hidden,
+            Resolution::Removed if t.tiny => return Resolution::Removed,
+            _ => {}
+        }
     }
     next
 }
 
-/// web's `next_resolution` (without the 1:1 DM path, which waits for message reports).
+/// web's `next_resolution`.
 fn step(reason: Reason, current: Resolution, yes: u32, no: u32, t: &Thresholds) -> Resolution {
     let reviewing = matches!(current, Resolution::UnderReview | Resolution::Hidden);
     if reviewing && !t.can_still_delete(yes, no) {
         return Resolution::Dismissed;
     }
     if current == Resolution::Open && yes >= 1 {
+        if t.tiny && t.delete_ready(yes, no) {
+            return Resolution::Removed;
+        }
         return Resolution::UnderReview;
     }
     if reviewing && t.delete_ready(yes, no) {
@@ -184,6 +214,34 @@ mod tests {
         let out = replay(Reason::Spam, 3, 0, 0, &votes);
         assert_eq!(out.resolution, Resolution::Removed);
         assert_eq!((out.yes, out.no), (3, 0));
+    }
+
+    #[test]
+    fn one_yes_removes_a_message_in_a_one_to_one_chat() {
+        let out = replay_chat(Reason::Spam, 1, 0, &[b(1, 1, true)]);
+        assert_eq!(out.resolution, Resolution::Removed);
+        let harm = replay_chat(Reason::SeriousHarm, 1, 0, &[b(1, 1, true)]);
+        assert_eq!(harm.resolution, Resolution::Removed);
+    }
+
+    #[test]
+    fn a_small_group_reviews_and_then_dismisses() {
+        // Three people: two others can't reach web's 3-vote floor.
+        let one = [b(1, 1, true)];
+        assert_eq!(
+            replay_chat(Reason::Spam, 2, 0, &one).resolution,
+            Resolution::UnderReview
+        );
+        let two = [b(1, 1, true), b(2, 2, true)];
+        assert_eq!(
+            replay_chat(Reason::Spam, 2, 0, &two).resolution,
+            Resolution::Dismissed
+        );
+        let four = [b(1, 1, true), b(2, 2, true), b(3, 3, true)];
+        assert_eq!(
+            replay_chat(Reason::Spam, 3, 0, &four).resolution,
+            Resolution::Removed
+        );
     }
 
     #[test]

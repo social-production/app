@@ -5,11 +5,11 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
-## What's left for full parity (summary, 2026-11-05, after ADR 0074)
+## What's left for full parity (summary, 2026-11-05, after ADR 0075)
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
-1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
-   1:1 one-vote path; conversation-DNA integrity change, a chat reset). (Bot reviews and the
+1. ~~Moderation, rest~~ (done 2026-11-05: reports in direct and group chats with web's 1:1
+   path, ADR 0075, a conversation reset). (Bot reviews and the
    paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on web, not parity.)
    (A removed project leaving the
    rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
@@ -199,8 +199,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] Moderation part (b), 2026-11-03 (PR #88, ADR 0071): reports on comments (threads, posts) and on
   project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
-- [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
-  integrity change in the conversation DNA).
+- [x] Moderation, later parts (2026-11-05, ADR 0075, conversation reset): reports in direct and
+  group chats from the bubble menu (web's `message` target): chat members vote, the audience
+  is the other members, and in a 1:1 chat the report itself removes the message (web's
+  `is_tiny_private_dm`). Batched with it: declined invites are a private inbox entry.
 - [x] Bot reviews and the paused badge (2026-11-05, PR #103, ADR 0074, directory reset): web's Bot
   action, "Mark … as a possible bot?", the bot review card (Real person / Bot, tally, closes,
   "Found to be a bot", Ask for a re-review), the Trust sheet (Vouchers / Bot marks tabs) from

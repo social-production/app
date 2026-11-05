@@ -83,9 +83,8 @@ behind "Hidden for serious harm report — reveal to read".
   shared with the ⋮ menu). A refused vote shows above the composer (web toasts it).
 - **Deviation:** web keeps a hidden message's photos visible behind the reveal and a removed
   message's files downloadable; the app hides both until revealed (removed: always).
-- **Still to come:** direct and group chats (web's `message` target and its 1:1 fast path:
-  one vote decides in a two-person chat). They live in the conversation DNA, whose messages
-  zome has no reports: an integrity change there (a chat reset).
+- **Direct and group chats:** done in [0075](./0075-chat-message-reports.md) (web's
+  `message` target and its 1:1 path; a conversation-DNA change).
 
 ## Consequences
 - **Integrity change in the project DNA** (discussion zome): merging resets the project

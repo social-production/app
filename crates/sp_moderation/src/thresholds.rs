@@ -84,7 +84,7 @@ pub fn hide_share_percent(reason: Reason, age_days: u32, score: u32) -> u32 {
     }
 }
 
-/// Votes cast before deletion can pass. web's 1-vote DM path waits for message reports.
+/// Votes cast before deletion can pass (web's 1-vote path for 1:1 chats: `Thresholds::chat`).
 #[must_use]
 pub fn delete_quorum(audience: u32, reason: Reason) -> u32 {
     let base = required_votes(audience);
@@ -119,6 +119,9 @@ pub struct Thresholds {
     pub hide_quorum: u32,
     pub delete_share: u32,
     pub hide_share: u32,
+    /// web's `is_tiny_private_dm`: a message in a chat with one other person, where one
+    /// vote decides at once.
+    pub tiny: bool,
 }
 
 impl Thresholds {
@@ -130,7 +133,24 @@ impl Thresholds {
             hide_quorum: hide_quorum(audience),
             delete_share: delete_share_percent(reason, age_days, score),
             hide_share: hide_share_percent(reason, age_days, score),
+            tiny: false,
         }
+    }
+
+    /// A direct or group chat message (web's `message` target): `audience` is the chat's
+    /// members other than the author, with no floor (web's `max(1, members - 1)`), and no
+    /// popularity (web scores chat messages 0). With one other person, one vote decides.
+    #[must_use]
+    pub fn chat(reason: Reason, audience: u32, age_days: u32) -> Self {
+        let audience = audience.max(1);
+        let tiny = audience <= 1;
+        let mut t = Self::at(reason, audience, age_days, 0);
+        if tiny {
+            t.delete_quorum = 1;
+            t.hide_quorum = 1;
+        }
+        t.tiny = tiny;
+        t
     }
 
     #[must_use]
@@ -204,6 +224,20 @@ mod tests {
         assert!(!t.delete_ready(1, 2));
         assert!(t.can_still_delete(1, 0));
         assert!(!t.can_still_delete(1, 2));
+    }
+
+    #[test]
+    fn a_one_to_one_chat_needs_one_vote() {
+        let t = Thresholds::chat(Reason::Spam, 1, 0);
+        assert!(t.tiny);
+        assert_eq!((t.delete_quorum, t.hide_quorum), (1, 1));
+        assert!(t.delete_ready(1, 0));
+        // A group keeps web's floors and its real size (2 others: deletion is out of reach).
+        let g = Thresholds::chat(Reason::Spam, 2, 0);
+        assert!(!g.tiny);
+        assert_eq!(g.delete_quorum, 3);
+        assert!(!g.can_still_delete(1, 0));
+        assert_eq!(Thresholds::chat(Reason::Spam, 0, 0).audience, 1);
     }
 
     #[test]

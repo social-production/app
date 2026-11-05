@@ -2,8 +2,10 @@
 //! clone: `start_chat`, the group's `rename_group`/`add_member`/`remove_member`/`leave`, messages
 //! (`post_message`, `edit_message`, `delete_message`, `list_messages`), pins (`pin_message`,
 //! `pins`), and your own `summary`, `mark_read` and `set_prefs`; a direct chat's
-//! `peer_read_at` (read receipts) and `log_call` (call lines). In the base cell (the inbox):
-//! `send_invite` and `inbox`. The UI polls, as it does the project chat (ADR 0038).
+//! `peer_read_at` (read receipts) and `log_call` (call lines); reports on messages
+//! (`report_message`, `vote_report`, `message_moderation`, ADR 0075). In the base cell (the
+//! inbox): `send_invite`, `inbox` and declines (`decline_invite`, `declined_invites`). The UI
+//! polls, as it does the project chat (ADR 0038).
 
 mod calls;
 mod entries;
@@ -15,6 +17,7 @@ mod people;
 mod pins;
 mod reads;
 mod receipts;
+mod reports;
 mod summary;
 
 use hdk::prelude::*;

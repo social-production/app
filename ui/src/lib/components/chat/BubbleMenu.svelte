@@ -20,7 +20,7 @@
     onPin: (m: ChatLine) => void;
     onEdit: (m: ChatLine) => void;
     onDelete: (m: ChatLine) => void;
-    /** Set in a space's chat (web's `subjectId`). */
+    /** Set in every text chat (web's `subjectId`; direct and group chats since ADR 0075). */
     onReport?: ((m: ChatLine) => void) | undefined;
     onVote?: ((m: ChatLine, report: string, yes: boolean) => void) | undefined;
     onClose: () => void;

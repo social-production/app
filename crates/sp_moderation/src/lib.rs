@@ -6,7 +6,7 @@
 mod replay;
 mod thresholds;
 
-pub use replay::{age_days, replay, Ballot, Outcome};
+pub use replay::{age_days, replay, replay_chat, Ballot, Outcome};
 pub use thresholds::{
     age_boost_percent, audience, delete_quorum, delete_share_percent, hide_quorum,
     hide_share_percent, popularity_boost_percent, popularity_score, Thresholds, MIN_AUDIENCE,

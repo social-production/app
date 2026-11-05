@@ -2,6 +2,7 @@
   import { untrack } from 'svelte';
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
+  import { ChatModeration } from '#lib/components/chat/chatModeration.svelte.ts';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import { withReceipts } from '#lib/components/chat/chatFormat.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
@@ -11,6 +12,11 @@
   import PinBar from '#lib/components/messages/PinBar.svelte';
   import type { ChatPin, ChatSummary } from '#lib/domain/messages.ts';
   import { attachmentBlob } from '#lib/services/attachments.ts';
+  import {
+    chatModeration,
+    reportChatMessage,
+    voteOnChatReport,
+  } from '#lib/services/chatReports.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
     chatPeerReadAt,
@@ -67,6 +73,20 @@
     inbox.names,
   );
 
+  // Reports on this chat's messages (ADR 0075), read as messages arrive and every 30 s.
+  const reports = new ChatModeration({
+    read: (ids) => chatModeration(seed, ids),
+    report: (message, reason, description) =>
+      inTurn(() => reportChatMessage(seed, message, reason, description)),
+    vote: (report, yes) => inTurn(() => voteOnChatReport(seed, report, yes)),
+  });
+  $effect(() => {
+    const ids = thread.messages.map((m) => m.id);
+    void reports.refresh(ids);
+    const timer = setInterval(() => void reports.refresh(ids, true), 30_000);
+    return () => clearInterval(timer);
+  });
+
   const title = $derived(inbox.title(chat));
   let pins = $state<ChatPin[]>([]);
   let focus = $state<{ id: string; n: number } | null>(null);
@@ -83,9 +103,13 @@
   // Pins and the read receipt follow each load of the chat (web reads `peer_read_at` with
   // the thread); receipts are for direct chats only, as on web.
   let peerReadAt = $state<number | null>(null);
-  const lines = $derived(
-    chat.kind === 'direct' ? withReceipts(thread.lines, peerReadAt) : thread.lines,
-  );
+  const lines = $derived.by(() => {
+    const moderated = thread.lines.map((l) => {
+      const moderation = reports.byId[l.id];
+      return moderation ? { ...l, moderation } : l;
+    });
+    return chat.kind === 'direct' ? withReceipts(moderated, peerReadAt) : moderated;
+  });
   $effect(() => {
     void thread.messages;
     void chatPins(seed).then(
@@ -195,6 +219,7 @@
   onDelete={(id) => thread.remove(id)}
   onEdit={(id, body) => thread.edit(id, body)}
   onTogglePin={chat.canPin ? (id, pinned) => thread.pin(id, pinned) : null}
+  reports={{ report: reports.report, vote: reports.vote, explain, signedIn: () => true }}
   mentionSearch={mentions.search}
   mentionAgent={mentions.agentOf}
 />

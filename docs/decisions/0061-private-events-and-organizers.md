@@ -76,7 +76,8 @@ web (web-backend `services/events/helpers.py::create_event`, `events/phases/gate
 - Who invited whom is visible on the inbox network (ADR 0043); which event is not.
 - Gateway-hosted people's events are readable by that node's operator, as on web.
 - A declined invite comes back on another device until declines move into a private entry
-  (a conversation integrity change, to batch with the next one).
+  (a conversation integrity change, to batch with the next one). Done in
+  [0075](./0075-chat-message-reports.md): a private `Declined` entry in the inbox.
 - Private events don't appear in the feed yet (it is built from the directory's index);
   their members reach them from Invites, notifications, the rail and links. Merging the
   events open on this node into the feed comes next.
