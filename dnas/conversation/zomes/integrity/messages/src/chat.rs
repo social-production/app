@@ -25,6 +25,13 @@ pub fn validate_entry(
     entry: &EntryTypes,
     author: &AgentPubKey,
 ) -> ExternResult<ValidateCallbackResult> {
+    // The author's own commit of a private entry is validated with the entry in hand.
+    if let EntryTypes::Declined(d) = entry {
+        if d.seed.len() > INBOX_TAG_MAX {
+            return invalid("an invitation's seed is too long");
+        }
+        return validate_private_of(UnitEntryTypes::Declined);
+    }
     let (creator, kind) = match chat()? {
         Ok(chat) => chat,
         Err(reason) => return invalid(&reason),
@@ -76,7 +83,7 @@ pub fn validate_entry(
         EntryTypes::Report(r) => validate_report(r, author, &creator),
         EntryTypes::ReportVote(v) => validate_vote(v, author, &creator),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
-        EntryTypes::Declined(_) => invalid("declines stay private"),
+        EntryTypes::Declined(_) => invalid("declines are checked above"),
     }
 }
 

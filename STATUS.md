@@ -54,7 +54,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 **Conversation integrity change: merging resets every chat and the inbox** (test data only).
 Project and directory DNAs keep their hashes (checked with `hc dna hash` against main's
 bundles: project `uhC0kqPxFpmg…`, directory `uhC0kUx_esWp…`; conversation becomes
-`uhC0kIVCOXsm…`). See the "Done" entry below for what changed; after merging: smoke live
+`uhC0kanmDwfg…`). See the "Done" entry below for what changed; after merging: smoke live
 `messages.mjs` (it now reports a DM reply) and `invites` (decline an event invite).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
@@ -96,6 +96,10 @@ hashes unchanged.
   calls (ProjectChat passes the discussion zome's, ConversationView `services/chatReports.ts`).
 - **Declines:** private `Declined { seed }` in the inbox (`decline_invite`,
   `declined_invites`); `services/events.ts` reads it instead of `localStorage`.
+- **Lesson:** the author's own commit of a *private* entry is validated as an ordinary
+  `CreateEntry` (the record still carries the entry), not only as `CreatePrivateEntry`; so
+  `validate_entry` must accept `Declined` in the inbox before its chat-only checks. The
+  first scenario run failed on exactly this ("the inbox holds only invitations").
 - **Tests:** scenario `chat_reports.rs` (DM removal at once, group 3-of-3, declines);
   `messages.mjs` now reports Bob's reply ("Removed for spam" for both).
 - **Checked:** `cargo test -p sp_moderation` (17), `cargo clippy -p messages -p
