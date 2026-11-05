@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Remove organizer, and removed projects end for their members (PR #101, 2026-11-05 5:23 pm
+  Melbourne, ADR 0073):** any organizer of a private event can remove a co-organizer from
+  the members sheet (never the creator), as on web; a project removed by a report leaves its
+  members' activity rail and they get web's "This project was removed after a … report."
+  notification. No network reset. Live `private-events.mjs` and `rail.mjs` passed.
 - **Event cards show when and where (PR #99, 2026-11-05 9:25 am Melbourne):** an event's
   feed card reads "<start> · <place>" from its leading plan, as on web; placeholder places
   such as "TBD" are left out. No network reset. Live `events.mjs` passed.

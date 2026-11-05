@@ -50,11 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #101 (branch `claude/social-production-handoff-dsam61`): "Remove organizer" (ADR 0073) + a removed project's side effects
-**Coordinators + UI, no DNA hash change (integrity untouched), no network reset.** The two
-entries below say what each does. CI's first run failed `check` on `cargo fmt` (the new
-scenario test, written after the last fmt); fixed in the second push, which also carried the
-removed-project commit. When CI is green: merge, smoke live `private-events.mjs`, update README.
+## In flight: nothing (PR #101 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -66,14 +62,18 @@ removed-project commit. When CI is green: merge, smoke live `private-events.mjs`
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
 moderation's later parts (DM/group reports with the 1:1 path, a
-conversation-DNA integrity change; a removed project's side effects, bot reviews and the
-paused badge). (Events' Remove organizer: done 2026-11-05, ADR 0073.)
+conversation-DNA integrity change; the author's warm-up penalty after a removal, bot
+reviews and the paused badge; the removal's rail and `prj-removed` effects: done 2026-11-05).
+(Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order: the author's warm-up
+penalty with bot reviews (directory standing, web-backend `bot_reviews.py`), then DM/group
+reports (conversation-DNA reset, batch it with other conversation integrity changes such as
+ADR 0061's declined-invite entry), then service requests, map/places, software PRs.
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Also in PR #101: a removed project's side effects
+## Done 2026-11-05: a removed project's side effects, PR #101 (see the entry below for the merge)
 **UI only.** web-backend's `_end_removed_project`: memberships, open votes and role sign-ups
 end, and members + role holders get `prj-removed` ("This project was removed after a spam
 report.", no actor, href "/"). The app: `activityRail.railProject` drops a project whose
@@ -85,7 +85,12 @@ ContentMetaRow without a name). Category `phase_done`, as web's KIND_TO_CATEGORY
   `notifications.mjs` and `rail.mjs` **passed** locally. Not testable in a browser locally:
   removal needs 3 Full voters and dev-founders has 2.
 
-## Events' "Remove organizer" (ADR 0073), PR #101
+## Done 2026-11-05: events' "Remove organizer" (ADR 0073), PR #101 merged 06:23 UTC (5:23 pm Melbourne)
+- **Live after merge:** CI's second run was green (79 min; the first failed `check` on
+  `cargo fmt` in the new scenario test: run `cargo fmt` after the *last* Rust edit). The seed
+  node restarted ~06:35 UTC (911 MB at 134 s). No network reset. Live `private-events.mjs`
+  **passed** (06:36 UTC, remove step included); live `rail.mjs` failed once at its last step
+  (the cast vote not yet in History, 2 min after the restart) and **passed** on the re-run.
 **Coordinators + UI only; the project DNA keeps its hash.** web's `EventMembersPanel` shows
 "Remove organizer" (danger) on co-organizer rows; web-backend's `revoke_event_editor` lets any
 organizer revoke any co-organizer, never the creator.
