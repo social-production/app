@@ -58,7 +58,10 @@ see the newest "Done" entry below once it lands; until then this branch is the w
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
   another setup call hits it, route it through `setup_call` too. Run `bash scripts/check-sizes.sh` after the
-  *last* edit (PR #92's first CI run failed on a 302-line AppShell).
+  *last* edit (PR #92's first CI run failed on a 302-line AppShell; PR #103's on a 306-line
+  `domain/notifications.ts`). Run **workspace** clippy (`cargo clippy --workspace --all-targets
+  -D warnings`), not per package: it also lints scenario tests (60-line functions) and crates'
+  unit tests (no `unwrap`).
 - **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
   items (pushed together once the later two were tested locally) rather than three PRs.
 
@@ -74,7 +77,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-05: bot reviews and the paused badge (ADR 0074), PR pending CI
+## Done 2026-11-05: bot reviews and the paused badge (ADR 0074), PR #103 (CI pending)
 **Directory integrity change: merging resets the directory network** (everyone signs up again).
 Project and conversation DNAs unchanged (no changes to them or their crates; `Cargo.lock` only
 adds `sp_bot_review`). Local hashes: directory `uhC0kUx_esWp…`, conversation `uhC0kUmCMHl…`.

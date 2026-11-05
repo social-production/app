@@ -19,6 +19,7 @@ fn vote(who: u8, at: i64, bot: bool) -> Act<u8> {
         kind: Kind::Vote(bot),
     }
 }
+#[allow(clippy::trivially_copy_pass_by_ref)] // `replay` takes `Fn(&A, i64)`.
 fn all_full(_: &u8, _: i64) -> bool {
     true
 }
@@ -74,7 +75,7 @@ fn three_bot_votes_uphold_and_pause() {
     assert!(!s.paused_at(5));
     assert_eq!(
         s.re_review_from(),
-        Some(s.last_closed.unwrap().at + APPEAL_AFTER_US)
+        Some(s.last_closed.expect("closed").at + APPEAL_AFTER_US)
     );
 }
 
@@ -126,7 +127,7 @@ fn upheld_at_9() -> Vec<Act<u8>> {
 #[test]
 fn the_one_re_review_opens_after_thirty_days() {
     let s = replay(upheld_at_9(), all_full, 10);
-    let closed = s.last_closed.unwrap().at;
+    let closed = s.last_closed.expect("closed").at;
     let early = Act {
         who: 0,
         at: closed + APPEAL_AFTER_US - 1,
@@ -163,7 +164,7 @@ fn the_one_re_review_opens_after_thirty_days() {
 #[test]
 fn an_upheld_re_review_is_final() {
     let s = replay(upheld_at_9(), all_full, 10);
-    let appeal_at = s.last_closed.unwrap().at + APPEAL_AFTER_US;
+    let appeal_at = s.last_closed.expect("closed").at + APPEAL_AFTER_US;
     let mut acts = upheld_at_9();
     acts.push(Act {
         who: 0,

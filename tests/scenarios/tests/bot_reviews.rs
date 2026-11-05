@@ -3,7 +3,7 @@
 //! counting). New members can't mark, nobody marks themselves, and marks are never deleted.
 
 use holochain::prelude::*;
-use holochain::sweettest::{await_consistency, SweetConductorBatch, SweetZome};
+use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
 use serde::{Deserialize, Serialize};
 
 mod common;
@@ -41,111 +41,138 @@ struct StandingAt {
     at: Timestamp,
 }
 
+/// Five directory agents: ann, bob, cat and dan are founders (Full); eve is New. Dan is the
+/// account under review.
+struct Net {
+    conductors: SweetConductorBatch,
+    cells: Vec<SweetCell>,
+}
+
+impl Net {
+    fn dan(&self) -> AgentPubKey {
+        self.cells[3].agent_pubkey().clone()
+    }
+
+    fn choice(&self, bot: bool) -> BotChoice {
+        BotChoice {
+            account: self.dan(),
+            bot,
+        }
+    }
+
+    async fn call<
+        I: Serialize + std::fmt::Debug,
+        O: serde::de::DeserializeOwned + std::fmt::Debug,
+    >(
+        &self,
+        i: usize,
+        func: &str,
+        payload: I,
+    ) -> O {
+        let zome = self.cells[i].zome("identity");
+        self.conductors[i].call(&zome, func, payload).await
+    }
+
+    async fn refused<I: Serialize + std::fmt::Debug>(
+        &self,
+        i: usize,
+        func: &str,
+        payload: I,
+    ) -> bool {
+        let zome = self.cells[i].zome("identity");
+        let r: Result<ActionHash, _> = self.conductors[i].call_fallible(&zome, func, payload).await;
+        r.is_err()
+    }
+
+    async fn review(&self, i: usize) -> BotReviewView {
+        self.call(i, "get_bot_review", self.dan()).await
+    }
+
+    async fn settle(&self) {
+        await_consistency(&self.cells).await.expect("consistency");
+    }
+}
+
 #[tokio::test(flavor = "multi_thread")]
 async fn three_marks_open_a_review_that_pauses_a_bot() {
     let mut conductors = SweetConductorBatch::standard(5).await;
-    // ann, bob, cat and dan are founders (Full); eve is New.
     let cells = common::directory_network(&mut conductors, 4).await;
-    let zome = |i: usize| cells[i].zome("identity");
-    let dan = cells[3].agent_pubkey().clone();
-    let choice = |bot| BotChoice {
-        account: dan.clone(),
-        bot,
-    };
-    let review = |i: usize| {
-        let z: SweetZome = zome(i);
-        let dan = dan.clone();
-        let c = &conductors[i];
-        async move { c.call::<_, BotReviewView>(&z, "get_bot_review", dan).await }
-    };
+    let net = Net { conductors, cells };
+    marks_open_the_review(&net).await;
+    votes_uphold_it(&net).await;
+    the_paused_account_is_read_only(&net).await;
+    notices_follow_the_review(&net).await;
+    common::shut_down(net.conductors).await;
+}
 
-    let refused: Result<ActionHash, _> = conductors[4]
-        .call_fallible(&zome(4), "set_bot_mark", choice(true))
-        .await;
-    assert!(refused.is_err(), "a New member can't mark");
-    let own: Result<ActionHash, _> = conductors[3]
-        .call_fallible(&zome(3), "set_bot_mark", choice(true))
-        .await;
-    assert!(own.is_err(), "nobody marks themselves");
-
+async fn marks_open_the_review(net: &Net) {
+    assert!(
+        net.refused(4, "set_bot_mark", net.choice(true)).await,
+        "a New member can't mark"
+    );
+    assert!(
+        net.refused(3, "set_bot_mark", net.choice(true)).await,
+        "nobody marks themselves"
+    );
     for i in 0..3 {
-        let _: ActionHash = conductors[i]
-            .call(&zome(i), "set_bot_mark", choice(true))
-            .await;
+        let _: ActionHash = net.call(i, "set_bot_mark", net.choice(true)).await;
     }
-    await_consistency(&cells).await.expect("consistency");
-    let open = review(4).await;
+    net.settle().await;
+    let open = net.review(4).await;
     assert_eq!(open.status, "open");
     assert_eq!(open.markers.len(), 3);
     assert_eq!(open.votes_required, 3);
+    assert!(
+        net.refused(3, "request_bot_re_review", ()).await,
+        "no re-review while not paused"
+    );
+    assert!(
+        net.refused(4, "vote_bot_review", net.choice(true)).await,
+        "only full members vote"
+    );
+}
 
-    let early: Result<ActionHash, _> = conductors[3]
-        .call_fallible(&zome(3), "request_bot_re_review", ())
-        .await;
-    assert!(early.is_err(), "no re-review while not paused");
-    let new_vote: Result<ActionHash, _> = conductors[4]
-        .call_fallible(&zome(4), "vote_bot_review", choice(true))
-        .await;
-    assert!(new_vote.is_err(), "only full members vote");
-
-    let _: ActionHash = conductors[0]
-        .call(&zome(0), "vote_bot_review", choice(true))
-        .await;
-    let mine = review(0).await;
+async fn votes_uphold_it(net: &Net) {
+    let _: ActionHash = net.call(0, "vote_bot_review", net.choice(true)).await;
+    let mine = net.review(0).await;
     assert_eq!((mine.my_vote, mine.bot_votes), (Some(true), 1));
     for i in 1..3 {
-        let _: ActionHash = conductors[i]
-            .call(&zome(i), "vote_bot_review", choice(true))
-            .await;
+        let _: ActionHash = net.call(i, "vote_bot_review", net.choice(true)).await;
     }
-    await_consistency(&cells).await.expect("consistency");
-
-    let upheld = review(4).await;
+    net.settle().await;
+    let upheld = net.review(4).await;
     assert_eq!(upheld.status, "upheld", "{upheld:?}");
     assert!(upheld.re_review_from.is_some());
-    let standing: StandingView = conductors[4]
-        .call(&zome(4), "get_standing", dan.clone())
-        .await;
+}
+
+async fn the_paused_account_is_read_only(net: &Net) {
+    let standing: StandingView = net.call(4, "get_standing", net.dan()).await;
     assert_eq!(standing.level, "Paused");
-    let now = Timestamp::now();
-    let full: bool = conductors[4]
-        .call(
-            &zome(4),
-            "full_standing_before",
-            StandingAt {
-                agent: dan.clone(),
-                at: now,
-            },
-        )
-        .await;
+    let at = StandingAt {
+        agent: net.dan(),
+        at: Timestamp::now(),
+    };
+    let full: bool = net.call(4, "full_standing_before", at).await;
     assert!(!full, "a paused founder's votes no longer count");
+    let eve = BotChoice {
+        account: net.cells[4].agent_pubkey().clone(),
+        bot: true,
+    };
+    assert!(
+        net.refused(3, "set_bot_mark", eve).await,
+        "a paused account is read-only"
+    );
+    assert!(
+        net.refused(3, "request_bot_re_review", ()).await,
+        "the re-review opens 30 days later"
+    );
+}
 
-    let paused_mark: Result<ActionHash, _> = conductors[3]
-        .call_fallible(
-            &zome(3),
-            "set_bot_mark",
-            BotChoice {
-                account: cells[4].agent_pubkey().clone(),
-                bot: true,
-            },
-        )
-        .await;
-    assert!(paused_mark.is_err(), "a paused account is read-only");
-    let too_soon: Result<ActionHash, _> = conductors[3]
-        .call_fallible(&zome(3), "request_bot_re_review", ())
-        .await;
-    assert!(too_soon.is_err(), "the re-review opens 30 days later");
-
-    let theirs: Vec<BotNotice> = conductors[3]
-        .call(&zome(3), "my_bot_review_notices", ())
-        .await;
+async fn notices_follow_the_review(net: &Net) {
+    let theirs: Vec<BotNotice> = net.call(3, "my_bot_review_notices", ()).await;
     let kinds: Vec<&str> = theirs.iter().map(|n| n.kind.as_str()).collect();
     assert_eq!(kinds, ["opened", "upheld"]);
-    let markers: Vec<BotNotice> = conductors[0]
-        .call(&zome(0), "my_bot_review_notices", ())
-        .await;
-    assert!(markers.iter().all(|n| n.account == dan));
+    let markers: Vec<BotNotice> = net.call(0, "my_bot_review_notices", ()).await;
+    assert!(markers.iter().all(|n| n.account == net.dan()));
     assert_eq!(markers.len(), 2);
-
-    common::shut_down(conductors).await;
 }
