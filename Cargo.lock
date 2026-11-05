@@ -5455,6 +5455,7 @@ dependencies = [
  "sp_call",
  "sp_core",
  "sp_event",
+ "sp_moderation",
 ]
 
 [[package]]
@@ -5468,6 +5469,7 @@ dependencies = [
  "sp_attachment",
  "sp_call",
  "sp_core",
+ "sp_moderation",
 ]
 
 [[package]]

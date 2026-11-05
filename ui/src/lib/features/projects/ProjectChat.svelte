@@ -1,17 +1,17 @@
 <script lang="ts">
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
+  import { ChatModeration } from '#lib/components/chat/chatModeration.svelte.ts';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import { projectAttachmentBlob } from '#lib/services/attachments.ts';
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
+  import { getMessageModeration, reportMessage, voteOnReport } from '#lib/services/moderation.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
   import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
-
-  import { ChatModeration } from './chatModeration.svelte.ts';
 
   /** web's ProjectChatTab: the project's "# project-chat", polled while the tab is open. */
   interface Props {
@@ -58,8 +58,12 @@
     },
     names,
   );
-  // svelte-ignore state_referenced_locally
-  const reports = new ChatModeration(projectId);
+  const reports = new ChatModeration({
+    read: (ids) => getMessageModeration(projectId, ids),
+    report: (message, reason, description) =>
+      reportMessage(projectId, message, reason, description),
+    vote: (report, yes) => voteOnReport(projectId, report, yes),
+  });
   const lines = $derived(
     chat.lines.map((l) => {
       const moderation = reports.byId[l.id];

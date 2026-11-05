@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-05 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-06 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #103 merged; this docs PR follows it).
+## In flight: PR #105, reports in direct and group chats + private invite declines (ADR 0075)
+**Conversation integrity change: merging resets every chat and the inbox** (test data only).
+Project and directory DNAs keep their hashes (checked with `hc dna hash` against main's
+bundles: project `uhC0kqPxFpmg…`, directory `uhC0kUx_esWp…`; conversation becomes
+`uhC0kanmDwfg…`). See the "Done" entry below for what changed; after merging: smoke live
+`messages.mjs` (it now reports a DM reply) and `invites` (decline an event invite).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -63,16 +68,46 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   items (pushed together once the later two were tested locally) rather than three PRs.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
-**Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
-moderation's last part (DM/group reports with the 1:1 path, a conversation-DNA integrity
-change). (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
+**Full list: PARITY.md's summary at the top ("What's left for full parity").** Moderation is
+done once ADR 0075 merges (DM/group reports, with ADR 0061's declined-invite entry batched in).
+(Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
-DM/group reports (conversation-DNA reset, batch it with other conversation integrity changes such as
-ADR 0061's declined-invite entry), then service requests, map/places, software PRs.
+service requests, map/places, software PRs.
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-05/06: reports in direct and group chats (ADR 0075), not merged yet
+**Conversation integrity change** (chats and the inbox reset on merge); project and directory
+hashes unchanged.
+- **web:** MessagesPage's `LiveChatPanel` with `reportTargetType="message"` (bubble menu Report,
+  Vote to remove / keep). web-backend: chat members vote (no standing check), audience
+  `max(1, members - 1)`, popularity 0, and `is_tiny_private_dm` (audience ≤ 1: quorum 1, the
+  report's own yes removes it at once). A group of three can never remove (2 others < web's
+  3-vote floor): kept as web.
+- **Records:** conversation entries `Report { message, reason, description, invite }` and
+  `ReportVote { report, yes, invite }` under the messages anchor (`Reports`, `ReportVotes`);
+  both cite the writer's invitation (validators check membership). `sp_moderation` gains
+  `Thresholds::chat` and `replay_chat` (the 1:1 path in `advance`/`step`).
+- **Coordinator** `messages/src/reports.rs`: `report_message`, `vote_report`,
+  `message_moderation` (the project DNA's `ModerationView` shape).
+- **UI:** `ChatModeration` moved to `components/chat/chatModeration.svelte.ts` with injected
+  calls (ProjectChat passes the discussion zome's, ConversationView `services/chatReports.ts`).
+- **Declines:** private `Declined { seed }` in the inbox (`decline_invite`,
+  `declined_invites`); `services/events.ts` reads it instead of `localStorage`.
+- **Lesson:** the author's own commit of a *private* entry is validated as an ordinary
+  `CreateEntry` (the record still carries the entry), not only as `CreatePrivateEntry`; so
+  `validate_entry` must accept `Declined` in the inbox before its chat-only checks. The
+  first scenario run failed on exactly this ("the inbox holds only invitations").
+- **Tests:** scenario `chat_reports.rs` (DM removal at once, group 3-of-3, declines);
+  `messages.mjs` now reports Bob's reply ("Removed for spam" for both).
+- **Checked:** `cargo test -p sp_moderation` (17), `cargo clippy -p messages -p
+  messages_integrity -p sp_moderation --all-targets -D warnings`, `cargo fmt`, hApp pack +
+  `hc dna hash`, UI check + lint, boundaries, sizes; scenarios `chat_reports` (539 s),
+  `messages`, `receipts` **passed**. Not run here: workspace clippy (outside Nix it rebuilds
+  Holochain and fills the disk; CI runs it), the other scenario files, and `messages.mjs`
+  against a local seed node.
 
 ## Done 2026-11-05: bot reviews and the paused badge (ADR 0074), PR #103 merged 11:27 UTC (10:27 pm Melbourne)
 - **Live after merge:** CI's third run was green (the first two failed `check`: a 306-line

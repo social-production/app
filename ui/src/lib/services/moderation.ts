@@ -32,7 +32,7 @@ interface ReportWire {
   hide_share: number;
 }
 
-interface ModerationWire {
+export interface ModerationWire {
   state: Moderation['state'];
   report: ReportWire | null;
 }
@@ -56,7 +56,7 @@ function toReport(r: ReportWire): ContentReport {
   };
 }
 
-function toModeration(m: ModerationWire): Moderation {
+export function toModeration(m: ModerationWire): Moderation {
   return { state: m.state, report: m.report ? toReport(m.report) : null };
 }
 

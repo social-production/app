@@ -76,3 +76,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0072](./0072-plan-became-leading.md) "Plan became leading": lead changes replayed from the order plans closed (coordinator only)
 - [0073](./0073-remove-organizer.md) "Remove organizer": a revoke-tagged link, replayed by every reader (coordinator only)
 - [0074](./0074-bot-reviews.md) Bot reviews: marks, votes and re-reviews as links on the account, replayed by every reader; Paused standing and badge (directory reset)
+- [0075](./0075-chat-message-reports.md) Reports in direct and group chats (web's 1:1 path) and invite declines as private inbox entries (conversation reset)

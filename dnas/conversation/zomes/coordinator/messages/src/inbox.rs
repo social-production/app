@@ -6,9 +6,10 @@
 use std::collections::BTreeSet;
 
 use hdk::prelude::*;
-use messages_integrity::{network, LinkTypes, Network};
+use messages_integrity::{network, Declined, EntryTypes, LinkTypes, Network, UnitEntryTypes};
 use sp_core::conversation::{chat_seed, INBOX_TAG_MAX};
 
+use crate::entries::private;
 use crate::guest;
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -109,4 +110,28 @@ fn own_links_to(me: &AgentPubKey) -> ExternResult<Vec<(AgentPubKey, Vec<u8>, Tim
             _ => None,
         })
         .collect())
+}
+
+/// Decline an invitation to a private event or community (web's `answerInvite`, ADR 0061):
+/// a private note on your chain, so the invite stays hidden wherever your inbox cell runs.
+#[hdk_extern]
+pub fn decline_invite(seed: String) -> ExternResult<()> {
+    inbox_only()?;
+    if !invitable(&seed) {
+        return Err(guest("That isn't a chat or a private event."));
+    }
+    if declined_invites(())?.contains(&seed) {
+        return Ok(());
+    }
+    create_entry(EntryTypes::Declined(Declined { seed }))?;
+    Ok(())
+}
+
+/// The seeds of the invitations you declined.
+#[hdk_extern]
+pub fn declined_invites() -> ExternResult<Vec<String>> {
+    inbox_only()?;
+    let found = private::<Declined>(UnitEntryTypes::Declined)?;
+    let seeds: BTreeSet<String> = found.into_iter().map(|f| f.entry.seed).collect();
+    Ok(seeds.into_iter().collect())
 }

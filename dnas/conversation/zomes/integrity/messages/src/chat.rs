@@ -5,6 +5,7 @@ use sp_call::check_call;
 use sp_core::chat::check_message;
 
 use crate::attachments::{validate_chunk, validate_message_files};
+use crate::report::{validate_report, validate_vote};
 use sp_core::conversation::{check_title, ChatKind, INBOX_TAG_MAX};
 
 use crate::rights::{manages, member, message_author};
@@ -24,6 +25,13 @@ pub fn validate_entry(
     entry: &EntryTypes,
     author: &AgentPubKey,
 ) -> ExternResult<ValidateCallbackResult> {
+    // The author's own commit of a private entry is validated with the entry in hand.
+    if let EntryTypes::Declined(d) = entry {
+        if d.seed.len() > INBOX_TAG_MAX {
+            return invalid("an invitation's seed is too long");
+        }
+        return validate_private_of(UnitEntryTypes::Declined);
+    }
     let (creator, kind) = match chat()? {
         Ok(chat) => chat,
         Err(reason) => return invalid(&reason),
@@ -72,7 +80,10 @@ pub fn validate_entry(
             ),
             Err(reason) => invalid(&reason),
         },
+        EntryTypes::Report(r) => validate_report(r, author, &creator),
+        EntryTypes::ReportVote(v) => validate_vote(v, author, &creator),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
+        EntryTypes::Declined(_) => invalid("declines are checked above"),
     }
 }
 
@@ -89,6 +100,15 @@ pub fn validate_private() -> ExternResult<ValidateCallbackResult> {
     match chat()? {
         Ok(_) => Ok(ValidateCallbackResult::Valid),
         Err(reason) => invalid(&reason),
+    }
+}
+
+/// A private entry: declines live in the inbox (ADR 0061), the rest in a chat.
+pub fn validate_private_of(unit: UnitEntryTypes) -> ExternResult<ValidateCallbackResult> {
+    match (unit, network()?) {
+        (UnitEntryTypes::Declined, Network::Inbox) => Ok(ValidateCallbackResult::Valid),
+        (UnitEntryTypes::Declined, Network::Chat(..)) => invalid("declines live in the inbox"),
+        _ => validate_private(),
     }
 }
 
@@ -164,6 +184,8 @@ pub fn validate_link(
         LinkTypes::Pins => UnitEntryTypes::Pin,
         LinkTypes::Seens => UnitEntryTypes::Seen,
         LinkTypes::Calls => UnitEntryTypes::Call,
+        LinkTypes::Reports => UnitEntryTypes::Report,
+        LinkTypes::ReportVotes => UnitEntryTypes::ReportVote,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
     // Whether the entry itself was allowed is the entry's own validation.

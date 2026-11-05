@@ -121,24 +121,17 @@ export interface PendingInvite {
   schedule: EventSchedule | null;
 }
 
-const declinedKey = (me: string) => `sp.invites.declined.${me}`;
-
-/** Declines are kept on this device until they can be private entries (ADR 0061). */
-function declined(me: string): string[] {
-  try {
-    const raw = localStorage.getItem(declinedKey(me));
-    return raw ? (JSON.parse(raw) as string[]) : [];
-  } catch {
-    return [];
-  }
+/** The invites you declined: private entries in your inbox cell (ADR 0061, 0075). */
+async function declined(): Promise<string[]> {
+  return callZome<string[]>('conversation', 'messages', 'declined_invites');
 }
 
 /** Invites you haven't answered: reading each one joins its network, not the event or
  * community. */
 export async function pendingInvites(): Promise<PendingInvite[]> {
-  const me = await myAgent();
-  const skip = new Set(declined(me));
-  const open = (await eventInvitations()).filter((i) => !skip.has(i.seed));
+  const [declines, invitations] = await Promise.all([declined(), eventInvitations()]);
+  const skip = new Set(declines);
+  const open = invitations.filter((i) => !skip.has(i.seed));
   const found = await Promise.allSettled(
     open.map(async (i): Promise<PendingInvite | null> => {
       const p = await getProject(i.seed);
@@ -163,17 +156,12 @@ export async function pendingInvites(): Promise<PendingInvite[]> {
   return invites.map((i) => ({ ...i, invitedBy: names[i.from] ?? null }));
 }
 
-/** web's answerInvite: accepting joins the event or community; declining hides the invite on this device. */
+/** web's answerInvite: accepting joins the event or community; declining hides the invite. */
 export async function answerInvite(seed: string, accept: boolean): Promise<void> {
   if (accept) {
     // `join` renews a membership from before a removal, so a removed person can come back.
     await joinProject(seed, true);
     return;
   }
-  const me = await myAgent();
-  try {
-    localStorage.setItem(declinedKey(me), JSON.stringify([...declined(me), seed]));
-  } catch {
-    // Private windows: the invite shows again next time.
-  }
+  await callZome<null>('conversation', 'messages', 'decline_invite', seed);
 }

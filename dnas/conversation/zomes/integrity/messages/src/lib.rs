@@ -5,9 +5,11 @@
 
 mod attachments;
 mod chat;
+mod report;
 mod rights;
 
 pub use chat::is_type;
+pub use report::{Declined, Report, ReportVote};
 
 use hdi::prelude::*;
 use sp_attachment::preview_text;
@@ -174,6 +176,10 @@ pub enum EntryTypes {
     Seen(Seen),
     Chunk(Chunk),
     Call(Call),
+    Report(Report),
+    ReportVote(ReportVote),
+    #[entry_type(visibility = "private")]
+    Declined(Declined),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -188,14 +194,16 @@ pub enum LinkTypes {
     /// Inbox network only: a person's key → the sender's key, the tag an invitation encrypted
     /// to that person.
     Inbox,
-    /// Chat anchor → a removal, a leave, an edit, a pin, a `Seen` or a `Call`, each by its
-    /// entry's author.
+    /// Chat anchor → a removal, a leave, an edit, a pin, a `Seen`, a `Call`, a report or a
+    /// report vote (ADR 0075), each by its entry's author.
     Removals,
     Leaves,
     Edits,
     Pins,
     Seens,
     Calls,
+    Reports,
+    ReportVotes,
 }
 
 /// Which network this cell is: one chat (its creator and kind) or the inbox.
@@ -228,7 +236,9 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         | FlatOp::CreateRecord(OpRecord::CreateEntry { app_entry, action }) => {
             chat::validate_entry(&app_entry, action.author())
         }
-        FlatOp::CreateRecord(OpRecord::CreatePrivateEntry { .. }) => chat::validate_private(),
+        FlatOp::CreateRecord(OpRecord::CreatePrivateEntry { app_entry_type, .. }) => {
+            chat::validate_private_of(app_entry_type)
+        }
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })
         | FlatOp::CreateRecord(OpRecord::UpdateEntry { .. })
         | FlatOp::Update(_) => invalid("chat entries are never edited"),

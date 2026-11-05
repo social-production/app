@@ -5,7 +5,7 @@ use hdi::prelude::*;
 
 use crate::{is_type, Invite, Leave, UnitEntryTypes};
 
-fn decode<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
+pub(crate) fn decode<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
     record: &Record,
 ) -> ExternResult<Option<T>> {
     record

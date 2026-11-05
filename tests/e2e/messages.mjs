@@ -1,7 +1,9 @@
 // M4c direct and group chats end to end at phone width (ADR 0043). Two new accounts: Ann
 // messages Bob from his profile, Bob sees the count on the send icon, finds the chat (unread) in
 // Messages and replies (the count clears; Ann's message turns from ✓ to ✓✓, web's read
-// receipt), then Ann starts a named group with Bob from the New message button (no receipts).
+// receipt). Ann reports Bob's reply from the bubble menu: in a 1:1 chat that removes it at once
+// (web's 1:1 path, ADR 0075), for both of them. Then Ann starts a named group with Bob from the
+// New message button (no receipts).
 //   node tests/e2e/messages.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
 import assert from 'node:assert/strict';
@@ -93,6 +95,20 @@ await receipt(ann, hello)
 assert.equal(await receipt(ann, hello).innerText(), '✓✓', 'two ticks: Bob read it');
 await ann.screenshot({ path: `${out}/phone390-dm-read.png` });
 log("ann's message shows bob read it");
+
+// web's bubble menu Report in a direct chat: the reporter's yes is the one vote it needs.
+await ann.locator('.chat-message', { hasText: answer }).first().locator('.message-time').click();
+await ann.getByRole('menuitem', { name: 'Report', exact: true }).click();
+const composer = ann.locator('.report-composer');
+await composer.getByLabel("What's wrong?").fill('Testing a report.');
+await composer.getByRole('button', { name: 'Submit report' }).click();
+await ann.locator('.chat-log').getByText('Removed for spam').waitFor({ timeout: 60_000 });
+assert.equal(await ann.locator('.chat-log').getByText(answer).count(), 0, 'the text is gone');
+await ann.screenshot({ path: `${out}/phone390-dm-report.png` });
+await (await rowShows(bob, annName)).click();
+await bob.locator('.chat-log').getByText('Removed for spam').waitFor({ timeout: 120_000 });
+await bob.getByRole('button', { name: 'Back to chats' }).click();
+log("ann reported bob's reply: removed for both");
 
 await ann.getByRole('button', { name: 'Back to chats' }).click();
 await ann.getByRole('button', { name: 'New message' }).click();
