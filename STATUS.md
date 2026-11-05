@@ -104,7 +104,10 @@ hashes unchanged.
   `messages.mjs` now reports Bob's reply ("Removed for spam" for both).
 - **Checked:** `cargo test -p sp_moderation` (17), `cargo clippy -p messages -p
   messages_integrity -p sp_moderation --all-targets -D warnings`, `cargo fmt`, hApp pack +
-  `hc dna hash`, UI check + lint, boundaries, sizes. (Scenario and browser results below.)
+  `hc dna hash`, UI check + lint, boundaries, sizes; scenarios `chat_reports` (539 s),
+  `messages`, `receipts` **passed**. Not run here: workspace clippy (outside Nix it rebuilds
+  Holochain and fills the disk; CI runs it), the other scenario files, and `messages.mjs`
+  against a local seed node.
 
 ## Done 2026-11-05: bot reviews and the paused badge (ADR 0074), PR #103 merged 11:27 UTC (10:27 pm Melbourne)
 - **Live after merge:** CI's third run was green (the first two failed `check`: a 306-line
