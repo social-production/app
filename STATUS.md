@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: reports in direct and group chats + private invite declines (ADR 0075), branch `claude/social-production-handoff-dsam61`
+## In flight: PR #105, reports in direct and group chats + private invite declines (ADR 0075)
 **Conversation integrity change: merging resets every chat and the inbox** (test data only).
 Project and directory DNAs keep their hashes (checked with `hc dna hash` against main's
 bundles: project `uhC0kqPxFpmg…`, directory `uhC0kUx_esWp…`; conversation becomes
