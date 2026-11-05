@@ -68,15 +68,17 @@
           <span class="unread-dot"></span>
         {/if}
         <span class="subject-label"
-          >{item.subject === 'thread' || item.projectMode === 'thread'
-            ? 'Thread'
-            : item.projectMode === 'post'
-              ? 'Post'
-              : item.projectMode === 'event'
-                ? 'Event'
-                : item.projectMode === 'help-request'
-                  ? 'Help request'
-                  : 'Project'}</span
+          >{item.subject === 'account'
+            ? 'Account'
+            : item.subject === 'thread' || item.projectMode === 'thread'
+              ? 'Thread'
+              : item.projectMode === 'post'
+                ? 'Post'
+                : item.projectMode === 'event'
+                  ? 'Event'
+                  : item.projectMode === 'help-request'
+                    ? 'Help request'
+                    : 'Project'}</span
         >
       </div>
     {/if}

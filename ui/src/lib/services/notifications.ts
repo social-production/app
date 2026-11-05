@@ -4,13 +4,14 @@ import {
   followNotifications,
   projectNotifications,
   withReadMarks,
-  type NotificationCategory,
   type NotificationItem,
   type ReadMarks,
 } from '#lib/domain/notifications.ts';
+import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
 import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
 import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
 import { removedNotifications } from '#lib/domain/removedNotifications.ts';
+import { botReviewNotifications } from '#lib/domain/botReviewNotifications.ts';
 import { VISIBLE } from '#lib/domain/moderation.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
 import { shareNotifications } from '#lib/domain/share.ts';
@@ -18,6 +19,7 @@ import type { CharterMode } from '#lib/domain/projects.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { listActivities } from './activities.ts';
+import { myBotNotices } from './botReview.ts';
 import { pendingInvites } from './events.ts';
 import { listMessages } from './chat.ts';
 import { getModeration } from './moderation.ts';
@@ -54,6 +56,7 @@ export async function myNotifications(
     ...chats.map((c) => fromChat(c.seed, c.at, me, name)),
     followView(me).then(followNotifications),
     pendingInvites().then(inviteNotifications),
+    fromBotReviews(me, off),
   ]);
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };
@@ -94,6 +97,15 @@ async function fromProject(seed: string, me: string, myName: string, planLeads: 
     ...activityNotifications(glance, activities, me, names),
     ...planLeadNotifications(glance, leads, me),
   ];
+}
+
+/** web's bot review cards (ADR 0074). */
+async function fromBotReviews(me: string, off: NotificationCategory[]) {
+  if (off.includes('votes_needed')) return [];
+  const notices = await myBotNotices();
+  if (notices.length === 0) return [];
+  const names = await namesOf([...new Set(notices.map((n) => n.account))]);
+  return botReviewNotifications(notices, me, names);
 }
 
 /** Mentions in a direct or group chat you're still in (web notifies only its members), and

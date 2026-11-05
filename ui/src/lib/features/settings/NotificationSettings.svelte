@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { NotificationCategory } from '#lib/domain/notifications.ts';
+  import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
   import { notificationsOff, setNotificationCategory } from '#lib/stores/notifications.svelte.ts';
 
   /** web's Notifications settings for the kinds the app has; on this device. */

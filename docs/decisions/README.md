@@ -75,3 +75,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0071](./0071-reports-and-moderation.md) Reports (web's ⋮ Report): records in the discussion zome, state replayed from Full members' votes (part a: spaces; part b: comments and chat messages in spaces)
 - [0072](./0072-plan-became-leading.md) "Plan became leading": lead changes replayed from the order plans closed (coordinator only)
 - [0073](./0073-remove-organizer.md) "Remove organizer": a revoke-tagged link, replayed by every reader (coordinator only)
+- [0074](./0074-bot-reviews.md) Bot reviews: marks, votes and re-reviews as links on the account, replayed by every reader; Paused standing and badge (directory reset)

@@ -22,7 +22,9 @@ pub struct StandingView {
 pub fn view(agent: &AgentPubKey, founders: &[AgentPubKey]) -> ExternResult<StandingView> {
     let founder = founders.contains(agent);
     let grant = grant_of(agent)?;
-    let level = if founder || grant.is_some() {
+    let level = if crate::bot_review::paused_at(agent, sys_time()?.as_micros())? {
+        StandingLevel::Paused
+    } else if founder || grant.is_some() {
         StandingLevel::Full
     } else {
         StandingLevel::New
@@ -39,16 +41,34 @@ pub fn view(agent: &AgentPubKey, founders: &[AgentPubKey]) -> ExternResult<Stand
     })
 }
 
-/// Whether `agent` held Full standing before `at` (founders always have). Projects use this to
-/// filter voters when applying outcomes (ADR 0033).
+/// Whether `agent` held Full standing before `at` (founders always have) and no bot review
+/// had paused it then (ADR 0074). Projects use this to filter voters when applying outcomes
+/// (ADR 0033).
 pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
+    let full = full_since(agent)?.is_some_and(|from| from < at.as_micros());
+    Ok(full && !crate::bot_review::paused_at(agent, at.as_micros())?)
+}
+
+/// Since when `agent` has had Full standing (`i64::MIN` for founders), ignoring bot reviews.
+pub fn full_since(agent: &AgentPubKey) -> ExternResult<Option<i64>> {
     if founder_agents()?.contains(agent) {
-        return Ok(true);
+        return Ok(Some(i64::MIN));
     }
     let Some(grant) = grant_of(agent)? else {
-        return Ok(false);
+        return Ok(None);
     };
-    Ok(get(grant, GetOptions::default())?.is_some_and(|r| r.action().timestamp() < at))
+    Ok(get(grant, GetOptions::default())?.map(|r| r.action().timestamp().as_micros()))
+}
+
+/// Delete the caller's vouches for `vouchee` (a bot mark replaces a vouch, as on web).
+pub fn withdraw_my_vouch(vouchee: &AgentPubKey) -> ExternResult<()> {
+    let me = agent_info()?.agent_initial_pubkey;
+    for (hash, voucher) in vouches_for(vouchee)? {
+        if voucher == me {
+            delete_entry(hash)?;
+        }
+    }
+    Ok(())
 }
 
 /// Vouch for `vouchee`. Fails early with a readable reason when validation would reject it.
@@ -59,6 +79,22 @@ pub fn vouch(vouchee: AgentPubKey) -> ExternResult<ActionHash> {
     }
     let voucher_standing =
         own_proof()?.ok_or_else(|| guest_error("Only full members can vouch."))?;
+    if crate::bot_review::paused_at(&me, sys_time()?.as_micros())? {
+        return Err(guest_error(
+            "A community review found this account is a bot, so it is read-only.",
+        ));
+    }
+    if crate::bot_review::vouch_banned(&own_vouchees()?)? {
+        return Err(guest_error(
+            "Someone you vouched for was found to be a bot, so you can't vouch for 30 days.",
+        ));
+    }
+    if crate::bot_review::my_mark_is_live(&vouchee)? {
+        crate::bot_review::set_mark(crate::bot_review::BotChoice {
+            account: vouchee.clone(),
+            bot: false,
+        })?;
+    }
     let earlier = own_entry_times(UnitEntryTypes::Vouch)?;
     check_vouch_cap(&earlier, sys_time()?.as_micros()).map_err(|e| guest_error(e.to_string()))?;
 
@@ -140,6 +176,21 @@ fn vouches_for(agent: &AgentPubKey) -> ExternResult<Vec<(ActionHash, AgentPubKey
         let voucher = record.action().author().clone();
         if &v.vouchee == agent && !out.iter().any(|(_, a)| a == &voucher) {
             out.push((hash, voucher));
+        }
+    }
+    Ok(out)
+}
+
+/// Everyone the caller has vouched for (own chain).
+fn own_vouchees() -> ExternResult<Vec<AgentPubKey>> {
+    let entry_type = EntryType::App(UnitEntryTypes::Vouch.try_into()?);
+    let filter = ChainQueryFilter::new()
+        .entry_type(entry_type)
+        .include_entries(true);
+    let mut out = Vec::new();
+    for record in query(filter)? {
+        if let Some(v) = decode::<Vouch>(&record)? {
+            out.push(v.vouchee);
         }
     }
     Ok(out)

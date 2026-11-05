@@ -1,6 +1,7 @@
 //! Identity rules for the directory DNA (docs/GOVERNANCE.md#standing, docs/plans/M1-identity.md).
 //! Every rule here is re-checked by every validator. Pure maths lives in `sp_governance`.
 
+mod bot_review;
 mod chain;
 mod device;
 mod feedback;
@@ -13,6 +14,7 @@ mod vouch;
 
 use hdi::prelude::*;
 
+pub use bot_review::{MARK_BOT, MARK_CLEAR, VOTE_BOT, VOTE_REAL};
 use chain::same_author;
 pub(crate) use chain::{earlier_creates, invalid, prev_action, typed_entry};
 pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
@@ -136,6 +138,10 @@ pub enum LinkTypes {
     // Feedback: "feedback" anchor → item; item → voter, tag `[VOTE_UP]` or `[VOTE_DOWN]`.
     AllFeedback,
     FeedbackVotes,
+    // Bot reviews (ADR 0074): account → marker / voter / itself; never deleted.
+    BotMarks,
+    BotReviewVotes,
+    ReReviews,
 }
 
 #[hdk_extern]
@@ -166,6 +172,10 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         | FlatOp::CreateRecord(OpRecord::CreateLink { link_type, action }) => {
             validate_create_link(link_type, &action)
         }
+        FlatOp::Link(OpLink::DeleteLink {
+            link_type: LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews,
+            ..
+        }) => invalid("bot marks and review votes are never taken back; a newer one counts"),
         FlatOp::Link(OpLink::DeleteLink {
             original_action,
             action,
@@ -231,6 +241,9 @@ fn validate_create_link(
         | LinkTypes::RequiresFollowApproval => follow::validate_create_link(link_type, action),
         LinkTypes::AllFeedback => feedback::validate_listing_link(action),
         LinkTypes::FeedbackVotes => feedback::validate_vote_link(action),
+        LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews => {
+            bot_review::validate_create_link(link_type, action)
+        }
         _ => Ok(ValidateCallbackResult::Valid),
     }
 }

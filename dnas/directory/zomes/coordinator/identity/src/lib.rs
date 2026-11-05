@@ -1,6 +1,8 @@
 //! Identity API (directory DNA). Used by `ui/src/lib/services/people.ts` and the scenario
 //! tests. Reads are best-effort views; integrity validation is what enforces the rules.
 
+mod bot_notices;
+mod bot_review;
 mod devices;
 mod feedback;
 mod follow_links;
@@ -13,6 +15,7 @@ mod standing;
 use hdk::prelude::*;
 use identity_integrity::{founder_agents, DirectoryProperties, Founder};
 
+pub use bot_review::{BotChoice, BotReviewView};
 pub use feedback::{FeedbackView, FeedbackVote, VoteDirection};
 pub use follows::{FollowRow, FollowStatus, FollowView};
 pub use listings::{Allowance, ListingInput, ListingView};
@@ -58,6 +61,33 @@ pub struct StandingAt {
 #[hdk_extern]
 pub fn full_standing_before(query: StandingAt) -> ExternResult<bool> {
     standing::full_before(&query.agent, query.at)
+}
+
+/// web's profile bot review card and Trust sheet's "Bot marks" (ADR 0074).
+#[hdk_extern]
+pub fn get_bot_review(account: AgentPubKey) -> ExternResult<BotReviewView> {
+    bot_review::view(&account)
+}
+
+/// web's `bot-review` / `bot-review-result` notifications, derived on the device (ADR 0046).
+#[hdk_extern]
+pub fn my_bot_review_notices(_: ()) -> ExternResult<Vec<bot_notices::BotNotice>> {
+    bot_notices::mine()
+}
+
+#[hdk_extern]
+pub fn set_bot_mark(choice: BotChoice) -> ExternResult<ActionHash> {
+    bot_review::set_mark(choice)
+}
+
+#[hdk_extern]
+pub fn vote_bot_review(choice: BotChoice) -> ExternResult<ActionHash> {
+    bot_review::vote(choice)
+}
+
+#[hdk_extern]
+pub fn request_bot_re_review(_: ()) -> ExternResult<ActionHash> {
+    bot_review::request_re_review()
 }
 
 #[hdk_extern]

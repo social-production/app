@@ -18,11 +18,13 @@
   const title = $derived(
     vouched
       ? 'You vouched for them'
-      : person.standing.level !== 'New'
+      : person.standing.level === 'Full'
         ? 'Already a full member'
-        : canVouch
-          ? 'Vouch'
-          : 'Vouching opens once your own votes count fully.',
+        : person.standing.level === 'Paused'
+          ? 'A community review found this account is a bot.'
+          : canVouch
+            ? 'Vouch'
+            : 'Vouching opens once your own votes count fully.',
   );
 </script>
 

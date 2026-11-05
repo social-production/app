@@ -32,7 +32,7 @@
   import AuthActionNotice from './AuthActionNotice.svelte';
   import { createLinks, surfaceLinks } from './createLinks.ts';
   import { railLinks, startMyScopes } from './myScopesLoop.ts';
-  import { provideReports } from './reportActionsProvider.ts';
+  import { provideShellContexts } from './shellContexts.ts';
   import RightRailPanel from './RightRailPanel.svelte';
   import ScopeDiscoverSheet from './ScopeDiscoverSheet.svelte';
 
@@ -41,7 +41,7 @@
 
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
   let { children }: { children: Snippet } = $props();
-  provideReports();
+  provideShellContexts();
 
   let compact = $state(true);
   let leftOpen = $state(false);

@@ -40,6 +40,8 @@
     emptyCopy?: string;
     people?: Person[];
     sections?: PeopleSection[] | null;
+    /** web's `sectionLayout`: 'tabs' shows one section at a time behind a tab row. */
+    sectionLayout?: 'stack' | 'tabs';
     actions?: Snippet | undefined;
     onClose: () => void;
   }
@@ -51,11 +53,14 @@
     emptyCopy = 'No people yet.',
     people = [],
     sections = null,
+    sectionLayout = 'stack',
     actions,
     onClose,
   }: Props = $props();
 
   let query = $state('');
+  let activeTab = $state(0);
+  const tabs = $derived(sectionLayout === 'tabs' && (sections?.length ?? 0) > 1);
   const needle = $derived(query.trim().toLowerCase());
   const shown = $derived(
     (sections ?? [{ emptyCopy, people }]).map((section) => ({
@@ -68,8 +73,13 @@
     })),
   );
 
+  const visible = $derived(tabs ? shown.slice(activeTab, activeTab + 1) : shown);
+
   $effect(() => {
-    if (!open) query = '';
+    if (!open) {
+      query = '';
+      activeTab = 0;
+    }
   });
 </script>
 
@@ -88,8 +98,24 @@
       />
     </div>
   {/snippet}
-  {#each shown as section, index (index)}
-    {#if section.title || section.description}
+  {#if tabs}
+    <div class="sheet-tabs" role="tablist">
+      {#each sections ?? [] as section, index (index)}
+        <button
+          aria-selected={activeTab === index}
+          class:active={activeTab === index}
+          role="tab"
+          type="button"
+          onclick={() => (activeTab = index)}
+        >
+          {section.title}
+          <span>{section.people.length}</span>
+        </button>
+      {/each}
+    </div>
+  {/if}
+  {#each visible as section, index (index)}
+    {#if !tabs && (section.title || section.description)}
       <div class="section-copy">
         {#if section.title}<h3>{section.title}</h3>{/if}
         {#if section.description}<p>{section.description}</p>{/if}
@@ -134,6 +160,6 @@
         <p class="empty-row">{needle ? 'No matches.' : section.emptyCopy}</p>
       {/each}
     </div>
-    {#if index < shown.length - 1}<div class="section-divider"></div>{/if}
+    {#if !tabs && index < visible.length - 1}<div class="section-divider"></div>{/if}
   {/each}
 </OverlaySheet>

@@ -10,10 +10,14 @@
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import BotButton from './BotButton.svelte';
+  import BotReviewCard from './BotReviewCard.svelte';
   import FollowButton from './FollowButton.svelte';
   import FollowRequests from './FollowRequests.svelte';
   import { ProfileFollows } from './followState.svelte.ts';
   import MessageButton from './MessageButton.svelte';
+  import TrustSheets from './TrustSheets.svelte';
+  import { ProfileTrust } from './trustState.svelte.ts';
   import VouchButton from './VouchButton.svelte';
 
   import '#lib/components/styles/profile.css';
@@ -37,6 +41,10 @@
   );
 
   const follows = $derived(new ProfileFollows(agent, own));
+  const trust = $derived(new ProfileTrust(agent, load));
+  // web: accounts found to be bots can't message, vouch or mark.
+  const viewerPaused = $derived(me?.standing.level === 'Paused');
+  const viewerFull = $derived(me?.standing.level === 'Full');
   const sheetPeople = $derived.by(() => {
     const view = follows.view;
     if (!view || !follows.list) return [];
@@ -55,6 +63,7 @@
       person = p;
       me = mine;
       devices = 1 + pairing.devices.length;
+      await trust.load(p);
     } catch (e) {
       error = explain(e);
     }
@@ -86,7 +95,15 @@
   <section class="page">
     {#if person}
       {@const shown = person}
-      <ProfileHero person={shown} {devices}>
+      <ProfileHero
+        person={shown}
+        {devices}
+        trustOpen={trust.open}
+        onStanding={() => {
+          trust.open = !trust.open;
+          if (trust.open) follows.list = null;
+        }}
+      >
         {#snippet counts()}
           {@const view = follows.view}
           {#if view}
@@ -94,7 +111,10 @@
             <button
               class:active={follows.list === 'followers'}
               type="button"
-              onclick={() => (follows.list = follows.list === 'followers' ? null : 'followers')}
+              onclick={() => {
+                follows.list = follows.list === 'followers' ? null : 'followers';
+                trust.open = false;
+              }}
             >
               <strong>{followers}</strong>
               {followers === 1 ? 'follower' : 'followers'}
@@ -102,7 +122,10 @@
             <button
               class:active={follows.list === 'following'}
               type="button"
-              onclick={() => (follows.list = follows.list === 'following' ? null : 'following')}
+              onclick={() => {
+                follows.list = follows.list === 'following' ? null : 'following';
+                trust.open = false;
+              }}
             >
               <strong>{acceptedCount(view.following)}</strong> following
             </button>
@@ -111,6 +134,7 @@
         {#snippet actions()}
           <!-- As on web, guests see no actions on someone's profile. -->
           {#if !own && me}
+            {@const viewing = me}
             <div class="action-row">
               <FollowButton
                 name={shown.profile?.name ?? 'them'}
@@ -118,23 +142,42 @@
                 busy={follows.busy || !follows.view}
                 onToggle={() => void follows.toggle()}
               />
-              {#if me && me.standing.level !== 'Paused'}
+              {#if !viewerPaused}
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
                   viewer={me.agent}
                 />
+                <VouchButton
+                  person={shown}
+                  viewer={me}
+                  {busy}
+                  onVouch={() => run(() => vouchFor(agent))}
+                />
+                <BotButton
+                  name={shown.profile?.name ?? 'them'}
+                  marked={trust.markedBy(viewing.agent)}
+                  canMark={viewerFull && !trust.review?.myCooldownUntil}
+                  busy={trust.stancePending || !trust.review}
+                  onToggle={() => trust.toggleMark(viewing.agent)}
+                />
               {/if}
-              <VouchButton
-                person={shown}
-                viewer={me}
-                {busy}
-                onVouch={() => run(() => vouchFor(agent))}
-              />
             </div>
           {/if}
         {/snippet}
       </ProfileHero>
       {#if follows.error}<p class="warning-card" role="alert">{follows.error}</p>{/if}
+      {#if trust.stanceMessage}<p class="warning-card" role="alert">{trust.stanceMessage}</p>{/if}
+      {#if trust.review && trust.review.status !== 'none'}
+        <BotReviewCard
+          review={trust.review}
+          {own}
+          canVote={!own && viewerFull && !viewerPaused}
+          pending={trust.reviewPending}
+          message={trust.reviewMessage}
+          onVote={(vote) => void trust.vote(vote)}
+          onReReview={() => void trust.reReview()}
+        />
+      {/if}
       {#if own}
         <FollowRequests
           requests={follows.requests}
@@ -150,6 +193,7 @@
         people={sheetPeople}
         onClose={() => (follows.list = null)}
       />
+      <TrustSheets {trust} person={shown} />
 
       {#if own}
         <section class="empty-card own-card">

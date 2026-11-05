@@ -1,0 +1,12 @@
+[package]
+name = "sp_bot_review"
+description = "Public bot reviews (web-backend's bot_reviews.py), replayed from bot marks, review votes and re-review requests (ADR 0074). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sp_governance = { workspace = true }
+
+[lints]
+workspace = true
