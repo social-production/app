@@ -5,18 +5,20 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
-## What's left for full parity (summary, 2026-11-05)
+## What's left for full parity (summary, 2026-11-05, after ADR 0074)
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
 1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
-   1:1 one-vote path; conversation-DNA integrity change, a chat reset); the author's warm-up
-   penalty after a removal; bot reviews and the paused badge. (A removed project leaving the
+   1:1 one-vote path; conversation-DNA integrity change, a chat reset). (Bot reviews and the
+   paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on web, not parity.)
+   (A removed project leaving the
    rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
    2026-11-03.)
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
-   the app still lacks: bot reviews (`prj-removed`: done 2026-11-05).
+   the app still lacks: `bot-review-vote` (bot reviews' other cards and `prj-removed`: done
+   2026-11-05).
    (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
    `thread-share`/`post-share` cards: done 2026-11-04.)
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
@@ -198,8 +200,14 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
-  integrity change in the conversation DNA), the author's warm-up penalty after a removal,
-  bot reviews (web-backend `bot_reviews.py`) and the paused badge.
+  integrity change in the conversation DNA).
+- [x] Bot reviews and the paused badge (2026-11-05, ADR 0074, directory reset): web's Bot
+  action, "Mark … as a possible bot?", the bot review card (Real person / Bot, tally, closes,
+  "Found to be a bot", Ask for a re-review), the Trust sheet (Vouchers / Bot marks tabs) from
+  the standing chip, Paused standing, the `bot-review` / `bot-review-result` cards and the
+  Paused badge after author names. Not ported: `bot-review-vote` to everyone sharing a space.
+  The author's warm-up penalty after a removal is not parity: web runs with it off
+  (`GOVERNANCE_REMOVAL_PENALTY_HOURS=0`) and the app has no warm level (ADR 0074).
 - [x] A removed project's side effects (2026-11-05, UI only): it leaves its members' rail and
   they (and role holders) get web's `prj-removed` card (ADR 0071 Consequences).
 - [x] The blur on hidden detail pages (2026-11-03): web's `ModerationRestrictionNotice`

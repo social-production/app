@@ -1,6 +1,7 @@
 <script lang="ts">
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { activityInstant, describeUpdate, relativeCompact } from '#lib/domain/time.ts';
 
   import type { ResolvedPathname } from '$app/types';
@@ -34,6 +35,8 @@
       ? `${authorName.slice(0, NAME_LIMIT - 1)}…`
       : authorName,
   );
+  // Author links are `/profile/<agent>` (web's PausedBadge takes the username).
+  const authorAgent = $derived(authorHref.split('/profile/')[1]?.split(/[?#]/)[0] ?? null);
   const updated = $derived(updatedAt !== null && updatedAt > createdAt);
   const label = $derived(describeUpdate(createdAt, updatedAt));
 
@@ -44,6 +47,7 @@
   {#if !timeOnly}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
     <a class="inline-link" href={authorHref} title={authorName}>{shortName}</a>
+    <PausedBadge agent={authorAgent} />
   {/if}
   {#if memberCount !== null}
     <span class="meta-chip" title={`${memberCount} members`}>

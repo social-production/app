@@ -17,6 +17,7 @@ const DIRECTORY: &[(&str, &[&str])] = &[(
     &[
         "get_profile",
         "get_standing",
+        "get_bot_review",
         "get_listing",
         "find_listing",
         "follow_view",

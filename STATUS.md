@@ -50,7 +50,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #101 merged; this docs PR follows it).
+## In flight: bot reviews and the paused badge (ADR 0074), branch `claude/social-production-handoff-dsam61`
+**Directory integrity change: merging resets the directory network** (everyone signs up again;
+test data only). Project and conversation DNA hashes unchanged. PR number, CI and merge state:
+see the newest "Done" entry below once it lands; until then this branch is the work.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -61,12 +64,10 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Candidates:
-moderation's later parts (DM/group reports with the 1:1 path, a
-conversation-DNA integrity change; the author's warm-up penalty after a removal, bot
-reviews and the paused badge; the removal's rail and `prj-removed` effects: done 2026-11-05).
-(Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order: the author's warm-up
-penalty with bot reviews (directory standing, web-backend `bot_reviews.py`), then DM/group
-reports (conversation-DNA reset, batch it with other conversation integrity changes such as
+moderation's last part (DM/group reports with the 1:1 path, a conversation-DNA integrity
+change). (Bot reviews and the paused badge: ADR 0074, in flight; the warm-up penalty is off on
+web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
+DM/group reports (conversation-DNA reset, batch it with other conversation integrity changes such as
 ADR 0061's declined-invite entry), then service requests, map/places, software PRs.
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service

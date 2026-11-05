@@ -90,4 +90,5 @@ export const gatewayApi = {
   projects: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/projects', query),
   people: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/people', query),
   scopes: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/scopes', query),
+  paused: (g: string) => get<string[]>(g, '/index/paused', {}),
 };

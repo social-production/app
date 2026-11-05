@@ -123,6 +123,11 @@ pub async fn people(
     Ok(Json(state.node.people.search(&p.q, limit).await))
 }
 
+/// `GET /index/paused`: agents a bot review paused (web's `bootstrap.pausedUsernames`).
+pub async fn paused(State(state): State<AppState>) -> ApiResult<Vec<String>> {
+    Ok(Json(state.node.people.paused().await))
+}
+
 /// `GET /index/scopes?q=`: channels and communities for Discover and tag search (ADR 0068).
 pub async fn scopes(
     State(state): State<AppState>,

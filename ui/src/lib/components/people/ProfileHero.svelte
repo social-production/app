@@ -13,9 +13,12 @@
     actions?: Snippet;
     /** Leading items of the count row (web's follower / following buttons). */
     counts?: Snippet;
+    /** web's standing chip is a button that opens the Trust sheet. */
+    trustOpen?: boolean;
+    onStanding?: () => void;
   }
 
-  let { person, devices = 1, actions, counts }: Props = $props();
+  let { person, devices = 1, actions, counts, trustOpen = false, onStanding }: Props = $props();
 
   import '#lib/components/styles/profile.css';
 </script>
@@ -32,11 +35,23 @@
         <div class="hero-copy">
           <div class="name-row">
             <h1>{displayName(person)}</h1>
-            <span
-              class="standing-chip"
-              class:paused={person.standing.level === 'Paused'}
-              title={standingHint(person)}>{standingLabel(person)}</span
-            >
+            {#if onStanding}
+              <button
+                aria-expanded={trustOpen}
+                aria-label={`Standing: ${standingLabel(person)}`}
+                class="standing-chip"
+                class:paused={person.standing.level === 'Paused'}
+                title={standingHint(person)}
+                type="button"
+                onclick={onStanding}>{standingLabel(person)}</button
+              >
+            {:else}
+              <span
+                class="standing-chip"
+                class:paused={person.standing.level === 'Paused'}
+                title={standingHint(person)}>{standingLabel(person)}</span
+              >
+            {/if}
           </div>
           {#if person.profile?.bio}
             <p class="profile-bio">{person.profile.bio}</p>

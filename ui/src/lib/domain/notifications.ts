@@ -34,7 +34,9 @@ export type NotificationKind =
   | 'post-share'
   | 'prj-plan-lead'
   | 'evt-plan-lead'
-  | 'prj-removed';
+  | 'prj-removed'
+  | 'bot-review'
+  | 'bot-review-result';
 
 /** web's notification settings categories (web-backend `notification_preferences.py`
  * KIND_TO_CATEGORY). */
@@ -71,6 +73,8 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'prj-plan-lead': 'plan_leading',
   'evt-plan-lead': 'plan_leading',
   'prj-removed': 'phase_done',
+  'bot-review': 'votes_needed',
+  'bot-review-result': 'votes_needed',
 };
 
 export interface NotificationItem {
@@ -78,7 +82,7 @@ export interface NotificationItem {
   kind: NotificationKind;
   /** web's subject: a project, a direct or group chat (web's "Thread" card), a person, or
    * an invite waiting under Invites (web's `href: /invites`). */
-  subject: 'project' | 'thread' | 'profile' | 'invites';
+  subject: 'project' | 'thread' | 'profile' | 'invites' | 'account';
   /** The project's or chat's network seed (empty for follows); a project's page is found by
    *  seed on opening. */
   seed: string;
@@ -99,6 +103,8 @@ export interface NotificationItem {
     | { space: string }
     /** web's `href: "/"` (a removed project, which has no page). */
     | { home: true }
+    /** A bot review card (web's `href: /profile/<username>`, ADR 0074). */
+    | { profile: string }
     | null;
   createdAt: number;
   isUnread: boolean;

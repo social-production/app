@@ -41,6 +41,7 @@ sp_governance = { path = "crates/sp_governance" }
 sp_help = { path = "crates/sp_help" }
 sp_discussion = { path = "crates/sp_discussion" }
 sp_moderation = { path = "crates/sp_moderation" }
+sp_bot_review = { path = "crates/sp_bot_review" }
 sp_scope = { path = "crates/sp_scope" }
 sp_index = { path = "crates/sp_index" }
 health_integrity = { path = "zomes/health/integrity" }

@@ -94,6 +94,10 @@
         return;
       }
       const t = item.target;
+      if (t && 'profile' in t) {
+        await goto(resolve('/profile/[agent]', { agent: t.profile }));
+        return;
+      }
       if (t && 'home' in t) {
         await goto(resolve('/'));
         return;

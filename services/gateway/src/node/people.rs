@@ -20,6 +20,15 @@ pub struct PersonCard {
     pub agent: String,
     pub name: String,
     pub bio: String,
+    /// A bot review found the account is a bot (ADR 0074; web's `pausedUsernames`).
+    #[serde(skip)]
+    pub paused: bool,
+}
+
+/// The part of `get_standing` the index reads.
+#[derive(Debug, Deserialize)]
+struct Standing {
+    level: String,
 }
 
 /// The profile fields search needs (mirrors the identity zome's `Profile`).
@@ -36,6 +45,16 @@ impl PeopleIndex {
     /// People whose name or bio contains `query` (case-insensitive), best match first.
     pub async fn search(&self, query: &str, limit: usize) -> Vec<PersonCard> {
         rank(&self.0.read().await, query, limit)
+    }
+
+    /// Everyone a bot review paused, for web's "Paused" badge on author lines.
+    pub async fn paused(&self) -> Vec<String> {
+        let people = self.0.read().await;
+        people
+            .iter()
+            .filter(|p| p.paused)
+            .map(|p| p.agent.clone())
+            .collect()
     }
 }
 
@@ -92,13 +111,23 @@ impl Node {
                 )
                 .await
                 .unwrap_or(None);
-            if let Some(p) = profile {
-                people.push(PersonCard {
-                    agent: AgentPubKeyB64::from(key).to_string(),
-                    name: p.name,
-                    bio: p.bio,
-                });
-            }
+            let Some(p) = profile else { continue };
+            let standing: Option<Standing> = self
+                .call(
+                    &agent,
+                    directory.clone(),
+                    "identity",
+                    "get_standing",
+                    key.clone(),
+                )
+                .await
+                .ok();
+            people.push(PersonCard {
+                agent: AgentPubKeyB64::from(key).to_string(),
+                name: p.name,
+                bio: p.bio,
+                paused: standing.is_some_and(|s| s.level == "Paused"),
+            });
         }
         let count = people.len();
         *self.people.0.write().await = people;
@@ -115,6 +144,7 @@ mod tests {
             agent: name.into(),
             name: name.into(),
             bio: bio.into(),
+            paused: false,
         }
     }
 

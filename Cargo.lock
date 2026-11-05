@@ -4283,6 +4283,7 @@ dependencies = [
  "hdk",
  "identity_integrity",
  "serde",
+ "sp_bot_review",
  "sp_follow",
  "sp_governance",
 ]
@@ -8785,6 +8786,13 @@ name = "sp_attachment"
 version = "0.0.1"
 dependencies = [
  "sp_core",
+]
+
+[[package]]
+name = "sp_bot_review"
+version = "0.0.1"
+dependencies = [
+ "sp_governance",
 ]
 
 [[package]]

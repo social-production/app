@@ -1,0 +1,36 @@
+/* Ported from web/src/lib/components/shared/PausedBadge.svelte (ADR 0032, scripts/port-styles.py) */
+.paused-badge {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--status-warning-soft, color-mix(in srgb, #d97706 14%, transparent));
+  color: var(--status-warning-text, #92400e);
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.paused-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+[data-theme='dark'] .paused-badge {
+  background: color-mix(in srgb, #f59e0b 18%, transparent);
+  color: #fcd34d;
+}
+
+@media (max-width: 480px) {
+  .paused-badge {
+    padding: 3px;
+  }
+
+  .paused-badge .text {
+    display: none;
+  }
+}

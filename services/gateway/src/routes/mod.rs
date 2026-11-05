@@ -50,6 +50,7 @@ pub fn router(state: AppState) -> Router {
         .route("/session/cells", post(session::cells))
         .route("/index/projects", get(index::projects))
         .route("/index/people", get(index::people))
+        .route("/index/paused", get(index::paused))
         .route("/index/scopes", get(index::scopes))
         .route("/public/read", post(public::read))
         .route("/ws", get(ws_proxy::upgrade))

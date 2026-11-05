@@ -1,5 +1,6 @@
 <script lang="ts">
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
+  import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { bodyParts } from '#lib/components/chat/chatFormat.ts';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import type { DiscussionComment as Comment, VoteDirection } from '#lib/domain/discussions.ts';
@@ -89,6 +90,7 @@
       <a class="author-link" href={resolve('/profile/[agent]', { agent: comment.author })}>
         {name}
       </a>
+      <PausedBadge agent={comment.author} />
       <span class="comment-time">{relativeCompact(comment.createdAt)}</span>
       <button
         aria-expanded={!collapsed}
