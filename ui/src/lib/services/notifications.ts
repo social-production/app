@@ -10,6 +10,8 @@ import {
 } from '#lib/domain/notifications.ts';
 import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
 import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
+import { removedNotifications } from '#lib/domain/removedNotifications.ts';
+import { VISIBLE } from '#lib/domain/moderation.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
 import { shareNotifications } from '#lib/domain/share.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
@@ -18,6 +20,7 @@ import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo
 import { listActivities } from './activities.ts';
 import { pendingInvites } from './events.ts';
 import { listMessages } from './chat.ts';
+import { getModeration } from './moderation.ts';
 import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
 import { listProposals, planLeadChanges } from './governance.ts';
@@ -58,12 +61,13 @@ export async function myNotifications(
 
 async function fromProject(seed: string, me: string, myName: string, planLeads: boolean) {
   const cell = await projectCell(seed, 'Project');
-  const [project, proposals, messages, activities, leads] = await Promise.all([
+  const [project, proposals, messages, activities, leads, moderation] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
     listProposals({ seed }),
     listMessages({ seed }),
     listActivities({ seed }).catch(() => []),
     planLeads ? planLeadChanges({ seed }).catch(() => []) : [],
+    getModeration({ seed }).catch(() => VISIBLE),
   ]);
   if (!project?.charter) return [];
   const labels = new Map(project.phases.map((p) => [p.id, p.label]));
@@ -82,7 +86,10 @@ async function fromProject(seed: string, me: string, myName: string, planLeads: 
     a.author === me ? a.roles.flatMap((r) => r.people) : [],
   );
   const names = takers.length ? await namesOf([...new Set(takers)]) : {};
+  const holdsRole = activities.some((a) => a.roles.some((r) => r.people.includes(me)));
+  const involved = project.am_member || holdsRole;
   return [
+    ...removedNotifications({ ...glance, involved }, moderation),
     ...projectNotifications(glance, me, myName),
     ...activityNotifications(glance, activities, me, names),
     ...planLeadNotifications(glance, leads, me),

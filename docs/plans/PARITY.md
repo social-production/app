@@ -9,14 +9,14 @@ Tick items off as they ship, with the PR number. Add findings as you compare mor
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
 1. **Moderation, rest:** reports in direct and group chats (web's `message` target and the
-   1:1 one-vote path; conversation-DNA integrity change, a chat reset); a removed project's
-   side effects (memberships, votes and sign-ups end, `prj-removed`, the author's warm-up
-   penalty); bot reviews and the paused badge. (The blur on hidden detail pages: done
+   1:1 one-vote path; conversation-DNA integrity change, a chat reset); the author's warm-up
+   penalty after a removal; bot reviews and the paused badge. (A removed project leaving the
+   rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
    2026-11-03.)
 2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
    those land in web's history (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
-   the app still lacks: bot reviews, `prj-removed`.
+   the app still lacks: bot reviews (`prj-removed`: done 2026-11-05).
    (Project/event pages' "Share +" with `prj-share`/`evt-share`, "Create post", and the
    `thread-share`/`post-share` cards: done 2026-11-04.)
 4. ~~Posts and threads, later parts~~ (done 2026-11-04: @mentions in the comment composer,
@@ -198,9 +198,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project, event and help request chat messages: the comment's ⋮, the bubble menu's Report /
   Vote to remove / Vote to keep, web's "Removed for …" and serious-harm reveal. No reset.
 - [ ] Moderation, later parts: reports in direct and group chats (the 1:1 DM fast path; an
-  integrity change in the conversation DNA), a removed project's side effects (memberships, votes and
-  sign-ups end, `prj-removed`, the author's warm-up penalty), bot reviews (web-backend
-  `bot_reviews.py`) and the paused badge.
+  integrity change in the conversation DNA), the author's warm-up penalty after a removal,
+  bot reviews (web-backend `bot_reviews.py`) and the paused badge.
+- [x] A removed project's side effects (2026-11-05, UI only): it leaves its members' rail and
+  they (and role holders) get web's `prj-removed` card (ADR 0071 Consequences).
 - [x] The blur on hidden detail pages (2026-11-03): web's `ModerationRestrictionNotice`
   (`components/moderation/RestrictionNotice.svelte`) over the title of project, event and help
   request pages, a thread's title and body and a post's body; Reveal / Hide again.

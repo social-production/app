@@ -92,9 +92,13 @@ behind "Hidden for serious harm report — reveal to read".
   network (test data only).
 - Removed items stay on the DHT (nothing can be deleted from other people's chains); every
   reader hides them. Their chats and pages still answer direct zome calls.
-- web's side effects of a removal are left out for now: ending a removed project's
-  memberships, votes and role sign-ups, the `prj-removed` notification, and the author's
-  warm-up penalty (`record_content_removal_penalty`). They come with bot reviews/standing.
+- web's side effects of a removal: since 2026-11-05 (UI only) a removed project leaves its
+  members' right rail (web ends its memberships, open votes and role sign-ups) and its
+  members and role holders get web's `prj-removed` card ("This project was removed after a
+  spam report.", no actor, opening Home; Settings' Phase finished switch), timed at the
+  report (`domain/removedNotifications.ts`). Nothing is deleted from chains; a direct zome
+  call still joins or votes. The author's warm-up penalty
+  (`record_content_removal_penalty`) comes with bot reviews/standing.
 - A report's numbers use the audience and popularity as read now (web stores them per
   vote), so a growing project can make an old report harder to pass on replay. Small in
   practice: both only move the bar by web's boost steps.

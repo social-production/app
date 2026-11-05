@@ -18,6 +18,7 @@ import {
 
 import { listActivities } from './activities.ts';
 import { listProposals } from './governance.ts';
+import { getModeration } from './moderation.ts';
 import { listPlans } from './plans.ts';
 import { listingTitle, myProjectSeeds } from './projects.ts';
 
@@ -82,8 +83,13 @@ export async function myActivityRail(): Promise<{ items: RailItem[]; history: Ra
 
 async function railProject(seed: string): Promise<RailProject | null> {
   const cell = await projectCell(seed, 'Project');
-  const project = await callCell<GlanceWire | null>(cell, 'project', 'get_project');
+  const [project, moderation] = await Promise.all([
+    callCell<GlanceWire | null>(cell, 'project', 'get_project'),
+    getModeration({ seed }).catch(() => null),
+  ]);
   if (!project?.charter || !project.am_member) return null;
+  // web ends a removed project's memberships, open votes and sign-ups (ADR 0071).
+  if (moderation?.state === 'removed') return null;
   const [activities, proposals, board, links] = await Promise.all([
     listActivities({ seed }).catch(() => []),
     listProposals({ seed }).catch(() => []),

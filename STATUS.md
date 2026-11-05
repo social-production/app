@@ -71,6 +71,18 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
+## Next PR (committed locally on the branch, push after PR #101 merges): a removed project's side effects
+**UI only.** web-backend's `_end_removed_project`: memberships, open votes and role sign-ups
+end, and members + role holders get `prj-removed` ("This project was removed after a spam
+report.", no actor, href "/"). The app: `activityRail.railProject` drops a project whose
+moderation is `removed`; `notifications.fromProject` adds `removedNotifications` (new
+`domain/removedNotifications.ts`, projects only, as web) with target `{ home: true }`
+(NotificationsPage opens Home); a card with no actor shows only its time (web's
+ContentMetaRow without a name). Category `phase_done`, as web's KIND_TO_CATEGORY.
+- **Checked:** UI check + lint, boundaries, sizes; the pure function by hand (node strip-types);
+  `notifications.mjs` and `rail.mjs` **passed** locally. Not testable in a browser locally:
+  removal needs 3 Full voters and dev-founders has 2.
+
 ## Done 2026-11-05: events' "Remove organizer" (ADR 0073), PR pending
 **Coordinators + UI only; the project DNA keeps its hash.** web's `EventMembersPanel` shows
 "Remove organizer" (danger) on co-organizer rows; web-backend's `revoke_event_editor` lets any
