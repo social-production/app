@@ -18,7 +18,7 @@ What works today:
   first step of the map (M6). Projects, plans, edits and activities can store a place with
   coordinates next to their location label, checked by the network as web-backend checks
   locations. Nothing in the UI picks places yet (that comes with the location picker).
-  **The project network was reset.**
+  **The project network was reset.** Live `projects.mjs` passed.
 - **Availability and bookings on personal services (PR #109, 2026-11-06 8:16 pm Melbourne,
   ADR 0077):** as on web, a personal service's creator adds one-off slots and weekly hours;
   others see them on the calendar and agenda (Open / Taken / Yours) and request a slot with its

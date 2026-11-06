@@ -50,11 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: docs PR for PR #112 (place records, ADR 0078), merged 14:59 UTC (1:59 am Melbourne, Nov 7)
-CI was green on its second run (the first failed `check` on clippy's 60-line rule in the new
-scenario). **The project network resets** once the seed node redeploys (not restarted by
-15:10 UTC; earlier deploys took ~20 min). Smoke live after the restart (`/readyz`, create a
-project, e.g. `projects.mjs`), record it here and in README Status, then merge this docs PR.
+## In flight: nothing (PR #112 merged; its docs PR follows it).
 **Next:** M6 phase 2, geocoding on the gateway (`docs/plans/M6-places.md`), then phase 3's
 LocationPicker; then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -84,6 +80,10 @@ requests, software PR flow; posts and threads are done, with their later parts i
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
 ## Done 2026-11-07: M6 phase 1, place records (ADR 0078), PR #112 merged 14:59 UTC Nov 6 (1:59 am Melbourne), place records (ADR 0078)
+- **Live after merge:** CI green on the second run (the first failed `check` on clippy's
+  60-line rule in the new scenario). The seed node restarted 15:12 UTC (695 MB at 12 s; ~13
+  min after the merge). **The project network reset.** Live `projects.mjs` **passed**
+  (15:13–15:15 UTC).
 **Project integrity change: merging resets the project network.** Directory and conversation
 unchanged (`sp_place` is its own crate, not `sp_core`).
 - **Records:** `project_integrity::Place { label, latitude, longitude, region, country,
