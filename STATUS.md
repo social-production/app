@@ -104,6 +104,11 @@ service's manager, so its review is unreachable: owner review in ADR 0076).
   Requests rows (`domain/requestRail.ts`, `RailItem.projectId`).
 - **Tests:** scenario `service_requests.rs` (chat decisions; personal settings at once;
   collective needs a reason; productive refused); browser `tests/e2e/service-requests.mjs`.
+- **Checked:** `cargo test -p sp_service` (7), workspace clippy `-D warnings` in Nix,
+  `cargo fmt --check`, hApp pack, UI check + lint, boundaries, sizes; scenario
+  `service_requests` **passed** (3 tests, 19 min here). **Not run here:** the other scenario
+  files (CI) and `tests/e2e/service-requests.mjs` (needs a local seed node: run it with
+  `bash scripts/cloud-seed.sh` + `scripts/e2e-local.sh`, or live after merge).
 - **Not done (parts b, c):** availability, slot holds, bookings, the create flow's request
   mode, the "Done" hint on past bookings; collective services' screens.
 
