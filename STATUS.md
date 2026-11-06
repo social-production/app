@@ -50,26 +50,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #105, reports in direct and group chats + private invite declines (ADR 0075)
-**Conversation integrity change: merging resets every chat and the inbox** (test data only).
-Project and directory DNAs keep their hashes (checked with `hc dna hash` against main's
-bundles: project `uhC0kqPxFpmg…`, directory `uhC0kUx_esWp…`; conversation becomes
-`uhC0kanmDwfg…`). See the "Done" entry below for what changed; after merging: smoke live
-`messages.mjs` (it now reports a DM reply) and `invites` (decline an event invite).
+## In flight: nothing (PR #105 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
   another setup call hits it, route it through `setup_call` too. Run `bash scripts/check-sizes.sh` after the
-  *last* edit (PR #92's first CI run failed on a 302-line AppShell; PR #103's on a 306-line
-  `domain/notifications.ts`). Run **workspace** clippy (`cargo clippy --workspace --all-targets
-  -D warnings`), not per package: it also lints scenario tests (60-line functions) and crates'
-  unit tests (no `unwrap`).
+  *last* edit. Run **workspace** clippy (`cargo clippy --workspace --all-targets -D warnings`)
+  inside Nix, not per package (it lints scenario tests too). **Never run cargo on the
+  scenarios/holochain crates outside Nix in a cloud session:** it rebuilds Holochain from
+  scratch with other flags and fills the disk (2026-11-06; CI's `check` runs workspace clippy).
 - **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
   items (pushed together once the later two were tested locally) rather than three PRs.
 
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Moderation is
-done once ADR 0075 merges (DM/group reports, with ADR 0061's declined-invite entry batched in).
+done (ADR 0075 merged 2026-11-06: DM/group reports, with ADR 0061's declined-invite entry).
 (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
 service requests, map/places, software PRs.
@@ -78,7 +73,12 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-05/06: reports in direct and group chats (ADR 0075), not merged yet
+## Done 2026-11-06: reports in direct and group chats (ADR 0075), PR #105 merged 22:55 UTC Nov 5 (9:55 am Melbourne)
+- **Live after merge:** CI green on the first run (check + 8 shards, 78 min). The seed node
+  restarted 23:09 UTC (593 MB at 32 s). **Chats and the inbox reset.** Live `messages.mjs`
+  **passed** (~23:10 UTC, DM report step included). Not covered by any browser test:
+  declining an invite on the Invites page (the scenario covers `decline_invite`); worth a
+  step in `private-events.mjs` next time it is touched.
 **Conversation integrity change** (chats and the inbox reset on merge); project and directory
 hashes unchanged.
 - **web:** MessagesPage's `LiveChatPanel` with `reportTargetType="message"` (bubble menu Report,
