@@ -26,7 +26,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
    time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
-6. **Service requests** (ADR 0076): part (a) done 2026-11-06 (personal services' requests,
+6. **Service requests** (ADR 0076): part (a) done 2026-11-06 (PR #107, live) (personal services' requests,
    settings, chat lines, `svc-request` cards, the rail's Requests rows). Left: (b)
    availability, slot holds and bookings (+ the create flow's request mode); (c) collective
    services' settings vote, Request service and planning (review waits on the owner). web's

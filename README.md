@@ -14,6 +14,13 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Service requests on personal services (PR #107, 2026-11-06 3:35 pm Melbourne, ADR 0076):**
+  as on web, anyone can ask a personal service for help from its Participation tab (Request
+  service); the request opens a direct chat with the creator, who accepts or declines it (with
+  a reason) from Requests, and the person asking can cancel. Both get notifications, the
+  creator sees open requests in the right rail, and Request settings turn requests off or
+  change their mode. **The project network and every chat were reset.** Live
+  `service-requests.mjs` and `messages.mjs` passed.
 - **Reports in direct and group chats (PR #105, 2026-11-06 9:55 am Melbourne, ADR 0075):** as
   on web, you can report a message in a direct or group chat from its menu and the other
   members vote; in a one-to-one chat the report itself removes the message. Declining an
@@ -254,7 +261,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
 | M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail (with link and plan votes). ✅ M5c: public and private events, help requests (feed activity cards wait on Region, M6). ✅ M5d: channels and communities, private communities with invites, settings and votes (ADR 0068). Every browser test runs live with test founders. Next: parity pass | in progress |
-| M6 | Platform | ✅ posts and threads, ✅ reports and moderation (ADR 0071, 0075), ✅ bot reviews (ADR 0074); map/places, service requests, push relay, software PR/merge flow (asset management and board receipts come after parity) | |
+| M6 | Platform | ✅ posts and threads, ✅ reports and moderation (ADR 0071, 0075), ✅ bot reviews (ADR 0074), ✅ service requests part (a) (ADR 0076); map/places, service requests (b, c), push relay, software PR/merge flow (asset management and board receipts come after parity) | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
 
 ## License
