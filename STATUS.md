@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: service requests part (b), availability and bookings (ADR 0077), branch `claude/social-production-handoff-dsam61`
+## In flight: service requests part (b), availability and bookings (ADR 0077), PR #109
 **Project integrity change: merging resets the project network** (directory and chats
 unchanged). See "Done (unmerged) 2026-11-07" below for what it holds and what was checked; the
 PR still needs CI, the merge, and live `bookings.mjs` + `service-requests.mjs` + `rail.mjs`
