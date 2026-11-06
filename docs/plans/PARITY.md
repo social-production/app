@@ -26,11 +26,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
    time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
-6. **Service requests** (ADR 0076): part (a) done 2026-11-06 (PR #107, live) (personal services' requests,
-   settings, chat lines, `svc-request` cards, the rail's Requests rows). Left: (b)
-   availability, slot holds and bookings (+ the create flow's request mode); (c) collective
-   services' settings vote, Request service and planning (review waits on the owner). web's
-   borrowing/delivery frames are dead code (`RequestFrameStack` is imported nowhere): not parity.
+6. **Service requests** (ADR 0076): parts (a) (PR #107, live) and (b) (ADR 0077:
+   availability, slots, bookings, Request history, the create flow's request mode) done
+   2026-11-06. Left: (c) collective services' settings vote, Request service and planning
+   (review waits on the owner). web's borrowing/delivery frames are dead code
+   (`RequestFrameStack` is imported nowhere): not parity.
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
 8. **Software projects:** pull requests and the merge flow in the Activity phase.
@@ -202,8 +202,12 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   a reason, Cancel request, Open conversation), Request service and Request settings sheets;
   the request and its status lines live in the direct chat with the creator; `svc-request`
   cards; the right rail's Requests rows. web's `features/requests` frames are dead code.
-- [ ] Service requests, part (b): Add availability (one-off slots, weekly hours), slot holds,
-  bookings (Provider role, Request history), the create flow's "Service request mode".
+- [x] Service requests, part (b) (2026-11-06, ADR 0077, project reset): Add availability
+  (One-off / Weekly), weekly hours with Remove, the calendar and agenda of slots (Open / Taken /
+  Yours / Closed; the creator's Booked / Open), requesting a slot with its times locked,
+  off-schedule refusals, bookings with the Provider role, Past activity's Request history and
+  Self planned history (the requester's check-in and rating), the create flow's "Service
+  request mode". Not ported: web's Timezone selects (no Display timezone setting yet).
 - [ ] Service requests, part (c): collective services' Settings ▾ → Request settings vote,
   Request service, Plan request. **Owner review:** web's review half is unreachable (nobody
   can become a manager); who should review in the app?

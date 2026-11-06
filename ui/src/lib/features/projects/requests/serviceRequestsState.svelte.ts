@@ -1,3 +1,5 @@
+import { fitsOpenSlot, type Slot } from '#lib/domain/availability.ts';
+import { toLocalInput } from '#lib/domain/helpRequests.ts';
 import type { RequestMode, RequestSettings } from '#lib/domain/projects.ts';
 import {
   preferredTime,
@@ -20,9 +22,19 @@ export interface RequestForm {
   body: string;
   scheduledAt: string;
   endsAt: string;
+  /** The listed slot it starts from (web's `selectedActivityId`): its times are locked. */
+  slot: string;
 }
 
-const emptyForm = (): RequestForm => ({ title: '', body: '', scheduledAt: '', endsAt: '' });
+const emptyForm = (): RequestForm => ({
+  title: '',
+  body: '',
+  scheduledAt: '',
+  endsAt: '',
+  slot: '',
+});
+
+const local = (micros: number): string => toLocalInput(new Date(micros / 1000));
 
 const micros = (local: string): number | null => (local ? Date.parse(local) * 1000 : null);
 
@@ -50,7 +62,13 @@ export class ServiceRequestsState {
     private readonly project: string,
     private readonly me: () => string,
     private readonly reviewer: () => boolean,
+    /** An accepted timed request becomes a booking (ADR 0077). */
+    private readonly book: (request: ServiceRequest) => Promise<void> = async () => {},
   ) {}
+
+  /** Bookings already tried this session, so a failed one isn't retried on every load. */
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity -- bookkeeping, never rendered
+  private booked = new Set<string>();
 
   /** The requests this person may see, newest first. */
   get shown(): ServiceRequest[] {
@@ -83,6 +101,25 @@ export class ServiceRequestsState {
     this.composing = true;
   }
 
+  /** web's `prefillRequestFromSlot`: the slot's times, locked. */
+  openForSlot(slot: Slot): void {
+    this.form = {
+      ...emptyForm(),
+      scheduledAt: local(slot.startsAt),
+      endsAt: local(slot.endsAt),
+      slot: slot.id,
+    };
+    this.error = '';
+    this.composing = true;
+  }
+
+  /** web's `openRequestForDay` without an open slot: that day 18:00–19:00. */
+  openForDay(iso: string): void {
+    this.form = { ...emptyForm(), scheduledAt: `${iso}T18:00`, endsAt: `${iso}T19:00` };
+    this.error = '';
+    this.composing = true;
+  }
+
   addPreferredTime(): void {
     this.form = { ...this.form, ...preferredTime() };
   }
@@ -91,6 +128,7 @@ export class ServiceRequestsState {
     title: string;
     creator: string;
     settings: RequestSettings;
+    slots: Slot[];
   }): Promise<boolean> {
     const f = this.form;
     if (!f.title.trim() || !f.body.trim()) {
@@ -101,20 +139,18 @@ export class ServiceRequestsState {
       this.error = 'Add both a start and a finish time, or neither.';
       return false;
     }
-    const refused = refusal(service.settings, !!f.scheduledAt);
+    const start = micros(f.scheduledAt);
+    const end = micros(f.endsAt);
+    const fits = start === null || end === null || fitsOpenSlot(service.slots, start, end);
+    const refused = refusal(service.settings, !!f.scheduledAt, fits);
     if (refused) {
       this.error = refused;
       return false;
     }
     return this.run(async () => {
       await sendServiceRequest(
-        { id: this.project, ...service },
-        {
-          title: f.title,
-          body: f.body,
-          startsAt: micros(f.scheduledAt),
-          endsAt: micros(f.endsAt),
-        },
+        { id: this.project, title: service.title, creator: service.creator },
+        { title: f.title, body: f.body, startsAt: start, endsAt: end },
       );
       this.composing = false;
       this.form = emptyForm();
@@ -130,7 +166,27 @@ export class ServiceRequestsState {
       await decideServiceRequest(request, status, reason);
       this.declining = '';
       this.declineReason = '';
+      if (status === 'accepted') await this.bookOnce(request);
     });
+  }
+
+  /** web books an accepted timed request at once; a booking that didn't happen then (the
+   * project call failed after the chat's) is made the next time the creator looks. */
+  async heal(bookedRequests: string[]): Promise<void> {
+    if (!this.reviewer()) return;
+    try {
+      for (const r of this.shown) {
+        if (r.status === 'accepted' && !bookedRequests.includes(r.id)) await this.bookOnce(r);
+      }
+    } catch (e) {
+      this.error = explain(e);
+    }
+  }
+
+  private async bookOnce(request: ServiceRequest): Promise<void> {
+    if (request.startsAt === null || request.endsAt === null || this.booked.has(request.id)) return;
+    this.booked.add(request.id);
+    await this.book(request);
   }
 
   openSettings(current: RequestSettings): void {

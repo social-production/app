@@ -2,7 +2,13 @@
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
-  import { defaultMonth, isoOf, monthDays, monthStart } from '#lib/domain/activityCalendar.ts';
+  import {
+    defaultMonth,
+    isoOf,
+    monthDays,
+    monthStart,
+    type ToneOf,
+  } from '#lib/domain/activityCalendar.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
 
   import '#lib/components/styles/activities.css';
@@ -20,6 +26,8 @@
     onDay: (iso: string) => void;
     onActivity: (id: string) => void;
     onCreate: () => void;
+    /** A personal service's slots are green while open (web's slot `statusTone`). */
+    toneOf?: ToneOf;
   }
 
   let p: Props = $props();
@@ -37,7 +45,7 @@
   });
   let hoveredActivity = $state('');
 
-  const days = $derived(monthDays(month, p.activities));
+  const days = $derived(monthDays(month, p.activities, Date.now(), p.toneOf));
   const label = $derived(month.toLocaleDateString([], { month: 'long', year: 'numeric' }));
   const zone = zoneOf(new Date());
   const today = isoOf(new Date());

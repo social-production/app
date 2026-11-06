@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-06 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-07 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,7 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #107 merged; this docs PR follows it).
+## In flight: service requests part (b), availability and bookings (ADR 0077), PR #109
+**Project integrity change: merging resets the project network** (directory and chats
+unchanged). See "Done (unmerged) 2026-11-07" below for what it holds and what was checked; the
+PR still needs CI, the merge, and live `bookings.mjs` + `service-requests.mjs` + `rail.mjs`
+afterwards. Then fix `tests/e2e/activities.mjs` (see that entry).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -67,6 +71,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Moderation is
 done (ADR 0075 merged 2026-11-06: DM/group reports, with ADR 0061's declined-invite entry).
+Service requests (b) is in flight (ADR 0077); after it: (c) waits on the owner (ADR 0076).
 (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
 service requests (b) availability and bookings, then (c) collective services once the owner
@@ -75,6 +80,42 @@ says who reviews them (ADR 0076), map/places, software PRs.
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done (unmerged) 2026-11-07: service requests part (b), availability and bookings (ADR 0077)
+- **web:** IndividualServicePhaseOne's calendar of slots, Add availability (One-off / Weekly),
+  weekly hours with Remove, slot rows (Open / Taken / Yours / Closed; the creator's Booked /
+  Open), requesting a slot (times locked), off-schedule refusals, bookings, Past activity's
+  Request history / Self planned history; web-backend `projects_service_availability.py`.
+- **Records (project DNA):** `AvailabilityRule { space, weekday, start, end, zone, note }` +
+  `Availability` link (removing deletes it); `Activity.booking: Option<Booking { request,
+  requester }>` (creator only, one Provider role); rating/completion `assignment` is now
+  `Option` (`None` = the booking's requester). Integrity split: `history.rs` (ratings,
+  check-ins), `availability.rs`. Rules in `sp_activity::availability`.
+- **Coordinator** `activities/src/booking.rs`: `add_/remove_/list_availability_rules`,
+  `book_request` (idempotent per request; the creator takes Provider). `ActivityView.booking`,
+  `completion.requester`/`requester_can_set`. Suggestions moved to `suggestions.rs`.
+- **UI:** `features/projects/requests/ServicePhase.svelte` replaces ServiceRequests and the
+  generic Activity phase for personal services (+ `ServiceActivity`, `ServiceHistory`,
+  `AvailabilitySheet`, `availabilityState`); `domain/availability.ts` (rule expansion with
+  `Intl` zones, holds, `fitsOpenSlot`), `domain/serviceAgenda.ts`. Accepting a timed request
+  books it; `ServiceRequestsState.heal` books accepted ones that missed it. ActivityHistory
+  gets headings, the requester side and role badges; ActivityCard/Agenda take `chip` and
+  `onSelect`; the calendar a `toneOf`. Create flow: "Service request mode" (saved at once
+  unless it's "Calendar + direct").
+- **Tests:** scenario `bookings.rs` (2 tests, passed, 17 min here); browser
+  `tests/e2e/bookings.mjs` (new: request mode, weekly hours, one-off slot, a locked-time
+  request, Accept → Booked / Yours, an off-schedule refusal). `rail.mjs` now adds its activity
+  through Add availability.
+- **Checked:** `cargo test -p sp_activity` (10), workspace clippy `-D warnings` in Nix,
+  `cargo fmt --check`, hApp pack, UI check + lint, boundaries, sizes; scenario `bookings`
+  **passed**; against a local seed node (`cloud-seed.sh`) `bookings.mjs`, `service-requests.mjs`
+  and `rail.mjs` **passed**. **Not run here:** the other scenario files (CI).
+- **Broken by design, fix next:** `tests/e2e/activities.mjs` used a personal service's old
+  generic "Add activity" wizard (app-only; web shows slots there), so it now fails at its first
+  step. Its role / suggestion / photo / Past-activity checks need a project in its Activity
+  phase that isn't a personal service: move it onto an event via the founders path in
+  `events.mjs` (extract that path into a `lib.mjs` helper). The generic flows are still covered
+  by the `activities` scenario and partly by `events.mjs` and `help-requests.mjs`.
 
 ## Done 2026-11-06: service requests, part (a) (ADR 0076), PR #107 merged 04:35 UTC (3:35 pm Melbourne)
 - **Live after merge:** CI's third run was green (the first failed `check` on a svelte-check

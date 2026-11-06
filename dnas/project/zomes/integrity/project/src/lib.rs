@@ -6,13 +6,16 @@
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
 //! importance votes are records too (ADR 0041); links to other projects are proposals (ADR 0042).
 //! Activities and their roles, suggestions and ratings are records; taking a role is a link
-//! (ADR 0056).
+//! (ADR 0056). A personal service's weekly hours are records and its bookings activities
+//! (ADR 0077).
 
 mod activity;
 mod applied;
+mod availability;
 mod challenge;
 mod charter;
 mod governance;
+mod history;
 mod link;
 mod links;
 mod organizer;
@@ -23,11 +26,11 @@ mod value;
 
 use hdi::prelude::*;
 
-pub use activity::{
-    Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
-};
+pub use activity::{Activity, ActivityRole, RoleSuggestion, SuggestionDecline};
 pub use applied::{Applied, AppliedRequests, AppliedUpdate};
+pub use availability::{AvailabilityRule, Booking};
 pub use governance::{check_scope_kind, SNAPSHOT_MAX};
+pub use history::{ActivityCompletion, ActivityRating};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
@@ -171,6 +174,7 @@ pub enum EntryTypes {
     ActivityRating(ActivityRating),
     ActivityCompletion(ActivityCompletion),
     Organizer(Organizer),
+    AvailabilityRule(AvailabilityRule),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -209,6 +213,9 @@ pub enum LinkTypes {
     Recent,
     /// A private community → a private event for its members; tag: the event's seed (ADR 0069).
     ScopeItems,
+    /// A personal service → its creator's weekly hours; deleting the link removes them
+    /// (ADR 0077).
+    Availability,
 }
 
 #[hdk_extern]
@@ -233,9 +240,10 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::Activity(a) => activity::validate_activity(&a, &action),
             EntryTypes::RoleSuggestion(r) => activity::validate_suggestion(&r, &action),
             EntryTypes::SuggestionDecline(d) => activity::validate_decline(&d, &action),
-            EntryTypes::ActivityRating(r) => activity::validate_rating(&r, &action),
-            EntryTypes::ActivityCompletion(c) => activity::validate_completion(&c, &action),
+            EntryTypes::ActivityRating(r) => history::validate_rating(&r, &action),
+            EntryTypes::ActivityCompletion(c) => history::validate_completion(&c, &action),
             EntryTypes::Organizer(o) => organizer::validate(&o, &action),
+            EntryTypes::AvailabilityRule(r) => availability::validate_rule(&r, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })

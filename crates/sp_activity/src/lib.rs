@@ -3,6 +3,7 @@
 //! coordinator (input checks and the view). Not in `sp_core`: code there changes every DNA's
 //! hash.
 
+pub mod availability;
 mod fill;
 
 pub use fill::{fill, Taken};

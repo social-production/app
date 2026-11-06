@@ -19,6 +19,10 @@
     onSuggest: (activity: string, role: number, agent: string) => void;
     onDecline: (suggestion: string) => void;
     searchPeople: (q: string) => Promise<{ agent: string; name: string }[]>;
+    /** web's `agendaChip` per row (a personal service's Open / Booked / Taken…). */
+    chipOf?: (a: Activity) => { label: string; tone: 'locked' | 'need' | 'full' | 'open' } | null;
+    /** web's `onSelect`: a row tap requests the slot instead of opening the card. */
+    onSelect?: ((id: string) => void) | null;
   }
 
   let p: Props = $props();
@@ -57,6 +61,8 @@
               onSuggest={(role, agent) => p.onSuggest(activity.id, role, agent)}
               onDecline={p.onDecline}
               searchPeople={p.searchPeople}
+              chip={p.chipOf?.(activity) ?? null}
+              onSelect={p.onSelect ? () => p.onSelect?.(activity.id) : null}
             />
           </div>
         {/each}

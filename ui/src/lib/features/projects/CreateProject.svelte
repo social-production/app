@@ -4,7 +4,7 @@
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import TypeSelector from '#lib/components/create/TypeSelector.svelte';
-  import { PROJECT_TYPES } from '#lib/domain/projects.ts';
+  import { PROJECT_TYPES, REQUEST_MODES } from '#lib/domain/projects.ts';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
@@ -47,6 +47,15 @@
         options={PROJECT_TYPES}
         onSelect={(mode) => (s.mode = mode)}
       />
+      {#if s.mode === 'personal-service'}
+        <TypeSelector
+          label="Service request mode"
+          name="service-request-mode"
+          selected={s.requestMode}
+          options={REQUEST_MODES}
+          onSelect={(mode) => (s.requestMode = mode)}
+        />
+      {/if}
       {#if s.allowance !== null}
         <p class="helper-text">
           New members can start 2 projects a week ({s.allowance} left). Full members have no limit.
@@ -79,7 +88,10 @@
   {:else}
     <div class="form-stack overview">
       <button class="overview-row" type="button" onclick={() => (s.step = 0)}>
-        <strong>Type</strong><span>{s.typeLabel}</span>
+        <strong>Type</strong><span
+          >{s.typeLabel}{#if s.mode === 'personal-service'}
+            · {s.requestModeLabel}{/if}</span
+        >
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
         <strong>Basics</strong><span>{s.title.trim() || 'Untitled project'}</span>

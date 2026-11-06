@@ -27,6 +27,9 @@ pub struct CompletionView {
     /// The caller's check-in, if they are eligible and have one.
     pub mine: Option<bool>,
     pub can_set: bool,
+    /// A booking's requester side (ADR 0077): their check-in, and whether the caller is them.
+    pub requester: Option<bool>,
+    pub requester_can_set: bool,
 }
 
 pub fn check_in(input: CheckInInput) -> ExternResult<ActionHash> {
@@ -36,11 +39,17 @@ pub fn check_in(input: CheckInInput) -> ExternResult<ActionHash> {
         return Err(guest("Activity has not ended yet"));
     }
     let me = agent_info()?.agent_initial_pubkey;
-    let Some(assignment) = view::my_take(&input.activity, &me)? else {
+    let requester = found
+        .entry
+        .booking
+        .as_ref()
+        .is_some_and(|b| b.requester == me);
+    let assignment = view::my_take(&input.activity, &me)?;
+    if assignment.is_none() && !requester {
         return Err(guest(
             "Only assigned participants can set participant completion",
         ));
-    };
+    }
     let hash = create_entry(EntryTypes::ActivityCompletion(ActivityCompletion {
         activity: input.activity.clone(),
         done: input.done,
@@ -55,10 +64,12 @@ pub fn check_in(input: CheckInInput) -> ExternResult<ActionHash> {
     Ok(hash)
 }
 
-/// The participants' check-ins among those who held a role (`holders`).
+/// The participants' check-ins among those who held a role (`holders`), and a booking's
+/// requester's.
 pub fn completion(
     activity: &ActionHash,
     holders: &[AgentPubKey],
+    requester: Option<&AgentPubKey>,
     me: &AgentPubKey,
 ) -> ExternResult<CompletionView> {
     let all = reads::linked::<ActivityCompletion>(
@@ -82,5 +93,7 @@ pub fn completion(
         uncompleted: count(false),
         mine: if can_set { state(me) } else { None },
         can_set,
+        requester: requester.and_then(state),
+        requester_can_set: requester == Some(me),
     })
 }

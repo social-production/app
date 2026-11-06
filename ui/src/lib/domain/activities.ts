@@ -38,6 +38,15 @@ export interface ActivityCompletion {
   uncompleted: number;
   mine: boolean | null;
   canSet: boolean;
+  /** A booking's requester side (ADR 0077): their check-in, and whether you are them. */
+  requester: boolean | null;
+  requesterCanSet: boolean;
+}
+
+/** The service request an activity books (ADR 0077) and who asked. */
+export interface Booking {
+  request: string;
+  requester: string;
 }
 
 export interface Activity {
@@ -58,6 +67,7 @@ export interface Activity {
   ratings: ActivityRating[];
   canRate: boolean;
   completion: ActivityCompletion;
+  booking: Booking | null;
 }
 
 /** web's `minimumParticipants`: every role's required count. */

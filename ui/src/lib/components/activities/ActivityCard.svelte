@@ -28,6 +28,10 @@
     searchPeople: (q: string) => Promise<{ agent: string; name: string }[]>;
     /** web's historyMode: the past row's badge and rating line; the sheet gets `children`. */
     history?: { badge: string; tone: 'open' | 'need' | 'locked'; rating: string } | null;
+    /** web's `agendaChip` (a service's Open / Taken / Booked…), in place of the fill chip. */
+    chip?: { label: string; tone: 'locked' | 'need' | 'full' | 'open' } | null;
+    /** web's `onSelect`: tapping the row calls this instead of opening the card. */
+    onSelect?: (() => void) | null;
     children?: Snippet;
   }
 
@@ -39,7 +43,7 @@
   let copied = $state(false);
 
   const a = $derived(p.activity);
-  const chip = $derived(fillChip(a));
+  const chip = $derived(p.chip ?? fillChip(a));
   const place = $derived(placeLabel(a));
   const zone = $derived(zoneOf(new Date(a.startsAt / 1000)));
   const until = $derived(multiDayEnd(a.startsAt, a.endsAt));
@@ -75,7 +79,7 @@
     class="agenda-row"
     type="button"
     title={a.title}
-    onclick={() => (open = true)}
+    onclick={() => (p.onSelect ? p.onSelect() : (open = true))}
   >
     <span class="agenda-time">
       {#if p.history}<span>{shortDay}</span>{/if}

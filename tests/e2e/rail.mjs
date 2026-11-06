@@ -1,5 +1,5 @@
 // web's right rail (the top bar's activity button) at phone width. Ann offers a personal
-// service with one activity: it shows under Project Activity & Events with its signups and
+// service with one availability slot: it shows under Project Activity & Events with its signups and
 // the button's badge; clearing it moves it to Cleared until restored, and opening it goes to
 // the activity's sheet. Bob joins Ann's productive project; her edit shows under Votes to
 // cast on his rail, Assess opens its vote, and once he votes it moves to History.
@@ -15,7 +15,7 @@ mkdirSync(out, { recursive: true });
 const phone = { width: 390, height: 844 };
 const stamp = Date.now().toString(36).slice(-5);
 const service = `Bike fixing ${stamp}`;
-const activity = `Saturday repairs ${stamp}`;
+const activity = 'Available';
 const coop = `Tool library ${stamp}`;
 
 async function create(page, title, personal) {
@@ -45,24 +45,17 @@ await railButton(ann).click();
 await signUp(ann, `ann${stamp}`);
 const serviceUrl = await create(ann, service, true);
 await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Add activity' }).click();
-const next = () => ann.getByRole('button', { name: 'Next', exact: true }).click();
-await ann.getByPlaceholder('Activity title').fill(activity);
-await next();
-await next();
-await ann.getByPlaceholder('Place or address').fill('The shed');
-await next();
-await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
-await next();
-await ann.getByPlaceholder('What should happen in this activity?').fill('Fix brakes.');
-await next();
-await ann.getByRole('button', { name: 'Create activity' }).click();
+// web's personal service lists one-off availability: an "Available" activity, one Service
+// lead needed, at the service's place (online here).
+await ann.getByRole('button', { name: 'Add availability', exact: true }).waitFor({ timeout: 60_000 });
+await ann.getByRole('button', { name: 'Add availability', exact: true }).click();
+await ann.getByRole('dialog').getByRole('button', { name: 'Add availability', exact: true }).click();
 await ann.locator('.agenda-row', { hasText: activity }).waitFor({ timeout: 60_000 });
 log('ann added an activity');
 
 const row = () => rail(ann).locator('.activity-row', { hasText: activity });
 await railShows(ann, row, 'the activity');
-assert.match(await row().innerText(), /The shed/);
+assert.match(await row().innerText(), /Online/);
 assert.match(await row().innerText(), /0 signed up · 1 needed/);
 assert.match(await row().innerText(), /Project activity/i);
 await ann.locator('.panel-toggle-right .count-badge').waitFor();

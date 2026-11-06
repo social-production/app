@@ -45,13 +45,15 @@ export function preferredTime(now = new Date()): { scheduledAt: string; endsAt: 
   return { scheduledAt: toLocalInput(start), endsAt: toLocalInput(end) };
 }
 
-/** web's `_ensure_requests_enabled` (without listed slots, ADR 0076 part b): why these
- * settings refuse a request with or without a time, or null. */
-export function refusal(settings: RequestSettings, timed: boolean): string | null {
+/** web's `_ensure_requests_enabled`: why these settings refuse a request with or without a
+ * time, or null; `fits` says whether the time lies in an open listed slot (ADR 0077). */
+export function refusal(settings: RequestSettings, timed: boolean, fits = true): string | null {
   if (!settings.enabled) return 'Not taking requests.';
   if (settings.mode === 'calendar' && !timed)
     return 'Calendar requests require a start and finish time';
   if (settings.mode === 'direct' && timed && !settings.offSchedule)
     return 'This service only accepts direct unscheduled requests';
+  if (timed && !settings.offSchedule && settings.mode !== 'direct' && !fits)
+    return 'That time is outside the listed availability slots. Off-schedule requests are turned off.';
   return null;
 }

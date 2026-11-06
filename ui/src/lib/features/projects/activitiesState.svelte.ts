@@ -57,6 +57,7 @@ export class ActivitiesState {
         a.author,
         ...a.roles.flatMap((r) => [...r.people, ...(r.suggestion ? [r.suggestion.person] : [])]),
         ...a.ratings.map((r) => r.author),
+        ...(a.booking ? [a.booking.requester] : []),
       ]);
       const unique = people.filter((a, i) => people.indexOf(a) === i);
       this.names = { ...this.names, ...(await namesOf(unique)) };

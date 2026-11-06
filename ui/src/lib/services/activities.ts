@@ -1,4 +1,5 @@
 import type { Activity } from '#lib/domain/activities.ts';
+import type { AvailabilityRule } from '#lib/domain/availability.ts';
 import {
   callCell,
   hashToString,
@@ -56,7 +57,10 @@ interface ActivityWire {
     uncompleted: number;
     mine: boolean | null;
     can_set: boolean;
+    requester?: boolean | null;
+    requester_can_set?: boolean;
   };
+  booking?: { request: ActionHash; requester: AgentPubKey } | null;
 }
 
 export interface NewActivityRole {
@@ -120,7 +124,12 @@ function toActivity(w: ActivityWire): Activity {
       uncompleted: w.completion.uncompleted,
       mine: w.completion.mine,
       canSet: w.completion.can_set,
+      requester: w.completion.requester ?? null,
+      requesterCanSet: w.completion.requester_can_set ?? false,
     },
+    booking: w.booking
+      ? { request: hashToString(w.booking.request), requester: hashToString(w.booking.requester) }
+      : null,
   };
 }
 
@@ -200,4 +209,44 @@ export async function checkIn(
   done: boolean | null,
 ): Promise<void> {
   await activities<ActionHash>(project, 'check_in', { activity: stringToHash(activity), done });
+}
+
+interface RuleWire {
+  id: ActionHash;
+  weekday: number;
+  start: number;
+  end: number;
+  zone: string;
+  note: string;
+}
+
+export async function listAvailabilityRules(project: ProjectRef): Promise<AvailabilityRule[]> {
+  const wire = await activities<RuleWire[]>(project, 'list_availability_rules');
+  return wire.map((r) => ({ ...r, id: hashToString(r.id) }));
+}
+
+/** web's "Add weekly hours". */
+export async function addAvailabilityRule(
+  project: ProjectRef,
+  rule: Omit<AvailabilityRule, 'id'>,
+): Promise<void> {
+  await activities<ActionHash>(project, 'add_availability_rule', rule);
+}
+
+export async function removeAvailabilityRule(project: ProjectRef, rule: string): Promise<void> {
+  await activities<null>(project, 'remove_availability_rule', stringToHash(rule));
+}
+
+/** An accepted timed request becomes a booking (web's `update_service_request_status`). */
+export async function bookRequest(
+  project: ProjectRef,
+  request: { id: string; requester: string; title: string; startsAt: number; endsAt: number },
+): Promise<void> {
+  await activities<ActionHash>(project, 'book_request', {
+    request: stringToHash(request.id),
+    requester: stringToHash(request.requester),
+    title: request.title,
+    starts_at: request.startsAt,
+    ends_at: request.endsAt,
+  });
 }
