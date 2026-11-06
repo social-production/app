@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-07 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-06 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,11 +50,9 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: service requests part (b), availability and bookings (ADR 0077), PR #109
-**Project integrity change: merging resets the project network** (directory and chats
-unchanged). See "Done (unmerged) 2026-11-07" below for what it holds and what was checked; the
-PR still needs CI, the merge, and live `bookings.mjs` + `service-requests.mjs` + `rail.mjs`
-afterwards. Then fix `tests/e2e/activities.mjs` (see that entry).
+## In flight: nothing (PR #109 merged; this docs PR follows it).
+**Next:** fix `tests/e2e/activities.mjs` (see the 2026-11-06 availability entry), then the
+parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -71,7 +69,7 @@ afterwards. Then fix `tests/e2e/activities.mjs` (see that entry).
 ## Next: the parity pass (`docs/plans/PARITY.md`)
 **Full list: PARITY.md's summary at the top ("What's left for full parity").** Moderation is
 done (ADR 0075 merged 2026-11-06: DM/group reports, with ADR 0061's declined-invite entry).
-Service requests (b) is in flight (ADR 0077); after it: (c) waits on the owner (ADR 0076).
+Service requests (b) is done (ADR 0077, PR #109); (c) waits on the owner (ADR 0076).
 (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
 service requests (b) availability and bookings, then (c) collective services once the owner
@@ -81,7 +79,10 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done (unmerged) 2026-11-07: service requests part (b), availability and bookings (ADR 0077)
+## Done 2026-11-06: service requests part (b), availability and bookings (ADR 0077), PR #109 merged 09:16 UTC (8:16 pm Melbourne)
+- **Live after merge:** CI green on the first run (check + 8 shards, ~93 min). The seed node
+  restarted 09:35 UTC (728 MB at 16 s). **The project network reset.** Live `bookings.mjs`,
+  `service-requests.mjs` and `rail.mjs` **passed** (~09:40–10:00 UTC).
 - **web:** IndividualServicePhaseOne's calendar of slots, Add availability (One-off / Weekly),
   weekly hours with Remove, slot rows (Open / Taken / Yours / Closed; the creator's Booked /
   Open), requesting a slot (times locked), off-schedule refusals, bookings, Past activity's
