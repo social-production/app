@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-06 late evening Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-07 early morning Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,10 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 1, place records (ADR 0078), PR #112
-PR #112 waits on CI (**project reset** on merge); merge when green, then smoke live (create a
-project; `projects.mjs`) and update README Status. PR #111 merged 13:21 UTC (12:21 am
-Melbourne, Nov 7): CI green on the first run; no DNA or UI change, live UI and `/readyz` fine.
+## In flight: docs PR for PR #112 (place records, ADR 0078), merged 14:59 UTC (1:59 am Melbourne, Nov 7)
+CI was green on its second run (the first failed `check` on clippy's 60-line rule in the new
+scenario). **The project network resets** once the seed node redeploys (not restarted by
+15:10 UTC; earlier deploys took ~20 min). Smoke live after the restart (`/readyz`, create a
+project, e.g. `projects.mjs`), record it here and in README Status, then merge this docs PR.
 **Next:** M6 phase 2, geocoding on the gateway (`docs/plans/M6-places.md`), then phase 3's
 LocationPicker; then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -82,7 +83,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-06 (late, PR #112, not yet merged): M6 phase 1, place records (ADR 0078)
+## Done 2026-11-07: M6 phase 1, place records (ADR 0078), PR #112 merged 14:59 UTC Nov 6 (1:59 am Melbourne), place records (ADR 0078)
 **Project integrity change: merging resets the project network.** Directory and conversation
 unchanged (`sp_place` is its own crate, not `sp_core`).
 - **Records:** `project_integrity::Place { label, latitude, longitude, region, country,
