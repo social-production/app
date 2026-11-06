@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: service requests part (a), ADR 0076, branch `claude/social-production-handoff-dsam61`
+## In flight: PR #107, service requests part (a), ADR 0076 (opened 2026-11-06 ~12:40 pm Melbourne)
 See "Done 2026-11-06: service requests, part (a)" below for what is built and checked. If a
 PR is open for it, watch its CI; merging **resets the project network and the chats**.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -76,7 +76,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-06: service requests, part (a) (ADR 0076), not merged yet
+## Done 2026-11-06: service requests, part (a) (ADR 0076), PR #107 open
 **Project and conversation integrity change: merging resets the project network and the
 chats** (directory unchanged). PARITY's "borrowing and delivery frames" are dead code on web
 (`RequestFrameStack` imported nowhere); the real feature is web-backend's project service
