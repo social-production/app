@@ -67,90 +67,94 @@ fn decide(request: &ActionHash, status: &str, reason: &str) -> DecideInput {
     }
 }
 
+/// Agent `i` decides `request` in the chat; `Err` when the zome refuses.
+async fn try_decide(
+    conductors: &SweetConductorBatch,
+    cells: &Cells,
+    i: usize,
+    request: &ActionHash,
+    status: &str,
+    reason: &str,
+) -> Result<RequestView, String> {
+    conductors[i]
+        .call_fallible(
+            &cells[i].1.zome("messages"),
+            "decide_service_request",
+            decide(request, status, reason),
+        )
+        .await
+        .map_err(|e| format!("{e:?}"))
+}
+
+async fn send(conductors: &SweetConductorBatch, cells: &Cells, title: &str) -> ActionHash {
+    let hash = conductors[0]
+        .call(
+            &cells[0].1.zome("messages"),
+            "send_service_request",
+            request(title),
+        )
+        .await;
+    let chats: Vec<_> = cells.iter().map(|(_, c)| c.clone()).collect();
+    await_consistency(&chats).await.expect("consistency");
+    hash
+}
+
+type Cells = Vec<(
+    holochain::sweettest::SweetCell,
+    holochain::sweettest::SweetCell,
+)>;
+
 #[tokio::test(flavor = "multi_thread")]
 async fn a_request_is_settled_once_in_the_direct_chat() {
     let mut conductors = SweetConductorBatch::standard(2).await;
     // Agent 0 asks; agent 1 runs the service.
     let (cells, _) = chat_network(&mut conductors, "direct").await;
-    let chats: Vec<_> = cells.iter().map(|(_, c)| c.clone()).collect();
-    let chat = |i: usize| cells[i].1.zome("messages");
-    let provider = cells[1].1.agent_pubkey().clone();
     let start = StartInput {
-        members: vec![provider],
+        members: vec![cells[1].1.agent_pubkey().clone()],
         title: None,
     };
-    let () = conductors[0].call(&chat(0), "start_chat", start).await;
+    let () = conductors[0]
+        .call(&cells[0].1.zome("messages"), "start_chat", start)
+        .await;
 
-    let fix: ActionHash = conductors[0]
-        .call(&chat(0), "send_service_request", request("Fix my bike"))
-        .await;
-    await_consistency(&chats).await.expect("consistency");
-    let own: Result<RequestView, _> = conductors[0]
-        .call_fallible(
-            &chat(0),
-            "decide_service_request",
-            decide(&fix, "accepted", ""),
-        )
-        .await;
+    let fix = send(&conductors, &cells, "Fix my bike").await;
+    let own = try_decide(&conductors, &cells, 0, &fix, "accepted", "").await;
     assert!(
         own.is_err(),
         "the person asking can't accept their own request"
     );
-    let declined: RequestView = conductors[1]
-        .call(
-            &chat(1),
-            "decide_service_request",
-            decide(&fix, "declined", "Away that week"),
-        )
-        .await;
+    let declined = try_decide(&conductors, &cells, 1, &fix, "declined", "Away that week")
+        .await
+        .expect("the creator declines");
     assert_eq!(declined.status, "declined");
     assert_eq!(declined.decline_reason.as_deref(), Some("Away that week"));
-    let again: Result<RequestView, _> = conductors[1]
-        .call_fallible(
-            &chat(1),
-            "decide_service_request",
-            decide(&fix, "accepted", ""),
-        )
-        .await;
+    let again = try_decide(&conductors, &cells, 1, &fix, "accepted", "").await;
     assert!(again.is_err(), "the first decision settles it");
 
-    let tune: ActionHash = conductors[0]
-        .call(&chat(0), "send_service_request", request("Tune my bike"))
-        .await;
-    await_consistency(&chats).await.expect("consistency");
-    let theirs: Result<RequestView, _> = conductors[1]
-        .call_fallible(
-            &chat(1),
-            "decide_service_request",
-            decide(&tune, "cancelled", ""),
-        )
-        .await;
+    let tune = send(&conductors, &cells, "Tune my bike").await;
+    let theirs = try_decide(&conductors, &cells, 1, &tune, "cancelled", "").await;
     assert!(theirs.is_err(), "only the person asking cancels");
-    let cancelled: RequestView = conductors[0]
-        .call(
-            &chat(0),
-            "decide_service_request",
-            decide(&tune, "cancelled", ""),
-        )
-        .await;
+    let cancelled = try_decide(&conductors, &cells, 0, &tune, "cancelled", "")
+        .await
+        .expect("the person asking cancels");
     assert_eq!(cancelled.status, "cancelled");
+    let chats: Vec<_> = cells.iter().map(|(_, c)| c.clone()).collect();
     await_consistency(&chats).await.expect("consistency");
 
-    let seen: Vec<RequestView> = conductors[1].call(&chat(1), "service_requests", ()).await;
+    let chat = cells[1].1.zome("messages");
+    let seen: Vec<RequestView> = conductors[1].call(&chat, "service_requests", ()).await;
     let states: Vec<(&ActionHash, &str)> =
         seen.iter().map(|r| (&r.id, r.status.as_str())).collect();
     assert_eq!(states, vec![(&tune, "cancelled"), (&fix, "declined")]);
-    let lines: Vec<MessageView> = conductors[1].call(&chat(1), "list_messages", ()).await;
-    let bodies: Vec<&str> = lines.iter().map(|m| m.body.as_str()).collect();
-    assert!(bodies
-        .iter()
-        .any(|b| b.starts_with("Request \"Fix my bike\" · Pending\n\nMy bike has a flat tyre.")));
-    assert!(bodies
-        .iter()
-        .any(|b| b.starts_with("Request \"Fix my bike\" · Declined\n\nReason: Away that week")));
-    assert!(bodies
-        .iter()
-        .any(|b| b.starts_with("Request \"Tune my bike\" · Cancelled")));
+    let lines: Vec<MessageView> = conductors[1].call(&chat, "list_messages", ()).await;
+    let has = |start: &str| lines.iter().any(|m| m.body.starts_with(start));
+    assert!(has(
+        "Request \"Fix my bike\" · Pending\n\nMy bike has a flat tyre."
+    ));
+    assert!(has(
+        "Request \"Fix my bike\" · Declined\n\nReason: Away that week"
+    ));
+    assert!(has("Request \"Tune my bike\" · Cancelled"));
     common::shut_down(conductors).await;
 }
 
