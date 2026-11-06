@@ -86,9 +86,16 @@ async fn a_request_is_settled_once_in_the_direct_chat() {
         .await;
     await_consistency(&chats).await.expect("consistency");
     let own: Result<RequestView, _> = conductors[0]
-        .call_fallible(&chat(0), "decide_service_request", decide(&fix, "accepted", ""))
+        .call_fallible(
+            &chat(0),
+            "decide_service_request",
+            decide(&fix, "accepted", ""),
+        )
         .await;
-    assert!(own.is_err(), "the person asking can't accept their own request");
+    assert!(
+        own.is_err(),
+        "the person asking can't accept their own request"
+    );
     let declined: RequestView = conductors[1]
         .call(
             &chat(1),
@@ -99,7 +106,11 @@ async fn a_request_is_settled_once_in_the_direct_chat() {
     assert_eq!(declined.status, "declined");
     assert_eq!(declined.decline_reason.as_deref(), Some("Away that week"));
     let again: Result<RequestView, _> = conductors[1]
-        .call_fallible(&chat(1), "decide_service_request", decide(&fix, "accepted", ""))
+        .call_fallible(
+            &chat(1),
+            "decide_service_request",
+            decide(&fix, "accepted", ""),
+        )
         .await;
     assert!(again.is_err(), "the first decision settles it");
 
@@ -108,17 +119,26 @@ async fn a_request_is_settled_once_in_the_direct_chat() {
         .await;
     await_consistency(&chats).await.expect("consistency");
     let theirs: Result<RequestView, _> = conductors[1]
-        .call_fallible(&chat(1), "decide_service_request", decide(&tune, "cancelled", ""))
+        .call_fallible(
+            &chat(1),
+            "decide_service_request",
+            decide(&tune, "cancelled", ""),
+        )
         .await;
     assert!(theirs.is_err(), "only the person asking cancels");
     let cancelled: RequestView = conductors[0]
-        .call(&chat(0), "decide_service_request", decide(&tune, "cancelled", ""))
+        .call(
+            &chat(0),
+            "decide_service_request",
+            decide(&tune, "cancelled", ""),
+        )
         .await;
     assert_eq!(cancelled.status, "cancelled");
     await_consistency(&chats).await.expect("consistency");
 
     let seen: Vec<RequestView> = conductors[1].call(&chat(1), "service_requests", ()).await;
-    let states: Vec<(&ActionHash, &str)> = seen.iter().map(|r| (&r.id, r.status.as_str())).collect();
+    let states: Vec<(&ActionHash, &str)> =
+        seen.iter().map(|r| (&r.id, r.status.as_str())).collect();
     assert_eq!(states, vec![(&tune, "cancelled"), (&fix, "declined")]);
     let lines: Vec<MessageView> = conductors[1].call(&chat(1), "list_messages", ()).await;
     let bodies: Vec<&str> = lines.iter().map(|m| m.body.as_str()).collect();
@@ -178,7 +198,11 @@ async fn a_personal_service_creator_saves_request_settings_at_once() {
         mode: "both".into(),
         off_schedule: true,
     };
-    assert_eq!(requests_of(&net, 1).await, defaults, "web's personal defaults");
+    assert_eq!(
+        requests_of(&net, 1).await,
+        defaults,
+        "web's personal defaults"
+    );
     let other: Result<ActionHash, String> = net
         .try_call(1, "governance", "propose", settings(false, "direct", ""))
         .await;
@@ -199,7 +223,10 @@ async fn a_personal_service_creator_saves_request_settings_at_once() {
 #[tokio::test(flavor = "multi_thread")]
 async fn a_collective_service_votes_on_request_settings_with_a_reason() {
     let net = Net::with_charter(2, 1, "service-votes", charter("collective-service")).await;
-    assert!(!requests_of(&net, 0).await.enabled, "off until a vote passes");
+    assert!(
+        !requests_of(&net, 0).await.enabled,
+        "off until a vote passes"
+    );
     let bare: Result<ActionHash, String> = net
         .try_call(0, "governance", "propose", settings(true, "both", ""))
         .await;
@@ -207,8 +234,16 @@ async fn a_collective_service_votes_on_request_settings_with_a_reason() {
     net.shut_down().await;
     let products = Net::new(1, 1, "service-product").await;
     let product: Result<ActionHash, String> = products
-        .try_call(0, "governance", "propose", settings(true, "both", "Open up"))
+        .try_call(
+            0,
+            "governance",
+            "propose",
+            settings(true, "both", "Open up"),
+        )
         .await;
-    assert!(product.is_err(), "only service projects take request settings");
+    assert!(
+        product.is_err(),
+        "only service projects take request settings"
+    );
     products.shut_down().await;
 }
