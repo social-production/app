@@ -61,6 +61,8 @@ PR is open for it, watch its CI; merging **resets the project network and the ch
   inside Nix, not per package (it lints scenario tests too). **Never run cargo on the
   scenarios/holochain crates outside Nix in a cloud session:** it rebuilds Holochain from
   scratch with other flags and fills the disk (2026-11-06; CI's `check` runs workspace clippy).
+- **Read svelte-check's summary line** (`… N ERRORS`), not a grep for "Error": its errors
+  are coloured, and PR #107's first CI run failed `check` on a type error a grep missed.
 - **Batching small UI items:** a second push restarts CI (~75 min), so PR #94 carried three
   items (pushed together once the later two were tested locally) rather than three PRs.
 

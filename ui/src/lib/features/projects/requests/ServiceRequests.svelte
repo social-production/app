@@ -1,6 +1,7 @@
 <script lang="ts">
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
+  import type { RequestSettings } from '#lib/domain/projects.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { resolve } from '$app/paths';
@@ -30,9 +31,8 @@
     () => me,
     () => reviewer,
   );
-  const settings = $derived(
-    project?.requests ?? { enabled: true, mode: 'both', offSchedule: true },
-  );
+  const fallback: RequestSettings = { enabled: true, mode: 'both', offSchedule: true };
+  const settings = $derived(project?.requests ?? fallback);
   const requestsOff = $derived(!settings.enabled);
   const highlighted = $derived(page.url.searchParams.get('request'));
   const showRequests = $derived(reviewer || state.shown.length > 0);
