@@ -98,8 +98,12 @@ unchanged (`sp_place` is its own crate, not `sp_core`).
   `Net::with_charter` is now generic over the charter shape.
 - **Checked:** hApp pack; `cargo clippy -p project_integrity -p activities -p governance -p
   project -p sp_place --all-targets -D warnings` in Nix; `cargo fmt --check`; scenario
-  `places` **passed** (450 s here). **Not run:** workspace clippy and the other scenario files
-  (CI); no UI change (the UI sends no places until phase 3).
+  `places` **passed** (450 s here). **Not run:** the other scenario files (CI); no UI change
+  (the UI sends no places until phase 3).
+- **Lesson:** CI's first run failed `check` on clippy's 60-line rule in the new scenario test
+  (74 lines). Lint a new scenario file before pushing, inside Nix and without debug info:
+  `bash scripts/cloud-nix.sh env CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 cargo
+  clippy -p scenarios --test <name> -- -D warnings` (it passed here and fit the disk).
 
 ## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place` (PR #111, merged 13:21 UTC)
 - **`tests/e2e/activities.mjs`** now runs on an event: the dev founders create it, move it to
