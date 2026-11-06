@@ -19,6 +19,7 @@ mod history;
 mod link;
 mod links;
 mod organizer;
+mod place;
 mod plan;
 mod scope_item;
 mod space;
@@ -33,6 +34,7 @@ pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use history::{ActivityCompletion, ActivityRating};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
+pub use place::Place;
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 pub use scope_item::SEED_MAX as SCOPE_ITEM_SEED_MAX;
 pub use space::{
@@ -48,6 +50,9 @@ pub struct Charter {
     pub mode: String,
     pub subtype: String,
     pub location_label: String,
+    /// The place behind `location_label`, when it was picked with coordinates (ADR 0078).
+    #[serde(default)]
+    pub place: Option<Place>,
     /// The phase the project was created in; later phases come from passed proposals.
     pub phase: String,
     pub tags: Vec<String>,
@@ -61,6 +66,9 @@ pub enum ProposalKind {
         title: Option<String>,
         description: Option<String>,
         location: Option<String>,
+        /// With `location`: its place (ADR 0078); `None` there leaves the label without one.
+        #[serde(default)]
+        place: Option<Box<Place>>,
     },
     Update {
         body: String,

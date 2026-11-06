@@ -70,6 +70,24 @@ pub fn state(standing: &mut Standing, roll: &Roll) -> ExternResult<State> {
     })
 }
 
+/// A passed edit: the fields it changes; a new location brings its place, or none (ADR 0078).
+fn edit(out: &mut Applied, kind: ProposalKind) {
+    if let ProposalKind::Edit {
+        title,
+        description,
+        location,
+        place,
+    } = kind
+    {
+        out.title = title.or(out.title.take());
+        out.description = description.or(out.description.take());
+        if location.is_some() {
+            out.location = location;
+            out.place = place.map(|p| *p);
+        }
+    }
+}
+
 /// Apply passed decisions in the order they were decided.
 fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approved]) -> Applied {
     let mut out = Applied::default();
@@ -77,15 +95,7 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
     for d in decisions {
         out.last_decision_at = Some(d.at);
         match d.proposal.entry.kind {
-            ProposalKind::Edit {
-                title,
-                description,
-                location,
-            } => {
-                out.title = title.or(out.title);
-                out.description = description.or(out.description);
-                out.location = location.or(out.location);
-            }
+            kind @ ProposalKind::Edit { .. } => edit(&mut out, kind),
             ProposalKind::Update { body } => out.updates.push(AppliedUpdate {
                 proposal: d.proposal.hash,
                 author: d.proposal.author,

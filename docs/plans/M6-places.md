@@ -1,7 +1,7 @@
 # M6: places and the map (parity item 7)
 
-Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Not
-started. Each phase starts with its ADR and ships as its own PR. Port from web only
+Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Phase 1 in
+progress. Each phase starts with its ADR and ships as its own PR. Port from web only
 (STATUS "Owner decisions"); asset management stays out.
 
 ## What web has
@@ -30,17 +30,17 @@ started. Each phase starts with its ADR and ships as its own PR. Port from web o
   scope of the feed (distance-sorted, with project-activity cards and distances).
 
 ## Phases (app)
-1. **Place records** (integrity: project + directory reset). A `Place` struct in a new crate
-   `crates/sp_place` (not `sp_core`, CLAUDE.md) with web's rules and rounding; an optional
-   `place: Option<Place>` next to each existing label (charter location, event plan
-   location, activity place, help request place, the profile's default location). Labels
-   stay as they are, so old views keep working. Scenario + `cargo test -p sp_place`.
+1. **Place records** (ADR 0078, project reset; done on a branch 2026-11-06): `Place` checked
+   by `crates/sp_place`, an optional place next to the charter's, edits', plans' and
+   activities' labels. Scenario `places.rs`. The account's default location moves to phase 3
+   (a private record: profiles are public).
 2. **Geocoding on the gateway**: `/locations/search`, `/reverse`, `/ip-hint` as web's routes,
    proxied to Nominatim with a cache and the per-IP limit (gateway env vars like web's
    `GEOCODING_*`). The native app calls a gateway for these too. Needs the seed node's
    network to reach `nominatim.openstreetmap.org` (Railway: fine).
 3. **LocationPicker** in the UI (`components/location/`), ported with web's CSS through
-   `PORTS`, into the create flows, both wizards, the edit sheet and Settings' Regional.
+   `PORTS`, into the create flows, both wizards, the edit sheet and Settings' Regional (the
+   default location as a private entry).
 4. **Index**: the gateway index reads places; `/index/map-markers` and the Region feed with
    web's visibility rules (private spaces' places never leave their members).
 5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),

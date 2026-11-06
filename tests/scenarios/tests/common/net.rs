@@ -60,7 +60,11 @@ impl Net {
         Self::with_charter(n, founders, seed, charter("productive")).await
     }
 
-    pub async fn with_charter(n: usize, founders: usize, seed: &str, charter: Charter) -> Self {
+    /// As `new`, founding the space with `charter` (any shape that mirrors the charter).
+    pub async fn with_charter<C>(n: usize, founders: usize, seed: &str, charter: C) -> Self
+    where
+        C: Serialize + std::fmt::Debug + Clone,
+    {
         let mut conductors = SweetConductorBatch::standard(n).await;
         let seed = if is_private(seed) {
             seed.to_string()

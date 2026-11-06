@@ -59,6 +59,8 @@ pub struct CharterGlance {
     pub mode: String,
     #[serde(default)]
     pub location_label: String,
+    #[serde(default)]
+    pub place: Option<project_integrity::Place>,
 }
 
 pub fn glance() -> ExternResult<Glance> {

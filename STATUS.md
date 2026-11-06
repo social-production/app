@@ -50,13 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: the activities browser test on an event (PR #111, branch `claude/social-production-handoff-dsam61`)
-`tests/e2e/activities.mjs` now runs on an event in its Activity phase (founders' path, shared
-with `events.mjs` in the new `tests/e2e/event-flow.mjs`), plus the M6 plan
-(`docs/plans/M6-places.md`) and its first pure crate `crates/sp_place` (no zome uses it yet,
-so no DNA hash changes). See the newest "Done" entry for what was checked.
-**Next:** M6 phase 1, place records (`docs/plans/M6-places.md`; write its ADR 0078 first),
-then the rest of the parity list below.
+## In flight: M6 phase 1, place records (ADR 0078), PR #112
+PR #112 waits on CI (**project reset** on merge); merge when green, then smoke live (create a
+project; `projects.mjs`) and update README Status. PR #111 merged 13:21 UTC (12:21 am
+Melbourne, Nov 7): CI green on the first run; no DNA or UI change, live UI and `/readyz` fine.
+**Next:** M6 phase 2, geocoding on the gateway (`docs/plans/M6-places.md`), then phase 3's
+LocationPicker; then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -83,7 +82,30 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place`
+## Done 2026-11-06 (late, PR #112, not yet merged): M6 phase 1, place records (ADR 0078)
+**Project integrity change: merging resets the project network.** Directory and conversation
+unchanged (`sp_place` is its own crate, not `sp_core`).
+- **Records:** `project_integrity::Place { label, latitude, longitude, region, country,
+  provider_id, precision, online }` (`src/place.rs`, rules in `sp_place`); optional
+  `#[serde(default)]` fields `Charter.place`, `ProposalKind::Edit.place` (boxed),
+  `Plan.place` (boxed: clippy's large-enum-variant on `ProposalKind::Plan`),
+  `Activity.location`. A place's label must equal the record's own label.
+- **Coordinator:** `Applied.place` (a passed edit with `location` sets or clears it; the fold's
+  edit arm moved to `apply.rs::edit` to stay under 60 lines); `merge` copies it to the
+  charter; `NewActivity.location`; bookings copy the service's place when its label is used.
+- **Tests:** scenario `places.rs` (a charter with a place; refusals for extra decimals, a
+  mismatched label and half a pair; an edit's place passes and a label-only edit clears it).
+  `Net::with_charter` is now generic over the charter shape.
+- **Checked:** hApp pack; `cargo clippy -p project_integrity -p activities -p governance -p
+  project -p sp_place --all-targets -D warnings` in Nix; `cargo fmt --check`; scenario
+  `places` **passed** (450 s here). **Not run:** the other scenario files (CI); no UI change
+  (the UI sends no places until phase 3).
+- **Lesson:** CI's first run failed `check` on clippy's 60-line rule in the new scenario test
+  (74 lines). Lint a new scenario file before pushing, inside Nix and without debug info:
+  `bash scripts/cloud-nix.sh env CARGO_PROFILE_DEV_DEBUG=0 CARGO_PROFILE_TEST_DEBUG=0 cargo
+  clippy -p scenarios --test <name> -- -D warnings` (it passed here and fit the disk).
+
+## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place` (PR #111, merged 13:21 UTC)
 - **`tests/e2e/activities.mjs`** now runs on an event: the dev founders create it, move it to
   Event Plan, approve a plan from today for two weeks (00:00–23:59, so the two-minute
   activity fits) and move it to Activity; founder one is Ann, Bob is a new account (so the

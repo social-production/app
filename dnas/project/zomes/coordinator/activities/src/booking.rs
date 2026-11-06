@@ -173,6 +173,12 @@ fn booking_of(input: BookInput, project: &calls::Glance, membership: ActionHash)
         .map(|c| c.location_label.trim().to_string())
         .filter(|p| !p.is_empty())
         .unwrap_or_else(|| "Online".into());
+    // The service's own place, when it has coordinates and is the label used (ADR 0078).
+    let location = project
+        .charter
+        .as_ref()
+        .and_then(|c| c.place.clone())
+        .filter(|p| !p.online && p.label == place);
     Activity {
         title: if title.is_empty() {
             "Booking".into()
@@ -183,6 +189,7 @@ fn booking_of(input: BookInput, project: &calls::Glance, membership: ActionHash)
         ends_at: input.ends_at,
         online: false,
         place,
+        location,
         meeting_url: None,
         note: "Booked through a service request.".into(),
         plan_stage: None,

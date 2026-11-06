@@ -79,3 +79,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0075](./0075-chat-message-reports.md) Reports in direct and group chats (web's 1:1 path) and invite declines as private inbox entries (conversation reset)
 - [0076](./0076-service-requests.md) Service requests: a request lives in the direct chat with the service's creator; request settings are a proposal (part a: personal services; project and chat reset)
 - [0077](./0077-availability-and-bookings.md) Availability and bookings: weekly hours are records, one-off slots and bookings are activities; the requester checks in and rates (project reset)
+- [0078](./0078-places.md) Places: an optional `Place` (coordinates, precision, online) next to each location label, rules in `sp_place` (M6 phase 1; project reset)
