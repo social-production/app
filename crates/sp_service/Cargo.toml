@@ -1,0 +1,11 @@
+[package]
+name = "sp_service"
+description = "Rules for service requests (web's project service requests, ADR 0076). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

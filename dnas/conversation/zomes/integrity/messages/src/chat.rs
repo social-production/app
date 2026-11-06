@@ -6,6 +6,7 @@ use sp_core::chat::check_message;
 
 use crate::attachments::{validate_chunk, validate_message_files};
 use crate::report::{validate_report, validate_vote};
+use crate::service::{validate_request, validate_status};
 use sp_core::conversation::{check_title, ChatKind, INBOX_TAG_MAX};
 
 use crate::rights::{manages, member, message_author};
@@ -27,10 +28,7 @@ pub fn validate_entry(
 ) -> ExternResult<ValidateCallbackResult> {
     // The author's own commit of a private entry is validated with the entry in hand.
     if let EntryTypes::Declined(d) = entry {
-        if d.seed.len() > INBOX_TAG_MAX {
-            return invalid("an invitation's seed is too long");
-        }
-        return validate_private_of(UnitEntryTypes::Declined);
+        return validate_declined(&d.seed);
     }
     let (creator, kind) = match chat()? {
         Ok(chat) => chat,
@@ -80,10 +78,35 @@ pub fn validate_entry(
             ),
             Err(reason) => invalid(&reason),
         },
-        EntryTypes::Report(r) => validate_report(r, author, &creator),
-        EntryTypes::ReportVote(v) => validate_vote(v, author, &creator),
+        EntryTypes::Report(_)
+        | EntryTypes::ReportVote(_)
+        | EntryTypes::ServiceRequest(_)
+        | EntryTypes::RequestStatus(_) => validate_cited(entry, author, &creator, kind),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
         EntryTypes::Declined(_) => invalid("declines are checked above"),
+    }
+}
+
+fn validate_declined(seed: &str) -> ExternResult<ValidateCallbackResult> {
+    if seed.len() > INBOX_TAG_MAX {
+        return invalid("an invitation's seed is too long");
+    }
+    validate_private_of(UnitEntryTypes::Declined)
+}
+
+/// Reports (ADR 0075) and service requests (ADR 0076): each checks what it cites.
+fn validate_cited(
+    entry: &EntryTypes,
+    author: &AgentPubKey,
+    creator: &AgentPubKey,
+    kind: ChatKind,
+) -> ExternResult<ValidateCallbackResult> {
+    match entry {
+        EntryTypes::Report(r) => validate_report(r, author, creator),
+        EntryTypes::ReportVote(v) => validate_vote(v, author, creator),
+        EntryTypes::ServiceRequest(r) => validate_request(r, author, creator, kind),
+        EntryTypes::RequestStatus(s) => validate_status(s, author, creator),
+        _ => invalid("not a cited entry"),
     }
 }
 
@@ -186,6 +209,8 @@ pub fn validate_link(
         LinkTypes::Calls => UnitEntryTypes::Call,
         LinkTypes::Reports => UnitEntryTypes::Report,
         LinkTypes::ReportVotes => UnitEntryTypes::ReportVote,
+        LinkTypes::Requests => UnitEntryTypes::ServiceRequest,
+        LinkTypes::RequestStatuses => UnitEntryTypes::RequestStatus,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
     // Whether the entry itself was allowed is the entry's own validation.

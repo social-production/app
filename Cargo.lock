@@ -5456,6 +5456,7 @@ dependencies = [
  "sp_core",
  "sp_event",
  "sp_moderation",
+ "sp_service",
 ]
 
 [[package]]
@@ -5470,6 +5471,7 @@ dependencies = [
  "sp_call",
  "sp_core",
  "sp_moderation",
+ "sp_service",
 ]
 
 [[package]]
@@ -7212,6 +7214,7 @@ dependencies = [
  "sp_governance",
  "sp_help",
  "sp_scope",
+ "sp_service",
 ]
 
 [[package]]
@@ -8851,6 +8854,10 @@ version = "0.0.1"
 dependencies = [
  "sp_core",
 ]
+
+[[package]]
+name = "sp_service"
+version = "0.0.1"
 
 [[package]]
 name = "space_scope"

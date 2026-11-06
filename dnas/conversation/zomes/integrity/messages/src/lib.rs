@@ -7,9 +7,11 @@ mod attachments;
 mod chat;
 mod report;
 mod rights;
+mod service;
 
 pub use chat::is_type;
 pub use report::{Declined, Report, ReportVote};
+pub use service::{RequestStatus, ServiceRequest};
 
 use hdi::prelude::*;
 use sp_attachment::preview_text;
@@ -180,6 +182,8 @@ pub enum EntryTypes {
     ReportVote(ReportVote),
     #[entry_type(visibility = "private")]
     Declined(Declined),
+    ServiceRequest(ServiceRequest),
+    RequestStatus(RequestStatus),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -195,7 +199,8 @@ pub enum LinkTypes {
     /// to that person.
     Inbox,
     /// Chat anchor → a removal, a leave, an edit, a pin, a `Seen`, a `Call`, a report or a
-    /// report vote (ADR 0075), each by its entry's author.
+    /// report vote (ADR 0075), a service request or its status (ADR 0076), each by its
+    /// entry's author.
     Removals,
     Leaves,
     Edits,
@@ -204,6 +209,8 @@ pub enum LinkTypes {
     Calls,
     Reports,
     ReportVotes,
+    Requests,
+    RequestStatuses,
 }
 
 /// Which network this cell is: one chat (its creator and kind) or the inbox.

@@ -6,7 +6,7 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{Proposal, VoteChoice};
+use project_integrity::{Proposal, ProposalKind, VoteChoice};
 use sp_governance::Verdict;
 
 use crate::calls;
@@ -56,8 +56,11 @@ pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision
         };
         // Integrity accepts a vote-less pass only for an organizer's proposal (ADR 0061).
         // What a removed organizer decided afterwards doesn't count (ADR 0073).
-        if outcome.entry.votes.is_empty() && organized {
-            if calls::lapsed(&ends, proposal.entry.organizer.as_ref(), proposal.at) {
+        // Integrity accepts one for a personal service creator's request settings too
+        // (ADR 0076).
+        let saved = matches!(proposal.entry.kind, ProposalKind::RequestSettings { .. });
+        if outcome.entry.votes.is_empty() && (organized || saved) {
+            if organized && calls::lapsed(&ends, proposal.entry.organizer.as_ref(), proposal.at) {
                 continue;
             }
             passed.push(Decision {

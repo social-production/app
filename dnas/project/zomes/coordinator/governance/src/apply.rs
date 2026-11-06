@@ -2,7 +2,7 @@
 //! decided (`decide`). Returns go back to an earlier planning phase (ADR 0040).
 
 use hdk::prelude::*;
-use project_integrity::{Applied, AppliedUpdate, Charter, ProposalKind};
+use project_integrity::{Applied, AppliedRequests, AppliedUpdate, Charter, ProposalKind};
 use sp_governance::phases::{next_phase, Phase, Shape};
 use sp_governance::plans::required_plan_kind;
 use sp_governance::returns::{can_return, reopens_subtype};
@@ -115,6 +115,19 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
             // both projects' approval, which the Links tab pairs (ADR 0042).
             ProposalKind::Plan(_) | ProposalKind::Link(_) => {}
             ProposalKind::RemoveMember { agent } => out.removed.push((agent, d.at)),
+            ProposalKind::RequestSettings {
+                enabled,
+                mode,
+                off_schedule,
+                ..
+            } => {
+                out.requests = Some(AppliedRequests {
+                    enabled,
+                    mode,
+                    off_schedule,
+                    at: d.at,
+                });
+            }
         }
     }
     out.updates.reverse(); // newest first, as web lists them
