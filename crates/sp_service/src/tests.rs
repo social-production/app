@@ -2,13 +2,14 @@ use super::*;
 
 #[test]
 fn checks_requests() {
-    assert!(check_request("p", "Fix my bike", "Flat tyre", None).is_ok());
-    assert!(check_request("p", "Fix", "Flat", Some((1, 2))).is_ok());
-    assert!(check_request("", "Fix", "Flat", None).is_err());
-    assert!(check_request("p", " ", "Flat", None).is_err());
-    assert!(check_request("p", &"x".repeat(TITLE_MAX + 1), "Flat", None).is_err());
-    assert!(check_request("p", "Fix", "", None).is_err());
-    assert!(check_request("p", "Fix", "Flat", Some((2, 2))).is_err());
+    assert!(check_request("p", "Bikes", "Fix my bike", "Flat tyre", None).is_ok());
+    assert!(check_request("p", "Bikes", "Fix", "Flat", Some((1, 2))).is_ok());
+    assert!(check_request("", "Bikes", "Fix", "Flat", None).is_err());
+    assert!(check_request("p", "Bikes", " ", "Flat", None).is_err());
+    assert!(check_request("p", "Bikes", &"x".repeat(TITLE_MAX + 1), "Flat", None).is_err());
+    assert!(check_request("p", "Bikes", "Fix", "", None).is_err());
+    assert!(check_request("p", "Bikes", "Fix", "Flat", Some((2, 2))).is_err());
+    assert!(check_request("p", "", "Fix", "Flat", None).is_err());
 }
 
 #[test]

@@ -5,6 +5,7 @@ import {
   type RailProject,
 } from '#lib/domain/activityRail.ts';
 import { railHistory } from '#lib/domain/activityRailHistory.ts';
+import { requestRailItems } from '#lib/domain/requestRail.ts';
 import type { VoteChoice } from '#lib/domain/governance.ts';
 import type { SideStatus } from '#lib/domain/links.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
@@ -20,7 +21,9 @@ import { listActivities } from './activities.ts';
 import { listProposals } from './governance.ts';
 import { getModeration } from './moderation.ts';
 import { listPlans } from './plans.ts';
+import { namesOf, myAgent } from './people.ts';
 import { listingTitle, myProjectSeeds } from './projects.ts';
+import { myServiceRequests } from './serviceRequests.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
@@ -75,10 +78,25 @@ async function railLinks(cell: CellId): Promise<RailLink[]> {
  */
 export async function myActivityRail(): Promise<{ items: RailItem[]; history: RailItem[] }> {
   const seeds = await myProjectSeeds();
-  const settled = await Promise.allSettled(seeds.map(railProject));
+  const [settled, requests] = await Promise.all([
+    Promise.allSettled(seeds.map(railProject)),
+    railRequests().catch(() => []),
+  ]);
   const projects = settled.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []));
   const now = Date.now() * 1000;
-  return { items: railItems(projects, now), history: railHistory(projects, now) };
+  return {
+    items: [...railItems(projects, now), ...requests],
+    history: railHistory(projects, now),
+  };
+}
+
+/** Open requests to the services you run (ADR 0076), from your direct chats. */
+async function railRequests(): Promise<RailItem[]> {
+  const [me, requests] = await Promise.all([myAgent(), myServiceRequests()]);
+  const asking = requests.filter((r) => r.status === 'open' && r.requester !== me);
+  if (asking.length === 0) return [];
+  const names = await namesOf([...new Set(asking.map((r) => r.requester))]);
+  return requestRailItems(asking, me, names);
 }
 
 async function railProject(seed: string): Promise<RailProject | null> {

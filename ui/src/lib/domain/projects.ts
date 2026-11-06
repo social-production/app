@@ -87,6 +87,17 @@ export interface Project {
   /** The creator first, then co-organizers. */
   organizers: string[];
   amOrganizer: boolean;
+  /** A service's request settings (ADR 0076; web's `requestSystem.settings`). */
+  requests: RequestSettings;
+}
+
+/** web's request modes: listed slots, written messages, or both. */
+export type RequestMode = 'calendar' | 'direct' | 'both';
+
+export interface RequestSettings {
+  enabled: boolean;
+  mode: RequestMode;
+  offSchedule: boolean;
 }
 
 export type EventAudience = 'public' | 'private_community' | 'invite_only';

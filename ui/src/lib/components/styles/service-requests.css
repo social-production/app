@@ -1,0 +1,382 @@
+/* Ported from web/src/lib/features/projects/detail/lifecycle/individual-service/phases/IndividualServicePhaseOne.svelte (ADR 0032, scripts/port-styles.py) */
+.service-ui .history-section {
+  border-top: 1px solid var(--panel-border);
+  padding-top: 12px;
+}
+
+.service-ui .history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.service-ui .history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.service-ui .history-chevron {
+  transition: transform 0.15s ease;
+}
+
+.service-ui details[open] > .history-summary .history-chevron {
+  transform: rotate(180deg);
+}
+
+.service-ui .phase-surface,
+.service-ui .card-rail-section,
+.service-ui .history-stack,
+.service-ui .composer-card {
+  display: grid;
+  gap: 12px;
+}
+
+.service-ui .overlay-footer:has(.sheet-actions) {
+  gap: 0;
+}
+
+.service-ui .sheet-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  width: 100%;
+}
+
+.service-ui .sheet-cancel,
+.service-ui .sheet-submit {
+  min-height: 56px;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.service-ui .sheet-cancel {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset -1px 0 0 var(--panel-border);
+}
+
+.service-ui .sheet-submit {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.service-ui .request-header-row,
+.service-ui .binary-row,
+.service-ui .number-grid {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.service-ui .request-header-row {
+  justify-content: space-between;
+}
+
+.service-ui .section-head,
+.service-ui .card-rail {
+  display: grid;
+  gap: 12px;
+}
+
+.service-ui .section-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.service-ui .card-rail {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  padding-right: 2px;
+}
+
+.service-ui .card-rail:has(.activity-card-shell) {
+  gap: 0;
+}
+
+.service-ui .rail-card {
+  min-width: 0;
+}
+
+.service-ui .composer-card,
+.service-ui .empty-card {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.service-ui .helper-card {
+  background: var(--panel);
+}
+
+.service-ui .checkbox-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.service-ui .checkbox-row input {
+  width: auto;
+}
+
+.service-ui .review-actions {
+  justify-content: flex-start;
+}
+
+.service-ui .number-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.service-ui .vote-chip.negative {
+  color: var(--tablet-community-text);
+}
+
+.service-ui .empty-card,
+.service-ui p,
+.service-ui span {
+  color: var(--text-soft);
+}
+
+.service-ui h3,
+.service-ui .field-inline-label {
+  color: var(--text-main);
+}
+
+.service-ui h3 {
+  font-size: 14px;
+  margin: 0;
+}
+
+.service-ui input,
+.service-ui textarea,
+.service-ui select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+}
+
+.service-ui textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.service-ui .field-inline-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-ui .field-help {
+  margin: 0;
+  font-size: 12px;
+}
+
+.service-ui .vote-chip {
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-ui .vote-chip.selected {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.service-ui .rules-list,
+.service-ui .rule-row {
+  display: grid;
+  gap: 8px;
+}
+
+.service-ui .rule-row {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-ui .conversation-link,
+.service-ui .add-time {
+  justify-self: start;
+}
+
+.service-ui .text-button {
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.service-ui .text-button {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+@media (max-width: 760px) {
+  .service-ui .section-head,
+  .service-ui .number-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.service-ui .owner-note {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.service-ui .owner-note a {
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+.service-ui .requests-off-banner {
+  padding: 10px 14px;
+  border: 1px solid var(--status-yellow);
+  border-radius: var(--radius-sm);
+  background: var(--status-yellow-soft);
+  color: var(--status-yellow-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/components/cards/project-detail/CollapsibleServiceRequestCard.svelte (ADR 0032, scripts/port-styles.py) */
+.service-ui .request-card-shell {
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  display: grid;
+  gap: 10px;
+  transition:
+    border-color 0.12s ease,
+    box-shadow 0.12s ease;
+}
+
+.service-ui .request-card-shell:hover,
+.service-ui .request-card-shell.expanded,
+.service-ui .request-card-shell.highlighted {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--brand) 25%, transparent);
+}
+
+.service-ui .collapse-toggle {
+  width: 100%;
+  list-style: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  display: grid;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.service-ui .collapse-toggle::-webkit-details-marker {
+  display: none;
+}
+
+.service-ui .request-header,
+.service-ui .request-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.service-ui .request-copy {
+  display: grid;
+  gap: 3px;
+}
+
+.service-ui .request-copy strong {
+  color: var(--text-main);
+}
+
+.service-ui .request-copy span,
+.service-ui .request-meta,
+.service-ui .request-body p {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.service-ui .request-footer {
+  justify-content: flex-end;
+}
+
+.service-ui .request-body {
+  display: grid;
+  gap: 10px;
+}
+
+.service-ui .request-body p {
+  margin: 0;
+  line-height: 1.45;
+}
+
+.service-ui .request-body .decline-reason {
+  color: var(--text-main);
+}
+
+.service-ui .phase-badge {
+  padding: 6px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.service-ui .phase-badge.current,
+.service-ui .phase-badge.complete {
+  border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+  background: color-mix(in srgb, var(--brand-soft) 75%, var(--panel));
+  color: var(--brand-strong);
+}
+
+.service-ui .phase-badge.locked {
+  border-color: var(--tablet-community-bg);
+  background: color-mix(in srgb, var(--tablet-community-bg) 16%, var(--panel));
+  color: var(--tablet-community-text);
+}
+
+.service-ui .phase-badge.upcoming {
+  border-color: color-mix(in srgb, var(--status-yellow) 44%, var(--panel-border));
+  background: color-mix(in srgb, var(--status-yellow-soft) 72%, var(--panel));
+  color: var(--status-yellow-strong);
+}
+
+@media (max-width: 760px) {
+  .service-ui .request-footer {
+    justify-content: flex-start;
+  }
+}

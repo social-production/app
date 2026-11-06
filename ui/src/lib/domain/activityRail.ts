@@ -10,14 +10,16 @@ import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
 import type { CharterMode } from './projects.ts';
 
-/** web's kinds this app has so far; events, help requests and service requests come later. */
-export type RailKind = 'project' | 'vote';
+/** web's kinds this app has so far (service requests: `requestRail.ts`); help requests later. */
+export type RailKind = 'project' | 'vote' | 'request';
 export type RailVoteKind = 'phase_change' | 'plan' | 'update' | 'edit' | 'link' | 'link_sever';
 
 export interface RailItem {
   id: string;
   /** The project's network seed; its page is looked up when the card is opened. */
   seed: string;
+  /** The page's id when it is already known (service requests name their service). */
+  projectId?: string;
   kind: RailKind;
   title: string;
   /** The project page's query, as web's `href` carries it. */
@@ -226,6 +228,7 @@ export function railKicker(item: RailItem): string {
   if (item.kind === 'vote') {
     return item.voteKindLabel ? `Vote · ${item.voteKindLabel.replace('_', ' ')}` : 'Vote';
   }
+  if (item.kind === 'request') return 'Service request';
   return 'Project activity';
 }
 

@@ -20,6 +20,7 @@ use crate::{guest, MESSAGES};
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RequestInput {
     pub project: String,
+    pub service: String,
     pub title: String,
     pub body: String,
     pub starts_at: Option<Timestamp>,
@@ -39,6 +40,7 @@ pub struct DecideInput {
 pub struct RequestView {
     pub id: ActionHash,
     pub project: String,
+    pub service: String,
     pub requester: AgentPubKey,
     pub title: String,
     pub body: String,
@@ -89,10 +91,12 @@ pub fn send_service_request(input: RequestInput) -> ExternResult<ActionHash> {
         _ => return Err(guest("Add both a start and a finish time, or neither.")),
     };
     let micros = window.map(|(s, e)| (s.as_micros(), e.as_micros()));
-    check_request(&input.project, &title, &body, micros).map_err(|r| guest(&r))?;
+    let service = input.service.trim().to_string();
+    check_request(&input.project, &service, &title, &body, micros).map_err(|r| guest(&r))?;
     let invite = chat.my_invite()?;
     let request = ServiceRequest {
         project: input.project.clone(),
+        service,
         title: title.clone(),
         body: body.clone(),
         starts_at: input.starts_at,
@@ -211,6 +215,7 @@ impl Ledger {
         RequestView {
             id: r.hash.clone(),
             project: r.entry.project.clone(),
+            service: r.entry.service.clone(),
             requester: r.author.clone(),
             title: r.entry.title.clone(),
             body: r.entry.body.clone(),

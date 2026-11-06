@@ -10,6 +10,7 @@
 
   import { ActivitiesState, stageOptions } from './activitiesState.svelte.ts';
   import type { DetailState } from './detailState.svelte.ts';
+  import ServiceRequests from './requests/ServiceRequests.svelte';
 
   import '#lib/components/styles/activities.css';
 
@@ -61,6 +62,9 @@
 </script>
 
 <section id="participation-activities" class="phase-surface activity-ui">
+  {#if personal && project}
+    <ServiceRequests {detail} creatorName={detail.names[project.creator] ?? 'the creator'} />
+  {/if}
   <section class="scheduling-panel">
     <ActivityCalendar
       activities={state.activities}

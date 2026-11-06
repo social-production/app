@@ -11,6 +11,7 @@ import type { NotificationCategory } from '#lib/domain/notificationCategories.ts
 import { inviteNotifications } from '#lib/domain/inviteNotifications.ts';
 import { planLeadNotifications } from '#lib/domain/planLeadNotifications.ts';
 import { removedNotifications } from '#lib/domain/removedNotifications.ts';
+import { requestNotifications } from '#lib/domain/requestNotifications.ts';
 import { botReviewNotifications } from '#lib/domain/botReviewNotifications.ts';
 import { VISIBLE } from '#lib/domain/moderation.ts';
 import { activityNotifications } from '#lib/domain/activityNotifications.ts';
@@ -27,6 +28,7 @@ import { followView } from './follows.ts';
 import { chatSummary, listChatMessages, myChats } from './messages.ts';
 import { listProposals, planLeadChanges } from './governance.ts';
 import { myAgent, namesOf, viewer } from './people.ts';
+import { myServiceRequests } from './serviceRequests.ts';
 import { listingIdOf, myProjectSeeds } from './projects.ts';
 
 /** The part of `get_project` notifications read. */
@@ -57,6 +59,7 @@ export async function myNotifications(
     followView(me).then(followNotifications),
     pendingInvites().then(inviteNotifications),
     fromBotReviews(me, off),
+    myServiceRequests().then((r) => requestNotifications(r, me)),
   ]);
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };

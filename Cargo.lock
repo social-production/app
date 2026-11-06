@@ -7196,6 +7196,7 @@ dependencies = [
  "sp_discussion",
  "sp_governance",
  "sp_help",
+ "sp_service",
  "space_scope",
 ]
 

@@ -15,6 +15,8 @@ use crate::{invalid, is_type, UnitEntryTypes};
 pub struct ServiceRequest {
     /// The service: its project id as the app routes it.
     pub project: String,
+    /// The service's title when asked (web's notification and rail rows name it).
+    pub service: String,
     pub title: String,
     pub body: String,
     /// web's `scheduled_at` / `ends_at`, both or neither.
@@ -53,7 +55,9 @@ pub fn validate_request(
     if kind != ChatKind::Direct {
         return invalid("service requests go in a direct chat with the service's creator");
     }
-    if let Err(reason) = window(r).and_then(|w| check_request(&r.project, &r.title, &r.body, w)) {
+    if let Err(reason) =
+        window(r).and_then(|w| check_request(&r.project, &r.service, &r.title, &r.body, w))
+    {
         return invalid(&reason);
     }
     if !member(author, r.invite.as_ref(), creator)? {

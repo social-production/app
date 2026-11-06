@@ -36,7 +36,8 @@ export type NotificationKind =
   | 'evt-plan-lead'
   | 'prj-removed'
   | 'bot-review'
-  | 'bot-review-result';
+  | 'bot-review-result'
+  | 'svc-request';
 
 export interface NotificationItem {
   id: string;
@@ -66,6 +67,8 @@ export interface NotificationItem {
     | { home: true }
     /** A bot review card (web's `href: /profile/<username>`, ADR 0074). */
     | { profile: string }
+    /** A service request (`svc-request`, ADR 0076): its service's page opens the request. */
+    | { request: { project: string; id: string } }
     | null;
   createdAt: number;
   isUnread: boolean;

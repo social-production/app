@@ -12,7 +12,17 @@ export type ProposalKind =
   /** web's revert request: back to an earlier planning phase, with a reason (ADR 0040). */
   | { Return: { to: string; reason: string } }
   /** A channel's or community's member vote to remove someone (ADR 0068). */
-  | { RemoveMember: { agent: string } };
+  | { RemoveMember: { agent: string } }
+  /** A service's request settings (ADR 0076): voted in a collective service, saved at once
+   * by a personal service's creator. */
+  | {
+      RequestSettings: {
+        enabled: boolean;
+        mode: 'calendar' | 'direct' | 'both';
+        off_schedule: boolean;
+        reason: string;
+      };
+    };
 
 export interface Proposal {
   id: string;
@@ -49,15 +59,20 @@ export interface ProjectUpdate {
 /** Needs 66% yes, as on web (sp_governance::Threshold::DEFAULT). */
 export const APPROVAL_PERCENT = 66;
 
-export function kindName(kind: ProposalKind): 'edit' | 'update' | 'phase' | 'return' | 'remove' {
+export function kindName(
+  kind: ProposalKind,
+): 'edit' | 'update' | 'phase' | 'return' | 'remove' | 'settings' {
   if ('Edit' in kind) return 'edit';
+  if ('RequestSettings' in kind) return 'settings';
   if ('RemoveMember' in kind) return 'remove';
   if ('Return' in kind) return 'return';
   return 'Update' in kind ? 'update' : 'phase';
 }
 
 /** A move or a return: web allows one open phase vote at a time. */
-export function isPhaseChange(kind: ProposalKind): boolean {
+export function isPhaseChange(
+  kind: ProposalKind,
+): kind is Extract<ProposalKind, { Phase: unknown } | { Return: unknown }> {
   return 'Phase' in kind || 'Return' in kind;
 }
 
@@ -66,6 +81,7 @@ export function proposalLabel(kind: ProposalKind, phaseLabel: (id: string) => st
   if ('Edit' in kind) return 'Edit project';
   if ('Update' in kind) return 'Post update';
   if ('RemoveMember' in kind) return 'Remove member';
+  if ('RequestSettings' in kind) return 'Request settings';
   // web's phaseChangeDecisionTitle('return', …).
   if ('Return' in kind) return `Return to ${phaseLabel(kind.Return.to)}`;
   return `Move to ${phaseLabel(kind.Phase.to)}`;
@@ -79,6 +95,7 @@ export function outcomeSentence(
 ): string {
   if ('Update' in kind) return 'If this passes, this update is posted.';
   if ('RemoveMember' in kind) return 'If this passes, this member is removed.';
+  if ('RequestSettings' in kind) return 'If this passes, the request settings change.';
   if ('Phase' in kind) return `If this passes, this moves from ${from} to ${to(kind.Phase.to)}.`;
   if ('Return' in kind) return `If this passes, this moves from ${from} to ${to(kind.Return.to)}.`;
   const e = kind.Edit;

@@ -26,7 +26,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
    time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
-6. **Service requests** (borrowing and delivery frames; the right rail's Requests section).
+6. **Service requests** (ADR 0076): part (a) done 2026-11-06 (personal services' requests,
+   settings, chat lines, `svc-request` cards, the rail's Requests rows). Left: (b)
+   availability, slot holds and bookings (+ the create flow's request mode); (c) collective
+   services' settings vote, Request service and planning (review waits on the owner). web's
+   borrowing/delivery frames are dead code (`RequestFrameStack` is imported nowhere): not parity.
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
    project-activity cards, distances.
 8. **Software projects:** pull requests and the merge flow in the Activity phase.
@@ -48,7 +52,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   (ended activities, roles you hold, votes you cast, with the Show filter) and Cleared
   (dismiss ×, Restore, Restore all); the button's badge and the first desktop load opening it
   when there's something to do. Signed out it matches web at 390px (`tests/e2e/rail.mjs`).
-  Help Requests and Requests stay empty until help requests and service requests exist (M5c).
+  Help Requests stays empty; Requests lists open service requests to services you run
+  (ADR 0076).
   **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
   out personal services (Activity is their `phase-1`); the app lists both.
 - [x] Rail link votes: web's "Link vote · <other project>" / "Sever link · …" rows (this
@@ -192,8 +197,16 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   `ScopeCreateMenu` (dead code on web, imported nowhere).
 - [x] Posts in Search (2026-11-04): web's Posts filter and Post rows; the index serves posts
   to Search only (`/index/projects?posts=true`), public feeds still leave them out.
-- [ ] Service requests (`features/requests`: borrowing and delivery frames; the right rail's
-  Requests section). Asset-use requests come with asset management, after parity.
+- [x] Service requests, part (a) (2026-11-06, ADR 0076, project + chat reset): a personal
+  service's owner note, "Not taking requests.", Requests / Your requests (Accept, Decline with
+  a reason, Cancel request, Open conversation), Request service and Request settings sheets;
+  the request and its status lines live in the direct chat with the creator; `svc-request`
+  cards; the right rail's Requests rows. web's `features/requests` frames are dead code.
+- [ ] Service requests, part (b): Add availability (one-off slots, weekly hours), slot holds,
+  bookings (Provider role, Request history), the create flow's "Service request mode".
+- [ ] Service requests, part (c): collective services' Settings ▾ → Request settings vote,
+  Request service, Plan request. **Owner review:** web's review half is unreachable (nobody
+  can become a manager); who should review in the app?
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
   threads and posts (web's thresholds, Full members' votes, replayed by every reader).
 - [x] Moderation part (b), 2026-11-03 (PR #88, ADR 0071): reports on comments (threads, posts) and on

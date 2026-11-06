@@ -21,15 +21,19 @@ pub const PROJECT_MAX: usize = 200;
 /// The decisions a request can get after it is sent ("open", web's Pending).
 pub const STATUSES: [&str; 3] = ["accepted", "declined", "cancelled"];
 
-/// A request names its service, has web's title and body, and either no time or a start
-/// before its finish (microseconds).
+/// A request names its service (id and title), has web's title and body, and either no
+/// time or a start before its finish (microseconds).
 pub fn check_request(
     project: &str,
+    service: &str,
     title: &str,
     body: &str,
     window: Option<(i64, i64)>,
 ) -> Result<(), String> {
     if project.trim().is_empty() || project.len() > PROJECT_MAX {
+        return Err("A request names its service".into());
+    }
+    if service.trim().is_empty() || service.chars().count() > TITLE_MAX {
         return Err("A request names its service".into());
     }
     if title.trim().is_empty() || title.chars().count() > TITLE_MAX {

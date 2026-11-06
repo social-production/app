@@ -50,7 +50,9 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #105 merged; this docs PR follows it).
+## In flight: service requests part (a), ADR 0076, branch `claude/social-production-handoff-dsam61`
+See "Done 2026-11-06: service requests, part (a)" below for what is built and checked. If a
+PR is open for it, watch its CI; merging **resets the project network and the chats**.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -67,11 +69,43 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 done (ADR 0075 merged 2026-11-06: DM/group reports, with ADR 0061's declined-invite entry).
 (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
-service requests, map/places, software PRs.
+service requests (b) availability and bookings, then (c) collective services once the owner
+says who reviews them (ADR 0076), map/places, software PRs.
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-06: service requests, part (a) (ADR 0076), not merged yet
+**Project and conversation integrity change: merging resets the project network and the
+chats** (directory unchanged). PARITY's "borrowing and delivery frames" are dead code on web
+(`RequestFrameStack` imported nowhere); the real feature is web-backend's project service
+requests, which work on web only for personal services (nobody can become a collective
+service's manager, so its review is unreachable: owner review in ADR 0076).
+- **Records:** chat entries `ServiceRequest { project, service, title, body, starts_at,
+  ends_at, invite }` and `RequestStatus { request, status, reason, invite }` (direct chats
+  only; the person asking cancels, the other person accepts/declines, first decision wins,
+  `sp_service::replay`). Project `ProposalKind::RequestSettings { enabled, mode, off_schedule,
+  reason }`: a personal service's creator writes it with a vote-less Outcome (integrity
+  checks founder + personal mode); collective needs a reason and a vote. `get_project` has
+  `requests` (newest passed, else web's defaults). New crate `crates/sp_service`.
+- **Coordinator** `messages/src/service.rs`: `send_service_request` (posts web's
+  `Request "…" · Pending` line), `decide_service_request` (posts the status line),
+  `service_requests`. Governance: `accepts`/`saves_at_once` in `write.rs`, `decide.rs`
+  counts the vote-less pass, `apply.rs` folds `Applied.requests`. Project view structs moved
+  to `project/src/view.rs`.
+- **UI:** `features/projects/requests/` (ServiceRequests: owner note, "Not taking
+  requests.", toolbar Requests / Your requests, Request settings, Request service;
+  RequestsSheet, RequestComposer, RequestSettingsSheet), `components/requests/
+  ServiceRequestCard.svelte` (web's CollapsibleServiceRequestCard), ported
+  `service-requests.css` (root `.service-ui`). `services/serviceRequests.ts` reads every
+  direct chat; `startChat` takes a null first message. `svc-request` cards
+  (`domain/requestNotifications.ts`, category Roles, target opens `?request=`), the rail's
+  Requests rows (`domain/requestRail.ts`, `RailItem.projectId`).
+- **Tests:** scenario `service_requests.rs` (chat decisions; personal settings at once;
+  collective needs a reason; productive refused); browser `tests/e2e/service-requests.mjs`.
+- **Not done (parts b, c):** availability, slot holds, bookings, the create flow's request
+  mode, the "Done" hint on past bookings; collective services' screens.
 
 ## Done 2026-11-06: reports in direct and group chats (ADR 0075), PR #105 merged 22:55 UTC Nov 5 (9:55 am Melbourne)
 - **Live after merge:** CI green on the first run (check + 8 shards, 78 min). The seed node

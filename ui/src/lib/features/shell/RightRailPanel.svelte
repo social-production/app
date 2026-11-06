@@ -21,7 +21,8 @@
 
   /**
    * web's RightRailPanel: Project Activity & Events, Help Requests, Requests, Votes to cast,
-   * History and Cleared. Help and service requests stay empty until they exist (M5c).
+   * History and Cleared. Requests lists open service requests to services you run (ADR 0076);
+   * Help Requests stays empty for now.
    */
   let { onClose }: { onClose: () => void } = $props();
 
@@ -31,13 +32,14 @@
   const cleared = $derived(activityRail.items.filter((i) => activityRail.dismissed.includes(i.id)));
   const activities = $derived(visible.filter((i) => i.kind === 'project'));
   const votes = $derived(visible.filter((i) => i.kind === 'vote'));
+  const requests = $derived(visible.filter((i) => i.kind === 'request'));
   const unseen = (item: RailItem): boolean => !activityRail.seen.includes(item.id);
 
   /** web's handleOpenItem; a link into the page already open reloads it, so it opens there. */
   async function openItem(item: RailItem): Promise<void> {
     if (item.kind !== 'vote') markRailItemSeen(item.id);
     onClose();
-    const id = await projectPageOf(item.seed);
+    const id = item.projectId ?? (await projectPageOf(item.seed));
     if (!id) return;
     const path = spaceHref(item.projectMode, id);
     if (page.url.pathname === path) {
@@ -81,12 +83,24 @@
 
   <RailSection
     title="Requests"
-    count={0}
-    hot={false}
+    count={requests.length}
+    hot={requests.some(unseen)}
     extraClass="rail-section-requests"
     emptyTitle="No open requests"
     emptyText="Service requests you can review will appear here and open the matching project card."
-  />
+  >
+    {#each requests as item (item.id)}
+      <RailRow
+        {item}
+        unseen={unseen(item)}
+        rowClass=""
+        dismissLabel="Dismiss request card"
+        time={railTime(item.createdAt)}
+        onOpen={() => openItem(item)}
+        onDismiss={() => dismissRailItem(item.id)}
+      />
+    {/each}
+  </RailSection>
 
   <RailSection
     title="Votes to cast"

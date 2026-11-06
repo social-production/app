@@ -142,3 +142,5 @@ report.css        -               web/src/lib/components/shared/ModerationRestri
 history.css       .history-shell  web/src/lib/components/shared/DecisionHistoryList.svelte
 history.css       .history-shell  web/src/lib/components/shared/DecisionHistoryCard.svelte
 paused.css        .paused-badge   web/src/lib/components/shared/PausedBadge.svelte
+service-requests.css .service-ui web/src/lib/features/projects/detail/lifecycle/individual-service/phases/IndividualServicePhaseOne.svelte
+service-requests.css .service-ui web/src/lib/components/cards/project-detail/CollapsibleServiceRequestCard.svelte
