@@ -107,6 +107,12 @@
         await goto(`${resolve('/messages')}?conversation=${encodeURIComponent(t.conversation)}`);
         return;
       }
+      if (t && 'request' in t) {
+        const page = spaceHref('personal-service', t.request.project);
+        // eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it
+        await goto(`${page}?request=${encodeURIComponent(t.request.id)}`);
+        return;
+      }
       if (t && 'space' in t) {
         // eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it
         await goto(spaceHref(item.projectMode, t.space));

@@ -38,6 +38,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     let charter =
         calls::base_charter()?.ok_or_else(|| guest("This project has no charter yet."))?;
     accepts(&charter.mode, &kind)?;
+    let saved = saves_at_once(&charter.mode)?;
     // Organizer-controlled events (ADR 0061): only organizers propose, and it applies at once.
     let organized = project_integrity::organized()?;
     let organizer =
@@ -83,7 +84,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         organizer,
     }))?;
     create_link(space_scope::base()?, hash.clone(), LinkTypes::Proposals, ())?;
-    if organized {
+    if organized || saved {
         decide_now(&hash)?;
     } else if proposer_votes {
         vote(hash.clone(), VoteChoice::Yes)?;
@@ -91,10 +92,23 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
     Ok(hash)
 }
 
+/// A personal service's creator saves its request settings at once (ADR 0076); nobody else
+/// changes them (`accepts` lets only those through).
+fn saves_at_once(mode: &str) -> ExternResult<bool> {
+    let saved = mode == "personal-service";
+    if saved && calls::base_creator()? != Some(agent_info()?.agent_initial_pubkey) {
+        return Err(guest(
+            "Only the service creator can update personal service request settings",
+        ));
+    }
+    Ok(saved)
+}
+
 /// Personal services take no proposals; channels and communities take removals but keep
 /// their handle (ADR 0068).
 fn accepts(mode: &str, kind: &ProposalKind) -> ExternResult<()> {
-    if mode == "personal-service" {
+    let settings = matches!(kind, ProposalKind::RequestSettings { .. });
+    if mode == "personal-service" && !settings {
         return Err(guest("Personal services don't take proposals."));
     }
     project_integrity::check_scope_kind(mode, kind).map_err(guest)

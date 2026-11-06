@@ -20,6 +20,7 @@ sp_help = { workspace = true }
 sp_discussion = { workspace = true }
 sp_scope = { workspace = true }
 sp_governance = { workspace = true }
+sp_service = { workspace = true }
 
 [lints]
 workspace = true

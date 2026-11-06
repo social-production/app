@@ -8,6 +8,7 @@ import {
   type FeedWindow,
   type Project,
   type ProjectCard,
+  type RequestMode,
   type Stance,
 } from '#lib/domain/projects.ts';
 import {
@@ -52,6 +53,7 @@ interface ProjectWire {
   governance: EventGovernance;
   organizers: AgentPubKey[];
   am_organizer: boolean;
+  requests?: { enabled: boolean; mode: RequestMode; off_schedule: boolean };
 }
 
 const directory = <T>(fn: string, payload?: unknown) =>
@@ -192,6 +194,9 @@ export async function getProject(id: string): Promise<Project> {
     governance: p.governance,
     organizers: p.organizers.map(hashToString),
     amOrganizer: p.am_organizer,
+    requests: p.requests
+      ? { enabled: p.requests.enabled, mode: p.requests.mode, offSchedule: p.requests.off_schedule }
+      : { enabled: false, mode: 'both', offSchedule: false },
   };
 }
 

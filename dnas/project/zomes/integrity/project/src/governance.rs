@@ -23,10 +23,7 @@ pub fn validate_proposal(
     if let Err(reason) = check_kind(&p.kind) {
         return invalid(&reason);
     }
-    let Some((charter, _)) = crate::charter_at(&p.space)? else {
-        return invalid("a proposal decides for a space");
-    };
-    if let Err(reason) = check_scope_kind(&charter.mode, &p.kind) {
+    if let Err(reason) = check_space(p, action.author())? {
         return invalid(&reason);
     }
     if let ProposalKind::Phase {
@@ -129,8 +126,32 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
         }
         // A link needs the DNA's seed and the cited create half (`link::check`); a removal
         // needs the space's mode (`check_scope_kind`).
-        ProposalKind::Link(_) | ProposalKind::RemoveMember { .. } => Ok(()),
+        // Request settings need the space's mode too (whether a reason is needed).
+        ProposalKind::Link(_)
+        | ProposalKind::RemoveMember { .. }
+        | ProposalKind::RequestSettings { .. } => Ok(()),
     }
+}
+
+/// What the space's mode allows, and who may change a personal service's request settings.
+fn check_space(p: &Proposal, author: &AgentPubKey) -> ExternResult<Result<(), String>> {
+    let Some((charter, founder)) = crate::charter_at(&p.space)? else {
+        return Ok(Err("a proposal decides for a space".into()));
+    };
+    if let Err(reason) = check_scope_kind(&charter.mode, &p.kind) {
+        return Ok(Err(reason));
+    }
+    if personal_settings(&charter.mode, &p.kind) && author != &founder {
+        return Ok(Err(
+            "only a personal service's creator changes its request settings".into(),
+        ));
+    }
+    Ok(Ok(()))
+}
+
+/// A personal service's creator saves its request settings without a vote (ADR 0076).
+fn personal_settings(mode: &str, kind: &ProposalKind) -> bool {
+    mode == "personal-service" && matches!(kind, ProposalKind::RequestSettings { .. })
 }
 
 pub fn validate_vote(
@@ -163,6 +184,20 @@ pub fn validate_outcome(
     let mirrored = matches!(&proposal.kind, ProposalKind::Link(l) if l.source.is_some());
     if o.passed && o.votes.is_empty() && !mirrored && crate::organized()? {
         return Ok(ValidateCallbackResult::Valid);
+    }
+    // A personal service's creator saves request settings at once (ADR 0076).
+    if o.passed
+        && o.votes.is_empty()
+        && matches!(proposal.kind, ProposalKind::RequestSettings { .. })
+    {
+        let Some((charter, founder)) = crate::charter_at(&proposal.space)? else {
+            return invalid("a proposal decides for a space");
+        };
+        let by_founder =
+            proposal_record.action().author() == &founder && action.author() == &founder;
+        if personal_settings(&charter.mode, &proposal.kind) && by_founder {
+            return Ok(ValidateCallbackResult::Valid);
+        }
     }
     let mut voters = BTreeSet::new();
     let mut choices = Vec::new();
@@ -210,6 +245,11 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
         ProposalKind::Edit { title: Some(_), .. } if scope => {
             Err("a channel's or community's name is its handle and stays".into())
         }
+        ProposalKind::RequestSettings {
+            mode: requests,
+            reason,
+            ..
+        } => sp_service::check_settings(mode, requests, reason),
         _ => Ok(()),
     }
 }

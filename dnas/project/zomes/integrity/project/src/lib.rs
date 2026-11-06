@@ -9,6 +9,7 @@
 //! (ADR 0056).
 
 mod activity;
+mod applied;
 mod challenge;
 mod charter;
 mod governance;
@@ -25,6 +26,7 @@ use hdi::prelude::*;
 pub use activity::{
     Activity, ActivityCompletion, ActivityRating, ActivityRole, RoleSuggestion, SuggestionDecline,
 };
+pub use applied::{Applied, AppliedRequests, AppliedUpdate};
 pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Organizer, OrganizerRole};
@@ -80,6 +82,14 @@ pub enum ProposalKind {
     /// Remove a member from a channel or community (web's `remove_member`, ADR 0068).
     RemoveMember {
         agent: AgentPubKey,
+    },
+    /// A service's request settings (web's settings change request, ADR 0076): voted in a
+    /// collective service, saved at once by a personal service's creator.
+    RequestSettings {
+        enabled: bool,
+        mode: String,
+        off_schedule: bool,
+        reason: String,
     },
 }
 
@@ -270,31 +280,4 @@ pub(crate) fn typed_entry(record: &Record) -> ExternResult<Option<EntryTypes>> {
         return Ok(None);
     };
     EntryTypes::deserialize_from_type(def.zome_index, def.entry_index, entry)
-}
-
-/// What the governance coordinator reports as applied, for the project coordinator's view.
-/// Defined here because both coordinators depend on this crate, never on each other.
-#[derive(Serialize, Deserialize, Clone, Debug, Default, PartialEq)]
-pub struct Applied {
-    /// Passed edits merged in order: the latest value of each field.
-    pub title: Option<String>,
-    pub description: Option<String>,
-    pub location: Option<String>,
-    /// The phase reached through passed `Phase` proposals, if any.
-    pub phase: Option<String>,
-    /// The subtype chosen by the production or operations plan (ADR 0039), if any.
-    pub subtype: Option<String>,
-    pub updates: Vec<AppliedUpdate>,
-    pub last_decision_at: Option<Timestamp>,
-    /// Members removed by passed `RemoveMember` proposals, and when (ADR 0068).
-    #[serde(default)]
-    pub removed: Vec<(AgentPubKey, Timestamp)>,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct AppliedUpdate {
-    pub proposal: ActionHash,
-    pub author: AgentPubKey,
-    pub body: String,
-    pub at: Timestamp,
 }

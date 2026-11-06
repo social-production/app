@@ -62,6 +62,12 @@ pub fn base_charter() -> ExternResult<Option<Charter>> {
     project("base_charter")
 }
 
+/// Who founded the space this call is for (its charter's author).
+pub fn base_creator() -> ExternResult<Option<AgentPubKey>> {
+    let space = space_scope::current()?;
+    Ok(get(space, GetOptions::default())?.map(|r| r.action().author().clone()))
+}
+
 #[derive(Deserialize, Debug)]
 pub struct SignalCounts {
     pub demand: u32,

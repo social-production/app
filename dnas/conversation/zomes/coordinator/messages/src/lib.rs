@@ -3,9 +3,10 @@
 //! (`post_message`, `edit_message`, `delete_message`, `list_messages`), pins (`pin_message`,
 //! `pins`), and your own `summary`, `mark_read` and `set_prefs`; a direct chat's
 //! `peer_read_at` (read receipts) and `log_call` (call lines); reports on messages
-//! (`report_message`, `vote_report`, `message_moderation`, ADR 0075). In the base cell (the
-//! inbox): `send_invite`, `inbox` and declines (`decline_invite`, `declined_invites`). The UI
-//! polls, as it does the project chat (ADR 0038).
+//! (`report_message`, `vote_report`, `message_moderation`, ADR 0075); service requests
+//! (`send_service_request`, `decide_service_request`, `service_requests`, ADR 0076). In the
+//! base cell (the inbox): `send_invite`, `inbox` and declines (`decline_invite`,
+//! `declined_invites`). The UI polls, as it does the project chat (ADR 0038).
 
 mod calls;
 mod entries;
@@ -18,6 +19,7 @@ mod pins;
 mod reads;
 mod receipts;
 mod reports;
+mod service;
 mod summary;
 
 use hdk::prelude::*;

@@ -7,55 +7,19 @@ mod own;
 mod people;
 mod scope_items;
 mod spaces;
+mod view;
 
 use hdk::prelude::*;
-use project_integrity::{
-    audience, space_creator, Applied, AppliedUpdate, Charter, LinkTypes, OrganizerRole,
-};
+use project_integrity::{audience, space_creator, Applied, Charter, LinkTypes, OrganizerRole};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
 use space_scope::{enter, In};
+pub use view::{PhaseStep, ProjectView, RequestSettingsView};
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Stance {
     Demand,
     Oppose,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct ProjectView {
-    pub creator: AgentPubKey,
-    /// The charter with every passed edit applied (and the subtype a plan chose).
-    pub charter: Option<Charter>,
-    /// web's phase id ("phase-1"…) and its label for this project's mode ("Production Plan").
-    pub phase: String,
-    pub stage: String,
-    /// The phases this project shows, and the one a proposal may move it to next.
-    pub phases: Vec<PhaseStep>,
-    pub next_phase: Option<PhaseStep>,
-    /// Earlier phases a return may go back to (web's `revertablePhaseIds`, ADR 0040).
-    pub returns: Vec<PhaseStep>,
-    pub updates: Vec<AppliedUpdate>,
-    pub members: Vec<AgentPubKey>,
-    pub demand: u32,
-    pub opposition: u32,
-    pub am_member: bool,
-    pub my_signal: Option<Stance>,
-    pub created_at: Option<Timestamp>,
-    pub last_activity_at: Option<Timestamp>,
-    /// web's event audience and governance, from the seed (ADR 0061).
-    pub audience: String,
-    pub governance: String,
-    /// The creator and co-organizers (private events; just the creator otherwise).
-    pub organizers: Vec<AgentPubKey>,
-    pub am_organizer: bool,
-}
-
-/// One phase as the stepper shows it (ids and labels from `sp_governance::phases`).
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct PhaseStep {
-    pub id: String,
-    pub label: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -185,6 +149,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         (c.mode.as_str(), c.subtype.as_str())
     });
     let (phases, next, returns, stage) = lifecycle(mode, subtype, current);
+    let requests = RequestSettingsView::of(mode, applied.requests.as_ref());
 
     let organizers = organizers::list()?;
     let seen = audience()?;
@@ -212,6 +177,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         governance: seen.governance_id().into(),
         am_organizer: organizers.contains(&agent_info()?.agent_initial_pubkey),
         organizers,
+        requests,
     }))
 }
 

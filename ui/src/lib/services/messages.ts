@@ -106,13 +106,14 @@ export async function chatSummary(seed: string, invitedAt: number): Promise<Chat
 /**
  * Start a chat (web's start_direct_conversation / create_group_conversation): clone it,
  * invite everyone, send each of them (and yourself, for your other devices) the seed through
- * the inbox, then post the first message. Returns the chat's id.
+ * the inbox, then post the first message (a service request posts its own, ADR 0076).
+ * Returns the chat's id.
  */
 export async function startChat(
   kind: ChatKind,
   members: string[],
   title: string | null,
-  body: string,
+  body: string | null,
 ): Promise<string> {
   const me = await myAgent();
   const seed = newChatSeed(me, kind);
@@ -120,7 +121,7 @@ export async function startChat(
   for (const to of [me, ...members]) {
     await inbox<null>('send_invite', { to: stringToHash(to), seed });
   }
-  await postChatMessage(seed, body, null);
+  if (body !== null) await postChatMessage(seed, body, null);
   return seed;
 }
 
