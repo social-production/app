@@ -50,7 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 2, geocoding on the gateway (ADR 0079), branch `claude/social-production-handoff-dsam61`
+## In flight: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114 (branch `claude/social-production-handoff-dsam61`; merge once CI is green, then smoke and update README Status)
 Gateway only (no DNA change, no reset): `services/gateway/src/geo/` (`shape.rs` web's
 Nominatim/ip-api normalisation, `memo.rs` TTL cache + window limits, `mod.rs` provider calls
 and web's error codes) and `routes/locations.rs` (`GET /locations/search`, `/reverse`,
@@ -85,7 +85,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR open (see "In flight")
+## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114
 - **Routes** (web's `app/routers/locations.py`): `GET /locations/search?q=&limit=&country_codes=&viewbox=`,
   `/locations/reverse?lat=&lon=`, `/locations/ip-hint`; `{ items: [Location] }` in web's
   snake case; refusals are `{ error: <web's detail code> }` (`geocoding_rate_limit_exceeded`,
