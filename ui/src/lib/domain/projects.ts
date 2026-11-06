@@ -206,6 +206,25 @@ export const PROJECT_TYPES: ProjectTypeOption[] = [
   },
 ];
 
+/** web's `serviceRequestModeOptions` (the create flow's "Service request mode"). */
+export const REQUEST_MODES: { value: RequestMode; label: string; summary: string }[] = [
+  {
+    value: 'calendar',
+    label: 'Calendar booking',
+    summary: 'Show availability on the calendar and let people request a slot.',
+  },
+  {
+    value: 'direct',
+    label: 'Direct requests',
+    summary: 'Let people send written requests without calendar booking.',
+  },
+  {
+    value: 'both',
+    label: 'Calendar + direct',
+    summary: 'Keep slot booking and allow standalone written requests.',
+  },
+];
+
 /** Where a new project happens (web's location intent). */
 export type LocationChoice = 'physical' | 'online' | 'later';
 

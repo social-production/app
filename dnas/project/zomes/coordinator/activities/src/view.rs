@@ -4,22 +4,13 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{
-    Activity, ActivityRating, LinkTypes, RoleSuggestion, SuggestionDecline, UnitEntryTypes,
-};
+use project_integrity::{Activity, ActivityRating, LinkTypes, UnitEntryTypes};
 use sp_activity::{fill, roles_open, Taken};
 
 use crate::calls;
 use crate::history::{self, CompletionView};
 use crate::reads::{self, Found};
-
-#[derive(Serialize, Deserialize, Debug)]
-pub struct SuggestionView {
-    pub id: ActionHash,
-    pub person: AgentPubKey,
-    pub by: AgentPubKey,
-    pub at: Timestamp,
-}
+use crate::suggestions::SuggestionView;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct RoleView {
@@ -45,6 +36,13 @@ pub struct RatingView {
     pub at: Timestamp,
 }
 
+/// The request an activity books (ADR 0077) and who asked.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct BookingView {
+    pub request: ActionHash,
+    pub requester: AgentPubKey,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ActivityView {
     pub id: ActionHash,
@@ -67,6 +65,7 @@ pub struct ActivityView {
     pub can_rate: bool,
     /// Participants' check-ins (meaningful once it has ended).
     pub completion: CompletionView,
+    pub booking: Option<BookingView>,
 }
 
 /// Every activity, soonest first.
@@ -119,38 +118,17 @@ fn one(
     let completion = if open {
         CompletionView::default()
     } else {
-        history::completion(&a.hash, &everyone, me)?
+        let requester = a.entry.booking.as_ref().map(|b| &b.requester);
+        history::completion(&a.hash, &everyone, requester, me)?
     };
-    let (mut suggestions, mut declined) = suggestions(&a.hash)?;
-    let takes = reads::takes(&a.hash)?;
-    let taken_at = |role: usize, agent: &AgentPubKey| {
-        let mine = takes
-            .iter()
-            .filter(|t| usize::from(t.role) == role && t.agent == *agent);
-        mine.map(|t| t.at).min().unwrap_or(a.at)
-    };
-    let roles = a
-        .entry
-        .roles
-        .iter()
-        .zip(holders)
-        .enumerate()
-        .map(|(i, (r, people))| RoleView {
-            label: r.label.clone(),
-            description: r.description.clone(),
-            required: r.required,
-            maximum: r.maximum,
-            taken_at: people.iter().map(|p| taken_at(i, p)).collect(),
-            people,
-            suggestion: u8::try_from(i).ok().and_then(|i| suggestions.remove(&i)),
-            declined: u8::try_from(i)
-                .ok()
-                .and_then(|i| declined.remove(&i))
-                .unwrap_or_default(),
-        })
-        .collect();
+    let roles = role_views(&a, holders)?;
+    let requester = a.entry.booking.as_ref().is_some_and(|b| &b.requester == me);
     Ok(ActivityView {
-        can_rate: my_take(&a.hash, me)?.is_some(),
+        can_rate: requester || my_take(&a.hash, me)?.is_some(),
+        booking: a.entry.booking.map(|b| BookingView {
+            request: b.request,
+            requester: b.requester,
+        }),
         ratings: ratings(&a.hash)?,
         completion,
         id: a.hash,
@@ -207,69 +185,6 @@ pub fn my_take(activity: &ActionHash, me: &AgentPubKey) -> ExternResult<Option<A
         .map(|t| t.link))
 }
 
-type PerRole<T> = BTreeMap<u8, T>;
-
-/// The latest suggestion per role that its person hasn't declined, and every decline per role.
-fn suggestions(
-    activity: &ActionHash,
-) -> ExternResult<(PerRole<SuggestionView>, PerRole<Vec<SuggestionView>>)> {
-    let made: Vec<Found<RoleSuggestion>> = reads::linked::<RoleSuggestion>(
-        activity.clone(),
-        LinkTypes::ActivityToSuggestions,
-        UnitEntryTypes::RoleSuggestion,
-    )?
-    .into_iter()
-    .filter(|s| s.entry.activity == *activity)
-    .collect();
-    let declines = reads::linked::<SuggestionDecline>(
-        activity.clone(),
-        LinkTypes::ActivityToSuggestions,
-        UnitEntryTypes::SuggestionDecline,
-    )?;
-    let mut declined: PerRole<Vec<SuggestionView>> = BTreeMap::new();
-    for d in &declines {
-        let Some(s) = made
-            .iter()
-            .find(|s| s.hash == d.entry.suggestion && s.entry.person == d.author)
-        else {
-            continue;
-        };
-        declined
-            .entry(s.entry.role)
-            .or_default()
-            .push(SuggestionView {
-                id: d.hash.clone(),
-                person: d.author.clone(),
-                by: s.author.clone(),
-                at: d.at,
-            });
-    }
-    let mut latest: PerRole<&Found<RoleSuggestion>> = BTreeMap::new();
-    for s in &made {
-        latest.insert(s.entry.role, s);
-    }
-    let standing = latest
-        .into_iter()
-        .filter(|(_, s)| {
-            !declines
-                .iter()
-                .any(|d| d.entry.suggestion == s.hash && d.author == s.entry.person)
-        })
-        .map(|(role, s)| {
-            (
-                role,
-                SuggestionView {
-                    id: s.hash.clone(),
-                    person: s.entry.person.clone(),
-                    by: s.author.clone(),
-                    at: s.at,
-                },
-            )
-        })
-        .collect();
-    Ok((standing, declined))
-}
-
 /// Each participant's latest rating, unless they removed it.
 fn ratings(activity: &ActionHash) -> ExternResult<Vec<RatingView>> {
     let all = reads::linked::<ActivityRating>(
@@ -292,4 +207,37 @@ fn ratings(activity: &ActionHash) -> ExternResult<Vec<RatingView>> {
             })
         })
         .collect())
+}
+
+/// Each role with its holders, when each took it, and its suggestions.
+fn role_views(a: &Found<Activity>, holders: Vec<Vec<AgentPubKey>>) -> ExternResult<Vec<RoleView>> {
+    let (mut suggestions, mut declined) = crate::suggestions::suggestions(&a.hash)?;
+    let takes = reads::takes(&a.hash)?;
+    let taken_at = |role: usize, agent: &AgentPubKey| {
+        let mine = takes
+            .iter()
+            .filter(|t| usize::from(t.role) == role && t.agent == *agent);
+        mine.map(|t| t.at).min().unwrap_or(a.at)
+    };
+    let roles = a
+        .entry
+        .roles
+        .iter()
+        .zip(holders)
+        .enumerate()
+        .map(|(i, (r, people))| RoleView {
+            label: r.label.clone(),
+            description: r.description.clone(),
+            required: r.required,
+            maximum: r.maximum,
+            taken_at: people.iter().map(|p| taken_at(i, p)).collect(),
+            people,
+            suggestion: u8::try_from(i).ok().and_then(|i| suggestions.remove(&i)),
+            declined: u8::try_from(i)
+                .ok()
+                .and_then(|i| declined.remove(&i))
+                .unwrap_or_default(),
+        })
+        .collect();
+    Ok(roles)
 }

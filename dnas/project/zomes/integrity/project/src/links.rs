@@ -43,6 +43,7 @@ pub fn validate_create(
         LinkTypes::Recent if is_space(&action.target_address)? => Ok(ValidateCallbackResult::Valid),
         LinkTypes::Recent => invalid("a recent-activity link points at a space"),
         LinkTypes::ScopeItems => crate::scope_item::validate(action),
+        LinkTypes::Availability => crate::availability::validate_link(action),
     }
 }
 

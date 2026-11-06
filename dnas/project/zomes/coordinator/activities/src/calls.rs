@@ -57,6 +57,8 @@ pub struct Glance {
 #[derive(Deserialize, Debug)]
 pub struct CharterGlance {
     pub mode: String,
+    #[serde(default)]
+    pub location_label: String,
 }
 
 pub fn glance() -> ExternResult<Glance> {

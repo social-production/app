@@ -118,6 +118,7 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
             .collect(),
         membership: membership.clone(),
         organizer,
+        booking: None,
     };
     check_activity(&spec(&activity)).map_err(guest)?;
     let hash = create_entry(EntryTypes::Activity(activity))?;

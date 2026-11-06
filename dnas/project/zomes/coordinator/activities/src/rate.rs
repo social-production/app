@@ -19,9 +19,17 @@ pub struct RateInput {
 pub fn rate(input: RateInput) -> ExternResult<ActionHash> {
     let found = activity(&input.activity)?;
     let me = agent_info()?.agent_initial_pubkey;
-    let Some(assignment) = view::my_take(&input.activity, &me)? else {
-        return Err(guest("Only participants can rate activities"));
-    };
+    let requester = found
+        .entry
+        .booking
+        .as_ref()
+        .is_some_and(|b| b.requester == me);
+    let assignment = view::my_take(&input.activity, &me)?;
+    if assignment.is_none() && !requester {
+        return Err(guest(
+            "Only participants or the requester can rate activities",
+        ));
+    }
     let comment = input.comment.trim().to_string();
     if let Some(stars) = input.stars {
         let now = sys_time()?.as_micros();

@@ -6,7 +6,7 @@
 //! the last place at once is the view's (`sp_activity::fill`).
 
 use hdi::prelude::*;
-use sp_activity::{check_activity, check_rating, roles_open, ActivitySpec, RoleSpec};
+use sp_activity::{check_activity, roles_open, ActivitySpec, RoleSpec};
 
 use crate::links::{is_membership, membership_space};
 use crate::{invalid, EntryTypes};
@@ -40,6 +40,9 @@ pub struct Activity {
     /// The author's `Organizer` record in an organizer-controlled event (ADR 0061).
     #[serde(default)]
     pub organizer: Option<ActionHash>,
+    /// The service request this books (ADR 0077); `None` for every other activity.
+    #[serde(default)]
+    pub booking: Option<crate::availability::Booking>,
 }
 
 /// A member suggests someone else for a role (web's role suggestion); the latest per role
@@ -58,18 +61,6 @@ pub struct RoleSuggestion {
 #[derive(Clone, PartialEq)]
 pub struct SuggestionDecline {
     pub suggestion: ActionHash,
-}
-
-/// A participant's 1–5 rating once the activity has ended; the latest counts and `None`
-/// removes it (web's delete).
-#[hdk_entry_helper]
-#[derive(Clone, PartialEq)]
-pub struct ActivityRating {
-    pub activity: ActionHash,
-    pub stars: Option<u8>,
-    pub comment: String,
-    /// The author's `Assignments` link on this activity: only participants rate.
-    pub assignment: ActionHash,
 }
 
 fn spec(a: &Activity) -> ActivitySpec<'_> {
@@ -111,8 +102,12 @@ pub fn validate_activity(
     )? {
         return invalid("only members can add activities");
     }
+    let space = membership_space(&a.membership)?;
+    if let Some(booking) = &a.booking {
+        return crate::availability::validate_booking(a, booking, space.as_ref(), action.author());
+    }
     // A help request's one activity is its creator's (ADR 0067).
-    if let Some(space) = membership_space(&a.membership)? {
+    if let Some(space) = space {
         if let Some((charter, creator)) = crate::charter_at(&space)? {
             if charter.mode == sp_help::MODE && &creator != action.author() {
                 return invalid("only the person asking adds a help request's activity");
@@ -164,69 +159,6 @@ pub fn validate_decline(
         }
         _ => invalid("only the suggested person can decline"),
     }
-}
-
-pub fn validate_rating(
-    r: &ActivityRating,
-    action: &TypedAction<CreateData>,
-) -> ExternResult<ValidateCallbackResult> {
-    let Some(activity) = activity_at(&r.activity)? else {
-        return invalid("a rating is for an activity");
-    };
-    if let Some(stars) = r.stars {
-        let at = action.timestamp().as_micros();
-        if let Err(reason) = check_rating(stars, &r.comment, activity.ends_at.as_micros(), at) {
-            return invalid(&reason);
-        }
-    }
-    if !is_own_assignment(&r.assignment, &r.activity, action.author())? {
-        return invalid("only participants can rate activities");
-    }
-    Ok(ValidateCallbackResult::Valid)
-}
-
-/// A participant's check-in once the activity has ended (web's history completion): it
-/// happened (`Some(true)`), it didn't (`Some(false)`), or cleared (`None`); the latest counts.
-#[hdk_entry_helper]
-#[derive(Clone, PartialEq)]
-pub struct ActivityCompletion {
-    pub activity: ActionHash,
-    pub done: Option<bool>,
-    /// The author's `Assignments` link on this activity: only participants check in.
-    pub assignment: ActionHash,
-}
-
-pub fn validate_completion(
-    c: &ActivityCompletion,
-    action: &TypedAction<CreateData>,
-) -> ExternResult<ValidateCallbackResult> {
-    let Some(activity) = activity_at(&c.activity)? else {
-        return invalid("a check-in is for an activity");
-    };
-    if roles_open(activity.ends_at.as_micros(), action.timestamp().as_micros()) {
-        return invalid("an activity is checked in once it has ended");
-    }
-    if !is_own_assignment(&c.assignment, &c.activity, action.author())? {
-        return invalid("only assigned participants can set participant completion");
-    }
-    Ok(ValidateCallbackResult::Valid)
-}
-
-/// `hash` is an `Assignments` link `author` made on `activity` (deleted later or not).
-fn is_own_assignment(
-    hash: &ActionHash,
-    activity: &ActionHash,
-    author: &AgentPubKey,
-) -> ExternResult<bool> {
-    let taken = must_get_action(hash.clone())?;
-    let ActionData::CreateLink(link) = &taken.action().data else {
-        return Ok(false);
-    };
-    let assignments: ScopedLinkType = crate::LinkTypes::Assignments.try_into()?;
-    let is_assignment =
-        link.zome_index == assignments.zome_index && link.link_type == assignments.zome_type;
-    let base = link.base_address.clone().into_action_hash();
-    Ok(is_assignment && taken.action().author() == author && base.as_ref() == Some(activity))
 }
 
 /// Taking a role: activity → yourself, tag `[role]` + your `Members` link, before it ends.

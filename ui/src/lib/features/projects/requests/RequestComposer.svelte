@@ -16,7 +16,7 @@
 
   let { state, scheduleRequired, onSend }: Props = $props();
 
-  const showSchedule = $derived(scheduleRequired || !!state.form.scheduledAt);
+  const showSchedule = $derived(scheduleRequired || !!state.form.scheduledAt || !!state.form.slot);
 </script>
 
 <OverlaySheet
@@ -44,11 +44,19 @@
         <div class="number-grid">
           <label>
             <span class="field-inline-label">Start time</span>
-            <input bind:value={state.form.scheduledAt} type="datetime-local" />
+            <input
+              bind:value={state.form.scheduledAt}
+              disabled={!!state.form.slot}
+              type="datetime-local"
+            />
           </label>
           <label>
             <span class="field-inline-label">Finish time</span>
-            <input bind:value={state.form.endsAt} type="datetime-local" />
+            <input
+              bind:value={state.form.endsAt}
+              disabled={!!state.form.slot}
+              type="datetime-local"
+            />
           </label>
         </div>
       {:else}

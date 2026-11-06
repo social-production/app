@@ -33,7 +33,10 @@ export function isoOf(date: Date): string {
 
 const time = (d: Date): string => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
-function bars(iso: string, activities: Activity[], now: number): DayBar[] {
+/** A bar's colour by sign-ups, unless `toneOf` says otherwise (a service's slots, ADR 0077). */
+export type ToneOf = (a: Activity) => DayBar['tone'] | null;
+
+function bars(iso: string, activities: Activity[], now: number, toneOf?: ToneOf): DayBar[] {
   const dayStart = new Date(`${iso}T00:00`);
   const dayEnd = new Date(dayStart);
   dayEnd.setDate(dayEnd.getDate() + 1);
@@ -45,7 +48,7 @@ function bars(iso: string, activities: Activity[], now: number): DayBar[] {
       const start = (from.getTime() - dayStart.getTime()) / 60_000;
       const end = Math.max((to.getTime() - dayStart.getTime()) / 60_000, start + 30);
       const ended = !a.rolesOpen || a.endsAt / 1000 <= now;
-      const tone: DayBar['tone'] = ended ? 'muted' : TONE[signupTone(a)];
+      const tone: DayBar['tone'] = ended ? 'muted' : (toneOf?.(a) ?? TONE[signupTone(a)]);
       return { a, start, end, tone, label: `${time(from)} to ${time(to)}`, col: 0 };
     })
     .sort((x, y) => x.start - y.start);
@@ -73,7 +76,12 @@ function bars(iso: string, activities: Activity[], now: number): DayBar[] {
   });
 }
 
-export function monthDays(month: Date, activities: Activity[], now = Date.now()): CalendarDay[] {
+export function monthDays(
+  month: Date,
+  activities: Activity[],
+  now = Date.now(),
+  toneOf?: ToneOf,
+): CalendarDay[] {
   const start = new Date(month);
   start.setDate(month.getDate() - ((month.getDay() + 6) % 7));
   return Array.from({ length: 42 }, (_, i) => {
@@ -84,7 +92,7 @@ export function monthDays(month: Date, activities: Activity[], now = Date.now())
       iso,
       day: date.getDate(),
       inMonth: date.getMonth() === month.getMonth(),
-      bars: bars(iso, activities, now),
+      bars: bars(iso, activities, now, toneOf),
     };
   });
 }

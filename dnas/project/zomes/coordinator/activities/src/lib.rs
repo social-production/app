@@ -1,20 +1,25 @@
 //! Project DNA API for activities (ADR 0056): web's Activity phase. Members schedule
 //! activities with roles, take or leave one role each, suggest people for roles, and rate an
-//! activity they took part in once it has ended.
+//! activity they took part in once it has ended. A personal service's creator lists weekly
+//! hours and books accepted requests (ADR 0077).
 
+mod booking;
 mod calls;
 mod history;
 mod rate;
 mod reads;
+mod suggestions;
 mod view;
 mod write;
 
 use hdk::prelude::*;
 use space_scope::{enter, touch, In};
 
+pub use booking::{BookInput, RuleInput, RuleView};
 pub use history::{CheckInInput, CompletionView};
 pub use rate::RateInput;
-pub use view::{ActivityView, RatingView, RoleView, SuggestionView};
+pub use suggestions::SuggestionView;
+pub use view::{ActivityView, BookingView, RatingView, RoleView};
 pub use write::{NewActivity, NewRole, RoleInput, SuggestInput};
 
 /// web's "Create activity" (Activity phase; members only).
@@ -81,6 +86,38 @@ pub fn rate_activity(call: In<RateInput>) -> ExternResult<ActionHash> {
 pub fn check_in(call: In<CheckInInput>) -> ExternResult<ActionHash> {
     let input = enter(call)?;
     let out = history::check_in(input)?;
+    touch()?;
+    Ok(out)
+}
+
+/// web's "Add weekly hours" (a personal service's creator).
+#[hdk_extern]
+pub fn add_availability_rule(call: In<RuleInput>) -> ExternResult<ActionHash> {
+    let input = enter(call)?;
+    let out = booking::add_rule(input)?;
+    touch()?;
+    Ok(out)
+}
+
+/// web's weekly hours "Remove".
+#[hdk_extern]
+pub fn remove_availability_rule(call: In<ActionHash>) -> ExternResult<()> {
+    let rule = enter(call)?;
+    booking::remove_rule(rule)?;
+    touch()
+}
+
+#[hdk_extern]
+pub fn list_availability_rules(call: In<()>) -> ExternResult<Vec<RuleView>> {
+    enter(call)?;
+    booking::list_rules()
+}
+
+/// An accepted timed request becomes a booking with the creator as its Provider.
+#[hdk_extern]
+pub fn book_request(call: In<BookInput>) -> ExternResult<ActionHash> {
+    let input = enter(call)?;
+    let out = booking::book(input)?;
     touch()?;
     Ok(out)
 }
