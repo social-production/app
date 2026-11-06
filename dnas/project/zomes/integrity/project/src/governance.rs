@@ -86,6 +86,7 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             title,
             description,
             location,
+            place,
         } => {
             if title.is_none() && description.is_none() && location.is_none() {
                 return Err("an edit must change something".into());
@@ -97,7 +98,7 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             if !(title_ok && description_ok && within(location, LOCATION_LABEL_MAX)) {
                 return Err("an edit's fields must fit the charter's limits".into());
             }
-            Ok(())
+            crate::place::check_optional(place.as_deref(), location.as_deref())
         }
         ProposalKind::Update { body }
             if !body.trim().is_empty() && body.chars().count() <= LONG_TEXT_MAX =>

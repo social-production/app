@@ -57,6 +57,7 @@ fn check_charter(c: &Charter) -> Result<(), String> {
     } else {
         (c.mode.as_str(), c.subtype.as_str())
     };
+    crate::place::check_optional(c.place.as_ref(), Some(&c.location_label))?;
     check_fields(&CharterFields {
         title: &c.title,
         mode,

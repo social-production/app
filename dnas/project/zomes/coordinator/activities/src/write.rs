@@ -4,7 +4,7 @@
 
 use hdk::prelude::*;
 use project_integrity::{
-    Activity, ActivityRole, EntryTypes, LinkTypes, RoleSuggestion, SuggestionDecline,
+    Activity, ActivityRole, EntryTypes, LinkTypes, Place, RoleSuggestion, SuggestionDecline,
 };
 use sp_activity::{check_activity, roles_open, ActivitySpec, RoleSpec};
 
@@ -35,6 +35,9 @@ pub struct NewActivity {
     pub ends_at: Timestamp,
     pub online: bool,
     pub place: String,
+    /// The place behind `place`, when picked with coordinates (ADR 0078).
+    #[serde(default)]
+    pub location: Option<Place>,
     pub meeting_url: Option<String>,
     pub note: String,
     pub plan_stage: Option<String>,
@@ -100,6 +103,10 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
         ends_at: input.ends_at,
         online: input.online,
         place: input.place.trim().to_string(),
+        location: input.location.map(|mut p| {
+            p.label = p.label.trim().to_string();
+            p
+        }),
         meeting_url: input
             .meeting_url
             .map(|u| u.trim().to_string())

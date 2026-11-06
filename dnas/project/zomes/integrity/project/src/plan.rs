@@ -26,6 +26,9 @@ pub struct Plan {
     pub subtype: Option<String>,
     pub repository_url: Option<String>,
     pub location: Option<String>,
+    /// The place behind `location` (ADR 0078).
+    #[serde(default)]
+    pub place: Option<Box<crate::Place>>,
     pub recipients: Option<String>,
     pub stages: Vec<PlanStage>,
     /// Event plans only, and required there (ADR 0057).
@@ -71,6 +74,7 @@ pub struct Rating {
 
 pub fn check(plan: &Plan) -> Result<(), String> {
     check_event_fields(plan)?;
+    crate::place::check_optional(plan.place.as_deref(), plan.location.as_deref())?;
     check_plan(&PlanFields {
         title: &plan.title,
         description: &plan.description,

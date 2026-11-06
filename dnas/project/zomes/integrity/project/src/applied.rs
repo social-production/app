@@ -10,6 +10,9 @@ pub struct Applied {
     pub title: Option<String>,
     pub description: Option<String>,
     pub location: Option<String>,
+    /// The place the edit that set `location` gave it, if any (ADR 0078).
+    #[serde(default)]
+    pub place: Option<crate::Place>,
     /// The phase reached through passed `Phase` proposals, if any.
     pub phase: Option<String>,
     /// The subtype chosen by the production or operations plan (ADR 0039), if any.

@@ -29,6 +29,9 @@ pub struct Activity {
     pub ends_at: Timestamp,
     pub online: bool,
     pub place: String,
+    /// The place behind `place` (ADR 0078); online only for an online activity.
+    #[serde(default)]
+    pub location: Option<crate::Place>,
     pub meeting_url: Option<String>,
     pub note: String,
     /// The approved plan stage this carries out, web's `linked_plan_phase_id`
@@ -92,6 +95,14 @@ pub fn validate_activity(
 ) -> ExternResult<ValidateCallbackResult> {
     if let Err(reason) = check_activity(&spec(a)) {
         return invalid(&reason);
+    }
+    if let Some(p) = &a.location {
+        if let Err(reason) = crate::place::check(p, &a.place) {
+            return invalid(&reason);
+        }
+        if p.online != a.online {
+            return invalid("an activity's place is online only when the activity is");
+        }
     }
     // The membership chooses the activity's space.
     if !is_membership(

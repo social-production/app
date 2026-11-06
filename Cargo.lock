@@ -7214,6 +7214,7 @@ dependencies = [
  "sp_event",
  "sp_governance",
  "sp_help",
+ "sp_place",
  "sp_scope",
  "sp_service",
 ]

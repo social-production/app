@@ -243,6 +243,7 @@ fn merge(mut c: Charter, a: &Applied) -> Charter {
     }
     if let Some(l) = &a.location {
         c.location_label.clone_from(l);
+        c.place.clone_from(&a.place);
     }
     // The production or operations plan chooses the subtype (ADR 0039).
     if let Some(s) = &a.subtype {
