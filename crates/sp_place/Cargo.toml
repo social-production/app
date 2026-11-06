@@ -1,0 +1,11 @@
+[package]
+name = "sp_place"
+description = "Rules for places (web-backend's locations, M6). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

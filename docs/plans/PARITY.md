@@ -32,7 +32,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    (review waits on the owner). web's borrowing/delivery frames are dead code
    (`RequestFrameStack` is imported nowhere): not parity.
 7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
-   project-activity cards, distances.
+   project-activity cards, distances. Plan in five phases: `docs/plans/M6-places.md`
+   (rules crate `sp_place` landed 2026-11-06; nothing uses it yet).
 8. **Software projects:** pull requests and the merge flow in the Activity phase.
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.

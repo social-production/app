@@ -1,0 +1,54 @@
+# M6: places and the map (parity item 7)
+
+Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Not
+started. Each phase starts with its ADR and ships as its own PR. Port from web only
+(STATUS "Owner decisions"); asset management stays out.
+
+## What web has
+- **A place** (web-backend `locations` table, `app/services/locations/model.py`):
+  `display_label` (≤240, required), `latitude`/`longitude` (null when online), `region`,
+  `country` (≤120), `provider_place_id` (≤160), `precision` `exact | approximate`
+  (approximate rounds coordinates to 2 decimals, exact to 6), `is_online`. Projects, events,
+  event plans, activities and help requests keep their `location_label` and point at a
+  `location_id`; the label stays what cards show (`feeds/location_display.py`).
+- **Geocoding** (`app/routers/locations.py`): `GET /locations/search?q=`, `/reverse?lat=&lon=`,
+  `/ip-hint` (`ip_hint.py`), backed by Nominatim (`geocoding_provider_url`, a User-Agent,
+  a 24 h cache, 30 requests a minute per IP).
+- **LocationPicker** (`components/shared/LocationPicker.svelte`, 649 lines): modes physical /
+  online / TBD, search with suggestions, quick picks (your default location, the project's
+  places), precision. Used by the create flows (project, event, help request), the plan and
+  activity wizards, ProposeEditSheet, the project header, Settings' Regional, onboarding.
+- **Regional settings** (`location/defaults.ts`, `sync.ts`, `geolocation.ts`): a default
+  location (typed, device GPS, or the IP hint), stored on the account.
+- **Map panel** (`features/map/MapPanel.svelte`, 1825 lines; `maps/maplibre.ts`):
+  maplibre-gl 6 with Carto's Positron style (`basemaps.cartocdn.com`, fallback
+  `demotiles.maplibre.org`), radius (`location/radius.ts`), time window, entity filter,
+  `MapDiscoveryCard`s; `stores/mapFocus.ts` `openPlaceOnMap()` opens it on a place.
+- **Markers and the Region feed** (`feeds/region.py`): `GET /feeds/map-markers` (events with
+  a confirmed physical place, help requests, scheduled activities, projects with open
+  spots; private ones only for their members; never private coordinates) and the Region
+  scope of the feed (distance-sorted, with project-activity cards and distances).
+
+## Phases (app)
+1. **Place records** (integrity: project + directory reset). A `Place` struct in a new crate
+   `crates/sp_place` (not `sp_core`, CLAUDE.md) with web's rules and rounding; an optional
+   `place: Option<Place>` next to each existing label (charter location, event plan
+   location, activity place, help request place, the profile's default location). Labels
+   stay as they are, so old views keep working. Scenario + `cargo test -p sp_place`.
+2. **Geocoding on the gateway**: `/locations/search`, `/reverse`, `/ip-hint` as web's routes,
+   proxied to Nominatim with a cache and the per-IP limit (gateway env vars like web's
+   `GEOCODING_*`). The native app calls a gateway for these too. Needs the seed node's
+   network to reach `nominatim.openstreetmap.org` (Railway: fine).
+3. **LocationPicker** in the UI (`components/location/`), ported with web's CSS through
+   `PORTS`, into the create flows, both wizards, the edit sheet and Settings' Regional.
+4. **Index**: the gateway index reads places; `/index/map-markers` and the Region feed with
+   web's visibility rules (private spaces' places never leave their members).
+5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),
+   the top bar's map button, `openPlaceOnMap`, distances on cards, Region in the scope menu.
+
+## Open questions (decide in the phase's ADR)
+- Coordinates on a public DHT are public: web keeps private spaces' coordinates off the map;
+  in the app a private space's records stay in its own clone, so only its members hold them.
+  Approximate precision is the default, as on web.
+- IP hints from the gateway see the gateway's client IP (the browser's); the native app's
+  request comes from the device, as on web.

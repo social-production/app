@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-06 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-06 late evening Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,9 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #109 merged; this docs PR follows it).
-**Next:** fix `tests/e2e/activities.mjs` (see the 2026-11-06 availability entry), then the
-parity list below.
+## In flight: the activities browser test on an event (PR #111, branch `claude/social-production-handoff-dsam61`)
+`tests/e2e/activities.mjs` now runs on an event in its Activity phase (founders' path, shared
+with `events.mjs` in the new `tests/e2e/event-flow.mjs`), plus the M6 plan
+(`docs/plans/M6-places.md`) and its first pure crate `crates/sp_place` (no zome uses it yet,
+so no DNA hash changes). See the newest "Done" entry for what was checked.
+**Next:** M6 phase 1, place records (`docs/plans/M6-places.md`; write its ADR 0078 first),
+then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -72,12 +76,31 @@ done (ADR 0075 merged 2026-11-06: DM/group reports, with ADR 0061's declined-inv
 Service requests (b) is done (ADR 0077, PR #109); (c) waits on the owner (ADR 0076).
 (Bot reviews and the paused badge: done 2026-11-05, ADR 0074; the warm-up penalty is off on
 web, so not parity.) (Events' Remove organizer: done 2026-11-05, ADR 0073.) Suggested order:
-service requests (b) availability and bookings, then (c) collective services once the owner
-says who reviews them (ADR 0076), map/places, software PRs.
+map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and service requests
+(c) collective services once the owner says who reviews them (ADR 0076).
 (web's scope-page `ScopeCreateMenu` is dead code on web: not parity, struck 2026-11-04.) Then
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place`
+- **`tests/e2e/activities.mjs`** now runs on an event: the dev founders create it, move it to
+  Event Plan, approve a plan from today for two weeks (00:00–23:59, so the two-minute
+  activity fits) and move it to Activity; founder one is Ann, Bob is a new account (so the
+  username search for "Suggest someone" finds him; founder two only votes). The event chat's
+  box is "Message members...". It now needs a local seed node (dev founders), not live.
+- **`tests/e2e/event-flow.mjs`** (new): `signInFounders`, `createEvent`, `until`, `voteYes`,
+  `advance`, `advanceTo`, `filePlan` (single date or `range`), `assess`, `approvePlan`,
+  `daysFromNow`; `events.mjs` uses it (89 lines now).
+- **M6 plan** `docs/plans/M6-places.md` (what web has, five phases, open questions) and
+  `crates/sp_place` (web's place rules: label/area limits, precision rounding, online vs
+  physical, haversine distance; 6 unit tests). No zome depends on it yet.
+- **Checked:** against a local seed node (`cloud-seed.sh`) `activities.mjs` and `events.mjs`
+  **passed**; `cargo test -p sp_place`, `cargo clippy -p sp_place --all-targets -D warnings`,
+  `cargo fmt --check`, `check-sizes.sh`. **Lesson:** on a fresh local seed node the first
+  phrase sign-in of a founder can take ~2 min (debug gateway, "starting a fresh chain"); the
+  first try timed out at 120 s, the rerun passed. **Not run:** UI check (no UI change),
+  scenarios (no zome change).
 
 ## Done 2026-11-06: service requests part (b), availability and bookings (ADR 0077), PR #109 merged 09:16 UTC (8:16 pm Melbourne)
 - **Live after merge:** CI green on the first run (check + 8 shards, ~93 min). The seed node
