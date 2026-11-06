@@ -50,9 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #107, service requests part (a), ADR 0076 (opened 2026-11-06 ~12:40 pm Melbourne)
-See "Done 2026-11-06: service requests, part (a)" below for what is built and checked. If a
-PR is open for it, watch its CI; merging **resets the project network and the chats**.
+## In flight: nothing (PR #107 merged; this docs PR follows it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -78,7 +76,14 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-06: service requests, part (a) (ADR 0076), PR #107 open
+## Done 2026-11-06: service requests, part (a) (ADR 0076), PR #107 merged 04:35 UTC (3:35 pm Melbourne)
+- **Live after merge:** CI's third run was green (the first failed `check` on a svelte-check
+  type error and a Nix cache download; the second on workspace clippy, a 79-line scenario
+  function after `cargo fmt`). The seed node restarted 04:56 UTC (671 MB at 10 s; ~21 min
+  after the merge). **The project network and the chats reset.** Live `service-requests.mjs`
+  (its first live try failed only in its last step: the Overview tab keeps the Participation
+  panel mounted but hidden, so count() saw a hidden banner; fixed to wait for it visible) and
+  `messages.mjs` **passed** (~05:00–05:20 UTC).
 **Project and conversation integrity change: merging resets the project network and the
 chats** (directory unchanged). PARITY's "borrowing and delivery frames" are dead code on web
 (`RequestFrameStack` imported nowhere); the real feature is web-backend's project service

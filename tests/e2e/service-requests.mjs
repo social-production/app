@@ -128,12 +128,13 @@ await press(ann, 'Request settings');
 await ann.getByRole('dialog').getByLabel('Enable requests').uncheck();
 await ann.getByRole('dialog').getByRole('button', { name: 'Save settings' }).click();
 await ann.locator('.requests-off-banner').waitFor({ timeout: 120_000 });
-await until(bob, projectUrl, bob.getByRole('tab', { name: 'Participation' }), 'the project');
-for (let i = 0; i < 20 && !(await bob.locator('.requests-off-banner').count()); i++) {
+// The Overview tab keeps the Participation panel mounted but hidden: check what shows.
+const banner = bob.locator('.requests-off-banner');
+for (let i = 0; i < 20; i++) {
   await participation(bob);
-  await bob.waitForTimeout(3000);
+  if (await banner.waitFor({ timeout: 5000 }).then(() => true, () => false)) break;
 }
-await bob.locator('.requests-off-banner').waitFor({ timeout: 10_000 });
+await banner.waitFor({ timeout: 10_000 });
 assert.equal(await bob.getByRole('button', { name: 'Request service', exact: true }).count(), 0);
 await bob.screenshot({ path: `${out}/phone390-not-taking-requests.png` });
 log('ann turned requests off; bob sees "Not taking requests."');
