@@ -3,6 +3,7 @@
 
 mod auth;
 mod config;
+mod geo;
 mod hex;
 mod node;
 mod routes;
@@ -38,6 +39,7 @@ pub async fn serve(
         // A guest's project page polls its chat every few seconds: an hour is ~1,500 reads.
         read_limit: Arc::new(auth::ratelimit::SignupLimit::new(20_000)),
         started: std::time::Instant::now(),
+        geo: Arc::new(geo::Geo::new(geo::Settings::from_env())?),
         config: Arc::new(config),
         node,
     };

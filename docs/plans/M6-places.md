@@ -1,7 +1,7 @@
 # M6: places and the map (parity item 7)
 
-Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Phase 1 in
-progress. Each phase starts with its ADR and ships as its own PR. Port from web only
+Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Phases 1–2
+done. Each phase starts with its ADR and ships as its own PR. Port from web only
 (STATUS "Owner decisions"); asset management stays out.
 
 ## What web has
@@ -34,7 +34,7 @@ progress. Each phase starts with its ADR and ships as its own PR. Port from web 
    by `crates/sp_place`, an optional place next to the charter's, edits', plans' and
    activities' labels. Scenario `places.rs`. The account's default location moves to phase 3
    (a private record: profiles are public).
-2. **Geocoding on the gateway**: `/locations/search`, `/reverse`, `/ip-hint` as web's routes,
+2. **Geocoding on the gateway** (ADR 0079, 2026-11-07): `/locations/search`, `/reverse`, `/ip-hint` as web's routes,
    proxied to Nominatim with a cache and the per-IP limit (gateway env vars like web's
    `GEOCODING_*`). The native app calls a gateway for these too. Needs the seed node's
    network to reach `nominatim.openstreetmap.org` (Railway: fine).

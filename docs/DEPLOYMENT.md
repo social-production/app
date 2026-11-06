@@ -20,6 +20,7 @@ Separate from the live FastAPI project `social-production`, so nothing is shared
 | `RP_ID` / `RP_ORIGIN` | the UI's domain and origin; passkeys are bound to them (e.g. `ui-production-333c.up.railway.app`, `https://ui-production-333c.up.railway.app`) |
 | `POW_BITS` | signup proof-of-work difficulty (default 20; the test network uses 18) |
 | `SIGNUPS_PER_IP_PER_DAY` | default 5 |
+| `GEOCODING_*`, `IP_HINT_URL` | the place picker's search, reverse and IP hint (ADR 0079): `GEOCODING_PROVIDER_URL` (default Nominatim), `GEOCODING_USER_AGENT`, `GEOCODING_CACHE_TTL_SECONDS` (86400), `GEOCODING_RATE_LIMIT` (30 per IP per `GEOCODING_RATE_LIMIT_WINDOW_SECONDS`, 60), `GEOCODING_TIMEOUT_SECONDS` (8), `GEOCODING_PROVIDER_API_KEY` (none); defaults need no setting |
 | `PORT` | set by Railway. The gateway listens here and proxies the app websocket on `/ws` |
 
 The seed node is one process (ADR 0023). The conductor is embedded in the gateway, there is no

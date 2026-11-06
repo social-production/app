@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-07 early morning Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-07 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,9 +50,15 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #112 merged; its docs PR follows it).
-**Next:** M6 phase 2, geocoding on the gateway (`docs/plans/M6-places.md`), then phase 3's
-LocationPicker; then the rest of the parity list below.
+## In flight: M6 phase 2, geocoding on the gateway (ADR 0079), branch `claude/social-production-handoff-dsam61`
+Gateway only (no DNA change, no reset): `services/gateway/src/geo/` (`shape.rs` web's
+Nominatim/ip-api normalisation, `memo.rs` TTL cache + window limits, `mod.rs` provider calls
+and web's error codes) and `routes/locations.rs` (`GET /locations/search`, `/reverse`,
+`/ip-hint`, web's params and `{ items }` answers). `reqwest` 0.12 (already in the lockfile).
+Env vars in DEPLOYMENT.md. See the newest "Done" entry for what was checked.
+**Next:** M6 phase 3, the LocationPicker (port web's `components/shared/LocationPicker.svelte`
+and its driver `api/drivers/fastapi/domains/locations.ts` against these routes; round to the
+precision on save, as web's `create_location` does); then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -78,6 +84,22 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR open (see "In flight")
+- **Routes** (web's `app/routers/locations.py`): `GET /locations/search?q=&limit=&country_codes=&viewbox=`,
+  `/locations/reverse?lat=&lon=`, `/locations/ip-hint`; `{ items: [Location] }` in web's
+  snake case; refusals are `{ error: <web's detail code> }` (`geocoding_rate_limit_exceeded`,
+  `geocoding_provider_unavailable`, `ip_location_unavailable`, ...). Public.
+- **Limits:** 30/min per IP (`GEOCODING_RATE_LIMIT`), 10 IP hints per IP per window, and (not
+  on web) 60 provider calls a minute per gateway (Nominatim's ~1/s policy); 24 h cache. All
+  in memory, a restart empties them.
+- **Checked:** `cargo test -p gateway --lib` (22, incl. 6 new: shapes, checks, a fake local
+  Nominatim for caching and the 429/500 mapping), `cargo clippy -p gateway --all-targets -D
+  warnings` and `cargo fmt` in Nix, `check-sizes.sh`; live Nominatim's answer has the fixture's
+  shape (curl). **Not run:** ip-api.com (its host doesn't resolve in the cloud sandbox), a
+  local seed node, scenarios (no zome change), UI checks (no UI change).
+- **After merge:** smoke `curl "<seed-node>/locations/search?q=Fitzroy"` and `/locations/ip-hint`
+  (the seed-node URL is in "What's live").
 
 ## Done 2026-11-07: M6 phase 1, place records (ADR 0078), PR #112 merged 14:59 UTC Nov 6 (1:59 am Melbourne), place records (ADR 0078)
 - **Live after merge:** CI green on the second run (the first failed `check` on clippy's
