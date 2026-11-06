@@ -1,16 +1,18 @@
-// Activities and roles (ADR 0056) end to end at phone width. A personal service's Activity
-// phase is its first, so Ann offers one: she adds an activity with one Helper place on web's
-// calendar; Bob joins, takes the role (the row then reads Full), leaves it again; Ann's
-// suggestion of Bob for the role shows on his sheet and he declines it (Ann is told).
-// Project chats take photos since the same change: Bob sends one and Ann sees it load. Last,
-// a two-minute activity Bob takes part in moves to Past activity, where he checks in and
-// rates it.
+// Activities and roles (ADR 0056) end to end at phone width, on an event in its Activity
+// phase (a personal service shows web's slots there instead, ADR 0077). The dev founders
+// (scripts/dev-seed.sh) move Ann's event there with a plan running from today for two
+// weeks; Ann adds an activity with one Helper place on web's calendar; Bob (a new account)
+// joins, takes the role (the row then reads Full), leaves it again; Ann's suggestion of Bob
+// for the role shows on his sheet and he declines it (Ann is told). Event chats take
+// photos since the same change: Bob sends one and Ann sees it load. Last, a two-minute
+// activity Bob takes part in moves to Past activity, where he checks in and rates it.
 //   node tests/e2e/activities.mjs http://localhost:4174 [screens dir]
-// It signs up two test accounts, so it may run against the live test network too.
+// It needs the dev founders, so it runs only against a local seed node.
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { advanceTo, approvePlan, createEvent, daysFromNow, filePlan, signInFounders } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -19,18 +21,16 @@ const stamp = Date.now().toString(36).slice(-5);
 const title = `Bike fixing ${stamp}`;
 const activity = `Saturday repairs ${stamp}`;
 
-const ann = await device({ viewport: phone });
-await signUp(ann, `ann${stamp}`);
-await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('radio', { name: /Personal service/ }).click();
-await ann.getByRole('button', { name: 'Continue' }).click();
-await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('I fix bikes on weekends.');
-await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
-await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-const projectUrl = ann.url().split('?')[0];
-log('ann offers a personal service');
+const { ann, bob: voter } = await signInFounders(phone);
+const projectUrl = await createEvent(ann, voter, title);
+await advanceTo(ann, voter, 'Event Plan');
+const planTitle = `Repair fortnight ${stamp}`;
+const range = [daysFromNow(0), daysFromNow(14)];
+await filePlan(ann, { title: planTitle, range, start: '00:00', finish: '23:59', place: 'The shed' });
+await approvePlan(ann, voter, planTitle);
+await advanceTo(ann, voter, 'Activity');
+await voter.context().close();
+log('the founders moved ann\'s event to Activity with a two-week plan');
 
 /** Reload Notifications until a card with `text` shows (derived from the network). */
 async function notified(page, text) {
@@ -74,8 +74,8 @@ const bob = await device({ viewport: phone });
 await signUp(bob, `bob${stamp}`);
 await bob.goto(projectUrl);
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-await bob.getByRole('button', { name: 'Join project' }).click();
-await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
+await bob.getByRole('button', { name: 'Join event' }).click();
+await bob.getByRole('button', { name: '3 members' }).waitFor({ timeout: 60_000 });
 for (let i = 0; ; i++) {
   await takePart(bob);
   if (await row(bob).waitFor({ timeout: 20_000 }).then(() => true, () => false)) break;
@@ -124,7 +124,7 @@ log('bob declined the suggestion');
 await notified(ann, 'The person you suggested declined this role.');
 log('ann is told bob declined');
 
-// Photos in the project chat (ADR 0056 ride-along).
+// Photos in the event chat (ADR 0056 ride-along).
 const png = Buffer.from(
   await bob.evaluate(() => {
     const canvas = Object.assign(document.createElement('canvas'), { width: 160, height: 120 });
@@ -139,7 +139,7 @@ const caption = `Chain after ${stamp}`;
 await bob.goto(`${projectUrl}?tab=chat`);
 await bob.locator('input.attach-input[accept]').setInputFiles({ name: 'chain.png', mimeType: 'image/png', buffer: png });
 await bob.locator('.attach-preview img').waitFor();
-await bob.getByRole('textbox', { name: 'Message the project...' }).fill(caption);
+await bob.getByRole('textbox', { name: 'Message members...' }).fill(caption);
 await bob.getByRole('button', { name: 'Send', exact: true }).click();
 await bob.locator('.chat-log').getByText('Sending…').waitFor({ state: 'detached', timeout: 120_000 });
 const photoIn = (page) => page.locator('.chat-message', { hasText: caption }).locator('.message-photo');
@@ -151,8 +151,8 @@ for (let i = 0; ; i++) {
 await ann.waitForFunction((el) => el.complete && el.naturalWidth > 0, await photoIn(ann).elementHandle(), {
   timeout: 120_000,
 });
-await ann.screenshot({ path: `${out}/phone390-project-chat-photo.png` });
-log('bob sent a photo in the project chat; ann sees it');
+await ann.screenshot({ path: `${out}/phone390-event-chat-photo.png` });
+log('bob sent a photo in the event chat; ann sees it');
 
 // Past activity: a short activity ends; Bob checks in Completed and rates it 4 stars.
 const local = (d) => {

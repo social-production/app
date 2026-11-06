@@ -8850,6 +8850,10 @@ dependencies = [
 ]
 
 [[package]]
+name = "sp_place"
+version = "0.0.1"
+
+[[package]]
 name = "sp_scope"
 version = "0.0.1"
 dependencies = [
