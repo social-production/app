@@ -50,10 +50,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 1, place records (ADR 0078)
-PR #111 (activities browser test on an event, M6 plan, `sp_place`) waits on CI; merge it when
-green. Then push the place-records commit on the same branch and open its PR (**project
-reset** on merge). See the newest "Done" entries.
+## In flight: M6 phase 1, place records (ADR 0078), PR #112
+PR #112 waits on CI (**project reset** on merge); merge when green, then smoke live (create a
+project; `projects.mjs`) and update README Status. PR #111 merged 13:21 UTC (12:21 am
+Melbourne, Nov 7): CI green on the first run; no DNA or UI change, live UI and `/readyz` fine.
 **Next:** M6 phase 2, geocoding on the gateway (`docs/plans/M6-places.md`), then phase 3's
 LocationPicker; then the rest of the parity list below.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -82,7 +82,7 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-06 (late, not yet merged): M6 phase 1, place records (ADR 0078)
+## Done 2026-11-06 (late, PR #112, not yet merged): M6 phase 1, place records (ADR 0078)
 **Project integrity change: merging resets the project network.** Directory and conversation
 unchanged (`sp_place` is its own crate, not `sp_core`).
 - **Records:** `project_integrity::Place { label, latitude, longitude, region, country,
@@ -101,7 +101,7 @@ unchanged (`sp_place` is its own crate, not `sp_core`).
   `places` **passed** (450 s here). **Not run:** workspace clippy and the other scenario files
   (CI); no UI change (the UI sends no places until phase 3).
 
-## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place`
+## Done 2026-11-06 (late): activities browser test on an event; M6 plan and `sp_place` (PR #111, merged 13:21 UTC)
 - **`tests/e2e/activities.mjs`** now runs on an event: the dev founders create it, move it to
   Event Plan, approve a plan from today for two weeks (00:00–23:59, so the two-minute
   activity fits) and move it to Activity; founder one is Ann, Bob is a new account (so the
