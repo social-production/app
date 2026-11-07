@@ -90,7 +90,8 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   `tzOffset`, `date_from`/`date_to` (`routes/map.rs::span`).
 - **Checked:** `cargo test -p gateway --lib` (28; 3 new), clippy `-p gateway -p activities
   --all-targets -D warnings`, `cargo fmt`; scenario `help_requests` (now asserts the view's
-  `location`) — see the PR for its result.
+  `location`) **passed** locally (676 s) and its clippy is clean. CI's first run failed `check`
+  on `cargo fmt` in that scenario file: run `cargo fmt --all --check`, not `-p gateway`.
 
 ## Done 2026-11-07: M6 phase 4a merged (PR #118, 08:51 UTC = 7:51 pm Melbourne)
 - CI green on the first run of each push. The seed node restarted ~09:10 UTC. No reset. Live

@@ -168,7 +168,11 @@ async fn helpers_commit_to_one_role_each() {
     assert_eq!(seen[0].people.len() + seen[1].people.len(), 2);
     assert_eq!(seen[0].description, "Driver wanted");
     assert_eq!(seen[1].maximum, None, "any number");
-    assert_eq!(all[0].location, Some(gate()), "the view carries the activity's place");
+    assert_eq!(
+        all[0].location,
+        Some(gate()),
+        "the view carries the activity's place"
+    );
 
     let proposal: Result<ActionHash, String> = net
         .try_call(
