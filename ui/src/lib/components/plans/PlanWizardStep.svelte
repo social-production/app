@@ -7,21 +7,30 @@
   } from '#lib/domain/policy.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleProblem } from '#lib/domain/eventSchedule.ts';
-  import type { PlanForm, PlanStep } from '#lib/domain/planForm.ts';
+  import {
+    sameAsProduction,
+    withPlanPlace,
+    type PlanForm,
+    type PlanStep,
+    type ProductionLocation,
+  } from '#lib/domain/planForm.ts';
+  import type { PlaceSearch } from '#lib/domain/places.ts';
+  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
   import type { ProjectSubtype } from '#lib/domain/projects.ts';
 
   import PlanStagesEditor from './PlanStagesEditor.svelte';
 
   /**
-   * The fields of one plan wizard step (web's PlanCreationWizard body). Locations are plain
-   * labels, like the charter's; web's place search arrives with the location work.
+   * The fields of one plan wizard step (web's PlanCreationWizard body), places through web's
+   * LocationPicker (ADR 0080).
    */
   interface Props {
     step: PlanStep;
     form: PlanForm;
     subtypes: { value: ProjectSubtype; label: string }[];
     /** The approved production plan's location, for "Same as production plan location". */
-    productionLocation: string | null;
+    productionLocation: ProductionLocation | null;
+    places: PlaceSearch;
     demand: number;
     opposition: number;
     required: number;
@@ -33,6 +42,7 @@
     form = $bindable(),
     subtypes,
     productionLocation,
+    places,
     demand,
     opposition,
     required,
@@ -41,11 +51,6 @@
 
   const total = $derived(demand + opposition);
   const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-  function sameAsProduction(checked: boolean): void {
-    form.sameAsProduction = checked;
-    form.location = checked ? (productionLocation ?? '') : '';
-  }
 </script>
 
 {#if step.id === 'plan-overview'}
@@ -81,10 +86,14 @@
   />
 {:else if step.id === 'location'}
   <div class="location-step">
-    <input
-      bind:value={form.location}
-      aria-label="Location"
-      placeholder="Place, address or Online"
+    <LocationPicker
+      value={form.place}
+      modes={['physical', 'online']}
+      portaled
+      elevated
+      onChange={(value) => (form = withPlanPlace(form, value))}
+      search={places.search}
+      failure={places.failure}
     />
   </div>
 {:else if step.id === 'distribution-location'}
@@ -94,16 +103,21 @@
         <input
           checked={form.sameAsProduction}
           type="checkbox"
-          onchange={(e) => sameAsProduction(e.currentTarget.checked)}
+          onchange={(e) =>
+            (form = sameAsProduction(form, e.currentTarget.checked, productionLocation))}
         />
-        <span>Same as production plan location ({productionLocation})</span>
+        <span>Same as production plan location ({productionLocation.label})</span>
       </label>
     {/if}
     {#if !form.sameAsProduction}
-      <input
-        bind:value={form.location}
-        aria-label="Distribution location"
-        placeholder="Place, address or Online"
+      <LocationPicker
+        value={form.place}
+        modes={['physical', 'online']}
+        portaled
+        elevated
+        onChange={(value) => (form = withPlanPlace(form, value))}
+        search={places.search}
+        failure={places.failure}
       />
     {/if}
     <label class="recipients-field">

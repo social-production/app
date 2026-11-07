@@ -63,8 +63,12 @@ async function get<T>(gateway: string, path: string, query: Record<string, strin
   const url = new URL(path, gateway);
   for (const [key, value] of Object.entries(query)) url.searchParams.set(key, value);
   const response = await fetch(url);
-  if (!response.ok)
-    throw new GatewayError(`The server answered ${response.status}.`, response.status);
+  if (!response.ok) {
+    // The place routes explain a refusal with web's error code (ADR 0079).
+    const json: unknown = await response.json().catch(() => ({}));
+    const code = (json as { error?: string }).error;
+    throw new GatewayError(code ?? `The server answered ${response.status}.`, response.status);
+  }
   return (await response.json()) as T;
 }
 

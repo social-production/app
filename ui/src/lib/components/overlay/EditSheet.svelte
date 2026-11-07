@@ -1,5 +1,7 @@
 <script lang="ts">
-  import type { CharterDraft } from '#lib/domain/projects.ts';
+  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
+  import { emptyPlaceValue, type PlaceSearch, type PlaceValue } from '#lib/domain/places.ts';
+  import { charterDraft, type Charter, type CharterDraft } from '#lib/domain/projects.ts';
 
   import OverlaySheet from './OverlaySheet.svelte';
 
@@ -12,11 +14,13 @@
     sheetTitle?: string;
     submitLabel?: string;
     appliesDirectly?: boolean;
-    draft: CharterDraft;
+    /** The charter as it is; each opening starts from it. */
+    charter: Charter;
     pending: boolean;
     message: string | undefined;
     onSubmit: (draft: CharterDraft) => void;
     onClose: () => void;
+    places: PlaceSearch;
   }
 
   let {
@@ -24,25 +28,26 @@
     sheetTitle = 'Propose Edit',
     submitLabel = 'Propose Edit',
     appliesDirectly = false,
-    draft,
+    charter,
     pending,
     message,
     onSubmit,
     onClose,
+    places,
   }: Props = $props();
 
   let title = $state('');
   let description = $state('');
-  let location = $state('');
+  let location = $state<PlaceValue>(emptyPlaceValue());
 
   // Each opening starts from the current values.
   $effect(() => {
-    if (open) ({ title, description, location } = draft);
+    if (open) ({ title, description, location } = charterDraft(charter));
   });
 
   function submit(event: SubmitEvent): void {
     event.preventDefault();
-    onSubmit({ title: title.trim(), description, location: location.trim() });
+    onSubmit({ title: title.trim(), description, location });
   }
 </script>
 
@@ -71,10 +76,18 @@
       <span class="field-label">Description</span>
       <textarea bind:value={description} rows="6" placeholder="Describe the project..."></textarea>
     </label>
-    <label class="field">
+    <div class="field">
       <span class="field-label">Location</span>
-      <input bind:value={location} maxlength="160" placeholder="Town, region or Online" />
-    </label>
+      <LocationPicker
+        value={location}
+        portaled
+        elevated
+        modes={['physical', 'online']}
+        onChange={(next) => (location = next)}
+        search={places.search}
+        failure={places.failure}
+      />
+    </div>
   </form>
   {#snippet footer()}
     <div class="sheet-actions">

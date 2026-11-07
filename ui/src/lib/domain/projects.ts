@@ -1,7 +1,14 @@
 /** Mirrors the project DNA's zome and the gateway's project index. */
 
 import type { ProjectUpdate } from './governance.ts';
-import type { Place } from './places.ts';
+import {
+  fitLabel,
+  fromPlace,
+  placeRecord,
+  samePlace,
+  type Place,
+  type PlaceValue,
+} from './places.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
 /** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), or a
@@ -179,7 +186,8 @@ export function takesSignals(mode: CharterMode): boolean {
 export interface CharterDraft {
   title: string;
   description: string;
-  location: string;
+  /** web's ProposeEditSheet location picker (ADR 0080). */
+  location: PlaceValue;
 }
 
 export interface ProjectTypeOption {
@@ -233,3 +241,28 @@ export type LocationChoice = 'physical' | 'online' | 'later';
 
 /** A detail page's tabs (web's detailTabs.ts); each appears once its milestone lands. */
 export type DetailTabId = 'context' | 'participation' | 'chat' | 'links' | 'history';
+
+/** web's ProposeEditSheet: only the fields that change (null otherwise). A new place under the
+ * same label is a location change too, since an edit's place rides with its label (ADR 0078). */
+export function charterEdit(draft: CharterDraft, c: Charter) {
+  const changed = (next: string, now: string): string | null =>
+    next.trim() === now.trim() ? null : next;
+  const label = fitLabel(draft.location.displayLabel, LOCATION_LABEL_MAX);
+  const place = placeRecord(draft.location, label);
+  const moved = label !== c.location_label.trim() || !samePlace(place, c.place);
+  return {
+    title: changed(draft.title, c.title),
+    description: changed(draft.description, c.description),
+    location: moved ? label : null,
+    place: moved ? place : null,
+  };
+}
+
+/** The edit sheet opens on the charter as it is. */
+export function charterDraft(c: Charter): CharterDraft {
+  return {
+    title: c.title,
+    description: c.description,
+    location: fromPlace(c.place, c.location_label),
+  };
+}

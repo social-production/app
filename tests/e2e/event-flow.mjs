@@ -120,7 +120,7 @@ export async function filePlan(page, { title, date, range, start, finish, place 
   await wizard.getByLabel('Start time').fill(start);
   await wizard.getByLabel('Finish time').fill(finish);
   await next(); // → place
-  await wizard.getByLabel('Location').fill(place);
+  await wizard.getByRole('textbox', { name: 'Place' }).fill(place);
   await next();
   await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Everyone who signalled can come.');
   await next();

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { PlaceSearch } from '#lib/domain/places.ts';
+  import type { ProductionLocation } from '#lib/domain/planForm.ts';
   import { DIRECT_USE_CORE, DIRECT_USE_PLAN } from '#lib/domain/policy.ts';
   import {
     emptyPlanForm,
@@ -24,7 +26,8 @@
     kind: PlanKind;
     mode: CharterMode;
     subtype: ProjectSubtype;
-    productionLocation: string | null;
+    productionLocation: ProductionLocation | null;
+    places: PlaceSearch;
     demand: number;
     opposition: number;
     required: number;
@@ -42,6 +45,7 @@
     mode,
     subtype,
     productionLocation,
+    places,
     demand,
     opposition,
     required,
@@ -129,6 +133,7 @@
             bind:form
             subtypes={isProjectMode(mode) ? subtypeOptions(mode) : []}
             {productionLocation}
+            {places}
             {demand}
             {opposition}
             {required}

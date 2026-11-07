@@ -27,6 +27,13 @@ export interface PlaceQuickPick {
   value: PlaceValue;
 }
 
+/** The gateway's place search and its failure sentence, handed to the picker by features
+ * (components don't call services). */
+export interface PlaceSearch {
+  search: (query: string, limit: number) => Promise<PlaceValue[]>;
+  failure: (error: unknown) => string;
+}
+
 /** The zome's `project_integrity::Place`. */
 export interface Place {
   label: string;
@@ -164,12 +171,18 @@ export function intentPlace(
   return intent === 'physical' ? placeRecord(value, label) : null;
 }
 
+/** Two places say the same thing (an edit changes the location when its place differs). */
+export function samePlace(a: Place | null | undefined, b: Place | null | undefined): boolean {
+  if (!a || !b) return !a && !b;
+  return (Object.keys(a) as (keyof Place)[]).every((key) => a[key] === b[key]);
+}
+
 /** web's `buildLocationQuickPick`: null for a blank or "Online" label. */
 export function quickPick(input: {
   id: string;
   label: string;
   sourceLabel: string;
-  place?: Place | null;
+  place?: Place | null | undefined;
 }): PlaceQuickPick | null {
   const label = input.label.trim();
   if (!label || label.toLowerCase() === 'online') return null;

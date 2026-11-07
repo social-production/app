@@ -29,8 +29,11 @@ field.
   `sp_core`/`sp_activity`; Nominatim's labels go to 240): changing `sp_core` would reset every
   network, and web's own `location_label` columns are what cards show anyway.
 - **3a wires the create flows** (project, event with its upfront plan, help request with its
-  activity) through `LocationIntent`. 3b: the plan and activity wizards, ProposeEditSheet and
-  the project header. 3c: Settings' Regional default location (a private entry; profiles
+  activity) through `LocationIntent`. **3b** (same day): ProposeEditSheet (an edit proposes
+  the label and place together when either changed), the activity wizard with web's quick
+  picks (the record's own place, then the approved leading plans'; web has no separate
+  online detail, so the Online checkbox and its text field went) and both plan wizard
+  location steps ("Same as production plan location" copies the place too). 3c: Settings' Regional default location (a private entry; profiles
   are public) and the IP hint and device position.
 
 ## Consequences

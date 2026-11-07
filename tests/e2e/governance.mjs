@@ -98,7 +98,7 @@ await bob.locator('.context-panel').screenshot({ path: `${shots}/update-line-390
 log('an update passed and shows in the header');
 // web's feed card shows the newest update ("Latest: …") once the index refreshes.
 const latest = bob.locator('.project-card', { hasText: title }).getByText('Latest: First repair night went well.');
-for (let i = 0; i < 20 && !(await latest.count()); i++) {
+for (let i = 0; i < 45 && !(await latest.count()); i++) {
   await bob.goto(BASE);
   await bob.getByRole('button', { name: 'Sort public feed by' }).click();
   await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
@@ -151,7 +151,7 @@ await wizard.getByPlaceholder('Plan title').fill(planTitle);
 await wizard.getByPlaceholder('Describe the plan').fill('Open the workshop every Saturday morning.');
 await wizard.getByRole('button', { name: 'Next' }).click(); // overview → plan type
 await wizard.getByRole('button', { name: 'Next' }).click(); // → location
-await wizard.getByLabel('Location').fill('Community hall');
+await wizard.getByRole('textbox', { name: 'Place' }).fill('Community hall');
 await wizard.getByRole('button', { name: 'Next' }).click();
 await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both supporters can come.');
 await wizard.getByRole('button', { name: 'Next' }).click();

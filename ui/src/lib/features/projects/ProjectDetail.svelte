@@ -7,6 +7,7 @@
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
   import { removedLabel } from '#lib/domain/moderation.ts';
   import { isEvent, isPrivateSeed, type DetailTabId, type Project } from '#lib/domain/projects.ts';
+  import { placeSearch } from '#lib/services/locations.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
   import { goto } from '$app/navigation';
@@ -268,13 +269,10 @@
         sheetTitle={editLabel(project, false)}
         submitLabel={editLabel(project, true)}
         appliesDirectly={project.governance === 'organizer_controlled'}
-        draft={{
-          title: charter.title,
-          description: charter.description,
-          location: charter.location_label,
-        }}
+        {charter}
         pending={detail.saving}
         message={detail.sheetMessage}
+        places={placeSearch}
         onSubmit={(draft) => void filed(detail.proposeEdit(draft))}
         onClose={() => (sheet = null)}
       />

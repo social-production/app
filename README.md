@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Place search when creating (PR #116, 2026-11-07 3:28 pm Melbourne, ADR 0080):** web's
+  location picker in the create flows for projects, events and help requests: type a place,
+  pick a suggestion, and the record keeps its coordinates (approximate, as on web) for the
+  coming map. No network reset. Live `places.mjs` passed.
 - **Place search on the gateway (PR #114, 2026-11-07 11:08 am Melbourne, ADR 0079):** the
   seed node answers web's `/locations/search`, `/locations/reverse` and `/locations/ip-hint`
   (OpenStreetMap's Nominatim and ip-api.com, cached, limited per IP) for the coming location

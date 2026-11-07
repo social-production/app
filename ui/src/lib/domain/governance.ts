@@ -1,10 +1,20 @@
 /** Mirrors the project DNA's governance zome (Proposal → Vote → Outcome, ADR 0033). */
 
+import type { Place } from './places.ts';
+
 export type VoteChoice = 'Yes' | 'No' | 'Neutral';
 export type ProposalStatus = 'Open' | 'Passed' | 'Rejected';
 
 export type ProposalKind =
-  | { Edit: { title: string | null; description: string | null; location: string | null } }
+  | {
+      Edit: {
+        title: string | null;
+        description: string | null;
+        location: string | null;
+        /** With `location`: its place (ADR 0078); none leaves the label without one. */
+        place?: Place | null;
+      };
+    }
   | { Update: { body: string } }
   /** `plan`: the approved plan a move out of a plan phase goes ahead with (ADR 0039);
    * `reason`: web's required "why" for a phase change. */
