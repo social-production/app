@@ -55,7 +55,7 @@ const next = () => ann.getByRole('button', { name: 'Next', exact: true }).click(
 await ann.getByPlaceholder('Activity title').fill(activity);
 await next();
 await next(); // the next hour, web's default
-await ann.getByPlaceholder('Place or address').fill('The shed');
+await ann.getByPlaceholder('Search a place').fill('The shed');
 await next();
 await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
 await ann.getByPlaceholder('No cap').fill('1');
@@ -169,7 +169,7 @@ await next();
 await ann.getByLabel('Start time').fill(local(start));
 await ann.getByLabel('Finish time').fill(local(end));
 await next();
-await ann.getByPlaceholder('Place or address').fill('The shed');
+await ann.getByPlaceholder('Search a place').fill('The shed');
 await next();
 await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
 await next();

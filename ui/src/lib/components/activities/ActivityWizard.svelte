@@ -8,16 +8,19 @@
     placeSummary,
     scheduleProblem,
     stepReady,
+    withLocation,
     type ActivityForm,
   } from '#lib/domain/activityForm.ts';
+  import type { PlaceQuickPick, PlaceSearch } from '#lib/domain/places.ts';
+  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
 
   import RolesEditor from './RolesEditor.svelte';
 
   import '#lib/components/styles/activities.css';
 
   /**
-   * web's ActivityCreationWizard: title, schedule, place (a plain label or Online until places
-   * land), the plan stage when the leading plans have stages, roles, note, review.
+   * web's ActivityCreationWizard: title, schedule, place (web's LocationPicker with its quick
+   * picks), the plan stage when the leading plans have stages, roles, note, review.
    */
   interface Props {
     open: boolean;
@@ -30,6 +33,8 @@
     onSubmit: () => void;
     onCancel: () => void;
     searchPeople: (q: string) => Promise<{ agent: string; name: string }[]>;
+    places: PlaceSearch;
+    quickPicks: PlaceQuickPick[];
   }
 
   let {
@@ -42,6 +47,8 @@
     onSubmit,
     onCancel,
     searchPeople,
+    places,
+    quickPicks,
   }: Props = $props();
 
   let index = $state(0);
@@ -122,15 +129,14 @@
           </div>
           {#if problem}<p class="validation-copy">{problem}</p>{/if}
         {:else if step.type === 'location'}
-          <label class="online-toggle">
-            <input bind:checked={form.online} type="checkbox" />
-            <span>Online</span>
-          </label>
-          <input
-            bind:value={form.place}
-            aria-label={form.online ? 'Online detail' : 'Place'}
-            maxlength="160"
-            placeholder={form.online ? 'Online detail (optional)' : 'Place or address'}
+          <LocationPicker
+            value={form.location}
+            portaled
+            modes={['physical', 'online']}
+            {quickPicks}
+            onChange={(value) => (form = withLocation(form, value))}
+            search={places.search}
+            failure={places.failure}
           />
           {#if form.online}
             <label>

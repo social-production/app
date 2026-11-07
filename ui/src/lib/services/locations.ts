@@ -1,4 +1,9 @@
-import { fromGateway, type GatewayLocation, type PlaceValue } from '#lib/domain/places.ts';
+import {
+  fromGateway,
+  type GatewayLocation,
+  type PlaceSearch,
+  type PlaceValue,
+} from '#lib/domain/places.ts';
 import { GatewayError, locationLookup } from '#lib/holo/index.ts';
 
 /** web's `services/queries/locations.ts` against the gateway's routes (ADR 0079). */
@@ -38,3 +43,6 @@ export function searchFailure(error: unknown): string {
     ? 'Too many searches. Wait a moment and try again.'
     : 'Could not search places right now.';
 }
+
+/** What the picker needs (`PlaceSearch`). */
+export const placeSearch: PlaceSearch = { search: searchPlaces, failure: searchFailure };

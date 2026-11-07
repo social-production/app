@@ -6,7 +6,7 @@ import {
 } from '#lib/domain/governance.ts';
 import type { Person } from '#lib/domain/people.ts';
 import type { Plan, PlanBoard, PlanRating } from '#lib/domain/plans.ts';
-import type { CharterDraft, Project, Stance } from '#lib/domain/projects.ts';
+import { charterEdit, type CharterDraft, type Project, type Stance } from '#lib/domain/projects.ts';
 import type { Importance, ProjectValue } from '#lib/domain/values.ts';
 import { explain } from '#lib/services/errors.ts';
 import {
@@ -180,13 +180,7 @@ export class DetailState {
   proposeEdit(draft: CharterDraft): Promise<boolean> {
     const c = this.project?.charter;
     if (!c) return Promise.resolve(false);
-    const changed = (next: string, now: string): string | null =>
-      next.trim() === now.trim() ? null : next;
-    const edit = {
-      title: changed(draft.title, c.title),
-      description: changed(draft.description, c.description),
-      location: changed(draft.location, c.location_label),
-    };
+    const edit = charterEdit(draft, c);
     if (edit.title === null && edit.description === null && edit.location === null) {
       this.sheetMessage = 'Nothing has changed.';
       return Promise.resolve(false);

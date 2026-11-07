@@ -50,16 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 3a, the LocationPicker in the create flows (ADR 0080), PR on `claude/social-production-handoff-dsam61`
-UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs` needs a
-signed-up account; live Nominatim answers through the seed node), then README Status.
-**Next:** phase 3b, the picker in the plan wizard (`components/plans/PlanDetails.svelte`'s
-location field → `Plan.place`), the activity wizard (`ActivityWizard.svelte` → `NewActivity.location`,
-with web's quick picks: the project's own place and its plans' places), the edit sheet
-(`overlay/EditSheet.svelte` → `ProposalKind::Edit.place`, web's `portaled elevated`, the
-charter's `place` read back with `domain/places.ts::fromPlace`), the project header. Then 3c:
-Settings' Regional default location (a private entry, ADR 0078), the IP hint and device
-position. Then phases 4–5 (index + map).
+## In flight: M6 phase 3b, the picker in the edit sheet and both wizards (ADR 0080), PR on `claude/social-production-handoff-dsam61`
+UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs` now also
+proposes an edit to another place), then README Status.
+**Next:** phase 3c: Settings' Regional default location (web's `location/defaults.ts`,
+`sync.ts`, `geolocation.ts`; a private entry, since profiles are public: decide where in its
+ADR), the IP hint and device position (`/locations/ip-hint`, `/locations/reverse`), and the
+project header's place line if web shows one. Then phases 4–5 (index + map).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -86,7 +83,33 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (on the branch): M6 phase 3a, the LocationPicker in the create flows (ADR 0080)
+## Done 2026-11-07 (on the branch): M6 phase 3b, the picker in the edit sheet and wizards (ADR 0080)
+- **Edit sheet** (`overlay/EditSheet.svelte`, web's ProposeEditSheet): the picker (`portaled
+  elevated`, physical/online) opens on the charter's place (`domain/projects.ts::charterDraft`
+  → `places.ts::fromPlace`); `charterEdit` proposes `location` + `place` when the label or the
+  place changed (a new place under the same label counts, since an edit's place rides with its
+  label, ADR 0078). It takes the charter now, not a draft.
+- **Activity wizard**: the picker replaces the Online checkbox and text field (web has no
+  separate online detail); web's quick picks (`activityForm.ts::activityQuickPicks`: Event
+  location / Plan location for events; Project location, Production plan or Plan location,
+  Distribution plan otherwise, from the approved leading plans). Saved as
+  `NewActivity.location`.
+- **Plan wizard**: both location steps use the picker (`planForm.ts::withPlanPlace`,
+  `sameAsProduction` copies the production plan's place); `planFromForm` sets `Plan.place`.
+- `PlaceSearch` (`domain/places.ts`) is what features hand components (`placeSearch` in
+  `services/locations.ts`).
+- **Tests:** `places.mjs` also proposes an edit to another searched place (the call carries
+  it). Tests that typed into the old fields now use the picker (`activities.mjs`,
+  `event-flow.mjs`, `governance.mjs`). `governance.mjs`'s wait for the feed card's "Latest:"
+  went from 20 to 45 tries: on the cloud seed node the index took longer (the card was right,
+  checked by hand). Against a local seed node `places.mjs`, `activities.mjs`, `governance.mjs`
+  **passed**; UI check, lint, boundaries, sizes clean. **Not run:** scenarios (no zome change).
+
+## Done 2026-11-07: M6 phase 3a merged (PR #116, 04:28 UTC = 3:28 pm Melbourne)
+- CI green on the first run. The seed node restarted ~04:40 UTC (464 MB at 10 min). No reset.
+  Live `places.mjs` **passed** (04:51 UTC): search through the live gateway, pick, save.
+
+## Done 2026-11-07: M6 phase 3a, the LocationPicker in the create flows (ADR 0080)
 - **What:** web's LocationPicker ported (`ui/src/lib/components/location/LocationPicker.svelte`,
   styles via PORTS → `styles/location.css`, two port fixes in `additions.css`) into
   `components/create/LocationIntent.svelte`, so project, event and help-request creation

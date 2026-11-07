@@ -3,7 +3,9 @@
   import ActivityCalendar from '#lib/components/activities/ActivityCalendar.svelte';
   import ActivityHistory from '#lib/components/activities/ActivityHistory.svelte';
   import ActivityWizard from '#lib/components/activities/ActivityWizard.svelte';
+  import { activityQuickPicks } from '#lib/domain/activityForm.ts';
   import { dayWindow, planOpen, scheduleDays } from '#lib/domain/eventSchedule.ts';
+  import { placeSearch } from '#lib/services/locations.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { page } from '$app/state';
@@ -50,6 +52,13 @@
   const composerDay = $derived(state.selectedDay || planDays[0] || '');
   const planWindow = $derived(schedule ? dayWindow(schedule, composerDay) : null);
   const stages = $derived(stageOptions(detail.plans, project?.charter?.mode ?? ''));
+  const quickPicks = $derived(
+    activityQuickPicks(
+      project?.charter?.mode ?? '',
+      { label: project?.charter?.location_label ?? '', place: project?.charter?.place },
+      detail.plans?.plans ?? [],
+    ),
+  );
 
   $effect(() => {
     state.highlighted = page.url.searchParams.get('activity');
@@ -150,6 +159,8 @@
         onSubmit={() => void state.submit()}
         onCancel={() => (state.composing = false)}
         searchPeople={state.searchPeople}
+        places={placeSearch}
+        {quickPicks}
       />
     {/if}
   </section>

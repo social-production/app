@@ -3,6 +3,8 @@ import { defaultTimes } from '#lib/domain/activityCalendar.ts';
 import { withinWindow } from '#lib/domain/eventSchedule.ts';
 import { namedRoles, newActivityForm, type ActivityForm } from '#lib/domain/activityForm.ts';
 import { rankMentions, type MentionPool } from '#lib/domain/mentions.ts';
+import { fitLabel, onlinePlaceValue, placeRecord } from '#lib/domain/places.ts';
+import { LOCATION_LABEL_MAX } from '#lib/domain/projects.ts';
 import type { PlanBoard, PlanKind } from '#lib/domain/plans.ts';
 import {
   checkIn,
@@ -96,6 +98,7 @@ export class ActivitiesState {
 
   async submit(): Promise<void> {
     const f = this.form;
+    const place = fitLabel(f.online ? f.place.trim() || 'Online' : f.place, LOCATION_LABEL_MAX);
     this.busy = true;
     try {
       await createActivity(this.projectId, {
@@ -103,7 +106,8 @@ export class ActivitiesState {
         startsAt: Date.parse(f.scheduledAt) * 1000,
         endsAt: Date.parse(f.endsAt) * 1000,
         online: f.online,
-        place: f.online ? f.place.trim() || 'Online' : f.place.trim(),
+        place,
+        location: placeRecord(f.online ? onlinePlaceValue(place) : f.location, place),
         meetingUrl: f.online && f.meetingUrl.trim() ? f.meetingUrl.trim() : null,
         note: f.note.trim(),
         planStage: f.planStage,

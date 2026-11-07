@@ -9,8 +9,16 @@ import {
   scheduleProblem,
   type ScheduleForm,
 } from './eventSchedule.ts';
+import {
+  emptyPlaceValue,
+  fitLabel,
+  fromPlace,
+  placeRecord,
+  type Place,
+  type PlaceValue,
+} from './places.ts';
 import type { Plan, PlanKind } from './plans.ts';
-import type { ProjectSubtype } from './projects.ts';
+import { LOCATION_LABEL_MAX, type ProjectSubtype } from './projects.ts';
 
 export type PlanStepType =
   | 'plan-overview'
@@ -32,6 +40,12 @@ export interface PlanStep {
   helper?: string;
 }
 
+/** The leading production plan's place, for "Same as production plan location". */
+export interface ProductionLocation {
+  label: string;
+  place: Place | null;
+}
+
 export interface PlanForm extends ScheduleForm {
   title: string;
   description: string;
@@ -39,6 +53,8 @@ export interface PlanForm extends ScheduleForm {
   subtype: ProjectSubtype;
   repositoryUrl: string;
   location: string;
+  /** The picker's value behind `location` (ADR 0080). */
+  place: PlaceValue;
   sameAsProduction: boolean;
   recipients: string;
   stages: { title: string; details: string; startDate: string; endDate: string }[];
@@ -52,6 +68,7 @@ export function emptyPlanForm(subtype: ProjectSubtype): PlanForm {
     subtype,
     repositoryUrl: '',
     location: '',
+    place: emptyPlaceValue(),
     sameAsProduction: false,
     recipients: '',
     stages: [{ title: '', details: '', startDate: '', endDate: '' }],
@@ -181,6 +198,7 @@ export function planFromForm(kind: PlanKind, f: PlanForm): Plan {
   const producing = kind === 'Production' || kind === 'Organisation';
   const software = producing && f.subtype === 'software';
   const event = kind === 'Event';
+  const location = software ? null : orNull(fitLabel(f.location, LOCATION_LABEL_MAX));
   return {
     kind,
     title: f.title.trim(),
@@ -188,7 +206,8 @@ export function planFromForm(kind: PlanKind, f: PlanForm): Plan {
     demand_note: f.demandNote.trim(),
     subtype: producing ? f.subtype : null,
     repository_url: software ? orNull(f.repositoryUrl) : null,
-    location: software ? null : orNull(f.location),
+    location,
+    place: location ? placeRecord(f.place, location) : null,
     recipients: producing ? null : orNull(f.recipients),
     stages: f.stages.map((s) => ({
       title: s.title.trim(),
@@ -198,4 +217,22 @@ export function planFromForm(kind: PlanKind, f: PlanForm): Plan {
     })),
     ...(event ? { schedule: scheduleFromForm(f) } : {}),
   };
+}
+
+/** web's handleLocationChange (`resolvedPickerLabel`: an online place is "Online"). */
+export function withPlanPlace(f: PlanForm, value: PlaceValue): PlanForm {
+  const online = value.mode === 'online' || value.isOnline;
+  const label = online ? value.displayLabel.trim() || 'Online' : value.displayLabel;
+  return { ...f, location: label, place: value };
+}
+
+/** web's applySameAsProductionLocation / clearSameAsProductionLocation. */
+export function sameAsProduction(
+  f: PlanForm,
+  checked: boolean,
+  production: ProductionLocation | null,
+): PlanForm {
+  const label = checked ? (production?.label ?? '') : '';
+  const place = checked && production ? fromPlace(production.place, label) : emptyPlaceValue();
+  return { ...f, sameAsProduction: checked, location: label, place };
 }

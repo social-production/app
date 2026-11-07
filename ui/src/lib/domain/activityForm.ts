@@ -1,7 +1,17 @@
 /**
  * web's activity creation form and steps (utils/activityCreationSteps.ts). Times are the
- * browser's `datetime-local` values; places are plain labels until places land (M6).
+ * browser's `datetime-local` values; the place comes from web's LocationPicker (ADR 0080).
  */
+import {
+  dedupeQuickPicks,
+  emptyPlaceValue,
+  quickPick,
+  type Place,
+  type PlaceQuickPick,
+  type PlaceValue,
+} from './places.ts';
+import type { PlanView } from './plans.ts';
+
 export interface RoleDraft {
   label: string;
   required: number;
@@ -15,7 +25,10 @@ export interface ActivityForm {
   scheduledAt: string;
   endsAt: string;
   online: boolean;
+  /** The picked place's label ("Online" for an online activity). */
   place: string;
+  /** The picker's value behind `online` and `place`. */
+  location: PlaceValue;
   meetingUrl: string;
   roles: RoleDraft[];
   planStage: string | null;
@@ -45,6 +58,7 @@ export function newActivityForm(place = ''): ActivityForm {
     endsAt: '',
     online: false,
     place,
+    location: { ...emptyPlaceValue(), displayLabel: place },
     meetingUrl: '',
     roles: [emptyRole()],
     planStage: null,
@@ -103,8 +117,44 @@ export const minimumPeople = (roles: RoleDraft[]): number =>
 
 /** web's place summary: "Online", "Online · Zoom" or the place. */
 export function placeSummary(form: ActivityForm): string {
-  if (form.online) return form.place.trim() ? `Online · ${form.place.trim()}` : 'Online';
-  return form.place.trim();
+  const place = form.place.trim();
+  if (form.online) return place && place !== 'Online' ? `Online · ${place}` : 'Online';
+  return place;
+}
+
+/** web's syncFormFromLocationValue. */
+export function withLocation(form: ActivityForm, value: PlaceValue): ActivityForm {
+  const online = value.mode === 'online' || value.isOnline;
+  return { ...form, location: value, online, place: value.displayLabel };
+}
+
+/** web's `buildActivityLocationQuickPicks` sources per lifecycle: the record's own place, then
+ * the approved leading plans' (EventActivityPhase, ProductiveLifecyclePhaseFive, and the
+ * generic and collective-service phase five). */
+export function activityQuickPicks(
+  mode: string,
+  own: { label: string; place: Place | null | undefined },
+  plans: PlanView[],
+): PlaceQuickPick[] {
+  const leading = (kinds: string[]) =>
+    plans.find((p) => kinds.includes(p.plan.kind) && p.leader === 'Leading' && p.approved)?.plan;
+  const pick = (id: string, sourceLabel: string, plan: PlanView['plan'] | undefined) =>
+    plan && quickPick({ id, sourceLabel, label: plan.location ?? '', place: plan.place ?? null });
+  if (mode === 'event') {
+    return dedupeQuickPicks([
+      quickPick({ id: 'event-initial', sourceLabel: 'Event location', ...own }),
+      pick('event-plan', 'Plan location', leading(['Event'])),
+    ]);
+  }
+  return dedupeQuickPicks([
+    quickPick({ id: 'project-initial', sourceLabel: 'Project location', ...own }),
+    pick(
+      'production-plan',
+      mode === 'productive' ? 'Production plan' : 'Plan location',
+      leading(['Production', 'Organisation', 'Access']),
+    ),
+    pick('distribution-plan', 'Distribution plan', leading(['Distribution'])),
+  ]);
 }
 
 /** web's `activityScheduleValidationMessage`. */

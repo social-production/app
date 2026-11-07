@@ -5,6 +5,7 @@
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { PlanKind, Plan } from '#lib/domain/plans.ts';
   import { projectSubtype } from '#lib/domain/projects.ts';
+  import { placeSearch } from '#lib/services/locations.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
@@ -30,9 +31,11 @@
   const board = $derived(detail.plans);
   const plans = $derived(board?.plans.filter((p) => p.plan.kind === kind) ?? []);
   const canSubmit = $derived(!!project?.amMember && board?.openKind === kind);
+  const production = $derived(
+    board?.plans.find((p) => p.plan.kind === 'Production' && p.leader === 'Leading')?.plan,
+  );
   const productionLocation = $derived(
-    board?.plans.find((p) => p.plan.kind === 'Production' && p.leader === 'Leading')?.plan
-      .location ?? null,
+    production?.location ? { label: production.location, place: production.place ?? null } : null,
   );
 
   async function submit(plan: Plan): Promise<boolean> {
@@ -51,6 +54,7 @@
         mode={project.charter.mode}
         subtype={projectSubtype(project.charter.subtype)}
         {productionLocation}
+        places={placeSearch}
         demand={project.demand}
         opposition={project.opposition}
         required={board?.required ?? 0}
