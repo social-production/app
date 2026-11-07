@@ -84,8 +84,8 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
 ## Done 2026-11-07: M6 phase 4a merged (PR #118, 08:51 UTC = 7:51 pm Melbourne)
 - CI green on the first run of each push. The seed node restarted ~09:10 UTC. No reset. Live
   `/index/map-markers?lat=-37.8&lon=144.98` pinned the two "Tool library" test projects from
-  the live `places.mjs` runs at (-37.80, 144.98). (Their Carlton edits didn't apply: a
-  single-member Propose Edit still waits for its vote window.)
+  the live `places.mjs` runs at (-37.80, 144.98). (Their proposed Carlton edits have not
+  applied; not investigated: `places.mjs` only checks the edit is filed with its place.)
 
 ## Done 2026-11-07: M6 phase 4a, map markers (ADR 0082)
 - Cards carry `place` (the charter's physical place, or an event's leading plan's; online
