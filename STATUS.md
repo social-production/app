@@ -50,10 +50,14 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #117 merged and live; this docs PR follows it).
-**Next:** M6 phase 4: the gateway index reads places (`/index/map-markers`, the Region feed,
-web's visibility rules: private spaces' places never leave their members), then phase 5 (the
-map panel). Both need Nix (gateway Rust); check `df -h /` first.
+## In flight: M6 phase 4a, map markers from the index (ADR 0082), in PR #118 with the 3b/3c docs
+Gateway only (no reset). When its CI is green: merge; once the seed node restarts, check live
+`curl 'https://seed-node-production.up.railway.app/index/map-markers?lat=-37.8&lon=144.98'`
+(the Fitzroy test projects from `places.mjs` should pin; Carlton too if an edit passed).
+**Next:** phase 4b: activity markers (scheduled activities, web's "Open spots" for
+projects), calendar windows / date ranges on markers, and the Region feed (`/index/region`,
+distance-sorted cards with `distance_km`), which need the archivist to read activities for
+every space (today only help requests'). Then phase 5, the map panel (maplibre + Carto).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -79,6 +83,20 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-07 (in PR #118): M6 phase 4a, map markers (ADR 0082)
+- Cards carry `place` (the charter's physical place, or an event's leading plan's; online
+  places have none): `node/markers.rs` (`PlaceMirror`, `CardPlace`, `markers()`), mirrors in
+  `cards.rs` (`Charter.place`) and `event_time.rs` (`Plan.place`, `EventFacts.coordinates`).
+- `GET /index/map-markers` (`routes/map.rs`): web's parameters, refusal codes and
+  `MapMarkersResponse` (projects, events, help requests; `upcoming_only`; soonest first).
+- **Checked:** `cargo test -p gateway --lib` (25, 3 new in `markers_tests.rs`),
+  `cargo clippy -p gateway --all-targets -D warnings`, `cargo fmt --check`, sizes, all in Nix
+  with `CARGO_INCREMENTAL=0`; against a local seed node, `places.mjs` made a Fitzroy project
+  and `/index/map-markers` pinned it at (-37.80, 144.98), nothing from Sydney's centre, nothing
+  under `filter=events`, and `region_coordinates_out_of_range` for lat −137.8.
+- **Disk lesson:** with ~2.5 GB free, `CARGO_INCREMENTAL=0` plus deleting the finished gateway
+  test binary (`target/debug/deps/gateway-<hash>`, ~630 MB) before clippy kept it fitting.
 
 ## Done 2026-11-07: M6 phases 3b + 3c merged (PR #117, 06:24 UTC = 5:24 pm Melbourne)
 - CI green on the first run (~80 min). The seed node restarted 06:36 UTC. No reset. Live

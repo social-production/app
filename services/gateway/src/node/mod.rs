@@ -7,6 +7,7 @@ mod cards;
 mod event_time;
 mod hosting;
 mod index;
+mod markers;
 mod people;
 mod public;
 mod release;
@@ -28,6 +29,7 @@ use holochain_types::websocket::AllowedOrigins;
 
 pub use hosting::app_id;
 pub use index::{ProjectCard, ProjectIndex, Who};
+pub use markers::{Marker, MarkerQuery};
 pub use people::{PeopleIndex, PersonCard};
 pub use public::{PublicRead, Refused};
 

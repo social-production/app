@@ -21,6 +21,9 @@ pub struct PlanView {
 pub struct Plan {
     pub kind: String,
     pub location: Option<String>,
+    /// ADR 0078; older plans have none.
+    #[serde(default)]
+    pub place: Option<super::markers::PlaceMirror>,
     pub schedule: Option<Schedule>,
 }
 
@@ -32,12 +35,14 @@ pub struct Schedule {
 }
 
 /// What the leading plan sets on an event's card.
-#[derive(Debug, Default, PartialEq, Eq)]
+#[derive(Debug, Default, PartialEq)]
 pub struct EventFacts {
     /// The plan's start, in Holochain microseconds.
     pub start: Option<i64>,
     /// The plan's place, when it names one.
     pub place: Option<String>,
+    /// Its coordinates, when the place was picked (ADR 0082).
+    pub coordinates: Option<super::markers::CardPlace>,
 }
 
 impl EventFacts {
@@ -45,6 +50,9 @@ impl EventFacts {
     pub fn apply(self, card: &mut super::ProjectCard) {
         card.scheduled_at = self.start;
         if let Some(place) = self.place {
+            // A new label without coordinates must not keep the charter's pin (web uses the
+            // plan's location row alone).
+            card.place = self.coordinates;
             card.location_label = place;
         }
     }
@@ -71,7 +79,15 @@ pub fn event_facts(board: &PlanBoard) -> EventFacts {
         .map(str::trim)
         .filter(|l| !l.is_empty())
         .map(str::to_owned);
-    EventFacts { start, place }
+    let coordinates = plan
+        .place
+        .as_ref()
+        .and_then(super::markers::PlaceMirror::physical);
+    EventFacts {
+        start,
+        place,
+        coordinates,
+    }
 }
 
 /// `YYYY-MM-DD` and `HH:MM` in UTC as microseconds since the epoch.
