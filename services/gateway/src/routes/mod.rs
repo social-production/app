@@ -7,6 +7,7 @@ pub mod index;
 mod locations;
 mod map;
 mod maps;
+mod region;
 pub mod passkey;
 pub mod public;
 pub mod session;
@@ -57,6 +58,7 @@ pub fn router(state: AppState) -> Router {
         .route("/index/paused", get(index::paused))
         .route("/index/scopes", get(index::scopes))
         .route("/index/map-markers", get(map::map_markers))
+        .route("/index/region", get(region::region))
         .route("/public/read", post(public::read))
         .route("/locations/search", get(locations::search))
         .route("/locations/reverse", get(locations::reverse))

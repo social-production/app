@@ -43,6 +43,8 @@ pub struct EventFacts {
     pub place: Option<String>,
     /// Its coordinates, when the place was picked (ADR 0082).
     pub coordinates: Option<super::markers::CardPlace>,
+    /// The plan's picked place is online (ADR 0084).
+    pub online: bool,
 }
 
 impl EventFacts {
@@ -53,6 +55,7 @@ impl EventFacts {
             // A new label without coordinates must not keep the charter's pin (web uses the
             // plan's location row alone).
             card.place = self.coordinates;
+            card.online = self.online;
             card.location_label = place;
         }
     }
@@ -87,6 +90,7 @@ pub fn event_facts(board: &PlanBoard) -> EventFacts {
         start,
         place,
         coordinates,
+        online: plan.place.as_ref().is_some_and(|p| p.online),
     }
 }
 

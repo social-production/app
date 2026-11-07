@@ -157,11 +157,12 @@ pub fn card_activity(a: &ActivityView) -> super::markers::CardActivity {
 pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
     let created_at = view.created_at.as_micros();
     let mut l = view.listing;
-    let place = project
+    let mirror = project
         .as_ref()
         .and_then(|p| p.charter.as_ref())
-        .and_then(|c| c.place.as_ref())
-        .and_then(super::markers::PlaceMirror::physical);
+        .and_then(|c| c.place.as_ref());
+    let place = mirror.and_then(super::markers::PlaceMirror::physical);
+    let online = mirror.is_some_and(|m| m.online);
     // The project's own network is the source of truth once decisions change it (ADR 0033).
     if let Some(p) = &project {
         if let Some(c) = &p.charter {
@@ -202,5 +203,6 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         moderation: None,
         place,
         activities: Vec::new(),
+        online,
     }
 }

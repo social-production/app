@@ -44,7 +44,7 @@ done. Each phase starts with its ADR and ships as its own PR. Port from web only
    picks), the edit sheet. **3c** (2026-11-07, ADR 0081): Settings' Regional, the default
    location kept on the device, the IP hint and device position.
 4. **Index** (4a 2026-11-07, ADR 0082: cards carry places, `/index/map-markers` for projects,
-   events, help requests; 4b (ADR 0083): activity markers, Open spots, windows; 4c: the Region feed): the gateway index reads places; `/index/map-markers` and the Region feed with
+   events, help requests; 4b (ADR 0083): activity markers, Open spots, windows; 4c (ADR 0084): the Region feed, `/index/region`): the gateway index reads places; `/index/map-markers` and the Region feed with
    web's visibility rules (private spaces' places never leave their members).
 5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),
    the top bar's map button, `openPlaceOnMap`, distances on cards, Region in the scope menu.
