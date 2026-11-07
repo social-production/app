@@ -7,10 +7,11 @@
   import FollowSettings from './FollowSettings.svelte';
   import NotificationSettings from './NotificationSettings.svelte';
   import ProfileSettings from './ProfileSettings.svelte';
+  import RegionalSettings from './RegionalSettings.svelte';
 
   import '#lib/components/styles/settings.css';
 
-  /** web's settings layout: a section nav beside cards (Profile, Appearance, Notifications, Devices, Follow requests, Privacy, Account). */
+  /** web's settings layout: a section nav beside cards (Profile, Appearance, Regional, Notifications, Devices, Follow requests, Privacy, Account). */
   let requestCount = $state(0);
   const me = $derived(connection.current.status === 'connected' ? connection.current.agent : '');
 </script>
@@ -21,6 +22,7 @@
       <p class="settings-nav-label">Settings</p>
       <a class="nav-item" href="#settings-profile">Profile</a>
       <a class="nav-item" href="#settings-appearance">Appearance</a>
+      <a class="nav-item" href="#settings-regional">Regional</a>
       <a class="nav-item" href="#settings-notifications">Notifications</a>
       <a class="nav-item" href="#settings-devices">Devices</a>
       {#if requestCount > 0}
@@ -39,6 +41,7 @@
       {#if me}
         <ProfileSettings {me} />
         <AppearanceSettings />
+        <RegionalSettings {me} />
         <NotificationSettings />
         <DeviceSettings {me} />
         <FollowSettings {me} onRequests={(n) => (requestCount = n)} />
