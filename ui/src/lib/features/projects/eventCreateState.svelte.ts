@@ -5,6 +5,7 @@ import {
   type EventStepId,
 } from '#lib/domain/eventCreate.ts';
 import type { Contact } from '#lib/domain/messages.ts';
+import type { Plan } from '#lib/domain/plans.ts';
 import { emptyPlanForm, planFromForm, type PlanForm } from '#lib/domain/planForm.ts';
 import type { EventAudience, EventGovernance } from '#lib/domain/projects.ts';
 import type { Scope } from '#lib/domain/scopes.ts';
@@ -60,6 +61,12 @@ export class EventCreateState extends CreateState {
       this.intent === 'online' ? 'Online' : this.intent === 'physical' ? this.place.trim() : 'TBD';
     const stages = this.plan.stages.filter((s) => s.title.trim() || s.details.trim());
     return { ...this.plan, stages, location, demandNote: ORGANIZER_DEMAND_NOTE };
+  }
+
+  /** The organizer's plan, with the Location step's place beside its label (ADR 0078). */
+  private upfrontPlanRecord(): Plan {
+    const plan = planFromForm('Event', this.planWithPlace());
+    return { ...plan, place: plan.location ? this.placeFor(plan.location) : null };
   }
 
   /** web: public events need at least one channel or community tag; private ones none. */
@@ -131,7 +138,7 @@ export class EventCreateState extends CreateState {
         community: this.audience === 'private_community' ? this.community : null,
         invitees: this.audience === 'invite_only' ? this.invitees.map((c) => c.agent) : [],
         organizers: this.isPrivate ? this.organizers.map((c) => c.agent) : [],
-        plan: this.upfrontPlan ? planFromForm('Event', this.planWithPlace()) : null,
+        plan: this.upfrontPlan ? this.upfrontPlanRecord() : null,
       });
     } catch (e) {
       this.message = explain(e);

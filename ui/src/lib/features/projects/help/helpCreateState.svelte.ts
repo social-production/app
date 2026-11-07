@@ -5,7 +5,8 @@ import {
   scheduleLabel,
   type HelpRoleDraft,
 } from '#lib/domain/helpRequests.ts';
-import type { LocationChoice } from '#lib/domain/projects.ts';
+import { emptyPlaceValue, fitLabel, intentPlace, type PlaceValue } from '#lib/domain/places.ts';
+import { LOCATION_LABEL_MAX, type LocationChoice } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
 import { createHelpRequest } from '#lib/services/helpRequests.ts';
 
@@ -26,13 +27,22 @@ export class HelpCreateState {
   title = $state('');
   body = $state('');
   intent = $state<LocationChoice>('physical');
-  place = $state('');
+  /** The Location step's picker (web's `locationValue`). */
+  placeValue = $state<PlaceValue>(emptyPlaceValue());
   neededAt = $state(hoursAfter(null, 2));
   endsAt = $state('');
   tags = $state<string[]>([]);
   roles = $state<HelpRoleDraft[]>([{ label: '', description: '', slots: 1 }]);
   submitting = $state(false);
   message = $state<string>();
+
+  get place(): string {
+    return this.placeValue.displayLabel;
+  }
+
+  setPlace(value: PlaceValue): void {
+    this.placeValue = { ...value, displayLabel: fitLabel(value.displayLabel, LOCATION_LABEL_MAX) };
+  }
 
   constructor() {
     this.endsAt = hoursAfter(this.neededAt, 2);
@@ -103,11 +113,13 @@ export class HelpCreateState {
     this.submitting = true;
     this.message = undefined;
     try {
+      const location = this.intent === 'online' ? 'Online' : this.place.trim();
       return await createHelpRequest({
         title: this.title.trim(),
         body: this.body.trim(),
         online: this.intent === 'online',
-        location: this.intent === 'online' ? 'Online' : this.place.trim(),
+        location,
+        place: intentPlace(this.intent, this.placeValue, location),
         startsAt: inputMicros(this.neededAt),
         endsAt: inputMicros(this.endsAt),
         tags: this.tags,

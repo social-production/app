@@ -1,6 +1,7 @@
 import type { Activity } from '#lib/domain/activities.ts';
 import { HELP_MODE, roleCounts, type HelpRoleDraft } from '#lib/domain/helpRequests.ts';
 import type { Contact } from '#lib/domain/messages.ts';
+import type { Place } from '#lib/domain/places.ts';
 import { shareMessage } from '#lib/domain/share.ts';
 
 import { createActivity, listActivities, setCommitment } from './activities.ts';
@@ -14,6 +15,8 @@ export interface HelpDraft {
   online: boolean;
   /** The place, or "Online". */
   location: string;
+  /** The place behind `location` (ADR 0078): the charter's and the activity's. */
+  place: Place | null;
   /** Holochain microseconds. */
   startsAt: number;
   endsAt: number;
@@ -32,6 +35,7 @@ export async function createHelpRequest(d: HelpDraft): Promise<string> {
     mode: HELP_MODE,
     subtype: 'standard',
     location_label: d.location,
+    place: d.place,
     phase: 'Help request',
     tags: d.tags,
   });
@@ -41,6 +45,7 @@ export async function createHelpRequest(d: HelpDraft): Promise<string> {
     endsAt: d.endsAt,
     online: d.online,
     place: d.location,
+    location: d.place,
     meetingUrl: null,
     note: d.body,
     planStage: null,

@@ -50,10 +50,16 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #114 merged and live; its docs PR follows it).
-**Next:** M6 phase 3, the LocationPicker (port web's `components/shared/LocationPicker.svelte`
-and its driver `api/drivers/fastapi/domains/locations.ts` against these routes; round to the
-precision on save, as web's `create_location` does); then the rest of the parity list below.
+## In flight: M6 phase 3a, the LocationPicker in the create flows (ADR 0080), PR on `claude/social-production-handoff-dsam61`
+UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs` needs a
+signed-up account; live Nominatim answers through the seed node), then README Status.
+**Next:** phase 3b, the picker in the plan wizard (`components/plans/PlanDetails.svelte`'s
+location field → `Plan.place`), the activity wizard (`ActivityWizard.svelte` → `NewActivity.location`,
+with web's quick picks: the project's own place and its plans' places), the edit sheet
+(`overlay/EditSheet.svelte` → `ProposalKind::Edit.place`, web's `portaled elevated`, the
+charter's `place` read back with `domain/places.ts::fromPlace`), the project header. Then 3c:
+Settings' Regional default location (a private entry, ADR 0078), the IP hint and device
+position. Then phases 4–5 (index + map).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -79,6 +85,26 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-07 (on the branch): M6 phase 3a, the LocationPicker in the create flows (ADR 0080)
+- **What:** web's LocationPicker ported (`ui/src/lib/components/location/LocationPicker.svelte`,
+  styles via PORTS → `styles/location.css`, two port fixes in `additions.css`) into
+  `components/create/LocationIntent.svelte`, so project, event and help-request creation
+  search places (`services/locations.ts` → gateway `/locations/search`) and save a `Place`
+  (`domain/places.ts::placeRecord`: online, or physical with coordinates rounded to the
+  precision; a typed name has none) on the charter, the event's upfront plan and the help
+  request's activity. Labels are cut to 160 (the records' limit; Nominatim's go to 240).
+- **Parity note:** web's "Use “…” as the place name" button never shows in the create flow
+  (typing already sets the label); the port keeps the same logic.
+- **Tests:** new browser test `tests/e2e/places.mjs` (search, pick, overview, the create
+  call carries `provider_id` and `approximate`; a typed-only name). **Passed** against a local
+  seed node, with `help-requests.mjs` and `events.mjs`. `npm run check -w ui` (0 errors),
+  `npm run lint -w ui`, `check-boundaries.sh`, `check-sizes.sh`. **Not run:** scenarios (no
+  zome change), `private-events.mjs` (its event decides the place later).
+- **Lesson:** the cloud disk filled during `cloud-seed.sh`'s warm-up ("database or disk is
+  full", then a crashed page). `target/debug` held ~20 GB (old gateway/scenario test binaries,
+  `incremental/`); deleting `target/debug/incremental` and stale test binaries in
+  `target/debug/deps` freed enough. Check `df -h /` before starting the seed node.
 
 ## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114 merged 00:08 UTC (11:08 am Melbourne)
 - **Live after merge:** CI green on the first run (check + 8 shards, ~90 min). The seed node

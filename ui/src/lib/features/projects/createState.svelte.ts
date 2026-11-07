@@ -5,7 +5,15 @@ import {
   type LocationChoice,
   type CharterMode,
   type RequestMode,
+  LOCATION_LABEL_MAX,
 } from '#lib/domain/projects.ts';
+import {
+  emptyPlaceValue,
+  fitLabel,
+  intentPlace,
+  type Place,
+  type PlaceValue,
+} from '#lib/domain/places.ts';
 import { tagScope } from '#lib/domain/scopes.ts';
 import { explain } from '#lib/services/errors.ts';
 import { createProject, projectAllowance } from '#lib/services/projects.ts';
@@ -34,7 +42,8 @@ export class CreateState {
   title = $state('');
   description = $state('');
   intent = $state<LocationChoice>('later');
-  place = $state('');
+  /** The Location step's picker (web's `locationValue`). */
+  placeValue = $state<PlaceValue>(emptyPlaceValue());
   tags = $state<string[]>([]);
   submitting = $state(false);
   message = $state<string>();
@@ -70,6 +79,20 @@ export class CreateState {
     return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : 'a channel tag';
   }
 
+  /** The picked place's label (cut to the records' limit, as the old field's maxlength was). */
+  get place(): string {
+    return this.placeValue.displayLabel;
+  }
+
+  setPlace(value: PlaceValue): void {
+    this.placeValue = { ...value, displayLabel: fitLabel(value.displayLabel, LOCATION_LABEL_MAX) };
+  }
+
+  /** The record's place for `label`: online, or picked with coordinates (ADR 0078). */
+  placeFor(label: string): Place | null {
+    return intentPlace(this.intent, this.placeValue, label);
+  }
+
   constructor(mode: CharterMode = 'productive') {
     this.mode = mode;
   }
@@ -91,12 +114,14 @@ export class CreateState {
   }
 
   charter(): Charter {
+    const label = this.intent === 'later' ? '' : this.locationLabel;
     return {
       title: this.title.trim(),
       description: this.description.trim(),
       mode: this.mode,
       subtype: 'standard',
-      location_label: this.intent === 'later' ? '' : this.locationLabel,
+      location_label: label,
+      place: this.placeFor(label),
       phase: 'Proposal',
       tags: this.tags,
     };
