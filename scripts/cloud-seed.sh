@@ -6,6 +6,14 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
+# dev-seed.sh deletes its data on exit, but a killed session (container restart) skips that and
+# leaves ~370 MB per run under nix-shell temp dirs. With no seed node running, sweep them.
+if ! curl -sf -o /dev/null http://localhost:8080/readyz; then
+  for stale in /tmp/nix-shell.*/tmp.*/dev-happ; do
+    if [[ -e "$stale" ]]; then rm -rf "$(dirname "$stale")"; fi
+  done
+fi
+
 shim=$(mktemp -d)/noipv6.so
 # The system compiler, so the shim loads into both system and Nix binaries.
 /usr/bin/cc -shared -fPIC -o "$shim" scripts/cloud/noipv6.c

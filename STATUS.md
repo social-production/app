@@ -95,7 +95,9 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   with `CARGO_INCREMENTAL=0`; against a local seed node, `places.mjs` made a Fitzroy project
   and `/index/map-markers` pinned it at (-37.80, 144.98), nothing from Sydney's centre, nothing
   under `filter=events`, and `region_coordinates_out_of_range` for lat −137.8.
-- **Disk lesson:** with ~2.5 GB free, `CARGO_INCREMENTAL=0` plus deleting the finished gateway
+- **Disk lesson (2026-11-07):** killed cloud sessions left 129 old local seed nodes' data
+  under `/tmp/nix-shell.*/tmp.*` (~370 MB each, 4.8 GB in all); `cloud-seed.sh` now sweeps
+  them at start when no seed node is running. **Disk lesson:** with ~2.5 GB free, `CARGO_INCREMENTAL=0` plus deleting the finished gateway
   test binary (`target/debug/deps/gateway-<hash>`, ~630 MB) before clippy kept it fitting.
 
 ## Done 2026-11-07: M6 phases 3b + 3c merged (PR #117, 06:24 UTC = 5:24 pm Melbourne)
