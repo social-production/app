@@ -65,8 +65,8 @@ pub struct RegionActivity {
 #[derive(Debug, Serialize)]
 #[serde(untagged)]
 pub enum RegionItem {
-    Card(RegionCard),
-    Activity(RegionActivity),
+    Card(Box<RegionCard>),
+    Activity(Box<RegionActivity>),
 }
 
 impl RegionItem {
@@ -138,11 +138,11 @@ fn nearby(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -
             let p = c.place.as_ref()?;
             let distance = sp_place::distance_km(q.center, (p.latitude, p.longitude));
             (distance <= q.radius_km).then(|| {
-                RegionItem::Card(RegionCard {
+                RegionItem::Card(Box::new(RegionCard {
                     card: c.clone(),
                     distance_km: Some(round_km(distance)),
                     is_online: false,
-                })
+                }))
             })
         })
         .collect()
@@ -151,9 +151,16 @@ fn nearby(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -
 /// web's `_region_project_activity_feed_items`: upcoming activities of projects (not events)
 /// at their own physical place (web joins the activity's location, not its parent's), in the
 /// window; a full personal-service activity is left out.
-fn activities(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -> Vec<RegionItem> {
+fn activities(
+    cards: &[&ProjectCard],
+    q: &RegionQuery,
+    bounds: Option<(i64, i64)>,
+) -> Vec<RegionItem> {
     let mut out = Vec::new();
-    for c in cards.iter().filter(|c| PROJECT_MODES.contains(&c.mode.as_str())) {
+    for c in cards
+        .iter()
+        .filter(|c| PROJECT_MODES.contains(&c.mode.as_str()))
+    {
         for a in &c.activities {
             let ActivityPlace::Own(p) = &a.place else {
                 continue;
@@ -166,7 +173,7 @@ fn activities(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)
             if distance > q.radius_km {
                 continue;
             }
-            out.push(RegionItem::Activity(RegionActivity {
+            out.push(RegionItem::Activity(Box::new(RegionActivity {
                 kind: "project-activity",
                 id: a.id.clone(),
                 parent_id: c.id.clone(),
@@ -181,7 +188,7 @@ fn activities(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)
                 last_activity_at: a.starts_at,
                 distance_km: round_km(distance),
                 is_online: false,
-            }));
+            })));
         }
     }
     out
@@ -203,11 +210,11 @@ fn online(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -
         })
         .take(q.limit)
         .map(|c| {
-            RegionItem::Card(RegionCard {
+            RegionItem::Card(Box::new(RegionCard {
                 card: c.clone(),
                 distance_km: None,
                 is_online: true,
-            })
+            }))
         })
         .collect()
 }

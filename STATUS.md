@@ -90,7 +90,11 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   Items are the feed's camelCase cards plus `distanceKm`/`isOnline`, and web's
   `kind: "project-activity"` items. `ProjectCard.online` (not sent) marks online places;
   `index.rs::rank` is the feed's ranking, shared.
-- **Checked:** see the "Checked" line below once filled.
+- **Checked:** `cargo test -p gateway --lib` (37; 9 new in `region_tests.rs`), `cargo clippy
+  -p gateway --all-targets -D warnings`, `cargo fmt --all --check`, sizes, in Nix with
+  `CARGO_INCREMENTAL=0`. **Not run:** a local seed node (disk ~6 GB free; the route is a pure
+  read over the cards 4a/4b already build), scenarios (no zome change), UI checks (no UI
+  change). Clippy wants both `RegionItem` variants boxed (`large_enum_variant`).
 
 ## Done 2026-11-07: M6 phase 4b merged (PR #119, 12:53 UTC = 11:53 pm Melbourne)
 - CI green on the second run (the first failed `check` on `cargo fmt` in the scenario file).

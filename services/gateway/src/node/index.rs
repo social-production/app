@@ -111,10 +111,7 @@ impl ProjectIndex {
     }
 
     /// web's Region feed over the cards held now (ADR 0084).
-    pub async fn region(
-        &self,
-        q: &super::RegionQuery<'_>,
-    ) -> (Vec<super::RegionItem>, usize) {
+    pub async fn region(&self, q: &super::RegionQuery<'_>) -> (Vec<super::RegionItem>, usize) {
         super::region::region(&self.0.read().await, q)
     }
 

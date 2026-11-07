@@ -7,9 +7,9 @@ pub mod index;
 mod locations;
 mod map;
 mod maps;
-mod region;
 pub mod passkey;
 pub mod public;
+mod region;
 pub mod session;
 pub mod ws_proxy;
 

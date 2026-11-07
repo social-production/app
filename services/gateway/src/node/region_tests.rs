@@ -16,6 +16,14 @@ fn at(spot: (f64, f64)) -> Option<CardPlace> {
     })
 }
 
+fn own_place() -> CardPlace {
+    CardPlace {
+        latitude: FITZROY.0,
+        longitude: FITZROY.1,
+        precision: "approximate".into(),
+    }
+}
+
 fn card(id: &str, mode: &str, place: Option<CardPlace>) -> ProjectCard {
     ProjectCard {
         id: id.into(),
@@ -127,10 +135,10 @@ fn removed_items_are_left_out() {
 fn project_activities_at_their_own_place_join_in() {
     let mut p = card("garden", "productive", at((-37.77, 144.96)));
     p.activities = vec![
-        activity("own", NOW + DAY, ActivityPlace::Own(at(FITZROY).unwrap())),
+        activity("own", NOW + DAY, ActivityPlace::Own(own_place())),
         // web joins the activity's own location only.
         activity("parent", NOW + DAY, ActivityPlace::Parent),
-        activity("past", NOW - DAY, ActivityPlace::Own(at(FITZROY).unwrap())),
+        activity("past", NOW - DAY, ActivityPlace::Own(own_place())),
     ];
     let (items, total) = region(&[p.clone()], &query("all"));
     assert_eq!(ids(&items), ["own", "garden"]);
@@ -150,7 +158,7 @@ fn project_activities_at_their_own_place_join_in() {
 #[test]
 fn a_full_personal_service_activity_is_left_out() {
     let mut s = card("care", "personal-service", None);
-    let mut full = activity("full", NOW + DAY, ActivityPlace::Own(at(FITZROY).unwrap()));
+    let mut full = activity("full", NOW + DAY, ActivityPlace::Own(own_place()));
     (full.committed, full.minimum) = (2, 2);
     s.activities = vec![full.clone()];
     assert!(region(&[s.clone()], &query("all")).0.is_empty());
@@ -216,13 +224,14 @@ fn pages_then_appends_online_items() {
 }
 
 #[test]
-fn cards_send_distance_and_online_beside_the_card() {
+fn cards_send_distance_and_online_beside_the_card() -> Result<(), serde_json::Error> {
     let mut c = card("fitzroy", "event", at(FITZROY));
     c.help = Some(HelpCard::default());
     let (items, _) = region(&[c], &query("all"));
-    let json = serde_json::to_value(&items[0]).unwrap();
+    let json = serde_json::to_value(&items[0])?;
     assert_eq!(json["id"], "fitzroy");
     assert_eq!(json["distanceKm"], 0.0);
     assert_eq!(json["isOnline"], false);
     assert!(json.get("activities").is_none());
+    Ok(())
 }
