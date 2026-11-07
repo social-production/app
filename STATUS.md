@@ -50,12 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114 (branch `claude/social-production-handoff-dsam61`; merge once CI is green, then smoke and update README Status)
-Gateway only (no DNA change, no reset): `services/gateway/src/geo/` (`shape.rs` web's
-Nominatim/ip-api normalisation, `memo.rs` TTL cache + window limits, `mod.rs` provider calls
-and web's error codes) and `routes/locations.rs` (`GET /locations/search`, `/reverse`,
-`/ip-hint`, web's params and `{ items }` answers). `reqwest` 0.12 (already in the lockfile).
-Env vars in DEPLOYMENT.md. See the newest "Done" entry for what was checked.
+## In flight: nothing (PR #114 merged and live; its docs PR follows it).
 **Next:** M6 phase 3, the LocationPicker (port web's `components/shared/LocationPicker.svelte`
 and its driver `api/drivers/fastapi/domains/locations.ts` against these routes; round to the
 precision on save, as web's `create_location` does); then the rest of the parity list below.
@@ -85,7 +80,11 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114
+## Done 2026-11-07: M6 phase 2, geocoding on the gateway (ADR 0079), PR #114 merged 00:08 UTC (11:08 am Melbourne)
+- **Live after merge:** CI green on the first run (check + 8 shards, ~90 min). The seed node
+  restarted ~00:21 UTC (508 MB at 10 s). No reset. Live `/locations/search?q=Fitzroy
+  Melbourne`, `/locations/reverse?lat=-37.80&lon=144.98` and `/locations/ip-hint` answered
+  (the hint located the cloud sandbox's egress, so X-Forwarded-For's first hop works).
 - **Routes** (web's `app/routers/locations.py`): `GET /locations/search?q=&limit=&country_codes=&viewbox=`,
   `/locations/reverse?lat=&lon=`, `/locations/ip-hint`; `{ items: [Location] }` in web's
   snake case; refusals are `{ error: <web's detail code> }` (`geocoding_rate_limit_exceeded`,
@@ -98,8 +97,6 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   warnings` and `cargo fmt` in Nix, `check-sizes.sh`; live Nominatim's answer has the fixture's
   shape (curl). **Not run:** ip-api.com (its host doesn't resolve in the cloud sandbox), a
   local seed node, scenarios (no zome change), UI checks (no UI change).
-- **After merge:** smoke `curl "<seed-node>/locations/search?q=Fitzroy"` and `/locations/ip-hint`
-  (the seed-node URL is in "What's live").
 
 ## Done 2026-11-07: M6 phase 1, place records (ADR 0078), PR #112 merged 14:59 UTC Nov 6 (1:59 am Melbourne), place records (ADR 0078)
 - **Live after merge:** CI green on the second run (the first failed `check` on clippy's
