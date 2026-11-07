@@ -28,6 +28,7 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         moderation: None,
         place: None,
         activities: Vec::new(),
+        online: false,
     }
 }
 

@@ -10,6 +10,7 @@ mod index;
 mod markers;
 mod people;
 mod public;
+mod region;
 mod release;
 mod restore;
 mod seeds;
@@ -33,6 +34,7 @@ pub use index::{ProjectCard, ProjectIndex, Who};
 pub use markers::{Marker, MarkerQuery};
 pub use people::{PeopleIndex, PersonCard};
 pub use public::{PublicRead, Refused};
+pub use region::{RegionItem, RegionQuery};
 
 use crate::config::Config;
 

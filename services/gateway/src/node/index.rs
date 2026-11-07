@@ -51,6 +51,9 @@ pub struct ProjectCard {
     /// not sent with feed cards.
     #[serde(skip)]
     pub activities: Vec<super::markers::CardActivity>,
+    /// Its place is online (the Region feed's online list, ADR 0084); not sent.
+    #[serde(skip)]
+    pub online: bool,
 }
 
 /// The moderation state of an item a report took down.
@@ -107,6 +110,11 @@ impl ProjectIndex {
         super::markers::markers(&self.0.read().await, q)
     }
 
+    /// web's Region feed over the cards held now (ADR 0084).
+    pub async fn region(&self, q: &super::RegionQuery<'_>) -> (Vec<super::RegionItem>, usize) {
+        super::region::region(&self.0.read().await, q)
+    }
+
     /// The cards held now, by listing id (kept for spaces nobody wrote to since).
     pub async fn by_id(&self) -> std::collections::BTreeMap<String, ProjectCard> {
         self.0
@@ -137,37 +145,13 @@ impl ProjectIndex {
             .filter(|c| who.keeps(c))
             .filter(|c| tags.is_empty() || c.tags.iter().any(|have| tags.contains(&have.as_str())))
             .collect();
-        let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
-        let pairs: Vec<(&ProjectCard, &ItemStats)> = cards.into_iter().zip(&stats).collect();
-        let ranked = query(
-            &pairs,
-            q,
-            // Help requests, threads and posts rank by votes (their Support/Oppose signals,
-            // ADR 0067, 0070), as on web.
-            |(c, _)| {
-                if c.help.is_some() || sp_discussion::is_discussion(&c.mode) {
-                    ItemKind::Voted
-                } else {
-                    ItemKind::Signalled
-                }
-            },
-            |(_, s)| s,
-            |(c, _)| {
-                let mut fields = vec![
-                    c.title.as_str(),
-                    c.summary.as_str(),
-                    c.location_label.as_str(),
-                ];
-                fields.extend(c.tags.iter().map(String::as_str));
-                fields
-            },
-        );
+        let ranked = rank(cards, q);
         let total = ranked.len();
         let page = ranked
             .into_iter()
             .skip(offset)
             .take(limit)
-            .map(|(c, _)| (*c).clone())
+            .map(|c| (*c).clone())
             .collect();
         (page, total)
     }
@@ -198,6 +182,38 @@ impl ProjectIndex {
             .cloned()
             .collect()
     }
+}
+
+/// The cards that pass the feed's window and search, best first (web's `sort_order_columns`).
+pub(super) fn rank<'c>(cards: Vec<&'c ProjectCard>, q: &FeedQuery<'_>) -> Vec<&'c ProjectCard> {
+    let stats: Vec<ItemStats> = cards.iter().map(|c| stats_of(c)).collect();
+    let pairs: Vec<(&ProjectCard, &ItemStats)> = cards.into_iter().zip(&stats).collect();
+    query(
+        &pairs,
+        q,
+        // Help requests, threads and posts rank by votes (their Support/Oppose signals,
+        // ADR 0067, 0070), as on web.
+        |(c, _)| {
+            if c.help.is_some() || sp_discussion::is_discussion(&c.mode) {
+                ItemKind::Voted
+            } else {
+                ItemKind::Signalled
+            }
+        },
+        |(_, s)| s,
+        |(c, _)| {
+            let mut fields = vec![
+                c.title.as_str(),
+                c.summary.as_str(),
+                c.location_label.as_str(),
+            ];
+            fields.extend(c.tags.iter().map(String::as_str));
+            fields
+        },
+    )
+    .into_iter()
+    .map(|(c, _)| *c)
+    .collect()
 }
 
 fn stats_of(card: &ProjectCard) -> ItemStats {

@@ -85,3 +85,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0081](./0081-default-location.md) The default location stays on the device (web's Regional settings: search, GPS, network hint); an account-wide private settings entry waits for more settings (M6 phase 3c; UI only)
 - [0082](./0082-map-markers-index.md) Map markers from the gateway index: cards carry their place, `/index/map-markers` answers as web's `/feeds/map-markers` (M6 phase 4a; gateway only)
 - [0083](./0083-activity-markers.md) Activity markers, "Open spots" and time windows on the map; the activity view exposes its place (M6 phase 4b; coordinator + gateway, no reset)
+- [0084](./0084-region-feed.md) The Region feed from the gateway index: `/index/region` answers as web's `/feeds/region` (nearest first, project activities, online items appended) in the app's feed shape (M6 phase 4c; gateway only)

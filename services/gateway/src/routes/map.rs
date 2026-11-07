@@ -66,26 +66,31 @@ pub struct MarkerPage {
 
 #[derive(Serialize)]
 pub struct Center {
-    latitude: f64,
-    longitude: f64,
+    pub(super) latitude: f64,
+    pub(super) longitude: f64,
 }
 
 fn refuse(code: &str) -> ApiError {
     ApiError(StatusCode::UNPROCESSABLE_ENTITY, code.into())
 }
 
+/// web's `validate_region_center` and `normalize_radius_km`: the radius, if both are sound.
+pub(super) fn checked_area(lat: f64, lon: f64, radius_km: Option<u32>) -> Result<u32, ApiError> {
+    if !(-90.0..=90.0).contains(&lat) || !(-180.0..=180.0).contains(&lon) {
+        return Err(refuse("region_coordinates_out_of_range"));
+    }
+    let radius_km = radius_km.unwrap_or(RADIUS_DEFAULT);
+    if !(1..=RADIUS_MAX).contains(&radius_km) {
+        return Err(refuse("invalid_region_radius"));
+    }
+    Ok(radius_km)
+}
+
 pub async fn map_markers(
     State(state): State<AppState>,
     Query(p): Query<MarkerParams>,
 ) -> ApiResult<MarkerPage> {
-    // web's `validate_region_center` and `normalize_radius_km`.
-    if !(-90.0..=90.0).contains(&p.lat) || !(-180.0..=180.0).contains(&p.lon) {
-        return Err(refuse("region_coordinates_out_of_range"));
-    }
-    let radius_km = p.radius_km.unwrap_or(RADIUS_DEFAULT);
-    if !(1..=RADIUS_MAX).contains(&radius_km) {
-        return Err(refuse("invalid_region_radius"));
-    }
+    let radius_km = checked_area(p.lat, p.lon, p.radius_km)?;
     let filter = match p.filter.as_deref() {
         Some(f @ ("projects" | "events" | "help_requests")) => f.to_owned(),
         _ => "all".to_owned(),

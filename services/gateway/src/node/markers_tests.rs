@@ -34,6 +34,7 @@ fn card(id: &str, mode: &str, place: Option<(f64, f64)>) -> ProjectCard {
             precision: "approximate".into(),
         }),
         activities: Vec::new(),
+        online: false,
     }
 }
 

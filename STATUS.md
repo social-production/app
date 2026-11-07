@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-07 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-08 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,10 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #119 merged and live; this docs PR follows it).
-**Next:** phase 4c, the Region feed (`/index/region`: web's `get_region_feed`, distance-sorted
-cards with `distance_km`, project-activity items, online items when asked); then phase 5,
-the map panel (maplibre + Carto) that reads markers.
+## In flight: M6 phase 4c, the Region feed (ADR 0084), branch `claude/social-production-handoff-dsam61`
+`GET /index/region` (gateway only): web's `/feeds/region` over the index (`node/region.rs`,
+`routes/region.rs`, tests `node/region_tests.rs`). Open a PR, wait for CI, merge, smoke
+`/index/region?lat=-37.8&lon=144.98` live.
+**Next after it:** phase 5, the map panel (maplibre + Carto) that reads markers, Region in the
+feed's scope menu (reads `/index/region`), distances on cards.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -79,6 +81,20 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-07: M6 phase 4c, the Region feed (ADR 0084), not yet merged
+- `/index/region`: web's parameters (`lat`, `lon`, `radius_km`, `sort`, `window`, `filter`,
+  `include_online`, `limit` ≤100, `offset`, plus `tzOffset`), the map's refusal codes
+  (`map.rs::checked_area`). Nearest first, then by time; project activities at their *own*
+  place (web's rule, unlike the map's parent fallback); online items appended after the page.
+  Items are the feed's camelCase cards plus `distanceKm`/`isOnline`, and web's
+  `kind: "project-activity"` items. `ProjectCard.online` (not sent) marks online places;
+  `index.rs::rank` is the feed's ranking, shared.
+- **Checked:** `cargo test -p gateway --lib` (37; 9 new in `region_tests.rs`), `cargo clippy
+  -p gateway --all-targets -D warnings`, `cargo fmt --all --check`, sizes, in Nix with
+  `CARGO_INCREMENTAL=0`. **Not run:** a local seed node (disk ~6 GB free; the route is a pure
+  read over the cards 4a/4b already build), scenarios (no zome change), UI checks (no UI
+  change). Clippy wants both `RegionItem` variants boxed (`large_enum_variant`).
 
 ## Done 2026-11-07: M6 phase 4b merged (PR #119, 12:53 UTC = 11:53 pm Melbourne)
 - CI green on the second run (the first failed `check` on `cargo fmt` in the scenario file).
