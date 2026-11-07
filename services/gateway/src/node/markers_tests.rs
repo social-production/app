@@ -33,6 +33,7 @@ fn card(id: &str, mode: &str, place: Option<(f64, f64)>) -> ProjectCard {
             longitude,
             precision: "approximate".into(),
         }),
+        activities: Vec::new(),
     }
 }
 
@@ -44,6 +45,7 @@ fn query(filter: &str) -> MarkerQuery<'_> {
         upcoming_only: true,
         limit: 200,
         now: 1_000,
+        span: None,
     }
 }
 
@@ -117,4 +119,85 @@ fn removed_items_and_online_places_have_no_pin() {
         online: true,
     };
     assert_eq!(online.physical(), None);
+}
+
+fn activity(id: &str, at: i64, place: ActivityPlace, committed: u32) -> CardActivity {
+    CardActivity {
+        id: id.into(),
+        title: id.into(),
+        starts_at: at,
+        ends_at: at + 100,
+        label: "The shed".into(),
+        place,
+        committed,
+        minimum: 2,
+    }
+}
+
+#[test]
+fn activities_pin_at_their_place_or_their_parents() {
+    let shed = CardPlace {
+        latitude: -37.79,
+        longitude: 144.97,
+        precision: "approximate".into(),
+    };
+    let mut garden = card("garden", "productive", Some(FITZROY));
+    garden.activities = vec![
+        activity("own", 3_000, ActivityPlace::Own(shed.clone()), 0),
+        activity("parent", 2_000, ActivityPlace::Parent, 0),
+        activity("online", 2_500, ActivityPlace::Elsewhere, 0),
+        activity("past", 500, ActivityPlace::Parent, 0),
+    ];
+    let found = markers(&[garden], &query("projects"));
+    let ids: Vec<&str> = found.iter().map(|m| m.id.as_str()).collect();
+    assert_eq!(ids, ["parent", "own", "garden"]);
+    let own = &found[1];
+    assert_eq!(
+        (own.latitude, own.display_label.as_str()),
+        (-37.79, "The shed")
+    );
+    assert_eq!(own.href, "/projects/garden?activity=own");
+    assert_eq!(
+        (own.activity_source, own.committed_count),
+        (Some("project"), Some(0))
+    );
+    assert_eq!(found[0].display_label, "Somewhere", "the parent's label");
+    assert!(markers(&[card("x", "event", None)], &query("events")).is_empty());
+}
+
+#[test]
+fn services_show_open_spots_and_hide_full_activities() {
+    let mut kitchen = card("kitchen", "collective-service", Some(FITZROY));
+    kitchen.phase = "Activity".into();
+    kitchen.activities = vec![
+        activity("full", 2_000, ActivityPlace::Parent, 2),
+        activity("open", 3_000, ActivityPlace::Parent, 1),
+    ];
+    let found = markers(&[kitchen.clone()], &query("all"));
+    let ids: Vec<&str> = found.iter().map(|m| m.id.as_str()).collect();
+    assert_eq!(ids, ["open", "kitchen"]);
+    assert_eq!(found[1].subtitle.as_deref(), Some("Open spots"));
+    kitchen.activities.pop();
+    let found = markers(&[kitchen], &query("all"));
+    assert_eq!(found[0].subtitle.as_deref(), Some("Activity"));
+}
+
+#[test]
+fn a_span_keeps_timed_items_inside_it_and_every_project() {
+    let mut garden = card("garden", "productive", Some(FITZROY));
+    garden.activities = vec![
+        activity("early", 2_000, ActivityPlace::Parent, 0),
+        activity("late", 9_000, ActivityPlace::Parent, 0),
+    ];
+    let mut fair = card("fair", "event", Some(FITZROY));
+    fair.scheduled_at = Some(9_500);
+    let q = MarkerQuery {
+        span: Some((1_500, 5_000)),
+        ..query("all")
+    };
+    let ids: Vec<String> = markers(&[garden, fair], &q)
+        .into_iter()
+        .map(|m| m.id)
+        .collect();
+    assert_eq!(ids, ["early", "garden"]);
 }

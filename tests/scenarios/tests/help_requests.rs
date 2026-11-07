@@ -29,6 +29,33 @@ struct NewActivity {
     note: String,
     plan_stage: Option<String>,
     roles: Vec<NewRole>,
+    location: Option<Place>,
+}
+
+/// Mirrors `project_integrity::Place` (ADR 0078).
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+struct Place {
+    label: String,
+    latitude: Option<f64>,
+    longitude: Option<f64>,
+    region: Option<String>,
+    country: Option<String>,
+    provider_id: Option<String>,
+    precision: String,
+    online: bool,
+}
+
+fn gate() -> Place {
+    Place {
+        label: "Allotment gate".into(),
+        latitude: Some(-37.8),
+        longitude: Some(144.98),
+        region: None,
+        country: None,
+        provider_id: None,
+        precision: "approximate".into(),
+        online: false,
+    }
 }
 
 #[derive(Serialize, Debug)]
@@ -47,6 +74,8 @@ struct RoleView {
 #[derive(Deserialize, Debug)]
 struct ActivityView {
     roles: Vec<RoleView>,
+    /// The activity's place, which the map's markers read (ADR 0083).
+    location: Option<Place>,
 }
 
 #[derive(Deserialize, Debug)]
@@ -85,6 +114,7 @@ fn request(roles: Vec<NewRole>) -> NewActivity {
         note: "Need a lift on Friday morning.".into(),
         plan_stage: None,
         roles,
+        location: Some(gate()),
     }
 }
 
@@ -138,6 +168,7 @@ async fn helpers_commit_to_one_role_each() {
     assert_eq!(seen[0].people.len() + seen[1].people.len(), 2);
     assert_eq!(seen[0].description, "Driver wanted");
     assert_eq!(seen[1].maximum, None, "any number");
+    assert_eq!(all[0].location, Some(gate()), "the view carries the activity's place");
 
     let proposal: Result<ActionHash, String> = net
         .try_call(

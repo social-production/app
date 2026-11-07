@@ -84,3 +84,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0080](./0080-location-picker.md) The LocationPicker: web's picker in the create flows; the place rides on the record (no `locations` rows), labels cut to 160 (M6 phase 3a; UI only)
 - [0081](./0081-default-location.md) The default location stays on the device (web's Regional settings: search, GPS, network hint); an account-wide private settings entry waits for more settings (M6 phase 3c; UI only)
 - [0082](./0082-map-markers-index.md) Map markers from the gateway index: cards carry their place, `/index/map-markers` answers as web's `/feeds/map-markers` (M6 phase 4a; gateway only)
+- [0083](./0083-activity-markers.md) Activity markers, "Open spots" and time windows on the map; the activity view exposes its place (M6 phase 4b; coordinator + gateway, no reset)

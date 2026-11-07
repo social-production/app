@@ -91,7 +91,7 @@ pub fn event_facts(board: &PlanBoard) -> EventFacts {
 }
 
 /// `YYYY-MM-DD` and `HH:MM` in UTC as microseconds since the epoch.
-fn utc_micros(date: &str, time: &str) -> Option<i64> {
+pub fn utc_micros(date: &str, time: &str) -> Option<i64> {
     let mut d = date.splitn(3, '-').map(str::parse::<i64>);
     let (y, m, day) = (d.next()?.ok()?, d.next()?.ok()?, d.next()?.ok()?);
     let (h, min) = time.split_once(':')?;

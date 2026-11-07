@@ -27,6 +27,7 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         scheduled_at: None,
         moderation: None,
         place: None,
+        activities: Vec::new(),
     }
 }
 

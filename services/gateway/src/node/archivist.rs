@@ -12,7 +12,8 @@ use holochain::prelude::*;
 use holochain_types::app::{AppBundleSource, InstallAppPayload};
 
 use super::cards::{
-    card, help_of, moderation_of, ActivityView, ListingView, ModerationView, Profile, ProjectView,
+    card, card_activity, help_of, moderation_of, ActivityView, ListingView, ModerationView,
+    Profile, ProjectView,
 };
 use super::event_time::{event_facts, EventFacts, PlanBoard};
 use super::spaces::{space_of_seed, Scoped};
@@ -115,18 +116,18 @@ impl Node {
             .await
             .unwrap_or_default();
         let help = project.as_ref().is_some_and(ProjectView::is_help_request);
-        let activities: Vec<ActivityView> = if help {
-            let read = self.call(
+        // Every space's, for the map's activity markers (ADR 0083); a help request's card
+        // shows its one activity too.
+        let activities: Vec<ActivityView> = self
+            .call(
                 agent,
                 commons.clone(),
                 "activities",
                 "list_activities",
                 at(()),
-            );
-            read.await.unwrap_or_default()
-        } else {
-            Vec::new()
-        };
+            )
+            .await
+            .unwrap_or_default();
         let moderation: Option<ModerationView> = self
             .call(agent, commons.clone(), "discussion", "moderation", at(()))
             .await
@@ -134,6 +135,7 @@ impl Node {
         let mut card = card(view, project);
         card.moderation = moderation_of(moderation);
         card.help = help.then(|| help_of(&activities));
+        card.activities = activities.iter().map(card_activity).collect();
         if card.mode == "event" {
             self.event_facts(agent, commons, &space)
                 .await
