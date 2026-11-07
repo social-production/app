@@ -83,3 +83,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0079](./0079-geocoding-gateway.md) Geocoding on the gateway: web's `/locations/search`, `/reverse`, `/ip-hint` proxied to Nominatim and ip-api.com with a cache and per-IP limits (M6 phase 2; gateway only)
 - [0080](./0080-location-picker.md) The LocationPicker: web's picker in the create flows; the place rides on the record (no `locations` rows), labels cut to 160 (M6 phase 3a; UI only)
 - [0081](./0081-default-location.md) The default location stays on the device (web's Regional settings: search, GPS, network hint); an account-wide private settings entry waits for more settings (M6 phase 3c; UI only)
+- [0082](./0082-map-markers-index.md) Map markers from the gateway index: cards carry their place, `/index/map-markers` answers as web's `/feeds/map-markers` (M6 phase 4a; gateway only)

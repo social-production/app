@@ -43,6 +43,10 @@ pub struct ProjectCard {
     /// Removed items leave the feed; absent while nothing is reported.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub moderation: Option<String>,
+    /// Where it happens, when a physical place was picked (M6 phase 4, ADR 0082): the
+    /// charter's, or an event's leading plan's. Private spaces are never indexed.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub place: Option<super::markers::CardPlace>,
 }
 
 /// The moderation state of an item a report took down.
@@ -92,6 +96,11 @@ pub struct ProjectIndex(Arc<RwLock<Vec<ProjectCard>>>);
 impl ProjectIndex {
     pub async fn replace(&self, cards: Vec<ProjectCard>) {
         *self.0.write().await = cards;
+    }
+
+    /// web's map markers over the cards held now (ADR 0082).
+    pub async fn markers(&self, q: &super::MarkerQuery<'_>) -> Vec<super::Marker> {
+        super::markers::markers(&self.0.read().await, q)
     }
 
     /// The cards held now, by listing id (kept for spaces nobody wrote to since).

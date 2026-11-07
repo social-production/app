@@ -71,6 +71,9 @@ pub struct Charter {
     pub title: String,
     pub description: String,
     pub location_label: String,
+    /// ADR 0078; older charters have none.
+    #[serde(default)]
+    pub place: Option<super::markers::PlaceMirror>,
 }
 
 impl ProjectView {
@@ -122,6 +125,11 @@ pub fn help_of(activities: &[ActivityView]) -> HelpCard {
 pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
     let created_at = view.created_at.as_micros();
     let mut l = view.listing;
+    let place = project
+        .as_ref()
+        .and_then(|p| p.charter.as_ref())
+        .and_then(|c| c.place.as_ref())
+        .and_then(super::markers::PlaceMirror::physical);
     // The project's own network is the source of truth once decisions change it (ADR 0033).
     if let Some(p) = &project {
         if let Some(c) = &p.charter {
@@ -160,5 +168,6 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         help: None,
         scheduled_at: None,
         moderation: None,
+        place,
     }
 }

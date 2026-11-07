@@ -1,7 +1,7 @@
 # M6: places and the map (parity item 7)
 
-Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Phases 1–2
-and 3a done; 3b on a branch. Each phase starts with its ADR and ships as its own PR. Port from web only
+Written 2026-11-06 by a cloud session from web (`../web`, 2026-10-18) and web-backend. Phases 1–3
+done. Each phase starts with its ADR and ships as its own PR. Port from web only
 (STATUS "Owner decisions"); asset management stays out.
 
 ## What web has
@@ -43,7 +43,8 @@ and 3a done; 3b on a branch. Each phase starts with its ADR and ships as its own
    help request + its activity). **3b** (2026-11-07): the plan and activity wizards (quick
    picks), the edit sheet. **3c** (2026-11-07, ADR 0081): Settings' Regional, the default
    location kept on the device, the IP hint and device position.
-4. **Index**: the gateway index reads places; `/index/map-markers` and the Region feed with
+4. **Index** (4a 2026-11-07, ADR 0082: cards carry places, `/index/map-markers` for projects,
+   events, help requests; 4b: activities, windows, the Region feed): the gateway index reads places; `/index/map-markers` and the Region feed with
    web's visibility rules (private spaces' places never leave their members).
 5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),
    the top bar's map button, `openPlaceOnMap`, distances on cards, Region in the scope menu.
