@@ -50,10 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 4a, map markers from the index (ADR 0082), in PR #118 with the 3b/3c docs
-Gateway only (no reset). When its CI is green: merge; once the seed node restarts, check live
-`curl 'https://seed-node-production.up.railway.app/index/map-markers?lat=-37.8&lon=144.98'`
-(the Fitzroy test projects from `places.mjs` should pin; Carlton too if an edit passed).
+## In flight: nothing (PR #118 merged and live; this docs PR follows it).
 **Next:** phase 4b: activity markers (scheduled activities, web's "Open spots" for
 projects), calendar windows / date ranges on markers, and the Region feed (`/index/region`,
 distance-sorted cards with `distance_km`), which need the archivist to read activities for
@@ -84,7 +81,13 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (in PR #118): M6 phase 4a, map markers (ADR 0082)
+## Done 2026-11-07: M6 phase 4a merged (PR #118, 08:51 UTC = 7:51 pm Melbourne)
+- CI green on the first run of each push. The seed node restarted ~09:10 UTC. No reset. Live
+  `/index/map-markers?lat=-37.8&lon=144.98` pinned the two "Tool library" test projects from
+  the live `places.mjs` runs at (-37.80, 144.98). (Their Carlton edits didn't apply: a
+  single-member Propose Edit still waits for its vote window.)
+
+## Done 2026-11-07: M6 phase 4a, map markers (ADR 0082)
 - Cards carry `place` (the charter's physical place, or an event's leading plan's; online
   places have none): `node/markers.rs` (`PlaceMirror`, `CardPlace`, `markers()`), mirrors in
   `cards.rs` (`Charter.place`) and `event_time.rs` (`Plan.place`, `EventFacts.coordinates`).
