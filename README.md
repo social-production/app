@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Place search on the gateway (PR #114, 2026-11-07 11:08 am Melbourne, ADR 0079):** the
+  seed node answers web's `/locations/search`, `/locations/reverse` and `/locations/ip-hint`
+  (OpenStreetMap's Nominatim and ip-api.com, cached, limited per IP) for the coming location
+  picker. No network reset. Live search, reverse and IP hint answered.
 - **Places behind location labels (PR #112, 2026-11-07 1:59 am Melbourne, ADR 0078):** the
   first step of the map (M6). Projects, plans, edits and activities can store a place with
   coordinates next to their location label, checked by the network as web-backend checks
@@ -273,7 +277,7 @@ Every milestone ends deployed to `social-production-p2p`, verified by the automa
 | **M3** | Governance | ✅ M3a: Proposal/Vote/Outcome for edits, updates, phases ([plan](docs/plans/M3-governance.md)). ✅ M3b: plans. ✅ M3c: returns, challenge rules, reasons. ✅ M3d: project values. ✅ M3e: links between projects | ✅ live |
 | M4 | Talk | ✅ M4a: project chat with replies and author deletes, polled live ([plan](docs/plans/M4-talk.md)). ✅ M4c: web's Messages page (direct and group chats, Public tab, group options, chat menu, edits, pins, read receipts, photos and files, voice calls in direct chats with web's call lines, the send icon's unread count). ✅ M4d first part: web's Notifications page and bell (phase votes, phase changes, chat replies). ✅ @mentions in every chat, with mention notifications and links to the message. Next: more of web's notification kinds as their features land (discussion threads parked: not on web's project pages) | in progress |
 | M5 | Work | ✅ M5a: follows, Feedback page, Home scope ([plan](docs/plans/M5-work.md)). ✅ M5b first part: activities, roles, Past activity, activity notifications, project-chat photos. ✅ The right rail (with link and plan votes). ✅ M5c: public and private events, help requests (feed activity cards wait on Region, M6). ✅ M5d: channels and communities, private communities with invites, settings and votes (ADR 0068). Every browser test runs live with test founders. Next: parity pass | in progress |
-| M6 | Platform | ✅ posts and threads, ✅ reports and moderation (ADR 0071, 0075), ✅ bot reviews (ADR 0074), ✅ service requests parts (a) and (b) (ADR 0076, 0077); map/places (phase 1 of 5 done: place records, ADR 0078; [plan](docs/plans/M6-places.md)), service requests (c), push relay, software PR/merge flow (asset management and board receipts come after parity) | |
+| M6 | Platform | ✅ posts and threads, ✅ reports and moderation (ADR 0071, 0075), ✅ bot reviews (ADR 0074), ✅ service requests parts (a) and (b) (ADR 0076, 0077); map/places (phases 1–2 of 5 done: place records, ADR 0078; geocoding, ADR 0079; [plan](docs/plans/M6-places.md)), service requests (c), push relay, software PR/merge flow (asset management and board receipts come after parity) | |
 | M7 | Mobile + cutover | Tauri Android/iOS light nodes, multi-seed failover, archivist + feed index on every full node (ADR 0036), Storage setting (light / slice / archive, size limit) and Android help-while-charging (ADR 0037), replace the FastAPI site | |
 
 ## License
