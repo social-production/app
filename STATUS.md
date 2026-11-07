@@ -50,9 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 4b, activity markers + windows (ADR 0083), on `claude/social-production-handoff-dsam61`
-Coordinator (`ActivityView.location`) + gateway; no reset. In PR #119 with the 4a docs. When
-its CI is green: merge, then live `/index/map-markers?lat=-37.8&lon=144.98&window=month`.
+## In flight: nothing (PR #119 merged and live; this docs PR follows it).
 **Next:** phase 4c, the Region feed (`/index/region`: web's `get_region_feed`, distance-sorted
 cards with `distance_km`, project-activity items, online items when asked); then phase 5,
 the map panel (maplibre + Carto) that reads markers.
@@ -82,7 +80,13 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (in PR #119): M6 phase 4b, activity markers (ADR 0083)
+## Done 2026-11-07: M6 phase 4b merged (PR #119, 12:53 UTC = 11:53 pm Melbourne)
+- CI green on the second run (the first failed `check` on `cargo fmt` in the scenario file).
+  The seed node restarted 13:06 UTC. No reset. Live `/index/map-markers` answered
+  `window=month` (the two Fitzroy test projects, "Proposal"), refused `date_from=bad` with
+  `invalid_date_filter`. No live activity has a place yet, so no activity pin was seen live.
+
+## Done 2026-11-07: M6 phase 4b, activity markers (ADR 0083)
 - `ActivityView.location` (activities coordinator). The archivist now reads every re-read
   space's activities (`cards.rs::card_activity` → `ProjectCard.activities`, `serde(skip)`).
 - `/index/map-markers` adds web's activity markers (own place, else the parent's; online
