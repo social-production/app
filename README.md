@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Map markers on the seed node (PR #118, 2026-11-07 7:51 pm Melbourne, ADR 0082):** the
+  gateway answers web's map-markers query (`/index/map-markers`): projects, events and help
+  requests with a picked place near a point, private spaces never included. The map panel
+  that shows them comes later (M6 phase 5). No network reset. Live markers answered.
 - **Place picker everywhere web has it, and Regional settings (PR #117, 2026-11-07 5:24 pm
   Melbourne, ADR 0080/0081):** proposing an edit, filing a plan and adding an activity search
   places too (activities with web's quick picks), and Settings → Regional sets a default

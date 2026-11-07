@@ -84,16 +84,25 @@ impl ProjectView {
     }
 }
 
-/// Mirrors the activities zome's `ActivityView` (the fields a help request's card shows).
+/// Mirrors the activities zome's `ActivityView` (what a help request's card and the map's
+/// activity markers show, ADR 0067 and 0083).
 #[derive(Debug, Deserialize)]
 pub struct ActivityView {
+    pub id: ActionHash,
+    pub title: String,
     pub starts_at: Timestamp,
     pub ends_at: Timestamp,
+    pub online: bool,
+    pub place: String,
+    /// Older coordinators don't send it.
+    #[serde(default)]
+    pub location: Option<super::markers::PlaceMirror>,
     pub roles: Vec<RoleView>,
 }
 
 #[derive(Debug, Deserialize)]
 pub struct RoleView {
+    pub required: u32,
     pub maximum: Option<u32>,
     pub people: Vec<AgentPubKey>,
 }
@@ -119,6 +128,29 @@ pub fn help_of(activities: &[ActivityView]) -> HelpCard {
         ends_at: Some(a.ends_at.as_micros()),
         signup_count: count(a.roles.iter().map(|r| r.people.len()).sum()),
         slots_needed: a.roles.iter().filter_map(|r| r.maximum).sum(),
+    }
+}
+
+/// What the map keeps of an activity (ADR 0083): web's commitment counts are the people in
+/// its roles and the sum of the roles' required counts.
+pub fn card_activity(a: &ActivityView) -> super::markers::CardActivity {
+    use super::markers::ActivityPlace;
+    let count = |n: usize| u32::try_from(n).unwrap_or(u32::MAX);
+    super::markers::CardActivity {
+        id: ActionHashB64::from(a.id.clone()).to_string(),
+        title: a.title.clone(),
+        starts_at: a.starts_at.as_micros(),
+        ends_at: a.ends_at.as_micros(),
+        label: a.place.clone(),
+        place: match &a.location {
+            Some(p) => p
+                .physical()
+                .map_or(ActivityPlace::Elsewhere, ActivityPlace::Own),
+            None if a.online => ActivityPlace::Elsewhere,
+            None => ActivityPlace::Parent,
+        },
+        committed: count(a.roles.iter().map(|r| r.people.len()).sum()),
+        minimum: a.roles.iter().map(|r| r.required).sum(),
     }
 }
 
@@ -169,5 +201,6 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         scheduled_at: None,
         moderation: None,
         place,
+        activities: Vec::new(),
     }
 }

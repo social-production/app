@@ -27,6 +27,7 @@ use holochain_keystore::MetaLairClient;
 use holochain_types::prelude::CoordinatorBundle;
 use holochain_types::websocket::AllowedOrigins;
 
+pub use event_time::utc_micros;
 pub use hosting::app_id;
 pub use index::{ProjectCard, ProjectIndex, Who};
 pub use markers::{Marker, MarkerQuery};

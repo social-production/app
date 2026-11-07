@@ -4,7 +4,7 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{Activity, ActivityRating, LinkTypes, UnitEntryTypes};
+use project_integrity::{Activity, ActivityRating, LinkTypes, Place, UnitEntryTypes};
 use sp_activity::{fill, roles_open, Taken};
 
 use crate::calls;
@@ -53,6 +53,8 @@ pub struct ActivityView {
     pub ends_at: Timestamp,
     pub online: bool,
     pub place: String,
+    /// The place behind `place` (ADR 0078), for the map's activity markers (ADR 0083).
+    pub location: Option<Place>,
     pub meeting_url: Option<String>,
     pub note: String,
     pub plan_stage: Option<String>,
@@ -139,6 +141,7 @@ fn one(
         ends_at: a.entry.ends_at,
         online: a.entry.online,
         place: a.entry.place,
+        location: a.entry.location,
         meeting_url: a.entry.meeting_url,
         note: a.entry.note,
         plan_stage: a.entry.plan_stage,

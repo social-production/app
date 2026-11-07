@@ -47,6 +47,10 @@ pub struct ProjectCard {
     /// charter's, or an event's leading plan's. Private spaces are never indexed.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub place: Option<super::markers::CardPlace>,
+    /// The space's activities, for the map's activity markers and "Open spots" (ADR 0083);
+    /// not sent with feed cards.
+    #[serde(skip)]
+    pub activities: Vec<super::markers::CardActivity>,
 }
 
 /// The moderation state of an item a report took down.

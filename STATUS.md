@@ -50,14 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 4a, map markers from the index (ADR 0082), in PR #118 with the 3b/3c docs
-Gateway only (no reset). When its CI is green: merge; once the seed node restarts, check live
-`curl 'https://seed-node-production.up.railway.app/index/map-markers?lat=-37.8&lon=144.98'`
-(the Fitzroy test projects from `places.mjs` should pin; Carlton too if an edit passed).
-**Next:** phase 4b: activity markers (scheduled activities, web's "Open spots" for
-projects), calendar windows / date ranges on markers, and the Region feed (`/index/region`,
-distance-sorted cards with `distance_km`), which need the archivist to read activities for
-every space (today only help requests'). Then phase 5, the map panel (maplibre + Carto).
+## In flight: M6 phase 4b, activity markers + windows (ADR 0083), on `claude/social-production-handoff-dsam61`
+Coordinator (`ActivityView.location`) + gateway; no reset. In PR #119 with the 4a docs. When
+its CI is green: merge, then live `/index/map-markers?lat=-37.8&lon=144.98&window=month`.
+**Next:** phase 4c, the Region feed (`/index/region`: web's `get_region_feed`, distance-sorted
+cards with `distance_km`, project-activity items, online items when asked); then phase 5,
+the map panel (maplibre + Carto) that reads markers.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -84,7 +82,24 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (in PR #118): M6 phase 4a, map markers (ADR 0082)
+## Done 2026-11-07 (in PR #119): M6 phase 4b, activity markers (ADR 0083)
+- `ActivityView.location` (activities coordinator). The archivist now reads every re-read
+  space's activities (`cards.rs::card_activity` → `ProjectCard.activities`, `serde(skip)`).
+- `/index/map-markers` adds web's activity markers (own place, else the parent's; online
+  none; full service activities none), "Open spots" on collective services, and `window` +
+  `tzOffset`, `date_from`/`date_to` (`routes/map.rs::span`).
+- **Checked:** `cargo test -p gateway --lib` (28; 3 new), clippy `-p gateway -p activities
+  --all-targets -D warnings`, `cargo fmt`; scenario `help_requests` (now asserts the view's
+  `location`) **passed** locally (676 s) and its clippy is clean. CI's first run failed `check`
+  on `cargo fmt` in that scenario file: run `cargo fmt --all --check`, not `-p gateway`.
+
+## Done 2026-11-07: M6 phase 4a merged (PR #118, 08:51 UTC = 7:51 pm Melbourne)
+- CI green on the first run of each push. The seed node restarted ~09:10 UTC. No reset. Live
+  `/index/map-markers?lat=-37.8&lon=144.98` pinned the two "Tool library" test projects from
+  the live `places.mjs` runs at (-37.80, 144.98). (Their proposed Carlton edits have not
+  applied; not investigated: `places.mjs` only checks the edit is filed with its place.)
+
+## Done 2026-11-07: M6 phase 4a, map markers (ADR 0082)
 - Cards carry `place` (the charter's physical place, or an event's leading plan's; online
   places have none): `node/markers.rs` (`PlaceMirror`, `CardPlace`, `markers()`), mirrors in
   `cards.rs` (`Charter.place`) and `event_time.rs` (`Plan.place`, `EventFacts.coordinates`).
