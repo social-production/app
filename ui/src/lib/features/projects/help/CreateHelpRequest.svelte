@@ -1,6 +1,7 @@
 <script lang="ts">
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
+  import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import ScopeTagsStep from '../scopes/ScopeTagsStep.svelte';
@@ -64,11 +65,13 @@
     <div class="form-stack">
       <LocationIntent
         intent={s.intent}
-        place={s.place}
+        place={s.placeValue}
+        search={searchPlaces}
+        failure={searchFailure}
         allowLater={false}
         helperText="Help requests need a physical or online location so people know where to show up."
         onIntent={(i) => (s.intent = i)}
-        onPlace={(p) => (s.place = p)}
+        onPlace={(p) => s.setPlace(p)}
       />
     </div>
   {:else if s.stepId === 'timing'}

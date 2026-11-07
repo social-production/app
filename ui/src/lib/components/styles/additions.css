@@ -112,3 +112,15 @@ span.share-sheet {
 .help-overview .identity-copy {
   justify-content: stretch;
 }
+
+/* LocationPicker's portaled list keeps the root class for the ported rules; the wrapper itself
+   must not be a box or a stacking context (web's scoped class did this without a wrapper). */
+.location-picker.location-portal {
+  display: contents;
+}
+
+/* web's scoped `.compact input` matched the root's own class; the port prefixes it. */
+.location-picker.compact input {
+  padding: 6px 8px;
+  font-size: 13px;
+}

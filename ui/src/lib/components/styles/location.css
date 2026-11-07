@@ -1,0 +1,189 @@
+/* Ported from web/src/lib/components/shared/LocationPicker.svelte (ADR 0032, scripts/port-styles.py) */
+.location-picker {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+}
+
+.location-picker.compact {
+  gap: 6px;
+}
+
+.location-picker.elevated {
+  z-index: 50;
+}
+
+.location-picker.elevated .search-wrap {
+  z-index: 51;
+}
+
+.location-picker.elevated .suggestions {
+  z-index: 120;
+}
+
+.location-picker .mode-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.location-picker .mode-chip {
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 12px;
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.location-picker .mode-chip.active {
+  border-color: var(--brand);
+  color: var(--brand-strong);
+  background: var(--brand-soft);
+}
+
+.location-picker .quick-picks {
+  display: grid;
+  gap: 6px;
+}
+
+.location-picker .quick-picks.compact-picks {
+  max-height: 140px;
+  overflow: auto;
+}
+
+.location-picker .quick-pick {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+}
+
+.location-picker .quick-pick.active {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.location-picker .quick-pick-label {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.location-picker .quick-pick-source {
+  font-size: 11px;
+  color: var(--text-soft);
+}
+
+.location-picker .search-wrap {
+  position: relative;
+  min-width: 0;
+  z-index: 3;
+}
+
+.location-picker input {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 8px 10px;
+  font: inherit;
+}
+
+.location-picker .compact input {
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+.location-picker .status {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.location-picker .error {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--danger, #c0392b);
+}
+
+.location-picker .use-typed-name {
+  justify-self: start;
+  margin: 4px 0 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.location-picker .suggestions {
+  position: absolute;
+  z-index: 40;
+  left: 0;
+  right: 0;
+  top: calc(100% + 4px);
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  background: var(--panel-strong, var(--panel));
+  max-height: 220px;
+  overflow: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.location-picker .suggestions.prefer-above {
+  top: auto;
+  bottom: calc(100% + 4px);
+}
+
+.location-picker .suggestions.portaled {
+  position: fixed;
+  z-index: 140;
+  right: auto;
+  top: auto;
+  left: auto;
+  max-height: min(280px, 40vh);
+}
+
+.location-picker .suggestions button {
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  padding: 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+}
+
+.location-picker .suggestions button:hover {
+  background: var(--brand-soft);
+}
+
+.location-picker .tbd-label {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 13px;
+}

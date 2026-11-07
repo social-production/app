@@ -28,3 +28,14 @@ export function pausedIndex(): Promise<string[]> {
   if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
   return gatewayApi.paused(gateway);
 }
+
+/** web's place routes on the home node's gateway (GET /locations/*, ADR 0079). The native
+ * app asks a gateway too: its conductor has no geocoder. */
+export function locationLookup<T>(
+  route: 'search' | 'reverse' | 'ip-hint',
+  query: Record<string, string>,
+): Promise<T> {
+  const gateway = homeGateway();
+  if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
+  return gatewayApi.locations<T>(gateway, route, query);
+}

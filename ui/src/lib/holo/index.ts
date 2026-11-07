@@ -14,7 +14,7 @@ export {
   projectCell,
 } from './cells.ts';
 export { spaceInSeed, spaceSeed } from './spaces.ts';
-export { pausedIndex, peopleIndex, projectFeed, scopeIndex } from './feed.ts';
+export { locationLookup, pausedIndex, peopleIndex, projectFeed, scopeIndex } from './feed.ts';
 export {
   callCell,
   callZome,

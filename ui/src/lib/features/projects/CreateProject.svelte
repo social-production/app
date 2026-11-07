@@ -1,6 +1,7 @@
 <script lang="ts">
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
+  import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import TypeSelector from '#lib/components/create/TypeSelector.svelte';
@@ -77,9 +78,11 @@
   {:else if s.stepId === 'location'}
     <LocationIntent
       intent={s.intent}
-      place={s.place}
+      place={s.placeValue}
+      search={searchPlaces}
+      failure={searchFailure}
       onIntent={(i) => (s.intent = i)}
-      onPlace={(p) => (s.place = p)}
+      onPlace={(p) => s.setPlace(p)}
     />
   {:else if s.stepId === 'scope'}
     <div class="form-stack">

@@ -1,6 +1,7 @@
 /** Mirrors the project DNA's zome and the gateway's project index. */
 
 import type { ProjectUpdate } from './governance.ts';
+import type { Place } from './places.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
 /** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), or a
@@ -19,6 +20,8 @@ export interface Charter {
   /** A project's subtype; a channel's or community's join policy (`open`/`closed`). */
   subtype: ProjectSubtype | 'open' | 'closed';
   location_label: string;
+  /** The place behind `location_label` (ADR 0078), when it was picked or is online. */
+  place?: Place | null;
   phase: string;
   tags: string[];
 }

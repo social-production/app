@@ -91,4 +91,10 @@ export const gatewayApi = {
   people: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/people', query),
   scopes: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/scopes', query),
   paused: (g: string) => get<string[]>(g, '/index/paused', {}),
+  /** Place search, reverse lookup and the IP hint (ADR 0079). */
+  locations: <T>(
+    g: string,
+    route: 'search' | 'reverse' | 'ip-hint',
+    query: Record<string, string>,
+  ) => get<T>(g, `/locations/${route}`, query),
 };

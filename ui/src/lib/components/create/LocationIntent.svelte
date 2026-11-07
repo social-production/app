@@ -1,15 +1,17 @@
 <script lang="ts">
+  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
+  import type { PlaceValue } from '#lib/domain/places.ts';
   import type { LocationChoice } from '#lib/domain/projects.ts';
 
-  /**
-   * web's CreateLocationIntent. The place is a typed label until the map lands (M6), when
-   * web's LocationPicker replaces the text field.
-   */
+  /** web's CreateLocationIntent, with web's LocationPicker for a physical place (ADR 0080). */
   interface Props {
     intent: LocationChoice;
-    place: string;
+    place: PlaceValue;
     onIntent: (intent: LocationChoice) => void;
-    onPlace: (place: string) => void;
+    onPlace: (place: PlaceValue) => void;
+    /** The gateway's place search and its failure sentence (features pass the service). */
+    search: (query: string, limit: number) => Promise<PlaceValue[]>;
+    failure: (error: unknown) => string;
     /** web's `allowLater` and `helperText` (help requests need a place now). */
     allowLater?: boolean;
     helperText?: string;
@@ -20,6 +22,8 @@
     place,
     onIntent,
     onPlace,
+    search,
+    failure,
     allowLater = true,
     helperText = 'A physical location helps people discover this on the map. You can change it later.',
   }: Props = $props();
@@ -56,12 +60,13 @@
     {/each}
   </div>
   {#if intent === 'physical'}
-    <input
-      aria-label="Place"
-      maxlength="160"
-      placeholder="Search a place"
+    <LocationPicker
       value={place}
-      oninput={(e) => onPlace(e.currentTarget.value)}
+      modes={['physical']}
+      placeholder="Search a place"
+      onChange={onPlace}
+      {search}
+      {failure}
     />
   {/if}
 </div>

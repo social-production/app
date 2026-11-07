@@ -1,5 +1,6 @@
 import type { Activity } from '#lib/domain/activities.ts';
 import type { AvailabilityRule } from '#lib/domain/availability.ts';
+import type { Place } from '#lib/domain/places.ts';
 import {
   callCell,
   hashToString,
@@ -80,6 +81,8 @@ export interface NewActivity {
   endsAt: number;
   online: boolean;
   place: string;
+  /** The place behind `place` (ADR 0078). */
+  location?: Place | null;
   meetingUrl: string | null;
   note: string;
   planStage: string | null;
@@ -144,6 +147,7 @@ export async function createActivity(project: ProjectRef, a: NewActivity): Promi
     ends_at: a.endsAt,
     online: a.online,
     place: a.place,
+    location: a.location ?? null,
     meeting_url: a.meetingUrl,
     note: a.note,
     plan_stage: a.planStage,

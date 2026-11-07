@@ -4,6 +4,7 @@
  */
 
 import type { EventSchedule } from './eventSchedule.ts';
+import type { Place } from './places.ts';
 import type { ProposalStatus, VoteChoice } from './governance.ts';
 import type { CharterMode, ProjectMode, ProjectSubtype } from './projects.ts';
 
@@ -27,6 +28,8 @@ export interface Plan {
   subtype: ProjectSubtype | null;
   repository_url: string | null;
   location: string | null;
+  /** The place behind `location` (ADR 0078). */
+  place?: Place | null;
   recipients: string | null;
   stages: PlanStage[];
   /** Event plans only (ADR 0057). */

@@ -3,6 +3,7 @@
   import EventAudiencePanel from '#lib/components/create/EventAudiencePanel.svelte';
   import EventPlanStep from '#lib/components/create/EventPlanStep.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
+  import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PeoplePicker from '#lib/components/create/PeoplePicker.svelte';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
@@ -139,9 +140,11 @@
   {:else if s.stepId === 'location'}
     <LocationIntent
       intent={s.intent}
-      place={s.place}
+      place={s.placeValue}
+      search={searchPlaces}
+      failure={searchFailure}
       onIntent={(i) => (s.intent = i)}
-      onPlace={(p) => (s.place = p)}
+      onPlace={(p) => s.setPlace(p)}
     />
   {:else if s.stepId === 'plan'}
     <EventPlanStep bind:plan={s.plan} problems={s.planProblems} />
