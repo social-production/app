@@ -50,9 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phases 3b + 3c in PR #117 (ADR 0080, 0081), on `claude/social-production-handoff-dsam61`
-UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs`,
-`regional.mjs`), then README Status and STATUS "Done".
+## In flight: nothing (PR #117 merged and live; this docs PR follows it).
 **Next:** M6 phase 4: the gateway index reads places (`/index/map-markers`, the Region feed,
 web's visibility rules: private spaces' places never leave their members), then phase 5 (the
 map panel). Both need Nix (gateway Rust); check `df -h /` first.
@@ -82,7 +80,12 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (in PR #117): M6 phase 3c, Regional settings (ADR 0081)
+## Done 2026-11-07: M6 phases 3b + 3c merged (PR #117, 06:24 UTC = 5:24 pm Melbourne)
+- CI green on the first run (~80 min). The seed node restarted 06:36 UTC. No reset. Live
+  `places.mjs` and `regional.mjs` **passed** (~06:38–06:45 UTC); on live, "Set from network"
+  set the IP hint (the sandbox's egress, San Francisco), so ip-api.com works from Railway.
+
+## Done 2026-11-07: M6 phase 3c, Regional settings (ADR 0081)
 - web's Regional section in Settings (after Appearance, with its nav link): default location
   by search (picker, physical only), the "Device location (GPS)" switch (one fix, named by
   `/locations/reverse`), "Set from network" (`/locations/ip-hint`). Kept in this device's
@@ -93,7 +96,7 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   localhost sentence, since ip-api.com isn't reachable from the sandbox) **passed** against a
   local seed node; UI check, lint, boundaries, sizes clean.
 
-## Done 2026-11-07 (in PR #117): M6 phase 3b, the picker in the edit sheet and wizards (ADR 0080)
+## Done 2026-11-07: M6 phase 3b, the picker in the edit sheet and wizards (ADR 0080)
 - **Edit sheet** (`overlay/EditSheet.svelte`, web's ProposeEditSheet): the picker (`portaled
   elevated`, physical/online) opens on the charter's place (`domain/projects.ts::charterDraft`
   → `places.ts::fromPlace`); `charterEdit` proposes `location` + `place` when the label or the

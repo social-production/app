@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Place picker everywhere web has it, and Regional settings (PR #117, 2026-11-07 5:24 pm
+  Melbourne, ADR 0080/0081):** proposing an edit, filing a plan and adding an activity search
+  places too (activities with web's quick picks), and Settings → Regional sets a default
+  location by search, device GPS or network, kept on the device. No network reset. Live
+  `places.mjs` and `regional.mjs` passed.
 - **Place search when creating (PR #116, 2026-11-07 3:28 pm Melbourne, ADR 0080):** web's
   location picker in the create flows for projects, events and help requests: type a place,
   pick a suggestion, and the record keeps its coordinates (approximate, as on web) for the
