@@ -111,7 +111,9 @@ fn filters_by_kind_and_threads_are_empty() {
     ];
     assert_eq!(ids(&region(&cards, &query("events")).0), ["e"]);
     assert_eq!(ids(&region(&cards, &query("help_requests")).0), ["h"]);
-    assert_eq!(region(&cards, &query("threads")), (Vec::new(), 0));
+    let (none, total) = region(&cards, &query("threads"));
+    assert!(none.is_empty());
+    assert_eq!(total, 0);
 }
 
 #[test]
