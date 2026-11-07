@@ -41,8 +41,8 @@ and 3a done; 3b on a branch. Each phase starts with its ADR and ships as its own
 3. **LocationPicker** in the UI (`components/location/`), ported with web's CSS through
    `PORTS` (ADR 0080). **3a** (2026-11-07): the create flows (project, event + upfront plan,
    help request + its activity). **3b** (2026-11-07): the plan and activity wizards (quick
-   picks), the edit sheet. **3c:** Settings' Regional (the default location as a private
-   entry), the IP hint and device position.
+   picks), the edit sheet. **3c** (2026-11-07, ADR 0081): Settings' Regional, the default
+   location kept on the device, the IP hint and device position.
 4. **Index**: the gateway index reads places; `/index/map-markers` and the Region feed with
    web's visibility rules (private spaces' places never leave their members).
 5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),

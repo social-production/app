@@ -50,13 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 3b, the picker in the edit sheet and both wizards (ADR 0080), PR on `claude/social-production-handoff-dsam61`
-UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs` now also
-proposes an edit to another place), then README Status.
-**Next:** phase 3c: Settings' Regional default location (web's `location/defaults.ts`,
-`sync.ts`, `geolocation.ts`; a private entry, since profiles are public: decide where in its
-ADR), the IP hint and device position (`/locations/ip-hint`, `/locations/reverse`), and the
-project header's place line if web shows one. Then phases 4–5 (index + map).
+## In flight: M6 phases 3b + 3c in PR #117 (ADR 0080, 0081), on `claude/social-production-handoff-dsam61`
+UI only (no network reset). When its CI is green: merge, smoke live (`places.mjs`,
+`regional.mjs`), then README Status and STATUS "Done".
+**Next:** M6 phase 4: the gateway index reads places (`/index/map-markers`, the Region feed,
+web's visibility rules: private spaces' places never leave their members), then phase 5 (the
+map panel). Both need Nix (gateway Rust); check `df -h /` first.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -83,7 +82,18 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07 (on the branch): M6 phase 3b, the picker in the edit sheet and wizards (ADR 0080)
+## Done 2026-11-07 (in PR #117): M6 phase 3c, Regional settings (ADR 0081)
+- web's Regional section in Settings (after Appearance, with its nav link): default location
+  by search (picker, physical only), the "Device location (GPS)" switch (one fix, named by
+  `/locations/reverse`), "Set from network" (`/locations/ip-hint`). Kept in this device's
+  storage under web's key shape; no account copy (ADR 0081 says why and when that changes).
+- `holo/gateway.ts::get` now passes a route's `error` code into `GatewayError`.
+- **Tests:** new `tests/e2e/regional.mjs` (search + reload keeps it; a fake GPS fix in
+  Fitzroy is named by the reverse lookup; "Set from network" on a local node shows web's
+  localhost sentence, since ip-api.com isn't reachable from the sandbox) **passed** against a
+  local seed node; UI check, lint, boundaries, sizes clean.
+
+## Done 2026-11-07 (in PR #117): M6 phase 3b, the picker in the edit sheet and wizards (ADR 0080)
 - **Edit sheet** (`overlay/EditSheet.svelte`, web's ProposeEditSheet): the picker (`portaled
   elevated`, physical/online) opens on the charter's place (`domain/projects.ts::charterDraft`
   → `places.ts::fromPlace`); `charterEdit` proposes `location` + `place` when the label or the
