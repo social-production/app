@@ -4,6 +4,7 @@
 pub mod account;
 mod heap;
 pub mod index;
+mod locations;
 mod maps;
 pub mod passkey;
 pub mod public;
@@ -25,6 +26,8 @@ use crate::{config::Config, node::Node, store::Store};
 pub struct AppState {
     pub config: Arc<Config>,
     pub node: Node,
+    /// Geocoding for the place picker (ADR 0079).
+    pub geo: Arc<crate::geo::Geo>,
     pub store: Store,
     pub passkeys: Arc<Passkeys>,
     pub pow: Arc<Pow>,
@@ -53,6 +56,9 @@ pub fn router(state: AppState) -> Router {
         .route("/index/paused", get(index::paused))
         .route("/index/scopes", get(index::scopes))
         .route("/public/read", post(public::read))
+        .route("/locations/search", get(locations::search))
+        .route("/locations/reverse", get(locations::reverse))
+        .route("/locations/ip-hint", get(locations::ip_hint))
         .route("/ws", get(ws_proxy::upgrade))
         // The UI is served from another origin (ui service, dev server).
         .layer(CorsLayer::permissive())

@@ -80,3 +80,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0076](./0076-service-requests.md) Service requests: a request lives in the direct chat with the service's creator; request settings are a proposal (part a: personal services; project and chat reset)
 - [0077](./0077-availability-and-bookings.md) Availability and bookings: weekly hours are records, one-off slots and bookings are activities; the requester checks in and rates (project reset)
 - [0078](./0078-places.md) Places: an optional `Place` (coordinates, precision, online) next to each location label, rules in `sp_place` (M6 phase 1; project reset)
+- [0079](./0079-geocoding-gateway.md) Geocoding on the gateway: web's `/locations/search`, `/reverse`, `/ip-hint` proxied to Nominatim and ip-api.com with a cache and per-IP limits (M6 phase 2; gateway only)
