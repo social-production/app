@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Activity markers and time windows (PR #119, 2026-11-07 11:53 pm Melbourne, ADR 0083):**
+  map markers also pin scheduled activities (at their own place or their project's), show
+  "Open spots" on collective services with unfilled activities, and keep to today / this week /
+  this month or a date range. No network reset. Live markers answered with the window.
 - **Map markers on the seed node (PR #118, 2026-11-07 7:51 pm Melbourne, ADR 0082):** the
   gateway answers web's map-markers query (`/index/map-markers`): projects, events and help
   requests with a picked place near a point, private spaces never included. The map panel
