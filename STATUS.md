@@ -50,17 +50,16 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 5b (ADR 0085), PR from `claude/social-production-handoff-dsam61`
-The feed's Region scope, the map's "Open as list", show-on-map from the activity sheet and the
-Venue link (ADR 0085's 5b section). **Checked:** UI check, lint, boundaries, sizes; new
-`tests/e2e/region.mjs` **passed** against a local seed node (Region lists a Fitzroy project
-from the default place; "Open as list" opens Region on the map's place; the Venue link opens
-the map there), with `map.mjs`, `activities.mjs`, `links.mjs`, `projects.mjs`. **Not run:**
-scenarios (no zome change). Merge when green, smoke live (`region.mjs`), then M6 is done:
-update PARITY's summary and pick the next parity item (software PRs, then service requests
-(c) once the owner says who reviews them, ADR 0076).
-- At 390px the Region toolbar's last button (the online list) sits past the edge: the row
-  scrolls sideways, as web's ported CSS does. Not changed.
+## In flight: nothing (M6 is done: PR #125 merged and live; this docs PR follows it).
+**Next: software projects (PARITY item 8),** web's `ProjectSoftwareGovernancePanel.svelte`
+(697 lines), `SoftwareGovernanceWizard.svelte` (699), `RepositoryMenu.svelte` in the Activity
+phase, over web-backend's `app/routers/projects_software.py`: pull requests (propose, vote,
+merge), merge-capability requests (vote) and repository-replacement requests (vote), each with
+web's `APPROVAL_THRESHOLD = 0.66` tally. Start with an ADR and a plan (`docs/plans/`): which
+records the project DNA needs (an integrity change means a reset, so check whether the
+existing proposal/vote entries can carry them, as links and edits did), then the
+coordinator, a scenario, the UI port, browser tests. Then service requests (c) once the owner
+says who reviews them (ADR 0076).
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -92,6 +91,11 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
 ## Done 2026-11-08: the map's connection fix merged (PR #124, 04:55 UTC = 3:55 pm Melbourne)
 - CI green on the first run. Live `map.mjs` **passed** at 04:57 UTC: the top bar's map and
   `/map` after a page load both start from the saved Fitzroy place and list the new project.
+
+## Done 2026-11-08: M6 phase 5b merged (PR #125, 07:11 UTC = 6:11 pm Melbourne)
+- CI green on the first run. UI deployed 07:12 UTC. Live `region.mjs` **passed** (07:19 UTC):
+  Region lists a Fitzroy project from the default place, "Open as list" opens Region on the
+  map's place, the Venue link opens the map there. **M6 (places and the map) is done.**
 
 ## Done 2026-11-08: M6 phase 5a merged (PR #123, 02:57 UTC = 1:57 pm Melbourne)
 - CI green on the first run. UI deployed by ~03:15 UTC. Live `map.mjs`: the top bar's map
