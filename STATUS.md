@@ -50,18 +50,14 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: software projects, phases (a) + (b) (ADR 0086, plan `docs/plans/SOFTWARE.md`)
-Branch `claude/social-production-handoff-dsam61`. One PR carries both phases (a CI run is
-~2 h, and (a) alone shows nothing): **(a)** `crates/sp_software` (checks, stages, `replay`),
-`ProposalKind::Software(SoftwareRequest)` in the project integrity zome (**project reset on
-merge**), the governance coordinator's `software.rs` (ledger + `propose`'s refusals) and
-`software_view.rs` (`software` extern), scenario `tests/scenarios/tests/software.rs`;
-**(b)** the UI: `features/projects/software/` (web's panel, wizard, Repository ▾, the dock's
-Pull request button), `domain/software.ts`, `services/software.ts`, styles via PORTS
-(`styles/software.css`), `PlanWizardShell`'s `showFooter`, `ActivityCalendar`'s `extra`
-snippet; browser test `tests/e2e/software.mjs`. See the newest "Done" entry for what was
-checked. **Next after it merges:** phase (c) (rail rows, History tab / Past activity cards,
-`pr-approved`), then service requests (c) once the owner says who reviews them (ADR 0076).
+## In flight: nothing (software projects phases a + b merged, PR #127; this docs PR follows).
+**Next: software projects phase (c)** (`docs/plans/SOFTWARE.md`): the right rail's "Vote ·
+pull request", "Action · merge needed" (Record merge) and "Vote · merge capability" rows
+(web-backend `bootstrap/activity_rail.py`, web `RightRailPanel`); the History tab and Past
+activity cards for the four software decision kinds (`build_software_history_entries`); the
+`pr-approved` notification to a pull request's author. Coordinator + UI, no integrity change
+expected (the views already expose every proposal with its tally). Then service requests (c)
+once the owner says who reviews them (ADR 0076).
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -90,7 +86,13 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-08: software projects, phases (a) + (b) (ADR 0086), PR open
+## Done 2026-11-08: software projects merged (PR #127, 11:14 UTC = 10:14 pm Melbourne)
+- CI green on the first run (~93 min). UI and bootstrap deployed 11:14 UTC; the seed node
+  restarted 11:26 UTC (655 MB at 26 s). **The project network reset** (`/index/projects`
+  listed only the smoke's project afterwards). Live `software.mjs` **passed** (11:27–11:29
+  UTC, ~2 min).
+
+## Done 2026-11-08: software projects, phases (a) + (b) (ADR 0086), PR #127
 - Pull requests, recorded merges, merge capability and repository replacements are one new
   proposal kind (`ProposalKind::Software`), voted like any other (no author vote, as on
   web); a recorded merge is its own proposal whose vote is web's confirmation. The governance
