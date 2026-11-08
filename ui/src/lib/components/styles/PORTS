@@ -148,3 +148,4 @@ location.css      .location-picker web/src/lib/components/shared/LocationPicker.
 map.css           .map-panel      web/src/lib/features/map/MapPanel.svelte
 map.css           .radius-combobox web/src/lib/components/shared/RadiusCombobox.svelte
 map.css           .map-discovery-card web/src/lib/components/cards/map/MapDiscoveryCard.svelte
+cards.css         .project-activity-card web/src/lib/components/cards/public-feed/ProjectActivityCard.svelte

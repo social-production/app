@@ -19,6 +19,8 @@
     onRadius: (value: string) => void;
     onFilters: () => void;
     onUpcoming: () => void;
+    /** web's "Open as list": the Region feed on this place. */
+    onList: () => void;
   }
 
   let {
@@ -31,6 +33,7 @@
     onRadius,
     onFilters,
     onUpcoming,
+    onList,
   }: Props = $props();
 
   let dateButton = $state<HTMLButtonElement>();
@@ -143,4 +146,14 @@
   >
     <ToolbarIcon name="filter" />
   </IconMenuButton>
+  <button
+    aria-label="Open as list"
+    title="Open as list"
+    class="icon-button filter-icon-button"
+    disabled={!s.hasCenter}
+    type="button"
+    onclick={onList}
+  >
+    <ToolbarIcon name="list" />
+  </button>
 </div>

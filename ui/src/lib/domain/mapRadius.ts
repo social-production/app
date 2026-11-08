@@ -44,3 +44,13 @@ export function shouldAdoptViewportRadius(
   if (viewportKm > selectedKm + slack) return !selectedIsGlobal;
   return viewportKm < selectedKm - slack;
 }
+
+/** web's `normalizeRadiusFromUrl`: a link's radius ("global", or whole km). */
+export function normalizeRadiusFromUrl(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  if (trimmed === GLOBAL_RADIUS_VALUE) return GLOBAL_RADIUS_VALUE;
+  const parsed = Number(trimmed);
+  if (!Number.isFinite(parsed)) return trimmed;
+  return parsed >= GLOBAL_RADIUS_KM ? GLOBAL_RADIUS_VALUE : String(Math.round(parsed));
+}

@@ -2,23 +2,29 @@
   import { untrack } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
+  import { page } from '$app/state';
+  import { resolve } from '$app/paths';
+  import type { ResolvedPathname } from '$app/types';
   import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
+  import ProjectActivityCard from '#lib/components/cards/ProjectActivityCard.svelte';
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import type { FeedScope, HomeAudience } from '#lib/domain/homeFeed.ts';
   import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
+  import { regionLink, type RegionActivity } from '#lib/domain/regionFeed.ts';
 
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { HomeFeedState } from './homeFeedState.svelte.ts';
+  import RegionControls from './RegionControls.svelte';
 
   import '#lib/components/styles/feed.css';
 
   /**
    * web's PublicFeed (projects only until threads/events land): scope, audience, filter, sort,
-   * window, cards. Region joins the scope menu with places (M6).
+   * window, cards; Region (ADR 0084, 0085) has its own centre, radius and online list.
    */
   let { search = '' }: { search?: string } = $props();
 
@@ -28,6 +34,7 @@
   const scopes: { value: FeedScope; label: string }[] = [
     { value: 'home', label: 'Home' },
     { value: 'global', label: 'Global' },
+    { value: 'region', label: 'Region' },
   ];
   const audiences: { value: HomeAudience; label: string }[] = [
     { value: 'following', label: 'Following only' },
@@ -50,27 +57,53 @@
     { value: 'all', label: 'All time' },
   ];
 
-  // Reload when the search or sign-in changes; the reload reads feed state, which must not
-  // re-trigger it.
+  // The Region centre is read once the connection settles (your default place is kept under
+  // your key). The map's "Open as list" opens Region on its place (also while the feed shows).
+  let hydrated = $state(false);
+  let followed = '';
+  $effect(() => {
+    const current = connection.current;
+    if (hydrated || current.status === 'connecting') return;
+    untrack(() => {
+      feed.region.hydrate(current.status === 'connected' ? current.agent : null);
+      hydrated = true;
+    });
+  });
+
   $effect(() => {
     void search;
     const viewer = signedIn;
-    untrack(() => void feed.reload(viewer));
+    const link = regionLink(page.url.searchParams);
+    const key = link ? page.url.search : '';
+    if (!hydrated) return;
+    untrack(() => {
+      if (link && key !== followed) {
+        followed = key;
+        void feed.openRegion(link, viewer);
+      } else void feed.reload(viewer);
+    });
   });
+
+  /** An activity's project page, with web's `?activity=`. */
+  const activityHref = (a: RegionActivity): ResolvedPathname =>
+    `${resolve('/projects/[id]', { id: a.parentId })}?activity=${a.id}` as ResolvedPathname;
+  const scopeIcon = $derived(
+    feed.shownScope === 'home' ? 'home' : feed.shownScope === 'region' ? 'map-pin' : 'globe',
+  );
 </script>
 
 <section class="feed-page">
-  <section class="toolbar-card">
+  <section class="toolbar-card" class:toolbar-card-region={feed.shownScope === 'region'}>
     <div class="controls-row controls-row-primary">
       <IconMenuButton
         value={feed.shownScope}
         ariaLabel="Choose public feed scope"
         defaultValue="global"
         options={scopes}
-        showTriggerLabel={labels.current}
+        showTriggerLabel={labels.current && feed.shownScope !== 'region'}
         onChange={(v) => void feed.setScope(v)}
       >
-        <ToolbarIcon name={feed.shownScope === 'home' ? 'home' : 'globe'} />
+        <ToolbarIcon name={scopeIcon} />
       </IconMenuButton>
       {#if signedIn}
         <IconMenuButton
@@ -112,7 +145,26 @@
       >
         <ToolbarIcon name="clock" />
       </IconMenuButton>
+      {#if feed.shownScope === 'region'}<RegionControls region={feed.region} />{/if}
     </div>
+    {#if feed.shownScope === 'region'}
+      {#if feed.region.message}
+        <p class="inline-alert" role="alert">{feed.region.message}</p>
+      {/if}
+      {#if feed.region.suggestions.length > 0}
+        <ul class="suggestions">
+          {#each feed.region.suggestions as place, i (i)}
+            <li>
+              <button
+                type="button"
+                onmousedown={(e) => e.preventDefault()}
+                onclick={() => void feed.region.select(place)}>{place.displayLabel}</button
+              >
+            </li>
+          {/each}
+        </ul>
+      {/if}
+    {/if}
   </section>
 
   <div class="stack">
@@ -120,6 +172,10 @@
       <section class="empty-card"><p>{feed.error}</p></section>
     {:else if feed.loading && feed.rows.length === 0}
       <section class="empty-card"><p>Loading feed...</p></section>
+    {:else if feed.shownScope === 'region' && !feed.region.hasCenter}
+      <section class="empty-card">
+        <p>Choose a place or enable device location to load the region feed.</p>
+      </section>
     {:else if feed.rows.length === 0}
       <section class="empty-card">
         <p>
@@ -128,7 +184,9 @@
       </section>
     {:else}
       {#each feed.rows as row (row.key)}
-        {#if row.source === 'personal'}
+        {#if 'activity' in row}
+          <ProjectActivityCard item={row.activity} href={activityHref(row.activity)} />
+        {:else if row.source === 'personal'}
           <PersonalSpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
         {:else}
           <SpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />

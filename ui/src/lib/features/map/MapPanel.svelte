@@ -1,9 +1,11 @@
 <script lang="ts">
   import { onMount, tick, untrack } from 'svelte';
   import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
   import { portal } from '#lib/components/actions/portal.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import { effectiveRadiusKm } from '#lib/domain/mapRadius.ts';
+  import { effectiveRadiusKm, radiusForUrl } from '#lib/domain/mapRadius.ts';
+  import { regionLinkQuery } from '#lib/domain/regionFeed.ts';
   import type { PlaceValue } from '#lib/domain/places.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { clearMapFocusRequest, mapFocus } from '#lib/stores/mapFocus.svelte.ts';
@@ -49,6 +51,22 @@
     view.resetViewportQuery();
     s.persistFilters();
     void view.syncRadiusToCenter().then(() => loader.schedule());
+  }
+
+  /** web's `openRegionalFeed`: the feed's Region scope on this place, radius and filters. */
+  function openList(): void {
+    const { centerLat: lat, centerLon: lon } = s;
+    if (lat == null || lon == null) return;
+    const query = regionLinkQuery({
+      lat,
+      lon,
+      place: s.place.displayLabel,
+      radius: radiusForUrl(s.radiusKm),
+      window: s.windowFilter,
+      filter: s.entityFilter,
+    });
+    // eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + web's query
+    void goto(`${resolve('/')}${query}`).then(onClose);
   }
 
   async function toggleFullscreen(): Promise<void> {
@@ -216,6 +234,7 @@
       s.upcomingOnly = !s.upcomingOnly;
       changed();
     }}
+    onList={openList}
   />
 {/snippet}
 
