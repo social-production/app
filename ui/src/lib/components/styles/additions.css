@@ -124,3 +124,10 @@ span.share-sheet {
   padding: 6px 8px;
   font-size: 13px;
 }
+
+/* The map's portaled menus (RadiusCombobox, the custom date range) keep their root class for
+   the ported rules; the wrapper itself must not be a box (ADR 0085). */
+.radius-combobox.radius-portal,
+.map-panel.map-portal {
+  display: contents;
+}

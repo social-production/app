@@ -13,11 +13,8 @@
   import MobileMoreSheet from '#lib/components/shell/MobileMoreSheet.svelte';
   import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
-  import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
   import { connect } from '#lib/services/account.ts';
-  import { myNotifications } from '#lib/services/notifications.ts';
   import { getPerson } from '#lib/services/people.ts';
-  import { unreadMessageCount } from '#lib/services/unread.ts';
   import { applyAppearance, appearance } from '#lib/stores/appearance.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -30,6 +27,8 @@
 
   import { refreshActivityRail, startActivityRail } from './activityRailLoop.ts';
   import AuthActionNotice from './AuthActionNotice.svelte';
+  import { startBell } from './bellLoop.ts';
+  import { MapToggle } from './mapToggle.svelte.ts';
   import { createLinks, surfaceLinks } from './createLinks.ts';
   import { railLinks, startMyScopes } from './myScopesLoop.ts';
   import { provideShellContexts } from './shellContexts.ts';
@@ -40,7 +39,7 @@
   import '#lib/components/styles/additions.css';
 
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
-  let { children }: { children: Snippet } = $props();
+  let { children, mapPanel }: { children: Snippet; mapPanel?: Snippet<[() => void]> } = $props();
   provideShellContexts();
 
   let compact = $state(true);
@@ -48,6 +47,13 @@
   let rightOpen = $state(false);
   let moreOpen = $state(false);
   let discoverOpen = $state(false);
+  // web's map panel over the content, or the `/map` page (mapToggle.ts, ADR 0085).
+  const mapPage = $derived(page.url.pathname === '/map');
+  const map = new MapToggle(
+    () => ({ left: leftOpen, right: rightOpen, compact }),
+    (r) => ([leftOpen, rightOpen] = [r.left, r.right]),
+    () => ({ path: page.url.pathname, mapPage }),
+  );
 
   const signedIn = $derived(connection.current.status === 'connected');
   // web's isAuthSurface: onboarding shows only the brand (no rails, bottom nav or "+").
@@ -102,28 +108,9 @@
     void connect();
   });
 
-  // The bell's and the send icon's counts stay fresh while someone is signed in (every 30 s
-  // while visible). The Messages page keeps the send icon's count itself, as on web.
+  // The bell's and the send icon's counts (bellLoop.ts).
   $effect(() => {
-    if (!signedIn) return;
-    const refresh = async (): Promise<void> => {
-      const onMessages = page.url.pathname.startsWith('/messages');
-      const [items, unread] = await Promise.allSettled([
-        myNotifications(bell.notificationsOff.categories),
-        onMessages ? null : unreadMessageCount(),
-      ]);
-      // A failed round keeps the old count; the next round tries again.
-      if (items.status === 'fulfilled') bell.showNotifications(items.value.items);
-      if (unread.status === 'fulfilled' && unread.value !== null)
-        messageBadge.unread = unread.value;
-    };
-    untrack(() => void refresh());
-    const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
-    return () => {
-      stop();
-      bell.showNotifications([]);
-      messageBadge.unread = 0;
-    };
+    if (signedIn) return untrack(() => startBell(() => page.url.pathname.startsWith('/messages')));
   });
 
   // web's left rail lists the channels and communities you joined (ADR 0068).
@@ -198,6 +185,8 @@
   class="shell"
   data-signed-in={signedIn}
   class:shell-compact={compact}
+  class:shell-map-open={map.open || mapPage}
+  class:shell-map-page={mapPage}
   class:feed-chrome-collapsed={immersive}
   style={`--left-width: ${leftOpen && !compact && !authSurface ? '262px' : '0px'}; --right-width: ${rightOpen && !compact && !authSurface ? '292px' : '0px'}; --topbar-height: ${shellTopbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${bottomNav === '0px' ? 'var(--shell-safe-bottom)' : '0px'}; --main-frame-max-width: ${frameMaxWidth};`}
 >
@@ -214,6 +203,8 @@
     {isActive}
     {toggleLeft}
     {toggleRight}
+    mapOpen={map.open}
+    toggleMap={() => map.toggle()}
     onSearch={(q) => goto(resolve(`/search?q=${encodeURIComponent(q)}`))}
     onSignIn={() => goto(resolve('/onboarding'))}
     auth={authSurface}
@@ -228,7 +219,11 @@
     ></button>
   {/if}
 
-  <div class="content-grid">
+  <section class="map-overlay" class:map-overlay--open={map.open} aria-hidden={!map.open}>
+    {#if map.open}{@render mapPanel?.(() => map.close())}{/if}
+  </section>
+
+  <div class="content-grid" class:content-grid--map-open={map.open || mapPage}>
     <aside class="rail left-rail" data-open={leftOpen && !authSurface}>
       {#if !authSurface}
         <LeftRail
