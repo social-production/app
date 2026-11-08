@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { fillChip, placeLabel, signupTone, type Activity } from '#lib/domain/activities.ts';
   import { clockTime, dateLine, multiDayEnd, zoneOf } from '#lib/domain/activityTime.ts';
@@ -53,6 +54,15 @@
   const mapHref = $derived(
     `https://www.openstreetmap.org/search?query=${encodeURIComponent(a.place)}`,
   );
+
+  /** web's `showOnMap`: a plain click opens the app's map on the place (ADR 0085). */
+  const map = placeOnMap();
+  function showOnMap(event: MouseEvent): void {
+    if (!map || event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    open = false;
+    map.show(a.place);
+  }
 
   /** web's shareLink: the system share sheet, else the link copied. */
   async function share(): Promise<void> {
@@ -120,7 +130,8 @@
             href={mapHref}
             title="Show on map"
             target="_blank"
-            rel="noopener noreferrer">{place}</a
+            rel="noopener noreferrer"
+            onclick={showOnMap}>{place}</a
           >
           <!-- eslint-enable svelte/no-navigation-without-resolve -->
         {:else}
