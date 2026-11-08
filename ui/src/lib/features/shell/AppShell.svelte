@@ -146,9 +146,10 @@
   });
 
   // web's isFeedDiscoveryPath: the "+" sits on the feed, platform and profile pages (and
-  // channel/community feeds once they exist), never on onboarding.
+  // channel/community feeds once they exist), never on onboarding or over the map.
   const showCreateFab = $derived(
     !authSurface &&
+      !map.open &&
       (['/', '/platform', '/profile'].includes(page.url.pathname) ||
         /^\/(profile|channels|communities)\/[^/]+$/.test(page.url.pathname)),
   );

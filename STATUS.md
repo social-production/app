@@ -50,13 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 5a, the map panel (ADR 0085), branch `claude/social-production-handoff-dsam61`
-Port web's map: `maplibre-gl@6.9.0`, `ui/src/lib/maps/` (web's `maps/{types,adapter,geo,maplibre}.ts`,
-split under 300 lines), `ui/src/lib/features/map/` (web's `MapPanel.svelte`, 1825 lines, split),
-`MapDiscoveryCard`, `location/{radius,mapPreferences}.ts`, `stores/mapFocus.ts`, the top bar's
-map button (a disabled stub in `components/shell/Topbar.svelte` today), the overlay (web's CSS
-is already in `shell.css`), `/map`. The layout route hands the panel to the shell (features
-can't import each other). Services read `/index/map-markers` (micros → ISO). Then 5b.
+## In flight: M6 phase 5a, the map panel (ADR 0085), PR from `claude/social-production-handoff-dsam61`
+Open the PR, wait for CI, merge, smoke the live map (top bar → map; `/map`). Then **5b**:
+web's "Open as list" button (`openRegionalFeed`, left out of 5a because the feed has no Region
+scope yet), the feed's Region scope (`/index/region`, ADR 0084) with web's
+`ProjectActivityCard` and distances, and `openPlaceOnMap` from project, event and activity
+pages (the store, `stores/mapFocus.svelte.ts`, and the shell's opening are already in 5a).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -82,6 +81,33 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-08: M6 phase 5a, the map panel (ADR 0085), not yet merged
+- `maplibre-gl@6.9.0` (web's). `ui/src/lib/maps/`: web's adapter split (`types`, `geo`,
+  `markerLook`, `markerElement`, `stacking`, `pins`, `tooltip`, `load` (Carto, fallback demo
+  style), `maplibre` (a class: eslint counts a closure's inner functions against the outer
+  one), `adapter`). Pins navigate with SvelteKit's `goto`, not a page load (a reload would
+  reconnect to Holochain).
+- `features/map/`: web's MapPanel as `panelState.svelte.ts` (state), `mapView.ts` (camera,
+  radius, viewport adoption), `markerLoader.ts` (markers, broadening, anchor, first centre,
+  "show on map"), `MapPanel.svelte`, `MapFilters.svelte` (desktop bar and overlay),
+  `MapResults.svelte`, `MapHost.svelte` (lazy import, so maplibre is its own chunk).
+  `components/map/{RadiusCombobox,MapDiscoveryCard}.svelte`; CSS via PORTS → `styles/map.css`
+  (portaled menus keep their root class through a `display: contents` wrapper, additions.css).
+- The shell: the Topbar's map button works; `features/shell/mapToggle.svelte.ts` opens and
+  closes the overlay (rails remembered on desktop, closes on navigation, opens on
+  `openPlaceOnMap`); the root layout hands `MapHost` to AppShell as a snippet (features can't
+  import each other); `/map` route. The "+" hides while the map is open (web). AppShell's
+  bell poll moved to `bellLoop.ts` to stay under 300 lines.
+- No toast host in the app: "Could not find X on the map" shows in the map's own toast.
+- **Checked:** `npm run check -w ui` (0), `npm run lint -w ui`, boundaries, sizes, a UI build
+  (worker and panel CSS are lazy chunks); new `tests/e2e/map.mjs` **passed** against a local
+  seed node (project at a searched Fitzroy place → listed 0.1 km away on the map, a saved
+  filter survives `/map`, the phone layout, a result opens the project), with `shell.mjs` and
+  `accounts.mjs`. Carto tiles loaded from the sandbox. **Not run:** scenarios (no zome change).
+- **Seen, left as web:** resizing a desktop window to phone width can change the radius
+  (MapLibre passes the window resize as the move's `originalEvent`, so it counts as the
+  person's zoom); web has the same logic.
 
 ## Done 2026-11-08: M6 phase 4c merged (PR #121, 22:46 UTC = 9:46 am Melbourne)
 - CI green on the first run (~98 min). The seed node restarted ~22:58 UTC (514 MB). No reset.

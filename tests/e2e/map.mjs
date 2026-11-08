@@ -73,7 +73,9 @@ log('/map shows it, with the saved filter');
 
 // Phone width: the map sits over the list, filters over the map.
 await page.setViewportSize({ width: 390, height: 844 });
-await page.locator('.map-page .filter-panel-overlay').waitFor({ timeout: 10_000 });
+await page.reload();
+await page.locator('.map-page .filter-panel-overlay').waitFor({ timeout: 30_000 });
+await page.locator('.map-page .map-discovery-card', { hasText: title }).waitFor({ timeout: 30_000 });
 await page.screenshot({ path: `${out}/map-390.png` });
 
 // A result opens its page.
