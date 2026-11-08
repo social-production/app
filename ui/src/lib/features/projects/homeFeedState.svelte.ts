@@ -5,6 +5,7 @@ import {
   type HomeFeedRow,
 } from '#lib/domain/homeFeed.ts';
 import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/projects.ts';
+import type { RegionLink } from '#lib/domain/regionFeed.ts';
 import { scopeTag } from '#lib/domain/scopes.ts';
 import { communityEventCards } from '#lib/services/closedCommunities.ts';
 import { followCircles } from '#lib/services/follows.ts';
@@ -12,6 +13,7 @@ import { myAgent } from '#lib/services/people.ts';
 import { myScopes } from '#lib/services/scopes.ts';
 
 import { FeedState } from './feedState.svelte.ts';
+import { RegionFeedState } from './regionState.svelte.ts';
 
 const KEYS = { scope: 'sp_feed_scope', audience: 'sp_home_audience' };
 
@@ -48,10 +50,12 @@ function matching(cards: ProjectCard[], q: string): ProjectCard[] {
  * are kept per device (web keeps them in its settings).
  */
 export class HomeFeedState {
-  scope = $state<FeedScope>(read(KEYS.scope, ['home', 'global'], 'global'));
+  scope = $state<FeedScope>(read(KEYS.scope, ['home', 'global', 'region'], 'global'));
   audience = $state<HomeAudience>(read(KEYS.audience, ['following', 'popular'], 'popular'));
   readonly public = new FeedState(() => this.search());
   readonly personal = new FeedState(() => '');
+  /** web's Region scope (ADR 0084): its own centre, radius and pages. */
+  readonly region = new RegionFeedState(() => ({ sort: this.sort, window: this.window }));
   private signedIn = $state(false);
   /** Home: events listed on your private communities (ADR 0069), read from their networks. */
   private communityEvents = $state<ProjectCard[]>([]);
@@ -68,21 +72,34 @@ export class HomeFeedState {
 
   /** What the stack shows: Home before the first load settles shows "Loading feed...". */
   /** Signed out, Home shows Global as on web (the choice is kept for when you sign in). */
-  readonly shownScope = $derived<FeedScope>(this.signedIn ? this.scope : 'global');
+  /** Region works signed out too (web); Home needs an account. */
+  readonly shownScope = $derived<FeedScope>(
+    this.signedIn || this.scope === 'region' ? this.scope : 'global',
+  );
 
   readonly rows = $derived.by((): HomeFeedRow[] => {
     const shown =
-      this.shownScope === 'home'
-        ? [...this.public.items, ...matching(this.communityEvents, this.search())]
-        : this.public.items;
+      this.shownScope === 'region'
+        ? this.region.items
+        : this.shownScope === 'home'
+          ? [...this.public.items, ...matching(this.communityEvents, this.search())]
+          : this.public.items;
     if (!this.signedIn) return mergeHomeFeed(shown, [], 'trending');
     const sort = this.public.sort === 'recent' ? 'recent' : 'trending';
     return mergeHomeFeed(shown, this.personal.items, sort);
   });
 
-  readonly loading = $derived(this.public.loading || this.personal.loading);
-  readonly error = $derived(this.public.error ?? this.personal.error);
-  readonly hasMore = $derived(this.public.hasMore || (this.signedIn && this.personal.hasMore));
+  private readonly regional = $derived(this.shownScope === 'region');
+  readonly loading = $derived(
+    (this.regional ? this.region.loading : this.public.loading) || this.personal.loading,
+  );
+  readonly error = $derived(
+    (this.regional ? this.region.error : this.public.error) ?? this.personal.error,
+  );
+  readonly hasMore = $derived(
+    (this.regional ? this.region.hasMore : this.public.hasMore) ||
+      (this.signedIn && this.personal.hasMore),
+  );
 
   async reload(signedIn: boolean): Promise<void> {
     this.signedIn = signedIn;
@@ -92,8 +109,9 @@ export class HomeFeedState {
   }
 
   async more(): Promise<void> {
+    const shown = this.regional ? this.region : this.public;
     await Promise.all([
-      this.public.hasMore ? this.public.more() : undefined,
+      shown.hasMore ? shown.more() : undefined,
       this.signedIn && this.personal.hasMore ? this.personal.more() : undefined,
     ]);
   }
@@ -102,6 +120,15 @@ export class HomeFeedState {
     this.scope = scope;
     keep(KEYS.scope, scope);
     return this.reload(this.signedIn);
+  }
+
+  /** The map's "Open as list": Region on the link's place, radius and window. */
+  openRegion(link: RegionLink, signedIn: boolean): Promise<void> {
+    this.signedIn = signedIn;
+    this.region.follow(link);
+    const window = ['today', 'week', 'month', 'all'].find((w) => w === link.window);
+    if (window) this.public.window = window as FeedWindow;
+    return this.setScope('region');
   }
 
   setAudience(audience: HomeAudience): Promise<void> {
@@ -126,6 +153,7 @@ export class HomeFeedState {
 
   private async reloadPublic(): Promise<void> {
     this.communityEvents = [];
+    if (this.shownScope === 'region') return this.region.reload();
     if (this.shownScope === 'global') {
       this.public.tag = undefined;
       return this.public.reload();

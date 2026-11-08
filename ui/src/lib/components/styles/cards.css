@@ -1812,3 +1812,40 @@
   font-weight: 700;
   text-decoration: underline;
 }
+
+/* Ported from web/src/lib/components/cards/public-feed/ProjectActivityCard.svelte (ADR 0032, scripts/port-styles.py) */
+.project-activity-card .parent-title {
+  margin: 0 0 4px;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.project-activity-card .title {
+  display: block;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
+  text-decoration: none;
+  line-height: 1.35;
+}
+
+.project-activity-card .detail-row {
+  margin: 4px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.project-activity-card .detail-row.time {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.project-activity-card .detail-row.location,
+.project-activity-card .detail-row.footer {
+  color: var(--text-muted);
+}
+
+.project-activity-card .detail-row.footer {
+  font-size: 11px;
+}

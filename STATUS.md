@@ -50,18 +50,19 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: a map fix (the panel waited for no connection), branch `claude/social-production-handoff-dsam61`
-PR #123 (5a) merged 02:57 UTC and is live, but live `map.mjs` failed at `/map`: after a page
-load the panel read the viewer's key before the connection opened, so it used the anonymous
-default place and the network hint (the sandbox's San Francisco on live; Worldwide locally,
-which hid it). Fixed: `MapPanel.svelte` starts once `connection.current` settles; `map.mjs`
-now asserts `/map` starts from the saved Fitzroy place (fails without the fix, passes with
-it, locally). Open the PR, merge when green, re-run `map.mjs` live. **Then 5b**: web's "Open
-as list" (`openRegionalFeed`), the feed's Region scope (`/index/region`, ADR 0084) with
-`ProjectActivityCard` and distances, and `openPlaceOnMap` from project, event and activity
-pages (the store and the shell's opening are in 5a).
-- **Lesson:** a page that reads per-account storage on mount must wait for the connection;
-  test such pages after a full page load, not only after in-app navigation.
+## In flight: M6 phase 5b (ADR 0085), PR from `claude/social-production-handoff-dsam61`
+The feed's Region scope, the map's "Open as list", show-on-map from the activity sheet and the
+Venue link (ADR 0085's 5b section). **Checked:** UI check, lint, boundaries, sizes; new
+`tests/e2e/region.mjs` **passed** against a local seed node (Region lists a Fitzroy project
+from the default place; "Open as list" opens Region on the map's place; the Venue link opens
+the map there), with `map.mjs`, `activities.mjs`, `links.mjs`, `projects.mjs`. **Not run:**
+scenarios (no zome change). Merge when green, smoke live (`region.mjs`), then M6 is done:
+update PARITY's summary and pick the next parity item (software PRs, then service requests
+(c) once the owner says who reviews them, ADR 0076).
+- At 390px the Region toolbar's last button (the online list) sits past the edge: the row
+  scrolls sideways, as web's ported CSS does. Not changed.
+- **Lesson (5a):** a page that reads per-account storage on mount must wait for the
+  connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -87,6 +88,10 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-08: the map's connection fix merged (PR #124, 04:55 UTC = 3:55 pm Melbourne)
+- CI green on the first run. Live `map.mjs` **passed** at 04:57 UTC: the top bar's map and
+  `/map` after a page load both start from the saved Fitzroy place and list the new project.
 
 ## Done 2026-11-08: M6 phase 5a merged (PR #123, 02:57 UTC = 1:57 pm Melbourne)
 - CI green on the first run. UI deployed by ~03:15 UTC. Live `map.mjs`: the top bar's map

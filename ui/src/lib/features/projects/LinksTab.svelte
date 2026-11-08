@@ -4,6 +4,7 @@
   import LinksSection from '#lib/components/links/LinksSection.svelte';
   import LinkVoteHistory from '#lib/components/links/LinkVoteHistory.svelte';
   import { LINKS_INTRO } from '#lib/domain/links.ts';
+  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
   import { LinksState } from './linksState.svelte.ts';
@@ -32,6 +33,13 @@
   const frame = $derived(links.frame);
   const venue = $derived(detail.project?.charter?.location_label.trim() ?? '');
 
+  /** web's Venue `onOpen`: a plain click opens the app's map on the place (ADR 0085). */
+  function showVenue(event: MouseEvent): void {
+    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
+    event.preventDefault();
+    openPlaceOnMap(venue);
+  }
+
   async function submit(targetId: string, summary: string): Promise<void> {
     if (await links.propose(targetId, summary)) composing = false;
   }
@@ -48,8 +56,8 @@
       <a
         class="external-link"
         href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(venue)}`}
-        target="_blank"
         rel="noopener noreferrer"
+        onclick={showVenue}
       >
         <strong>Venue</strong>
         <span>{venue}</span>

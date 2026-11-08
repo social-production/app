@@ -31,9 +31,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    2026-11-06. Left: (c) collective services' settings vote, Request service and planning
    (review waits on the owner). web's borrowing/delivery frames are dead code
    (`RequestFrameStack` is imported nowhere): not parity.
-7. **Map + places (M6):** the map panel, LocationPicker, Region scope, Regional settings,
-   project-activity cards, distances. Plan in five phases: `docs/plans/M6-places.md`
-   (rules crate `sp_place` landed 2026-11-06; nothing uses it yet).
+7. **Map + places (M6):** done with phase 5b (2026-11-08, `docs/plans/M6-places.md`, ADR
+   0078–0085): places on records, geocoding, the LocationPicker, Regional settings, map
+   markers, the map panel, the Region scope with project-activity cards, show on map.
 8. **Software projects:** pull requests and the merge flow in the Activity phase.
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
@@ -233,8 +233,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] The blur on hidden detail pages (2026-11-03): web's `ModerationRestrictionNotice`
   (`components/moderation/RestrictionNotice.svelte`) over the title of project, event and help
   request pages, a thread's title and body and a post's body; Reveal / Hide again.
-- [ ] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
-  project-activity cards.
+- [x] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
+  project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
 - [ ] Software project governance (pull requests / merge flow) in the Activity phase.
 - Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
   the platform board, asset-use requests) comes later.
