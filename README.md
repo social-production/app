@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The map (PRs #123 and #124, 2026-11-08 3:55 pm Melbourne, ADR 0085):** the top bar's map
+  button (and `/map`) opens web's map panel: Carto tiles, pins for projects, events, help
+  requests and activities near your place, radius, time window and type filters, and the
+  results list beside the map. It starts from your Regional default place. No network reset.
+  Live `map.mjs` passed. Next: the feed's Region scope and "show on map" links (phase 5b).
 - **The Region feed on the seed node (PR #121, 2026-11-08 9:46 am Melbourne, ADR 0084):** the
   gateway answers web's Region feed (`/index/region`): projects, events and help requests near
   a point, nearest first with their distance, upcoming project activities, and online items
