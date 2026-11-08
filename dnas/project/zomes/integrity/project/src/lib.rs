@@ -3,11 +3,10 @@
 //! the charter's hash (ADR 0065). A private space is a clone whose seed names its creator
 //! (ADR 0030, 0061) and holds that one space under the same rules.
 //! Membership and signals are links from the space to their author, so they need no entries.
-//! Decisions are Proposal → Vote → Outcome records (ADR 0009, ADR 0033). Values and their
-//! importance votes are records too (ADR 0041); links to other projects are proposals (ADR 0042).
-//! Activities and their roles, suggestions and ratings are records; taking a role is a link
-//! (ADR 0056). A personal service's weekly hours are records and its bookings activities
-//! (ADR 0077).
+//! Decisions are Proposal → Vote → Outcome records (ADR 0009, 0033), links to other projects
+//! (ADR 0042) and software pull requests (ADR 0086) among them. Values and importance votes
+//! (ADR 0041), activities with roles, suggestions and ratings (ADR 0056; taking a role is a
+//! link) and a personal service's weekly hours (ADR 0077) are records.
 
 mod activity;
 mod applied;
@@ -22,6 +21,7 @@ mod organizer;
 mod place;
 mod plan;
 mod scope_item;
+mod software;
 mod space;
 mod value;
 
@@ -37,6 +37,7 @@ pub use organizer::{audience, organized, Organizer, OrganizerRole};
 pub use place::Place;
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 pub use scope_item::SEED_MAX as SCOPE_ITEM_SEED_MAX;
+pub use software::SoftwareRequest;
 pub use space::{
     charter_at, creator, creator_in_seed, space_creator, space_in_seed, SPACE_SEED_WORD,
 };
@@ -58,8 +59,7 @@ pub struct Charter {
     pub tags: Vec<String>,
 }
 
-/// What a proposal decides. An edit stores only what changes (as web does), so two passed
-/// edits of different fields never undo each other.
+/// What a proposal decides. An edit stores only what changes (as web does).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub enum ProposalKind {
     Edit {
@@ -94,14 +94,15 @@ pub enum ProposalKind {
     RemoveMember {
         agent: AgentPubKey,
     },
-    /// A service's request settings (web's settings change request, ADR 0076): voted in a
-    /// collective service, saved at once by a personal service's creator.
+    /// Request settings (ADR 0076): voted in a collective service, saved by a personal one's.
     RequestSettings {
         enabled: bool,
         mode: String,
         off_schedule: bool,
         reason: String,
     },
+    /// A software project's pull request, merge, merge capability or repository (ADR 0086).
+    Software(SoftwareRequest),
 }
 
 #[hdk_entry_helper]

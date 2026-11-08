@@ -13,6 +13,10 @@
   import { ActivitiesState, stageOptions } from './activitiesState.svelte.ts';
   import type { DetailState } from './detailState.svelte.ts';
   import ServicePhase from './requests/ServicePhase.svelte';
+  import SoftwareDock from './software/SoftwareDock.svelte';
+  import SoftwarePanel from './software/SoftwarePanel.svelte';
+  import { SoftwareState } from './software/softwareState.svelte.ts';
+  import SoftwareWizard from './software/SoftwareWizard.svelte';
 
   import '#lib/components/styles/activities.css';
 
@@ -60,6 +64,17 @@
     ),
   );
 
+  // A software project's pull requests (ADR 0086), as web shows them above the calendar.
+  const software = $derived(
+    project?.charter?.subtype === 'software' &&
+      ['productive', 'collective-service'].includes(project.charter.mode),
+  );
+  // svelte-ignore state_referenced_locally
+  const sw = new SoftwareState(detail.id);
+  $effect(() => {
+    if (software) void sw.load();
+  });
+
   $effect(() => {
     state.highlighted = page.url.searchParams.get('activity');
     void state.load();
@@ -75,6 +90,20 @@
   <ServicePhase {detail} />
 {:else}
   <section id="participation-activities" class="phase-surface activity-ui">
+    {#if software}
+      {#if sw.governance}
+        <SoftwarePanel {sw} />
+        <SoftwareWizard {sw} />
+      {:else}
+        <div class="software-governance-placeholder">
+          <h3>Software governance</h3>
+          <p>
+            Pull request tools appear here once a leading software plan is approved for this
+            project.
+          </p>
+        </div>
+      {/if}
+    {/if}
     <section class="scheduling-panel">
       <ActivityCalendar
         activities={state.activities}
@@ -87,6 +116,7 @@
         onActivity={focus}
         onCreate={() =>
           state.composing ? (state.composing = false) : state.openComposer(composerDay, planWindow)}
+        extra={software && sw.governance?.canPropose ? dock : undefined}
       />
       <section class="card-rail-section live-section">
         {#if state.error && !state.composing}
@@ -165,3 +195,7 @@
     {/if}
   </section>
 {/if}
+
+{#snippet dock()}
+  <SoftwareDock {sw} />
+{/snippet}

@@ -34,7 +34,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 7. **Map + places (M6):** done with phase 5b (2026-11-08, `docs/plans/M6-places.md`, ADR
    0078–0085): places on records, geocoding, the LocationPicker, Regional settings, map
    markers, the map panel, the Region scope with project-activity cards, show on map.
-8. **Software projects:** pull requests and the merge flow in the Activity phase.
+8. **Software projects** (ADR 0086, `docs/plans/SOFTWARE.md`): the panel, wizard and
+   Repository ▾ in the Activity phase done 2026-11-08 (phases a + b). Left: (c) the rail's
+   pull request rows, History tab / Past activity cards and `pr-approved`.
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
@@ -162,7 +164,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
   the activity's author), Settings' Roles switch, and web's "<role> suggestion declined" card
   to the suggester (the activities view lists declines per role; coordinator only).
-- [ ] Software governance panel (pull requests) in a software project's Activity phase.
+- [x] Software governance panel (pull requests) in a software project's Activity phase
+  (2026-11-08, ADR 0086). Its rail rows, history cards and `pr-approved` are phase (c).
 - [x] History tab (web's `ProjectHistoryTab` / `EventHistoryTab`: Active Decisions and
   Resolutions of edits, updates, phase moves, returns and plans, each opening its vote sheet),
   on projects and events (2026-11-03, PR #90, `components/governance/HistoryTab.svelte`).
@@ -235,7 +238,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   request pages, a thread's title and body and a post's body; Reveal / Hide again.
 - [x] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
   project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
-- [ ] Software project governance (pull requests / merge flow) in the Activity phase.
+- [x] Software project governance (pull requests / merge flow) in the Activity phase
+  (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved` are phase (c)).
 - Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
   the platform board, asset-use requests) comes later.
 - web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the

@@ -15,6 +15,8 @@
     nextLabel: string;
     canGoBack: boolean;
     canGoNext: boolean;
+    /** web's `showFooter`: off when the step has its own actions (a vote); phones keep ×. */
+    showFooter?: boolean;
     onClose: () => void;
     /** Backdrop or Escape: hide, keeping the draft and step. */
     onDismiss: () => void;
@@ -31,6 +33,7 @@
     nextLabel,
     canGoBack,
     canGoNext,
+    showFooter = true,
     onClose,
     onDismiss,
     onBack,
@@ -90,22 +93,26 @@
 
       <div class="wizard-body" bind:this={body}>{@render children()}</div>
 
-      <footer class="wizard-footer">
-        {#if compact}
-          <button
-            aria-label="Close"
-            class="secondary-button wizard-close"
-            type="button"
-            onclick={onClose}>×</button
-          >
-        {/if}
-        {#if canGoBack}
-          <button class="secondary-button" type="button" onclick={onBack}>Back</button>
-        {/if}
-        <button class="primary-button" disabled={!canGoNext} type="button" onclick={onNext}>
-          {nextLabel}
-        </button>
-      </footer>
+      {#if showFooter || compact}
+        <footer class="wizard-footer">
+          {#if compact}
+            <button
+              aria-label="Close"
+              class="secondary-button wizard-close"
+              type="button"
+              onclick={onClose}>×</button
+            >
+          {/if}
+          {#if showFooter && canGoBack}
+            <button class="secondary-button" type="button" onclick={onBack}>Back</button>
+          {/if}
+          {#if showFooter}
+            <button class="primary-button" disabled={!canGoNext} type="button" onclick={onNext}>
+              {nextLabel}
+            </button>
+          {/if}
+        </footer>
+      {/if}
     </div>
   </div>
 {/if}

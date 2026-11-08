@@ -50,16 +50,18 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (M6 is done: PR #125 merged and live; this docs PR follows it).
-**Next: software projects (PARITY item 8),** web's `ProjectSoftwareGovernancePanel.svelte`
-(697 lines), `SoftwareGovernanceWizard.svelte` (699), `RepositoryMenu.svelte` in the Activity
-phase, over web-backend's `app/routers/projects_software.py`: pull requests (propose, vote,
-merge), merge-capability requests (vote) and repository-replacement requests (vote), each with
-web's `APPROVAL_THRESHOLD = 0.66` tally. Start with an ADR and a plan (`docs/plans/`): which
-records the project DNA needs (an integrity change means a reset, so check whether the
-existing proposal/vote entries can carry them, as links and edits did), then the
-coordinator, a scenario, the UI port, browser tests. Then service requests (c) once the owner
-says who reviews them (ADR 0076).
+## In flight: software projects, phases (a) + (b) (ADR 0086, plan `docs/plans/SOFTWARE.md`)
+Branch `claude/social-production-handoff-dsam61`. One PR carries both phases (a CI run is
+~2 h, and (a) alone shows nothing): **(a)** `crates/sp_software` (checks, stages, `replay`),
+`ProposalKind::Software(SoftwareRequest)` in the project integrity zome (**project reset on
+merge**), the governance coordinator's `software.rs` (ledger + `propose`'s refusals) and
+`software_view.rs` (`software` extern), scenario `tests/scenarios/tests/software.rs`;
+**(b)** the UI: `features/projects/software/` (web's panel, wizard, Repository ▾, the dock's
+Pull request button), `domain/software.ts`, `services/software.ts`, styles via PORTS
+(`styles/software.css`), `PlanWizardShell`'s `showFooter`, `ActivityCalendar`'s `extra`
+snippet; browser test `tests/e2e/software.mjs`. See the newest "Done" entry for what was
+checked. **Next after it merges:** phase (c) (rail rows, History tab / Past activity cards,
+`pr-approved`), then service requests (c) once the owner says who reviews them (ADR 0076).
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -87,6 +89,27 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-08: software projects, phases (a) + (b) (ADR 0086), PR open
+- Pull requests, recorded merges, merge capability and repository replacements are one new
+  proposal kind (`ProposalKind::Software`), voted like any other (no author vote, as on
+  web); a recorded merge is its own proposal whose vote is web's confirmation. The governance
+  coordinator replays them with the production/operations plan's lead changes
+  (`sp_software::replay`) into web's stages, mergers (web's source labels) and repository.
+- UI: web's panel (repository + mergers card, In-progress pull requests with stage dots,
+  replacement history), its wizard's five modes, Repository ▾ and the Pull request button
+  beside Add activity, for productive projects and collective services whose subtype is
+  software. `PlanWizardShell` gained web's `showFooter`; `ActivityCalendar` an `extra` snippet.
+- **Checked:** `cargo test -p sp_software` (6), workspace clippy `-D warnings` and `cargo fmt
+  --all --check` in Nix (`CARGO_INCREMENTAL=0`, debug info off), `build-happ.sh`; scenario
+  `software` **passed** locally (533 s); `npm run check -w ui` (0), `npm run lint -w ui`,
+  boundaries, sizes; against a local seed node `software.mjs` **passed** (plan → Activity →
+  PR → both approve → Ann records the merge → both confirm → it leaves the list; Bob's
+  Repository ▾) and `activities.mjs` **passed** (the calendar and wizard shell changed).
+  **Not run:** the other scenario files (CI runs them).
+- **Project integrity change: merging resets the project network.**
+- **Lesson:** a browser test started while a scenario runs can time out signing in (the
+  conductors starve each other); run them one after another.
 
 ## Done 2026-11-08: the map's connection fix merged (PR #124, 04:55 UTC = 3:55 pm Melbourne)
 - CI green on the first run. Live `map.mjs` **passed** at 04:57 UTC: the top bar's map and

@@ -90,13 +90,17 @@ pub struct ProposalView {
     pub can_challenge: bool,
 }
 
-/// Every proposal except plans and links (they have their own boards), newest first.
+/// Every proposal except plans, links and software requests (they have their own boards),
+/// newest first.
 pub fn list_proposals() -> ExternResult<Vec<ProposalView>> {
     let me = agent_info()?.agent_initial_pubkey;
     let roll = Roll::load()?;
     let mut out = Vec::new();
     for p in reads::proposals()? {
-        if matches!(p.entry.kind, ProposalKind::Plan(_) | ProposalKind::Link(_)) {
+        if matches!(
+            p.entry.kind,
+            ProposalKind::Plan(_) | ProposalKind::Link(_) | ProposalKind::Software(_)
+        ) {
             continue;
         }
         let t = tally_view(&p, &me, &roll)?;

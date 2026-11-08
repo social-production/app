@@ -34,10 +34,8 @@ pub fn validate_proposal(
             return invalid("a phase move cites a plan proposal");
         }
     }
-    if let ProposalKind::Link(link) = &p.kind {
-        if let Err(reason) = crate::link::check(link, &p.space)? {
-            return invalid(&reason);
-        }
+    if let Err(reason) = check_cited(p)? {
+        return invalid(&reason);
     }
     let at = Some(action.timestamp());
     let mirrored = matches!(&p.kind, ProposalKind::Link(l) if l.source.is_some());
@@ -78,6 +76,15 @@ pub fn validate_proposal(
     Ok(ValidateCallbackResult::Valid)
 }
 
+/// What a link or a software request cites must exist as it says (ADR 0042, 0086).
+fn check_cited(p: &Proposal) -> ExternResult<Result<(), String>> {
+    match &p.kind {
+        ProposalKind::Link(link) => crate::link::check(link, &p.space),
+        ProposalKind::Software(request) => crate::software::check_cited(request, &p.space),
+        _ => Ok(Ok(())),
+    }
+}
+
 fn check_kind(kind: &ProposalKind) -> Result<(), String> {
     let within =
         |text: &Option<String>, max: usize| text.as_ref().is_none_or(|t| t.chars().count() <= max);
@@ -116,6 +123,7 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             Ok(())
         }
         ProposalKind::Plan(plan) => crate::plan::check(plan),
+        ProposalKind::Software(request) => crate::software::check(request),
         ProposalKind::Return { to, reason } => {
             if Phase::parse(to).is_none() {
                 return Err("unknown phase".into());
@@ -251,6 +259,9 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
             reason,
             ..
         } => sp_service::check_settings(mode, requests, reason),
+        ProposalKind::Software(_) if !sp_software::takes_software(mode) => {
+            Err("only productive projects and collective services take software proposals".into())
+        }
         _ => Ok(()),
     }
 }

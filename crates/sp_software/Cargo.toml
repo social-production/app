@@ -1,0 +1,12 @@
+[package]
+name = "sp_software"
+description = "Rules for software projects' pull requests, merges and repository (web-backend's projects_software, ADR 0086). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+serde = { workspace = true }
+
+[lints]
+workspace = true

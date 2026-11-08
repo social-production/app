@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
@@ -28,6 +30,8 @@
     onCreate: () => void;
     /** A personal service's slots are green while open (web's slot `statusTone`). */
     toneOf?: ToneOf;
+    /** web's `dock-extra` slot: a software project's Pull request and Repository ▾. */
+    extra?: Snippet | undefined;
   }
 
   let p: Props = $props();
@@ -188,14 +192,19 @@
   </div>
 </div>
 
-{#if p.canCreate}
+{#if p.canCreate || p.extra}
   <PhaseWorkToolbar>
-    <RoundPlusButton
-      standout
-      active={p.createActive}
-      label="Add activity"
-      ariaLabel="Add activity"
-      onclick={p.onCreate}
-    />
+    {#if p.canCreate}
+      <RoundPlusButton
+        standout
+        active={p.createActive}
+        label="Add activity"
+        ariaLabel="Add activity"
+        onclick={p.onCreate}
+      />
+    {/if}
+    {#snippet governance()}
+      {@render p.extra?.()}
+    {/snippet}
   </PhaseWorkToolbar>
 {/if}
