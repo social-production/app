@@ -51,10 +51,10 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: M6 phase 5b (ADR 0085), branch `claude/social-production-handoff-dsam61`
-web's "Open as list" in the map's filters (`openRegionalFeed`: `/?scope=region&lat=&lon=&place=
-&radius=&window=&filter=`), the feed's Region scope (`/index/region`, ADR 0084) with web's
-`ProjectActivityCard` and distances on cards, and `openPlaceOnMap` from project, event and
-activity pages (the store `stores/mapFocus.svelte.ts` and the shell's opening are in 5a).
+Written: the feed's Region scope, the map's "Open as list", show-on-map from the activity
+sheet and the Venue link (ADR 0085's 5b section). UI check, lint, boundaries, sizes clean.
+Next: run the new `tests/e2e/region.mjs` (and `map.mjs`, `activities.mjs`, `links.mjs`)
+against a local seed node, open the PR, merge when green, smoke live.
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90

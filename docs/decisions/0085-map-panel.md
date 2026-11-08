@@ -34,6 +34,19 @@ map button as a disabled stub; the shell already carries web's map-overlay CSS.
   feed's Region scope (`/index/region`, ADR 0084) with web's `ProjectActivityCard`, and
   distances on cards.
 
+## 5b (2026-11-08)
+- **Region scope** in the feed's scope menu (`features/projects/regionState.svelte.ts`,
+  `RegionControls.svelte`): web's radius, place search (sets your default place), device
+  location and "Include online list"; it starts from your default place once the connection
+  settles. Region rows merge with the personal rows as web's combined feed does; project
+  activities render as web's `ProjectActivityCard`. web keeps feed choices in the URL; the
+  app keeps them per device (as Home/Global already are) and reads web's
+  `?scope=region&lat=&lon=&place=&radius=&window=` link, which the map's "Open as list" makes.
+- **Show on map:** components reach the map through a context the shell provides
+  (`components/map/placeOnMap.ts`, like the paused badge's); the activity sheet's place and
+  the Links tab's Venue open the app's map on the place (by label, as web), and modifier
+  clicks still open OpenStreetMap.
+
 ## Consequences
 - The UI bundle gains maplibre (~800 KB minified) in its own chunk, fetched when the map
   first opens. Browser tests stub tiles (no Carto from the sandbox) and check markers and
