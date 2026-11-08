@@ -50,11 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #121 merged and live; this docs PR follows it).
-**Next:** phase 5, the map panel (`docs/plans/M6-places.md`): maplibre-gl + Carto (the UI's
-CSP must allow `basemaps.cartocdn.com`), the top bar's map button, `openPlaceOnMap`, the Region
-scope in the feed's scope menu (reads `/index/region`, ADR 0084's shape), distances on cards.
-Start with its ADR; port web's `features/map/MapPanel.svelte` (1825 lines: split it).
+## In flight: M6 phase 5a, the map panel (ADR 0085), branch `claude/social-production-handoff-dsam61`
+Port web's map: `maplibre-gl@6.9.0`, `ui/src/lib/maps/` (web's `maps/{types,adapter,geo,maplibre}.ts`,
+split under 300 lines), `ui/src/lib/features/map/` (web's `MapPanel.svelte`, 1825 lines, split),
+`MapDiscoveryCard`, `location/{radius,mapPreferences}.ts`, `stores/mapFocus.ts`, the top bar's
+map button (a disabled stub in `components/shell/Topbar.svelte` today), the overlay (web's CSS
+is already in `shell.css`), `/map`. The layout route hands the panel to the shell (features
+can't import each other). Services read `/index/map-markers` (micros → ISO). Then 5b.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If

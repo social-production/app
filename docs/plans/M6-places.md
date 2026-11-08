@@ -46,8 +46,9 @@ done. Each phase starts with its ADR and ships as its own PR. Port from web only
 4. **Index** (4a 2026-11-07, ADR 0082: cards carry places, `/index/map-markers` for projects,
    events, help requests; 4b (ADR 0083): activity markers, Open spots, windows; 4c (ADR 0084): the Region feed, `/index/region`): the gateway index reads places; `/index/map-markers` and the Region feed with
    web's visibility rules (private spaces' places never leave their members).
-5. **Map panel**: maplibre-gl + Carto (the UI's CSP/hosts must allow `basemaps.cartocdn.com`),
-   the top bar's map button, `openPlaceOnMap`, distances on cards, Region in the scope menu.
+5. **Map panel** (ADR 0085): maplibre-gl + Carto, web's adapter. **5a**: the panel, the top bar's
+   map button, `/map`, markers and the discovery list. **5b**: `openPlaceOnMap`, distances on
+   cards, Region in the scope menu (`/index/region`, ADR 0084).
 
 ## Open questions (decide in the phase's ADR)
 - Coordinates on a public DHT are public: web keeps private spaces' coordinates off the map;
