@@ -50,11 +50,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 5b (ADR 0085), branch `claude/social-production-handoff-dsam61`
-Written: the feed's Region scope, the map's "Open as list", show-on-map from the activity
-sheet and the Venue link (ADR 0085's 5b section). UI check, lint, boundaries, sizes clean.
-Next: run the new `tests/e2e/region.mjs` (and `map.mjs`, `activities.mjs`, `links.mjs`)
-against a local seed node, open the PR, merge when green, smoke live.
+## In flight: M6 phase 5b (ADR 0085), PR from `claude/social-production-handoff-dsam61`
+The feed's Region scope, the map's "Open as list", show-on-map from the activity sheet and the
+Venue link (ADR 0085's 5b section). **Checked:** UI check, lint, boundaries, sizes; new
+`tests/e2e/region.mjs` **passed** against a local seed node (Region lists a Fitzroy project
+from the default place; "Open as list" opens Region on the map's place; the Venue link opens
+the map there), with `map.mjs`, `activities.mjs`, `links.mjs`, `projects.mjs`. **Not run:**
+scenarios (no zome change). Merge when green, smoke live (`region.mjs`), then M6 is done:
+update PARITY's summary and pick the next parity item (software PRs, then service requests
+(c) once the owner says who reviews them, ADR 0076).
+- At 390px the Region toolbar's last button (the online list) sits past the edge: the row
+  scrolls sideways, as web's ported CSS does. Not changed.
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
