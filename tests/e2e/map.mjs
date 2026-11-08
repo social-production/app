@@ -68,8 +68,16 @@ const prefs = await page.evaluate(() =>
   Object.entries(localStorage).find(([k]) => k.startsWith('sp_map_preferences_'))?.[1],
 );
 assert.equal(JSON.parse(prefs ?? '{}').entityFilter, 'projects');
+// After a page load the panel waits for the connection, then starts from this person's
+// default place (not the anonymous one, which would fall back to the network's hint).
+const place = page.locator('.map-page').getByRole('textbox', { name: 'Place' }).first();
+await page.waitForFunction(
+  (el) => el?.value.includes('Fitzroy'),
+  await place.elementHandle(),
+  { timeout: 30_000 },
+);
 await page.locator('.map-page .map-discovery-card', { hasText: title }).waitFor({ timeout: 30_000 });
-log('/map shows it, with the saved filter');
+log('/map starts from the saved place and shows it, with the saved filter');
 
 // Phone width: the map sits over the list, filters over the map.
 await page.setViewportSize({ width: 390, height: 844 });

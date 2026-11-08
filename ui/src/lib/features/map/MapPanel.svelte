@@ -104,9 +104,18 @@
     initialLoadDone = true;
   }
 
-  onMount(() => {
+  // Start once the connection settles, so a signed-in person's saved place and filters are
+  // read under their key (straight after a page load the connection is still opening).
+  let started = false;
+  $effect(() => {
     const current = connection.current;
+    if (started || current.status === 'connecting') return;
+    started = true;
     s.me = current.status === 'connected' ? current.agent : null;
+    untrack(() => void start());
+  });
+
+  onMount(() => {
     const phone = window.matchMedia('(max-width: 760px)');
     const narrow = window.matchMedia('(max-width: 900px)');
     const sync = (): void => {
@@ -123,7 +132,6 @@
     narrow.addEventListener('change', sync);
     window.addEventListener('resize', sync);
     document.addEventListener('click', closeDates);
-    void start();
     return () => {
       phone.removeEventListener('change', sync);
       narrow.removeEventListener('change', sync);

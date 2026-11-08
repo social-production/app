@@ -50,12 +50,18 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 5a, the map panel (ADR 0085), PR from `claude/social-production-handoff-dsam61`
-Open the PR, wait for CI, merge, smoke the live map (top bar → map; `/map`). Then **5b**:
-web's "Open as list" button (`openRegionalFeed`, left out of 5a because the feed has no Region
-scope yet), the feed's Region scope (`/index/region`, ADR 0084) with web's
+## In flight: a map fix (the panel waited for no connection), branch `claude/social-production-handoff-dsam61`
+PR #123 (5a) merged 02:57 UTC and is live, but live `map.mjs` failed at `/map`: after a page
+load the panel read the viewer's key before the connection opened, so it used the anonymous
+default place and the network hint (the sandbox's San Francisco on live; Worldwide locally,
+which hid it). Fixed: `MapPanel.svelte` starts once `connection.current` settles; `map.mjs`
+now asserts `/map` starts from the saved Fitzroy place (fails without the fix, passes with
+it, locally). Open the PR, merge when green, re-run `map.mjs` live. **Then 5b**: web's "Open
+as list" (`openRegionalFeed`), the feed's Region scope (`/index/region`, ADR 0084) with
 `ProjectActivityCard` and distances, and `openPlaceOnMap` from project, event and activity
-pages (the store, `stores/mapFocus.svelte.ts`, and the shell's opening are already in 5a).
+pages (the store and the shell's opening are in 5a).
+- **Lesson:** a page that reads per-account storage on mount must wait for the connection;
+  test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -82,7 +88,12 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-08: M6 phase 5a, the map panel (ADR 0085), not yet merged
+## Done 2026-11-08: M6 phase 5a merged (PR #123, 02:57 UTC = 1:57 pm Melbourne)
+- CI green on the first run. UI deployed by ~03:15 UTC. Live `map.mjs`: the top bar's map
+  listed the new project (live markers work), then `/map` after a page load started from the
+  wrong place (fixed above).
+
+## Done 2026-11-08: M6 phase 5a, the map panel (ADR 0085)
 - `maplibre-gl@6.9.0` (web's). `ui/src/lib/maps/`: web's adapter split (`types`, `geo`,
   `markerLook`, `markerElement`, `stacking`, `pins`, `tooltip`, `load` (Carto, fallback demo
   style), `maplibre` (a class: eslint counts a closure's inner functions against the outer
