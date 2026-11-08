@@ -50,12 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: M6 phase 4c, the Region feed (ADR 0084), branch `claude/social-production-handoff-dsam61`
-`GET /index/region` (gateway only): web's `/feeds/region` over the index (`node/region.rs`,
-`routes/region.rs`, tests `node/region_tests.rs`). Open a PR, wait for CI, merge, smoke
-`/index/region?lat=-37.8&lon=144.98` live.
-**Next after it:** phase 5, the map panel (maplibre + Carto) that reads markers, Region in the
-feed's scope menu (reads `/index/region`), distances on cards.
+## In flight: nothing (PR #121 merged and live; this docs PR follows it).
+**Next:** phase 5, the map panel (`docs/plans/M6-places.md`): maplibre-gl + Carto (the UI's
+CSP must allow `basemaps.cartocdn.com`), the top bar's map button, `openPlaceOnMap`, the Region
+scope in the feed's scope menu (reads `/index/region`, ADR 0084's shape), distances on cards.
+Start with its ADR; port web's `features/map/MapPanel.svelte` (1825 lines: split it).
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
   (a join) and PR #97 (`create_charter`); `Net::setup_call` retries a setup call refused
   unrun with `BadNonce` (up to 3 tries), and `Net::join` and the charter go through it. If
@@ -82,7 +81,14 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-07: M6 phase 4c, the Region feed (ADR 0084), not yet merged
+## Done 2026-11-08: M6 phase 4c merged (PR #121, 22:46 UTC = 9:46 am Melbourne)
+- CI green on the first run (~98 min). The seed node restarted ~22:58 UTC (514 MB). No reset.
+  Live `/index/region?lat=-37.8&lon=144.98` listed the two Fitzroy "Tool library" test
+  projects at 0.0 km once the archivist's first round ran (empty for the first ~minute);
+  lat −137.8 refused with `region_coordinates_out_of_range`; `filter=events&include_online=true`
+  was empty (no live event has a place or an online place yet).
+
+## Done 2026-11-07: M6 phase 4c, the Region feed (ADR 0084)
 - `/index/region`: web's parameters (`lat`, `lon`, `radius_km`, `sort`, `window`, `filter`,
   `include_online`, `limit` ≤100, `offset`, plus `tzOffset`), the map's refusal codes
   (`map.rs::checked_area`). Nearest first, then by time; project activities at their *own*

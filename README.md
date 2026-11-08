@@ -8,12 +8,17 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-07)
+## Status (2026-11-08)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The Region feed on the seed node (PR #121, 2026-11-08 9:46 am Melbourne, ADR 0084):** the
+  gateway answers web's Region feed (`/index/region`): projects, events and help requests near
+  a point, nearest first with their distance, upcoming project activities, and online items
+  when asked. The feed's Region scope and the map panel come next (M6 phase 5). No network
+  reset. Live Region feed answered.
 - **Activity markers and time windows (PR #119, 2026-11-07 11:53 pm Melbourne, ADR 0083):**
   map markers also pin scheduled activities (at their own place or their project's), show
   "Open spots" on collective services with unfilled activities, and keep to today / this week /
