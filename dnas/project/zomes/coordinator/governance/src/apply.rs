@@ -17,6 +17,8 @@ pub struct State {
     pub charter: Option<Charter>,
     pub applied: Applied,
     pub approved: Vec<Approved>,
+    /// Passed software proposals and when they passed (replayed by `software`, ADR 0086).
+    pub software: Vec<(ActionHash, Timestamp)>,
 }
 
 impl State {
@@ -57,6 +59,11 @@ pub fn state(standing: &mut Standing, roll: &Roll) -> ExternResult<State> {
     let charter = calls::base_charter()?;
     let mode = charter.as_ref().map_or("", |c| c.mode.as_str());
     let approved = plans::approved(&decisions, mode, standing)?;
+    let software = decisions
+        .iter()
+        .filter(|d| matches!(d.proposal.entry.kind, ProposalKind::Software(_)))
+        .map(|d| (d.proposal.hash.clone(), d.at))
+        .collect();
     let mut applied = fold(decisions, charter.as_ref(), &approved);
     if applied.subtype.is_none() {
         // While the production/operations plan is still being chosen, its leader sets the
@@ -67,6 +74,7 @@ pub fn state(standing: &mut Standing, roll: &Roll) -> ExternResult<State> {
         charter,
         applied,
         approved,
+        software,
     })
 }
 
@@ -122,8 +130,9 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                 }
             }
             // An approved plan changes nothing by itself; phase moves cite it. A link needs
-            // both projects' approval, which the Links tab pairs (ADR 0042).
-            ProposalKind::Plan(_) | ProposalKind::Link(_) => {}
+            // both projects' approval, which the Links tab pairs (ADR 0042). Software
+            // decisions are replayed on their own (`software`, ADR 0086).
+            ProposalKind::Plan(_) | ProposalKind::Link(_) | ProposalKind::Software(_) => {}
             ProposalKind::RemoveMember { agent } => out.removed.push((agent, d.at)),
             ProposalKind::RequestSettings {
                 enabled,

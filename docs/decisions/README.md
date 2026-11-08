@@ -87,3 +87,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0083](./0083-activity-markers.md) Activity markers, "Open spots" and time windows on the map; the activity view exposes its place (M6 phase 4b; coordinator + gateway, no reset)
 - [0084](./0084-region-feed.md) The Region feed from the gateway index: `/index/region` answers as web's `/feeds/region` (nearest first, project activities, online items appended) in the app's feed shape (M6 phase 4c; gateway only)
 - [0085](./0085-map-panel.md) The map panel: web's maplibre-gl + Carto map behind its adapter, opened from the top bar and `/map`; 5a panel and markers, 5b openPlaceOnMap, the Region scope and distances (M6 phase 5; UI only)
+- [0086](./0086-software-projects.md) Software projects: pull requests, recorded merges, merge capability and repository replacements are one new proposal kind, replayed by the governance coordinator into web's stages and mergers (phase a; project reset)

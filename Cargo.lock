@@ -3046,6 +3046,7 @@ dependencies = [
  "sp_discussion",
  "sp_governance",
  "sp_help",
+ "sp_software",
  "space_scope",
 ]
 
@@ -7219,6 +7220,7 @@ dependencies = [
  "sp_place",
  "sp_scope",
  "sp_service",
+ "sp_software",
 ]
 
 [[package]]
@@ -8866,6 +8868,13 @@ dependencies = [
 [[package]]
 name = "sp_service"
 version = "0.0.1"
+
+[[package]]
+name = "sp_software"
+version = "0.0.1"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "space_scope"

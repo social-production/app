@@ -149,3 +149,6 @@ map.css           .map-panel      web/src/lib/features/map/MapPanel.svelte
 map.css           .radius-combobox web/src/lib/components/shared/RadiusCombobox.svelte
 map.css           .map-discovery-card web/src/lib/components/cards/map/MapDiscoveryCard.svelte
 cards.css         .project-activity-card web/src/lib/components/cards/public-feed/ProjectActivityCard.svelte
+software.css      .software-panel web/src/lib/features/projects/detail/components/ProjectSoftwareGovernancePanel.svelte
+software.css      .software-wizard web/src/lib/features/projects/detail/components/SoftwareGovernanceWizard.svelte
+software.css      .software-governance-placeholder web/src/lib/features/projects/detail/lifecycle/productive/phases/ProductiveLifecyclePhaseFive.svelte

@@ -28,7 +28,7 @@ pub fn lead_changes() -> ExternResult<Vec<LeadChange>> {
 
 /// Each close, in order, against the leader of its kind just before it. Ratings count as they
 /// are now (web reads them live too; the app keeps no past averages).
-fn replay(approved: &[Approved]) -> Vec<LeadChange> {
+pub(crate) fn replay(approved: &[Approved]) -> Vec<LeadChange> {
     let mut out = Vec::new();
     for (i, closed) in approved.iter().enumerate() {
         let before = plans::leader(&approved[..i], closed.kind);

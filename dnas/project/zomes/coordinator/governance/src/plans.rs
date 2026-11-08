@@ -17,6 +17,8 @@ pub struct Approved {
     pub author: AgentPubKey,
     pub kind: PlanKind,
     pub subtype: Option<String>,
+    /// The repository a software plan names (ADR 0086).
+    pub repository: Option<String>,
     pub yes: u32,
     pub no: u32,
     /// When its Outcome closed it, and who closed it.
@@ -45,6 +47,7 @@ pub fn approved(
             author: d.proposal.author.clone(),
             kind: plan.kind,
             subtype: plan.subtype.clone(),
+            repository: plan.repository_url.clone(),
             yes: d.yes,
             no: d.no,
             at: d.at,

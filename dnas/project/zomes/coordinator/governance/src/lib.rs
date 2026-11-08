@@ -1,7 +1,7 @@
 //! Project governance API (docs/plans/M3-governance.md, ADR 0033, 0039, 0040): propose, vote,
 //! rate plans, challenge a count, add and rate project values (ADR 0041), read proposals and
-//! plans with their tallies, links between projects (ADR 0042), and the applied state the
-//! project view is built from.
+//! plans with their tallies, links between projects (ADR 0042), software projects' pull
+//! requests (ADR 0086), and the applied state the project view is built from.
 
 mod apply;
 mod calls;
@@ -16,6 +16,8 @@ mod plan_write;
 mod plans;
 mod reads;
 mod roll;
+mod software;
+mod software_view;
 mod values;
 mod views;
 mod write;
@@ -28,6 +30,7 @@ pub use link_view::{HalfView, LinkSides, LinkView, LinksView, RequestView};
 pub use plan_lead::LeadChange;
 pub use plan_view::{CriterionKind, CriterionView, LeaderStatus, PlanBoard, PlanView};
 pub use plan_write::RateInput;
+pub use software_view::SoftwareView;
 pub use values::{ImportanceInput, ValueView};
 pub use views::{ProposalView, TallyView};
 
@@ -148,4 +151,11 @@ pub fn list_plans(call: In<()>) -> ExternResult<PlanBoard> {
 pub fn plan_lead_changes(call: In<()>) -> ExternResult<Vec<LeadChange>> {
     enter(call)?;
     plan_lead::lead_changes()
+}
+
+/// A software project's repository, mergers, pull requests and requests (ADR 0086).
+#[hdk_extern]
+pub fn software(call: In<()>) -> ExternResult<SoftwareView> {
+    enter(call)?;
+    software_view::view()
 }

@@ -1,0 +1,427 @@
+/* Ported from web/src/lib/features/projects/detail/components/ProjectSoftwareGovernancePanel.svelte (ADR 0032, scripts/port-styles.py) */
+.software-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.software-panel .detail-card span,
+.software-panel .detail-card small {
+  color: var(--text-soft);
+}
+
+.software-panel .repo-card {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.software-panel .repo-cell {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+  padding: 10px 14px;
+}
+
+.software-panel .repo-cell + .repo-cell {
+  border-left: 1px solid var(--panel-border);
+}
+
+.software-panel .repo-title {
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.software-panel .repo-value {
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+.software-panel .repo-comma,
+.software-panel .merger-empty {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+@media (max-width: 420px) {
+  .software-panel .repo-card {
+    grid-template-columns: 1fr;
+  }
+
+  .software-panel .repo-cell + .repo-cell {
+    border-top: 1px solid var(--panel-border);
+    border-left: 0;
+  }
+}
+
+.software-panel .detail-card {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.software-panel .history-list,
+.software-panel .history-item {
+  display: grid;
+  gap: 6px;
+}
+
+.software-panel .pr-queue-title {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.software-panel .pr-queue-toggle {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.software-panel .pr-queue-toggle-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.software-panel .pr-queue-chevron {
+  color: var(--text-soft);
+  transition: transform 160ms ease;
+}
+
+.software-panel .pr-queue-chevron.open {
+  transform: rotate(180deg);
+}
+
+.software-panel .pr-card-list {
+  display: grid;
+  gap: 0;
+  margin-top: 10px;
+}
+
+.software-panel .pr-card-list.scrollable {
+  max-height: 27.5rem;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.software-panel .pr-card {
+  border: 1px solid var(--panel-border);
+  border-bottom-width: 0;
+  background: var(--panel);
+  scroll-margin-top: 120px;
+}
+
+.software-panel .pr-card:first-child {
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+}
+
+.software-panel .pr-card:last-child {
+  border-bottom-width: 1px;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+}
+
+.software-panel .pr-card:only-child {
+  border-radius: var(--radius-sm);
+}
+
+.software-panel .pr-card.expanded {
+  border-color: color-mix(in srgb, var(--brand) 35%, var(--panel-border));
+  z-index: 1;
+}
+
+.software-panel .pr-card-body-shell {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  cursor: pointer;
+}
+
+.software-panel .pr-card-body-shell:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 55%, transparent);
+  outline-offset: 2px;
+}
+
+.software-panel .pr-card-toggle {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  text-align: left;
+  color: inherit;
+}
+
+.software-panel .pr-card-top,
+.software-panel .pr-card-title-group,
+.software-panel .pr-card-link-row,
+.software-panel .pr-card-footer,
+.software-panel .pr-card-actions,
+.software-panel .merge-row,
+.software-panel .stage-dots,
+.software-panel .expand-chevrons,
+.software-panel .pr-card-meta-corner {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.software-panel .pr-card-top,
+.software-panel .pr-card-footer {
+  justify-content: space-between;
+}
+
+.software-panel .pr-card-title {
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.software-panel .pr-card-meta-corner {
+  margin-left: auto;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.software-panel .expand-chevrons {
+  gap: 1px;
+}
+
+.software-panel .expand-chevrons.open .expand-chevron {
+  transform: rotate(180deg);
+}
+
+.software-panel .expand-chevron {
+  display: inline-flex;
+  color: color-mix(in srgb, var(--text-soft) 70%, transparent);
+  font-size: 12px;
+  line-height: 1;
+  transition:
+    transform 160ms ease,
+    color 160ms ease,
+    opacity 160ms ease;
+}
+
+.software-panel .expand-chevron.filled {
+  color: var(--brand-strong);
+  opacity: 1;
+}
+
+.software-panel .expand-chevron.pulse {
+  animation: chevron-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes chevron-pulse {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.55;
+  }
+  50% {
+    transform: translateY(2px);
+    opacity: 1;
+  }
+}
+
+.software-panel .stage-dots {
+  gap: 5px;
+}
+
+.software-panel .stage-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: #111;
+  box-shadow: 0 0 0 1.5px color-mix(in srgb, var(--text-soft) 70%, transparent);
+}
+
+.software-panel .stage-dot.filled {
+  background: var(--brand-strong);
+  box-shadow: none;
+}
+
+.software-panel .pr-card-body,
+.software-panel .pr-card-meta {
+  display: grid;
+  gap: 6px;
+}
+
+.software-panel .pr-card-body {
+  padding-top: 8px;
+  border-top: 1px solid var(--panel-border);
+}
+
+.software-panel .stage-copy,
+.software-panel .summary-copy {
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.software-panel .repo-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 700;
+}
+
+/* Ported from web/src/lib/features/projects/detail/components/SoftwareGovernanceWizard.svelte (ADR 0032, scripts/port-styles.py) */
+.software-wizard .question-block {
+  display: grid;
+  gap: 14px;
+}
+
+.software-wizard h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.software-wizard .helper-copy,
+.software-wizard .vote-card small,
+.software-wizard .validation-copy {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.5;
+  font-size: 13px;
+}
+
+.software-wizard .validation-copy {
+  color: color-mix(in srgb, var(--brand-strong) 80%, var(--text-soft));
+  font-weight: 600;
+}
+
+.software-wizard input,
+.software-wizard textarea,
+.software-wizard select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  color: var(--text-main);
+  font: inherit;
+}
+
+.software-wizard .field-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.software-wizard .field-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.software-wizard .field-label,
+.software-wizard .meta-label {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.software-wizard .review-card,
+.software-wizard .vote-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.software-wizard .metadata-card {
+  gap: 12px;
+}
+
+.software-wizard .meta-row {
+  display: grid;
+  gap: 4px;
+}
+
+.software-wizard .review-card p,
+.software-wizard .review-card span,
+.software-wizard .meta-value {
+  margin: 0;
+  color: var(--text-soft);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.software-wizard .summary-value {
+  color: var(--text-main);
+}
+
+.software-wizard .meta-link {
+  color: var(--brand-strong);
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.software-wizard .stage-pill {
+  justify-self: start;
+  padding: 4px 8px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-strong);
+}
+
+@media (max-width: 760px) {
+  .software-wizard .field-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Ported from web/src/lib/features/projects/detail/lifecycle/productive/phases/ProductiveLifecyclePhaseFive.svelte (ADR 0032, scripts/port-styles.py) */
+.software-governance-placeholder .phase-surface {
+  display: grid;
+  gap: 12px;
+}
+
+.software-governance-placeholder {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.software-governance-placeholder h3,
+.software-governance-placeholder p {
+  margin: 0;
+}
+
+.software-governance-placeholder p {
+  color: var(--text-soft);
+  line-height: 1.45;
+}

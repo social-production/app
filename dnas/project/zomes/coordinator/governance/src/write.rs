@@ -11,7 +11,7 @@ use crate::apply::{self, Standing};
 use crate::count::count;
 use crate::reads::{self, Found};
 use crate::roll::Roll;
-use crate::{calls, link_write, moves, plan_write};
+use crate::{calls, link_write, moves, plan_write, software};
 
 pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
@@ -51,30 +51,14 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
             None
         };
     let roll = Roll::load()?;
-    let kind = match kind {
-        ProposalKind::Phase { to, reason, .. } => {
-            if reason.trim().is_empty() {
-                return Err(guest("Add a reason before submitting this phase change."));
-            }
-            let state = apply::state(&mut Standing::default(), &roll)?;
-            let plan = moves::check_phase_move(&state, &to)?;
-            ProposalKind::Phase { to, plan, reason }
-        }
-        ProposalKind::Plan(plan) => {
-            let state = apply::state(&mut Standing::default(), &roll)?;
-            ProposalKind::Plan(plan_write::prepare(&state, plan)?)
-        }
-        ProposalKind::Return { to, reason } => {
-            let state = apply::state(&mut Standing::default(), &roll)?;
-            moves::check_return(&state, &to, &reason, &roll)?;
-            ProposalKind::Return { to, reason }
-        }
-        other => other,
-    };
+    let kind = prepare(kind, &roll)?;
     // The proposer's own Yes comes with the proposal (web's proposer vote). Plans are assessed
-    // first and returns are opened without one, as on web (`revert.py`); their authors vote
-    // like everyone else.
-    let proposer_votes = !matches!(kind, ProposalKind::Plan(_) | ProposalKind::Return { .. });
+    // first; returns and software requests are opened without one, as on web (`revert.py`,
+    // `projects/software`); their authors vote like everyone else.
+    let proposer_votes = !matches!(
+        kind,
+        ProposalKind::Plan(_) | ProposalKind::Return { .. } | ProposalKind::Software(_)
+    );
     let members = calls::member_snapshot()?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         space: space_scope::current()?,
@@ -90,6 +74,35 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         vote(hash.clone(), VoteChoice::Yes)?;
     }
     Ok(hash)
+}
+
+/// web's checks before a phase move, plan, return or software request is filed; a phase move
+/// cites the current leading plan.
+fn prepare(kind: ProposalKind, roll: &Roll) -> ExternResult<ProposalKind> {
+    Ok(match kind {
+        ProposalKind::Phase { to, reason, .. } => {
+            if reason.trim().is_empty() {
+                return Err(guest("Add a reason before submitting this phase change."));
+            }
+            let state = apply::state(&mut Standing::default(), roll)?;
+            let plan = moves::check_phase_move(&state, &to)?;
+            ProposalKind::Phase { to, plan, reason }
+        }
+        ProposalKind::Plan(plan) => {
+            let state = apply::state(&mut Standing::default(), roll)?;
+            ProposalKind::Plan(plan_write::prepare(&state, plan)?)
+        }
+        ProposalKind::Return { to, reason } => {
+            let state = apply::state(&mut Standing::default(), roll)?;
+            moves::check_return(&state, &to, &reason, roll)?;
+            ProposalKind::Return { to, reason }
+        }
+        ProposalKind::Software(request) => {
+            software::check(&request)?;
+            ProposalKind::Software(request)
+        }
+        other => other,
+    })
 }
 
 /// A personal service's creator saves its request settings at once (ADR 0076); nobody else
