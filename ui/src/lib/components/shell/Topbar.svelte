@@ -25,6 +25,9 @@
     isActive: (href: string) => boolean;
     toggleLeft: () => void;
     toggleRight: () => void;
+    /** web's map panel toggle (ADR 0085). */
+    mapOpen?: boolean;
+    toggleMap?: () => void;
     onSearch: (query: string) => void;
     onSignIn: () => void;
     /** web's isAuthSurface (onboarding): only the brand shows. */
@@ -90,11 +93,12 @@
         </button>
         <button
           aria-label="Open map"
-          title="Map (coming in M6)"
+          title="Map"
+          aria-expanded={p.mapOpen ?? false}
           class="panel-toggle panel-toggle-map"
-          data-active={false}
+          data-active={p.mapOpen ?? false}
           type="button"
-          disabled
+          onclick={() => p.toggleMap?.()}
         >
           <SvgGlyph name="map" className="panel-toggle-icon" />
         </button>

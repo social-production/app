@@ -86,3 +86,4 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0082](./0082-map-markers-index.md) Map markers from the gateway index: cards carry their place, `/index/map-markers` answers as web's `/feeds/map-markers` (M6 phase 4a; gateway only)
 - [0083](./0083-activity-markers.md) Activity markers, "Open spots" and time windows on the map; the activity view exposes its place (M6 phase 4b; coordinator + gateway, no reset)
 - [0084](./0084-region-feed.md) The Region feed from the gateway index: `/index/region` answers as web's `/feeds/region` (nearest first, project activities, online items appended) in the app's feed shape (M6 phase 4c; gateway only)
+- [0085](./0085-map-panel.md) The map panel: web's maplibre-gl + Carto map behind its adapter, opened from the top bar and `/map`; 5a panel and markers, 5b openPlaceOnMap, the Region scope and distances (M6 phase 5; UI only)

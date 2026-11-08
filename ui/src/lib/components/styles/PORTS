@@ -145,3 +145,6 @@ paused.css        .paused-badge   web/src/lib/components/shared/PausedBadge.svel
 service-requests.css .service-ui web/src/lib/features/projects/detail/lifecycle/individual-service/phases/IndividualServicePhaseOne.svelte
 service-requests.css .service-ui web/src/lib/components/cards/project-detail/CollapsibleServiceRequestCard.svelte
 location.css      .location-picker web/src/lib/components/shared/LocationPicker.svelte
+map.css           .map-panel      web/src/lib/features/map/MapPanel.svelte
+map.css           .radius-combobox web/src/lib/components/shared/RadiusCombobox.svelte
+map.css           .map-discovery-card web/src/lib/components/cards/map/MapDiscoveryCard.svelte

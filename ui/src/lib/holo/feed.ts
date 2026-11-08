@@ -39,3 +39,13 @@ export function locationLookup<T>(
   if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
   return gatewayApi.locations<T>(gateway, route, query);
 }
+
+/** web's `/feeds/map-markers` and `/feeds/region` from the home node's index (ADR 0082–0084). */
+export function placeIndex<T>(
+  route: 'map-markers' | 'region',
+  query: Record<string, string>,
+): Promise<T> {
+  const gateway = homeGateway();
+  if (!gateway) return Promise.reject(new Error('No node configured (VITE_SP_GATEWAYS).'));
+  return gatewayApi.places<T>(gateway, route, query);
+}

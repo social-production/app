@@ -95,6 +95,9 @@ export const gatewayApi = {
   people: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/people', query),
   scopes: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/scopes', query),
   paused: (g: string) => get<string[]>(g, '/index/paused', {}),
+  /** web's map markers and Region feed over the index (ADR 0082–0084). */
+  places: <T>(g: string, route: 'map-markers' | 'region', query: Record<string, string>) =>
+    get<T>(g, `/index/${route}`, query),
   /** Place search, reverse lookup and the IP hint (ADR 0079). */
   locations: <T>(
     g: string,

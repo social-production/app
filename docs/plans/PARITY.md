@@ -45,8 +45,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] Top bar buttons: same set and order as web (home, networks, map, activity, search).
 - [x] Left rail (networks), signed out: same sections (Collective, Channels, Communities,
   Discover, Feedback).
-- [ ] Map button: web opens the map panel (`features/map/MapPanel.svelte`, radius, time,
-  filters); the app's does nothing. Comes with M6 map/places.
+- [x] Map button: web's map panel (`features/map/MapPanel.svelte`, radius, time, filters),
+  and `/map` (M6 phase 5a, ADR 0085, 2026-11-08). "Open as list" (the Region feed) is 5b.
 - [x] Activity (calendar) button: web's right rail (`RightRailPanel`): Project Activity &
   Events (upcoming activities in your projects' Activity phase, with signups), Votes to cast
   (open phase moves, plans, updates and edits you haven't voted on, with Assess), History
