@@ -14,6 +14,11 @@ export interface SoftwareTally {
   myVote: 'Yes' | 'No' | 'Neutral' | null;
   settled: boolean;
   closedAt: number | null;
+  neutral: number;
+  added: number;
+  missing: number;
+  challengeUntil: number | null;
+  canChallenge: boolean;
 }
 
 export interface SoftwareMerge {
@@ -35,6 +40,8 @@ export interface SoftwarePullRequest {
   stageLabel: string;
   merge: SoftwareMerge | null;
   tally: SoftwareTally;
+  /** The pull request's own vote passed: when, and who closed it (`pr-approved`). */
+  approved: { at: number; by: string } | null;
   canRecordMerge: boolean;
 }
 
@@ -80,6 +87,19 @@ export type SoftwareRequest =
   | { Merge: { pull_request: string; merge_id: string; merge_url: string } }
   | { MergeCapability: { agent: string; grant: boolean } }
   | { Repository: { repository_url: string; reason: string; pull_request: string } };
+
+/** web shows the software panel in software projects that do productive or service work. */
+export function isSoftwareProject(
+  charter: { mode: string; subtype?: string | null } | null | undefined,
+): boolean {
+  return (
+    charter?.subtype === 'software' && ['productive', 'collective-service'].includes(charter.mode)
+  );
+}
+
+/** The proposal a pull request's open vote is cast on: its recorded merge's while confirming. */
+export const votedProposal = (pr: SoftwarePullRequest): string =>
+  pr.stage === 'confirmation' && pr.merge ? pr.merge.proposal : pr.id;
 
 /** web's `isInProgressPullRequest`. */
 export function inProgress(pr: SoftwarePullRequest): boolean {

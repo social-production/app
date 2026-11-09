@@ -3,8 +3,11 @@
   import ActivityCalendar from '#lib/components/activities/ActivityCalendar.svelte';
   import ActivityHistory from '#lib/components/activities/ActivityHistory.svelte';
   import ActivityWizard from '#lib/components/activities/ActivityWizard.svelte';
+  import DecisionHistoryCard from '#lib/components/governance/DecisionHistoryCard.svelte';
+  import type { Activity } from '#lib/domain/activities.ts';
   import { activityQuickPicks } from '#lib/domain/activityForm.ts';
   import { dayWindow, planOpen, scheduleDays } from '#lib/domain/eventSchedule.ts';
+  import { isSoftwareProject } from '#lib/domain/software.ts';
   import { placeSearch } from '#lib/services/locations.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
@@ -15,7 +18,7 @@
   import ServicePhase from './requests/ServicePhase.svelte';
   import SoftwareDock from './software/SoftwareDock.svelte';
   import SoftwarePanel from './software/SoftwarePanel.svelte';
-  import { SoftwareState } from './software/softwareState.svelte.ts';
+  import { openSoftwareLink } from './software/softwareLink.ts';
   import SoftwareWizard from './software/SoftwareWizard.svelte';
 
   import '#lib/components/styles/activities.css';
@@ -64,16 +67,18 @@
     ),
   );
 
-  // A software project's pull requests (ADR 0086), as web shows them above the calendar.
-  const software = $derived(
-    project?.charter?.subtype === 'software' &&
-      ['productive', 'collective-service'].includes(project.charter.mode),
+  // A software project's pull requests (ADR 0086), as web shows them above the calendar;
+  // the page reads them (DetailState), and a rail link opens a pull request's wizard.
+  const software = $derived(isSoftwareProject(project?.charter));
+  const sw = $derived(detail.software);
+  $effect(() => openSoftwareLink(sw, page.url.searchParams));
+  // web's Past activity: ended activities and software decisions, newest first.
+  const pastTimeline = $derived(
+    [
+      ...state.past.map((a) => ({ id: a.id, at: a.startsAt, activity: a, entry: null })),
+      ...sw.history.map((e) => ({ id: `gov-${e.id}`, at: e.createdAt, activity: null, entry: e })),
+    ].sort((a, b) => b.at - a.at),
   );
-  // svelte-ignore state_referenced_locally
-  const sw = new SoftwareState(detail.id);
-  $effect(() => {
-    if (software) void sw.load();
-  });
 
   $effect(() => {
     state.highlighted = page.url.searchParams.get('activity');
@@ -146,7 +151,7 @@
           />
         {/if}
       </section>
-      {#if state.past.length > 0}
+      {#if state.past.length + sw.history.length > 0}
         <details class="history-section">
           <summary class="history-summary">
             <span>Past activity</span>
@@ -167,14 +172,27 @@
               />
             </svg>
           </summary>
-          <ActivityHistory
-            items={state.past}
-            names={state.names}
-            {me}
-            planStageOf={(id) => stages.find((s) => s.id === id)?.label ?? null}
-            onCheckIn={state.checkIn}
-            onRate={state.rate}
-          />
+          {#if sw.history.length === 0}
+            {@render past(state.past)}
+          {:else}
+            <!-- web's unified history: a software project's decisions among its activities. -->
+            <div class="unified-history">
+              {#each pastTimeline as row (row.id)}
+                {#if row.activity}
+                  {@render past([row.activity])}
+                {:else if row.entry && project?.charter}
+                  <DecisionHistoryCard
+                    entry={row.entry}
+                    names={{ ...detail.names, ...sw.names }}
+                    charter={project.charter}
+                    stageOf={() => project?.stage ?? ''}
+                    phaseLabel={detail.phaseLabel}
+                    onVote={(p, c) => detail.vote(p, c)}
+                  />
+                {/if}
+              {/each}
+            </div>
+          {/if}
         </details>
       {/if}
     </section>
@@ -195,6 +213,17 @@
     {/if}
   </section>
 {/if}
+
+{#snippet past(items: Activity[])}
+  <ActivityHistory
+    {items}
+    names={state.names}
+    {me}
+    planStageOf={(id) => stages.find((s) => s.id === id)?.label ?? null}
+    onCheckIn={state.checkIn}
+    onRate={state.rate}
+  />
+{/snippet}
 
 {#snippet dock()}
   <SoftwareDock {sw} />

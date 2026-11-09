@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  /** A collapsible rail section (web's `details.rail-section`), open at first when it has cards. */
+  /** A collapsible rail section (web's `details.rail-section`), open once its cards arrive. */
   interface Props {
     title: string;
     count: number;
@@ -16,9 +16,16 @@
 
   // svelte-ignore state_referenced_locally
   let open = $state(p.count > 0);
+  // svelte-ignore state_referenced_locally
+  let initialized = p.count > 0;
 
+  // web's `railOpenInitialized`: a section opens once, when its cards first arrive (here
+  // they can load after the rail mounts), and closes when the last goes; a restore after
+  // that leaves it as it is.
   $effect(() => {
     if (p.count === 0) open = false;
+    else if (!initialized) open = true;
+    if (p.count > 0) initialized = true;
   });
 </script>
 

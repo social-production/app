@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-08 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-09 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,14 +50,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (software projects phases a + b merged, PR #127; this docs PR follows).
-**Next: software projects phase (c)** (`docs/plans/SOFTWARE.md`): the right rail's "Vote ·
-pull request", "Action · merge needed" (Record merge) and "Vote · merge capability" rows
-(web-backend `bootstrap/activity_rail.py`, web `RightRailPanel`); the History tab and Past
-activity cards for the four software decision kinds (`build_software_history_entries`); the
-`pr-approved` notification to a pull request's author. Coordinator + UI, no integrity change
-expected (the views already expose every proposal with its tally). Then service requests (c)
-once the owner says who reviews them (ADR 0076).
+## In flight: software projects phase (c) (ADR 0087), branch `claude/social-production-handoff-dsam61`
+Coordinator + UI, **no network reset** (the governance coordinator's `software` view adds
+`approved: { at, by }` per pull request). See "Done 2026-11-09" below for what it does and
+what was checked; open the PR, wait for CI, merge, smoke live `software.mjs`.
+**Next after it:** service requests (c) once the owner says who reviews them (ADR 0076); else
+the rest of PARITY's summary (link votes in the History tab, item 2; Settings waiting on
+features, item 9; screens not compared yet, item 10).
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -85,6 +84,30 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-09: software projects phase (c) (ADR 0087), on branch, not merged yet
+- The rail's "Vote · pull request" (Assess opens the vote wizard), "Action · merge needed"
+  (Record merge), "Vote · merge capability", "Vote · repository" and their History casts;
+  the rail keeps web's eight vote rows, newest first. Take part's vote sheet casts merge
+  capability and repository votes (the app had no way to before). History tab and Past
+  activity list web's four software decision cards (`DecisionHistoryCard` is now its own
+  component). `pr-approved` to the author opens Record merge. Rail sections now open once
+  their first cards arrive (they stayed shut when cards loaded after the rail opened).
+- **Checked:** `npm run check -w ui` (0), `npm run lint -w ui`, boundaries, sizes; in Nix
+  `cargo fmt --all --check`, workspace clippy `-D warnings` (debug info off,
+  `CARGO_INCREMENTAL=0`), `build-happ.sh`; scenario `software` **passed** locally (559 s, now
+  checks `approved`). Against a local seed node: `software.mjs`
+  **passed** (rail Assess → vote wizard, merge needed row, `pr-approved` → Record merge, a
+  merge capability vote from the rail, History + Past activity), `rail.mjs` and
+  `activities.mjs` **passed**. **Not run:** the other scenario files and browser tests (CI runs the scenarios).
+- **Follow-up (measure live):** the rail reads `software` per software project on every
+  reload; locally Ann's rail took ~25 s with six software test projects. If live is slow,
+  read it only for projects in Activity or make the view cheaper (it counts each vote up to
+  three times).
+- **Lessons:** a browser test that votes and then navigates at once can drop the vote still
+  being written; wait for something the vote changes on the same page. A fresh local seed
+  node's first browser test may time out signing in (run it again); after ~8 software runs
+  the local node slowed until pages took >60 s, so restart it (its data is wiped on exit).
 
 ## Done 2026-11-08: software projects merged (PR #127, 11:14 UTC = 10:14 pm Melbourne)
 - CI green on the first run (~93 min). UI and bootstrap deployed 11:14 UTC; the seed node

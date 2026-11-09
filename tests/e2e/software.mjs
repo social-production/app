@@ -2,13 +2,17 @@
 // dev founders (scripts/dev-seed.sh). Ann creates a project; both founders move it to
 // Production Plan and approve Ann's software plan (with its repository), then move it to
 // Activity, where web's software panel shows the repository and Ann as its merger. Ann submits
-// a pull request through web's wizard; both approve it; Ann records the merge; both confirm
-// it, and it leaves "In-progress pull requests". Bob's Repository ▾ offers web's two votes.
+// a pull request through web's wizard; Ann approves it in the panel, Bob from his rail
+// ("Vote · pull request" → Assess opens the wizard). Ann's rail then says "Action · merge
+// needed" and her notifications "Pull request approved", which opens Record merge; both
+// confirm it, and it leaves "In-progress pull requests". Bob's Repository ▾ offers web's two
+// votes; he asks to be granted merge capability, Ann votes on it from her rail (Take part's
+// vote sheet), and the History tab and Past activity list the software decisions (phase c).
 //   node tests/e2e/software.mjs http://localhost:4174 [screens dir]
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, continueSteps, errors, log } from './lib.mjs';
+import { BASE, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
 import { advanceTo, signInFounders, until } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -140,10 +144,31 @@ async function voteYes(page, dialog, what) {
 }
 
 await voteYes(ann, 'Pull request vote needed', 'the pull request');
-await voteYes(bob, 'Pull request vote needed', 'the pull request on bob');
-log('both approved the pull request');
+// Bob's rail: web's "Vote · pull request"; Assess opens the pull request's wizard.
+await bob.goto(projectUrl);
+const prVote = () => rail(bob).locator('.vote-row', { hasText: `Pull request vote · ${prTitle}` });
+await railShows(bob, prVote, 'the pull request vote', 30_000);
+assert.match(await prVote().innerText(), /Vote · pull request/i);
+await bob.screenshot({ path: `${out}/software-rail-vote-390.png` });
+await prVote().getByRole('button', { name: 'Assess' }).click();
+const bobVote = bob.getByRole('dialog', { name: 'Pull request vote needed' });
+await bobVote.locator('.choice-bar .choice.yes').click({ timeout: 120_000 });
+await bobVote.waitFor({ state: 'hidden', timeout: 60_000 });
+log('both approved the pull request, bob from his rail');
 
-await openAction(ann, 'Record merge', 'the approved pull request');
+// Ann may merge: her rail says a merge is needed; web's pr-approved opens Record merge.
+await ann.goto(projectUrl);
+const needed = () => rail(ann).locator('.vote-row', { hasText: `Merge needed · ${prTitle}` });
+await railShows(ann, needed, 'the merge needed action', 30_000);
+assert.match(await needed().innerText(), /Action · merge needed/i);
+await needed().getByRole('button', { name: 'Record merge', exact: true }).waitFor();
+const approved = () => ann.locator('.notification-card', { hasText: 'Pull request approved' });
+for (let i = 0; i < 40 && !(await approved().count()); i++) {
+  await ann.goto(`${BASE}/notifications`);
+  await approved().first().waitFor({ timeout: 10_000 }).catch(() => {});
+}
+assert.match(await approved().first().innerText(), /your pull request is approved for merge/);
+await approved().first().click();
 const merge = ann.getByRole('dialog', { name: 'Merge needed' });
 await merge.getByLabel('Merge ID').fill('a1b2c3');
 await merge.getByLabel('Merge link').fill('https://example.org/garden/commit/a1b2c3');
@@ -167,6 +192,36 @@ const menu = bob.getByRole('dialog', { name: 'Repository' });
 await menu.getByRole('button', { name: /Replace repository/ }).waitFor();
 await menu.getByRole('button', { name: /Grant or revoke merge capability/ }).waitFor();
 log("bob's Repository ▾ offers web's two votes");
+
+// Bob asks for merge capability; Ann votes from her rail in Take part's vote sheet.
+await menu.getByRole('button', { name: /Grant or revoke merge capability/ }).click();
+const ask = bob.getByRole('dialog', { name: 'Merge capability change' });
+await ask.getByRole('button', { name: 'Next' }).click();
+await ask.getByRole('button', { name: 'Next' }).click();
+await ask.getByRole('button', { name: 'Submit vote request' }).click();
+await ask.waitFor({ state: 'hidden', timeout: 60_000 });
+const grant = () => rail(ann).locator('.vote-row', { hasText: 'Merge capability · Grant' });
+await ann.goto(projectUrl);
+await railShows(ann, grant, 'the merge capability vote', 60_000);
+assert.match(await grant().innerText(), /Vote · merge capability/i);
+await grant().getByRole('button', { name: 'Assess' }).click();
+const sheet = ann.getByRole('dialog', { name: 'Merge capability' });
+await sheet.getByText('Grant merge capability').waitFor({ timeout: 120_000 });
+await sheet.locator('.choice-bar .choice.yes').click();
+await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+
+// The History tab and Past activity list the software decisions. Stay on the page: leaving
+// it at once would drop the vote still being written.
+await ann.getByRole('tab', { name: 'History' }).click();
+const card = (kind) => ann.locator('.history-shell .history-card', { hasText: kind }).first();
+await card('Merge capability change').filter({ hasText: '1 yes' }).waitFor({ timeout: 120_000 });
+await card('Merge confirmation').waitFor({ timeout: 60_000 });
+log('bob asked for merge capability and ann voted on it from her rail');
+await ann.screenshot({ path: `${out}/software-history-390.png` });
+await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByText('Past activity').click();
+await ann.locator('.unified-history .history-card', { hasText: 'Merge confirmation' }).waitFor();
+log('History and Past activity list the software decisions');
 
 assert.deepEqual(errors, [], `page errors: ${errors.join('\n')}`);
 await browser.close();

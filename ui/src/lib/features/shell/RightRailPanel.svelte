@@ -127,7 +127,7 @@
               type="button"
               onclick={() => openItem(item)}
             >
-              Assess
+              {item.voteKindLabel === 'pull_request_merge' ? 'Record merge' : 'Assess'}
             </button>
           </div>
         {/snippet}

@@ -38,4 +38,5 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'bot-review': 'votes_needed',
   'bot-review-result': 'votes_needed',
   'svc-request': 'roles',
+  'pr-approved': 'votes_needed',
 };

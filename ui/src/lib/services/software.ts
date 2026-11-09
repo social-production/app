@@ -26,6 +26,11 @@ interface TallyWire {
   my_vote: SoftwareTally['myVote'];
   settled: boolean;
   closed_at: number | null;
+  neutral: number;
+  added: number;
+  missing: number;
+  challenge_until: number | null;
+  can_challenge: boolean;
 }
 
 interface Filed {
@@ -43,6 +48,7 @@ interface PullRequestWire extends Filed {
   stage: SoftwareStage;
   stage_label: string;
   merge: { proposal: ActionHash; merge_id: string; merge_url: string; by: AgentPubKey } | null;
+  approved: { at: number; by: AgentPubKey } | null;
   can_record_merge: boolean;
 }
 
@@ -70,6 +76,11 @@ const tally = (t: TallyWire): SoftwareTally => ({
   myVote: t.my_vote,
   settled: t.settled,
   closedAt: t.closed_at,
+  neutral: t.neutral,
+  added: t.added,
+  missing: t.missing,
+  challengeUntil: t.challenge_until,
+  canChallenge: t.can_challenge,
 });
 
 const filed = (f: Filed) => ({
@@ -99,6 +110,7 @@ export async function loadSoftware(project: ProjectRef): Promise<SoftwareGoverna
         mergeUrl: p.merge.merge_url,
         by: hashToString(p.merge.by),
       },
+      approved: p.approved && { at: p.approved.at, by: hashToString(p.approved.by) },
       canRecordMerge: p.can_record_merge,
     })),
     capabilityRequests: w.capability_requests.map((c) => ({

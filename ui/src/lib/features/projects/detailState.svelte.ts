@@ -7,6 +7,7 @@ import {
 import type { Person } from '#lib/domain/people.ts';
 import type { Plan, PlanBoard, PlanRating } from '#lib/domain/plans.ts';
 import { charterEdit, type CharterDraft, type Project, type Stance } from '#lib/domain/projects.ts';
+import { isSoftwareProject } from '#lib/domain/software.ts';
 import type { Importance, ProjectValue } from '#lib/domain/values.ts';
 import { explain } from '#lib/services/errors.ts';
 import {
@@ -22,6 +23,8 @@ import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
+import { SoftwareState } from './software/softwareState.svelte.ts';
+
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
 export class DetailState {
   project = $state<Project>();
@@ -36,7 +39,12 @@ export class DetailState {
   saving = $state(false);
   sheetMessage = $state<string>();
 
-  constructor(readonly id: string) {}
+  /** A software project's pull requests and their votes (ADR 0086), read with the page. */
+  readonly software: SoftwareState;
+
+  constructor(readonly id: string) {
+    this.software = new SoftwareState(id);
+  }
 
   /** Leaving an event asks first (web's confirmEventMembershipToggle). */
   confirmingLeave = $state(false);
@@ -131,6 +139,7 @@ export class DetailState {
     this.plans = plans;
     this.values = values;
     this.error = undefined;
+    if (isSoftwareProject(project.charter)) void this.software.load();
     const keys = [
       project.creator,
       ...proposals.map((p) => p.author),

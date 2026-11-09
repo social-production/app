@@ -30,7 +30,11 @@
     onRevealDone,
   }: Props = $props();
 
-  const votes = $derived(detail.openProposals.filter((p) => isPhaseChange(p.kind)));
+  // web's Take part votes: phase moves, then a software project's (ADR 0086).
+  const votes = $derived([
+    ...detail.openProposals.filter((p) => isPhaseChange(p.kind)),
+    ...detail.software.dockVotes,
+  ]);
 </script>
 
 {#if detail.project?.charter}
@@ -54,7 +58,7 @@
     {#if project.amMember}
       <VoteDock
         proposals={votes}
-        names={detail.names}
+        names={{ ...detail.names, ...detail.software.names }}
         {charter}
         stage={project.stage}
         phaseLabel={detail.phaseLabel}
