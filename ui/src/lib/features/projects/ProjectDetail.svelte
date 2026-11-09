@@ -230,7 +230,8 @@
             <HistoryTab
               proposals={detail.proposals}
               plans={detail.plans?.plans}
-              names={detail.names}
+              names={{ ...detail.names, ...detail.software.names }}
+              extra={detail.software.history}
               {charter}
               stage={project.stage}
               phaseLabel={detail.phaseLabel}

@@ -14,8 +14,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    (A removed project leaving the
    rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
    2026-11-03.)
-2. ~~History tab~~ (done 2026-11-03). Link votes and software decisions join it when
-   those land in web's history (web lists link create/sever votes there too).
+2. ~~History tab~~ (done 2026-11-03). Software decisions joined it 2026-11-09 (ADR 0087).
+   Link votes still to join it (web lists link create/sever votes there too).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
    the app still lacks: `bot-review-vote` (bot reviews' other cards and `prj-removed`: done
    2026-11-05).
@@ -34,9 +34,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 7. **Map + places (M6):** done with phase 5b (2026-11-08, `docs/plans/M6-places.md`, ADR
    0078–0085): places on records, geocoding, the LocationPicker, Regional settings, map
    markers, the map panel, the Region scope with project-activity cards, show on map.
-8. **Software projects** (ADR 0086, `docs/plans/SOFTWARE.md`): the panel, wizard and
-   Repository ▾ in the Activity phase done 2026-11-08 (phases a + b). Left: (c) the rail's
-   pull request rows, History tab / Past activity cards and `pr-approved`.
+8. ~~Software projects~~ (ADR 0086, 0087, `docs/plans/SOFTWARE.md`): the panel, wizard and
+   Repository ▾ (phases a + b, 2026-11-08); the rail's rows, Take part's merge capability and
+   repository votes, History / Past activity cards and `pr-approved` (phase c, 2026-11-09).
+   **Owner review (ADR 0087):** the rail's History says "Passed" for a confirmed merge (web:
+   "Still open"); Take part's sheet leaves pull request rows to the panel's Assess.
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
@@ -165,7 +167,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   the activity's author), Settings' Roles switch, and web's "<role> suggestion declined" card
   to the suggester (the activities view lists declines per role; coordinator only).
 - [x] Software governance panel (pull requests) in a software project's Activity phase
-  (2026-11-08, ADR 0086). Its rail rows, history cards and `pr-approved` are phase (c).
+  (2026-11-08, ADR 0086). Its rail rows, history cards and `pr-approved`: phase (c),
+  2026-11-09, ADR 0087.
 - [x] History tab (web's `ProjectHistoryTab` / `EventHistoryTab`: Active Decisions and
   Resolutions of edits, updates, phase moves, returns and plans, each opening its vote sheet),
   on projects and events (2026-11-03, PR #90, `components/governance/HistoryTab.svelte`).
@@ -239,7 +242,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - [x] Map panel + places (M6): Region scope, LocationPicker, Regional settings,
   project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
 - [x] Software project governance (pull requests / merge flow) in the Activity phase
-  (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved` are phase (c)).
+  (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved`: 2026-11-09, ADR 0087).
 - Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
   the platform board, asset-use requests) comes later.
 - web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the

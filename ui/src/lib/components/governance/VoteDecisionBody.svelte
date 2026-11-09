@@ -36,6 +36,20 @@
       <h3>Why</h3>
       <p>{'Return' in kind ? kind.Return.reason : kind.Phase.reason}</p>
     </section>
+  {:else if 'Software' in kind}
+    <!-- web's generic decision: the change's card, then why (software votes, ADR 0086). -->
+    {#if kind.Software.title && kind.Software.title !== kind.Software.label}
+      <section class="change-card">
+        <h3>{kind.Software.title}</h3>
+        {#if kind.Software.description}<p>{kind.Software.description}</p>{/if}
+      </section>
+    {/if}
+    {#if kind.Software.reason}
+      <section class="change-card">
+        <h3>Why</h3>
+        <p>{kind.Software.reason}</p>
+      </section>
+    {/if}
   {:else if 'Edit' in kind}
     {#each [{ name: 'Title', now: charter.title, next: kind.Edit.title }, { name: 'Description', now: charter.description, next: kind.Edit.description }] as field (field.name)}
       {#if field.next !== null}

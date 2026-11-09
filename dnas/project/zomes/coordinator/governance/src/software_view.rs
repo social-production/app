@@ -7,6 +7,7 @@ use project_integrity::SoftwareRequest;
 use sp_software::{Merger, Stage};
 
 use crate::calls;
+use crate::count::count;
 use crate::roll::Roll;
 use crate::software::{ledger, Ledger, Request};
 use crate::views::{tally_view, TallyView};
@@ -17,6 +18,13 @@ pub struct MergeView {
     pub proposal: ActionHash,
     pub merge_id: String,
     pub merge_url: String,
+    pub by: AgentPubKey,
+}
+
+/// When a vote passed and whose Outcome closed it.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct ClosedView {
+    pub at: Timestamp,
     pub by: AgentPubKey,
 }
 
@@ -35,6 +43,8 @@ pub struct PullRequestView {
     /// The vote now open or last held: the merge's while it is confirmed, else the pull
     /// request's own.
     pub tally: TallyView,
+    /// The pull request's own vote passed (web's `pr-approved` notification to its author).
+    pub approved: Option<ClosedView>,
     pub can_record_merge: bool,
 }
 
@@ -191,8 +201,20 @@ fn pull_request(ctx: &Ctx, r: &Request) -> ExternResult<Option<PullRequestView>>
             by: m.by.clone(),
         }),
         tally: tally_view(voted, &ctx.me, ctx.roll)?,
+        approved: approved(ctx, r)?,
         can_record_merge: ctx.member
             && pr.stage == Stage::AwaitingMerge
             && ctx.ledger.software.can_merge(&ctx.me),
     }))
+}
+
+/// The pull request's approval: when its vote passed and who closed it.
+fn approved(ctx: &Ctx, r: &Request) -> ExternResult<Option<ClosedView>> {
+    let Some((true, at)) = r.decided else {
+        return Ok(None);
+    };
+    let by = count(&r.found, ctx.roll)?
+        .decided
+        .map_or_else(|| r.found.author.clone(), |o| o.author);
+    Ok(Some(ClosedView { at, by }))
 }

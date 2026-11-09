@@ -9,10 +9,22 @@ import type { Proposal, VoteChoice } from './governance.ts';
 import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
 import type { CharterMode } from './projects.ts';
+import type { SoftwareGovernance } from './software.ts';
+import { softwareVotes } from './softwareRail.ts';
 
 /** web's kinds this app has so far (service requests: `requestRail.ts`); help requests later. */
 export type RailKind = 'project' | 'vote' | 'request';
-export type RailVoteKind = 'phase_change' | 'plan' | 'update' | 'edit' | 'link' | 'link_sever';
+export type RailVoteKind =
+  | 'phase_change'
+  | 'plan'
+  | 'update'
+  | 'edit'
+  | 'link'
+  | 'link_sever'
+  | 'pull_request'
+  | 'pull_request_merge'
+  | 'merge_capability'
+  | 'repository_replacement';
 
 export interface RailItem {
   id: string;
@@ -46,6 +58,8 @@ export interface RailProject {
   proposals: Proposal[];
   plans: PlanView[];
   links: RailLink[];
+  /** A software project's pull requests and votes (ADR 0086), with the names they cite. */
+  software?: { governance: SoftwareGovernance; names: Record<string, string> } | null | undefined;
 }
 
 /** This project's half of a link request (its `link_sides`), with the other project's title. */
@@ -61,9 +75,10 @@ export interface RailLink {
   myVote: VoteChoice | null;
 }
 
-/** web-backend's limits: four activities, three votes of each kind. */
+/** web-backend's limits: four activities, three votes of each kind, eight votes in all. */
 const ACTIVITY_LIMIT = 4;
 const VOTE_LIMIT = 3;
+const VOTES_SHOWN = 8;
 /**
  * The rail lists activities only while a project is in its Activity phase. web-backend checks
  * `phase-5` alone, which leaves out personal services (their Activity phase is `phase-1`,
@@ -144,7 +159,16 @@ function votesToCast(projects: RailProject[]): RailItem[] {
   const edits = pick(projects.flatMap((p) => open(p, 'Edit'))).map(({ p, v }) =>
     proposalItem(p, v, 'edit', p.title, 'Edit request'),
   );
-  return [...phases, ...plans, ...updates, ...edits, ...linksToCast(projects)];
+  const all = [
+    ...phases,
+    ...plans,
+    ...updates,
+    ...edits,
+    ...linksToCast(projects),
+    ...softwareVotes(projects),
+  ];
+  // web-backend: newest first, eight in all.
+  return newestFirst(all).slice(0, VOTES_SHOWN);
 }
 
 /**
@@ -223,9 +247,18 @@ export function countActionable(
   return items.filter((i) => !dismissed.includes(i.id) && !seen.includes(i.id)).length;
 }
 
+const SOFTWARE_KICKERS: Partial<Record<RailVoteKind, string>> = {
+  pull_request_merge: 'Action · merge needed',
+  pull_request: 'Vote · pull request',
+  merge_capability: 'Vote · merge capability',
+  repository_replacement: 'Vote · repository',
+};
+
 /** web's `itemKicker`. */
 export function railKicker(item: RailItem): string {
   if (item.kind === 'vote') {
+    const software = item.voteKindLabel && SOFTWARE_KICKERS[item.voteKindLabel];
+    if (software) return software;
     return item.voteKindLabel ? `Vote · ${item.voteKindLabel.replace('_', ' ')}` : 'Vote';
   }
   if (item.kind === 'request') return 'Service request';

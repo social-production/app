@@ -90,11 +90,12 @@ export async function keyOf(page) {
 export const rail = (page) => page.locator('.right-rail .rail-panel');
 export const railButton = (page) => page.getByRole('button', { name: 'Open activity' });
 
-/** Open the rail (it reloads on open) until `locator` shows in it. */
-export async function railShows(page, locator, what) {
+/** Open the rail (it reloads on open) until `locator` shows in it; `wait` per opening (a
+ * founder in many projects waits longer for the rail to load). */
+export async function railShows(page, locator, what, wait = 10_000) {
   for (let i = 0; i < 20; i++) {
     if (!(await rail(page).count())) await railButton(page).click();
-    if (await locator().waitFor({ timeout: 10_000 }).then(() => true, () => false)) return;
+    if (await locator().waitFor({ timeout: wait }).then(() => true, () => false)) return;
     await railButton(page).click(); // close, then reopen to reload it
   }
   throw new Error(`timed out waiting for ${what} in the rail`);

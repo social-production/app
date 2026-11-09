@@ -11,7 +11,7 @@ import type { CharterMode } from './projects.ts';
  * follows (`new-follower`, `follow-request`, `follow-accepted`, ADR 0054) and activities
  * (`prj-activity`, `prj-role-suggest`, `prj-role-taken`, ADR 0056) and shared help requests
  * (`hr-share`, `domain/share.ts`) and plans taking the lead (`prj-plan-lead`, `evt-plan-lead`,
- * `domain/planLeadNotifications.ts`).
+ * `domain/planLeadNotifications.ts`) and approved pull requests (`pr-approved`, ADR 0086).
  * Times are Holochain micros.
  */
 export type NotificationKind =
@@ -37,7 +37,8 @@ export type NotificationKind =
   | 'prj-removed'
   | 'bot-review'
   | 'bot-review-result'
-  | 'svc-request';
+  | 'svc-request'
+  | 'pr-approved';
 
 export interface NotificationItem {
   id: string;
@@ -58,7 +59,8 @@ export interface NotificationItem {
   /** Where the card goes on the project page (web's href query). */
   target:
     | { tab: 'chat'; comment: string }
-    | { open: 'vote'; voteTarget: string }
+    /** web's `?open=vote&voteKind=…`: a phase vote, or a pull request's merge (`pr-approved`). */
+    | { open: 'vote'; voteTarget: string; voteKind?: 'phase_change' | 'pull_request_merge' }
     | { conversation: string }
     | { activity: string }
     /** A shared project, event, help request, thread or post (by `projectMode`). */

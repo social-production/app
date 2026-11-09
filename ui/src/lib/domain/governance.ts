@@ -32,7 +32,17 @@ export type ProposalKind =
         off_schedule: boolean;
         reason: string;
       };
-    };
+    }
+  /** A software project's merge capability or repository vote (ADR 0086), built from the
+   * `software` read in web's generic vote sheet shape: a card (title, description) and why. */
+  | { Software: SoftwareVote };
+
+export interface SoftwareVote {
+  label: string;
+  title: string;
+  description: string;
+  reason: string;
+}
 
 export interface Proposal {
   id: string;
@@ -71,10 +81,11 @@ export const APPROVAL_PERCENT = 66;
 
 export function kindName(
   kind: ProposalKind,
-): 'edit' | 'update' | 'phase' | 'return' | 'remove' | 'settings' {
+): 'edit' | 'update' | 'phase' | 'return' | 'remove' | 'settings' | 'software' {
   if ('Edit' in kind) return 'edit';
   if ('RequestSettings' in kind) return 'settings';
   if ('RemoveMember' in kind) return 'remove';
+  if ('Software' in kind) return 'software';
   if ('Return' in kind) return 'return';
   return 'Update' in kind ? 'update' : 'phase';
 }
@@ -92,6 +103,7 @@ export function proposalLabel(kind: ProposalKind, phaseLabel: (id: string) => st
   if ('Update' in kind) return 'Post update';
   if ('RemoveMember' in kind) return 'Remove member';
   if ('RequestSettings' in kind) return 'Request settings';
+  if ('Software' in kind) return kind.Software.label;
   // web's phaseChangeDecisionTitle('return', …).
   if ('Return' in kind) return `Return to ${phaseLabel(kind.Return.to)}`;
   return `Move to ${phaseLabel(kind.Phase.to)}`;
@@ -106,6 +118,7 @@ export function outcomeSentence(
   if ('Update' in kind) return 'If this passes, this update is posted.';
   if ('RemoveMember' in kind) return 'If this passes, this member is removed.';
   if ('RequestSettings' in kind) return 'If this passes, the request settings change.';
+  if ('Software' in kind) return 'If this passes, this change is applied.';
   if ('Phase' in kind) return `If this passes, this moves from ${from} to ${to(kind.Phase.to)}.`;
   if ('Return' in kind) return `If this passes, this moves from ${from} to ${to(kind.Return.to)}.`;
   const e = kind.Edit;

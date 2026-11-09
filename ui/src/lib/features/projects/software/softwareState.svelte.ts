@@ -1,10 +1,12 @@
-import type {
-  SoftwareGovernance,
-  SoftwarePullRequest,
-  SoftwareRequest,
+import {
+  votedProposal,
+  type SoftwareGovernance,
+  type SoftwarePullRequest,
+  type SoftwareRequest,
 } from '#lib/domain/software.ts';
+import { softwareDockVotes, softwareHistory } from '#lib/domain/softwareVotes.ts';
 import { explain } from '#lib/services/errors.ts';
-import { castVote } from '#lib/services/governance.ts';
+import { castVote, closeProposal } from '#lib/services/governance.ts';
 import { namesOf } from '#lib/services/people.ts';
 import { loadSoftware, proposeSoftware } from '#lib/services/software.ts';
 
@@ -24,6 +26,8 @@ export class SoftwareState {
   busy = $state(false);
   mode = $state<SoftwareMode | null>(null);
   activeId = $state<string | null>(null);
+  /** The pull request a link already opened (`softwareLink.ts`). */
+  linked: string | null = null;
 
   constructor(readonly projectId: string) {}
 
@@ -31,13 +35,26 @@ export class SoftwareState {
     this.governance?.pullRequests.find((p) => p.id === this.activeId) ?? null,
   );
 
+  /** The History tab's and Past activity's software decisions. */
+  readonly history = $derived(softwareHistory(this.governance, this.names));
+  /** Take part's merge capability and repository votes. */
+  readonly dockVotes = $derived(softwareDockVotes(this.governance, this.names));
+
   async load(): Promise<void> {
     try {
-      const g = await loadSoftware(this.projectId);
+      let g = await loadSoftware(this.projectId);
+      // A vote that decided a request may have been cast before the voter saw every other
+      // vote; a member who loads it next writes the Outcome (ADR 0033), as for proposals.
+      const settled = g.canPropose ? settledOf(g) : [];
+      if (settled.length > 0) {
+        await Promise.all(settled.map((id) => closeProposal(this.projectId, id)));
+        g = await loadSoftware(this.projectId);
+      }
       const people = [
         ...g.mergers.map((m) => m.agent),
         ...g.candidates,
         ...g.pullRequests.flatMap((p) => [p.author, ...(p.merge ? [p.merge.by] : [])]),
+        ...g.capabilityRequests.flatMap((c) => [c.author, c.agent]),
         ...g.repositoryRequests.map((r) => r.author),
       ];
       const missing = people.filter((a, i) => people.indexOf(a) === i && !this.names[a]);
@@ -81,7 +98,15 @@ export class SoftwareState {
 
   /** The vote open on `pr`: its own, or its recorded merge's (the confirmation). */
   vote(pr: SoftwarePullRequest, choice: 'Yes' | 'No'): Promise<boolean> {
-    const proposal = pr.stage === 'confirmation' && pr.merge ? pr.merge.proposal : pr.id;
-    return this.run(() => castVote(this.projectId, proposal, choice));
+    return this.run(() => castVote(this.projectId, votedProposal(pr), choice));
   }
+}
+
+/** Votes the tallies decide that no Outcome has closed yet. */
+function settledOf(g: SoftwareGovernance): string[] {
+  return [
+    ...g.pullRequests.filter((p) => p.tally.settled).map(votedProposal),
+    ...g.capabilityRequests.filter((c) => c.tally.settled).map((c) => c.id),
+    ...g.repositoryRequests.filter((r) => r.tally.settled).map((r) => r.id),
+  ];
 }

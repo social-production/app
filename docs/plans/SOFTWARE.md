@@ -30,11 +30,22 @@ board mergers (asset management, owner 2026-10-31).
 - [x] Styles via PORTS (`python3 scripts/port-styles.py`), never by hand.
 - [x] Browser test `tests/e2e/software.mjs`: plan → PR → vote → record merge → confirm.
 
-## Phase (c): elsewhere on web (coordinator + UI)
-- [ ] Right rail: "Vote · pull request" (approval and confirmation), "Action · merge needed"
-  with Record merge, "Vote · merge capability" (web's `activity_rail.py`, `RightRailPanel`).
-- [ ] History tab and Past activity: web's `project-pull-request-approval`,
+## Phase (c): elsewhere on web (coordinator + UI, ADR 0087)
+- [x] Right rail: "Vote · pull request" (approval and confirmation, Assess opens the vote
+  wizard), "Action · merge needed" with Record merge, "Vote · merge capability", "Vote ·
+  repository" (web's `activity_rail.py`, `RightRailPanel`), and their History casts
+  (`domain/softwareRail.ts`); the rail now keeps web's eight vote rows, newest first.
+- [x] Take part's vote sheet casts merge capability and repository votes (web's
+  `pushSoftwareGovernanceActions`; the app had no way to vote on them before).
+- [x] History tab and Past activity: web's `project-pull-request-approval`,
   `-confirmation`, `project-merge-capability-change`, `project-repository-replacement` cards
-  (`build_software_history_entries`).
-- [ ] `pr-approved` notification to the pull request's author (category as web's
-  `KIND_TO_CATEGORY`), opening the vote (`?open=vote&voteKind=pull_request_merge`).
+  (`build_software_history_entries`, `domain/softwareVotes.ts`), on the extracted
+  `DecisionHistoryCard`; Past activity interleaves them with ended activities.
+- [x] `pr-approved` notification to the pull request's author (Votes needed), opening Record
+  merge (`?open=vote&voteKind=pull_request_merge`); the coordinator's pull request view adds
+  `approved: { at, by }`.
+- [x] Links: `voteKind=pull_request&assess=1` → vote wizard, `pull_request_merge` → Record
+  merge (`software/softwareLink.ts`).
+- [x] Browser test `software.mjs` extended (rail rows, Assess from the rail, `pr-approved`,
+  a merge capability vote from the rail, History and Past activity); scenario `software`
+  checks `approved`.

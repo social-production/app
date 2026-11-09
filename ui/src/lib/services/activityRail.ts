@@ -9,6 +9,7 @@ import { requestRailItems } from '#lib/domain/requestRail.ts';
 import type { VoteChoice } from '#lib/domain/governance.ts';
 import type { SideStatus } from '#lib/domain/links.ts';
 import type { CharterMode } from '#lib/domain/projects.ts';
+import { isSoftwareProject } from '#lib/domain/software.ts';
 import {
   callCell,
   hashToString,
@@ -24,10 +25,11 @@ import { listPlans } from './plans.ts';
 import { namesOf, myAgent } from './people.ts';
 import { listingTitle, myProjectSeeds } from './projects.ts';
 import { myServiceRequests } from './serviceRequests.ts';
+import { loadSoftware } from './software.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
-  charter: { title: string; mode: CharterMode } | null;
+  charter: { title: string; mode: CharterMode; subtype: string } | null;
   am_member: boolean;
   phase: string;
   phases: { id: string; label: string }[];
@@ -108,11 +110,12 @@ async function railProject(seed: string): Promise<RailProject | null> {
   if (!project?.charter || !project.am_member) return null;
   // web ends a removed project's memberships, open votes and sign-ups (ADR 0071).
   if (moderation?.state === 'removed') return null;
-  const [activities, proposals, board, links] = await Promise.all([
+  const [activities, proposals, board, links, software] = await Promise.all([
     listActivities({ seed }).catch(() => []),
     listProposals({ seed }).catch(() => []),
     listPlans({ seed }).catch(() => null),
     railLinks(cell).catch(() => []),
+    isSoftwareProject(project.charter) ? railSoftware(seed).catch(() => null) : null,
   ]);
   const labels = new Map(project.phases.map((p) => [p.id, p.label]));
   return {
@@ -126,5 +129,13 @@ async function railProject(seed: string): Promise<RailProject | null> {
     proposals,
     plans: board?.plans ?? [],
     links,
+    software,
   };
+}
+
+/** A software project's pull requests (ADR 0086), with the names merge capability votes cite. */
+async function railSoftware(seed: string): Promise<RailProject['software']> {
+  const governance = await loadSoftware({ seed });
+  const agents = [...new Set(governance.capabilityRequests.map((c) => c.agent))];
+  return { governance, names: agents.length ? await namesOf(agents) : {} };
 }

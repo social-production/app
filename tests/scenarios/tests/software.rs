@@ -70,11 +70,17 @@ struct MergeView {
 }
 
 #[derive(Deserialize, Debug)]
+struct ClosedView {
+    by: AgentPubKey,
+}
+
+#[derive(Deserialize, Debug)]
 struct PullRequestView {
     id: ActionHash,
     stage: String,
     merge: Option<MergeView>,
     tally: Tally,
+    approved: Option<ClosedView>,
     can_record_merge: bool,
 }
 
@@ -203,12 +209,17 @@ async fn merged(net: &Net) {
     let id = propose(net, 0, pr("Timer")).await;
     let opened = pull_request(net, 0, &id).await;
     assert_eq!((opened.stage.as_str(), opened.tally.yes), ("approval", 0));
+    assert!(opened.approved.is_none());
     let early = net
         .try_call::<_, ActionHash>(1, "governance", "propose", merge(&id))
         .await;
     assert!(early.is_err(), "not approved yet");
     both_vote_yes(net, &id).await;
-    assert_eq!(pull_request(net, 0, &id).await.stage, "awaiting-merge");
+    let approved = pull_request(net, 0, &id).await;
+    assert_eq!(approved.stage, "awaiting-merge");
+    // web's pr-approved names whoever closed the vote: the second Yes.
+    let closed = approved.approved.expect("approved");
+    assert_eq!(closed.by, agent(net, 1));
     assert!(!pull_request(net, 0, &id).await.can_record_merge);
     assert!(pull_request(net, 1, &id).await.can_record_merge);
     let refused = net
@@ -223,7 +234,9 @@ async fn merged(net: &Net) {
     assert_eq!((m.proposal, m.by), (recorded.clone(), agent(net, 1)));
     assert_eq!(waiting.tally.yes, 0, "the confirmation vote starts empty");
     both_vote_yes(net, &recorded).await;
-    assert_eq!(pull_request(net, 0, &id).await.stage, "confirmed");
+    let confirmed = pull_request(net, 0, &id).await;
+    assert_eq!(confirmed.stage, "confirmed");
+    assert!(confirmed.approved.is_some(), "the approval outlives the merge");
 }
 
 #[tokio::test(flavor = "multi_thread")]

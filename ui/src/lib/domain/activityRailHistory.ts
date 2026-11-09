@@ -13,6 +13,7 @@ import {
   type RailVoteKind,
 } from './activityRail.ts';
 import type { Proposal, ProposalStatus, VoteChoice } from './governance.ts';
+import { softwareCasts } from './softwareRail.ts';
 
 /** web-backend's limits. */
 const PAST_LIMIT = 20;
@@ -149,7 +150,7 @@ function castVotes(projects: RailProject[]): RailItem[] {
   );
   // web-backend keeps 12 of each kind; link and sever votes share one list.
   const byKind = new Map<string, Cast[]>();
-  for (const c of [...plans, ...proposals, ...linkCasts(projects)]) {
+  for (const c of [...plans, ...proposals, ...linkCasts(projects), ...softwareCasts(projects)]) {
     const key = c?.kind === 'link_sever' ? 'link' : c?.kind;
     if (c && key) byKind.set(key, [...(byKind.get(key) ?? []), c]);
   }
