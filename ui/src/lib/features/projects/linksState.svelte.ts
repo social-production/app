@@ -1,5 +1,10 @@
 import type { VoteChoice } from '#lib/domain/governance.ts';
-import type { LinkSide, LinksFrame, ProjectLink } from '#lib/domain/links.ts';
+import {
+  allRequests,
+  type LinkSide,
+  type LinksFrame,
+  type ProjectLink,
+} from '#lib/domain/links.ts';
 import type { Project } from '#lib/domain/projects.ts';
 import { explain } from '#lib/services/errors.ts';
 import {
@@ -30,7 +35,7 @@ export class LinksState {
     if (!here) return;
     try {
       const frame = await listLinks(here);
-      const all = [...frame.pending, ...frame.past];
+      const all = allRequests(frame);
       const missing = all
         .map((r) => r.proposedBy)
         .filter((a, i, list) => list.indexOf(a) === i && !(a in this.names));

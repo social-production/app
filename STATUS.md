@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 8:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,10 +50,12 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (software projects phase c merged, PR #129; this docs PR follows).
+## In flight: link votes in the History tab (PARITY item 2), PR on `claude/social-production-handoff-dsam61`.
+UI only (no zome change, no network reset). When CI is green: merge, smoke live `links.mjs`,
+update README Status + this file.
 **Next:** service requests (c) once the owner says who reviews them (ADR 0076). Otherwise,
-from PARITY's summary: link votes in the History tab (item 2), then compare the screens not
-compared yet (item 10); Settings waiting on features (item 9) comes with those features.
+from PARITY's summary: compare the screens not compared yet (item 10); Settings waiting on
+features (item 9) comes with those features.
 Also measure the live rail's load time now that it reads `software` (see "Done 2026-11-09").
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
@@ -82,6 +84,23 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-10: link votes in the History tab (PARITY item 2)
+- web-backend's `build_link_decision_history_entries`: every link create and sever request
+  of this project (pending, past, active and historical links) is a "Link decision" /
+  "Sever link decision" card; its tally and vote are this project's half, its status the
+  whole request's. The card opens web's generic vote sheet (label Link/Sever, the other
+  project's title, both sides' "Title: 50% · 1 yes / 0 no" lines, why). `domain/linkHistory.ts`
+  builds them as `Software`-shaped proposals, like the software votes; the new
+  `features/projects/ProjectHistory.svelte` reads them with `LinksState` when the tab opens
+  (the same reads as the Links tab) and casts a link vote on this project's half.
+  `LinksState` now names the proposers of active and historical links too.
+- **Checked:** `npm run check -w ui` (0), `npm run lint -w ui`, boundaries, sizes. Against a
+  local seed node (`cloud-seed.sh`): `links.mjs` **passed** (it now checks A's History lists
+  the approved link and sever decisions, and Bob casts the sever vote from History's sheet).
+  **Not run:** scenarios (no Rust change), the other browser tests.
+- Note: the rail's "Vote · link sever" row stays up to a minute after a vote from History (the
+  rail refreshes on its own minute loop for every vote path).
 
 ## Done 2026-11-10: software projects phase (c) merged (PR #129, 17:27 UTC Nov 9 = 4:27 am Melbourne)
 - CI: the first run failed `check` on `cargo fmt` (the scenario edited after the local

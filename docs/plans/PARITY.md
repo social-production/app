@@ -14,8 +14,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    (A removed project leaving the
    rail and its `prj-removed` card: done 2026-11-05.) (The blur on hidden detail pages: done
    2026-11-03.)
-2. ~~History tab~~ (done 2026-11-03). Software decisions joined it 2026-11-09 (ADR 0087).
-   Link votes still to join it (web lists link create/sever votes there too).
+2. ~~History tab~~ (done 2026-11-03). Software decisions joined it 2026-11-09 (ADR 0087);
+   link create/sever votes 2026-11-10 ("Link decision" / "Sever link decision", web's sheet,
+   cast on this project's half; the status is the whole request's, as web-backend's).
 3. ~~"Plan became leading"~~ (done 2026-11-03, ADR 0072). Notification kinds web has that
    the app still lacks: `bot-review-vote` (bot reviews' other cards and `prj-removed`: done
    2026-11-05).

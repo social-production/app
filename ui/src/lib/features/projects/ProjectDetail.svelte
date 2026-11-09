@@ -1,6 +1,5 @@
 <script lang="ts">
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
-  import HistoryTab from '#lib/components/governance/HistoryTab.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
@@ -23,6 +22,7 @@
   import ParticipationPanel from './ParticipationPanel.svelte';
   import ProjectChat from './ProjectChat.svelte';
   import ProjectDock from './ProjectDock.svelte';
+  import ProjectHistory from './ProjectHistory.svelte';
 
   import '#lib/components/styles/detail.css';
 
@@ -227,15 +227,10 @@
         {/if}
         {#if tab === 'history'}
           <div class="tab-panel">
-            <HistoryTab
-              proposals={detail.proposals}
-              plans={detail.plans?.plans}
-              names={{ ...detail.names, ...detail.software.names }}
-              extra={detail.software.history}
+            <ProjectHistory
+              {detail}
+              {project}
               {charter}
-              stage={project.stage}
-              phaseLabel={detail.phaseLabel}
-              onVote={(p, choice) => detail.vote(p, choice)}
               onOpenPlan={(plan) => ((revealPlan = plan.id), (tab = 'participation'))}
             />
           </div>
