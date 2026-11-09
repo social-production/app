@@ -2,13 +2,27 @@
 // place for a driver, any number of helpers); a new person finds its feed card.
 // The feed card's author link opens the asker's profile, with web's personal help-request card;
 // they sign up as driver (which joins the request), see the role full for others, and leave again.
+// The right rail's Help Requests (web's bootstrap rail): open in the helper's joined channel,
+// "You signed up" once they take a role, and "Your request" for the asker.
 // Then founder one shares it with them from web's Share menu: they get the link in a direct
 // chat and web's "A help request was shared with you." notification, which opens it.
 //   node tests/e2e/help-requests.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, signUp, tagTestChannel } from './lib.mjs';
+import {
+  BASE,
+  browser,
+  device,
+  errors,
+  log,
+  phraseSignIn,
+  rail,
+  railShows,
+  signUp,
+  tagTestChannel,
+  TEST_CHANNEL,
+} from './lib.mjs';
 
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -74,6 +88,21 @@ await personal.getByText('Allotment gate', { exact: false }).waitFor();
 await personal.locator('.identity .header-name').waitFor();
 if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/profile-help-request.png` });
 log('the asker\'s profile shows it on the personal help-request card');
+// The helper joins the channel the request is tagged with: the rail lists it as open help.
+await helper.goto(`${BASE}/channels/${TEST_CHANNEL}`);
+await helper.getByRole('button', { name: `Join ${TEST_CHANNEL}` }).click();
+await helper.getByRole('button', { name: `Leave ${TEST_CHANNEL}` }).waitFor({ timeout: 120_000 });
+const helpRow = (page, text) =>
+  rail(page).locator('.rail-section-help-requests .help-request-row', { hasText: title }).filter({ hasText: text });
+await railShows(helper, () => helpRow(helper, '0 signed up · 1 needed'), 'the open help request', 20_000);
+assert.match(await helpRow(helper, title).innerText(), /help request/i);
+assert.match(await helpRow(helper, title).innerText(), /Friday morning, with a suitcase\./);
+if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/rail-help-open.png` });
+await helpRow(helper, title).locator('.activity-open-button').click();
+await helper.waitForURL(/\/help-requests\//, { timeout: 60_000 });
+assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);
+log("the helper's rail lists it as open help in their channel");
+
 await helper.goto(url);
 const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
@@ -81,6 +110,12 @@ await driver.getByRole('button', { name: 'Sign up' }).click();
 await driver.getByRole('button', { name: 'Leave' }).waitFor({ timeout: 60_000 });
 await driver.getByText('1 signed up · 1 needed').waitFor();
 log('a helper signed up as driver');
+// Stay on the page until the sign-up shows (above), then the rail reads it.
+await railShows(helper, () => helpRow(helper, 'You signed up'), 'the signed-up help request', 20_000);
+assert.match(await helpRow(helper, 'You signed up').innerText(), /1 signed up · 1 needed/);
+log('the rail says the helper signed up');
+await helper.goto(url);
+await driver.waitFor({ timeout: 120_000 });
 
 for (let i = 0; ; i++) {
   await ann.goto(url);
@@ -91,6 +126,9 @@ for (let i = 0; ; i++) {
   await ann.waitForTimeout(3000);
 }
 log('the asker sees the driver role full');
+await railShows(ann, () => helpRow(ann, 'Your request'), "the asker's help request", 60_000);
+log("the asker's rail lists it as their request");
+await ann.goto(url);
 
 await driver.getByRole('button', { name: 'Leave' }).click();
 await driver.getByRole('button', { name: 'Sign up' }).waitFor({ timeout: 60_000 });

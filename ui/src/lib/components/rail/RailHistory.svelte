@@ -5,6 +5,7 @@
     historyOutcome,
     type HistoryFilter,
   } from '#lib/domain/activityRailHistory.ts';
+  import { isHelpKind } from '#lib/domain/helpRail.ts';
   import { modeAccent } from '#lib/domain/projects.ts';
 
   /** web's History section: what ended, what you signed up for and the votes you cast. */
@@ -52,7 +53,8 @@
               class="history-outcome"
               class:passed={item.kind === 'vote' && item.outcome === 'passed'}
               class:failed={item.kind === 'vote' && item.outcome === 'failed'}
-              class:participated={item.kind === 'project' && item.viewerParticipated}
+              class:participated={(item.kind === 'project' || isHelpKind(item.kind)) &&
+                item.viewerParticipated}
             >
               {historyOutcome(item)}
             </span>

@@ -8,12 +8,14 @@ import { zoneOf } from './activityTime.ts';
 import type { Proposal, VoteChoice } from './governance.ts';
 import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
+import { isHelpKind, type HelpKind } from './helpRail.ts';
+import { HELP_MODE } from './helpRequests.ts';
 import type { CharterMode } from './projects.ts';
 import type { SoftwareGovernance } from './software.ts';
 import { softwareVotes } from './softwareRail.ts';
 
-/** web's kinds this app has so far (service requests: `requestRail.ts`); help requests later. */
-export type RailKind = 'project' | 'vote' | 'request';
+/** web's kinds (service requests: `requestRail.ts`; help requests: `helpRail.ts`). */
+export type RailKind = 'project' | 'vote' | 'request' | HelpKind;
 export type RailVoteKind =
   | 'phase_change'
   | 'plan'
@@ -39,6 +41,8 @@ export interface RailItem {
   meta: string;
   createdAt: number;
   countLabel?: string;
+  /** web's body preview (help requests). */
+  body?: string;
   projectMode: CharterMode;
   activityId?: string;
   voteKindLabel?: RailVoteKind;
@@ -50,6 +54,9 @@ export interface RailItem {
 export interface RailProject {
   seed: string;
   title: string;
+  /** The charter's description (a help request's body). */
+  description: string;
+  creator: string;
   mode: CharterMode;
   amMember: boolean;
   phase: string;
@@ -85,7 +92,7 @@ const VOTES_SHOWN = 8;
  * ADR 0056); the app counts both (PARITY: owner review).
  */
 export const inActivityPhase = (p: Pick<RailProject, 'mode' | 'phase'>): boolean =>
-  p.phase === (p.mode === 'personal-service' ? 'phase-1' : 'phase-5');
+  p.mode !== HELP_MODE && p.phase === (p.mode === 'personal-service' ? 'phase-1' : 'phase-5');
 
 export const voteQuery = (kind: RailVoteKind, target: string, assess = false): string =>
   `?open=vote&voteKind=${kind}&voteTarget=${encodeURIComponent(target)}${assess ? '&assess=1' : ''}`;
@@ -262,6 +269,7 @@ export function railKicker(item: RailItem): string {
     return item.voteKindLabel ? `Vote · ${item.voteKindLabel.replace('_', ' ')}` : 'Vote';
   }
   if (item.kind === 'request') return 'Service request';
+  if (isHelpKind(item.kind)) return 'Help request';
   return 'Project activity';
 }
 

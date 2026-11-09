@@ -7,6 +7,7 @@
   import RailRow from '#lib/components/rail/RailRow.svelte';
   import RailSection from '#lib/components/rail/RailSection.svelte';
   import { railTime, type RailItem } from '#lib/domain/activityRail.ts';
+  import { isHelpKind } from '#lib/domain/helpRail.ts';
   import { projectPageOf } from '#lib/services/notifications.ts';
   import {
     activityRail,
@@ -21,8 +22,8 @@
 
   /**
    * web's RightRailPanel: Project Activity & Events, Help Requests, Requests, Votes to cast,
-   * History and Cleared. Requests lists open service requests to services you run (ADR 0076);
-   * Help Requests stays empty for now.
+   * History and Cleared. Help Requests lists yours, your sign-ups and open ones in your
+   * channels and communities; Requests, open service requests to services you run (ADR 0076).
    */
   let { onClose }: { onClose: () => void } = $props();
 
@@ -33,6 +34,7 @@
   const activities = $derived(visible.filter((i) => i.kind === 'project'));
   const votes = $derived(visible.filter((i) => i.kind === 'vote'));
   const requests = $derived(visible.filter((i) => i.kind === 'request'));
+  const help = $derived(visible.filter((i) => isHelpKind(i.kind)));
   const unseen = (item: RailItem): boolean => !activityRail.seen.includes(item.id);
 
   /** web's handleOpenItem; a link into the page already open reloads it, so it opens there. */
@@ -74,12 +76,24 @@
 
   <RailSection
     title="Help Requests"
-    count={0}
-    hot={false}
+    count={help.length}
+    hot={help.some(unseen)}
     extraClass="rail-section-help-requests"
     emptyTitle="No help requests yet"
     emptyText="Open help in your memberships will show here."
-  />
+  >
+    {#each help as item (item.id)}
+      <RailRow
+        {item}
+        unseen={unseen(item)}
+        rowClass="help-request-row"
+        dismissLabel="Dismiss help request card"
+        time={railTime(item.createdAt)}
+        onOpen={() => openItem(item)}
+        onDismiss={() => dismissRailItem(item.id)}
+      />
+    {/each}
+  </RailSection>
 
   <RailSection
     title="Requests"

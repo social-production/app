@@ -13,6 +13,8 @@ import {
   type RailVoteKind,
 } from './activityRail.ts';
 import type { Proposal, ProposalStatus, VoteChoice } from './governance.ts';
+import { isHelpKind } from './helpRail.ts';
+import { HELP_MODE } from './helpRequests.ts';
 import { softwareCasts } from './softwareRail.ts';
 
 /** web-backend's limits. */
@@ -32,8 +34,10 @@ export function railHistory(projects: RailProject[], nowMicros: number): RailIte
   return items.sort((a, b) => b.createdAt - a.createdAt).slice(0, HISTORY_LIMIT);
 }
 
+/** Help requests' activities are listed as help requests (`helpRail.ts`). */
 function pastActivities(projects: RailProject[], now: number): RailItem[] {
   return projects
+    .filter((p) => p.mode !== HELP_MODE)
     .flatMap((p) => p.activities.filter((a) => a.endsAt <= now).map((a) => ({ p, a })))
     .sort((x, y) => y.a.endsAt - x.a.endsAt)
     .slice(0, PAST_LIMIT)
@@ -201,11 +205,12 @@ function linkCasts(projects: RailProject[]): Cast[] {
   );
 }
 
-/** web's `historyMatchesFilter` (help and service requests don't exist here yet). */
+/** web's `historyMatchesFilter` (service requests have no history rows here yet). */
 export function historyMatches(item: RailItem, filter: HistoryFilter): boolean {
   if (filter === 'votes') return item.kind === 'vote' && item.viewerParticipated !== false;
   if (filter === 'activities') return item.kind === 'project';
-  if (filter === 'help' || filter === 'requests') return false;
+  if (filter === 'help') return isHelpKind(item.kind);
+  if (filter === 'requests') return item.kind === 'request';
   return true;
 }
 
@@ -216,5 +221,6 @@ export function historyOutcome(item: RailItem): string {
     if (item.outcome === 'failed') return 'Did not pass';
     return 'Still open';
   }
+  if (isHelpKind(item.kind)) return item.viewerParticipated ? 'You participated' : item.meta;
   return item.viewerParticipated ? 'You participated' : 'You did not participate';
 }
