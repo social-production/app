@@ -155,3 +155,19 @@ export function targetMetaRows(t: LinkTarget): string[] {
   if (t.memberCount !== null) rows.push(`${t.memberCount} members`);
   return rows;
 }
+
+/** Every request in a frame once: pending, past, and each link's create and sever votes. */
+export function allRequests(frame: LinksFrame): LinkRequest[] {
+  const links = [...frame.active, ...frame.historical];
+  const all = [
+    ...frame.pending,
+    ...frame.past,
+    ...links.flatMap((l) => (l.sever ? [l.create, l.sever] : [l.create])),
+  ];
+  return all.filter((r, i) => all.findIndex((s) => s.id === r.id) === i);
+}
+
+/** web-backend's `thisSideLabel` / `otherSideLabel`: "Title: 50% · 1 yes / 1 no". */
+export function sideLine(side: LinkSide): string {
+  return `${side.projectTitle}: ${sideVoteLabel(side.half)}`;
+}
