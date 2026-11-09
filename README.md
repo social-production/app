@@ -8,12 +8,15 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-08)
+## Status (2026-11-10)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Link votes in the History tab (PR #131, 2026-11-10 9:55 am Melbourne):** a project's or
+  event's History lists its link and sever votes as web's "Link decision" / "Sever link
+  decision" cards; open ones can be voted from their sheet. No reset. Live `links.mjs` passed.
 - **Software votes beyond the panel (PR #129, 2026-11-10 4:27 am Melbourne, ADR 0087):** the
   right rail lists pull request votes, merges to record, and merge capability and repository
   votes; Take part's vote sheet casts merge capability and repository votes; the History tab

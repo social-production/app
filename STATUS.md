@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 8:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 10:10 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,9 +50,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: link votes in the History tab (PARITY item 2), PR on `claude/social-production-handoff-dsam61`.
-UI only (no zome change, no network reset). When CI is green: merge, smoke live `links.mjs`,
-update README Status + this file.
+## In flight: nothing (link votes in History merged, PR #131; this docs PR follows).
 **Next:** service requests (c) once the owner says who reviews them (ADR 0076). Otherwise,
 from PARITY's summary: compare the screens not compared yet (item 10); Settings waiting on
 features (item 9) comes with those features.
@@ -84,6 +82,10 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-10: link votes in History merged (PR #131, 22:55 UTC Nov 9 = 9:55 am Melbourne)
+- CI green on the first run (~90 min). UI redeployed 22:55 UTC; no zome change, no reset.
+  Live `links.mjs` **passed** (23:05–23:07 UTC, History checks included).
 
 ## Done 2026-11-10: link votes in the History tab (PARITY item 2)
 - web-backend's `build_link_decision_history_entries`: every link create and sever request
