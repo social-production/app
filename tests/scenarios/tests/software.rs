@@ -236,7 +236,10 @@ async fn merged(net: &Net) {
     both_vote_yes(net, &recorded).await;
     let confirmed = pull_request(net, 0, &id).await;
     assert_eq!(confirmed.stage, "confirmed");
-    assert!(confirmed.approved.is_some(), "the approval outlives the merge");
+    assert!(
+        confirmed.approved.is_some(),
+        "the approval outlives the merge"
+    );
 }
 
 #[tokio::test(flavor = "multi_thread")]
