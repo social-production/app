@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-09 Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,13 +50,11 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: software projects phase (c) (ADR 0087), branch `claude/social-production-handoff-dsam61`
-Coordinator + UI, **no network reset** (the governance coordinator's `software` view adds
-`approved: { at, by }` per pull request). See "Done 2026-11-09" below for what it does and
-what was checked; open the PR, wait for CI, merge, smoke live `software.mjs`.
-**Next after it:** service requests (c) once the owner says who reviews them (ADR 0076); else
-the rest of PARITY's summary (link votes in the History tab, item 2; Settings waiting on
-features, item 9; screens not compared yet, item 10).
+## In flight: nothing (software projects phase c merged, PR #129; this docs PR follows).
+**Next:** service requests (c) once the owner says who reviews them (ADR 0076). Otherwise,
+from PARITY's summary: link votes in the History tab (item 2), then compare the screens not
+compared yet (item 10); Settings waiting on features (item 9) comes with those features.
+Also measure the live rail's load time now that it reads `software` (see "Done 2026-11-09").
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
   connection; test such pages after a full page load, not only after in-app navigation.
 - **CI note:** shard 6 failed in `reports`' *setup* with an expired nonce on PR #87, PR #90
@@ -85,7 +83,12 @@ the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/place
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
-## Done 2026-11-09: software projects phase (c) (ADR 0087), on branch, not merged yet
+## Done 2026-11-10: software projects phase (c) merged (PR #129, 17:27 UTC Nov 9 = 4:27 am Melbourne)
+- CI: the first run failed `check` on `cargo fmt` (the scenario edited after the local
+  check); the second run was green. The seed node restarted ~17:41 UTC (654 MB). No reset.
+  Live `software.mjs` and `rail.mjs` **passed** (17:42–18:05 UTC).
+
+## Done 2026-11-09: software projects phase (c) (ADR 0087), PR #129
 - The rail's "Vote · pull request" (Assess opens the vote wizard), "Action · merge needed"
   (Record merge), "Vote · merge capability", "Vote · repository" and their History casts;
   the rail keeps web's eight vote rows, newest first. Take part's vote sheet casts merge
@@ -104,7 +107,8 @@ asset management is not part of parity (owner, 2026-10-31). Each starts with its
   reload; locally Ann's rail took ~25 s with six software test projects. If live is slow,
   read it only for projects in Activity or make the view cheaper (it counts each vote up to
   three times).
-- **Lessons:** a browser test that votes and then navigates at once can drop the vote still
+- **Lessons:** run `cargo fmt --all --check` after the *last* Rust edit (PR #129's first CI
+  run failed on it). A browser test that votes and then navigates at once can drop the vote still
   being written; wait for something the vote changes on the same page. A fresh local seed
   node's first browser test may time out signing in (run it again); after ~8 software runs
   the local node slowed until pages took >60 s, so restart it (its data is wiped on exit).
