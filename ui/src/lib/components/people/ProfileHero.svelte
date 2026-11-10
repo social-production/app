@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
   import { displayName, type Person } from '#lib/domain/people.ts';
 
   import { standingHint, standingLabel } from './standing.ts';
@@ -20,6 +21,18 @@
 
   let { person, devices = 1, actions, counts, trustOpen = false, onStanding }: Props = $props();
 
+  // web's "View <name> profile photo": the picture opens full screen in the PhotoViewer.
+  const avatar = $derived(person.profile?.avatar ?? null);
+  let photoOpen = $state(false);
+  const photoUrl = $derived(
+    photoOpen && avatar
+      ? URL.createObjectURL(new Blob([avatar.bytes.slice()], { type: avatar.mime }))
+      : null,
+  );
+  $effect(() => () => {
+    if (photoUrl) URL.revokeObjectURL(photoUrl);
+  });
+
   import '#lib/components/styles/profile.css';
 </script>
 
@@ -27,11 +40,18 @@
   <div class="hero-topline">
     <div class="hero-main">
       <div class="hero-identity">
-        <AvatarBadge
-          size="md"
-          name={person.profile?.name ?? ''}
-          avatar={person.profile?.avatar ?? null}
-        />
+        {#if avatar}
+          <button
+            class="avatar-open"
+            type="button"
+            aria-label={`View ${person.profile?.name || displayName(person)} profile photo`}
+            onclick={() => (photoOpen = true)}
+          >
+            <AvatarBadge size="md" name={person.profile?.name ?? ''} {avatar} />
+          </button>
+        {:else}
+          <AvatarBadge size="md" name={person.profile?.name ?? ''} avatar={null} />
+        {/if}
         <div class="hero-copy">
           <div class="name-row">
             <h1>{displayName(person)}</h1>
@@ -70,3 +90,9 @@
     </div>
   </div>
 </section>
+
+<PhotoViewer
+  url={photoUrl}
+  alt={`${person.profile?.name || displayName(person)} profile photo`}
+  onClose={() => (photoOpen = false)}
+/>
