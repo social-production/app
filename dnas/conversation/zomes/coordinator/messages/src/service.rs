@@ -8,7 +8,6 @@ use hdk::prelude::*;
 use messages_integrity::{
     EntryTypes, LinkTypes, Message, RequestStatus, ServiceRequest, UnitEntryTypes,
 };
-use sp_core::conversation::ChatKind;
 use sp_service::{
     check_request, check_status, may_decide, replay, request_message, status_message,
 };
@@ -52,6 +51,9 @@ pub struct RequestView {
     pub created_at: Timestamp,
     /// When it was settled (web's `updated_at`), else when it was sent.
     pub updated_at: Timestamp,
+    /// Who settled it (in a group chat, the member who decided; ADR 0089).
+    #[serde(default)]
+    pub decided_by: Option<AgentPubKey>,
 }
 
 /// web's `_request_href`.
@@ -78,11 +80,6 @@ fn post_line(body: String, invite: Option<ActionHash>) -> ExternResult<()> {
 pub fn send_service_request(input: RequestInput) -> ExternResult<ActionHash> {
     let chat = load()?;
     chat.require_member()?;
-    if chat.kind != ChatKind::Direct {
-        return Err(guest(
-            "Service requests go in a direct chat with the service's creator.",
-        ));
-    }
     let title = input.title.trim().to_string();
     let body = input.body.trim().to_string();
     let window = match (input.starts_at, input.ends_at) {
@@ -225,6 +222,7 @@ impl Ledger {
             ends_at: r.entry.ends_at,
             created_at: r.at,
             updated_at: settled.map_or(r.at, |s| s.at),
+            decided_by: settled.map(|s| s.author.clone()),
         }
     }
 }

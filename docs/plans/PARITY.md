@@ -27,10 +27,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
    time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
-6. **Service requests** (ADR 0076): parts (a) (PR #107, live) and (b) (ADR 0077:
-   availability, slots, bookings, Request history, the create flow's request mode) done
-   2026-11-06. Left: (c) collective services' settings vote, Request service and planning
-   (review waits on the owner). web's borrowing/delivery frames are dead code
+6. ~~Service requests~~ (ADR 0076): parts (a) (PR #107) and (b) (ADR 0077: availability,
+   slots, bookings, Request history, the create flow's request mode) done 2026-11-06; (c)
+   collective services (ADR 0089: group-chat requests any member plans or declines, the
+   settings vote) 2026-11-10. web's borrowing/delivery frames are dead code
    (`RequestFrameStack` is imported nowhere): not parity.
 7. **Map + places (M6):** done with phase 5b (2026-11-08, `docs/plans/M6-places.md`, ADR
    0078–0085): places on records, geocoding, the LocationPicker, Regional settings, map
@@ -227,9 +227,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   off-schedule refusals, bookings with the Provider role, Past activity's Request history and
   Self planned history (the requester's check-in and rating), the create flow's "Service
   request mode". Not ported: web's Timezone selects (no Display timezone setting yet).
-- [ ] Service requests, part (c): collective services' Settings ▾ → Request settings vote,
-  Request service, Plan request. **Owner review:** web's review half is unreachable (nobody
-  can become a manager); who should review in the app?
+- [x] Service requests, part (c) (ADR 0089, 2026-11-10): collective services' Settings ▾ → Request settings vote,
+  Request service, Plan request; any member decides (owner 2026-11-10; web's review half is
+  unreachable there).
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
   threads and posts (web's thresholds, Full members' votes, replayed by every reader).
 - [x] Moderation part (b), 2026-11-03 (PR #88, ADR 0071): reports on comments (threads, posts) and on

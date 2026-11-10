@@ -54,6 +54,8 @@ export class ServiceRequestsState {
   settingsOpen = $state(false);
   form = $state<RequestForm>(emptyForm());
   settingsForm = $state<RequestSettings>({ enabled: true, mode: 'both', offSchedule: true });
+  /** A collective service's settings change is voted on, with web's required reason. */
+  settingsReason = $state('');
   /** The request whose decline reason is being written (web's `decliningRequestId`). */
   declining = $state('');
   declineReason = $state('');
@@ -124,11 +126,13 @@ export class ServiceRequestsState {
     this.form = { ...this.form, ...preferredTime() };
   }
 
+  /** `members`: a collective service's, who share its request chat (ADR 0089). */
   async send(service: {
     title: string;
     creator: string;
     settings: RequestSettings;
     slots: Slot[];
+    members?: string[];
   }): Promise<boolean> {
     const f = this.form;
     if (!f.title.trim() || !f.body.trim()) {
@@ -141,7 +145,12 @@ export class ServiceRequestsState {
     }
     const start = micros(f.scheduledAt);
     const end = micros(f.endsAt);
-    const fits = start === null || end === null || fitsOpenSlot(service.slots, start, end);
+    // A collective service lists no slots: its times are its activities' (web's calendar).
+    const fits =
+      !!service.members ||
+      start === null ||
+      end === null ||
+      fitsOpenSlot(service.slots, start, end);
     const refused = refusal(service.settings, !!f.scheduledAt, fits);
     if (refused) {
       this.error = refused;
@@ -149,7 +158,12 @@ export class ServiceRequestsState {
     }
     return this.run(async () => {
       await sendServiceRequest(
-        { id: this.project, title: service.title, creator: service.creator },
+        {
+          id: this.project,
+          title: service.title,
+          creator: service.creator,
+          members: service.members,
+        },
         { title: f.title, body: f.body, startsAt: start, endsAt: end },
       );
       this.composing = false;
@@ -189,7 +203,19 @@ export class ServiceRequestsState {
     await this.book(request);
   }
 
+  /** A collective request whose activity was written but whose acceptance wasn't (the chat
+   * call failed after the project's) is accepted the next time a member looks (ADR 0089). */
+  async healPlanned(bookedRequests: string[]): Promise<void> {
+    if (!this.reviewer()) return;
+    for (const r of this.shown) {
+      if (r.status !== 'open' || !bookedRequests.includes(r.id) || this.booked.has(r.id)) continue;
+      this.booked.add(r.id);
+      await decideServiceRequest(r, 'accepted').catch((e: unknown) => (this.error = explain(e)));
+    }
+  }
+
   openSettings(current: RequestSettings): void {
+    this.settingsReason = '';
     this.settingsForm = { ...current };
     this.error = '';
     this.settingsOpen = true;
@@ -198,7 +224,7 @@ export class ServiceRequestsState {
   async saveSettings(): Promise<boolean> {
     const s = this.settingsForm;
     return this.run(async () => {
-      await saveRequestSettings(this.project, s);
+      await saveRequestSettings(this.project, s, this.settingsReason);
       this.settingsOpen = false;
     });
   }

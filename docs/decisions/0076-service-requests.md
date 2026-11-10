@@ -1,7 +1,7 @@
 # 0076. Service requests: a request lives in the direct chat with the service's creator; request settings are a proposal
 
 Status: **accepted** (2026-11-06, cloud session; the owner steers less until parity, STATUS
-2026-10-25). Parts (a) and (b) built (b: [0077](./0077-availability-and-bookings.md)); part (c) to come. Builds on
+2026-10-25). Parts (a), (b) ([0077](./0077-availability-and-bookings.md)) and (c) ([0089](./0089-collective-service-requests.md)) built. Builds on
 [0043](./0043-direct-messages.md), [0056](./0056-activities-and-roles.md),
 [0059](./0059-types-evolve-through-plans.md) and [0061](./0061-private-events-and-organizers.md).
 

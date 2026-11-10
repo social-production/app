@@ -115,6 +115,27 @@ pub fn list_rules() -> ExternResult<Vec<RuleView>> {
     Ok(out)
 }
 
+/// A collective service's member plans a request into an activity with its roles (ADR 0089):
+/// the activity that already planned it, if any, so planning twice books once.
+pub fn planned(booking: &Booking) -> ExternResult<Option<ActionHash>> {
+    let project = calls::glance()?;
+    if project.charter.as_ref().map(|c| c.mode.as_str()) != Some("collective-service") {
+        return Err(guest("Only collective services plan requests into activities."));
+    }
+    if booking.requester == agent_info()?.agent_initial_pubkey {
+        return Err(guest("Someone else plans your request."));
+    }
+    let all = reads::linked::<Activity>(
+        reads::anchor()?,
+        LinkTypes::Activities,
+        UnitEntryTypes::Activity,
+    )?;
+    Ok(all
+        .into_iter()
+        .find(|a| a.entry.booking.as_ref().is_some_and(|b| b.request == booking.request))
+        .map(|a| a.hash))
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BookInput {
     /// The accepted request, in the direct chat (ADR 0076).

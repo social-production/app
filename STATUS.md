@@ -74,7 +74,17 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: docs PR (SEEDLESS plan, ADR 0088, the owner's 2026-11-10 decisions).
+## In flight: PR #135 grows into service requests (c) (ADR 0089) + the new About page + docs.
+Built on the branch (2026-11-10): conversation integrity takes requests in group chats (any
+member but the requester decides; `decided_by` in the view); project integrity lets a
+collective service's members book a request with any roles; `create_activity` takes an
+optional `booking` (`booking::planned` refuses the requester, returns an earlier plan);
+UI `CollectiveRequests.svelte` (Request service / Requests → Plan request opens the activity
+wizard / Settings ▾ → Request settings vote), Take part lists request-settings votes,
+`collective-service.css` ported. Tests: `tests/scenarios/tests/collective_requests.rs`,
+`tests/e2e/collective-requests.mjs`. **Both conversation and project networks reset on
+merge.** Before merging: scenarios `collective_requests`, `service_requests`, `bookings`, and
+browser tests `collective-requests.mjs`, `service-requests.mjs`, `shell.mjs` (About).
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
 words on desktop, a list of bootstrap/relay URLs), alongside parity, and service requests (c)
 (unblocked 2026-11-10, ADR 0076). Otherwise,

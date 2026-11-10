@@ -152,3 +152,4 @@ cards.css         .project-activity-card web/src/lib/components/cards/public-fee
 software.css      .software-panel web/src/lib/features/projects/detail/components/ProjectSoftwareGovernancePanel.svelte
 software.css      .software-wizard web/src/lib/features/projects/detail/components/SoftwareGovernanceWizard.svelte
 software.css      .software-governance-placeholder web/src/lib/features/projects/detail/lifecycle/productive/phases/ProductiveLifecyclePhaseFive.svelte
+collective-service.css .collective-service web/src/lib/features/projects/detail/lifecycle/collective-service/phases/CollectiveServicePhaseFive.svelte

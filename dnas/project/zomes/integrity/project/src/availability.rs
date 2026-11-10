@@ -65,33 +65,42 @@ pub fn validate_link(action: &TypedAction<CreateLinkData>) -> ExternResult<Valid
     }
 }
 
-/// A booking is the creator's, in their personal service, with web's one Provider role, for
-/// someone else's request.
+/// A booking is for someone else's request. In a personal service it is the creator's, with
+/// web's one Provider role; in a collective service any member books it (the activity's
+/// membership is checked by its caller) with whatever roles the request needs (ADR 0089).
 pub fn validate_booking(
     activity: &crate::Activity,
     booking: &Booking,
     space: Option<&ActionHash>,
     author: &AgentPubKey,
 ) -> ExternResult<ValidateCallbackResult> {
-    let roles: Vec<_> = activity
-        .roles
-        .iter()
-        .map(|r| sp_activity::RoleSpec {
-            label: &r.label,
-            required: r.required,
-            maximum: r.maximum,
-            description: &r.description,
-        })
-        .collect();
-    if let Err(reason) = check_booking(&roles) {
-        return invalid(&reason);
-    }
     if &booking.requester == author {
         return invalid("a booking is for someone else's request");
     }
-    match space {
-        Some(space) if creator_of_personal(space, author)? => Ok(ValidateCallbackResult::Valid),
-        _ => invalid("only a personal service's creator books requests"),
+    let Some(space) = space else {
+        return invalid("only services book requests");
+    };
+    match charter_at(space)? {
+        Some((charter, _)) if charter.mode == "collective-service" => {
+            Ok(ValidateCallbackResult::Valid)
+        }
+        Some((charter, creator)) if charter.mode == "personal-service" && &creator == author => {
+            let roles: Vec<_> = activity
+                .roles
+                .iter()
+                .map(|r| sp_activity::RoleSpec {
+                    label: &r.label,
+                    required: r.required,
+                    maximum: r.maximum,
+                    description: &r.description,
+                })
+                .collect();
+            match check_booking(&roles) {
+                Ok(()) => Ok(ValidateCallbackResult::Valid),
+                Err(reason) => invalid(&reason),
+            }
+        }
+        _ => invalid("only a personal service's creator or a collective service's members book requests"),
     }
 }
 

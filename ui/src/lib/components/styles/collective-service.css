@@ -1,0 +1,367 @@
+/* Ported from web/src/lib/features/projects/detail/lifecycle/collective-service/phases/CollectiveServicePhaseFive.svelte (ADR 0032, scripts/port-styles.py) */
+.collective-service .history-section {
+  border-top: 1px solid var(--panel-border);
+  padding-top: 12px;
+}
+
+.collective-service .history-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 0;
+  cursor: pointer;
+  list-style: none;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.collective-service .history-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collective-service .history-chevron {
+  transition: transform 0.15s ease;
+}
+
+.collective-service details[open] > .history-summary .history-chevron {
+  transform: rotate(180deg);
+}
+
+.collective-service .phase-surface,
+.collective-service .card-rail-section,
+.collective-service .history-stack,
+.collective-service .unified-history,
+.collective-service .composer-card,
+.collective-service .number-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.collective-service .slot-sheet-copy {
+  display: grid;
+  gap: 12px;
+  padding: 4px 20px 20px;
+}
+
+.collective-service .slot-sheet-copy p,
+.collective-service .slot-choice span {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.collective-service .slot-choice {
+  display: grid;
+  gap: 4px;
+}
+
+.collective-service .slot-choice strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.collective-service .settings-menu {
+  display: grid;
+  gap: 10px;
+  padding: 4px 20px 20px;
+}
+
+.collective-service .settings-option {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  text-align: left;
+  cursor: pointer;
+}
+
+.collective-service .settings-option strong {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.collective-service .settings-option span {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.collective-service .settings-option:hover,
+.collective-service .settings-option:focus-visible {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.collective-service .unified-history-copy {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.collective-service .overlay-footer:has(.sheet-actions) {
+  gap: 0;
+}
+
+.collective-service .sheet-actions {
+  display: flex;
+  width: 100%;
+}
+
+.collective-service .sheet-actions > .sheet-cancel,
+.collective-service .sheet-actions > .sheet-submit {
+  flex: 1 1 0;
+}
+
+.collective-service .sheet-cancel,
+.collective-service .sheet-submit {
+  min-height: 56px;
+  border: 0;
+  border-radius: 0;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.collective-service .sheet-cancel {
+  background: var(--panel-strong);
+  color: var(--text-main);
+  box-shadow: inset -1px 0 0 var(--panel-border);
+}
+
+.collective-service .sheet-submit {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.collective-service .request-header-row,
+.collective-service .composer-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.collective-service .section-head,
+.collective-service .card-rail,
+.collective-service .sheet-picker {
+  padding: 16px 20px 24px;
+}
+
+.collective-service .action-picker-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.collective-service .section-head {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+}
+
+.collective-service .section-copy h3,
+.collective-service .section-copy p {
+  margin: 0;
+}
+
+.collective-service .card-rail {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: start;
+  padding-right: 2px;
+}
+
+.collective-service .card-rail:has(.activity-card-shell) {
+  gap: 0;
+}
+
+.collective-service .rail-card {
+  min-width: 0;
+}
+
+.collective-service .action-choice {
+  width: 100%;
+  display: grid;
+  gap: 4px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+  text-align: left;
+}
+
+.collective-service .action-picker-grid {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.collective-service .composer-card,
+.collective-service .empty-card,
+.collective-service .feedback-card {
+  padding: 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+}
+
+.collective-service .feedback-card {
+  color: var(--text-main);
+  background: color-mix(in srgb, var(--brand-soft) 28%, var(--panel-strong));
+}
+
+.collective-service .number-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.collective-service .selection-note {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+}
+
+.collective-service .checkbox-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.collective-service .checkbox-row input {
+  width: auto;
+}
+
+.collective-service .review-actions {
+  justify-content: flex-start;
+}
+
+.collective-service .planner-card {
+  margin-top: 12px;
+}
+
+.collective-service .count-field {
+  display: grid;
+  gap: 6px;
+}
+
+.collective-service .count-field-label {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.collective-service .count-note {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.collective-service .count-readout {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.collective-service .count-readout strong {
+  color: var(--text-main);
+  font-size: 18px;
+  line-height: 1;
+}
+
+.collective-service .vote-chip.negative {
+  color: var(--tablet-community-text);
+}
+
+.collective-service .empty-card,
+.collective-service p,
+.collective-service span {
+  color: var(--text-soft);
+}
+
+.collective-service strong,
+.collective-service h3,
+.collective-service .field-inline-label {
+  color: var(--text-main);
+}
+
+.collective-service h3 {
+  margin: 0;
+}
+
+.collective-service input,
+.collective-service textarea,
+.collective-service select {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: var(--text-main);
+}
+
+.collective-service [id^='activity-card-'] {
+  scroll-margin-top: 92px;
+}
+
+.collective-service textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.collective-service .field-inline-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.collective-service .field-help {
+  margin: 0;
+  font-size: 12px;
+}
+
+.collective-service .primary-button,
+.collective-service .secondary-button,
+.collective-service .vote-chip {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.collective-service .primary-button {
+  background: var(--brand);
+  color: var(--page-bg);
+}
+
+.collective-service .secondary-button,
+.collective-service .vote-chip {
+  border: 1px solid var(--panel-border);
+  background: var(--panel);
+  color: var(--text-soft);
+}
+
+@media (max-width: 760px) {
+  .collective-service .section-head,
+  .collective-service .number-grid,
+  .collective-service .action-picker-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,21 +1,24 @@
 <script lang="ts">
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import ServiceRequestCard from '#lib/components/requests/ServiceRequestCard.svelte';
-  import { isPending } from '#lib/domain/serviceRequests.ts';
+  import { isPending, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
 
   import { resolve } from '$app/paths';
 
   import type { ServiceRequestsState } from './serviceRequestsState.svelte.ts';
 
-  /** web's personal-requests-sheet: Requests (the creator) or Your requests (anyone else). */
+  /** web's personal-requests-sheet: Requests (the creator) or Your requests (anyone else).
+   * A collective service's members plan a request into an activity instead of accepting it
+   * (web's CollectiveServicePhaseFive "Plan request", ADR 0089). */
   interface Props {
     state: ServiceRequestsState;
     reviewer: boolean;
     requestsOff: boolean;
     highlighted: string | null;
+    onPlan?: ((request: ServiceRequest) => void) | undefined;
   }
 
-  let { state, reviewer, requestsOff, highlighted }: Props = $props();
+  let { state, reviewer, requestsOff, highlighted, onPlan }: Props = $props();
 
   const requests = $derived(state.shown);
   const chatHref = (seed: string): string =>
@@ -74,14 +77,20 @@
                   </div>
                 {:else}
                   <div class="binary-row review-actions">
-                    <button
-                      class="vote-chip"
-                      type="button"
-                      disabled={state.busy}
-                      onclick={() => void state.decide(request, 'accepted')}
-                    >
-                      Accept
-                    </button>
+                    {#if onPlan}
+                      <button class="vote-chip" type="button" onclick={() => onPlan(request)}>
+                        Plan request
+                      </button>
+                    {:else}
+                      <button
+                        class="vote-chip"
+                        type="button"
+                        disabled={state.busy}
+                        onclick={() => void state.decide(request, 'accepted')}
+                      >
+                        Accept
+                      </button>
+                    {/if}
                     <button
                       class="vote-chip negative"
                       type="button"

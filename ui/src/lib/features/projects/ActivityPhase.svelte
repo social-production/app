@@ -15,6 +15,7 @@
 
   import { ActivitiesState, stageOptions } from './activitiesState.svelte.ts';
   import type { DetailState } from './detailState.svelte.ts';
+  import CollectiveRequests from './requests/CollectiveRequests.svelte';
   import ServicePhase from './requests/ServicePhase.svelte';
   import SoftwareDock from './software/SoftwareDock.svelte';
   import SoftwarePanel from './software/SoftwarePanel.svelte';
@@ -37,6 +38,14 @@
   const state = new ActivitiesState(detail.id, () => me);
   const project = $derived(detail.project);
   const personal = $derived(project?.charter?.mode === 'personal-service');
+  // A collective service's requests (ADR 0089): planned requests are accepted once written.
+  const collectiveService = $derived(project?.charter?.mode === 'collective-service');
+  const collective: { accept?: (request: string) => void } = {};
+
+  async function submitActivity(): Promise<void> {
+    const planned = state.planning;
+    if ((await state.submit()) && planned) collective.accept?.(planned.request);
+  }
   const schedule = $derived(
     project?.charter?.mode === 'event'
       ? (detail.plans?.plans.find(
@@ -196,6 +205,15 @@
         </details>
       {/if}
     </section>
+    {#if collectiveService}
+      <CollectiveRequests
+        register={(accept) => (collective.accept = accept)}
+        {detail}
+        activities={state}
+        {me}
+        canPlan={canCreate}
+      />
+    {/if}
     {#if canCreate}
       <ActivityWizard
         open={state.composing}
@@ -204,7 +222,7 @@
         {planWindow}
         busy={state.busy}
         error={state.error}
-        onSubmit={() => void state.submit()}
+        onSubmit={() => void submitActivity()}
         onCancel={() => (state.composing = false)}
         searchPeople={state.searchPeople}
         places={placeSearch}

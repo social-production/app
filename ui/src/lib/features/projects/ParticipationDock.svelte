@@ -30,9 +30,11 @@
     onRevealDone,
   }: Props = $props();
 
-  // web's Take part votes: phase moves, then a software project's (ADR 0086).
+  // web's Take part votes: phase moves, a collective service's request settings (ADR 0089),
+  // then a software project's (ADR 0086).
   const votes = $derived([
     ...detail.openProposals.filter((p) => isPhaseChange(p.kind)),
+    ...detail.openProposals.filter((p) => 'RequestSettings' in p.kind),
     ...detail.software.dockVotes,
   ]);
 </script>

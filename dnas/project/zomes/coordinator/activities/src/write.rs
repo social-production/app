@@ -4,7 +4,8 @@
 
 use hdk::prelude::*;
 use project_integrity::{
-    Activity, ActivityRole, EntryTypes, LinkTypes, Place, RoleSuggestion, SuggestionDecline,
+    Activity, ActivityRole, Booking, EntryTypes, LinkTypes, Place, RoleSuggestion,
+    SuggestionDecline,
 };
 use sp_activity::{check_activity, roles_open, ActivitySpec, RoleSpec};
 
@@ -42,6 +43,9 @@ pub struct NewActivity {
     pub note: String,
     pub plan_stage: Option<String>,
     pub roles: Vec<NewRole>,
+    /// The request a collective service's member plans into this activity (ADR 0089).
+    #[serde(default)]
+    pub booking: Option<Booking>,
 }
 
 fn member() -> ExternResult<ActionHash> {
@@ -84,6 +88,11 @@ fn in_activity_phase() -> ExternResult<()> {
 pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
     let membership = member()?;
     in_activity_phase()?;
+    if let Some(booking) = &input.booking {
+        if let Some(earlier) = crate::booking::planned(booking)? {
+            return Ok(earlier);
+        }
+    }
     if input.starts_at <= sys_time()? {
         return Err(guest("An activity has to start in the future."));
     }
@@ -125,7 +134,7 @@ pub fn create(input: NewActivity) -> ExternResult<ActionHash> {
             .collect(),
         membership: membership.clone(),
         organizer,
-        booking: None,
+        booking: input.booking,
     };
     check_activity(&spec(&activity)).map_err(guest)?;
     let hash = create_entry(EntryTypes::Activity(activity))?;
