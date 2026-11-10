@@ -29,7 +29,7 @@ export function requestNotifications(requests: ServiceRequest[], me: string): Un
     // Who decided: the person asking cancels; the creator accepts or declines.
     const byRequester = r.status === 'cancelled';
     if (r.status !== 'open' && byRequester !== mine) {
-      out.push(card(r.status, byRequester ? r.requester : r.other, r.updatedAt));
+      out.push(card(r.status, r.decidedBy ?? (byRequester ? r.requester : r.other), r.updatedAt));
     }
     return out;
   });

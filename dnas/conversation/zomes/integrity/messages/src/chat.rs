@@ -81,7 +81,7 @@ pub fn validate_entry(
         EntryTypes::Report(_)
         | EntryTypes::ReportVote(_)
         | EntryTypes::ServiceRequest(_)
-        | EntryTypes::RequestStatus(_) => validate_cited(entry, author, &creator, kind),
+        | EntryTypes::RequestStatus(_) => validate_cited(entry, author, &creator),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
         EntryTypes::Declined(_) => invalid("declines are checked above"),
     }
@@ -99,12 +99,11 @@ fn validate_cited(
     entry: &EntryTypes,
     author: &AgentPubKey,
     creator: &AgentPubKey,
-    kind: ChatKind,
 ) -> ExternResult<ValidateCallbackResult> {
     match entry {
         EntryTypes::Report(r) => validate_report(r, author, creator),
         EntryTypes::ReportVote(v) => validate_vote(v, author, creator),
-        EntryTypes::ServiceRequest(r) => validate_request(r, author, creator, kind),
+        EntryTypes::ServiceRequest(r) => validate_request(r, author, creator),
         EntryTypes::RequestStatus(s) => validate_status(s, author, creator),
         _ => invalid("not a cited entry"),
     }

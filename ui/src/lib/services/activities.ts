@@ -87,6 +87,8 @@ export interface NewActivity {
   note: string;
   planStage: string | null;
   roles: NewActivityRole[];
+  /** The collective service request this activity plans (ADR 0089). */
+  booking?: { request: string; requester: string } | null;
 }
 
 const activities = async <T>(project: ProjectRef, fn: string, payload?: unknown): Promise<T> =>
@@ -158,6 +160,9 @@ export async function createActivity(project: ProjectRef, a: NewActivity): Promi
       description: r.description ?? '',
       suggest: r.suggest ? stringToHash(r.suggest) : null,
     })),
+    booking: a.booking
+      ? { request: stringToHash(a.booking.request), requester: stringToHash(a.booking.requester) }
+      : null,
   });
   return hashToString(id);
 }

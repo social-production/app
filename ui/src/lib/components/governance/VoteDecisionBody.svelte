@@ -6,6 +6,7 @@
     type Proposal,
   } from '#lib/domain/governance.ts';
   import type { Charter } from '#lib/domain/projects.ts';
+  import { settingsSummary } from '#lib/domain/serviceRequests.ts';
 
   /** web's VoteDecisionBody: what passing changes, now vs proposed, and the tally. */
   interface Props {
@@ -48,6 +49,23 @@
       <section class="change-card">
         <h3>Why</h3>
         <p>{kind.Software.reason}</p>
+      </section>
+    {/if}
+  {:else if 'RequestSettings' in kind}
+    <!-- web's request_settings vote: the proposed setup, then why (ADR 0089). -->
+    <section class="change-card">
+      <h3>
+        {settingsSummary({
+          enabled: kind.RequestSettings.enabled,
+          mode: kind.RequestSettings.mode,
+          offSchedule: kind.RequestSettings.off_schedule,
+        })}
+      </h3>
+    </section>
+    {#if kind.RequestSettings.reason}
+      <section class="change-card">
+        <h3>Why</h3>
+        <p>{kind.RequestSettings.reason}</p>
       </section>
     {/if}
   {:else if 'Edit' in kind}

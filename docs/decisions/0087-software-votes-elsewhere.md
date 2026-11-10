@@ -56,3 +56,6 @@ Until this change the app had **no way to vote on a merge capability or reposito
 - Take part's sheet lists merge capability and repository votes; web also lists pull request
   rows there with an Assess button, which the app leaves to the panel's own Assess (the
   sheet casts votes, it doesn't open wizards). Owner review.
+
+## Owner review (2026-11-10)
+The rail's History keeps "Passed" for a confirmed merge rather than web's "Still open".

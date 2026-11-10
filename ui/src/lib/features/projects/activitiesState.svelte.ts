@@ -1,7 +1,13 @@
 import type { Activity } from '#lib/domain/activities.ts';
 import { defaultTimes } from '#lib/domain/activityCalendar.ts';
 import { withinWindow } from '#lib/domain/eventSchedule.ts';
-import { namedRoles, newActivityForm, type ActivityForm } from '#lib/domain/activityForm.ts';
+import {
+  emptyRole,
+  namedRoles,
+  newActivityForm,
+  type ActivityForm,
+} from '#lib/domain/activityForm.ts';
+import { toLocalInput } from '#lib/domain/helpRequests.ts';
 import { rankMentions, type MentionPool } from '#lib/domain/mentions.ts';
 import { fitLabel, onlinePlaceValue, placeRecord } from '#lib/domain/places.ts';
 import { LOCATION_LABEL_MAX } from '#lib/domain/projects.ts';
@@ -31,6 +37,8 @@ export interface StageOption {
  * activities, the composer, and the writes behind take/leave, suggest and decline (ADR 0056).
  * One write at a time, as the chain takes them.
  */
+const local = (micros: number): string => toLocalInput(new Date(micros / 1000));
+
 export class ActivitiesState {
   activities = $state<Activity[]>([]);
   names = $state<Record<string, string>>({});
@@ -41,6 +49,8 @@ export class ActivitiesState {
   form = $state<ActivityForm>(newActivityForm());
   selectedDay = $state('');
   highlighted = $state<string | null>(null);
+  /** The collective service request the composer plans (ADR 0089), booked by `submit`. */
+  planning = $state<{ request: string; requester: string } | null>(null);
   private pool: Promise<MentionPool> | undefined;
   private queue: Promise<unknown> = Promise.resolve();
 
@@ -92,11 +102,41 @@ export class ActivitiesState {
       ...newActivityForm(),
       ...withinWindow(defaultTimes(day || null, this.activities), planWindow),
     };
+    this.planning = null;
     this.error = '';
     this.composing = true;
   }
 
-  async submit(): Promise<void> {
+  /** web's `createRequestPlanningForm`: the request's title, time and details, and one
+   * "Service lead" role, planned into an activity that books the request (ADR 0089). */
+  openForRequest(
+    r: {
+      id: string;
+      requester: string;
+      title: string;
+      body: string;
+      startsAt: number | null;
+      endsAt: number | null;
+    },
+    place: string,
+  ): void {
+    const timed = r.startsAt !== null && r.endsAt !== null && r.startsAt > Date.now() * 1000;
+    this.form = {
+      ...newActivityForm(place),
+      ...(timed
+        ? { scheduledAt: local(r.startsAt ?? 0), endsAt: local(r.endsAt ?? 0) }
+        : defaultTimes(null, this.activities)),
+      title: r.title,
+      note: r.body,
+      roles: [{ ...emptyRole(), label: 'Service lead' }],
+    };
+    this.planning = { request: r.id, requester: r.requester };
+    this.error = '';
+    this.composing = true;
+  }
+
+  /** Returns whether the activity was written. */
+  async submit(): Promise<boolean> {
     const f = this.form;
     const place = fitLabel(f.online ? f.place.trim() || 'Online' : f.place, LOCATION_LABEL_MAX);
     this.busy = true;
@@ -112,11 +152,15 @@ export class ActivitiesState {
         note: f.note.trim(),
         planStage: f.planStage,
         roles: namedRoles(f.roles).map((r) => ({ ...r, suggest: r.suggest?.agent ?? null })),
+        booking: this.planning,
       });
       this.composing = false;
+      this.planning = null;
       await this.load();
+      return true;
     } catch (e) {
       this.error = explain(e);
+      return false;
     } finally {
       this.busy = false;
     }

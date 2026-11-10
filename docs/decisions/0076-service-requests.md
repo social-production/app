@@ -1,7 +1,7 @@
 # 0076. Service requests: a request lives in the direct chat with the service's creator; request settings are a proposal
 
 Status: **accepted** (2026-11-06, cloud session; the owner steers less until parity, STATUS
-2026-10-25). Parts (a) and (b) built (b: [0077](./0077-availability-and-bookings.md)); part (c) to come. Builds on
+2026-10-25). Parts (a), (b) ([0077](./0077-availability-and-bookings.md)) and (c) ([0089](./0089-collective-service-requests.md)) built. Builds on
 [0043](./0043-direct-messages.md), [0056](./0056-activities-and-roles.md),
 [0059](./0059-types-evolve-through-plans.md) and [0061](./0061-private-events-and-organizers.md).
 
@@ -78,4 +78,10 @@ Those are dead code on web: `RequestFrameStack` is imported nowhere, and every f
   per service would need the inbox to name chats, which ADR 0043 keeps hidden.
 - **Owner review:** who reviews a collective service's requests. web has no way to become a
   manager, so its review is dead; the app could let members (or the leading plan's roles)
-  review. Part (c) waits on that answer.
+  review. Owner, 2026-11-10: "both, people who did the activity and the one who received the
+  service" (the rating afterwards, both sides: built in (b)). **Accepting, owner 2026-11-10:
+  "Anyone can accept it if they are a member. But if multiple roles are needed obviously it
+  doesn't go ahead until they are filled, but the option to sign up would appear on calendar and
+  right rail."** So in a collective service any member accepts or declines; an accepted request
+  becomes an activity with its roles, which goes ahead only once its roles are filled, and
+  members sign up from the calendar and the right rail. Part (c) is unblocked.

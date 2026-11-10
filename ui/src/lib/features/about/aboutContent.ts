@@ -1,172 +1,152 @@
-// Ported from web/src/lib/features/about/aboutContent.ts unchanged (web's About copy).
-export type AboutTabId =
-  'purpose' | 'strategy' | 'roadmap' | 'costs' | 'governance' | 'moderation' | 'join';
+/**
+ * The About page's text. It deliberately differs from web's (owner, 2026-11-10: fewer
+ * sections, commons-based peer production, stigmergic signals in place of prices) and
+ * describes this app's own rules (ADR 0033, 0071, 0074) rather than web's.
+ */
+export type AboutTabId = 'why' | 'how' | 'decisions' | 'network';
 
-export type AboutTab = {
-  id: AboutTabId;
-  label: string;
-};
+/** `short` is the phone label (web's `tab-label-compact`). */
+export type AboutTab = { id: AboutTabId; label: string; short: string };
 
 export const ABOUT_SECTIONS: AboutTab[] = [
-  { id: 'purpose', label: 'Purpose' },
-  { id: 'strategy', label: 'Strategy' },
-  { id: 'roadmap', label: 'Roadmap' },
-  { id: 'costs', label: 'Costs' },
-  { id: 'governance', label: 'Governance' },
-  { id: 'moderation', label: 'Moderation' },
-  { id: 'join', label: 'Join' },
+  { id: 'why', label: 'Why', short: 'Why' },
+  { id: 'how', label: 'How it works', short: 'How' },
+  { id: 'decisions', label: 'Decisions', short: 'Decisions' },
+  { id: 'network', label: 'The network', short: 'Network' },
 ];
 
-export const ABOUT_TABS: AboutTab[] = ABOUT_SECTIONS;
+export type Block = { title?: string; paragraphs: string[] };
 
-export const aboutRoadmap = [
+export type ReadingLink = { label: string; href: string; blurb: string };
+
+export const aboutWhy: Block[] = [
   {
-    label: 'Now',
-    title: 'Web prototype',
-    current: true,
-    points: [
-      'FastAPI backend and a SvelteKit app people can use today.',
-      'Facilitation only: projects, events, help, and shared decisions. No asset holding.',
-      'Public use as the prototype becomes stable.',
+    paragraphs: [
+      'Most of what keeps people alive and well is already made without anyone selling it: meals cooked for a household, a neighbour driving someone to hospital, a mutual-aid kitchen, a Wikipedia article, the open-source software running most of the internet. Social Production is a tool for organising more of life that way, on purpose and at scale.',
     ],
   },
   {
-    label: 'Next',
-    title: 'Legal entity and funding',
-    current: false,
-    points: [
-      'A community-controlled non-profit holds donated funds.',
-      'Stewardship stays elected and recallable, with no discretionary slush fund.',
-      'Physical means of production can be coordinated once that structure exists.',
+    title: 'Use, not exchange',
+    paragraphs: [
+      'A thing’s use-value is what it is good for: bread feeds, a bike carries, a clinic heals. Its exchange-value is what it fetches on a market. Under capitalism things get made mainly because they can be sold, so a useful thing nobody can profit from goes unmade, and a harmful one that sells well gets made anyway.',
+      'Here the only reason to start anything is that it is useful to someone. There are no prices, wages, ads or data sales, and no one owns the platform.',
     ],
   },
   {
-    label: 'Later',
-    title: 'Peer-to-peer infrastructure',
-    current: false,
-    points: [
-      'Move hosting toward infrastructure the users run together.',
-      'Reduce dependence on a single conventional server.',
-    ],
-  },
-  {
-    label: 'Aim',
-    title: 'Shutdown-resistant coordination',
-    current: false,
-    points: [
-      'Keep useful activity organised for need rather than sale.',
-      'Make the network hard to capture or switch off.',
+    title: 'Commons-based peer production',
+    paragraphs: [
+      'Yochai Benkler gave a name to the way Wikipedia, Linux and OpenStreetMap get made: commons-based peer production. Many people contribute, each choosing what to work on; the result belongs to everyone; and coordination comes from the shared work itself rather than from managers or markets.',
+      'That has worked best for information, which costs almost nothing to copy. Social Production carries the same pattern into the physical world: workshops, food, repairs, care, events and services. Those need people in the same place at the same time, with tools and materials, so the tool adds what pure information projects never needed: plans, roles, schedules and places.',
     ],
   },
 ];
 
-export type ReadingLink = {
-  label: string;
-  href: string;
-  blurb: string;
-};
+export const aboutReading: ReadingLink[] = [
+  {
+    label: 'Commons-based peer production',
+    href: 'https://en.wikipedia.org/wiki/Commons-based_peer_production',
+    blurb: 'Benkler’s account of production by many contributors, outside firms and markets.',
+  },
+  {
+    label: 'Stigmergy',
+    href: 'https://en.wikipedia.org/wiki/Stigmergy',
+    blurb: 'Coordination through traces left in a shared environment, from termites to wikis.',
+  },
+  {
+    label: 'Use-value and exchange-value',
+    href: 'https://en.wikipedia.org/wiki/Use_value',
+    blurb: 'The distinction this project starts from.',
+  },
+  {
+    label: 'Mode of production',
+    href: 'https://en.wikipedia.org/wiki/Mode_of_production',
+    blurb:
+      'How a society organises production, ownership, and the relations through which people make and share things.',
+  },
+  {
+    label: 'Value-form theory',
+    href: 'https://en.wikipedia.org/wiki/Value-form',
+    blurb:
+      'Why value under capitalism is a social form expressed in exchange, not a natural property of useful things.',
+  },
+  {
+    label: 'Communization',
+    href: 'https://en.wikipedia.org/wiki/Communization',
+    blurb:
+      'Currents that emphasise abolishing exchange and building new relations directly, rather than managing the old ones under new owners.',
+  },
+];
 
-/** Condensed About explainer copy derived from Why Social Production.md. */
-export const aboutWhy = {
-  lead: 'Social Production exists to organise useful activity outside markets, wages, and private profit.',
-  framing: [
-    {
-      title: 'Use-value',
-      body: 'A thing’s use-value is its concrete usefulness: food when you are hungry, a hammer that drives nails, software that helps people coordinate. It satisfies a want or need directly.',
-    },
-    {
-      title: 'Exchange-value',
-      body: 'Exchange-value is not a physical property of the thing. It is a social relation in which value appears only through exchange. Price is a symbol of that real abstraction — value mediated by the market rather than by need.',
-    },
-  ],
-  points: [
-    'Under capitalism, production is organised mainly for exchange, not because something is needed.',
-    'We already organise outside exchange every day: meals, mutual aid, open-source software, protests, community work.',
-    'Corporate social networks enclose that coordination and turn it into ads, data extraction, and attention markets.',
-    'Social Production is the reverse enclosure: tools for collective coordination, owned and governed by the people using them.',
-    'No ads. No data sales. No production for exchange. The only reason to organise here is because something needs doing.',
-  ],
-  reading: [
-    {
-      label: 'Mode of production',
-      href: 'https://en.wikipedia.org/wiki/Mode_of_production',
-      blurb:
-        'How a society organises production, ownership, and the relations through which people make and share things.',
-    },
-    {
-      label: 'Value-form theory',
-      href: 'https://en.wikipedia.org/wiki/Value-form',
-      blurb:
-        'Why value under capitalism is a social form expressed in exchange, not a natural property of useful things.',
-    },
-    {
-      label: 'Communization',
-      href: 'https://en.wikipedia.org/wiki/Communization',
-      blurb:
-        'Currents that emphasise abolishing exchange and building communist relations rather than managing capitalism under new owners.',
-    },
-  ] as ReadingLink[],
-};
+export const aboutHow: Block[] = [
+  {
+    title: 'Signals instead of prices',
+    paragraphs: [
+      'A market coordinates through prices: a high price tells producers that something is wanted and that they can profit by making it. It is a powerful signal, but it only counts wants backed by money, and it tells you nothing about need.',
+      'Social Production coordinates through stigmergy, the way ants and termites build without a plan or a boss: each one leaves a trace in the shared environment, and the traces guide what others do next. Here the traces are open and readable by everyone. You can mark a proposed project with Demand or Oppose, join it, take a role in an activity, or ask for help. Each mark changes what others see: projects with strong demand rise in the feed, a role with open places shows on the calendar and in the right rail, a help request stays visible until its places are filled or its time has passed.',
+      'Nobody allocates the work. People see what is wanted, where help is short and what is already under way, and choose for themselves.',
+    ],
+  },
+  {
+    title: 'From idea to activity',
+    paragraphs: [
+      'Every project starts as a proposal. While it collects signals, members add and rate the values it should keep to. Once at least 66% of the signals are Demand, members can vote to move on to planning: a production plan and a distribution plan for a productive project, an operations plan and an access plan for a collective service. Members can write competing plans, assess them against the agreed values and vote; the plan that leads is the one carried out.',
+      'In the Activity phase the plan becomes dated activities with roles. People sign up for roles, the activity goes ahead once its roles are filled, and afterwards the people who took part check in and rate how it went.',
+      'Alongside projects there are events, help requests (for one-off help with a time and roles), personal and collective services that people can request, and channels and communities for discussion.',
+    ],
+  },
+];
 
-export const aboutProduce = {
-  lead: 'The strategy is to build new relations of production first — not to wait for political power, and not to seize factories only to reproduce the same market logic under new managers.',
-  steps: [
-    {
-      title: 'Coordinate for use',
-      body: 'Start with facilitation: projects, events, help requests, discussion, and shared decision-making oriented to need.',
-    },
-    {
-      title: 'Prove the relations',
-      body: 'Show that collective activity can run for use rather than sale before trying to hold large means of production.',
-    },
-    {
-      title: 'Grow the material base',
-      body: 'As participation grows, the network can fund and steward tools, land, and infrastructure under community control.',
-    },
-  ],
-  note: 'Historically, “seize the means first” often reproduced exchange under new owners. Social Production takes the opposite path: new non-market relations first, then a growing material base.',
-};
+export const aboutDecisions: Block[] = [
+  {
+    paragraphs: [
+      'There are no owners and no administrators. Every change to a project, its phase, plans, updates, links and settings, is decided by its members, and the rules are enforced by every participant’s own copy of the software rather than by a server.',
+    ],
+  },
+  {
+    title: 'Votes',
+    paragraphs: [
+      'A decision passes with at least 66% yes among the votes cast, once enough members have voted. How many is enough grows with the group but much more slowly than its size: it is the sample a pollster would need for a confident answer (Cochran’s formula, with a margin of error that tightens as the group grows), and never more than three quarters of the members. Small groups need most of their members; large ones need a representative share.',
+      'Votes are final once cast. A vote counts only if the voter was a full member before the proposal was made, and anyone can challenge a count that left eligible members out.',
+    ],
+  },
+  {
+    title: 'Standing',
+    paragraphs: [
+      'New accounts can join projects, talk and help straight away. To vote and to vouch, an account needs full standing: two full members vouch for it, or it stays active for 30 days. Full members can mark an account they believe is a bot; three marks open a public review, and if 66% of the voting full members agree, the account is paused and its votes stop counting.',
+    ],
+  },
+  {
+    title: 'Moderation',
+    paragraphs: [
+      'Anyone can report a post, project, comment or message. Full members vote on the report, with a quorum sized from the people involved (its members, commenters and those who signalled on it) and a yes share of at least 66%, higher for older or popular items. Serious harm can be hidden quickly while the vote runs, behind a warning you can choose to look past.',
+    ],
+  },
+];
 
-export const aboutCosts = {
-  lead: 'Servers cost money. That does not mean the network has to become a product, an equity play, or a market.',
-  cards: [
-    {
-      title: 'Phase 1',
-      body: 'Hosting is covered by people who believe in the use-value of the network. There is no promised return except the network itself.',
-    },
-    {
-      title: 'Phase 2',
-      body: 'A community-controlled non-profit can hold donated funds for specific means of production. Transparent purchases, elected and recallable stewardship, no discretionary slush fund.',
-    },
-    {
-      title: 'Phase 3',
-      body: 'Move toward peer-to-peer infrastructure so users collectively host the network and reduce reliance on centralised commercial hosting.',
-    },
-  ],
-};
+export const aboutNetwork: Block[] = [
+  {
+    title: 'Peer to peer',
+    paragraphs: [
+      'Social Production runs on Holochain. There is no central database: each person has their own signed record of what they did, and shared data is held by the participants themselves. Your account is a key that only your recovery phrase can restore, and the same phrase works in any copy of the app.',
+      'The desktop app is a full node: it holds a copy of the network and keeps it available for others. A small seed node helps new people find the network and lets browsers take part; the aim is a network that keeps running if that node is ever switched off.',
+    ],
+  },
+  {
+    title: 'Costs',
+    paragraphs: [
+      'For now the seed node is paid for by people who believe in the project, with no return expected except the network itself. As more people run the desktop app, the network carries itself and that cost falls away. There is nothing to buy and nothing for sale.',
+    ],
+  },
+  {
+    title: 'Join in',
+    paragraphs: [
+      'This is an early test network: expect rough edges and the occasional reset while it grows. Use it, start something useful, and tell us what breaks.',
+    ],
+  },
+];
 
-export const aboutBoard = {
-  lead: 'Platform moderators / board members execute community decisions. They do not rule the platform.',
-  points: [
-    'They stay in place only while they keep 66% approval and meet the platform quorum derived from weekly actives.',
-    'Any signed-in user can cast or change a standing yes/no vote on a board member at any time.',
-    'If approval or quorum falls below threshold, they can be removed automatically.',
-    'Their job is to execute software merges and community-directed purchases, not invent policy on their own.',
-  ],
-};
-
-export const aboutJoin = {
-  lead: 'Social Production is a prototype, an experiment, and a call to action. Use it, shape it, and help build production for use.',
-  recap: [
-    'Capitalism is not only private property. It is production for exchange.',
-    'The strategy is to build non-market relations of production first.',
-    'Phase 1 builds the facilitation tools and governance mechanics.',
-    'Later phases add community-controlled assets and decentralised infrastructure.',
-    'Votes and moderation both use derived quorums from weekly actives, not unanimous turnout.',
-  ],
-  links: [
-    { label: 'GitHub', href: 'https://github.com/social-production' },
-    { label: 'Discord', href: 'https://discord.gg/VvbJ3hhEPb' },
-    { label: 'Reddit', href: 'https://www.reddit.com/r/SocialProduction/' },
-  ],
-};
+export const aboutLinks = [
+  { label: 'GitHub', href: 'https://github.com/social-production' },
+  { label: 'Discord', href: 'https://discord.gg/VvbJ3hhEPb' },
+  { label: 'Reddit', href: 'https://www.reddit.com/r/SocialProduction/' },
+];

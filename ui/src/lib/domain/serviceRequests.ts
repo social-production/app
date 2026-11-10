@@ -23,6 +23,8 @@ export interface ServiceRequest {
   endsAt: number | null;
   createdAt: number;
   updatedAt: number;
+  /** Who settled it (a collective service's deciding member, ADR 0089). */
+  decidedBy: string | null;
 }
 
 /** web's `SERVICE_REQUEST_STATUS_LABELS`. */
@@ -56,4 +58,20 @@ export function refusal(settings: RequestSettings, timed: boolean, fits = true):
   if (timed && !settings.offSchedule && settings.mode !== 'direct' && !fits)
     return 'That time is outside the listed availability slots. Off-schedule requests are turned off.';
   return null;
+}
+
+/** web's `requestSettingsSummary`: "Calendar and direct · Off-schedule allowed". */
+export function settingsSummary(s: {
+  enabled: boolean;
+  mode: string;
+  offSchedule: boolean;
+}): string {
+  if (!s.enabled) return 'Disabled';
+  const mode =
+    s.mode === 'calendar'
+      ? 'Calendar only'
+      : s.mode === 'direct'
+        ? 'Direct only'
+        : 'Calendar and direct';
+  return `${mode} · ${s.offSchedule ? 'Off-schedule allowed' : 'Slot-bound only'}`;
 }

@@ -1,10 +1,11 @@
 //! Service requests (ADR 0076, web's personal-service requests): the person asking writes a
 //! `ServiceRequest` in their direct chat with the service's creator, so only those two see
-//! it; `RequestStatus` lines settle it. The person asking cancels; the other person accepts
-//! or declines. Every reader replays the decisions (`sp_service::replay`).
+//! it; `RequestStatus` lines settle it. The person asking cancels; anyone else in the chat
+//! accepts or declines. A collective service's request goes in a group chat with the
+//! service's members, so any of them decides (ADR 0089). Every reader replays the decisions
+//! (`sp_service::replay`).
 
 use hdi::prelude::*;
-use sp_core::conversation::ChatKind;
 use sp_service::{check_request, check_status, may_decide};
 
 use crate::rights::{decode, member};
@@ -45,16 +46,12 @@ fn window(r: &ServiceRequest) -> Result<Option<(i64, i64)>, String> {
     }
 }
 
-/// web's request fields, in a direct chat, by someone in it.
+/// web's request fields, in a direct or group chat (ADR 0089), by someone in it.
 pub fn validate_request(
     r: &ServiceRequest,
     author: &AgentPubKey,
     creator: &AgentPubKey,
-    kind: ChatKind,
 ) -> ExternResult<ValidateCallbackResult> {
-    if kind != ChatKind::Direct {
-        return invalid("service requests go in a direct chat with the service's creator");
-    }
     if let Err(reason) =
         window(r).and_then(|w| check_request(&r.project, &r.service, &r.title, &r.body, w))
     {
@@ -82,7 +79,7 @@ pub fn validate_status(
         return invalid("a request status settles a service request");
     }
     if !may_decide(&s.status, record.action().author() == author) {
-        return invalid("the person asking cancels; the service's creator accepts or declines");
+        return invalid("the person asking cancels; the people running the service decide");
     }
     if !member(author, s.invite.as_ref(), creator)? {
         return invalid("only people in the chat settle its requests");

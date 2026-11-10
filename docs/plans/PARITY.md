@@ -27,10 +27,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    The scope page's create menu is not parity: web's `ScopeCreateMenu` is imported nowhere.)
 5. ~~Events, later parts~~ (done: activities limited to the plan's days and the event card's
    time 2026-11-04/05; Remove organizer 2026-11-05, ADR 0073, coordinator only).
-6. **Service requests** (ADR 0076): parts (a) (PR #107, live) and (b) (ADR 0077:
-   availability, slots, bookings, Request history, the create flow's request mode) done
-   2026-11-06. Left: (c) collective services' settings vote, Request service and planning
-   (review waits on the owner). web's borrowing/delivery frames are dead code
+6. ~~Service requests~~ (ADR 0076): parts (a) (PR #107) and (b) (ADR 0077: availability,
+   slots, bookings, Request history, the create flow's request mode) done 2026-11-06; (c)
+   collective services (ADR 0089: group-chat requests any member plans or declines, the
+   settings vote) 2026-11-10. web's borrowing/delivery frames are dead code
    (`RequestFrameStack` is imported nowhere): not parity.
 7. **Map + places (M6):** done with phase 5b (2026-11-08, `docs/plans/M6-places.md`, ADR
    0078–0085): places on records, geocoding, the LocationPicker, Regional settings, map
@@ -38,15 +38,15 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 8. ~~Software projects~~ (ADR 0086, 0087, `docs/plans/SOFTWARE.md`): the panel, wizard and
    Repository ▾ (phases a + b, 2026-11-08); the rail's rows, Take part's merge capability and
    repository votes, History / Past activity cards and `pr-approved` (phase c, 2026-11-09).
-   **Owner review (ADR 0087):** the rail's History says "Passed" for a confirmed merge (web:
-   "Still open"); Take part's sheet leaves pull request rows to the panel's Assess.
+   Owner, 2026-11-10: the rail's History keeps "Passed" for a confirmed merge (web says
+   "Still open"; the app's is better).
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
    The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
    page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
-   web's **Deactivate account** (signed out for good; content stays under the name): needs
-   an ADR (the app has no password; who refuses a deactivated agent: gateway, directory?).
+   web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088
+   (owner 2026-11-10: in the directory), not built yet (a directory reset).
    web's Change password doesn't apply (passkeys and the recovery phrase).
 
 ## Shell (phone)
@@ -69,8 +69,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   with web's body preview and "N signed up · M needed"; History lists ended ones and current
   sign-ups (Show → Help), and help requests' activities no longer show as Project activity.
   Requests lists open service requests to services you run (ADR 0076).
-  **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
-  out personal services (Activity is their `phase-1`); the app lists both.
+  web-backend lists activities only from projects in `phase-5`, which leaves out personal
+  services (Activity is their `phase-1`); the app lists both (owner, 2026-11-10: keep).
 - [x] Rail link votes: web's "Link vote · <other project>" / "Sever link · …" rows (this
   project's half of a link request you haven't voted on, from `link_sides`; the other project's
   title from its directory listing) open the Links tab with the request expanded
@@ -85,10 +85,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   it used to show on every page.
 
 ## Pages
-- [x] About: web's About page with its tabs, ported with web's copy unchanged (pixel-identical
-  at 390px). **Owner review:** the copy describes web (Roadmap "Now: Web prototype, FastAPI
-  backend"; quorum from weekly actives, while the app counts full members, ADR 0033). Say if
-  the P2P app should say something different.
+- [x] About: web's tabbed reader with the owner's own copy (2026-11-10: "not so many
+  sections, information on commons-based peer production, stigmergic signalling to replace
+  price signals"): Why / How it works / Decisions / The network, describing the app's own
+  rules (ADR 0033, 0071, 0074). Deliberately not web's text.
 - [x] Search: web's own page (`features/search/SearchPage.svelte`, live suggestions, kind
   filter, result rows, empty-query chips). Kinds today: Projects (from `/index/projects?q=`)
   and Users (new gateway people index, `/index/people?q=`, refreshed every minute), so guests
@@ -115,7 +115,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   communities, plus the events listed on your private communities (2026-10-31: the index's
   `tag` takes several, comma-separated; `homeFeedState.svelte.ts`). The private-community
   events ignore the time window (the index's cards carry no schedule either).
-- [ ] Toolbar: Region in the scope menu (needs place coordinates, M6). ("Following + popular"'s
+- [x] Toolbar: Region in the scope menu (M6 phase 5b, 2026-11-08). ("Following + popular"'s
   discovery posts and threads: done 2026-11-04.)
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
   the gateway index (`commentCount` counts up to the chat's 200-message page).
@@ -172,8 +172,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 ## Project page: Activity phase (M5b, ADR 0056)
 - [x] Calendar card with Add activity, the creation wizard, agenda rows by day, the activity
   sheet with roles (Take/Leave, Suggest someone, Decline), Share activity.
-- [ ] Place search in the wizard (web's LocationPicker with quick picks): a plain label until
-  places land (M6). Times in the browser's zone until a Display timezone setting exists.
+- [x] Place search in the wizard (web's LocationPicker with quick picks): M6 phase 3. Times in the browser's zone until a Display timezone setting exists.
 - [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
   ratings, Community). The requester side waits on service requests.
 - [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
@@ -228,9 +227,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   off-schedule refusals, bookings with the Provider role, Past activity's Request history and
   Self planned history (the requester's check-in and rating), the create flow's "Service
   request mode". Not ported: web's Timezone selects (no Display timezone setting yet).
-- [ ] Service requests, part (c): collective services' Settings ▾ → Request settings vote,
-  Request service, Plan request. **Owner review:** web's review half is unreachable (nobody
-  can become a manager); who should review in the app?
+- [x] Service requests, part (c) (ADR 0089, 2026-11-10): collective services' Settings ▾ → Request settings vote,
+  Request service, Plan request; any member decides (owner 2026-11-10; web's review half is
+  unreachable there).
 - [x] Moderation part (a), 2026-11-02 (ADR 0071): reports on projects, events, help requests,
   threads and posts (web's thresholds, Full members' votes, replayed by every reader).
 - [x] Moderation part (b), 2026-11-03 (PR #88, ADR 0071): reports on comments (threads, posts) and on
