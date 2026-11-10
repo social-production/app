@@ -43,7 +43,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
-   The right rail's Help Requests was compared and ported 2026-11-10.
+   The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
+   page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
+   web's **Deactivate account** (signed out for good; content stays under the name): needs
+   an ADR (the app has no password; who refuses a deactivated agent: gateway, directory?).
+   web's Change password doesn't apply (passkeys and the recovery phrase).
 
 ## Shell (phone)
 - [x] More opens web's `MobileMoreSheet` (profile or Sign in, Settings, About), not the left
@@ -142,16 +146,19 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   The required channel tag came with M5d (PR #73).
 - [x] Help requests on web's `PersonalHelpRequestCard` in the Home feed's personal rows and on
   profiles (2026-10-31, PR #81; `components/cards/PersonalSpaceCard.svelte` picks the card by mode).
-- [ ] web's project-activity cards (`ProjectActivityCard`: activity title,
+- [x] web's project-activity cards (`ProjectActivityCard`: activity title,
   parent project, time, place, distance) come only from web-backend's Region feed
-  (`feeds/region.py`), so they wait on Region (places, M6). web's feed has no plan cards.
+  (`feeds/region.py`): done with the Region scope (M6 phase 5b, 2026-11-08). web's feed has no
+  plan cards.
 
 ## Settings (compared with web's `SettingsPage.svelte` source)
 - [x] Appearance: type size, theme (light/dark/system), accent colour, font, kept on this device
   under web's storage keys (web keeps them server-side too; the app has no settings store).
 - [ ] Appearance rows waiting on features: language (web: "coming soon"), separate Public and
   Personal feeds (needs the personal feed), display timezone (needs scheduled times, M5).
-- [ ] Regional (default location, device GPS, network location): needs places (M6).
+- [x] Regional (default location, device GPS, network location): done with M6 (ADR 0078–0085).
+- [x] Profile: photo (change/remove), username, home area, bio (M1/M5a). The profile page's
+  photo opens full screen in web's PhotoViewer ("View <name> profile photo", 2026-11-10).
 - [x] Notifications: web's switches for the categories the app has kinds for (Comments, Votes
   needed, Phase finished), per device; off hides those cards and their bell count.
 - [x] "Plan became leading" (`prj-plan-lead` / `evt-plan-lead`, off by default as on web), from

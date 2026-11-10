@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The right rail's Help Requests (PR #132, 2026-11-10 11:54 am Melbourne):** your help
+  requests, the ones you signed up for and open ones in your channels and communities, with
+  web's preview and sign-up counts; the rail's History lists them under Help. No reset. Live
+  `help-requests.mjs` and `rail.mjs` passed.
 - **Link votes in the History tab (PR #131, 2026-11-10 9:55 am Melbourne):** a project's or
   event's History lists its link and sever votes as web's "Link decision" / "Sever link
   decision" cards; open ones can be voted from their sheet. No reset. Live `links.mjs` passed.
