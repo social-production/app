@@ -146,7 +146,7 @@ await next(); // → schedule (web's default time)
 await next(); // → place
 await bob.getByPlaceholder('Search a place').fill('The shed');
 await next(); // → plan stage
-await bob.locator('select').first().selectOption({ index: 1 });
+await bob.locator('select:visible').first().selectOption({ index: 1 });
 await next(); // → roles: web's "Service lead"
 assert.equal(await bob.getByPlaceholder('For example: Intake desk').first().inputValue(), 'Service lead');
 await next(); // → note: the request's details
