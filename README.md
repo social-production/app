@@ -14,6 +14,13 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Collective service requests and the new About page (PR #135, 2026-11-10 10:07 pm
+  Melbourne, ADR 0089):** anyone can request a collective service; any member plans the
+  request into an activity with the roles it needs (it goes ahead once they're filled) or
+  declines it; members vote request settings on or off. The About page is rewritten (commons-
+  based peer production, signals instead of prices, how decisions are made, the network).
+  **The chat and project networks reset.** Live `collective-requests.mjs` and `shell.mjs`
+  passed. Plan for running without the seed node: `docs/plans/SEEDLESS.md`.
 - **Profile photos open full screen (PR #133, 2026-11-10 3:46 pm Melbourne):** tapping a
   profile photo opens it in the photo viewer, as on web. No reset. Live `accounts.mjs` passed.
 - **The right rail's Help Requests (PR #132, 2026-11-10 11:54 am Melbourne):** your help
