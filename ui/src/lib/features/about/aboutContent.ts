@@ -57,6 +57,24 @@ export const aboutReading: ReadingLink[] = [
     href: 'https://en.wikipedia.org/wiki/Use_value',
     blurb: 'The distinction this project starts from.',
   },
+  {
+    label: 'Mode of production',
+    href: 'https://en.wikipedia.org/wiki/Mode_of_production',
+    blurb:
+      'How a society organises production, ownership, and the relations through which people make and share things.',
+  },
+  {
+    label: 'Value-form theory',
+    href: 'https://en.wikipedia.org/wiki/Value-form',
+    blurb:
+      'Why value under capitalism is a social form expressed in exchange, not a natural property of useful things.',
+  },
+  {
+    label: 'Communization',
+    href: 'https://en.wikipedia.org/wiki/Communization',
+    blurb:
+      'Currents that emphasise abolishing exchange and building new relations directly, rather than managing the old ones under new owners.',
+  },
 ];
 
 export const aboutHow: Block[] = [
