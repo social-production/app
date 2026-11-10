@@ -78,4 +78,8 @@ Those are dead code on web: `RequestFrameStack` is imported nowhere, and every f
   per service would need the inbox to name chats, which ADR 0043 keeps hidden.
 - **Owner review:** who reviews a collective service's requests. web has no way to become a
   manager, so its review is dead; the app could let members (or the leading plan's roles)
-  review. Part (c) waits on that answer.
+  review. Owner, 2026-11-10: "both, people who did the activity and the one who received the
+  service". That reads as the rating after the service (Request history's two sides, built in
+  (b)); the cloud session asked the owner to confirm who accepts or declines a collective
+  service's incoming request (its likely reading: the people who will do the activity, i.e. the
+  service's members). Part (c) waits on that confirmation.

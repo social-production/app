@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 3:50 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 6:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -37,6 +37,18 @@ and continue from Next."
   `docs/plans/PARITY.md` ("Whole web pages the app doesn't have yet").
 - Owner noticed updates on project and event pages look different from web's: fixed in PR #83.
 
+## Owner direction (2026-11-10): the seed node must become optional
+- "This app needs to function without a seed node as it will potentially get shut down, it's
+  just there for initial start up really." Goal: once enough desktop clients run, shut the
+  seed node down and cancel Railway. **Plan: `docs/plans/SEEDLESS.md`** (what Railway does, what
+  desktops must take over, a build list, and when it is safe to switch off). Honest limit: a
+  tiny bootstrap + relay must stay somewhere (several community copies), even with no seed node.
+- Deactivation lives in the directory (ADR 0088, accepted, not built: a directory reset).
+- Service requests (c): owner answered "both, people who did the activity and the one who
+  received the service"; asked to confirm who **accepts or declines** a collective service's
+  request (likely: its members, who do the work). Build (c) once confirmed (ADR 0076).
+- "Keep going with parallel": read as keep going with parity; SEEDLESS work alongside.
+
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
 control". One network per project cannot reach that (each costs two databases, a gossip space and
@@ -50,8 +62,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (the profile photo viewer merged, PR #133; this docs PR follows).
-**Next:** service requests (c) once the owner says who reviews them (ADR 0076). Otherwise,
+## In flight: docs PR (SEEDLESS plan, ADR 0088, the owner's 2026-11-10 decisions).
+**Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
+words on desktop, a list of bootstrap/relay URLs), alongside parity; service requests (c) once
+the owner confirms who accepts requests (ADR 0076). Otherwise,
 from PARITY's summary: keep comparing the screens not compared yet (item 10; the right rail
 and Settings/profile were compared 2026-11-10: next, e.g. the create flows, the Messages page
 against web's current source, channel/community pages); Settings waiting on
