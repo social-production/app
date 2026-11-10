@@ -52,7 +52,7 @@ assert.equal(
 // The About page (the owner's own copy, 2026-11-10) in web's tabbed reader, ?section=.
 await guest.getByRole('heading', { name: /for use rather than sale/ }).waitFor();
 await guest.getByText(/Commons-based peer production/).first().waitFor();
-await guest.getByRole('tab', { name: 'How it works' }).click();
+await guest.getByRole('tab', { name: /^How/ }).click();
 await guest.waitForURL(/section=how/);
 await guest.getByRole('heading', { name: 'Signals instead of prices' }).waitFor();
 log('signed out: More shows sign in and About');
