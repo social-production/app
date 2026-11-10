@@ -39,6 +39,7 @@ pub fn run() {
             });
             let handle = app.handle().clone();
             app.handle().listen(EVENT_READY, move |_| {
+                network::log_stats(handle.clone());
                 let handle = handle.clone();
                 tauri::async_runtime::spawn(async move {
                     if let Err(e) = Box::pin(open_main_window(handle)).await {

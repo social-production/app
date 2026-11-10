@@ -110,6 +110,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cargo install tauri-driver --locked
+          export SP_NET_LOG=1
           xvfb-run -a bash -c '
             tauri-driver & driver=$!
             sleep 2

@@ -88,7 +88,7 @@ async function goto(path) {
 }
 
 /** Until the seed node's people index (GET /index/people) lists `name`. */
-async function waitForSeed(name, timeout = 300_000) {
+async function waitForSeed(name, timeout = 480_000) {
   const end = Date.now() + timeout;
   for (;;) {
     const people = await fetch(`${SEED}/index/people?q=${name}`)
