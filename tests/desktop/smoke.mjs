@@ -11,6 +11,8 @@ import { resolve } from 'node:path';
 
 const APP = resolve(process.argv[2] ?? 'target/release/social-production');
 const DRIVER = process.env.WEBDRIVER_URL ?? 'http://127.0.0.1:4444';
+// The gateway the app was built with (VITE_SP_GATEWAYS' first entry).
+const SEED = (process.env.VITE_SP_GATEWAYS ?? 'https://seed-node-production.up.railway.app').split(',')[0];
 const log = (...a) => console.log(new Date().toISOString().slice(11, 19), ...a);
 
 async function wd(method, path, body) {
@@ -85,6 +87,19 @@ async function goto(path) {
   await wd('POST', `${S}/url`, { url: `${origin}${path}` });
 }
 
+/** Until the seed node's people index (GET /index/people) lists `name`. */
+async function waitForSeed(name, timeout = 300_000) {
+  const end = Date.now() + timeout;
+  for (;;) {
+    const people = await fetch(`${SEED}/index/people?q=${name}`)
+      .then((r) => r.json())
+      .catch(() => []);
+    if (people.some((p) => p.name === name)) return;
+    if (Date.now() > end) throw new Error(`the seed node never listed ${name}`);
+    await new Promise((r) => setTimeout(r, 5000));
+  }
+}
+
 try {
   log('app started; waiting for the shell');
   await signedIn('false');
@@ -110,9 +125,14 @@ try {
 
   log('profile shows the name');
   await goto('/settings');
-  await until('the agent key', `return document.querySelector('#settings-account .key')?.innerText`);
+  const key = await until('the agent key', `return document.querySelector('#settings-account .key')?.innerText`);
   await goto('/profile');
   await until('the profile name', `return document.body.innerText.includes(arguments[0])`, 60_000, name);
+
+  // Signing out removes the only copy until another node holds the chain (ADR 0090), so
+  // wait until the seed node's index has the profile: this device reached the network.
+  log('waiting for the network (the seed node) to hold the profile');
+  await waitForSeed(name);
 
   log('sign out, then log in with the words');
   await goto('/settings');
@@ -123,6 +143,9 @@ try {
   await fill('Recovery phrase', words.join(' '));
   await click('Log in', 'button[type=submit]');
   await signedIn('true');
+  await goto('/settings');
+  const again = await until('the agent key after log-in', `return document.querySelector('#settings-account .key')?.innerText`);
+  if (again.trim() !== key.trim()) throw new Error(`log-in gave another key: ${again} (was ${key})`);
   await goto('/profile');
   await until('the profile after log-in', `return document.body.innerText.includes(arguments[0])`, 180_000, name);
   log('PASS');

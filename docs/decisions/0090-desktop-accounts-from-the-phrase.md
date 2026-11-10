@@ -33,9 +33,11 @@ can open unbound and be bound to an app later (`rebind_window`).
   can fork its chain. Until the gateway can **retire** a hosted copy (next: an
   `/account/retire` call the desktop makes with the seed, and the gateway refusing to restore
   a retired agent), the log-in screen on desktop asks people to use the account in one place.
-- Signing out of the desktop with no other node holding the chain loses it. Once desktops are
-  the only full nodes (SEEDLESS step 7), sign-out should warn when the readiness count says
-  nobody else holds it.
+- Signing out of the desktop with no other node holding the chain loses it. CI showed this:
+  signing out two seconds after sign-up and logging back in gave the same key but no profile
+  (a fresh chain). Next: sign-out waits for, or warns until, the chain is published (e.g. the
+  seed node's index or, without one, the readiness count of SEEDLESS step 7 shows it). The
+  smoke test waits for the seed node to list the profile before signing out.
 - The desktop UI still reads the feed index from a gateway (`VITE_SP_GATEWAYS`) until SEEDLESS
   step 4 moves the index onto the device.
 - Tested in CI: `.github/workflows/desktop.yml` builds the app on Linux, Windows and macOS and
