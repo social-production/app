@@ -44,9 +44,12 @@ and continue from Next."
   desktops must take over, a build list, and when it is safe to switch off). Honest limit: a
   tiny bootstrap + relay must stay somewhere (several community copies), even with no seed node.
 - Deactivation lives in the directory (ADR 0088, accepted, not built: a directory reset).
-- Service requests (c): owner answered "both, people who did the activity and the one who
-  received the service"; asked to confirm who **accepts or declines** a collective service's
-  request (likely: its members, who do the work). Build (c) once confirmed (ADR 0076).
+- Service requests (c), owner: any member of a collective service may accept a request; if it
+  needs several roles it doesn't go ahead until they are filled, and members sign up from the
+  calendar and the right rail (ADR 0076). Afterwards both sides rate (built in (b)).
+- Owner: the seed node stays up as long as possible. Desktop and phone must work without it;
+  browser access is nice while a seed is up. Bootstrap/relay on desktop full nodes: SEEDLESS.md
+  "Help the network" mode (step 3b).
 - "Keep going with parallel": read as keep going with parity; SEEDLESS work alongside.
 
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
@@ -64,8 +67,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: docs PR (SEEDLESS plan, ADR 0088, the owner's 2026-11-10 decisions).
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
-words on desktop, a list of bootstrap/relay URLs), alongside parity; service requests (c) once
-the owner confirms who accepts requests (ADR 0076). Otherwise,
+words on desktop, a list of bootstrap/relay URLs), alongside parity, and service requests (c)
+(unblocked 2026-11-10, ADR 0076). Otherwise,
 from PARITY's summary: keep comparing the screens not compared yet (item 10; the right rail
 and Settings/profile were compared 2026-11-10: next, e.g. the create flows, the Messages page
 against web's current source, channel/community pages); Settings waiting on

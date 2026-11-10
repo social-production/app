@@ -5,6 +5,10 @@ shut down, it's just there for initial start up really… once we have enough de
 seed node can get shut down and I can cancel my Railway." This plan lists what has to be built
 first. It extends ADR 0036 (every full node keeps the network) and README's M7.
 
+Owner, same day: the seed node stays up as long as possible; this prepares for the day no seed
+can host. **Desktop and phone apps are what must keep working.** Browser access is good while a
+seed (or a community gateway) is up, and fine to lose after.
+
 ## What Railway runs today
 
 | Railway service | What it does | Who depends on it |
@@ -29,19 +33,34 @@ What the seed node's gateway does, and whether a desktop app needs it:
 The rest is already peer to peer: chains, governance, chats, notifications (derived on device,
 ADR 0046), calls (signals over the network, public STUN), places, moderation.
 
-## The honest limit: a tiny server stays
+## Bootstrap and relay on desktop full nodes
 
 Holochain nodes find each other through a **bootstrap server** and reach each other across home
-routers through a **relay**. Two desktops that already know each other can keep talking for a
-while, but new people can't find the network and most home connections can't connect directly.
-So "no seed node" really means **no big seed node**: the 650 MB conductor and the hosted agents
-go; a small bootstrap + relay stays. It needs no database, little memory, and anyone can run a
-copy:
-- a free or ~US$5/month VPS (Fly.io, Oracle free tier, Hetzner), or a Pi at someone's home with
-  one forwarded port;
-- several copies run by different people, listed in the app (a list, not one URL);
-- iroh's public relays and Holochain's public bootstrap exist too, but their operators describe
-  them as for development: usable as a last fallback, not as the plan.
+routers through a **relay**. Both are Rust crates already in our dependency tree
+(`kitsune2_bootstrap_srv`, `iroh-relay`), so **a desktop full node can run them too**. What
+limits it is the internet, not the software:
+- **First contact only.** Once a node has met peers, they swap peer addresses in gossip
+  (kitsune2 `receive_agent_infos` → peer store), so a running network keeps finding itself
+  without any bootstrap. A bootstrap is needed for a new install, or for a node that was offline
+  long enough for every address it knew to change.
+- **Someone must be reachable from outside.** Most home desktops sit behind a router (NAT, or
+  carrier NAT with no public address at all), their address changes, and laptops sleep. A
+  bootstrap or relay on such a machine can't be reached by a new install. A desktop can serve
+  if it has a public address: a forwarded port (or UPnP), or IPv6.
+- **The relay needs a name and a certificate** (iroh's relay serves TLS through ACME), so a
+  desktop relay also needs a domain or dynamic-DNS name pointing at it.
+- **New installs need to know where to look.** The app ships a list; it should also learn more
+  from the directory, where serving desktops announce themselves.
+
+So the design is: **"Help the network" mode on desktop full nodes** that are reachable: the app
+runs the bootstrap (and the relay, when it has a name) and announces its address in the
+directory. Every app ships a list of known bootstrap URLs, adds the ones it learns from the
+directory, and remembers peers it has met. With a handful of such desktops, nothing has to be
+paid for. A cheap VPS (Fly.io, Oracle free tier, Hetzner) or a Pi with one forwarded port is the
+fallback, and iroh's and Holochain's public development servers are a last resort.
+
+Browser access needs a gateway (the seed-node image). Without one, the network is desktop- and
+phone-only, which the owner accepts.
 
 Browser access also needs a gateway. Without one, the network is desktop- and phone-only. A
 community member can run a gateway later; it is the same seed-node image.
@@ -58,6 +77,11 @@ community member can run a gateway later; it is the same seed-node image.
    Also check that passkey-only people can still see their phrase before the seed goes.
 3. **Several bootstrap/relay URLs** (S). A list in the app and a Settings field to add one;
    the app tries them in order. Write the "run a bootstrap" guide (one Docker command).
+3b. **"Help the network" mode on desktop** (M): the desktop app runs `kitsune2_bootstrap_srv`
+   (and `iroh-relay` when given a domain) when the person turns it on and the node is
+   reachable; it announces the URL in the directory; every app reads announced URLs into its
+   list. Test: two desktops find each other through a third desktop's bootstrap with Railway's
+   bootstrap switched off.
 4. **Archivist + index in a crate every full node runs** (L, the biggest piece). Move
    `services/gateway/src/node/{archivist,index,cards,event_time,people,markers,region,spaces}.rs`
    into a crate without the gateway's HTTP layer. The desktop app runs it in-process and the
@@ -87,7 +111,8 @@ community member can run a gateway later; it is the same seed-node image.
   directory and the commons (step 7's page says so), for a few weeks.
 - Every hosted account has moved to a desktop (or its owner accepted losing browser access);
   announce a date and keep the seed node read-only for a month.
-- At least two bootstrap/relay copies run by different people, both in the shipped list.
+- At least two bootstrap/relay copies run by different people (desktops in "Help the
+  network" mode or small servers), all in the shipped list or announced in the directory.
 - Take a final copy of the seed node's `/data` first; never lose `LAIR_PASSPHRASE` until hosted
   people have moved (their keys are in it).
 - Then: turn off `seed-node`, then `ui` (or move the static UI to GitHub Pages for browser
