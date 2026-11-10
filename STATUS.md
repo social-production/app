@@ -47,6 +47,12 @@ and continue from Next."
 - Service requests (c), owner: any member of a collective service may accept a request; if it
   needs several roles it doesn't go ahead until they are filled, and members sign up from the
   calendar and the right rail (ADR 0076). Afterwards both sides rate (built in (b)).
+  **Design chosen (to be ADR 0089):** a collective service's request lives in a group chat
+  between the requester and the service's members at that time (private, as on web; reuses
+  (a)/(b)'s chat records, lines, notifications and "Your requests"); any member plans it into an
+  activity with roles (a booking naming the request) or declines it. Needs conversation
+  integrity (group chats take requests; any non-requester member decides) and project
+  integrity (collective bookings by any member, any roles): both networks reset on merge.
 - Owner: the seed node stays up as long as possible. Desktop and phone must work without it;
   browser access is nice while a seed is up. Bootstrap/relay on desktop full nodes: SEEDLESS.md
   "Help the network" mode (step 3b).
