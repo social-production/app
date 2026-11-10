@@ -115,7 +115,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   communities, plus the events listed on your private communities (2026-10-31: the index's
   `tag` takes several, comma-separated; `homeFeedState.svelte.ts`). The private-community
   events ignore the time window (the index's cards carry no schedule either).
-- [ ] Toolbar: Region in the scope menu (needs place coordinates, M6). ("Following + popular"'s
+- [x] Toolbar: Region in the scope menu (M6 phase 5b, 2026-11-08). ("Following + popular"'s
   discovery posts and threads: done 2026-11-04.)
 - [x] Cards: comments count pill (opens the Chat tab) and the "Latest: …" update line, from
   the gateway index (`commentCount` counts up to the chat's 200-message page).
@@ -172,8 +172,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 ## Project page: Activity phase (M5b, ADR 0056)
 - [x] Calendar card with Add activity, the creation wizard, agenda rows by day, the activity
   sheet with roles (Take/Leave, Suggest someone, Decline), Share activity.
-- [ ] Place search in the wizard (web's LocationPicker with quick picks): a plain label until
-  places land (M6). Times in the browser's zone until a Display timezone setting exists.
+- [x] Place search in the wizard (web's LocationPicker with quick picks): M6 phase 3. Times in the browser's zone until a Display timezone setting exists.
 - [x] Past activity: web's ActivityHistorySection for self-planned activities (check-in,
   ratings, Community). The requester side waits on service requests.
 - [x] Activity notifications: "… was added." (members), suggested for a role, role taken (to
