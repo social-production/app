@@ -75,6 +75,7 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight: why a desktop can't find the seed node (bootstrap registrations)
+- PR #138 (docs + `scripts/check-bootstrap.sh`) merged 2026-11-11 9:32 am Melbourne.
 - **PR #137 merged 2026-11-11 7:17 am Melbourne** (20:17 UTC): desktop accounts from the phrase
   (ADR 0090) and the `desktop` CI workflow (Linux/Windows/macOS builds + Linux smoke test).
   See "Done 2026-11-11" below. No reset; seed node restarted 20:28 UTC.
@@ -90,6 +91,11 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   **Renewal works early:** at 25 min up (20:53 UTC) every entry had been re-put at ~15 min.
   So the lapse comes later (hours) or the bootstrap service drops its store; a check is
   scheduled at ~3 h up (23:30 UTC = 10:30 am Melbourne).
+  **Every merge to main redeploys the bootstrap too** (`deploy/railway/*.json` has no watch
+  paths) and its store is in memory, so each deploy wipes every entry; nodes must re-put them
+  (≤15 min). If the seed's re-puts stop after a bootstrap restart, that is the bug. PR #138's
+  merge (22:32 UTC) redeployed both; the 23:30 UTC check measures from there. Consider watch
+  paths so docs-only merges don't restart the bootstrap.
   Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
   space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
   kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
