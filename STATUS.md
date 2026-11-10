@@ -95,7 +95,10 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   paths) and its store is in memory, so each deploy wipes every entry; nodes must re-put them
   (≤15 min). If the seed's re-puts stop after a bootstrap restart, that is the bug. PR #138's
   merge (22:32 UTC) redeployed both; the 23:30 UTC check measures from there. Consider watch
-  paths so docs-only merges don't restart the bootstrap.
+  paths so docs-only merges don't restart the bootstrap. **23:30 UTC (seed up 44 min
+  after that redeploy):** all 5 agents listed in all three spaces, renewed ~13 min ago, so a
+  bootstrap + seed restart recovers. The lapse needs hours of uptime: a check is scheduled at
+  ~6 h up (04:50 UTC = 3:50 pm Melbourne); avoid merging before then.
   Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
   space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
   kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
