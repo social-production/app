@@ -127,6 +127,13 @@ for (let i = 0; i < 20 && !(await card.count()); i++) {
   await press(bob, 'Requests');
   await card.waitFor({ timeout: 10_000 }).catch(() => {});
 }
+if (!(await card.count())) {
+  await bob.screenshot({ path: `${out}/collective-requests-missing.png`, fullPage: true });
+  log('bob sees:', await bob.locator('.overlay-root').last().innerText().catch(() => 'no sheet'));
+  await bob.goto(`${BASE}/messages`);
+  await bob.waitForTimeout(8000);
+  log('bob messages:', await bob.locator('main').innerText().catch(() => 'no messages'));
+}
 await card.locator('summary').click();
 await card.getByRole('button', { name: 'Plan request' }).click();
 await bob.screenshot({ path: `${out}/phone390-collective-plan.png` });
