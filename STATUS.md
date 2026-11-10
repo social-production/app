@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 10:50 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 12:05 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -50,11 +50,10 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #132 (docs for PR #131 + the rail's Help Requests, PARITY item 10).
-UI only (no zome change, no reset). When CI is green: merge, smoke live `help-requests.mjs`
-and `rail.mjs`, update README Status + this file.
+## In flight: nothing (the rail's Help Requests merged, PR #132; this docs PR follows).
 **Next:** service requests (c) once the owner says who reviews them (ADR 0076). Otherwise,
-from PARITY's summary: compare the screens not compared yet (item 10); Settings waiting on
+from PARITY's summary: keep comparing the screens not compared yet (item 10; the right rail
+was compared 2026-11-10: next, e.g. the Messages page, create flows, profile editing); Settings waiting on
 features (item 9) comes with those features.
 Also measure the live rail's load time now that it reads `software` (see "Done 2026-11-09").
 - **Lesson (5a):** a page that reads per-account storage on mount must wait for the
@@ -84,6 +83,14 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-10: the rail's Help Requests merged (PR #132, 00:54 UTC = 11:54 am Melbourne)
+- CI green on the first run (~90 min). UI redeployed 00:55 UTC; no zome change, no reset.
+  Live `help-requests.mjs` **passed** (00:55–00:57 UTC, rail rows included). Live `rail.mjs`
+  failed once at its last step ("the cast vote never reached History", an edit vote; this PR
+  only adds help rows) and **passed** on rerun (00:57–00:59 UTC). That step has now failed
+  once live twice (see 2026-10-27): if it fails again, give its History loop more time or
+  find why Bob's rail lags his vote.
 
 ## Done 2026-11-10: the right rail's Help Requests (PARITY item 10), in PR #132
 - Comparing the rail with web's source found Help Requests always empty in the app. Ported
