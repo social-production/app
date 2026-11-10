@@ -123,10 +123,13 @@ log('cleo, not a member, sent a request');
 // Bob (any member) plans it: web's Plan request opens the activity wizard with it filled in.
 await press(bob, 'Requests');
 const card = bob.locator('.request-card-shell', { hasText: ask });
-for (let i = 0; i < 20 && !(await card.count()); i++) {
+// The request's group chat reaches the members by gossip; a new chat can take minutes.
+const asked = Date.now();
+for (let i = 0; i < 60 && !(await card.count()); i++) {
   await press(bob, 'Requests');
   await card.waitFor({ timeout: 10_000 }).catch(() => {});
 }
+log(`the request reached bob after ${Math.round((Date.now() - asked) / 1000)} s`);
 if (!(await card.count())) {
   await bob.screenshot({ path: `${out}/collective-requests-missing.png`, fullPage: true });
   log('bob sees:', await bob.locator('.overlay-root').last().innerText().catch(() => 'no sheet'));
