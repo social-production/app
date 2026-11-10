@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-11 1:30 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-11 7:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -74,45 +74,28 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: SEEDLESS steps 1–2, the desktop app (branch `claude/social-production-handoff-dsam61`)
-- **ADR 0090:** the desktop account is the recovery phrase (as on a gateway). The window opens
-  unbound; `native/src/account.rs` has `account_state` / `open_account(seed, restore)` /
-  `sign_out` (Tauri commands), using the runtime's `import_key_seed` and `rebind_window`. UI:
-  `holo/device.ts`; `holo/account.ts` and `connection.ts` take the device path when
-  `inNativeApp()` (no PoW, no passkeys). Log-in restores from the network (waits 120 s, then
-  starts fresh, like ADR 0035).
-- **CI:** new `.github/workflows/desktop.yml`: Nix job builds `ui/build` (with the live seed in
-  `VITE_SP_GATEWAYS`) + the hApp; stock-toolchain `cargo build --release -p native` on Linux,
-  Windows, macOS; on Linux `tests/desktop/smoke.mjs` (no-deps WebDriver client through
-  tauri-driver under xvfb: sign up, profile, sign out, log in with the words). The smoke test
-  joins the **live** test network (Railway bootstrap), like the live e2e tests.
-- **Checked here:** `npm run check -w ui` (0), `npm run lint -w ui`, sizes, boundaries; see the
-  newest Done for clippy. **Not run here:** the desktop app itself (no room on this disk to build
-  Tauri in release; CI is the first real run), scenarios (no zome change), browser e2e.
-- **CI rounds so far (desktop):** Ubuntu 26.04 renamed WebKit's driver (`webkitgtk-webdriver`);
-  Windows' vendored OpenSSL needs Strawberry Perl (`OPENSSL_SRC_PERL`) and `icons/icon.ico`;
-  `tauri` needs `custom-protocol` or the window loads devUrl; WebKitWebDriver element handles
-  differ, so the smoke test clicks/types in page JS; a reload leaves the page's injected app id
-  empty, so `account_state` always rebinds. Sign-up on the device's own node **passed** in CI.
-- **Finding (2026-11-10, the next thing to fix): a desktop app can't join the live network.**
-  The CI desktop connected to the Railway relay (one peer after ~4 min) but every publish
-  failed with `NoPeersForLocation`. This branch's hApp built in Nix here gives directory
-  `uhC0kUx_esWp-V0T_5E88TLQYZsfGHe8Kpb4zbKy21C9gt05g4pIO`, project
-  `uhC0kikyCYsDMbxffa5v9ps51bH7vnU8TbJS9WKryg16WYXJS2wm2`; the live bootstrap's
-  `GET /bootstrap/<space>` (space = the hash's 32 core bytes, base64url) lists **only the CI
-  desktop** in those spaces, and Holochain's dev bootstrap lists nobody. So the seed node's DNA
-  hashes differ from a Nix build of the same source (the Docker build drifted from Nix, despite
-  DEPLOYMENT.md's M0 check), or its `BOOTSTRAP_URL` points elsewhere. Check: build the
-  seed-node image (`docker build -f deploy/seed-node/Dockerfile .`) and compare `hc dna hash`;
-  or log the seed's DNA hashes at start-up (`/readyz` could show them). Browser users never
-  notice (they all live on the seed node). The smoke test now only logs whether the seed got
-  the profile.
-- **Expect CI rounds:** Windows/macOS have never built holochain here (OpenSSL, sysinfo); the
-  smoke test's selectors are untested. Fix from the job logs.
-- **Next after this PR:** the gateway retires a hosted copy when its account logs in on a
-  desktop (`/account/retire` with the seed; refuse restoring a retired agent), then step 3
-  (bootstrap URL list; the plugin already has `get/set_user_network_config` commands, see
-  `tauri-plugin-hc` `user_network.rs`).
+## In flight: why a desktop can't find the seed node (bootstrap registrations)
+- **PR #137 merged 2026-11-11 7:17 am Melbourne** (20:17 UTC): desktop accounts from the phrase
+  (ADR 0090) and the `desktop` CI workflow (Linux/Windows/macOS builds + Linux smoke test).
+  See "Done 2026-11-11" below. No reset; seed node restarted 20:28 UTC.
+- **The DNA hashes match** (`/readyz` now lists them): directory `uhC0kUx_es…`, project
+  `uhC0kikyCY…`, conversation `uhC0k1AJBc…`, the same as a Nix build. So the CI desktop *was*
+  on the right networks.
+- **The seed node's agents vanish from the bootstrap.** Right after its restart, the live
+  bootstrap's `GET /bootstrap/<space>` (space = the hash's 32 core bytes, base64url) lists its
+  5 agents (20-minute entries); at 18:35 UTC, after 3.6 h up, it listed none, only the CI
+  desktop. A new desktop then never finds the seed (`NoPeersForLocation` on every publish).
+  kitsune2 re-signs agent infos 5 min before expiry (and puts them to the bootstrap), so either
+  those puts stop or the bootstrap service loses them (an in-memory store across a restart).
+  **Renewal works early:** at 25 min up (20:53 UTC) every entry had been re-put at ~15 min.
+  So the lapse comes later (hours) or the bootstrap service drops its store; a check is
+  scheduled at ~3 h up (23:30 UTC = 10:30 am Melbourne).
+  Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
+  space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
+  kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
+  Browser users never notice (they all live on the seed node).
+- The desktop smoke test only logs whether the seed got the profile; make it required once
+  this is fixed.
 
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
 words on desktop, a list of bootstrap/relay URLs), alongside parity. Parity left (PARITY
@@ -152,6 +135,20 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-11: the desktop app with your words, built and tested in CI (PR #137)
+- ADR 0090: the desktop's account is the recovery phrase. The window opens unbound;
+  `native/src/account.rs` (`account_state`, `open_account`, `sign_out`) installs the hApp for the
+  phrase's agent (`import_key_seed`; on log-in again the key is already in lair, so it is
+  derived with sodoken) and binds the window (`rebind_window`, always, since a reload clears the
+  page's app id). UI: `holo/device.ts`, `holo/account.ts`, `connection.ts` (no PoW/passkeys on
+  desktop). `tauri` needs `custom-protocol`. `SP_NET_LOG=1` logs the node's connections.
+- CI `desktop.yml`: Nix bundle job (UI with the live seed + hApp), stock builds on 3 OSes
+  (Ubuntu 26.04: `webkitgtk-webdriver`; Windows: Strawberry Perl for OpenSSL, `icon.ico`;
+  all: `cargo clean -p tauri-plugin-hc` after the cache), Linux smoke test through tauri-driver
+  (`tests/desktop/smoke.mjs`, clicks/types in page JS; prints the app log on failure).
+- **Lesson:** signing out of a desktop seconds after signing up loses the chain (nobody else
+  held it): same key back, fresh chain. ADR 0090 records it; sign-out should wait or warn.
 
 ## Done 2026-11-10: collective service requests + About page merged (PR #135, 11:06 UTC = 10:06 pm Melbourne)
 - CI green after four rounds (fmt, file size, clippy's 60-line functions, a scenario that
