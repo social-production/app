@@ -89,6 +89,11 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 - **Checked here:** `npm run check -w ui` (0), `npm run lint -w ui`, sizes, boundaries; see the
   newest Done for clippy. **Not run here:** the desktop app itself (no room on this disk to build
   Tauri in release; CI is the first real run), scenarios (no zome change), browser e2e.
+- **CI rounds so far (desktop):** Ubuntu 26.04 renamed WebKit's driver (`webkitgtk-webdriver`);
+  Windows' vendored OpenSSL needs Strawberry Perl (`OPENSSL_SRC_PERL`) and `icons/icon.ico`;
+  `tauri` needs `custom-protocol` or the window loads devUrl; WebKitWebDriver element handles
+  differ, so the smoke test clicks/types in page JS; a reload leaves the page's injected app id
+  empty, so `account_state` always rebinds. Sign-up on the device's own node **passed** in CI.
 - **Expect CI rounds:** Windows/macOS have never built holochain here (OpenSSL, sysinfo); the
   smoke test's selectors are untested. Fix from the job logs.
 - **Next after this PR:** the gateway retires a hosted copy when its account logs in on a

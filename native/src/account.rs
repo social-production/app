@@ -121,11 +121,10 @@ async fn settle(runtime: &Runtime, agent: &holochain::prelude::AgentPubKey) -> R
     }
 }
 
+/// Always rebind, even when the window is already bound: after a reload the page's injected
+/// app id is empty again, and only the rebind event sets it.
 async fn bind(app: &AppHandle, window: &WebviewWindow) -> Result<(), String> {
     let plugin = app.holochain().map_err(text)?;
-    if plugin.bound_app(window.label()).as_deref() == Some(APP_ID) {
-        return Ok(());
-    }
     Box::pin(plugin.rebind_window(window.label(), Some(APP_ID.into())))
         .await
         .map_err(text)
