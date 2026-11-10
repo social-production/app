@@ -94,6 +94,19 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `tauri` needs `custom-protocol` or the window loads devUrl; WebKitWebDriver element handles
   differ, so the smoke test clicks/types in page JS; a reload leaves the page's injected app id
   empty, so `account_state` always rebinds. Sign-up on the device's own node **passed** in CI.
+- **Finding (2026-11-10, the next thing to fix): a desktop app can't join the live network.**
+  The CI desktop connected to the Railway relay (one peer after ~4 min) but every publish
+  failed with `NoPeersForLocation`. This branch's hApp built in Nix here gives directory
+  `uhC0kUx_esWp-V0T_5E88TLQYZsfGHe8Kpb4zbKy21C9gt05g4pIO`, project
+  `uhC0kikyCYsDMbxffa5v9ps51bH7vnU8TbJS9WKryg16WYXJS2wm2`; the live bootstrap's
+  `GET /bootstrap/<space>` (space = the hash's 32 core bytes, base64url) lists **only the CI
+  desktop** in those spaces, and Holochain's dev bootstrap lists nobody. So the seed node's DNA
+  hashes differ from a Nix build of the same source (the Docker build drifted from Nix, despite
+  DEPLOYMENT.md's M0 check), or its `BOOTSTRAP_URL` points elsewhere. Check: build the
+  seed-node image (`docker build -f deploy/seed-node/Dockerfile .`) and compare `hc dna hash`;
+  or log the seed's DNA hashes at start-up (`/readyz` could show them). Browser users never
+  notice (they all live on the seed node). The smoke test now only logs whether the seed got
+  the profile.
 - **Expect CI rounds:** Windows/macOS have never built holochain here (OpenSSL, sysinfo); the
   smoke test's selectors are untested. Fix from the job logs.
 - **Next after this PR:** the gateway retires a hosted copy when its account logs in on a
