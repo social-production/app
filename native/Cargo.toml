@@ -33,6 +33,7 @@ tauri-plugin-hc = "=0.1.0"
 tauri-plugin-log = "2"
 tokio = { workspace = true, features = ["time"] }
 serde_json = "1"
+sodoken = "0.1"
 sp_core = { workspace = true }
 url2 = "0.0.6"
 

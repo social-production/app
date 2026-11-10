@@ -6,7 +6,7 @@
 use std::time::Duration;
 
 use holochain::conductor::api::AppInfo;
-use holochain::prelude::{AppBundleSource, InstallAppPayload};
+use holochain::prelude::{AgentPubKey, AppBundleSource, InstallAppPayload};
 use holochain_types::app::AppStatus;
 use tauri::{AppHandle, WebviewWindow};
 use tauri_plugin_hc::{HolochainExt, Runtime};
@@ -48,7 +48,7 @@ pub async fn open_account(
     if find(&runtime).await?.is_some() {
         return Err("This device already has an account. Sign out first.".into());
     }
-    let agent = runtime.import_key_seed(seed).await.map_err(text)?;
+    let agent = import(&runtime, seed).await?;
     install(&runtime, &agent, restore).await?;
     Box::pin(settle(&runtime, &agent)).await?;
     Box::pin(bind(&app, &window)).await?;
@@ -70,16 +70,28 @@ pub async fn sign_out(app: AppHandle, window: WebviewWindow) -> Result<(), Strin
     Ok(())
 }
 
+/// Import the seed into the keystore, or reuse it: lair never deletes an entry, so logging in
+/// again after signing out finds the key already there (a UNIQUE constraint on its key).
+async fn import(runtime: &Runtime, seed: [u8; 32]) -> Result<AgentPubKey, String> {
+    match runtime.import_key_seed(seed).await {
+        Ok(agent) => Ok(agent),
+        Err(e) if e.to_string().contains("UNIQUE") => {
+            let mut public = [0_u8; sodoken::sign::PUBLICKEYBYTES];
+            let mut secret = sodoken::SizedLockedArray::<{ sodoken::sign::SECRETKEYBYTES }>::new()
+                .map_err(text)?;
+            sodoken::sign::seed_keypair(&mut public, &mut secret.lock(), &seed).map_err(text)?;
+            Ok(AgentPubKey::from_raw_32(public.to_vec()))
+        }
+        Err(e) => Err(e.to_string()),
+    }
+}
+
 async fn find(runtime: &Runtime) -> Result<Option<AppInfo>, String> {
     let apps = runtime.list_apps().await.map_err(text)?;
     Ok(apps.into_iter().find(|app| app.installed_app_id == APP_ID))
 }
 
-async fn install(
-    runtime: &Runtime,
-    agent: &holochain::prelude::AgentPubKey,
-    restore: bool,
-) -> Result<(), String> {
+async fn install(runtime: &Runtime, agent: &AgentPubKey, restore: bool) -> Result<(), String> {
     let payload = InstallAppPayload {
         source: AppBundleSource::Bytes(HAPP.to_vec().into()),
         agent_key: Some(agent.clone()),
@@ -95,7 +107,7 @@ async fn install(
 
 /// Bring the app to Enabled. A restore runs in the background until the chain arrives; a
 /// phrase the network has no chain for (new, or from a reset network) starts fresh.
-async fn settle(runtime: &Runtime, agent: &holochain::prelude::AgentPubKey) -> Result<(), String> {
+async fn settle(runtime: &Runtime, agent: &AgentPubKey) -> Result<(), String> {
     let started = tokio::time::Instant::now();
     loop {
         let app = find(runtime)
