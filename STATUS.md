@@ -87,6 +87,9 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   desktop. A new desktop then never finds the seed (`NoPeersForLocation` on every publish).
   kitsune2 re-signs agent infos 5 min before expiry (and puts them to the bootstrap), so either
   those puts stop or the bootstrap service loses them (an in-memory store across a restart).
+  **Renewal works early:** at 25 min up (20:53 UTC) every entry had been re-put at ~15 min.
+  So the lapse comes later (hours) or the bootstrap service drops its store; a check is
+  scheduled at ~3 h up (23:30 UTC = 10:30 am Melbourne).
   Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
   space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
   kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
