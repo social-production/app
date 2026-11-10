@@ -71,14 +71,17 @@ export interface FeedQuery {
   /** web's personal feed for `me` (`creator` = who they follow): their own posts join it, and
    * with `popular` ("Following + popular") everyone else's posts and threads. */
   personal?: { me: string; popular: boolean };
+  /** Cards per page (the index's default is 20, its most 50). */
+  limit?: number;
 }
 
 export function feed(query: FeedQuery): Promise<{ items: ProjectCard[]; total: number }> {
   const tzOffset = String(-new Date().getTimezoneOffset());
-  const { creator, tag, personal, ...rest } = query;
+  const { creator, tag, personal, limit, ...rest } = query;
   return projectFeed({
     ...rest,
     offset: String(query.offset),
+    ...(limit ? { limit: String(limit) } : {}),
     tzOffset,
     ...(creator ? { creator } : {}),
     ...(tag ? { tag } : {}),

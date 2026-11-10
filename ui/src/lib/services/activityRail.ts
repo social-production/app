@@ -5,16 +5,19 @@ import {
   type RailProject,
 } from '#lib/domain/activityRail.ts';
 import { railHistory } from '#lib/domain/activityRailHistory.ts';
+import { helpRailHistory, helpRailItems } from '#lib/domain/helpRail.ts';
 import { requestRailItems } from '#lib/domain/requestRail.ts';
 import type { VoteChoice } from '#lib/domain/governance.ts';
 import type { SideStatus } from '#lib/domain/links.ts';
-import type { CharterMode } from '#lib/domain/projects.ts';
+import type { CharterMode, ProjectCard } from '#lib/domain/projects.ts';
+import { scopeTag } from '#lib/domain/scopes.ts';
 import { isSoftwareProject } from '#lib/domain/software.ts';
 import {
   callCell,
   hashToString,
   projectCell,
   type ActionHash,
+  type AgentPubKey,
   type CellId,
 } from '#lib/holo/index.ts';
 
@@ -23,13 +26,15 @@ import { listProposals } from './governance.ts';
 import { getModeration } from './moderation.ts';
 import { listPlans } from './plans.ts';
 import { namesOf, myAgent } from './people.ts';
-import { listingTitle, myProjectSeeds } from './projects.ts';
+import { feed, listingTitle, myProjectSeeds } from './projects.ts';
+import { myScopes } from './scopes.ts';
 import { myServiceRequests } from './serviceRequests.ts';
 import { loadSoftware } from './software.ts';
 
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
-  charter: { title: string; mode: CharterMode; subtype: string } | null;
+  creator: AgentPubKey;
+  charter: { title: string; description: string; mode: CharterMode; subtype: string } | null;
   am_member: boolean;
   phase: string;
   phases: { id: string; label: string }[];
@@ -79,17 +84,36 @@ async function railLinks(cell: CellId): Promise<RailLink[]> {
  * person is in, as notifications are (ADR 0046, 0065).
  */
 export async function myActivityRail(): Promise<{ items: RailItem[]; history: RailItem[] }> {
-  const seeds = await myProjectSeeds();
-  const [settled, requests] = await Promise.all([
+  const [me, seeds] = await Promise.all([myAgent(), myProjectSeeds()]);
+  const [settled, requests, openHelp] = await Promise.all([
     Promise.allSettled(seeds.map(railProject)),
     railRequests().catch(() => []),
+    scopeHelpRequests().catch(() => []),
   ]);
   const projects = settled.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []));
   const now = Date.now() * 1000;
   return {
-    items: [...railItems(projects, now), ...requests],
-    history: railHistory(projects, now),
+    items: [
+      ...railItems(projects, now),
+      ...helpRailItems(projects, openHelp, me, now),
+      ...requests,
+    ],
+    history: [...railHistory(projects, now), ...helpRailHistory(projects, me, now)].sort(
+      (a, b) => b.createdAt - a.createdAt,
+    ),
   };
+}
+
+/**
+ * Cards tagged with your public channels and communities (web-backend's open help requests in
+ * your memberships), from the index's newest page; `helpRail.ts` keeps the help requests.
+ */
+async function scopeHelpRequests(): Promise<ProjectCard[]> {
+  const scopes = (await myScopes()).filter((s) => !s.isPrivate);
+  if (scopes.length === 0) return [];
+  const tag = scopes.map((s) => scopeTag(s.kind, s.slug)).join(',');
+  const { items } = await feed({ sort: 'recent', window: 'all', q: '', offset: 0, tag, limit: 50 });
+  return items;
 }
 
 /** Open requests to the services you run (ADR 0076), from your direct chats. */
@@ -121,6 +145,8 @@ async function railProject(seed: string): Promise<RailProject | null> {
   return {
     seed,
     title: project.charter.title,
+    description: project.charter.description,
+    creator: hashToString(project.creator),
     mode: project.charter.mode,
     amMember: project.am_member,
     phase: project.phase,

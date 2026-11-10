@@ -43,6 +43,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
+   The right rail's Help Requests was compared and ported 2026-11-10.
 
 ## Shell (phone)
 - [x] More opens web's `MobileMoreSheet` (profile or Sign in, Settings, About), not the left
@@ -58,8 +59,12 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   (ended activities, roles you hold, votes you cast, with the Show filter) and Cleared
   (dismiss ×, Restore, Restore all); the button's badge and the first desktop load opening it
   when there's something to do. Signed out it matches web at 390px (`tests/e2e/rail.mjs`).
-  Help Requests stays empty; Requests lists open service requests to services you run
-  (ADR 0076).
+  Help Requests (2026-11-10): web-backend's three kinds: your requests ("Your request"), ones
+  you signed up for ("You signed up"), and open ones tagged with your public channels and
+  communities (from the index's newest 50 cards there; web reads closed communities too), each
+  with web's body preview and "N signed up · M needed"; History lists ended ones and current
+  sign-ups (Show → Help), and help requests' activities no longer show as Project activity.
+  Requests lists open service requests to services you run (ADR 0076).
   **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
   out personal services (Activity is their `phase-1`); the app lists both.
 - [x] Rail link votes: web's "Link vote · <other project>" / "Sever link · …" rows (this

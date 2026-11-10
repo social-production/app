@@ -36,6 +36,9 @@
     </div>
     <span class="card-kicker">{railKicker(p.item)}</span>
     <strong>{p.item.title}</strong>
+    {#if p.item.body}
+      <span class="card-body-preview">{p.item.body}</span>
+    {/if}
     {#if p.item.meta}
       <span class="card-meta">{p.item.meta}</span>
     {/if}
