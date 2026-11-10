@@ -87,8 +87,9 @@ requests, software PR flow; posts and threads are done, with their later parts i
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
 
 ## Done 2026-11-10: the profile photo opens full screen (PARITY item 10), in PR #133
-- Compared Settings (Profile, Appearance, Regional, Notifications, Privacy, Account) and the
-  profile page with web's source. One gap: web's profile photo is a button ("View <name>
+- Compared Settings and the profile page with web's source. Gaps: web's **Deactivate
+  account** (Account section; needs an ADR, recorded in PARITY item 10; Privacy's switches are
+  item 9), and web's profile photo is a button ("View <name>
   profile photo") that opens it in `PhotoViewer`; the app's was a plain picture. Now
   `ProfileHero` opens the app's existing `PhotoViewer` (the label uses the profile name, as
   web's uses the username). Also ticked PARITY's stale Regional and project-activity boxes.

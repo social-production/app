@@ -44,7 +44,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
    The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
-   page 2026-11-10 (the profile photo now opens in the PhotoViewer; the rest matched).
+   page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
+   web's **Deactivate account** (signed out for good; content stays under the name): needs
+   an ADR (the app has no password; who refuses a deactivated agent: gateway, directory?).
+   web's Change password doesn't apply (passkeys and the recovery phrase).
 
 ## Shell (phone)
 - [x] More opens web's `MobileMoreSheet` (profile or Sign in, Settings, About), not the left
