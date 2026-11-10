@@ -41,11 +41,13 @@ struct RequestView {
     decided_by: Option<AgentPubKey>,
 }
 
-#[tokio::test(flavor = "multi_thread")]
-async fn any_member_decides_a_request_in_the_group_chat() {
-    let mut conductors = SweetConductorBatch::standard(3).await;
-    // Agent 0 asks; agents 1 and 2 run the service together.
-    let (cells, _) = chat_network(&mut conductors, "group").await;
+type Cells = Vec<(
+    holochain::sweettest::SweetCell,
+    holochain::sweettest::SweetCell,
+)>;
+
+/// Agent 0 starts a group chat with agents 1 and 2 (who run the service) and asks in it.
+async fn ask_in_group(conductors: &SweetConductorBatch, cells: &Cells) -> ActionHash {
     let start = StartInput {
         members: vec![
             cells[1].1.agent_pubkey().clone(),
@@ -64,11 +66,20 @@ async fn any_member_decides_a_request_in_the_group_chat() {
         starts_at: None,
         ends_at: None,
     };
-    let fix: ActionHash = conductors[0]
+    let fix = conductors[0]
         .call(&cells[0].1.zome("messages"), "send_service_request", ask)
         .await;
     let chats: Vec<_> = cells.iter().map(|(_, c)| c.clone()).collect();
     await_consistency(&chats).await.expect("consistency");
+    fix
+}
+
+#[tokio::test(flavor = "multi_thread")]
+async fn any_member_decides_a_request_in_the_group_chat() {
+    let mut conductors = SweetConductorBatch::standard(3).await;
+    let (cells, _) = chat_network(&mut conductors, "group").await;
+    let fix = ask_in_group(&conductors, &cells).await;
+    let chats: Vec<_> = cells.iter().map(|(_, c)| c.clone()).collect();
 
     let decide = |i: usize, status: &str| {
         let input = DecideInput {
