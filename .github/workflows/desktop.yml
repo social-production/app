@@ -99,7 +99,10 @@ jobs:
         shell: bash
         env:
           CARGO_PROFILE_RELEASE_DEBUG: '0'
-        run: cargo build --release -p native
+        run: |
+          # Vendored OpenSSL needs a full Perl; Git Bash's lacks Locale::Maketext::Simple.
+          if [ "$RUNNER_OS" = Windows ]; then export OPENSSL_SRC_PERL=C:/Strawberry/perl/bin/perl.exe; fi
+          cargo build --release -p native
       - name: Smoke test (sign up, profile, sign out, log in with the words)
         if: runner.os == 'Linux'
         run: |
