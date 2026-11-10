@@ -14,6 +14,8 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Profile photos open full screen (PR #133, 2026-11-10 3:46 pm Melbourne):** tapping a
+  profile photo opens it in the photo viewer, as on web. No reset. Live `accounts.mjs` passed.
 - **The right rail's Help Requests (PR #132, 2026-11-10 11:54 am Melbourne):** your help
   requests, the ones you signed up for and open ones in your channels and communities, with
   web's preview and sign-up counts; the rail's History lists them under Help. No reset. Live
