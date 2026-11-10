@@ -27,7 +27,8 @@ holo_hash = { version = "=0.7.1", features = ["encoding"] }
 holochain_types = "=0.7.1"
 log = "0.4"
 rand = "0.8"
-tauri = { version = "2.12", features = [] }
+# custom-protocol: serve the bundled ui/build (without it Tauri loads devUrl, a dev server).
+tauri = { version = "2.12", features = ["custom-protocol"] }
 tauri-plugin-hc = "=0.1.0"
 tauri-plugin-log = "2"
 tokio = { workspace = true, features = ["time"] }
