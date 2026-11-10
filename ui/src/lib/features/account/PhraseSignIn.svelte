@@ -1,6 +1,7 @@
 <script lang="ts">
   import {
     firstInvalidWord,
+    inNativeApp,
     phraseIsValid,
     signInWithPhrase,
     splitWords,
@@ -57,5 +58,13 @@
       This device stays signed in until you sign out. An account from another site or app comes
       along — same identity.
     </p>
+    {#if inNativeApp()}
+      <!-- ADR 0090: one agent on two nodes at once can fork its chain. -->
+      <p class="helper-text">
+        Your account now lives on this computer. If you used it on a website, use it here from now
+        on rather than in both places. Logging in can take up to two minutes while your history
+        arrives from the network.
+      </p>
+    {/if}
   </form>
 {/if}

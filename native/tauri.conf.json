@@ -18,7 +18,8 @@
     "active": true,
     "targets": "all",
     "icon": [
-      "icons/icon.png"
+      "icons/icon.png",
+      "icons/icon.ico"
     ],
     "iOS": {
       "minimumSystemVersion": "13.0"

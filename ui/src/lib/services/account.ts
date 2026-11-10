@@ -11,6 +11,7 @@ export {
   devicePasskeysAvailable,
   firstInvalidWord,
   GatewayError,
+  inNativeApp,
   newPhrase,
   phraseIsValid,
   signInWithPasskey,

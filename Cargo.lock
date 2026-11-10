@@ -5756,15 +5756,19 @@ dependencies = [
 name = "native"
 version = "0.0.1"
 dependencies = [
+ "holo_hash",
  "holochain",
+ "holochain_types",
  "log",
  "rand 0.8.8",
  "serde_json",
+ "sodoken",
  "sp_core",
  "tauri",
  "tauri-build",
  "tauri-plugin-hc",
  "tauri-plugin-log",
+ "tokio",
  "url2",
 ]
 

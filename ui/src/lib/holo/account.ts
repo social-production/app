@@ -1,9 +1,10 @@
 import { generateSigningKeyPair } from '@holochain/client';
 
-import { attach } from './connection.ts';
+import { attach, attachNative } from './connection.ts';
+import { openOnDevice } from './device.ts';
 import { gatewayApi, GatewayError, type GatewaySession, type OpenMode } from './gateway.ts';
 import { loadSession, saveSession, type DeviceSession, type KeyPair } from './keys.ts';
-import { homeGateway } from './nodes.ts';
+import { homeGateway, inNativeApp } from './nodes.ts';
 import { createPasskey, usePasskey } from './passkeys.ts';
 import { phraseToSeed } from './phrase.ts';
 import { solvePow } from './pow.ts';
@@ -23,6 +24,7 @@ export function signUp(words: string[], progress: Progress, beforeShow?: BeforeS
  * on another node or the app), it is restored here: same identity, new home.
  */
 export async function signInWithPhrase(words: string[], progress: Progress): Promise<void> {
+  if (inNativeApp()) return openWithPhrase('restore', words, progress);
   try {
     await openWithPhrase('signin', words, progress);
   } catch (error) {
@@ -66,6 +68,13 @@ async function openWithPhrase(
   progress: Progress,
   beforeShow?: BeforeShow,
 ): Promise<void> {
+  if (inNativeApp()) {
+    // This device's own node: no gateway, no proof-of-work (ADR 0090).
+    progress('connecting');
+    await openOnDevice(phraseToSeed(words), mode !== 'signup');
+    await attachNative(beforeShow);
+    return;
+  }
   const gateway = requireGateway();
   const seed = Array.from(phraseToSeed(words));
   let proof: { challenge?: string; nonce?: string } = {};

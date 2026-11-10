@@ -55,7 +55,21 @@ impl Node {
             .iter()
             .map(|a| a.cell_info.values().map(Vec::len).sum::<usize>())
             .sum();
-        Ok(serde_json::json!({ "apps": apps.len(), "enabled": enabled, "cells": cells }))
+        // Each role's base DNA: a desktop meets this node only if its hashes match (STATUS.md).
+        let mut dnas = std::collections::BTreeMap::new();
+        for app in &apps {
+            for (role, infos) in &app.cell_info {
+                for info in infos {
+                    if let CellInfo::Provisioned(cell) = info {
+                        let hash = holo_hash::DnaHashB64::from(cell.cell_id.dna_hash().clone());
+                        dnas.entry(role.clone()).or_insert_with(|| hash.to_string());
+                    }
+                }
+            }
+        }
+        Ok(serde_json::json!({
+            "apps": apps.len(), "enabled": enabled, "cells": cells, "dnas": dnas
+        }))
     }
 
     /// Give every cell of this hApp version the bundle's coordinators; returns how many cells

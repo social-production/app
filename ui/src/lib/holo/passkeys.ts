@@ -2,6 +2,8 @@
  * Browser side of passkeys. The gateway sends standard WebAuthn JSON options; modern
  * browsers parse and serialise them natively (`parse*OptionsFromJSON`, `toJSON`).
  */
+import { inNativeApp } from './nodes.ts';
+
 type JsonOptions = { publicKey: unknown };
 
 export function passkeysSupported(): boolean {
@@ -13,7 +15,8 @@ export function passkeysSupported(): boolean {
 
 /** True when this device has its own passkey store (Windows Hello, Touch ID, Android…). */
 export async function devicePasskeysAvailable(): Promise<boolean> {
-  if (!passkeysSupported()) return false;
+  // Passkeys sign in to a gateway's hosted account; the app holds its own key (ADR 0090).
+  if (!passkeysSupported() || inNativeApp()) return false;
   try {
     return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
   } catch {
