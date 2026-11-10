@@ -100,7 +100,9 @@ pub fn validate_booking(
                 Err(reason) => invalid(&reason),
             }
         }
-        _ => invalid("only a personal service's creator or a collective service's members book requests"),
+        _ => invalid(
+            "only a personal service's creator or a collective service's members book requests",
+        ),
     }
 }
 

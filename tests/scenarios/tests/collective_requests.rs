@@ -95,7 +95,10 @@ async fn any_member_decides_a_request_in_the_group_chat() {
     );
     let accepted = decide(2, "accepted").await.expect("any member accepts");
     assert_eq!(accepted.status, "accepted");
-    assert_eq!(accepted.decided_by.as_ref(), Some(cells[2].1.agent_pubkey()));
+    assert_eq!(
+        accepted.decided_by.as_ref(),
+        Some(cells[2].1.agent_pubkey())
+    );
     await_consistency(&chats).await.expect("consistency");
     assert!(
         decide(1, "declined").await.is_err(),
@@ -266,19 +269,40 @@ async fn a_member_plans_a_request_into_an_activity_with_roles() {
     // Any hash stands in for the request in the group chat.
     let request = net.space.clone().expect("a commons space");
     let own: Result<ActionHash, String> = net
-        .try_call(2, "activities", "create_activity", planned(&request, agent(&net, 2)))
+        .try_call(
+            2,
+            "activities",
+            "create_activity",
+            planned(&request, agent(&net, 2)),
+        )
         .await;
-    assert!(own.is_err(), "the person asking can't plan their own request");
+    assert!(
+        own.is_err(),
+        "the person asking can't plan their own request"
+    );
     let first: ActionHash = net
-        .call(1, "activities", "create_activity", planned(&request, agent(&net, 2)))
+        .call(
+            1,
+            "activities",
+            "create_activity",
+            planned(&request, agent(&net, 2)),
+        )
         .await;
     net.settle().await;
     let again: ActionHash = net
-        .call(0, "activities", "create_activity", planned(&request, agent(&net, 2)))
+        .call(
+            0,
+            "activities",
+            "create_activity",
+            planned(&request, agent(&net, 2)),
+        )
         .await;
     assert_eq!(first, again, "a request is planned once");
     let all: Vec<ActivityView> = net.call(2, "activities", "list_activities", ()).await;
-    let booked = all.iter().find(|a| a.id == first).expect("the planned activity");
+    let booked = all
+        .iter()
+        .find(|a| a.id == first)
+        .expect("the planned activity");
     assert_eq!(
         booked.booking.as_ref().map(|b| &b.requester),
         Some(&agent(&net, 2))

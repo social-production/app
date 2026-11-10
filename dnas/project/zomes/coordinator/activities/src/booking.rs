@@ -120,7 +120,9 @@ pub fn list_rules() -> ExternResult<Vec<RuleView>> {
 pub fn planned(booking: &Booking) -> ExternResult<Option<ActionHash>> {
     let project = calls::glance()?;
     if project.charter.as_ref().map(|c| c.mode.as_str()) != Some("collective-service") {
-        return Err(guest("Only collective services plan requests into activities."));
+        return Err(guest(
+            "Only collective services plan requests into activities.",
+        ));
     }
     if booking.requester == agent_info()?.agent_initial_pubkey {
         return Err(guest("Someone else plans your request."));
@@ -132,7 +134,12 @@ pub fn planned(booking: &Booking) -> ExternResult<Option<ActionHash>> {
     )?;
     Ok(all
         .into_iter()
-        .find(|a| a.entry.booking.as_ref().is_some_and(|b| b.request == booking.request))
+        .find(|a| {
+            a.entry
+                .booking
+                .as_ref()
+                .is_some_and(|b| b.request == booking.request)
+        })
         .map(|a| a.hash))
 }
 
