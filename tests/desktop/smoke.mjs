@@ -28,7 +28,6 @@ const session = await wd('POST', '/session', {
   capabilities: { alwaysMatch: { 'tauri:options': { application: APP } } },
 });
 const S = `/session/${session.sessionId}`;
-const ELEMENT = 'element-6066-11e4-a6c6-4ef6eb3b4f6e';
 
 /** Run `body` (a function's source taking `args`) in the page; returns its value. */
 const js = (body, ...args) => wd('POST', `${S}/execute/sync`, { script: body, args });
@@ -47,29 +46,35 @@ async function until(what, check, timeout = 60_000, ...args) {
   }
 }
 
-/** The first visible button (or tab/link) whose text is `label`. */
-const BUTTON = `const [label] = arguments;
-  return [...document.querySelectorAll('button, a, [role=tab]')].find(
-    (b) => b.innerText.trim() === label && b.offsetParent !== null && !b.disabled) ?? null;`;
+/** Click the first visible, enabled button (or tab/link) whose text is `label`; true once
+ * clicked. Clicked in the page: element handles differ between WebDriver servers. */
+const CLICK = `const [label, selector] = arguments;
+  const b = [...document.querySelectorAll(selector)].find(
+    (b) => b.innerText.trim() === label && b.offsetParent !== null && !b.disabled);
+  if (b) b.click();
+  return !!b;`;
 
-async function click(label, timeout) {
-  const el = await until(`the "${label}" button`, BUTTON, timeout, label);
-  await wd('POST', `${S}/element/${el[ELEMENT]}/click`, {});
-}
+const click = (label, selector = 'button, a, [role=tab]') =>
+  until(`the "${label}" button`, CLICK, 60_000, label, selector);
 
 /** Type into the input labelled `label` (a <label> wrapping a span with that text). */
 async function fill(label, text) {
-  const el = await until(
+  // Element handles differ between WebDriver servers, so set the value in the page and fire
+  // `input` (what Svelte's bind:value listens to).
+  await until(
     `the "${label}" field`,
-    `const [label] = arguments;
+    `const [label, text] = arguments;
      const l = [...document.querySelectorAll('label')].find(
        (l) => l.querySelector('.field-label')?.innerText.trim() === label);
-     return l?.querySelector('input, textarea') ?? null;`,
+     const input = l?.querySelector('input, textarea');
+     if (!input) return false;
+     input.value = text;
+     input.dispatchEvent(new Event('input', { bubbles: true }));
+     return true;`,
     60_000,
     label,
+    text,
   );
-  await wd('POST', `${S}/element/${el[ELEMENT]}/clear`, {});
-  await wd('POST', `${S}/element/${el[ELEMENT]}/value`, { text });
 }
 
 const signedIn = (state) =>
@@ -116,7 +121,7 @@ try {
   await goto('/onboarding');
   await click('Log in');
   await fill('Recovery phrase', words.join(' '));
-  await click('Log in');
+  await click('Log in', 'button[type=submit]');
   await signedIn('true');
   await goto('/profile');
   await until('the profile after log-in', `return document.body.innerText.includes(arguments[0])`, 180_000, name);
