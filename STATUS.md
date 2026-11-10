@@ -83,8 +83,17 @@ UI `CollectiveRequests.svelte` (Request service / Requests → Plan request open
 wizard / Settings ▾ → Request settings vote), Take part lists request-settings votes,
 `collective-service.css` ported. Tests: `tests/scenarios/tests/collective_requests.rs`,
 `tests/e2e/collective-requests.mjs`. **Both conversation and project networks reset on
-merge.** Before merging: scenarios `collective_requests`, `service_requests`, `bookings`, and
-browser tests `collective-requests.mjs`, `service-requests.mjs`, `shell.mjs` (About).
+merge.** **Checked locally (2026-11-10):** scenarios `collective_requests`,
+`collective_bookings`, `service_requests` (3), `bookings` (2) **passed**; browser tests
+`collective-requests.mjs` (the request reached a member in 7–8 s; once, on a fresh node, a new
+group chat took >6 min to arrive), `service-requests.mjs` and `shell.mjs` **passed**; `npm run
+check`/`lint`, sizes, boundaries, `cargo fmt --check`. Workspace clippy is CI's (no disk here).
+When CI is green: merge, smoke live `collective-requests.mjs` and `shell.mjs`, update README.
+- **Lessons (PR #135):** run `cargo fmt --all --check`, `check-sizes.sh` and mind clippy's
+  60-line functions *before* pushing Rust; in scenarios with 3+ voters, `settle()` after every
+  vote (the deciding voter closes the proposal and must see every vote), and plans carry no
+  automatic proposer Yes. Repack the hApp (`build-happ.sh`) before local scenarios after any
+  zome edit, or they run the old coordinator.
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
 words on desktop, a list of bootstrap/relay URLs), alongside parity, and service requests (c)
 (unblocked 2026-11-10, ADR 0076). Otherwise,
