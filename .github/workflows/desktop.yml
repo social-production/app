@@ -102,6 +102,9 @@ jobs:
         run: |
           # Vendored OpenSSL needs a full Perl; Git Bash's lacks Locale::Maketext::Simple.
           if [ "$RUNNER_OS" = Windows ]; then export OPENSSL_SRC_PERL=C:/Strawberry/perl/bin/perl.exe; fi
+          # tauri-plugin-hc's build script writes permission files into its registry source,
+          # which the cache doesn't keep (as in ci.yml): rerun it.
+          cargo clean --release -p tauri-plugin-hc
           cargo build --release -p native
       - name: Smoke test (sign up, profile, sign out, log in with the words)
         if: runner.os == 'Linux'
