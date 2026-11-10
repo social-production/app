@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 6:10 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-10 10:45 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -74,29 +74,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: PR #135 grows into service requests (c) (ADR 0089) + the new About page + docs.
-Built on the branch (2026-11-10): conversation integrity takes requests in group chats (any
-member but the requester decides; `decided_by` in the view); project integrity lets a
-collective service's members book a request with any roles; `create_activity` takes an
-optional `booking` (`booking::planned` refuses the requester, returns an earlier plan);
-UI `CollectiveRequests.svelte` (Request service / Requests → Plan request opens the activity
-wizard / Settings ▾ → Request settings vote), Take part lists request-settings votes,
-`collective-service.css` ported. Tests: `tests/scenarios/tests/collective_requests.rs`,
-`tests/e2e/collective-requests.mjs`. **Both conversation and project networks reset on
-merge.** **Checked locally (2026-11-10):** scenarios `collective_requests`,
-`collective_bookings`, `service_requests` (3), `bookings` (2) **passed**; browser tests
-`collective-requests.mjs` (the request reached a member in 7–8 s; once, on a fresh node, a new
-group chat took >6 min to arrive), `service-requests.mjs` and `shell.mjs` **passed**; `npm run
-check`/`lint`, sizes, boundaries, `cargo fmt --check`. Workspace clippy is CI's (no disk here).
-When CI is green: merge, smoke live `collective-requests.mjs` and `shell.mjs`, update README.
-- **Lessons (PR #135):** run `cargo fmt --all --check`, `check-sizes.sh` and mind clippy's
-  60-line functions *before* pushing Rust; in scenarios with 3+ voters, `settle()` after every
-  vote (the deciding voter closes the proposal and must see every vote), and plans carry no
-  automatic proposer Yes. Repack the hApp (`build-happ.sh`) before local scenarios after any
-  zome edit, or they run the old coordinator.
+## In flight: nothing (PR #135 merged: collective service requests, About page, SEEDLESS docs).
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
-words on desktop, a list of bootstrap/relay URLs), alongside parity, and service requests (c)
-(unblocked 2026-11-10, ADR 0076). Otherwise,
+words on desktop, a list of bootstrap/relay URLs), alongside parity. Parity left (PARITY
+summary): Deactivate account (ADR 0088, batch with the next directory reset), the
+`bot-review-vote` card, Settings waiting on features (item 9), and screens not compared yet
+(item 10: create flows, channel/community pages, event/help detail, Messages/Search/Feedback
+against web's current source). Otherwise,
 from PARITY's summary: keep comparing the screens not compared yet (item 10; the right rail
 and Settings/profile were compared 2026-11-10: next, e.g. the create flows, the Messages page
 against web's current source, channel/community pages); Settings waiting on
@@ -129,6 +113,31 @@ map/places (M6, `docs/plans/M6-places.md`, five phases), software PRs, and servi
 the big pieces in PARITY's "Whole web pages the app doesn't have yet" (map/places, service
 requests, software PR flow; posts and threads are done, with their later parts in PARITY);
 asset management is not part of parity (owner, 2026-10-31). Each starts with its ADR.
+
+## Done 2026-11-10: collective service requests + About page merged (PR #135, 11:06 UTC = 10:06 pm Melbourne)
+- CI green after four rounds (fmt, file size, clippy's 60-line functions, a scenario that
+  voted too fast; see the lessons below). UI redeployed 11:06 UTC; the seed node restarted
+  ~11:19 UTC (571 MB). **The chat and project networks reset.** Live `shell.mjs` and
+  `collective-requests.mjs` **passed** (11:37–11:41 UTC; the request reached a member in 4 s).
+- What it built (ADR 0089): Built on the branch (2026-11-10): conversation integrity takes requests in group chats (any
+member but the requester decides; `decided_by` in the view); project integrity lets a
+collective service's members book a request with any roles; `create_activity` takes an
+optional `booking` (`booking::planned` refuses the requester, returns an earlier plan);
+UI `CollectiveRequests.svelte` (Request service / Requests → Plan request opens the activity
+wizard / Settings ▾ → Request settings vote), Take part lists request-settings votes,
+`collective-service.css` ported. Tests: `tests/scenarios/tests/collective_requests.rs`,
+`tests/e2e/collective-requests.mjs`. **Both conversation and project networks reset on
+merge.** **Checked locally (2026-11-10):** scenarios `collective_requests`,
+`collective_bookings`, `service_requests` (3), `bookings` (2) **passed**; browser tests
+`collective-requests.mjs` (the request reached a member in 7–8 s; once, on a fresh node, a new
+group chat took >6 min to arrive), `service-requests.mjs` and `shell.mjs` **passed**; `npm run
+check`/`lint`, sizes, boundaries, `cargo fmt --check`. Workspace clippy is CI's (no disk here).
+When CI is green: merge, smoke live `collective-requests.mjs` and `shell.mjs`, update README.
+- **Lessons (PR #135):** run `cargo fmt --all --check`, `check-sizes.sh` and mind clippy's
+  60-line functions *before* pushing Rust; in scenarios with 3+ voters, `settle()` after every
+  vote (the deciding voter closes the proposal and must see every vote), and plans carry no
+  automatic proposer Yes. Repack the hApp (`build-happ.sh`) before local scenarios after any
+  zome edit, or they run the old coordinator.
 
 ## Done 2026-11-10: the profile photo viewer merged (PR #133, 04:45 UTC = 3:45 pm Melbourne)
 - CI green on the first run (shard 6 took ~105 min). UI redeployed 04:46 UTC; no reset.
