@@ -72,16 +72,18 @@ async fn propose(net: &Net, kind: ProposalKind) -> ActionHash {
     id
 }
 
-/// Everyone votes yes (the proposer's yes comes with the proposal).
-async fn all_vote_yes(net: &Net, proposal: &ActionHash) {
-    for i in 1..net.cells.len() {
+/// Agents `from..` vote yes, each after the last vote has reached everyone (the deciding
+/// voter closes the proposal and must see every vote). A phase move carries its proposer's
+/// yes (`from` 1); a plan doesn't (`from` 0).
+async fn all_vote_yes(net: &Net, proposal: &ActionHash, from: usize) {
+    for i in from..net.cells.len() {
         let input = VoteInput {
             proposal: proposal.clone(),
             choice: "Yes",
         };
         let _: ActionHash = net.call(i, "governance", "vote", input).await;
+        net.settle().await;
     }
-    net.settle().await;
 }
 
 fn move_to(to: &str) -> ProposalKind {
@@ -97,7 +99,7 @@ async fn collective_in_activity() -> Net {
     let net = Net::with_charter(3, 3, "collective-requests", charter("collective-service")).await;
     net.demand_all().await;
     let to_plans = propose(&net, move_to("phase-2")).await;
-    all_vote_yes(&net, &to_plans).await;
+    all_vote_yes(&net, &to_plans, 1).await;
     let plan = propose(
         &net,
         ProposalKind::Plan(Plan {
@@ -130,9 +132,9 @@ async fn collective_in_activity() -> Net {
             let _: ActionHash = net.call(i, "governance", "rate", input).await;
         }
     }
-    all_vote_yes(&net, &plan).await;
+    all_vote_yes(&net, &plan, 0).await;
     let to_activity = propose(&net, move_to("phase-5")).await;
-    all_vote_yes(&net, &to_activity).await;
+    all_vote_yes(&net, &to_activity, 1).await;
     let view: Option<ProjectView> = net.call(1, "project", "get_project", ()).await;
     assert_eq!(view.expect("project").stage, "Activity");
     net
