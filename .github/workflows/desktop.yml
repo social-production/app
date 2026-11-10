@@ -115,7 +115,12 @@ jobs:
             tauri-driver & driver=$!
             sleep 2
             node tests/desktop/smoke.mjs target/release/social-production; status=$?
-            kill $driver; exit $status'
+            kill $driver
+            if [ $status -ne 0 ]; then
+              echo "--- app log (tauri-plugin-log) ---"
+              find ~/.local/share ~/.config -path "*socialproduction*" -name "*.log" -exec tail -n 150 {} \;
+            fi
+            exit $status'
       - uses: actions/upload-artifact@v4
         with:
           name: social-production-${{ runner.os }}
