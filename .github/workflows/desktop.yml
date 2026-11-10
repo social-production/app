@@ -1,0 +1,118 @@
+name: desktop
+
+# The desktop app (native/, ADR 0021/0090) built on Linux, Windows and macOS, with a smoke
+# test of the real app on Linux (SEEDLESS step 1). The UI and the hApp are built once in
+# Nix and handed to the stock-toolchain builds, which is how a person would build the app.
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - native/**
+      - ui/**
+      - crates/**
+      - zomes/**
+      - dnas/**
+      - happ/**
+      - vendor/**
+      - tests/desktop/**
+      - .github/workflows/desktop.yml
+  push:
+    branches: [main]
+    paths:
+      - Cargo.toml
+      - Cargo.lock
+      - native/**
+      - ui/**
+      - crates/**
+      - zomes/**
+      - dnas/**
+      - happ/**
+      - vendor/**
+      - tests/desktop/**
+      - .github/workflows/desktop.yml
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # The test network's seed node: the desktop UI still reads the feed index from a gateway
+  # until SEEDLESS step 4 moves it onto the device.
+  VITE_SP_GATEWAYS: https://seed-node-production.up.railway.app
+
+jobs:
+  bundle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+      - uses: DeterminateSystems/nix-installer-action@v23
+      - uses: cachix/cachix-action@v17
+        with:
+          name: holochain-ci
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: scenarios
+          save-if: false
+      - run: nix develop --accept-flake-config --command npm ci
+      - run: nix develop --accept-flake-config --command npm run build -w ui
+      - run: nix develop --accept-flake-config --command bash scripts/build-happ.sh
+      - uses: actions/upload-artifact@v4
+        with:
+          name: bundle
+          path: |
+            ui/build
+            happ/social_production.happ
+          retention-days: 3
+
+  build:
+    needs: bundle
+    name: build (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v4
+        with:
+          name: bundle
+      - name: Free disk (Linux)
+        if: runner.os == 'Linux'
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc /opt/hostedtoolcache/CodeQL
+      - name: Tauri's Linux libraries, WebKit's WebDriver and a virtual display
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev librsvg2-dev \
+            libayatana-appindicator3-dev libssl-dev webkit2gtk-driver xvfb
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: desktop
+      - name: Build the app
+        shell: bash
+        env:
+          CARGO_PROFILE_RELEASE_DEBUG: '0'
+        run: cargo build --release -p native
+      - name: Smoke test (sign up, profile, sign out, log in with the words)
+        if: runner.os == 'Linux'
+        run: |
+          cargo install tauri-driver --locked
+          xvfb-run -a bash -c '
+            tauri-driver & driver=$!
+            sleep 2
+            node tests/desktop/smoke.mjs target/release/social-production; status=$?
+            kill $driver; exit $status'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: social-production-${{ runner.os }}
+          path: |
+            target/release/social-production
+            target/release/social-production.exe
+          if-no-files-found: error
+          retention-days: 7

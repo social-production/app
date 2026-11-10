@@ -47,16 +47,20 @@ person's agent; it can only call that person's zomes. Knowing the public half is
 without the private half. Revoking a device means deleting its grant. Clone cells
 (projects in M2, chats in M4) need a grant when they are created.
 
-## Native apps and devices (ADR 0021, 0024)
+## Native apps and devices (ADR 0021, 0024, 0090)
 
-The desktop (later phone) app runs its own conductor with its **own** agent, created on the
-device. One agent must never run on two conductors at once, because its chain would fork. So:
+The desktop (later phone) app runs its own conductor. Its account is the **recovery phrase**,
+exactly as on a gateway (ADR 0090): Sign up makes 24 words on the device, Log in imports them and
+restores the chain from the network. No proof-of-work or passkeys: those protect hosted accounts.
 
-- **Pair, don't share:** on the app, Profile → Devices → paste the main account's key, which sends a
-  pairing request; confirm it on the main account. Each side writes half of a `DeviceLink`, and a
-  pairing counts only when both halves exist.
-- Importing the phrase into the app is reserved for **moving off** a hosted node (M7), at which
-  point the hosted copy is retired.
+One agent must never run on two conductors at once, because its chain would fork. So:
+
+- Moving a hosted account to the desktop means using it only there from then on. Next: the
+  gateway retires the hosted copy when the desktop logs in (ADR 0090's consequences).
+- **Pair, don't share** for a second device that keeps its own key: on that device, Profile →
+  Devices → paste the main account's key, which sends a pairing request; confirm it on the main
+  account. Each side writes half of a `DeviceLink`, and a pairing counts only when both halves
+  exist.
 
 ## Founders (test network)
 

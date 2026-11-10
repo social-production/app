@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-10 10:45 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-11 1:30 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -74,7 +74,28 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing (PR #135 merged: collective service requests, About page, SEEDLESS docs).
+## In flight: SEEDLESS steps 1–2, the desktop app (branch `claude/social-production-handoff-dsam61`)
+- **ADR 0090:** the desktop account is the recovery phrase (as on a gateway). The window opens
+  unbound; `native/src/account.rs` has `account_state` / `open_account(seed, restore)` /
+  `sign_out` (Tauri commands), using the runtime's `import_key_seed` and `rebind_window`. UI:
+  `holo/device.ts`; `holo/account.ts` and `connection.ts` take the device path when
+  `inNativeApp()` (no PoW, no passkeys). Log-in restores from the network (waits 120 s, then
+  starts fresh, like ADR 0035).
+- **CI:** new `.github/workflows/desktop.yml`: Nix job builds `ui/build` (with the live seed in
+  `VITE_SP_GATEWAYS`) + the hApp; stock-toolchain `cargo build --release -p native` on Linux,
+  Windows, macOS; on Linux `tests/desktop/smoke.mjs` (no-deps WebDriver client through
+  tauri-driver under xvfb: sign up, profile, sign out, log in with the words). The smoke test
+  joins the **live** test network (Railway bootstrap), like the live e2e tests.
+- **Checked here:** `npm run check -w ui` (0), `npm run lint -w ui`, sizes, boundaries; see the
+  newest Done for clippy. **Not run here:** the desktop app itself (no room on this disk to build
+  Tauri in release; CI is the first real run), scenarios (no zome change), browser e2e.
+- **Expect CI rounds:** Windows/macOS have never built holochain here (OpenSSL, sysinfo); the
+  smoke test's selectors are untested. Fix from the job logs.
+- **Next after this PR:** the gateway retires a hosted copy when its account logs in on a
+  desktop (`/account/retire` with the seed; refuse restoring a retired agent), then step 3
+  (bootstrap URL list; the plugin already has `get/set_user_network_config` commands, see
+  `tauri-plugin-hc` `user_network.rs`).
+
 **Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
 words on desktop, a list of bootstrap/relay URLs), alongside parity. Parity left (PARITY
 summary): Deactivate account (ADR 0088, batch with the next directory reset), the

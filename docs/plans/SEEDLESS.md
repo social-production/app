@@ -67,11 +67,11 @@ community member can run a gateway later; it is the same seed-node image.
 
 ## Build list, in order
 
-1. **Desktop app works today, tested** (S–M). `native/` was last changed on 2026-10-19 and no
+1. **Desktop app works today, tested** (S–M; in progress 2026-11-10: `.github/workflows/desktop.yml`). `native/` was last changed on 2026-10-19 and no
    CI job builds or runs it (only the phone conductor check): build it in CI for
    Linux/Windows/macOS, run a smoke test on Linux (sign in, open a project,
    chat), and fix what broke (the commons, private spaces and `/session/cells` came after it).
-2. **Sign in with your words on desktop** (S). Today the desktop app makes its own agent and
+2. **Sign in with your words on desktop** (S; ADR 0090 built 2026-11-10, hosted-copy retirement next). Today the desktop app makes its own agent and
    pairs with a hosted account (ADR 0024); importing the phrase is "reserved for M7". Every
    hosted person must be able to move their own key to their desktop (IDENTITY.md's way out).
    Also check that passkey-only people can still see their phrase before the seed goes.

@@ -22,11 +22,15 @@ tauri-build = { version = "2.7", features = [] }
 # The conductor's WASM engine (cranelift JIT, or wasmi on iOS) is chosen by the
 # runtime crate per target; nothing to select here.
 holochain = { workspace = true, features = ["encryption", "schema"] }
+# Same pins as the gateway (ADR 0090: the account is the phrase's seed, as on a gateway).
+holo_hash = { version = "=0.7.1", features = ["encoding"] }
+holochain_types = "=0.7.1"
 log = "0.4"
 rand = "0.8"
 tauri = { version = "2.12", features = [] }
 tauri-plugin-hc = "=0.1.0"
 tauri-plugin-log = "2"
+tokio = { workspace = true, features = ["time"] }
 serde_json = "1"
 sp_core = { workspace = true }
 url2 = "0.0.6"

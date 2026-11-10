@@ -9,6 +9,7 @@ import {
   type Signal,
 } from '@holochain/client';
 
+import { deviceHasAccount, signOutOnDevice } from './device.ts';
 import { gatewayApi, GatewayError } from './gateway.ts';
 import { guestRead, guestSeedOf } from './guest.ts';
 import { forgetSession, loadSession, type DeviceSession } from './keys.ts';
@@ -94,11 +95,18 @@ async function open(): Promise<AppWebsocket | undefined> {
   }
 }
 
-async function openNative(): Promise<AppWebsocket> {
-  // Holochain's Tauri runtime injected the connection and signs our zome calls.
+async function openNative(): Promise<AppWebsocket | undefined> {
+  if (!(await deviceHasAccount())) return signedOut();
+  return attachNative();
+}
+
+/** The device's own node, once the window is bound to the person's app (holo/device.ts).
+ * Holochain's Tauri runtime injected the connection and signs our zome calls. */
+export async function attachNative(beforeShow?: () => Promise<void>): Promise<AppWebsocket> {
   client = await AppWebsocket.connect();
   relaySignals(client);
   const agent = (await client.appInfo())?.agent_pub_key;
+  await beforeShow?.();
   emit({ status: 'connected', node: 'this device', agent: agent ? encodeHashToBase64(agent) : '' });
   return client;
 }
@@ -134,7 +142,8 @@ export async function attach(
 /** Forget this device's session. Reloading drops the open websocket with the page. */
 export async function signOut(): Promise<void> {
   const gateway = homeGateway();
-  if (gateway) await forgetSession(gateway);
+  if (inNativeApp()) await signOutOnDevice();
+  else if (gateway) await forgetSession(gateway);
   client = undefined;
   deviceSession = undefined;
   window.location.reload();
