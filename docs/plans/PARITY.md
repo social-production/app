@@ -38,8 +38,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 8. ~~Software projects~~ (ADR 0086, 0087, `docs/plans/SOFTWARE.md`): the panel, wizard and
    Repository ▾ (phases a + b, 2026-11-08); the rail's rows, Take part's merge capability and
    repository votes, History / Past activity cards and `pr-approved` (phase c, 2026-11-09).
-   **Owner review (ADR 0087):** the rail's History says "Passed" for a confirmed merge (web:
-   "Still open"); Take part's sheet leaves pull request rows to the panel's Assess.
+   Owner, 2026-11-10: the rail's History keeps "Passed" for a confirmed merge (web says
+   "Still open"; the app's is better).
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
@@ -69,8 +69,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   with web's body preview and "N signed up · M needed"; History lists ended ones and current
   sign-ups (Show → Help), and help requests' activities no longer show as Project activity.
   Requests lists open service requests to services you run (ADR 0076).
-  **Owner review:** web-backend lists activities only from projects in `phase-5`, which leaves
-  out personal services (Activity is their `phase-1`); the app lists both.
+  web-backend lists activities only from projects in `phase-5`, which leaves out personal
+  services (Activity is their `phase-1`); the app lists both (owner, 2026-11-10: keep).
 - [x] Rail link votes: web's "Link vote · <other project>" / "Sever link · …" rows (this
   project's half of a link request you haven't voted on, from `link_sides`; the other project's
   title from its directory listing) open the Links tab with the request expanded
@@ -85,10 +85,10 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   it used to show on every page.
 
 ## Pages
-- [x] About: web's About page with its tabs, ported with web's copy unchanged (pixel-identical
-  at 390px). **Owner review:** the copy describes web (Roadmap "Now: Web prototype, FastAPI
-  backend"; quorum from weekly actives, while the app counts full members, ADR 0033). Say if
-  the P2P app should say something different.
+- [x] About: web's tabbed reader with the owner's own copy (2026-11-10: "not so many
+  sections, information on commons-based peer production, stigmergic signalling to replace
+  price signals"): Why / How it works / Decisions / The network, describing the app's own
+  rules (ADR 0033, 0071, 0074). Deliberately not web's text.
 - [x] Search: web's own page (`features/search/SearchPage.svelte`, live suggestions, kind
   filter, result rows, empty-query chips). Kinds today: Projects (from `/index/projects?q=`)
   and Users (new gateway people index, `/index/people?q=`, refreshed every minute), so guests

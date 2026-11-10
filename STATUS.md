@@ -57,6 +57,9 @@ and continue from Next."
   browser access is nice while a seed is up. Bootstrap/relay on desktop full nodes: SEEDLESS.md
   "Help the network" mode (step 3b).
 - "Keep going with parallel": read as keep going with parity; SEEDLESS work alongside.
+- Owner reviews settled (2026-11-10): a confirmed merge stays "Passed" in the rail's History;
+  personal services' activities stay in the rail; the About page is rewritten in the owner's
+  direction (done on this branch: four sections, commons-based peer production, stigmergy).
 
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
