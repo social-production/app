@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 12:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 6:05 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,9 +82,20 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092)
-Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am Melbourne Nov 12; CI ~2 h, merge when green). **No DNA change**
-(gateway, native and UI only), so no network reset.
+## Done 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092), PR #142 merged 18:26 UTC Nov 11 (5:26 am Melbourne)
+In flight: nothing. Live after the deploy (seed restarted 18:49 UTC; the UI at 18:27): `/readyz`
+up, bootstrap lists the seed's agents, `POST /account/retire` with junk → 400, live
+`shell.mjs` and **live `retire.mjs` passed** (from a cloud session, Node needs
+`NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt` for its own `fetch`).
+**Next:** SEEDLESS 3b ("Help the network") or 5 (geocoding from the device), alongside
+parity (PARITY summary). Optional for step 2: resend a retirement on desktop start when no
+gateway answered at log-in (ADR 0092's consequences).
+- **CI lesson (2026-11-11):** GitHub's Ubuntu runners failed to resolve `security.ubuntu.com`
+  for hours; `desktop.yml`'s apt step now retries. A desktop smoke's first `set_profile` can
+  also time out on a slow runner network (`get_links … response timeout`); one re-run passed.
+
+### What the PR did
+**No DNA change** (gateway, native and UI only), so no network reset.
 - **Retirement:** a desktop log-in that restored an existing chain (`settle` kept the restore)
   returns a statement signed with the phrase's key (`native/src/retire.rs`); the UI posts it to
   every configured gateway's new `POST /account/retire` (`holo/account.ts`
@@ -115,9 +126,6 @@ Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am M
 - Not run here: scenarios (none touched) and the desktop smoke (CI's `desktop.yml` runs it;
   its sign-out happens after the seed lists the profile, so the new warning shouldn't appear).
   Not testable in CI: the desktop retiring a real hosted account end to end.
-- Next after merge: smoke live (`shell.mjs`; `curl -X POST …/account/retire` with junk should
-  give 400/401), README Status, then SEEDLESS 3b ("Help the network") or 5 (geocoding from the
-  device), alongside parity.
 
 ## Done 2026-11-11: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), PR #140 merged 10:05 UTC (9:05 pm Melbourne)
 In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered with the bootstrap at 77 s (`check-bootstrap.sh`: 6 agents per space), UI and bootstrap `/health` 200, live `shell.mjs` passed. Next: see **Next** below (SEEDLESS step 2's rest).
@@ -151,7 +159,7 @@ In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered wi
 - PR #137 (desktop accounts, ADR 0090, `desktop.yml`) and #138 (docs, the script) merged
   2026-11-11 (7:17 and 9:32 am Melbourne).
 
-**Next:** (SEEDLESS step 2's rest is in flight above, ADR 0092), then 3b
+**Next:** (SEEDLESS step 2 is done, ADR 0092), then 3b
 ("Help the network": desktops run the bootstrap and announce it) or 5 (geocoding from the
 device), alongside parity. (Step 3 is the PR above.) Parity left (PARITY
 summary): Deactivate account (ADR 0088, batch with the next directory reset), the

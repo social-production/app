@@ -14,6 +14,12 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Moving a website account to the desktop app (PR #142, 2026-11-12 5:26 am Melbourne,
+  ADR 0092; SEEDLESS step 2):** when the desktop app's log-in brings your history over, the
+  website stops hosting your account (no more running it in two places). Logging in on the
+  website then says the account moved and offers **Use it here instead**. Signing out of the
+  desktop warns while no other node holds your account yet. No reset. Live `retire.mjs` and
+  `shell.mjs` passed.
 - **The desktop app tries several bootstrap servers (PR #140, 2026-11-11 9:05 pm Melbourne,
   ADR 0091; SEEDLESS step 3):** at start it uses the first that answers, in order: the one you
   saved in Settings → Network (desktop only), Railway's, then Holochain's public test servers.
