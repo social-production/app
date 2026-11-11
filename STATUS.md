@@ -98,7 +98,11 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   paths so docs-only merges don't restart the bootstrap. **23:30 UTC (seed up 44 min
   after that redeploy):** all 5 agents listed in all three spaces, renewed ~13 min ago, so a
   bootstrap + seed restart recovers. The lapse needs hours of uptime: a check is scheduled at
-  ~6 h up (04:50 UTC = 3:50 pm Melbourne); avoid merging before then.
+  ~6 h up (04:50 UTC = 3:50 pm Melbourne); avoid merging before then. **04:50 UTC (6.1 h up):
+  still fresh** (all 5 agents re-put 3–4 min earlier in every space), so renewal does not stop
+  after hours. Yesterday's gap (18:35 UTC, seed 3.6 h up) is unexplained: perhaps a lone
+  bootstrap restart the seed didn't re-put for a while. A manual `desktop.yml` run at 04:51
+  UTC tests whether a desktop reaches the seed while its entries are present.
   Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
   space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
   kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
