@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 6:05 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 8:41 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,12 +82,31 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight 2026-11-12: geocoding from the device (SEEDLESS step 5, ADR 0093), branch `claude/social-production-handoff-dsam61`
+**No DNA change** (gateway, native, UI), so no network reset. A PR is open (see the PR list);
+merge once CI is green, then smoke the live place search (`/locations/search?q=Melbourne`).
+- The gateway's geocoder (`services/gateway/src/geo/`) is now the crate **`services/geo`**
+  (package `geo`; not `crates/sp_*`, since it makes HTTP calls). A refusal's status is a `u16`;
+  the search checks are `geo::check_search`; `Settings::from_env_for("desktop app")` sets the
+  User-Agent. The gateway's `/locations/*` routes are unchanged in behaviour.
+- The desktop app's `locations(route, query)` command (`native/src/places.rs`) runs search,
+  reverse and the IP hint on the device (limits under one key "device"; the IP hint asks
+  ip-api.com about the device's own address). `holo/feed.ts` `locationLookup` uses it when
+  `inNativeApp()`; `holo/device.ts` maps a refusal to `GatewayError`. Browsers keep the gateway.
+- Checked here: `npm run check -w ui` (0 errors), `npm run lint -w ui`, boundaries, sizes, in
+  Nix `cargo clippy -p geo -p gateway -p native --all-targets -D warnings` (clean),
+  `cargo test -p geo` (6 pass), `cargo test -p native places` (1 pass: the checks before any
+  network call). Not run: a real desktop place search (needs the desktop app with a display
+  and Nominatim; CI's desktop smoke doesn't search places), scenarios (none touched).
+- **Next after merge:** SEEDLESS 3b ("Help the network") alongside parity (PARITY summary:
+  item 10, screens not compared yet; Deactivate account with the next directory reset).
+
 ## Done 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092), PR #142 merged 18:26 UTC Nov 11 (5:26 am Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 18:49 UTC; the UI at 18:27): `/readyz`
 up, bootstrap lists the seed's agents, `POST /account/retire` with junk → 400, live
 `shell.mjs` and **live `retire.mjs` passed** (from a cloud session, Node needs
 `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt` for its own `fetch`).
-**Next:** SEEDLESS 3b ("Help the network") or 5 (geocoding from the device), alongside
+**Next:** (5 is in flight, see above) SEEDLESS 3b ("Help the network"), alongside
 parity (PARITY summary). Optional for step 2: resend a retirement on desktop start when no
 gateway answered at log-in (ADR 0092's consequences).
 - **CI lesson (2026-11-11):** GitHub's Ubuntu runners failed to resolve `security.ubuntu.com`

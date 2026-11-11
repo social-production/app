@@ -47,6 +47,7 @@ pub fn coordinates(lat: f64, lon: f64) -> Result<(f64, f64), &'static str> {
 }
 
 /// web's `viewbox` parameter: four comma-separated numbers, else ignored.
+#[must_use]
 pub fn viewbox(raw: &str) -> Option<[f64; 4]> {
     let parts: Vec<f64> = raw
         .split(',')

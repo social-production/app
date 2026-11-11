@@ -43,7 +43,7 @@ fn hint_rate_limited() -> GeoError {
     GeoError(TOO_MANY_REQUESTS, "ip_location_rate_limit_exceeded")
 }
 
-/// web's FastAPI checks on a search: q 1–200 characters, limit 1–10, short extras.
+/// web's `FastAPI` checks on a search: q 1–200 characters, limit 1–10, short extras.
 pub fn check_search(
     q: &str,
     limit: usize,

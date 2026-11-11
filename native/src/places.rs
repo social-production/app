@@ -108,13 +108,25 @@ mod tests {
         let invalid = |c: &str| (422, c.to_string());
         assert_eq!(code(ask("search", &[])), invalid("invalid_location_search"));
         let many = [("q", "Fitzroy"), ("limit", "11")];
-        assert_eq!(code(ask("search", &many)), invalid("invalid_location_search"));
+        assert_eq!(
+            code(ask("search", &many)),
+            invalid("invalid_location_search")
+        );
         let words = [("q", "Fitzroy"), ("limit", "five")];
-        assert_eq!(code(ask("search", &words)), invalid("invalid_location_search"));
+        assert_eq!(
+            code(ask("search", &words)),
+            invalid("invalid_location_search")
+        );
         let half = [("lat", "1")];
-        assert_eq!(code(ask("reverse", &half)), invalid("invalid_location_coordinates"));
+        assert_eq!(
+            code(ask("reverse", &half)),
+            invalid("invalid_location_coordinates")
+        );
         let far = [("lat", "91"), ("lon", "0")];
-        assert_eq!(code(ask("reverse", &far)), invalid("location_coordinates_out_of_range"));
+        assert_eq!(
+            code(ask("reverse", &far)),
+            invalid("location_coordinates_out_of_range")
+        );
         assert_eq!(code(ask("map", &[])), invalid("unknown_location_route"));
     }
 }
