@@ -11,8 +11,10 @@ Built on Holochain's official [runtime-tauri](https://github.com/holochain/runti
 3. The plugin injects `__HC_TAURI_HOLOCHAIN__`. The UI connects with `AppWebsocket.connect()` over
    Tauri IPC and the plugin signs zome calls. No websocket or admin port is opened.
 
-Network: the Railway bootstrap/relay by default (`src/network.rs`). Override with
-`SP_BOOTSTRAP_URL` (an `http://` URL enables plaintext relay, for local dev only).
+Network (ADR 0091, `src/servers.rs`): the server saved in Settings → Network, then the shipped
+list (Railway, then Holochain's public dev servers); the first whose `/health` answers at start
+is used. `SP_BOOTSTRAP_URL` replaces the list (an `http://` URL enables plaintext relay, for
+local dev only).
 
 Build order: `npm run build -w ui`, then `bash scripts/build-happ.sh`, then `cargo run -p native`.
 Mobile (M7): the same crate builds as a library for Android and iOS (`tauri android|ios init`).

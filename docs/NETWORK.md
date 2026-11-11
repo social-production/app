@@ -24,8 +24,10 @@ How the platform keeps running when any one machine, including Railway, disappea
 - **Bootstrap** (`kitsune2-bootstrap-srv`) tells nodes where peers are for each DNA.
 - **Relay** (iroh relay, built into the same server) carries traffic between nodes that can't
   connect directly (NAT, mobile networks).
-- Both run as the Railway `bootstrap` service. Clients ship a **list** of bootstrap/relay URLs,
-  so community-run copies make this service replaceable too.
+- Both run as the Railway `bootstrap` service. The desktop app ships a **list** of
+  bootstrap/relay URLs and boots with the first that answers (ADR 0091, `native/src/servers.rs`;
+  Settings → Network adds your own), so community-run copies (docs/RUN-A-BOOTSTRAP.md) make this
+  service replaceable too.
 - Railway exposes HTTP(S) only, with no public UDP, so peers reach the seed node through the relay.
   Direct QUIC is used between peers that allow it.
 

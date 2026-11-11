@@ -27,6 +27,9 @@ holo_hash = { version = "=0.7.1", features = ["encoding"] }
 holochain_types = "=0.7.1"
 log = "0.4"
 rand = "0.8"
+# Already in the tree (the plugin uses it): probe each bootstrap's /health at start (ADR 0091).
+reqwest = { version = "0.12", default-features = false, features = ["blocking", "rustls-tls"] }
+serde = { version = "1", features = ["derive"] }
 # custom-protocol: serve the bundled ui/build (without it Tauri loads devUrl, a dev server).
 tauri = { version = "2.12", features = ["custom-protocol"] }
 tauri-plugin-hc = "=0.1.0"

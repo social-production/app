@@ -126,6 +126,10 @@ try {
   log('profile shows the name');
   await goto('/settings');
   const key = await until('the agent key', `return document.querySelector('#settings-account .key')?.innerText`);
+  // ADR 0091: the app picked Railway's bootstrap from its list (the first, and it is up).
+  const server = await until('the network section', `return document.querySelector('#settings-network .server-url')?.innerText`);
+  if (!server.includes('railway.app')) throw new Error(`booted with ${server}, not Railway's bootstrap`);
+  log(`network: ${server}`);
   await goto('/profile');
   await until('the profile name', `return document.body.innerText.includes(arguments[0])`, 60_000, name);
 

@@ -13,7 +13,7 @@ seed (or a community gateway) is up, and fine to lose after.
 
 | Railway service | What it does | Who depends on it |
 |---|---|---|
-| `bootstrap` | kitsune2 bootstrap (who is in each network) + iroh relay (traffic between nodes behind NAT) | **everyone**, desktop apps included (`native/src/network.rs` has one hard-coded URL) |
+| `bootstrap` | kitsune2 bootstrap (who is in each network) + iroh relay (traffic between nodes behind NAT) | **everyone**, desktop apps included (`native/src/servers.rs`: the saved one, Railway, then Holochain's public dev servers; ADR 0091) |
 | `seed-node` | gateway + embedded conductor, `/data` volume | see below |
 | `ui` | the static web UI | browser users |
 
@@ -75,8 +75,9 @@ community member can run a gateway later; it is the same seed-node image.
    pairs with a hosted account (ADR 0024); importing the phrase is "reserved for M7". Every
    hosted person must be able to move their own key to their desktop (IDENTITY.md's way out).
    Also check that passkey-only people can still see their phrase before the seed goes.
-3. **Several bootstrap/relay URLs** (S). A list in the app and a Settings field to add one;
-   the app tries them in order. Write the "run a bootstrap" guide (one Docker command).
+3. **Several bootstrap/relay URLs** (S; built 2026-11-11, ADR 0091). A list in the app and a Settings field to add one;
+   the app tries them in order (`native/src/servers.rs`; the first that answers `/health` at
+   start). The guide: `docs/RUN-A-BOOTSTRAP.md`.
 3b. **"Help the network" mode on desktop** (M): the desktop app runs `kitsune2_bootstrap_srv`
    (and `iroh-relay` when given a domain) when the person turns it on and the node is
    reachable; it announces the URL in the directory; every app reads announced URLs into its

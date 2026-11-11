@@ -5,6 +5,7 @@
 mod account;
 mod keystore;
 mod network;
+mod servers;
 
 use tauri::{AppHandle, Listener, Manager};
 use tauri_plugin_hc::{
@@ -32,6 +33,8 @@ pub fn run() {
             account::account_state,
             account::open_account,
             account::sign_out,
+            servers::network_servers,
+            servers::reset_network_servers,
         ])
         .setup(|app| {
             app.handle().listen(EVENT_SETUP_FAILED, |event| {
@@ -51,7 +54,9 @@ pub fn run() {
             let data_dir = app.path().app_data_dir()?.join("holochain");
             std::fs::create_dir_all(&data_dir)?;
             let passphrase = keystore::passphrase(&data_dir)?;
-            let config = HolochainPluginConfig::new(data_dir, network::config());
+            let server = servers::choose(&data_dir);
+            app.manage(servers::managed_path(&data_dir));
+            let config = HolochainPluginConfig::new(data_dir, network::config(&server));
             app.handle()
                 .plugin(tauri_plugin_hc::init(passphrase, config))?;
             Ok(())

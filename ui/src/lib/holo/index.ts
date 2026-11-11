@@ -33,6 +33,13 @@ export {
 } from './connection.ts';
 export { GatewayError } from './gateway.ts';
 export { inNativeApp } from './nodes.ts';
+export {
+  networkServers,
+  resetNetworkServer,
+  saveNetworkServer,
+  type NetworkServer,
+  type NetworkServers,
+} from './servers.ts';
 export { acceptSignals, onSignal, sendSignal } from './signals.ts';
 export { devicePasskeysAvailable, passkeysSupported } from './passkeys.ts';
 export {

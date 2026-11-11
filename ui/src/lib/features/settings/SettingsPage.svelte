@@ -1,10 +1,12 @@
 <script lang="ts">
+  import { inNativeApp } from '#lib/services/network.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import AccountSettings from './AccountSettings.svelte';
   import AppearanceSettings from './AppearanceSettings.svelte';
   import DeviceSettings from './DeviceSettings.svelte';
   import FollowSettings from './FollowSettings.svelte';
+  import NetworkSettings from './NetworkSettings.svelte';
   import NotificationSettings from './NotificationSettings.svelte';
   import ProfileSettings from './ProfileSettings.svelte';
   import RegionalSettings from './RegionalSettings.svelte';
@@ -13,6 +15,7 @@
 
   /** web's settings layout: a section nav beside cards (Profile, Appearance, Regional, Notifications, Devices, Follow requests, Privacy, Account). */
   let requestCount = $state(0);
+  const native = inNativeApp();
   const me = $derived(connection.current.status === 'connected' ? connection.current.agent : '');
 </script>
 
@@ -25,6 +28,9 @@
       <a class="nav-item" href="#settings-regional">Regional</a>
       <a class="nav-item" href="#settings-notifications">Notifications</a>
       <a class="nav-item" href="#settings-devices">Devices</a>
+      {#if native}
+        <a class="nav-item" href="#settings-network">Network</a>
+      {/if}
       {#if requestCount > 0}
         <a class="nav-item" href="#settings-follow-requests">Follow requests</a>
       {/if}
@@ -44,6 +50,7 @@
         <RegionalSettings {me} />
         <NotificationSettings />
         <DeviceSettings {me} />
+        <NetworkSettings />
         <FollowSettings {me} onRequests={(n) => (requestCount = n)} />
         <AccountSettings {me} />
       {/if}
