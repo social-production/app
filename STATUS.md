@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-11 7:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-11 4:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -74,31 +74,22 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: why a desktop can't find the seed node (bootstrap registrations)
-- **PR #137 merged 2026-11-11 7:17 am Melbourne** (20:17 UTC): desktop accounts from the phrase
-  (ADR 0090) and the `desktop` CI workflow (Linux/Windows/macOS builds + Linux smoke test).
-  See "Done 2026-11-11" below. No reset; seed node restarted 20:28 UTC.
-- **The DNA hashes match** (`/readyz` now lists them): directory `uhC0kUx_es…`, project
-  `uhC0kikyCY…`, conversation `uhC0k1AJBc…`, the same as a Nix build. So the CI desktop *was*
-  on the right networks.
-- **The seed node's agents vanish from the bootstrap.** Right after its restart, the live
-  bootstrap's `GET /bootstrap/<space>` (space = the hash's 32 core bytes, base64url) lists its
-  5 agents (20-minute entries); at 18:35 UTC, after 3.6 h up, it listed none, only the CI
-  desktop. A new desktop then never finds the seed (`NoPeersForLocation` on every publish).
-  kitsune2 re-signs agent infos 5 min before expiry (and puts them to the bootstrap), so either
-  those puts stop or the bootstrap service loses them (an in-memory store across a restart).
-  **Renewal works early:** at 25 min up (20:53 UTC) every entry had been re-put at ~15 min.
-  So the lapse comes later (hours) or the bootstrap service drops its store; a check is
-  scheduled at ~3 h up (23:30 UTC = 10:30 am Melbourne).
-  Check: `bash scripts/check-bootstrap.sh` (reads the hashes from `/readyz`, lists each
-  space's bootstrap entries and their ages). Next: watch the entries past 20 min; if they lapse, read
-  kitsune2_core's bootstrap client backoff (`core_bootstrap.rs`) and the bootstrap service.
-  Browser users never notice (they all live on the seed node).
-- The desktop smoke test only logs whether the seed got the profile; make it required once
-  this is fixed.
+## In flight: nothing. Desktop ↔ seed node works (2026-11-11)
+- **A desktop reaches the live network.** Manual `desktop.yml` run at 04:51 UTC: the CI desktop's
+  new profile reached the seed node's index in **59 s**, and after sign-out a log-in with the
+  words **restored the profile from the network**. The smoke test now requires both again.
+- Yesterday's failure (18:35 UTC) was a gap in the seed node's bootstrap entries: none were
+  listed then (seed up 3.6 h), while at 25 min, 44 min and 6.1 h up they were fresh (re-put
+  every ~15 min). Cause unknown; most likely a lone restart of the in-memory bootstrap
+  service. **Every merge redeploys the bootstrap too** (`deploy/railway/*.json` has no watch
+  paths). The DNA hashes match (`/readyz` lists them). If a desktop can't find the seed again,
+  run `bash scripts/check-bootstrap.sh` first.
+- PR #137 (desktop accounts, ADR 0090, `desktop.yml`) and #138 (docs, the script) merged
+  2026-11-11 (7:17 and 9:32 am Melbourne).
 
-**Next:** SEEDLESS.md steps 1–3 (the desktop app built and tested in CI, signing in with your
-words on desktop, a list of bootstrap/relay URLs), alongside parity. Parity left (PARITY
+**Next:** SEEDLESS step 2's rest (the gateway retires a hosted copy when its account logs in on
+a desktop, ADR 0090; sign-out waits or warns until the chain is held elsewhere) and step 3 (a
+list of bootstrap/relay URLs; the plugin has `get/set_user_network_config`), alongside parity. Parity left (PARITY
 summary): Deactivate account (ADR 0088, batch with the next directory reset), the
 `bot-review-vote` card, Settings waiting on features (item 9), and screens not compared yet
 (item 10: create flows, channel/community pages, event/help detail, Messages/Search/Feedback
