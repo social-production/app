@@ -61,6 +61,14 @@ and continue from Next."
   personal services' activities stay in the rail; the About page is rewritten in the owner's
   direction (done on this branch: four sections, commons-based peer production, stigmergy).
 
+## Owner direction (2026-11-11): the seed node stays until it is unnecessary
+- "I won't shut down the seed node until it is unnecessary." It is expected to run well into
+  growth (possibly tens of thousands of people). SEEDLESS is insurance and load relief (each
+  desktop person is one less hosted agent and one more copy of the data), not a deadline.
+  Keep parity first, with SEEDLESS steps as steady background work, in the current order.
+- Before heavy growth the limit is the seed's memory and cost (hosted agents), not blocking:
+  plan a second gateway (`VITE_SP_GATEWAYS` already takes a list) before one seed runs out.
+
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
 control". One network per project cannot reach that (each costs two databases, a gossip space and
