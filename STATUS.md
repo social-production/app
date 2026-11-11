@@ -108,6 +108,10 @@ Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am M
   can be clicked before the page has the person's name, and an empty name counted as "not
   listed"). Fixed: `listedOnNetwork` reads the name from the device's own chain; the smoke's
   timeout dump now shows an open dialog first.
+- CI runs 2 and 3 (re-run): the Linux desktop job died in `apt-get install` before building
+  (`Temporary failure resolving 'security.ubuntu.com'`; run 2 hung to the 120-min limit). Not
+  this PR's code: main's desktop run passed at 10:05 UTC. `desktop.yml`'s apt step now retries
+  (Acquire::Retries, 3 tries, 30-min step limit). Everything else was green on `e7ef321`.
 - Not run here: scenarios (none touched) and the desktop smoke (CI's `desktop.yml` runs it;
   its sign-out happens after the seed lists the profile, so the new warning shouldn't appear).
   Not testable in CI: the desktop retiring a real hosted account end to end.
