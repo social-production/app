@@ -25,11 +25,25 @@ export async function deviceHasAccount(): Promise<boolean> {
   return has;
 }
 
+/** Signed by the phrase's key on the device: retires a gateway's hosted copy (ADR 0092). */
+export interface Retirement {
+  agent: string;
+  at: number;
+  signature: number[];
+}
+
+interface Opened {
+  agent: string;
+  retirement: Retirement | null;
+}
+
 /** Create (`restore` false) or log in to (`restore` true) the account of `seed`. A log-in
- * waits up to two minutes for the network to send the person's chain. */
-export async function openOnDevice(seed: Uint8Array, restore: boolean): Promise<void> {
-  await invoke<string>('open_account', { seed: Array.from(seed), restore });
+ * waits up to two minutes for the network to send the person's chain; when it arrives, the
+ * result carries the statement that retires any hosted copy. */
+export async function openOnDevice(seed: Uint8Array, restore: boolean): Promise<Opened> {
+  const opened = await invoke<Opened>('open_account', { seed: Array.from(seed), restore });
   await bound();
+  return opened;
 }
 
 /** Remove the account from this device; the words bring it back. */

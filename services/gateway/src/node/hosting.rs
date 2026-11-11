@@ -131,6 +131,21 @@ impl Node {
         }
     }
 
+    /// Remove the person's hosted app (ADR 0092: they moved to a desktop app, which holds the
+    /// chain now, as does the network). Returns whether there was one.
+    pub async fn retire_hosted(&self, agent: &AgentPubKey) -> anyhow::Result<bool> {
+        let id = app_id(agent, &self.happ_version);
+        if self.find_app(&id).await?.is_none() {
+            return Ok(false);
+        }
+        self.admin(AdminRequest::UninstallApp {
+            installed_app_id: id,
+            force: true,
+        })
+        .await?;
+        Ok(true)
+    }
+
     pub async fn find_app(&self, id: &str) -> anyhow::Result<Option<AppInfo>> {
         match self
             .admin(AdminRequest::ListApps {

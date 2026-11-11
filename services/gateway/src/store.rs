@@ -41,6 +41,10 @@ impl Store {
         let _ = sqlx::query("alter table signing_keys add column secret_hash text")
             .execute(&pool)
             .await;
+        // ADR 0092: an account that moved to a desktop app is retired here.
+        let _ = sqlx::query("alter table persons add column retired_at integer")
+            .execute(&pool)
+            .await;
         Ok(Self { pool })
     }
 
@@ -50,6 +54,25 @@ impl Store {
             .fetch_optional(&self.pool)
             .await?;
         Ok(row.is_some())
+    }
+
+    /// When the person moved their account to a desktop app (ADR 0092), if they did.
+    pub async fn retired_at(&self, agent: &str) -> anyhow::Result<Option<i64>> {
+        let row = sqlx::query("select retired_at from persons where agent = ?")
+            .bind(agent)
+            .fetch_optional(&self.pool)
+            .await?;
+        Ok(row.and_then(|r| r.get::<Option<i64>, _>("retired_at")))
+    }
+
+    /// Mark the person retired (`true`: their account lives on a desktop now) or hosted again.
+    pub async fn set_retired(&self, agent: &str, retired: bool) -> anyhow::Result<()> {
+        sqlx::query("update persons set retired_at = ? where agent = ?")
+            .bind(retired.then(now))
+            .bind(agent)
+            .execute(&self.pool)
+            .await?;
+        Ok(())
     }
 
     pub async fn upsert_person(&self, agent: &str) -> anyhow::Result<()> {

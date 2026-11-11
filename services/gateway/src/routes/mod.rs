@@ -10,6 +10,7 @@ mod maps;
 pub mod passkey;
 pub mod public;
 mod region;
+pub mod retire;
 pub mod session;
 pub mod ws_proxy;
 
@@ -51,6 +52,7 @@ pub fn router(state: AppState) -> Router {
         .route("/account/passkey/finish", post(passkey::add_finish))
         .route("/account/login/start", post(account::login_start))
         .route("/account/login/finish", post(account::login_finish))
+        .route("/account/retire", post(retire::retire))
         .route("/session/resume", post(session::resume))
         .route("/session/cells", post(session::cells))
         .route("/index/projects", get(index::projects))

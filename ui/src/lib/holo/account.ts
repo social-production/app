@@ -1,10 +1,10 @@
 import { generateSigningKeyPair } from '@holochain/client';
 
 import { attach, attachNative } from './connection.ts';
-import { openOnDevice } from './device.ts';
+import { openOnDevice, type Retirement } from './device.ts';
 import { gatewayApi, GatewayError, type GatewaySession, type OpenMode } from './gateway.ts';
 import { loadSession, saveSession, type DeviceSession, type KeyPair } from './keys.ts';
-import { homeGateway, inNativeApp } from './nodes.ts';
+import { allGateways, homeGateway, inNativeApp } from './nodes.ts';
 import { createPasskey, usePasskey } from './passkeys.ts';
 import { phraseToSeed } from './phrase.ts';
 import { solvePow } from './pow.ts';
@@ -23,8 +23,14 @@ export function signUp(words: string[], progress: Progress, beforeShow?: BeforeS
  * Sign in with the recovery phrase. If this site doesn't host the account yet (it was made
  * on another node or the app), it is restored here: same identity, new home.
  */
-export async function signInWithPhrase(words: string[], progress: Progress): Promise<void> {
+export async function signInWithPhrase(
+  words: string[],
+  progress: Progress,
+  options: { reclaim?: boolean } = {},
+): Promise<void> {
   if (inNativeApp()) return openWithPhrase('restore', words, progress);
+  // An account that moved to the desktop app comes back here only when asked (ADR 0092).
+  if (options.reclaim) return openWithPhrase('restore', words, progress, undefined, true);
   try {
     await openWithPhrase('signin', words, progress);
   } catch (error) {
@@ -67,11 +73,13 @@ async function openWithPhrase(
   words: string[],
   progress: Progress,
   beforeShow?: BeforeShow,
+  reclaim = false,
 ): Promise<void> {
   if (inNativeApp()) {
     // This device's own node: no gateway, no proof-of-work (ADR 0090).
     progress('connecting');
-    await openOnDevice(phraseToSeed(words), mode !== 'signup');
+    const opened = await openOnDevice(phraseToSeed(words), mode !== 'signup');
+    if (opened.retirement) void retireHostedCopies(opened.retirement);
     await attachNative(beforeShow);
     return;
   }
@@ -90,8 +98,22 @@ async function openWithPhrase(
     ...proof,
     seed,
     signingKey: Array.from(signingKey),
+    reclaim,
   });
   await keep({ gateway, keyPair, signingKey, ...session }, beforeShow);
+}
+
+/** The chain is on this computer now: gateways stop hosting their copy, so one agent no
+ * longer runs on two nodes (ADR 0092). Best effort; a gateway that is down keeps its copy
+ * until the next log-in here. */
+async function retireHostedCopies(retirement: Retirement): Promise<void> {
+  await Promise.all(
+    allGateways().map((gateway) =>
+      gatewayApi.retire(gateway, retirement).catch((error: unknown) => {
+        console.warn(`Could not retire the hosted copy on ${gateway}`, error);
+      }),
+    ),
+  );
 }
 
 interface NewSession extends GatewaySession {
