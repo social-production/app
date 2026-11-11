@@ -21,6 +21,8 @@ tauri-build = { version = "2.7", features = [] }
 [dependencies]
 # The conductor's WASM engine (cranelift JIT, or wasmi on iOS) is chosen by the
 # runtime crate per target; nothing to select here.
+# Place lookups from the device, as the gateway does them (ADR 0093).
+geo = { workspace = true }
 holochain = { workspace = true, features = ["encryption", "schema"] }
 # Same pins as the gateway (ADR 0090: the account is the phrase's seed, as on a gateway).
 holo_hash = { version = "=0.7.1", features = ["encoding"] }

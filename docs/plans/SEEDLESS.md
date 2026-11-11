@@ -89,7 +89,7 @@ community member can run a gateway later; it is the same seed-node image.
    UI's `holo/feed.ts` asks the device (Tauri command) instead of the gateway when
    `inNativeApp()`. The gateway keeps using the same crate. Memory: the seed node uses ~650 MB
    for this today; measure on a desktop and keep it optional (ADR 0037's Storage setting).
-5. **Geocoding from the device** (S). In the native app, call Nominatim (with an identifying
+5. **Geocoding from the device** (S; built 2026-11-12, ADR 0093: `services/geo`, `native/src/places.rs`). In the native app, call Nominatim (with an identifying
    User-Agent, 1 req/s) and an IP hint directly from Rust; the browser keeps the gateway.
 6. **Updates without the gateway** (M). Signed installers and Tauri's updater fed from GitHub
    Releases (free). A coordinator change ships as an app update. An **integrity change is a new

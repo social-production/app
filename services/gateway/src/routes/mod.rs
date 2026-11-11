@@ -30,7 +30,7 @@ pub struct AppState {
     pub config: Arc<Config>,
     pub node: Node,
     /// Geocoding for the place picker (ADR 0079).
-    pub geo: Arc<crate::geo::Geo>,
+    pub geo: Arc<geo::Geo>,
     pub store: Store,
     pub passkeys: Arc<Passkeys>,
     pub pow: Arc<Pow>,

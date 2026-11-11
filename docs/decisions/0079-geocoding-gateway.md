@@ -18,7 +18,7 @@ server's polite rate), and the P2P network has no server of its own besides the 
   (`geocoding_rate_limit_exceeded`, `geocoding_provider_unavailable`,
   `ip_location_unavailable`, ...), so phase 3 ports web's driver and picker unchanged. Public,
   as on web. The native app calls a gateway for these too.
-- **Module `services/gateway/src/geo/`**: `shape.rs` (web's Nominatim/ip-api normalisation and
+- **Module `services/gateway/src/geo/`** (since ADR 0093 the crate `services/geo`, shared with the desktop app): `shape.rs` (web's Nominatim/ip-api normalisation and
   checks, using `sp_place`'s limits), `memo.rs` (in-memory TTL cache and fixed-window limits
   in place of web's Redis keys; a restart empties them), `mod.rs` (the provider calls and
   web's status mapping). HTTP through `reqwest` 0.12 with rustls, already in the tree via

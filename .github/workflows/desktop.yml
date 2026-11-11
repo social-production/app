@@ -10,6 +10,7 @@ on:
       - Cargo.toml
       - Cargo.lock
       - native/**
+      - services/geo/**
       - ui/**
       - crates/**
       - zomes/**
@@ -24,6 +25,7 @@ on:
       - Cargo.toml
       - Cargo.lock
       - native/**
+      - services/geo/**
       - ui/**
       - crates/**
       - zomes/**
