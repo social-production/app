@@ -20,6 +20,11 @@ export function homeGateway(): string | undefined {
   return configured[0];
 }
 
+/** Every configured gateway (the desktop retires a hosted copy on each, ADR 0092). */
+export function allGateways(): string[] {
+  return [...configured];
+}
+
 export function describeGateway(url: string): string {
   return new URL(url).host;
 }

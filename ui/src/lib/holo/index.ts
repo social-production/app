@@ -31,7 +31,7 @@ export {
   type ConnectionState,
   type Role,
 } from './connection.ts';
-export { GatewayError } from './gateway.ts';
+export { ACCOUNT_MOVED, GatewayError } from './gateway.ts';
 export { inNativeApp } from './nodes.ts';
 export {
   networkServers,

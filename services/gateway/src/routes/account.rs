@@ -34,6 +34,9 @@ pub struct OpenRequest {
     nonce: Option<String>,
     seed: Vec<u8>,
     signing_key: Vec<u8>,
+    /// Host again an account that moved to a desktop app (ADR 0092).
+    #[serde(default)]
+    reclaim: bool,
 }
 
 #[derive(Serialize)]
@@ -97,7 +100,15 @@ pub async fn open(
             "No account with this phrase on this site. Check the words, or use Restore.".into(),
         )),
         _ => {
-            let restore = req.mode == OpenMode::Restore && !exists;
+            // A moved account (ADR 0092) comes back only when asked, from the network.
+            let moved = exists && state.store.retired_at(&agent).await?.is_some();
+            if moved && !req.reclaim {
+                return Err(super::retire::moved(true));
+            }
+            if moved {
+                state.store.set_retired(&agent, false).await?;
+            }
+            let restore = (req.mode == OpenMode::Restore && !exists) || moved;
             Box::pin(session(&state, &headers, &agent, &req.signing_key, restore)).await
         }
     }
@@ -151,6 +162,9 @@ pub async fn login_finish(
         .login_credential_id(&req.credential)
         .map_err(|_| unknown())?;
     let (agent, stored) = state.store.passkey(&cred_id).await?.ok_or_else(unknown)?;
+    if state.store.retired_at(&agent).await?.is_some() {
+        return Err(super::retire::moved(false));
+    }
     let updated = state
         .passkeys
         .finish_login(req.ceremony, &req.credential, &stored)

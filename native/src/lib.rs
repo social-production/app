@@ -5,6 +5,7 @@
 mod account;
 mod keystore;
 mod network;
+mod retire;
 mod servers;
 
 use tauri::{AppHandle, Listener, Manager};

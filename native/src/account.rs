@@ -11,6 +11,7 @@ use holochain_types::app::AppStatus;
 use tauri::{AppHandle, WebviewWindow};
 use tauri_plugin_hc::{HolochainExt, Runtime};
 
+use crate::retire::Retirement;
 use crate::{APP_ID, HAPP};
 
 /// How long a log-in waits for the network to send the person's chain (ADR 0035's restore).
@@ -31,15 +32,26 @@ pub async fn account_state(app: AppHandle, window: WebviewWindow) -> Result<bool
     Ok(true)
 }
 
+/// What a log-in returns to the UI.
+#[derive(serde::Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Opened {
+    /// The agent key (base64).
+    agent: String,
+    /// When the network sent an existing chain: the signed statement that retires a
+    /// gateway's hosted copy (ADR 0092), for the UI to send to its gateways.
+    retirement: Option<Retirement>,
+}
+
 /// Create (`restore: false`) or log in to (`restore: true`) the account whose 32-byte seed
-/// is `seed`, then bind `window` to it. Returns the agent key (base64).
+/// is `seed`, then bind `window` to it.
 #[tauri::command]
 pub async fn open_account(
     app: AppHandle,
     window: WebviewWindow,
     seed: Vec<u8>,
     restore: bool,
-) -> Result<String, String> {
+) -> Result<Opened, String> {
     let seed: [u8; 32] = seed
         .try_into()
         .map_err(|_| "A recovery phrase is 32 bytes.".to_string())?;
@@ -50,9 +62,16 @@ pub async fn open_account(
     }
     let agent = import(&runtime, seed).await?;
     install(&runtime, &agent, restore).await?;
-    Box::pin(settle(&runtime, &agent)).await?;
+    let restored = Box::pin(settle(&runtime, &agent)).await? && restore;
     Box::pin(bind(&app, &window)).await?;
-    Ok(holo_hash::AgentPubKeyB64::from(agent).to_string())
+    let agent = holo_hash::AgentPubKeyB64::from(agent).to_string();
+    // A fresh chain must not retire a hosted copy: that copy may hold the only history.
+    let retirement = if restored {
+        Some(crate::retire::sign(&seed, &agent)?)
+    } else {
+        None
+    };
+    Ok(Opened { agent, retirement })
 }
 
 /// Remove the account from this device (its chain stays on the network; the words bring it
@@ -106,15 +125,17 @@ async fn install(runtime: &Runtime, agent: &AgentPubKey, restore: bool) -> Resul
 }
 
 /// Bring the app to Enabled. A restore runs in the background until the chain arrives; a
-/// phrase the network has no chain for (new, or from a reset network) starts fresh.
-async fn settle(runtime: &Runtime, agent: &AgentPubKey) -> Result<(), String> {
+/// phrase the network has no chain for (new, or from a reset network) starts fresh. Returns
+/// false when it had to start fresh.
+async fn settle(runtime: &Runtime, agent: &AgentPubKey) -> Result<bool, String> {
     let started = tokio::time::Instant::now();
+    let mut kept = true;
     loop {
         let app = find(runtime)
             .await?
             .ok_or_else(|| "The app vanished while installing.".to_string())?;
         match app.status {
-            AppStatus::Enabled => return Ok(()),
+            AppStatus::Enabled => return Ok(kept),
             AppStatus::Disabled(_) => {
                 runtime.enable_app(APP_ID.into()).await.map_err(text)?;
             }
@@ -125,6 +146,7 @@ async fn settle(runtime: &Runtime, agent: &AgentPubKey) -> Result<(), String> {
                 log::info!("nothing to restore; starting a fresh chain");
                 runtime.uninstall_app(APP_ID.into()).await.map_err(text)?;
                 install(runtime, agent, false).await?;
+                kept = false;
             }
             AppStatus::AwaitingMemproofs => {
                 return Err("The app is waiting for membrane proofs.".into());

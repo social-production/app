@@ -1,6 +1,8 @@
 <script lang="ts">
   import {
+    ACCOUNT_MOVED,
     firstInvalidWord,
+    GatewayError,
     inNativeApp,
     phraseIsValid,
     signInWithPhrase,
@@ -15,6 +17,8 @@
   let working = $state(false);
   let progress = $state<AccountStep>('connecting');
   let error = $state<string>();
+  /** The account moved to the desktop app (ADR 0092): offer to host it here again. */
+  let moved = $state(false);
 
   const words = $derived(splitWords(text));
   const valid = $derived(phraseIsValid(words));
@@ -30,12 +34,18 @@
 
   async function go(event: SubmitEvent): Promise<void> {
     event.preventDefault();
+    await open(false);
+  }
+
+  async function open(reclaim: boolean): Promise<void> {
     working = true;
     error = undefined;
+    moved = false;
     try {
-      await signInWithPhrase(words, (s) => (progress = s));
+      await signInWithPhrase(words, (s) => (progress = s), { reclaim });
     } catch (e) {
       error = explain(e);
+      moved = e instanceof GatewayError && e.status === ACCOUNT_MOVED;
       working = false;
     }
   }
@@ -54,6 +64,13 @@
       <button class="button-primary" disabled={!valid} type="submit">Log in</button>
     </div>
     {#if error}<p class="status-note">{error}</p>{/if}
+    {#if moved}
+      <div class="button-row">
+        <button class="button-secondary" type="button" onclick={() => open(true)}>
+          Use it here instead
+        </button>
+      </div>
+    {/if}
     <p class="helper-text">
       This device stays signed in until you sign out. An account from another site or app comes
       along — same identity.
@@ -61,9 +78,9 @@
     {#if inNativeApp()}
       <!-- ADR 0090: one agent on two nodes at once can fork its chain. -->
       <p class="helper-text">
-        Your account now lives on this computer. If you used it on a website, use it here from now
-        on rather than in both places. Logging in can take up to two minutes while your history
-        arrives from the network.
+        Your account now lives on this computer. If you used it on a website, the website stops
+        hosting it once your history arrives here (you can take it back there with your words).
+        Logging in can take up to two minutes while your history arrives from the network.
       </p>
     {/if}
   </form>

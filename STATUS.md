@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-11 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 12:40 am Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,6 +82,43 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092)
+Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am Melbourne Nov 12; CI ~2 h, merge when green). **No DNA change**
+(gateway, native and UI only), so no network reset.
+- **Retirement:** a desktop log-in that restored an existing chain (`settle` kept the restore)
+  returns a statement signed with the phrase's key (`native/src/retire.rs`); the UI posts it to
+  every configured gateway's new `POST /account/retire` (`holo/account.ts`
+  `retireHostedCopies`, best effort). The gateway (`routes/retire.rs`) checks the signature and
+  a 10-minute clock window, sets `persons.retired_at` (new column, added by `alter table`) and
+  uninstalls the person's app (`Node::retire_hosted`).
+- **Coming back:** phrase sign-in/restore of a retired account answers 410; the log-in form
+  shows **Use it here instead** (`PhraseSignIn.svelte`), which restores with `reclaim: true`
+  (PoW, chain restored from the network). Passkey log-in answers 410 and points to the words.
+- **Sign-out warning on desktop** (Settings → Account): if the gateway's people index doesn't
+  list the account (or no gateway answers), a confirm warns the history could be lost and
+  offers "Sign out anyway" (`services/account.ts` `listedOnNetwork`).
+- Checked here: `npm run check -w ui` (0 errors), `npm run lint -w ui`, boundaries, sizes,
+  `cargo fmt`, in Nix `cargo clippy -p gateway -p native --all-targets -D warnings` (clean),
+  `cargo test -p gateway retire` and `-p native retire` (pass; both pin the exact statement
+  bytes), and against a local seed node (`scripts/cloud-seed.sh`): **new `tests/e2e/retire.mjs`
+  passed** (wrong key 401, stale time 400, retire, log-in names the move, "Use it here
+  instead" brings the profile back) and `tests/e2e/accounts.mjs` passed. The first browser run
+  after the seed started timed out in sign-up (cold seed); rerun fine.
+- CI run 1: the desktop smoke timed out at sign-out (the new warning, most likely: Settings
+  can be clicked before the page has the person's name, and an empty name counted as "not
+  listed"). Fixed: `listedOnNetwork` reads the name from the device's own chain; the smoke's
+  timeout dump now shows an open dialog first.
+- CI runs 2 and 3 (re-run): the Linux desktop job died in `apt-get install` before building
+  (`Temporary failure resolving 'security.ubuntu.com'`; run 2 hung to the 120-min limit). Not
+  this PR's code: main's desktop run passed at 10:05 UTC. `desktop.yml`'s apt step now retries
+  (Acquire::Retries, 3 tries, 30-min step limit). Everything else was green on `e7ef321`.
+- Not run here: scenarios (none touched) and the desktop smoke (CI's `desktop.yml` runs it;
+  its sign-out happens after the seed lists the profile, so the new warning shouldn't appear).
+  Not testable in CI: the desktop retiring a real hosted account end to end.
+- Next after merge: smoke live (`shell.mjs`; `curl -X POST …/account/retire` with junk should
+  give 400/401), README Status, then SEEDLESS 3b ("Help the network") or 5 (geocoding from the
+  device), alongside parity.
+
 ## Done 2026-11-11: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), PR #140 merged 10:05 UTC (9:05 pm Melbourne)
 In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered with the bootstrap at 77 s (`check-bootstrap.sh`: 6 agents per space), UI and bootstrap `/health` 200, live `shell.mjs` passed. Next: see **Next** below (SEEDLESS step 2's rest).
 - `native/src/servers.rs`: the desktop boots with the first server, in order, whose `/health`
@@ -114,8 +151,7 @@ In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered wi
 - PR #137 (desktop accounts, ADR 0090, `desktop.yml`) and #138 (docs, the script) merged
   2026-11-11 (7:17 and 9:32 am Melbourne).
 
-**Next:** SEEDLESS step 2's rest (the gateway retires a hosted copy when its account logs in on
-a desktop, ADR 0090; sign-out waits or warns until the chain is held elsewhere), then 3b
+**Next:** (SEEDLESS step 2's rest is in flight above, ADR 0092), then 3b
 ("Help the network": desktops run the bootstrap and announce it) or 5 (geocoding from the
 device), alongside parity. (Step 3 is the PR above.) Parity left (PARITY
 summary): Deactivate account (ADR 0088, batch with the next directory reset), the

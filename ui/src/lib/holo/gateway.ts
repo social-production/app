@@ -20,6 +20,9 @@ export interface Resumed {
   token: number[];
 }
 
+/** The gateway's answer for an account that moved to the desktop app (ADR 0092). */
+export const ACCOUNT_MOVED = 410;
+
 /** An error the gateway explained in a sentence meant for people. */
 export class GatewayError extends Error {
   constructor(
@@ -57,6 +60,8 @@ export interface OpenBody {
   nonce?: string;
   seed: number[];
   signingKey: number[];
+  /** Host again an account that moved to the desktop app (ADR 0092). */
+  reclaim?: boolean;
 }
 
 async function get<T>(gateway: string, path: string, query: Record<string, string>): Promise<T> {
@@ -89,6 +94,8 @@ export const gatewayApi = {
     post<Ceremony>(g, '/account/passkey/start', body),
   passkeyFinish: (g: string, body: { ceremony: string; credential: unknown }) =>
     post<{ saved: boolean }>(g, '/account/passkey/finish', body),
+  retire: (g: string, body: { agent: string; at: number; signature: number[] }) =>
+    post<{ retired: boolean }>(g, '/account/retire', body),
   resume: (g: string, signingKey: number[]) => post<Resumed>(g, '/session/resume', { signingKey }),
   cells: (g: string, body: CellsBody) => post<{ granted: number }>(g, '/session/cells', body),
   projects: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/projects', query),
