@@ -75,7 +75,7 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## Done 2026-11-11: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), PR #140 merged 10:05 UTC (9:05 pm Melbourne)
-In flight: nothing. Live smoke after the deploy: see the line below (if missing, run `curl` on the seed `/readyz` and `bash scripts/check-bootstrap.sh`).
+In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered with the bootstrap at 77 s (`check-bootstrap.sh`: 6 agents per space), UI and bootstrap `/health` 200, live `shell.mjs` passed. Next: see **Next** below (SEEDLESS step 2's rest).
 - `native/src/servers.rs`: the desktop boots with the first server, in order, whose `/health`
   answers at start (all asked at once, 4 s): the one saved in **Settings → Network** (desktop
   only, `features/settings/NetworkSettings.svelte`, `holo/servers.ts`), then the shipped list
