@@ -83,8 +83,12 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `set_user_network_config` (the window now holds `hc:allow-set-user-network-config`);
   "Use the built-in list" is our `reset_network_servers`. Both restart the app.
 - Guide for community copies: `docs/RUN-A-BOOTSTRAP.md` (the Railway image + Caddy).
-- Checked here: `npm run check -w ui`, `npm run lint -w ui`, boundaries, sizes, rustfmt.
-  `cargo clippy -p native` in Nix: see the PR / next entry. Not tested: an end-to-end failover
+- Checked here: `npm run check -w ui`, `npm run lint -w ui`, boundaries, sizes, rustfmt, and in
+  Nix `cargo clippy -p native --all-targets -D warnings` (clean) and `cargo test -p native
+  servers` (2 pass). The desktop smoke test now also checks Settings → Network names Railway's
+  bootstrap. **Disk:** a cloud session's `target/debug` had grown to 22 GB and a native test
+  build filled the disk; deleting `target/debug` and building with `CARGO_PROFILE_DEV_DEBUG=0`
+  fit. Not tested: an end-to-end failover
   with Railway's bootstrap switched off (SEEDLESS 3b's two-desktop test covers it).
 - Then: open the PR, watch CI (`check`, scenarios, `desktop.yml`), merge when green.
 
