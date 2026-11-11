@@ -61,6 +61,14 @@ and continue from Next."
   personal services' activities stay in the rail; the About page is rewritten in the owner's
   direction (done on this branch: four sections, commons-based peer production, stigmergy).
 
+## Owner direction (2026-11-11): the seed node stays until it is unnecessary
+- "I won't shut down the seed node until it is unnecessary." It is expected to run well into
+  growth (possibly tens of thousands of people). SEEDLESS is insurance and load relief (each
+  desktop person is one less hosted agent and one more copy of the data), not a deadline.
+  Keep parity first, with SEEDLESS steps as steady background work, in the current order.
+- Before heavy growth the limit is the seed's memory and cost (hosted agents), not blocking:
+  plan a second gateway (`VITE_SP_GATEWAYS` already takes a list) before one seed runs out.
+
 ## Direction (2026-10-28): the commons, ADR 0065 (plan `docs/plans/COMMONS.md`)
 Owner: "we could have tens of thousands of projects… major changes can still be made… you have
 control". One network per project cannot reach that (each costs two databases, a gossip space and
@@ -74,7 +82,8 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), branch `claude/social-production-handoff-dsam61`
+## Done 2026-11-11: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), PR #140 merged 10:05 UTC (9:05 pm Melbourne)
+In flight: nothing. Live after the deploy (10:19 UTC): seed up and registered with the bootstrap at 77 s (`check-bootstrap.sh`: 6 agents per space), UI and bootstrap `/health` 200, live `shell.mjs` passed. Next: see **Next** below (SEEDLESS step 2's rest).
 - `native/src/servers.rs`: the desktop boots with the first server, in order, whose `/health`
   answers at start (all asked at once, 4 s): the one saved in **Settings → Network** (desktop
   only, `features/settings/NetworkSettings.svelte`, `holo/servers.ts`), then the shipped list
@@ -90,7 +99,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   build filled the disk; deleting `target/debug` and building with `CARGO_PROFILE_DEV_DEBUG=0`
   fit. Not tested: an end-to-end failover
   with Railway's bootstrap switched off (SEEDLESS 3b's two-desktop test covers it).
-- Then: open the PR, watch CI (`check`, scenarios, `desktop.yml`), merge when green.
+- CI green on the first run (check, 8 scenario shards, desktop builds on 3 OSes + Linux smoke).
 
 ## Earlier 2026-11-11: desktop ↔ seed node works
 - **A desktop reaches the live network.** Manual `desktop.yml` run at 04:51 UTC: the CI desktop's

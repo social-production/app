@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The desktop app tries several bootstrap servers (PR #140, 2026-11-11 9:05 pm Melbourne,
+  ADR 0091; SEEDLESS step 3):** at start it uses the first that answers, in order: the one you
+  saved in Settings → Network (desktop only), Railway's, then Holochain's public test servers.
+  Anyone can run a copy (`docs/RUN-A-BOOTSTRAP.md`). No reset.
 - **The desktop app signs up and logs in with your 24 words (PR #137, 2026-11-11 7:17 am
   Melbourne, ADR 0090; SEEDLESS steps 1–2):** the Linux/Windows/macOS app runs its own node;
   your words are your account there too. CI builds it on all three systems and smoke-tests
