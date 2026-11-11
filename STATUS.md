@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-11 4:30 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-11 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -74,7 +74,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight: nothing. Desktop ↔ seed node works (2026-11-11)
+## In flight: several bootstrap servers on desktop (SEEDLESS step 3, ADR 0091), branch `claude/social-production-handoff-dsam61`
+- `native/src/servers.rs`: the desktop boots with the first server, in order, whose `/health`
+  answers at start (all asked at once, 4 s): the one saved in **Settings → Network** (desktop
+  only, `features/settings/NetworkSettings.svelte`, `holo/servers.ts`), then the shipped list
+  (Railway, then Holochain's `dev-test-bootstrap2` + n0's iroh relay as the last resort).
+  `SP_BOOTSTRAP_URL` still replaces the list. Saving uses the plugin's
+  `set_user_network_config` (the window now holds `hc:allow-set-user-network-config`);
+  "Use the built-in list" is our `reset_network_servers`. Both restart the app.
+- Guide for community copies: `docs/RUN-A-BOOTSTRAP.md` (the Railway image + Caddy).
+- Checked here: `npm run check -w ui`, `npm run lint -w ui`, boundaries, sizes, rustfmt.
+  `cargo clippy -p native` in Nix: see the PR / next entry. Not tested: an end-to-end failover
+  with Railway's bootstrap switched off (SEEDLESS 3b's two-desktop test covers it).
+- Then: open the PR, watch CI (`check`, scenarios, `desktop.yml`), merge when green.
+
+## Earlier 2026-11-11: desktop ↔ seed node works
 - **A desktop reaches the live network.** Manual `desktop.yml` run at 04:51 UTC: the CI desktop's
   new profile reached the seed node's index in **59 s**, and after sign-out a log-in with the
   words **restored the profile from the network**. The smoke test now requires both again.
@@ -88,8 +102,9 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   2026-11-11 (7:17 and 9:32 am Melbourne).
 
 **Next:** SEEDLESS step 2's rest (the gateway retires a hosted copy when its account logs in on
-a desktop, ADR 0090; sign-out waits or warns until the chain is held elsewhere) and step 3 (a
-list of bootstrap/relay URLs; the plugin has `get/set_user_network_config`), alongside parity. Parity left (PARITY
+a desktop, ADR 0090; sign-out waits or warns until the chain is held elsewhere), then 3b
+("Help the network": desktops run the bootstrap and announce it) or 5 (geocoding from the
+device), alongside parity. (Step 3 is the PR above.) Parity left (PARITY
 summary): Deactivate account (ADR 0088, batch with the next directory reset), the
 `bot-review-vote` card, Settings waiting on features (item 9), and screens not compared yet
 (item 10: create flows, channel/community pages, event/help detail, Messages/Search/Feedback
