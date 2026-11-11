@@ -83,7 +83,7 @@ raised it and all three services came back by 07:36 UTC (seed node restarted, 53
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
 ## In flight 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092)
-Branch `claude/social-production-handoff-dsam61`, PR to open (CI not run yet). **No DNA change**
+Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am Melbourne Nov 12; CI ~2 h, merge when green). **No DNA change**
 (gateway, native and UI only), so no network reset.
 - **Retirement:** a desktop log-in that restored an existing chain (`settle` kept the restore)
   returns a statement signed with the phrase's key (`native/src/retire.rs`); the UI posts it to
