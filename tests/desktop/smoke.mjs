@@ -41,7 +41,9 @@ async function until(what, check, timeout = 60_000, ...args) {
     const value = await js(check, ...args).catch(() => undefined);
     if (value) return value;
     if (Date.now() > end) {
-      const text = await js('return document.body?.innerText.slice(0, 2000)').catch(() => '?');
+      // An open dialog sits at the end of the page: show it first.
+      const text = await js(`const d = document.querySelector('[role=alertdialog], [role=dialog]');
+        return (d ? 'DIALOG: ' + d.innerText + '\\n---\\n' : '') + document.body?.innerText.slice(0, 2000)`).catch(() => '?');
       throw new Error(`timed out waiting for ${what}. Page:\n${text}`);
     }
     await new Promise((r) => setTimeout(r, 500));

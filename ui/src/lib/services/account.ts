@@ -2,7 +2,7 @@
  *  passkeys are an optional shortcut on devices that can store them. */
 import { peopleIndex, signUp, type AccountStep } from '#lib/holo/index.ts';
 
-import { saveProfile } from './people.ts';
+import { saveProfile, viewer } from './people.ts';
 
 export {
   ACCOUNT_MOVED,
@@ -50,11 +50,12 @@ async function firstProfile(name: string): Promise<void> {
  * device may be the only holder of a new chain, and signing out removes it. Today the gauge
  * is a gateway's people index; `undefined` when no gateway answers.
  */
-export async function listedOnNetwork(agent: string, name: string): Promise<boolean | undefined> {
-  if (!name) return false;
+export async function listedOnNetwork(): Promise<boolean | undefined> {
   try {
-    const people = await peopleIndex<{ agent: string }[]>({ q: name, limit: '50' });
-    return people.some((person) => person.agent === agent);
+    // The name from this device's own chain: the page may not have loaded it yet.
+    const me = await viewer();
+    const people = await peopleIndex<{ agent: string }[]>({ q: me.name, limit: '50' });
+    return people.some((person) => person.agent === me.agent);
   } catch {
     return undefined;
   }

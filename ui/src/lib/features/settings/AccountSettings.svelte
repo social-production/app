@@ -38,7 +38,7 @@
   }
 
   async function leave(): Promise<void> {
-    if (inNativeApp() && (await listedOnNetwork(me, viewer.name)) !== true) {
+    if (inNativeApp() && (await listedOnNetwork()) !== true) {
       unheld = true;
       return;
     }

@@ -104,6 +104,10 @@ Branch `claude/social-production-handoff-dsam61`, **PR #142** (opened 12:45 am M
   passed** (wrong key 401, stale time 400, retire, log-in names the move, "Use it here
   instead" brings the profile back) and `tests/e2e/accounts.mjs` passed. The first browser run
   after the seed started timed out in sign-up (cold seed); rerun fine.
+- CI run 1: the desktop smoke timed out at sign-out (the new warning, most likely: Settings
+  can be clicked before the page has the person's name, and an empty name counted as "not
+  listed"). Fixed: `listedOnNetwork` reads the name from the device's own chain; the smoke's
+  timeout dump now shows an open dialog first.
 - Not run here: scenarios (none touched) and the desktop smoke (CI's `desktop.yml` runs it;
   its sign-out happens after the seed lists the profile, so the new warning shouldn't appear).
   Not testable in CI: the desktop retiring a real hosted account end to end.
