@@ -2702,6 +2702,7 @@ dependencies = [
  "anyhow",
  "axum",
  "futures-util",
+ "geo",
  "holo_hash",
  "holochain",
  "holochain_keystore",
@@ -2710,7 +2711,6 @@ dependencies = [
  "mr_bundle",
  "nix",
  "rand 0.8.8",
- "reqwest 0.12.28",
  "rmpv",
  "rustls",
  "serde",
@@ -2857,6 +2857,19 @@ checksum = "85649ca51fd72272d7821adaf274ad91c288277713d9c18820d8499a7ff69e9a"
 dependencies = [
  "typenum",
  "version_check",
+]
+
+[[package]]
+name = "geo"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "axum",
+ "reqwest 0.12.28",
+ "serde",
+ "serde_json",
+ "sp_place",
+ "tokio",
 ]
 
 [[package]]
@@ -5756,6 +5769,7 @@ dependencies = [
 name = "native"
 version = "0.0.1"
 dependencies = [
+ "geo",
  "holo_hash",
  "holochain",
  "holochain_types",

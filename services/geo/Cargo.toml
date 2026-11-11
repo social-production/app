@@ -1,0 +1,22 @@
+[package]
+name = "geo"
+description = "Geocoding (ADR 0079, 0093): web-backend's place lookups against Nominatim and ip-api.com, shared by the gateway and the desktop app."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+anyhow = "1"
+# Already in the tree through Holochain, rustls with webpki roots.
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "json"] }
+serde = { workspace = true }
+serde_json = "1"
+sp_place = { workspace = true }
+
+[dev-dependencies]
+axum = "0.8"
+tokio = { workspace = true, features = ["net"] }
+
+[lints]
+workspace = true

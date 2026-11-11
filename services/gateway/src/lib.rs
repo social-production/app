@@ -3,7 +3,6 @@
 
 mod auth;
 mod config;
-mod geo;
 mod hex;
 mod node;
 mod routes;

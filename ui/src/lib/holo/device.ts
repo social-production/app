@@ -5,6 +5,8 @@
  * a gateway, so the same words are the same person everywhere (docs/IDENTITY.md).
  */
 
+import { GatewayError } from './gateway.ts';
+
 interface TauriWindow {
   __TAURI_INTERNALS__?: {
     invoke<T>(command: string, args?: Record<string, unknown>): Promise<T>;
@@ -68,4 +70,23 @@ function bound(): Promise<void> {
     const timer = setTimeout(done, BIND_WAIT_MS);
     window.addEventListener('holochain-rebound', done);
   });
+}
+
+interface Refusal {
+  status?: number;
+  error?: string;
+}
+
+/** web's place lookups run by the device itself (native/src/places.rs, ADR 0093), with the
+ * gateway route's parameters and answers; a refusal becomes the gateway's `GatewayError`. */
+export async function deviceLocations<T>(
+  route: 'search' | 'reverse' | 'ip-hint',
+  query: Record<string, string>,
+): Promise<T> {
+  try {
+    return await invoke<T>('locations', { route, query });
+  } catch (e) {
+    const refusal = (typeof e === 'object' && e !== null ? e : {}) as Refusal;
+    throw new GatewayError(refusal.error ?? String(e), refusal.status ?? 503);
+  }
 }

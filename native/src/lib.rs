@@ -5,6 +5,7 @@
 mod account;
 mod keystore;
 mod network;
+mod places;
 mod retire;
 mod servers;
 
@@ -34,6 +35,7 @@ pub fn run() {
             account::account_state,
             account::open_account,
             account::sign_out,
+            places::locations,
             servers::network_servers,
             servers::reset_network_servers,
         ])

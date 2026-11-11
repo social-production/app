@@ -8,7 +8,8 @@ use axum::Json;
 use serde::{Deserialize, Serialize};
 
 use super::{client_ip, ApiError, ApiResult, AppState};
-use crate::geo::{shape, GeoError, Location};
+use axum::http::StatusCode;
+use geo::{GeoError, Location};
 
 #[derive(Serialize)]
 pub struct Items {
@@ -17,6 +18,7 @@ pub struct Items {
 
 impl From<GeoError> for ApiError {
     fn from(GeoError(status, code): GeoError) -> Self {
+        let status = StatusCode::from_u16(status).unwrap_or(StatusCode::BAD_GATEWAY);
         Self(status, code.into())
     }
 }
@@ -35,22 +37,15 @@ pub async fn search(
     headers: HeaderMap,
     Query(p): Query<SearchParams>,
 ) -> ApiResult<Items> {
-    // web's FastAPI checks: q 1–200 characters, limit 1–10 (5 by default), short extras.
     let limit = p.limit.unwrap_or(5);
-    let too_long = |v: &Option<String>, max: usize| v.as_ref().is_some_and(|s| s.len() > max);
-    if p.q.is_empty()
-        || p.q.chars().count() > shape::MAX_QUERY
-        || !(1..=shape::MAX_RESULTS).contains(&limit)
-        || too_long(&p.country_codes, 40)
-        || too_long(&p.viewbox, 80)
-    {
-        return Err(ApiError(
-            axum::http::StatusCode::UNPROCESSABLE_ENTITY,
-            "invalid_location_search".into(),
-        ));
-    }
+    geo::check_search(
+        &p.q,
+        limit,
+        p.country_codes.as_deref(),
+        p.viewbox.as_deref(),
+    )?;
     state.geo.check_limit(&client_ip(&headers))?;
-    let viewbox = p.viewbox.as_deref().and_then(shape::viewbox);
+    let viewbox = p.viewbox.as_deref().and_then(geo::shape::viewbox);
     let items = state
         .geo
         .search(&p.q, limit, p.country_codes.as_deref(), viewbox)

@@ -1,17 +1,19 @@
 //! Geocoding for the place picker (M6 phase 2, ADR 0079): web-backend's `/locations/search`,
-//! `/reverse` and `/ip-hint` (`app/services/locations/geocoding.py`, `ip_hint.py`) proxied to
+//! `/reverse` and `/ip-hint` (`app/services/locations/geocoding.py`, `ip_hint.py`) against
 //! Nominatim and ip-api.com, with web's cache, per-IP limits and error codes. Places are
-//! never stored here: what someone picks goes onto their own records (ADR 0078).
+//! never stored here: what someone picks goes onto their own records (ADR 0078). The gateway
+//! serves it over HTTP; the desktop app calls it in-process, from the device (ADR 0093).
 
 mod memo;
+mod settings;
 pub mod shape;
 #[cfg(test)]
 mod tests;
 
 use std::time::Duration;
 
-use axum::http::StatusCode;
 use memo::{Cache, WindowLimit};
+pub use settings::Settings;
 pub use shape::Location;
 
 /// Calls this node makes to the geocoder per minute, whoever asks: Nominatim's usage policy
@@ -20,51 +22,44 @@ const PROVIDER_PER_MINUTE: u32 = 60;
 /// web's `enforce_ip_hint_rate_limit`: 10 hints per IP per window.
 const HINTS_PER_WINDOW: u32 = 10;
 
-/// web's `geocoding_*` settings, from the same names upper-cased (docs/DEPLOYMENT.md).
-#[derive(Clone)]
-pub struct Settings {
-    pub provider_url: String,
-    pub api_key: String,
-    pub user_agent: String,
-    pub cache_ttl: Duration,
-    pub per_ip: u32,
-    pub window: Duration,
-    pub timeout: Duration,
-    /// ip-api.com's lookup; the client's IP is appended.
-    pub ip_hint_url: String,
+/// HTTP statuses web answers with (the gateway sends them; the desktop passes them to the UI).
+pub mod status {
+    pub const BAD_GATEWAY: u16 = 502;
+    pub const SERVICE_UNAVAILABLE: u16 = 503;
+    pub const TOO_MANY_REQUESTS: u16 = 429;
+    pub const UNPROCESSABLE_ENTITY: u16 = 422;
 }
+use status::{BAD_GATEWAY, SERVICE_UNAVAILABLE, TOO_MANY_REQUESTS, UNPROCESSABLE_ENTITY};
 
-impl Settings {
-    #[must_use]
-    pub fn from_env() -> Self {
-        let var = |k: &str, d: &str| std::env::var(k).unwrap_or_else(|_| d.to_string());
-        let num = |k: &str, d: f64| var(k, "").parse::<f64>().unwrap_or(d).max(0.0);
-        Self {
-            provider_url: var(
-                "GEOCODING_PROVIDER_URL",
-                "https://nominatim.openstreetmap.org",
-            ),
-            api_key: var("GEOCODING_PROVIDER_API_KEY", ""),
-            user_agent: var(
-                "GEOCODING_USER_AGENT",
-                "SocialProduction/0.1 (p2p seed node; github.com/social-production/app)",
-            ),
-            cache_ttl: Duration::from_secs_f64(num("GEOCODING_CACHE_TTL_SECONDS", 86_400.0)),
-            #[allow(clippy::cast_possible_truncation, clippy::cast_sign_loss)]
-            per_ip: num("GEOCODING_RATE_LIMIT", 30.0) as u32,
-            window: Duration::from_secs_f64(num("GEOCODING_RATE_LIMIT_WINDOW_SECONDS", 60.0)),
-            timeout: Duration::from_secs_f64(num("GEOCODING_TIMEOUT_SECONDS", 8.0)),
-            ip_hint_url: var("IP_HINT_URL", "http://ip-api.com/json/"),
-        }
-    }
-}
-
-/// A refusal in web's words: its status and its `detail` code.
+/// A refusal in web's words: its HTTP status and its `detail` code.
 #[derive(Debug, PartialEq, Eq)]
-pub struct GeoError(pub StatusCode, pub &'static str);
+pub struct GeoError(pub u16, pub &'static str);
 
 fn unprocessable(code: &'static str) -> GeoError {
-    GeoError(StatusCode::UNPROCESSABLE_ENTITY, code)
+    GeoError(UNPROCESSABLE_ENTITY, code)
+}
+
+fn hint_rate_limited() -> GeoError {
+    GeoError(TOO_MANY_REQUESTS, "ip_location_rate_limit_exceeded")
+}
+
+/// web's `FastAPI` checks on a search: q 1–200 characters, limit 1–10, short extras.
+pub fn check_search(
+    q: &str,
+    limit: usize,
+    country_codes: Option<&str>,
+    viewbox: Option<&str>,
+) -> Result<(), GeoError> {
+    let too_long = |v: Option<&str>, max: usize| v.is_some_and(|s| s.len() > max);
+    if q.is_empty()
+        || q.chars().count() > shape::MAX_QUERY
+        || !(1..=shape::MAX_RESULTS).contains(&limit)
+        || too_long(country_codes, 40)
+        || too_long(viewbox, 80)
+    {
+        return Err(unprocessable("invalid_location_search"));
+    }
+    Ok(())
 }
 
 pub struct Geo {
@@ -112,10 +107,7 @@ impl Geo {
         if self.per_ip.allow(ip) {
             Ok(())
         } else {
-            Err(GeoError(
-                StatusCode::TOO_MANY_REQUESTS,
-                "geocoding_rate_limit_exceeded",
-            ))
+            Err(GeoError(TOO_MANY_REQUESTS, "geocoding_rate_limit_exceeded"))
         }
     }
 
@@ -179,46 +171,49 @@ impl Geo {
         Ok(found)
     }
 
-    /// web's `ip_location_hint`: only on the person's explicit ask (Settings' Regional).
+    /// web's `ip_location_hint` for a client of the gateway: only on the person's explicit
+    /// ask (Settings' Regional).
     pub async fn ip_hint(&self, ip: &str) -> Result<Location, GeoError> {
-        if !self.hint_limit.allow(ip) {
-            return Err(GeoError(
-                StatusCode::TOO_MANY_REQUESTS,
-                "ip_location_rate_limit_exceeded",
-            ));
-        }
         if ip
             .parse::<std::net::IpAddr>()
             .map_or(true, |a| a.is_loopback())
         {
+            if !self.hint_limit.allow(ip) {
+                return Err(hint_rate_limited());
+            }
             return Err(unprocessable("ip_location_unavailable"));
         }
-        if let Some(hit) = self.hints.get(ip) {
+        self.hint_for(ip, ip).await
+    }
+
+    /// The same for this device's own address (the desktop app, ADR 0093): ip-api.com reads
+    /// the address the request comes from.
+    pub async fn own_ip_hint(&self) -> Result<Location, GeoError> {
+        self.hint_for("device", "").await
+    }
+
+    async fn hint_for(&self, key: &str, ip: &str) -> Result<Location, GeoError> {
+        if !self.hint_limit.allow(key) {
+            return Err(hint_rate_limited());
+        }
+        if let Some(hit) = self.hints.get(key) {
             return Ok(hit);
         }
         let url = format!(
             "{}{ip}?fields=status,message,country,regionName,city,lat,lon",
             self.settings.ip_hint_url
         );
-        let unavailable = GeoError(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "ip_location_provider_unavailable",
-        );
-        let response = self.http.get(url).send().await.map_err(|_| unavailable)?;
+        let unavailable = || GeoError(SERVICE_UNAVAILABLE, "ip_location_provider_unavailable");
+        let response = self.http.get(url).send().await.map_err(|_| unavailable())?;
         if response.status().as_u16() >= 400 {
-            return Err(GeoError(
-                StatusCode::SERVICE_UNAVAILABLE,
-                "ip_location_provider_unavailable",
-            ));
+            return Err(unavailable());
         }
-        let payload: serde_json::Value = response.json().await.map_err(|_| {
-            GeoError(
-                StatusCode::BAD_GATEWAY,
-                "ip_location_provider_invalid_response",
-            )
-        })?;
+        let payload: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|_| GeoError(BAD_GATEWAY, "ip_location_provider_invalid_response"))?;
         let hint = shape::ip_api(&payload).map_err(unprocessable)?;
-        self.hints.put(ip.to_string(), hint.clone());
+        self.hints.put(key.to_string(), hint.clone());
         Ok(hint)
     }
 
@@ -228,13 +223,10 @@ impl Geo {
         path: &str,
         mut params: Vec<(&'static str, String)>,
     ) -> Result<Vec<Location>, GeoError> {
-        let unavailable = GeoError(
-            StatusCode::SERVICE_UNAVAILABLE,
-            "geocoding_provider_unavailable",
-        );
+        let unavailable = GeoError(SERVICE_UNAVAILABLE, "geocoding_provider_unavailable");
         if !self.provider.allow("provider") {
             return Err(GeoError(
-                StatusCode::TOO_MANY_REQUESTS,
+                TOO_MANY_REQUESTS,
                 "geocoding_provider_rate_limited",
             ));
         }
@@ -252,35 +244,25 @@ impl Geo {
         let response = match sent {
             Ok(r) => r,
             Err(e) if e.is_timeout() => {
-                return Err(GeoError(
-                    StatusCode::SERVICE_UNAVAILABLE,
-                    "geocoding_provider_timeout",
-                ))
+                return Err(GeoError(SERVICE_UNAVAILABLE, "geocoding_provider_timeout"))
             }
             Err(_) => return Err(unavailable),
         };
         match response.status().as_u16() {
             429 => {
                 return Err(GeoError(
-                    StatusCode::TOO_MANY_REQUESTS,
+                    TOO_MANY_REQUESTS,
                     "geocoding_provider_rate_limited",
                 ))
             }
             500.. => return Err(unavailable),
-            400.. => {
-                return Err(GeoError(
-                    StatusCode::BAD_GATEWAY,
-                    "geocoding_provider_error",
-                ))
-            }
+            400.. => return Err(GeoError(BAD_GATEWAY, "geocoding_provider_error")),
             _ => {}
         }
-        let payload: serde_json::Value = response.json().await.map_err(|_| {
-            GeoError(
-                StatusCode::BAD_GATEWAY,
-                "geocoding_provider_invalid_response",
-            )
-        })?;
+        let payload: serde_json::Value = response
+            .json()
+            .await
+            .map_err(|_| GeoError(BAD_GATEWAY, "geocoding_provider_invalid_response"))?;
         Ok(shape::nominatim(&payload))
     }
 }

@@ -9,7 +9,7 @@ The P2P rebuild of Social Production. It runs in parallel with the live FastAPI 
 - `zomes/<name>/{integrity,coordinator}`: zomes shared by several DNAs (`health`).
 - `dnas/{directory,project,conversation}/`: `dna.yaml`. DNA-specific zomes go in `dnas/<dna>/zomes/{integrity,coordinator}/<name>/` (add the glob to root `Cargo.toml` when the first one lands).
 - `happ/`: `happ.yaml` (roles; project/conversation are cloned) + `web-happ.yaml`.
-- `services/gateway`: the seed node, one process (ADR 0023): embedded conductor + axum API (`/account/*` signup/restore/login with passkeys + proof-of-work, `/session/resume`, `/ws` proxy). Its own `gateway.sqlite` maps passkeys and device keys to hosted agents.
+- `services/gateway`: the seed node, one process (ADR 0023): embedded conductor + axum API (`/account/*` signup/restore/login with passkeys + proof-of-work, `/session/resume`, `/ws` proxy). Its own `gateway.sqlite` maps passkeys and device keys to hosted agents. `services/geo`: the geocoder (Nominatim), shared by the gateway and the desktop app (ADR 0093).
 - `ui/`: SvelteKit 3 static SPA. Layers: `routes → lib/features → lib/services → lib/holo`. Only `lib/holo` imports `@holochain/client`.
 - `native/`: Tauri 2 + Holochain's `tauri-plugin-hc` (ADR 0021). The UI talks to the device's conductor over IPC; browsers use gateways.
 - `deploy/`: seed-node + bootstrap Dockerfiles, Railway configs. `tests/scenarios`: sweettest multi-agent tests.

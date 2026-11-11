@@ -9,7 +9,7 @@ use axum::{Json, Router};
 use serde_json::{json, Value};
 
 use super::shape::{self, Location};
-use super::{Geo, GeoError, Settings};
+use super::{status, Geo, GeoError, Settings};
 
 fn melbourne() -> Value {
     json!({
@@ -151,7 +151,7 @@ async fn proxies_caches_and_maps_errors() {
     assert_eq!(
         busy,
         Err(GeoError(
-            StatusCode::TOO_MANY_REQUESTS,
+            status::TOO_MANY_REQUESTS,
             "geocoding_provider_rate_limited"
         ))
     );
@@ -159,7 +159,7 @@ async fn proxies_caches_and_maps_errors() {
     assert_eq!(
         down,
         Err(GeoError(
-            StatusCode::SERVICE_UNAVAILABLE,
+            status::SERVICE_UNAVAILABLE,
             "geocoding_provider_unavailable"
         ))
     );
@@ -171,7 +171,7 @@ async fn proxies_caches_and_maps_errors() {
     assert_eq!(
         geo.check_limit("1.2.3.4"),
         Err(GeoError(
-            StatusCode::TOO_MANY_REQUESTS,
+            status::TOO_MANY_REQUESTS,
             "geocoding_rate_limit_exceeded"
         ))
     );
@@ -179,7 +179,7 @@ async fn proxies_caches_and_maps_errors() {
     assert_eq!(
         local,
         Err(GeoError(
-            StatusCode::UNPROCESSABLE_ENTITY,
+            status::UNPROCESSABLE_ENTITY,
             "ip_location_unavailable"
         ))
     );
