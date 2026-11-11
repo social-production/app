@@ -129,11 +129,12 @@ try {
   await goto('/profile');
   await until('the profile name', `return document.body.innerText.includes(arguments[0])`, 60_000, name);
 
-  // Signing out removes the only copy until another node holds the chain (ADR 0090). Whether
-  // the seed node gets it is logged, not required: on 2026-11-10 a CI desktop reached the
-  // relay but never shared a DHT space with the seed node (STATUS.md, "DNA hashes").
-  const reached = await waitForSeed(name, 120_000);
-  log(reached ? 'the seed node holds the profile' : 'the seed node never listed the profile');
+  // Signing out removes the only copy until another node holds the chain (ADR 0090), so the
+  // seed node must have it first: this also proves the desktop shares the live network.
+  // (2026-11-11: listed after 59 s. If this fails, run scripts/check-bootstrap.sh: the
+  // seed's bootstrap entries were once missing for hours, see STATUS.md.)
+  if (!(await waitForSeed(name, 300_000))) throw new Error(`the seed node never listed ${name}`);
+  log('the seed node holds the profile');
 
   log('sign out, then log in with the words');
   await goto('/settings');
@@ -147,10 +148,8 @@ try {
   await goto('/settings');
   const again = await until('the agent key after log-in', `return document.querySelector('#settings-account .key')?.innerText`);
   if (again.trim() !== key.trim()) throw new Error(`log-in gave another key: ${again} (was ${key})`);
-  if (reached) {
-    await goto('/profile');
-    await until('the profile after log-in', `return document.body.innerText.includes(arguments[0])`, 180_000, name);
-  }
+  await goto('/profile');
+  await until('the profile after log-in', `return document.body.innerText.includes(arguments[0])`, 180_000, name);
   log('PASS');
 } catch (error) {
   console.error(error);

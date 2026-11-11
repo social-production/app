@@ -18,8 +18,8 @@ What works today:
   Melbourne, ADR 0090; SEEDLESS steps 1–2):** the Linux/Windows/macOS app runs its own node;
   your words are your account there too. CI builds it on all three systems and smoke-tests
   the real app on Linux (sign up, profile, sign out, log back in with the same key). The seed
-  node's `/readyz` now lists its DNA hashes. **Open problem:** a CI desktop never shared a
-  network with the seed node (see STATUS.md). No reset.
+  node's `/readyz` now lists its DNA hashes. A CI desktop's profile reaches the seed node in
+  about a minute and comes back after logging in again. No reset.
 - **Collective service requests and the new About page (PR #135, 2026-11-10 10:07 pm
   Melbourne, ADR 0089):** anyone can request a collective service; any member plans the
   request into an activity with the roles it needs (it goes ahead once they're filled) or
