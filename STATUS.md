@@ -113,7 +113,16 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   - `FeedSurface`'s `accent` prop draws nothing now; `LinksSection`, `LinkRequestsSection`,
     `LinkVoteHistory`, `DiscussionPage` and `MapDiscoveryCard` still pass it. Drop it when
     convenient.
-- **Next here:** mockups, then builds, of the create menu, the More sheet, bare icon buttons
+- **Checked (2026-11-12, local seed node, 390px):** `npm run check -w ui` (0 errors), lint,
+  boundaries, sizes; `check-fast.sh` on main after the pull; screenshots at 360, 390 and
+  desktop in light and dark; `shell`, `guests`, `help-requests`, `follows`,
+  `private-events`, `messages`, `threads` **passed**. Not run: scenarios (no Rust change),
+  the other browser tests.
+- **`notifications.mjs` fails locally on `main` too** (2026-11-12, `0bcc9e5`, fresh node,
+  twice on this branch and once with main's `ui/` and `tests/`): Ann never gets "Replied to
+  your project" after Bob writes in her project's chat, while a thread's "Replied to your
+  comment" does arrive. Not caused by this branch; for the parity session to look at.
+- **Next here:** builds of the create menu, the More sheet, bare icon buttons
   and the right-rail cards; then post comments; image posts need their own ADR (a post's
   charter has no attachment field: most likely an integrity change, so the owner decides when).
 
