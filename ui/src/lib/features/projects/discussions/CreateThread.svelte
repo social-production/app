@@ -23,11 +23,11 @@
 
   const missing = $derived(
     step === 0
-      ? [!title.trim() && 'thread title', !body.trim() && 'opening post'].filter(
+      ? [!title.trim() && 'Thread title', !body.trim() && 'Opening post'].filter(
           (m): m is string => !!m,
         )
       : tags.length === 0
-        ? ['a primary tag']
+        ? ['Primary tag']
         : [],
   );
 
@@ -71,7 +71,7 @@
     </div>
   {:else}
     <div class="form-stack">
-      <ScopeTagsStep {tags} onChange={(t) => (tags = t)} helperText="Required." choosePrimary />
+      <ScopeTagsStep {tags} onChange={(t) => (tags = t)} variant="thread" />
       {#if tags.length === 0}
         <p class="status-note">Add one primary channel or community tag.</p>
       {/if}

@@ -71,7 +71,7 @@ export class EventCreateState extends CreateState {
 
   /** web: public events need at least one channel or community tag; private ones none. */
   protected override scopeNeeded(): string {
-    return this.isPrivate || this.tags.length > 0 ? '' : 'a channel or community tag';
+    return this.isPrivate || this.tags.length > 0 ? '' : 'Channel or community tag';
   }
 
   /** People matching `query` by name, not yourself (as the compose sheet searches). */

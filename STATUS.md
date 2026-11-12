@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 4:20 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -146,6 +146,33 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   code-health items; (d) ADRs first for image posts (a post's charter has no attachment
   field: most likely an integrity change) and for creation through plans (ADR 0059 plus the
   owner's 2026-11-12 notes in UX.md; needs a project-network reset). Neither is started.
+
+## Owner direction (2026-11-12): UX in parallel; moderators are parity
+- A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
+  `claude/ux-*` branch. Split: UX owns the shell's bottom nav, feed cards, polish and
+  code-health splits; parity owns project/event/scope pages, the Platform channel and
+  moderators, and SEEDLESS (native, zomes). Each keeps its own "In flight" entry here and
+  merges `main` often. UX overrides of ported styles go in new files, not the generated
+  PORTS files (which `port-styles.py` rewrites).
+- Moderators (web's platform board) are parity, with the Platform channel: PARITY.md.
+
+## In flight 2026-11-12: create flows compared with web (PARITY item 10), branch `claude/social-production-handoff-dsam61`
+UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
+(PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:
+project / event / thread / help; an event's "Channel tags" + "Add communities", a help
+request's required "Primary tag type" with always-shown extra fields), the Overview's tag row
+reads "N channels · M communities" (`tagCounts` in `domain/scopes.ts`), and "Still needed:"
+uses web's capitalised names. `tests/e2e/lib.mjs` `continueSteps` also tags an event's
+"Channel tags" field (labels now match exactly).
+**Found:** the Platform channel (PARITY "Whole web pages"): web's `/platform` is the
+`platform` channel's feed and `#platform` projects vote with the whole network. The app has a
+stub. Next parity item after this PR; it needs an ADR first.
+Checked: `npm run check -w ui` (0 errors, 0 warnings), `npm run lint -w ui`, boundaries, sizes.
+Browser tests against a local seed node (`cloud-seed.sh`): `projects`, `events`,
+`help-requests`, `threads` all pass (`projects` timed out signing in on the cold node first,
+then passed). Not run: scenarios (no zome change). Lesson: a debug `cloud-seed.sh` build filled
+the disk (target 24 GB); run it with `CARGO_PROFILE_DEV_DEBUG=0`, and after `rm -rf target`
+also delete `happ/social_production.happ` so the zomes rebuild.
 
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
