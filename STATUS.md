@@ -122,9 +122,17 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   twice on this branch and once with main's `ui/` and `tests/`): Ann never gets "Replied to
   your project" after Bob writes in her project's chat, while a thread's "Replied to your
   comment" does arrive. Not caused by this branch; for the parity session to look at.
-- **Next here:** builds of the create menu, the More sheet, bare icon buttons
-  and the right-rail cards; then post comments; image posts need their own ADR (a post's
-  charter has no attachment field: most likely an integrity change, so the owner decides when).
+- **Second piece, branch `claude/ux-controls` (stacked on `claude/ux-nav-feed`, PR #148), ADR
+  0097:** bare icon buttons (top bar, map filter capsule, left rail pills), the create menu
+  and More menu as floating panels, theme default System with a switch in More, right-rail
+  cards without the type stripe and History rows with an outcome stripe. All overrides start
+  with `.shell` (the ported sheets load lazily, so plain overrides lose by load order).
+  **ADR number 0097 is taken too.**
+- **Next here:** flat (Twitter-style) comments on posts; threads keep nested comments. Then
+  UX.md's code-health items. Image posts need their own ADR (a post's charter has no
+  attachment field: most likely an integrity change, so the owner decides when). Content
+  creation through plans (ADR 0059, owner's notes in UX.md) needs a project-network reset
+  and is not started.
 
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA

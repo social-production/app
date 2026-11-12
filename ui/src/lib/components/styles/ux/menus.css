@@ -1,0 +1,266 @@
+/* The create menu and the phone's More menu (ADR 0097): floating panels in the nav capsule's
+   style. The create menu's rules override the ported fab.css. */
+
+.float-panel,
+.shell .create-fab .create-menu {
+  box-sizing: border-box;
+  padding: 8px;
+  border: 1px solid var(--float-border);
+  border-radius: 26px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+  animation: float-panel-in 0.18s ease;
+  transform-origin: bottom right;
+}
+
+@keyframes float-panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+}
+
+.float-panel-item,
+.shell .create-fab .create-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 48px;
+  padding: 0 14px;
+  border-radius: 18px;
+  color: var(--text-main);
+  font-size: 15.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.float-panel-item svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  color: var(--text-soft);
+}
+
+.float-panel-item:active,
+.shell .create-fab .create-menu-item:active {
+  background: var(--brand-soft);
+  transform: scale(0.97);
+}
+
+.float-panel-item.active-link {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .float-panel-item:hover {
+    background: var(--brand-soft);
+  }
+}
+
+.float-panel-sep {
+  height: 1px;
+  margin: 6px 14px;
+  background: var(--panel-border);
+}
+
+/* Create menu: one line per item, no descriptions, no section titles. */
+.shell .create-fab .create-menu {
+  display: block;
+  width: 236px;
+  overflow: visible;
+}
+
+.shell .create-fab .create-menu-body {
+  gap: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.shell .create-fab .item-description,
+.shell .create-fab .menu-close {
+  display: none;
+}
+
+.shell .create-fab .item-label {
+  font-size: 15.5px;
+  font-weight: 600;
+}
+
+.shell .create-fab .create-menu-icon-wrap .create-menu-icon {
+  width: 22px;
+  height: 22px;
+  color: var(--text-soft);
+}
+
+.shell .create-fab .menu-kicker {
+  height: 0;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-size: 0;
+}
+
+.shell .create-fab .menu-kicker-separated {
+  height: 1px;
+  margin: 6px 14px;
+  padding: 0;
+  border: none;
+  background: var(--panel-border);
+}
+
+.shell .create-fab .fab-button {
+  transition:
+    transform 0.2s ease,
+    background-color 0.16s ease;
+}
+
+.shell .create-fab .fab-button:active {
+  transform: scale(0.92);
+}
+
+.shell .create-fab .fab-button-open {
+  border: none;
+  background: var(--brand);
+  color: var(--on-brand);
+  box-shadow: 0 8px 24px color-mix(in srgb, var(--brand) 35%, transparent);
+}
+
+@media (max-width: 760px) {
+  /* Undo the ported full-screen sheet: the panel stays anchored above the plus. */
+  .shell .create-fab-shell.menu-open {
+    inset: auto;
+    right: 12px;
+    bottom: calc(
+      var(--shell-bottom-nav-offset, 0px) + var(--detail-action-dock-height, 0px) + 12px
+    );
+    z-index: var(--z-sheet);
+    display: grid;
+    width: auto;
+    height: auto;
+  }
+
+  .shell .create-fab .create-menu {
+    position: static;
+    width: 236px;
+    height: auto;
+    max-height: none;
+    padding: 8px;
+    border: 1px solid var(--float-border);
+    border-radius: 26px;
+  }
+
+  .shell .create-fab .create-menu-body {
+    padding: 0;
+  }
+
+  .shell .create-fab .create-menu-item {
+    min-height: 48px;
+    padding: 0 14px;
+  }
+
+  .shell .create-fab .sheet-close {
+    display: none;
+  }
+
+  .shell .create-fab .fab-button-open {
+    display: inline-flex;
+  }
+}
+
+/* Every icon takes the same slot, so the labels line up. */
+.shell .create-fab .create-menu-icon-wrap {
+  flex: none;
+  width: 22px;
+}
+
+/* More menu. The plus button steps aside while it is open. */
+.shell:has(.more-panel-root) .create-fab {
+  display: none;
+}
+
+.more-panel-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-shell-nav) - 2);
+  padding: 0;
+  border: none;
+  background: var(--shell-scrim);
+}
+
+.more-panel {
+  position: fixed;
+  left: calc(var(--shell-nav-margin-x) + var(--shell-safe-left));
+  right: calc(var(--shell-nav-margin-x) + var(--shell-safe-right));
+  bottom: calc(var(--shell-bottom-nav-height) + 2px);
+  z-index: calc(var(--z-shell-nav) - 1);
+  display: flex;
+  flex-direction: column;
+}
+
+.more-panel-me {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 18px;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.more-panel-me:active,
+.more-panel-me.active-link {
+  background: var(--brand-soft);
+}
+
+.more-panel-me-copy {
+  display: grid;
+  min-width: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.more-panel-me-copy strong {
+  overflow-wrap: anywhere;
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.more-panel-theme {
+  display: flex;
+  gap: 2px;
+  margin: 4px 8px 6px;
+  padding: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-main) 8%, transparent);
+}
+
+.more-panel-theme button {
+  flex: 1 1 0;
+  min-height: 36px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.more-panel-theme button.on {
+  background: var(--panel);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .float-panel,
+  .shell .create-fab .create-menu {
+    animation: none;
+  }
+}
