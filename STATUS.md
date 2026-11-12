@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 4:20 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,7 +82,15 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), branch `claude/social-production-handoff-dsam61`
+## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
+In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
+hashes unchanged (no reset), UI 200, bootstrap `/health` 200, **live `shell.mjs` passed**.
+CI: the Linux desktop smoke failed once on the known slow-runner `set_profile` get_links
+timeout (see PR #142's lesson below); one re-run passed. Everything else green first time.
+**Next:** parity (PARITY summary: item 10, screens not compared yet; Deactivate account with
+the next directory reset), with SEEDLESS step 4 (archivist + index on every full node, the
+biggest piece) as the next background item. Optional for 3b: a CI job with three desktop
+apps (one helping, Railway's bootstrap blocked) for the end-to-end test.
 **No DNA change** (health *coordinator*, native, UI): `hc dna hash` of all three DNAs equals the
 live seed's `/readyz`. No network reset.
 - **Settings → Network → Help the network** (desktop only, `HelpNetworkSettings.svelte`): a
@@ -108,8 +116,6 @@ live seed's `/readyz`. No network reset.
 - Not tested: three desktops finding each other through one's server with Railway's off
   (needs machines with displays and a forwarded port; ADR 0094's consequences), and whether
   iroh peers dial a plain `http://` relay across real routers (if not, helpers need https).
-- **Next:** open the PR (it also carries the 10:55 am README/STATUS docs commit), CI, merge,
-  live smoke (`/readyz` hashes unchanged; desktop smoke in CI). Then parity (PARITY summary).
 
 ## Done 2026-11-12: geocoding from the device (SEEDLESS step 5, ADR 0093), PR #144 merged 23:31 UTC Nov 11 (10:31 am Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 23:46 UTC = 10:46 am): UI 200,
