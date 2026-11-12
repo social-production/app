@@ -107,8 +107,12 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   create (ADRs updated). Coordinator: `get_board`, `volunteer_board`, `vote_board`,
   `is_moderator`, `record_active`, `weekly_active`, `deactivate_account`, `deactivated_since`,
   test-only `submit_active_link` (`board.rs`, `active.rs`, `deactivation.rs`, `board_api.rs`).
-  Scenario `tests/scenarios/tests/board.rs`. **Next:** project integrity (the fixed `platform`
-  channel in `sp_scope`/`charter.rs`, platform-tagged voters), the UI calling `record_active`
+  Scenario `tests/scenarios/tests/board.rs` **passes locally** (`cloud-nix` + no-IPv6 shim, 7.8 min).
+  Project integrity: `sp_scope::{PLATFORM, PLATFORM_DESCRIPTION, is_platform, check_platform}`;
+  a `platform` channel charter is valid only with web's exact description, open, no tags, in
+  the commons; the Platform channel takes no proposals (`governance.rs`). Unit tests pass.
+  **Next:** platform-tagged voters (any Full member votes;
+  population as ADR 0095), a scenario creating the Platform channel, the UI calling `record_active`
   after meaningful actions and refusing deactivated sign-ins, then `/platform` + the board UI.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
