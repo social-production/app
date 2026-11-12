@@ -10,6 +10,7 @@
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
   import { EventCreateState } from './eventCreateState.svelte.ts';
   import type { EventAudience } from '#lib/domain/projects.ts';
+  import { tagCounts } from '#lib/domain/scopes.ts';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -36,8 +37,8 @@
   );
 
   function blocker(step: string, audience: EventAudience): string {
-    if (step === 'plan') return 'plan details';
-    return audience === 'private_community' ? 'a private community' : 'invites';
+    if (step === 'plan') return 'Plan details';
+    return audience === 'private_community' ? 'Private community' : 'Invites';
   }
 
   async function publish(): Promise<void> {
@@ -82,7 +83,7 @@
     />
   {:else if s.stepId === 'scope' && !s.isPrivate}
     <div class="form-stack">
-      <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} helperText="" />
+      <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} variant="event" />
       {#if s.tags.length === 0}
         <p class="status-note">Public events need at least one channel or community tag.</p>
       {/if}
@@ -166,7 +167,7 @@
             {s.invitees.length} invites{#if s.organizers.length}
               · {s.organizers.length} organizers{/if}
           {:else}
-            {s.tags.length} {s.tags.length === 1 ? 'tag' : 'tags'}
+            {tagCounts(s.tags)}
           {/if}
         </span>
       </button>

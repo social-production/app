@@ -48,6 +48,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088
    (owner 2026-11-10: in the directory), not built yet (a directory reset).
    web's Change password doesn't apply (passkeys and the recovery phrase).
+   The seven create flows were compared with web's source 2026-11-12 (see "Create flows").
 
 ## Shell (phone)
 - [x] More opens web's `MobileMoreSheet` (profile or Sign in, Settings, About), not the left
@@ -169,6 +170,22 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   "hide … from non-followers / personal feeds" switches wait for personal posts and the
   personal feed.
 
+## Create flows (compared with web's `features/create/**` source, 2026-11-12)
+- [x] Each flow's scope step has web's own layout: a project's primary channel then "Add more
+  channels or communities"; an event's "Channel tags" then "Add communities" (no primary
+  tag); a help request's required "Primary tag type" with always-shown additional fields
+  ("Type to add another channel", "Optional."); a thread's as before. The extra fields open
+  by themselves when they already hold tags, as on web.
+- [x] The Overview's tag row reads web's "N channels · M communities" (projects, public
+  events, help requests), not "N tags".
+- [x] "Still needed:" uses web's capitalised field names (Title, Description, Location,
+  Channel). The app also names what blocks steps where web only disables Continue (an
+  event's plan, community or invites; a thread's or scope's fields), in the same style.
+- Not parity: web's `?channel=` / `?community=` prefill (only its dead `ScopeCreateMenu`
+  builds those links), and web's "a personal service cannot use the Platform channel" (the
+  app has no Platform channel; feedback lives on the Feedback page).
+- Not compared on screen: web's create pages need an account on the FastAPI site.
+
 ## Project page: Activity phase (M5b, ADR 0056)
 - [x] Calendar card with Add activity, the creation wizard, agenda rows by day, the activity
   sheet with roles (Take/Leave, Suggest someone, Decline), Share activity.
@@ -200,8 +217,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   platform, `FeedCardTop` + `ScopeGlyph`) and opens its page; "+N" opens web's `ScopeSheet`.
 - [x] Channels and communities (M5d, ADR 0068, 2026-10-29, parts a–c): create pages, scope
   pages with join/members and their tagged items, create-menu Surfaces, left-rail lists, the
-  scope step in create flows. Still to come: Discover sheet, closed
-  communities and invites, settings and vote sheets.
+  scope step in create flows. The Discover sheet (PR #75), closed communities and invites, and
+  the settings and vote sheets (PR #77) followed.
 
 ## Whole web pages the app doesn't have yet (route diff, 2026-10-31)
 - [x] Posts and threads (2026-10-31, ADR 0070): `create/post`, `create/thread`, `/posts/<id>`,
@@ -255,6 +272,22 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
 - [x] Software project governance (pull requests / merge flow) in the Activity phase
   (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved`: 2026-11-09, ADR 0087).
+- [ ] **The Platform channel** (found 2026-11-12): web's `/platform` is the `platform`
+  channel's scope page (`DirectoryFeedLayout`: description "The channel for the whole
+  network…", Follow, its projects and events; web-backend `services/platform.py` creates the
+  channel on demand). Projects tagged `#platform` take the whole network as their vote
+  population (`gates.py`: any signed-in user votes; `resolve_project_vote_population`), and a
+  personal service can't use the tag. The app reserves the slug (`domain/scopes.ts`), shows a
+  stub at `/platform`, and links `#platform` tags there. Needs an ADR (who may create the
+  channel record; the population rule is a governance change).
+- [ ] **Moderators** (owner, 2026-11-12: "we also don't have moderators"; this overrides the
+  2026-10-31 note that filed the platform board under asset management): web's moderator board
+  on the Platform page (`features/platform/board/*`: moderators and candidates, volunteer,
+  `castModeratorVote`, "How moderator roles work": moderators execute approved platform
+  outcomes, standing follows the weekly active platform vote context, a one-week grace period),
+  the Platform header's Moderators button and the left rail's "Moderators" link. web-backend:
+  `services/board.py` (`list_board_standing`), `platform_board_memberships`. Port together
+  with the Platform channel, one ADR for both.
 - Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
   the platform board, asset-use requests) comes later.
 - web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the

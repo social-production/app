@@ -6,6 +6,7 @@
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import TypeSelector from '#lib/components/create/TypeSelector.svelte';
   import { PROJECT_TYPES, REQUEST_MODES } from '#lib/domain/projects.ts';
+  import { tagCounts } from '#lib/domain/scopes.ts';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
@@ -103,7 +104,7 @@
         <strong>Location</strong><span>{s.locationLabel}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 3)}>
-        <strong>Scope</strong><span>{s.tags.length} {s.tags.length === 1 ? 'tag' : 'tags'}</span>
+        <strong>Scope</strong><span>{tagCounts(s.tags)}</span>
       </button>
       {#if s.message}<p class="status-note">{s.message}</p>{/if}
     </div>

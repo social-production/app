@@ -64,19 +64,19 @@ export class CreateState {
   );
   readonly missing = $derived.by(() => {
     if (this.stepId === 'basics') {
-      return [!this.title.trim() && 'title', !this.description.trim() && 'description'].filter(
+      return [!this.title.trim() && 'Title', !this.description.trim() && 'Description'].filter(
         (m): m is string => !!m,
       );
     }
     if (this.stepId === 'location' && this.intent === 'physical' && !this.place.trim())
-      return ['place'];
+      return ['Location'];
     if (this.stepId === 'scope' && this.scopeNeeded()) return [this.scopeNeeded()];
     return [];
   });
 
   /** web: a project needs a channel tag (events override it); '' when nothing is needed. */
   protected scopeNeeded(): string {
-    return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : 'a channel tag';
+    return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : 'Channel';
   }
 
   /** The picked place's label (cut to the records' limit, as the old field's maxlength was). */
