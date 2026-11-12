@@ -82,6 +82,21 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight (UX) 2026-11-12: bottom nav + feed cards, branch `claude/ux-nav-feed` (owner's PC session)
+- The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
+  on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
+  polish, image posts and UX.md's code-health items. It does not touch project/event detail
+  pages or their dock, channel/community/platform pages, `native/`, `zomes/`, `dnas/`, `crates/`.
+- **Waiting on the owner (8:26 pm Melbourne):** mockups of the nav capsule and the feed rows
+  are published for review (https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd, private to the
+  owner). Nothing is built yet; no ADR yet (one per decision once the owner says OK).
+- Owner, same evening: Twitter's mobile app is the styling reference; icon buttons without
+  labels or boxes (the map's and both rails' buttons should lose theirs); the create (FAB)
+  menu and the phone More sheet need a redesign too. Mockups for those come next.
+- Overrides of ported styles will go in `ui/src/lib/components/styles/ux/*.css`, loaded after
+  the generated files.
+- Needs from parity: none so far.
+
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
 hashes unchanged (no reset), UI 200, bootstrap `/health` 200, **live `shell.mjs` passed**.
