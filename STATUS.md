@@ -82,6 +82,19 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
+**Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
+design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`
+projects voted on by every Full member, moderators from `BoardCandidacy` / `BoardVotes`
+directory links replayed by a new `crates/sp_board`, their merge capability on platform
+software projects, web's `PlatformBoardPanel` on `/platform` and the rail's Moderators link.
+**Owner, 2026-11-12: quorum must come from active participation**, not "voters on this item":
+ADR 0095's weekly `Active` link per Full member (directory), counted by any reader (full nodes
+hold them all), snapshotted per proposal (ADR 0033) with ADR 0040's challenge window. It also
+replaces ADR 0071's and 0074's populations. Ship with ADR 0088 (deactivation) in one
+directory + project reset. Order: `sp_board` + the active count (pure crates, unit tests),
+directory integrity, coordinators + scenarios, UI, browser tests.
+
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
   `claude/ux-*` branch. Split: UX owns the shell's bottom nav, feed cards, polish and
@@ -91,7 +104,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   PORTS files (which `port-styles.py` rewrites).
 - Moderators (web's platform board) are parity, with the Platform channel: PARITY.md.
 
-## In flight 2026-11-12: create flows compared with web (PARITY item 10), branch `claude/social-production-handoff-dsam61`
+## Done 2026-11-12: create flows compared with web (PARITY item 10), PR #147 merged 11:00 UTC (10:00 pm Melbourne)
 UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
 (PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:
 project / event / thread / help; an event's "Channel tags" + "Add communities", a help
