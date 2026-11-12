@@ -34,7 +34,6 @@
   class="mobile-bottom-nav"
   class:chrome-collapsed={collapsed}
   aria-hidden={collapsed}
-  style={`--bottom-nav-slots: ${tabs.length + 1}`}
 >
   <!-- eslint-disable svelte/no-navigation-without-resolve -- hrefs arrive resolved (ResolvedPathname) -->
   {#each tabs as tab (tab.href)}
@@ -45,12 +44,14 @@
       href={tab.href}
       onclick={onNavigate}
     >
-      <span class="bottom-nav-icon" aria-hidden="true">
+      <span class="bottom-nav-icon">
         <ToolbarIcon name={tab.icon} />
+        {#if tab.badge && tab.badge > 0}
+          <CountBadge count={tab.badge} />
+        {/if}
       </span>
-      {#if tab.badge && tab.badge > 0}
-        <CountBadge count={tab.badge} />
-      {/if}
+      {#if isActive(tab.href)}<span class="bottom-nav-label" aria-hidden="true">{tab.label}</span
+        >{/if}
     </a>
     <!-- eslint-enable svelte/no-navigation-without-resolve -->
   {/each}
@@ -68,36 +69,33 @@
     <span class="bottom-nav-icon" aria-hidden="true">
       <ToolbarIcon name="more" />
     </span>
+    {#if moreActive}<span class="bottom-nav-label" aria-hidden="true">More</span>{/if}
   </button>
 </nav>
 
 <style>
   /*
-    The bar still paints through the home-indicator band. Icons sit at the
-    bottom of that band, lifted only --shell-nav-button-lift, so the strip
-    under them is not an empty gap.
+    ADR 0095: a floating capsule, not an edge-to-edge bar. The page scrolls under it and
+    shows through the blur; the current tab is a tinted pill that names itself.
   */
   .mobile-bottom-nav {
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: calc(var(--shell-nav-margin-x) + var(--shell-safe-left));
+    right: calc(var(--shell-nav-margin-x) + var(--shell-safe-right));
+    bottom: calc(var(--shell-nav-margin-bottom) + var(--shell-safe-bottom));
     z-index: var(--z-shell-nav);
-    width: 100%;
-    max-width: 100%;
     box-sizing: border-box;
-    display: grid;
-    grid-template-columns: repeat(var(--bottom-nav-slots, 5), minmax(0, 1fr));
-    align-content: end;
-    gap: 2px;
-    height: var(--shell-bottom-nav-height);
-    min-height: var(--shell-bottom-nav-height);
-    max-height: var(--shell-bottom-nav-height);
+    display: flex;
+    gap: 4px;
+    height: var(--shell-nav-capsule-height);
     margin: 0;
-    padding: 0 var(--shell-safe-right) var(--shell-nav-button-lift, 0px) var(--shell-safe-left);
-    border: none;
-    border-top: 1px solid var(--panel-border);
-    background: var(--toolbar-background);
+    padding: 6px;
+    border: 1px solid var(--float-border);
+    border-radius: 999px;
+    background: var(--float-background);
+    box-shadow: var(--float-shadow);
+    -webkit-backdrop-filter: var(--float-blur);
+    backdrop-filter: var(--float-blur);
     transition:
       transform 0.22s ease,
       visibility 0s;
@@ -105,7 +103,9 @@
   }
 
   .mobile-bottom-nav.chrome-collapsed {
-    transform: translateY(100%);
+    transform: translateY(
+      calc(100% + var(--shell-nav-margin-bottom) + var(--shell-safe-bottom) + 12px)
+    );
     pointer-events: none;
     visibility: hidden;
     transition:
@@ -114,22 +114,43 @@
   }
 
   .bottom-nav-item {
-    position: relative;
-    display: grid;
-    place-items: center;
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     min-height: 0;
-    height: var(--shell-bottom-nav-base);
     padding: 0;
     border: none;
-    border-radius: 0;
+    border-radius: 999px;
     background: transparent;
     color: var(--text-soft);
+    font-size: 13.5px;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
     transition:
       color 0.16s ease,
-      background-color 0.16s ease;
+      background-color 0.16s ease,
+      transform 0.12s ease;
+  }
+
+  .bottom-nav-item.active-link {
+    flex: 0 0 auto;
+    padding: 0 16px;
+  }
+
+  .bottom-nav-item:active {
+    transform: scale(0.94);
+  }
+
+  .bottom-nav-label {
+    white-space: nowrap;
   }
 
   .bottom-nav-icon {
+    position: relative;
     display: grid;
     place-items: center;
     width: 28px;
@@ -141,17 +162,28 @@
     height: 22px;
   }
 
-  .bottom-nav-item:hover,
   .bottom-nav-item.active-link {
     color: var(--brand-strong);
     background: var(--brand-soft);
     filter: none;
-    transform: none;
   }
 
-  .bottom-nav-item :global(.count-badge) {
+  @media (hover: hover) and (pointer: fine) {
+    .bottom-nav-item:hover {
+      color: var(--brand-strong);
+    }
+  }
+
+  .bottom-nav-icon :global(.count-badge) {
     position: absolute;
-    top: 4px;
-    right: calc(50% - 20px);
+    top: -5px;
+    right: -8px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-bottom-nav,
+    .bottom-nav-item {
+      transition: none;
+    }
   }
 </style>

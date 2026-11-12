@@ -85,7 +85,8 @@
   --shell-safe-left: env(safe-area-inset-left, 0px);
   --shell-safe-right: env(safe-area-inset-right, 0px);
   --shell-touch-min: 44px;
-  --shell-bottom-nav-base: 56px;
+  /* The floating capsule (60px) with its 12px bottom margin and 8px of air above (ADR 0095). */
+  --shell-bottom-nav-base: 80px;
   --shell-bottom-nav-height: calc(var(--shell-bottom-nav-base) + var(--shell-safe-bottom));
   /* How far the tab icons sit above the screen edge. iOS overrides this. */
   --shell-nav-button-lift: 0px;
@@ -240,7 +241,7 @@ body {
     right: 0;
     bottom: calc(-1 * env(safe-area-inset-bottom, 0px));
     height: env(safe-area-inset-bottom, 0px);
-    background: var(--toolbar-background);
+    background: var(--page-background);
     pointer-events: none;
   }
 }
