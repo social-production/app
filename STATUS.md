@@ -101,8 +101,10 @@ live seed's `/readyz`. No network reset.
   announced, Holochain's public. While Railway answers, nothing changes for anyone.
 - Checked here: `npm run check -w ui` (0 errors), `npm run lint -w ui`, boundaries, sizes,
   `cargo test -p native` (9 pass, incl. the real bootstrap server answering `/health` on a free
-  port), `build-happ.sh` + DNA hashes vs live. Running: clippy (native, health) and the
-  `health` scenario (new `announced_servers_reach_other_agents`).
+  port), `build-happ.sh` + DNA hashes vs live, in Nix `cargo clippy -p native -p health -p
+  scenarios --all-targets -D warnings` (clean), `cargo fmt --check`, and the `health` scenario
+  file (3 pass, incl. new `announced_servers_reach_other_agents`). Not run: the other
+  scenario files (untouched) and the desktop smoke (CI's `desktop.yml`).
 - Not tested: three desktops finding each other through one's server with Railway's off
   (needs machines with displays and a forwarded port; ADR 0094's consequences), and whether
   iroh peers dial a plain `http://` relay across real routers (if not, helpers need https).
