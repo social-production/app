@@ -145,7 +145,11 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   tired node. (3) Browser tests not yet run against these branches: everything
   except shell, guests, help-requests, follows, private-events, messages, threads, rail, map,
   accounts (all passed). Feed rows no longer show an author, so any test that reads one from
-  a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above).
+  a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above). (5) **`events.mjs` fails on main too**
+  (2026-11-13, `877ced0`, with main's `ui/` and `tests/`): on the event's Participation tab
+  no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
+  please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
+  `governance`, `guests`.
 - **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
   only runs once the branch has no conflicts), smoke live, update README Status; (b) build
   flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
