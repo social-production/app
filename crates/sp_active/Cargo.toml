@@ -1,0 +1,11 @@
+[package]
+name = "sp_active"
+description = "The weekly active count (ADR 0095): one signed Active link per Full member per week, counted by any reader. Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true
