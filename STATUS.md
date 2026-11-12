@@ -150,10 +150,14 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
   please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
   `governance`, `guests`.
-- **Waiting on the owner (2026-11-13): round 3 mockups** of the project, event and request
-  pages (dock as back button + action capsule, A above the nav or B replacing it; support and
-  oppose as pills in the page; word tabs; phase progress line; request roles as rows):
-  https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
+- **Detail pages, owner's choices so far (2026-11-13):** dock B (the dock replaces the nav
+  capsule inside a project, event or request; a round back button + one action capsule);
+  **Support and Oppose live in the dock, never in the page** ("no buttons in the page"; two
+  rows are fine); the Take part mockup (phase progress line, soft plan cards) and the Request
+  page mockup are approved. **Waiting on the owner:** version 2 of the mockup, where the vote
+  row is a small capsule above the actions and folds into a chip after voting, with Edit and
+  Update under ⋯ then: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
+  owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
 - **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
   only runs once the branch has no conflicts), smoke live, update README Status; (b) build
   flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
