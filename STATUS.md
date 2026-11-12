@@ -82,6 +82,15 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## Owner direction (2026-11-12): UX in parallel; moderators are parity
+- A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
+  `claude/ux-*` branch. Split: UX owns the shell's bottom nav, feed cards, polish and
+  code-health splits; parity owns project/event/scope pages, the Platform channel and
+  moderators, and SEEDLESS (native, zomes). Each keeps its own "In flight" entry here and
+  merges `main` often. UX overrides of ported styles go in new files, not the generated
+  PORTS files (which `port-styles.py` rewrites).
+- Moderators (web's platform board) are parity, with the Platform channel: PARITY.md.
+
 ## In flight 2026-11-12: create flows compared with web (PARITY item 10), branch `claude/social-production-handoff-dsam61`
 UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
 (PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:

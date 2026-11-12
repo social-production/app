@@ -279,8 +279,15 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   population (`gates.py`: any signed-in user votes; `resolve_project_vote_population`), and a
   personal service can't use the tag. The app reserves the slug (`domain/scopes.ts`), shows a
   stub at `/platform`, and links `#platform` tags there. Needs an ADR (who may create the
-  channel record; the population rule is a governance change). The board (`?board=1`) is
-  asset management: not parity.
+  channel record; the population rule is a governance change).
+- [ ] **Moderators** (owner, 2026-11-12: "we also don't have moderators"; this overrides the
+  2026-10-31 note that filed the platform board under asset management): web's moderator board
+  on the Platform page (`features/platform/board/*`: moderators and candidates, volunteer,
+  `castModeratorVote`, "How moderator roles work": moderators execute approved platform
+  outcomes, standing follows the weekly active platform vote context, a one-week grace period),
+  the Platform header's Moderators button and the left rail's "Moderators" link. web-backend:
+  `services/board.py` (`list_board_standing`), `platform_board_memberships`. Port together
+  with the Platform channel, one ADR for both.
 - Not for parity (owner, 2026-10-31): asset management (`platform/assets`, attached assets,
   the platform board, asset-use requests) comes later.
 - web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the
