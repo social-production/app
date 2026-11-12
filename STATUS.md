@@ -94,7 +94,11 @@ uses web's capitalised names. `tests/e2e/lib.mjs` `continueSteps` also tags an e
 `platform` channel's feed and `#platform` projects vote with the whole network. The app has a
 stub. Next parity item after this PR; it needs an ADR first.
 Checked: `npm run check -w ui` (0 errors, 0 warnings), `npm run lint -w ui`, boundaries, sizes.
-Browser tests: see below (filled in once run).
+Browser tests against a local seed node (`cloud-seed.sh`): `projects`, `events`,
+`help-requests`, `threads` all pass (`projects` timed out signing in on the cold node first,
+then passed). Not run: scenarios (no zome change). Lesson: a debug `cloud-seed.sh` build filled
+the disk (target 24 GB); run it with `CARGO_PROFILE_DEV_DEBUG=0`, and after `rm -rf target`
+also delete `happ/social_production.happ` so the zomes rebuild.
 
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
