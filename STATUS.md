@@ -105,6 +105,7 @@ directory integrity, coordinators + scenarios, UI, browser tests.
 - Moderators (web's platform board) are parity, with the Platform channel: PARITY.md.
 
 ## Done 2026-11-12: create flows compared with web (PARITY item 10), PR #147 merged 11:00 UTC (10:00 pm Melbourne)
+Live after the deploy: UI 200, seed node not restarted (UI only, up 4.1 h, 540 MB), **live `shell.mjs` passed**.
 UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
 (PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:
 project / event / thread / help; an event's "Channel tags" + "Add communities", a help
