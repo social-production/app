@@ -155,8 +155,10 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   **Support and Oppose live in the dock, never in the page** ("no buttons in the page"; two
   rows are fine); the Take part mockup (phase progress line, soft plan cards) and the Request
   page mockup are approved. **Waiting on the owner:** version 2 of the mockup, where the vote
-  row is a small capsule above the actions and folds into a chip after voting, with Edit and
-  Update under ⋯ then: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
+  row is a small capsule above the actions and folds into a chip after voting. **Owner: dock
+  actions are icons without words and there is no ⋯ menu button; Support and Oppose keep
+  their words** (version 3 also keeps the word on the one call to action: Join, Sign up, Add
+  plan): https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
   owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
 - **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
   only runs once the branch has no conflicts), smoke live, update README Status; (b) build
