@@ -35,6 +35,13 @@ then launch (no real users before; the FastAPI site is a prototype and gets wipe
 - Right-rail cards: no type stripe. A stripe only on History cards, meaning approved or not.
 - Project and event detail controls (the dock) take the nav capsule's style.
 - Image posts need a place for attachments first (none exists); to be built.
+- Round 2 mockups approved (create menu, More menu, bare icon buttons, rail cards, flat
+  comments on posts); build order is the session's choice.
+- Theme: the default follows the device ("System"); the More menu may carry a quick
+  light/dark switch as well as Settings.
+- Creation (extends ADR 0059): everything public starts as a proposal and becomes a type
+  through its plans. Threads, posts, requests and private events stay separate kinds.
+  "Help request" is renamed "Request".
 - App icon: `assets/logo and app icons/logo dark mode.png` (green, white gears).
 
 ## Creation
