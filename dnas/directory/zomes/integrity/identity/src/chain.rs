@@ -37,7 +37,12 @@ pub(crate) fn typed_entry(record: &Record) -> ExternResult<Option<EntryTypes>> {
 
 /// The action before a create (every create has one: genesis comes first).
 pub(crate) fn prev_action(action: &TypedAction<CreateData>) -> ExternResult<ActionHash> {
-    action.prev_action().cloned().ok_or_else(|| {
+    prev_action_of(action.prev_action())
+}
+
+/// Any action's previous action (only the DNA action has none).
+pub(crate) fn prev_action_of(prev: Option<&ActionHash>) -> ExternResult<ActionHash> {
+    prev.cloned().ok_or_else(|| {
         wasm_error!(WasmErrorInner::Guest(
             "create without a previous action".into()
         ))

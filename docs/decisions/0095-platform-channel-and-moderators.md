@@ -37,9 +37,13 @@ events, and governance.", Follow, and the projects and events tagged with it. we
   the project's member snapshot plus everyone who has voted on that proposal, with web's
   floor (until the weekly active count lands; then that count). A personal service can't carry the tag (create flow and integrity). Project integrity
   change (`sp_governance`'s voter check takes the platform flag).
-- **Moderator records** (directory integrity, `board.rs`): `BoardCandidacy` (the account to
-  itself, tag volunteer / withdraw) and `BoardVotes` (on the candidate, target the voter, tag
-  yes / no / neutral). Written as yourself, never deleted; a newer link replaces an older one.
+- **Moderator records** (directory integrity, `board.rs`): `BoardCandidacy` (from the `board`
+  path to the account, so readers list the board with one read; tag volunteer / withdraw) and
+  `BoardVotes` (on the candidate, target the voter, tag yes / no / neutral; never on yourself,
+  which `sp_board` ignores anyway). Written as yourself, never deleted; a newer link replaces
+  an older one. Only Full members' acts count (web's `ensure_established_voter`), read at the
+  act's time. With nobody active last week the quorum is 0 and a volunteer is seated at once,
+  as on web.
 - **Standing is replayed** (`crates/sp_board`, pure, unit-tested against web-backend's rules):
   candidacies and votes in time order give each person's state (candidate / moderator /
   grace / removed), checked at each act and each week's start, so every reader agrees

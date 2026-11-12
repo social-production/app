@@ -98,8 +98,18 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   (`replay`: candidate / moderator / grace / removed from candidacies and votes; checks at
   each act and each Monday 00:00 UTC so readers agree; 10 tests from board.py's rules) and
   `crates/sp_active` (`week_of`, `counted_week`, `weekly_active`; 3 tests). Checked: `cargo
-  test`, clippy `-D warnings`, fmt, sizes. **Next:** directory integrity (`BoardCandidacy`,
-  `BoardVotes`, `Active` links, plus ADR 0088's `Deactivated`), then coordinators.
+  test`, clippy `-D warnings`, fmt, sizes.
+- **Done on the branch (directory reset, not pushed as a PR yet):** identity integrity
+  `board.rs` (`BoardCandidacy` from the `board` path, `BoardVotes` on an account (never your
+  own), `Active` from `active.<week>` with one per person per week checked on the author's
+  chain, `Deactivated` on yourself; none deletable; a `CloseChain` is valid only right after
+  your own `Deactivated` link). ADR 0088 now closes the chain instead of scanning it on every
+  create (ADRs updated). Coordinator: `get_board`, `volunteer_board`, `vote_board`,
+  `is_moderator`, `record_active`, `weekly_active`, `deactivate_account`, `deactivated_since`,
+  test-only `submit_active_link` (`board.rs`, `active.rs`, `deactivation.rs`, `board_api.rs`).
+  Scenario `tests/scenarios/tests/board.rs`. **Next:** project integrity (the fixed `platform`
+  channel in `sp_scope`/`charter.rs`, platform-tagged voters), the UI calling `record_active`
+  after meaningful actions and refusing deactivated sign-ins, then `/platform` + the board UI.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
