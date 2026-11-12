@@ -14,6 +14,12 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Desktop apps can help the network (PR #145, 2026-11-12 2:21 pm Melbourne, ADR 0094;
+  SEEDLESS step 3b):** Settings → Network → Help the network runs a bootstrap server (with its
+  relay) inside the desktop app on a port you forward, and announces it in the directory.
+  Every desktop saves the announced servers and tries them after Railway's at its next start,
+  so people can still find each other if Railway's bootstrap goes. No reset (only the health
+  coordinator changed).
 - **The desktop app finds places by itself (PR #144, 2026-11-12 10:31 am Melbourne, ADR 0093;
   SEEDLESS step 5):** place search, naming "use my location" and the IP hint run on the
   device (the same code as the gateway's, now the `services/geo` crate), so the place picker
