@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 10:55 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -81,6 +81,33 @@ otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators
 Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
+
+## In flight 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), branch `claude/social-production-handoff-dsam61`
+**No DNA change** (health *coordinator*, native, UI): `hc dna hash` of all three DNAs equals the
+live seed's `/readyz`. No network reset.
+- **Settings → Network → Help the network** (desktop only, `HelpNetworkSettings.svelte`): a
+  switch, the port (8787 suggested) and the public address (`http(s)://host[:port]`, not
+  localhost). `set_help_network` saves `help-network.json` and restarts.
+- **`native/src/helping.rs`:** at start, when on, runs `kitsune2_bootstrap_srv` 0.5.2 (Railway's
+  server, with its iroh relay, QUIC discovery off) in-process on `0.0.0.0:<port>`;
+  `help_network_state` tells Settings whether it runs. This node's own entry is bootstrap
+  `http://127.0.0.1:<port>` + relay by its public address.
+- **Announcing:** health coordinator `announce_server(note)` (a link from path
+  `bootstrap_servers` to the author, the JSON note in the tag, ≤280 bytes) and `list_servers()`
+  (last 14 days, newest first). The UI's `shareServers` (`holo/servers.ts`, run from
+  `attachNative`) announces when helping, then hands every note to native `remember_servers`
+  (`native/src/announced.rs`: checks each address, keeps 8, `announced-servers.json`).
+- **Order at start** (`servers.rs` `with_learned`): saved, Railway, own (when helping),
+  announced, Holochain's public. While Railway answers, nothing changes for anyone.
+- Checked here: `npm run check -w ui` (0 errors), `npm run lint -w ui`, boundaries, sizes,
+  `cargo test -p native` (9 pass, incl. the real bootstrap server answering `/health` on a free
+  port), `build-happ.sh` + DNA hashes vs live. Running: clippy (native, health) and the
+  `health` scenario (new `announced_servers_reach_other_agents`).
+- Not tested: three desktops finding each other through one's server with Railway's off
+  (needs machines with displays and a forwarded port; ADR 0094's consequences), and whether
+  iroh peers dial a plain `http://` relay across real routers (if not, helpers need https).
+- **Next:** open the PR (it also carries the 10:55 am README/STATUS docs commit), CI, merge,
+  live smoke (`/readyz` hashes unchanged; desktop smoke in CI). Then parity (PARITY summary).
 
 ## Done 2026-11-12: geocoding from the device (SEEDLESS step 5, ADR 0093), PR #144 merged 23:31 UTC Nov 11 (10:31 am Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 23:46 UTC = 10:46 am): UI 200,

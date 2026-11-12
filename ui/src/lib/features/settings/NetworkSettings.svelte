@@ -7,6 +7,8 @@
     type NetworkServers,
   } from '#lib/services/network.ts';
 
+  import HelpNetworkSettings from './HelpNetworkSettings.svelte';
+
   /** Desktop only (ADR 0091): which bootstrap/relay server this node uses, and a field to
    * add one (a community copy, docs/RUN-A-BOOTSTRAP.md). Saving restarts the app. */
   let servers = $state<NetworkServers | null>(null);
@@ -87,6 +89,7 @@
           </div>
         </form>
       {/if}
+      <HelpNetworkSettings />
     </div>
   </section>
 {/if}

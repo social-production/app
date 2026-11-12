@@ -1,9 +1,10 @@
 //! The bootstrap/relay servers this device can use, and which one it picked (ADR 0091).
 //!
-//! Order: the one the person saved in Settings, then the shipped list. At start the app asks
-//! each for `/health` (in parallel, a few seconds each) and uses the first that answers; if
-//! none does, the first one, so the node retries it. `SP_BOOTSTRAP_URL` replaces the whole
-//! list (local dev, CI).
+//! Order: the one the person saved in Settings, then Railway's, then this desktop's own server
+//! when it helps the network, then servers other desktops announced (ADR 0094), then
+//! Holochain's public ones. At start the app asks each for `/health` (in parallel, a few
+//! seconds each) and uses the first that answers; if none does, the first one, so the node
+//! retries it. `SP_BOOTSTRAP_URL` replaces the whole list (local dev, CI).
 
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
@@ -69,9 +70,10 @@ pub fn managed_path(data_dir: &Path) -> UserNetworkConfigPath {
     UserNetworkConfigPath(saved_path(data_dir))
 }
 
-/// Pick the server to boot with, and remember the choice for Settings.
-pub fn choose(data_dir: &Path) -> Server {
-    let (candidates, saved, fixed) = candidates(data_dir);
+/// Pick the server to boot with, and remember the choice for Settings. `own` is this
+/// desktop's bootstrap when it helps the network (`helping::start`).
+pub fn choose(data_dir: &Path, own: Option<Server>) -> Server {
+    let (candidates, saved, fixed) = candidates(data_dir, own);
     let current = first_healthy(&candidates).unwrap_or_else(|| candidates[0].clone());
     log::info!(
         "network: using {} (of {})",
@@ -97,7 +99,7 @@ fn shipped() -> Vec<Server> {
         .collect()
 }
 
-fn candidates(data_dir: &Path) -> (Vec<Server>, Option<Server>, bool) {
+fn candidates(data_dir: &Path, own: Option<Server>) -> (Vec<Server>, Option<Server>, bool) {
     if let Ok(url) = std::env::var("SP_BOOTSTRAP_URL") {
         return (vec![Server::same(&url)], None, true);
     }
@@ -115,7 +117,23 @@ fn candidates(data_dir: &Path) -> (Vec<Server>, Option<Server>, bool) {
             None
         }
     };
-    (ordered(saved.clone(), shipped()), saved, false)
+    let known = with_learned(shipped(), own, crate::announced::read(data_dir));
+    (ordered(saved.clone(), known), saved, false)
+}
+
+/// The shipped list with this desktop's own server and the announced ones after the first
+/// (Railway's) and before the last resort.
+pub fn with_learned(
+    shipped: Vec<Server>,
+    own: Option<Server>,
+    announced: Vec<Server>,
+) -> Vec<Server> {
+    let mut rest = shipped.into_iter();
+    let mut list: Vec<Server> = rest.next().into_iter().collect();
+    list.extend(own);
+    list.extend(announced);
+    list.extend(rest);
+    list
 }
 
 /// The saved server first, then the shipped ones, without repeats.
@@ -206,6 +224,17 @@ mod tests {
         let again = ordered(Some(shipped[1].clone()), shipped.clone());
         assert_eq!(again[0], shipped[1]);
         assert_eq!(again.len(), shipped.len());
+    }
+
+    #[test]
+    fn learned_servers_go_between_railway_and_the_last_resort() {
+        let own = Server::same("http://127.0.0.1:8787");
+        let heard = Server::same("http://203.0.113.5:8787");
+        let list = with_learned(shipped(), Some(own.clone()), vec![heard.clone()]);
+        assert_eq!(
+            list,
+            [shipped()[0].clone(), own, heard, shipped()[1].clone()]
+        );
     }
 
     #[test]

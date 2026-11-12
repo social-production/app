@@ -4,6 +4,8 @@
  * these read that choice and save or forget a server (both restart the app).
  */
 
+import type { AppWebsocket } from '@holochain/client';
+
 export interface NetworkServer {
   bootstrap: string;
   relay: string;
@@ -48,4 +50,48 @@ export async function saveNetworkServer(url: string): Promise<void> {
 /** Forget the saved server and restart on the shipped list. */
 export async function resetNetworkServer(): Promise<void> {
   await invoke<null>('reset_network_servers');
+}
+
+/** "Help the network" (ADR 0094): this desktop runs a bootstrap server others can reach. */
+export interface HelpSettings {
+  enabled: boolean;
+  port: number;
+  /** How other people reach it: `http(s)://host[:port]`. */
+  publicUrl: string;
+}
+
+export interface HelpState {
+  settings: HelpSettings;
+  running: boolean;
+  error: string | null;
+  /** What this desktop announces in the directory while its server runs. */
+  announce: NetworkServer | null;
+}
+
+/** Whether this desktop helps, or null outside the app. */
+export function helpNetworkState(): Promise<HelpState | null> {
+  return invoke<HelpState | null>('help_network_state').catch(() => null);
+}
+
+/** Save the choice and restart the app to apply it. */
+export async function setHelpNetwork(settings: HelpSettings): Promise<void> {
+  await invoke<null>('set_help_network', { settings });
+}
+
+interface Announced {
+  note: string;
+}
+
+/**
+ * Once the device's node is connected: announce this desktop's server if it helps, and save
+ * the servers other desktops announced, which the next start tries after Railway's. Best
+ * effort; an older app's directory coordinator has no `list_servers`.
+ */
+export async function shareServers(ws: AppWebsocket): Promise<void> {
+  const call = <T>(fn_name: string, payload: unknown = null): Promise<T> =>
+    ws.callZome<T>({ role_name: 'directory', zome_name: 'health', fn_name, payload });
+  const help = await helpNetworkState();
+  if (help?.announce) await call('announce_server', JSON.stringify(help.announce));
+  const heard = await call<Announced[]>('list_servers');
+  await invoke<number>('remember_servers', { notes: heard.map((a) => a.note) });
 }

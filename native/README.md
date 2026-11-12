@@ -14,7 +14,10 @@ Built on Holochain's official [runtime-tauri](https://github.com/holochain/runti
 Network (ADR 0091, `src/servers.rs`): the server saved in Settings → Network, then the shipped
 list (Railway, then Holochain's public dev servers); the first whose `/health` answers at start
 is used. `SP_BOOTSTRAP_URL` replaces the list (an `http://` URL enables plaintext relay, for
-local dev only).
+local dev only). "Help the network" (ADR 0094, `src/helping.rs`): Settings → Network can run
+Kitsune's bootstrap server (and relay) on a forwarded port; the UI announces it in the directory
+(health zome `announce_server`) and every desktop saves the announced servers
+(`src/announced.rs`), which the next start tries after Railway's.
 
 Build order: `npm run build -w ui`, then `bash scripts/build-happ.sh`, then `cargo run -p native`.
 Mobile (M7): the same crate builds as a library for Android and iOS (`tauri android|ios init`).

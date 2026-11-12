@@ -5773,6 +5773,7 @@ dependencies = [
  "holo_hash",
  "holochain",
  "holochain_types",
+ "kitsune2_bootstrap_srv",
  "log",
  "rand 0.8.8",
  "reqwest 0.12.28",
