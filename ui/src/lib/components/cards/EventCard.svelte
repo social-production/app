@@ -6,8 +6,7 @@
 
   import { resolve } from '$app/paths';
 
-  import ContentMetaRow from './ContentMetaRow.svelte';
-  import CountPill from './CountPill.svelte';
+  import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import SignalStrip from './SignalStrip.svelte';
@@ -18,11 +17,10 @@
    */
   interface Props {
     card: ProjectCard;
-    authorName: string;
     onSignal: (next: Stance | null) => Promise<void>;
   }
 
-  let { card, authorName, onSignal }: Props = $props();
+  let { card, onSignal }: Props = $props();
 
   const href = $derived(resolve('/events/[id]', { id: card.id }));
   const closed = $derived(card.phase === 'Closed');
@@ -38,7 +36,13 @@
     accent={modeAccent(card.mode)}
     contentRestricted={card.moderation === 'hidden'}
   >
-    <FeedCardTop tags={card.tags} stage={card.phase}><CardReport {card} {href} /></FeedCardTop>
+    <FeedCardTop
+      tags={card.tags}
+      stage={card.phase}
+      mode={card.mode}
+      createdAt={card.createdAt}
+      updatedAt={card.lastActivityAt}><CardReport {card} {href} /></FeedCardTop
+    >
     <a class="title" href={resolve('/events/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>
     {#if card.latestUpdate}
@@ -47,32 +51,21 @@
     {#if place}
       <p class="location">{place}</p>
     {/if}
-    <div class="footer">
-      <div class="engagement-row feed-corner-actions">
-        <SignalStrip
-          corner
-          support={card.demand}
-          oppose={card.opposition}
-          mine={null}
-          disabled={closed}
-          {onSignal}
-        />
-        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + web's ?tab=chat -->
-        <a class="comment-link" href={`${href}?tab=chat`}>
-          <CountPill
-            label={`${card.commentCount} ${card.commentCount === 1 ? 'comment' : 'comments'}`}
-          />
-        </a>
-      </div>
-      <div class="footer-meta">
-        <ContentMetaRow
-          {authorName}
-          authorHref={resolve('/profile/[agent]', { agent: card.creator })}
-          memberCount={card.members}
-          createdAt={card.createdAt}
-          updatedAt={card.lastActivityAt}
-        />
-      </div>
-    </div>
+    <FeedActions
+      commentHref={`${href}?tab=chat`}
+      commentCount={card.commentCount}
+      memberCount={card.members}
+      shareHref={href}
+      shareTitle={card.title}
+    >
+      <SignalStrip
+        bare
+        support={card.demand}
+        oppose={card.opposition}
+        mine={null}
+        disabled={closed}
+        {onSignal}
+      />
+    </FeedActions>
   </FeedSurface>
 </div>

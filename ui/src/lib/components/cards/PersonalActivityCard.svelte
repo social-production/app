@@ -4,9 +4,8 @@
 
   import { resolve } from '$app/paths';
 
-  import ContentMetaRow from './ContentMetaRow.svelte';
   import { spaceHref } from './spaceHref.ts';
-  import CountPill from './CountPill.svelte';
+  import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import PersonalFeedIdentity from './PersonalFeedIdentity.svelte';
@@ -37,7 +36,13 @@
     contentRestricted={card.moderation === 'hidden'}
   >
     <div class="card-header">
-      <FeedCardTop stage={card.phase} tags={card.tags}><CardReport {card} /></FeedCardTop>
+      <FeedCardTop
+        stage={card.phase}
+        tags={card.tags}
+        mode={card.mode}
+        createdAt={card.createdAt}
+        updatedAt={card.lastActivityAt}><CardReport {card} /></FeedCardTop
+      >
       <div class="header-row">
         <PersonalFeedIdentity
           name={authorName}
@@ -51,32 +56,20 @@
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
-    <div class="footer">
-      <div class="engagement-row feed-corner-actions">
-        <SignalStrip
-          corner
-          support={card.demand}
-          oppose={card.opposition}
-          mine={null}
-          disabled={!takesSignals(card.mode)}
-          {onSignal}
-        />
-        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + web's ?tab=chat -->
-        <a class="comment-link" href={`${href}?tab=chat`}>
-          <CountPill
-            label={`${card.commentCount} ${card.commentCount === 1 ? 'comment' : 'comments'}`}
-          />
-        </a>
-      </div>
-      <div class="footer-meta">
-        <ContentMetaRow
-          timeOnly
-          {authorName}
-          authorHref={resolve('/profile/[agent]', { agent: card.creator })}
-          createdAt={card.createdAt}
-          updatedAt={card.lastActivityAt}
-        />
-      </div>
-    </div>
+    <FeedActions
+      commentHref={`${href}?tab=chat`}
+      commentCount={card.commentCount}
+      shareHref={href}
+      shareTitle={card.title}
+    >
+      <SignalStrip
+        bare
+        support={card.demand}
+        oppose={card.opposition}
+        mine={null}
+        disabled={!takesSignals(card.mode)}
+        {onSignal}
+      />
+    </FeedActions>
   </FeedSurface>
 </div>

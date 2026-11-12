@@ -14,10 +14,20 @@
     mine: Stance | null;
     docked?: boolean;
     corner?: boolean;
+    /** Feed rows (ADR 0096): no box, drawn arrows, styled by styles/ux/feed.css. */
+    bare?: boolean;
     onSignal: (next: Stance | null) => Promise<void>;
   }
 
-  let { support, oppose, mine, docked = false, corner = false, onSignal }: Props = $props();
+  let {
+    support,
+    oppose,
+    mine,
+    docked = false,
+    corner = false,
+    bare = false,
+    onSignal,
+  }: Props = $props();
 
   let local = $state<{ count: number; mine: Stance | null } | null>(null);
   const shown = $derived(local ?? { count: support - oppose, mine });
@@ -36,14 +46,23 @@
   }
 </script>
 
-<div class="vote-strip" class:docked class:corner>
+<div class={bare ? 'feed-vote' : 'vote-strip'} class:docked class:corner={corner && !bare}>
   <button
     aria-label="Vote up"
     aria-pressed={shown.mine === 'Demand'}
     class:active-up={shown.mine === 'Demand'}
     class="vote-button"
     type="button"
-    onclick={(e) => void click('Demand', e)}>▲</button
+    onclick={(e) => void click('Demand', e)}
+    >{#if bare}<svg aria-hidden="true" viewBox="0 0 24 24" class="feed-vote-icon"
+        ><path
+          d="M12 5.5 5 13h4v5.5h6V13h4L12 5.5Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        /></svg
+      >{:else}▲{/if}</button
   >
   <span
     class:active-up={shown.mine === 'Demand'}
@@ -56,6 +75,15 @@
     class:active-down={shown.mine === 'Oppose'}
     class="vote-button"
     type="button"
-    onclick={(e) => void click('Oppose', e)}>▼</button
+    onclick={(e) => void click('Oppose', e)}
+    >{#if bare}<svg aria-hidden="true" viewBox="0 0 24 24" class="feed-vote-icon"
+        ><path
+          d="M12 18.5 5 11h4V5.5h6V11h4l-7 7.5Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        /></svg
+      >{:else}▼{/if}</button
   >
 </div>
