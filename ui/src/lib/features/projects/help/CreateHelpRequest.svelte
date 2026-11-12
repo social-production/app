@@ -4,6 +4,7 @@
   import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
+  import { tagCounts } from '#lib/domain/scopes.ts';
   import ScopeTagsStep from '../scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
@@ -102,11 +103,7 @@
     </div>
   {:else if s.stepId === 'scope'}
     <div class="form-stack">
-      <ScopeTagsStep
-        tags={s.tags}
-        onChange={(t) => (s.tags = t)}
-        helperText="Required. Help requests must be tagged like threads."
-      />
+      <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} variant="help" />
     </div>
   {:else if s.stepId === 'roles'}
     <section class="roles-block">
@@ -163,7 +160,7 @@
         <strong>Timing</strong><span>{s.schedule}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 3)}>
-        <strong>Scope</strong><span>{s.tags.length} {s.tags.length === 1 ? 'tag' : 'tags'}</span>
+        <strong>Scope</strong><span>{tagCounts(s.tags)}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 4)}>
         <strong>Roles</strong>

@@ -127,7 +127,7 @@ export function ensureTestChannel() {
 /** On a create flow's scope step: types `name` into the tag field labelled `label` and picks it.
  * The index lists a new channel within a few minutes, so keep searching until it does. */
 export async function pickScopeTag(page, label, name) {
-  const field = page.getByLabel(label);
+  const field = page.getByLabel(label, { exact: true });
   const option = page.getByRole('option', { name, exact: true });
   for (let i = 0; ; i++) {
     await field.fill(name);
@@ -147,10 +147,16 @@ export async function tagTestChannel(page, label = 'Primary channel tag') {
   await pickScopeTag(page, label, TEST_CHANNEL);
 }
 
-/** Clicks Continue `n` times, tagging the test channel first whenever it is on a scope step. */
+/** Clicks Continue `n` times, tagging the test channel first whenever it is on a scope step
+ * (a project's or help request's primary channel, or an event's channel tags). */
 export async function continueSteps(page, n = 1) {
   for (let i = 0; i < n; i++) {
-    if (await page.getByLabel('Primary channel tag').count()) await tagTestChannel(page);
+    for (const label of ['Primary channel tag', 'Channel tags']) {
+      if (await page.getByLabel(label, { exact: true }).count()) {
+        await tagTestChannel(page, label);
+        break;
+      }
+    }
     await page.getByRole('button', { name: 'Continue' }).click();
   }
 }
