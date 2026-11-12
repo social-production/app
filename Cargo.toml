@@ -46,6 +46,8 @@ sp_help = { path = "crates/sp_help" }
 sp_discussion = { path = "crates/sp_discussion" }
 sp_moderation = { path = "crates/sp_moderation" }
 sp_bot_review = { path = "crates/sp_bot_review" }
+sp_board = { path = "crates/sp_board" }
+sp_active = { path = "crates/sp_active" }
 sp_scope = { path = "crates/sp_scope" }
 sp_index = { path = "crates/sp_index" }
 geo = { path = "services/geo" }

@@ -94,6 +94,12 @@ hold them all), snapshotted per proposal (ADR 0033) with ADR 0040's challenge wi
 replaces ADR 0071's and 0074's populations. Ship with ADR 0088 (deactivation) in one
 directory + project reset. Order: `sp_board` + the active count (pure crates, unit tests),
 directory integrity, coordinators + scenarios, UI, browser tests.
+- **Done (pure crates, no zome uses them yet, DNA hashes unchanged):** `crates/sp_board`
+  (`replay`: candidate / moderator / grace / removed from candidacies and votes; checks at
+  each act and each Monday 00:00 UTC so readers agree; 10 tests from board.py's rules) and
+  `crates/sp_active` (`week_of`, `counted_week`, `weekly_active`; 3 tests). Checked: `cargo
+  test`, clippy `-D warnings`, fmt, sizes. **Next:** directory integrity (`BoardCandidacy`,
+  `BoardVotes`, `Active` links, plus ADR 0088's `Deactivated`), then coordinators.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own

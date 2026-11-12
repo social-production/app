@@ -42,14 +42,16 @@ events, and governance.", Follow, and the projects and events tagged with it. we
   yes / no / neutral). Written as yourself, never deleted; a newer link replaces an older one.
 - **Standing is replayed** (`crates/sp_board`, pure, unit-tested against web-backend's rules):
   candidacies and votes in time order give each person's state (candidate / moderator /
-  grace / removed). Votes count only from people with Full standing at the time
+  grace / removed), checked at each act and each week's start, so every reader agrees
+  whenever it reads. Votes count only from people with Full standing at the time
   (`full_standing_before`, ADR 0074). Quorum: `required_votes(weekly active)` as web, from
   the participation count below. web's 66% share and 7-day grace are kept.
 - **Weekly active, counted from signed records** (owner 2026-11-12: "a better count for quorum
   based on active participation"): the first meaningful action of each ISO week (a vote, post,
   comment, role taken) writes one `Active` link from path `active.<week>` to the author in the
   directory, signed by them, one per person per week, never deleted. Weekly active = distinct
-  Full members with a link for the last complete week. Any reader can count it; full nodes
+  Full members with a link for the last complete week (`crates/sp_active`: weeks start
+  Monday 00:00 UTC). Any reader can count it; full nodes
   (SEEDLESS step 4) hold the whole set and answer fastest. A proposal snapshots the count when
   it opens (ADR 0033), and ADR 0040's challenge window covers an under-count. This replaces the
   "voters on this item, floor 3" deviations in ADR 0071 (reports) and 0074 (bot reviews), and
