@@ -40,7 +40,11 @@
       <AvatarBadge name={authorName} />
       <div class="post-main">
         <div class="post-head">
-          <a class="header-name" href={resolve('/profile/[agent]', { agent: card.creator })} title={authorName}>{authorName}</a>
+          <a
+            class="header-name"
+            href={resolve('/profile/[agent]', { agent: card.creator })}
+            title={authorName}>{authorName}</a
+          >
           <span class="feed-card-time" title={describeUpdate(card.createdAt, null)}
             >{relativeCompact(card.createdAt)}</span
           >
