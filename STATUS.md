@@ -111,8 +111,11 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   Project integrity: `sp_scope::{PLATFORM, PLATFORM_DESCRIPTION, is_platform, check_platform}`;
   a `platform` channel charter is valid only with web's exact description, open, no tags, in
   the commons; the Platform channel takes no proposals (`governance.rs`). Unit tests pass.
+  Scenario `scopes::the_platform_channel_is_fixed` passes. Regression run passed locally:
+  `scopes`, `identity`, `bot_reviews`. Not run yet: the other scenario shards, UI checks (no
+  UI change yet). No PR yet: open it once the UI part lands (one directory + project reset).
   **Next:** platform-tagged voters (any Full member votes;
-  population as ADR 0095), a scenario creating the Platform channel, the UI calling `record_active`
+  population as ADR 0095), the UI calling `record_active`
   after meaningful actions and refusing deactivated sign-ins, then `/platform` + the board UI.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
