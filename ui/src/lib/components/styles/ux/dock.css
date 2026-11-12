@@ -1,0 +1,339 @@
+/* The detail dock (ADR 0098): a round back button and one capsule of actions in the nav
+   capsule's style, with the Support / Oppose capsule above. It takes the nav's place inside
+   a project, event or request. Overrides of the ported detail.css; every rule starts with
+   `.shell` so load order cannot undo it. */
+
+.shell:has(> .detail-action-dock) .mobile-bottom-nav {
+  display: none;
+}
+
+.shell .detail-action-dock,
+.shell .detail-action-dock:has(.phase-action-group),
+.shell .detail-action-dock:has(.participation-membership),
+.shell .detail-action-dock.is-pad {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0;
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+@media (max-width: 1080px) {
+  .shell .detail-action-dock {
+    left: calc(var(--shell-nav-margin-x) + var(--shell-safe-left));
+    right: calc(var(--shell-nav-margin-x) + var(--shell-safe-right));
+    bottom: calc(var(--shell-nav-margin-bottom) + var(--shell-safe-bottom));
+  }
+}
+
+.shell .dock-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.shell .dock-back,
+.shell .dock-capsule,
+.shell .dock-vote > * {
+  box-sizing: border-box;
+  border: 1px solid var(--float-border);
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+  pointer-events: auto;
+}
+
+.shell .dock-back {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  padding: 0;
+  border-radius: 999px;
+  color: var(--text-main);
+  transition: transform 0.12s ease;
+}
+
+.shell .dock-back svg {
+  width: 24px;
+  height: 24px;
+}
+
+.shell .dock-back:active {
+  transform: scale(0.92);
+}
+
+.shell .dock-capsule {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 2px;
+  min-width: 0;
+  min-height: 54px;
+  padding: 5px;
+  border-radius: 27px;
+}
+
+.shell .dock-capsule:not(:has(button, a)) {
+  display: none;
+}
+
+/* Every control in the capsule is a pill; ported borders and fills go. */
+.shell .dock-capsule button,
+.shell .dock-capsule a {
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  box-shadow: none;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
+}
+
+.shell .dock-capsule button:active:not(:disabled) {
+  transform: scale(0.94);
+}
+
+.shell .dock-icon,
+.shell .dock-capsule .share-button {
+  display: inline-flex;
+  flex: 1 1 44px;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  padding: 0;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.shell .dock-capsule .share-sheet,
+.shell .dock-capsule .share-shell {
+  display: contents;
+}
+
+.shell .dock-capsule .share-button-label {
+  display: none;
+}
+
+.shell .dock-icon .toolbar-icon,
+.shell .dock-capsule .share-button svg {
+  width: 21px;
+  height: 21px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shell .dock-icon:hover,
+  .shell .dock-capsule .share-button:hover {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+}
+
+/* Join / members: a filled call to action until joined, then an icon with the count. */
+.shell .dock-capsule .membership-split,
+.shell .dock-capsule .participation-membership {
+  display: flex;
+  flex: 2 1 96px;
+  width: auto;
+  min-height: 44px;
+  overflow: hidden;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-soft);
+}
+
+.shell .dock-capsule .participation-membership .membership-split {
+  flex: 1 1 auto;
+}
+
+.shell .dock-capsule .membership-split .membership-join,
+.shell .dock-capsule .membership-split .membership-count {
+  flex: 1 1 auto;
+  width: auto;
+  max-width: none;
+  min-width: 44px;
+  padding: 0 12px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shell .dock-capsule .membership-split .membership-join:not(.joined) {
+  flex: 3 1 auto;
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.shell .dock-capsule .membership-split .membership-join.joined .join-text {
+  display: none;
+}
+
+.shell .dock-capsule .membership-split .membership-join.joined {
+  padding-right: 2px;
+}
+
+.shell .dock-capsule .membership-split.joined .membership-count {
+  padding-left: 4px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The folded stance. */
+.shell .dock-chip {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .dock-chip.opposed {
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: var(--danger);
+}
+
+.shell .dock-chip svg {
+  width: 19px;
+  height: 19px;
+}
+
+.shell .dock-chip svg.flipped {
+  transform: rotate(180deg);
+}
+
+/* Vote, and a phase's work actions (PhaseWorkToolbar: Add value, Add plan, Phase…). They keep
+   their words: they are the calls to action. The toolbar's own wrappers dissolve so every
+   action is a pill in the one capsule. */
+.shell .dock-capsule #detail-participation-actions,
+.shell .dock-capsule .phase-action-group,
+.shell .dock-capsule .phase-action-group .adds,
+.shell .dock-capsule .phase-action-group .governance-row,
+.shell .dock-capsule .phase-action-group #phase-nav-vote,
+.shell .dock-capsule .phase-action-group .phase-nav-bar,
+.shell .dock-capsule .phase-action-group .phase-action-slot,
+.shell .dock-capsule .phase-action-group .phase-nav-side,
+.shell .dock-capsule .phase-menu-scope {
+  display: contents;
+}
+
+.shell .dock-capsule .vote-dock {
+  display: flex;
+  flex: 1 1 auto;
+}
+
+.shell .dock-capsule .round-plus-button.round-plus-button.round-plus-button,
+.shell .dock-capsule .phase-shift-button.phase-shift-button.phase-shift-button,
+.shell .dock-capsule .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
+  display: inline-flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: auto;
+  min-height: 44px;
+  margin: 0;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.shell .dock-capsule .round-plus-button.standout.standout.standout,
+.shell .dock-capsule .adds .round-plus-button.round-plus-button.round-plus-button {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.shell .dock-capsule .plus-label,
+.shell .dock-capsule .phase-action-group .label {
+  white-space: nowrap;
+}
+
+/* A request's votes inside the capsule. */
+.shell .dock-capsule .feed-vote {
+  flex: 2 1 auto;
+  justify-content: center;
+  color: var(--text-main);
+}
+
+.shell .dock-capsule .feed-vote button {
+  color: var(--text-main);
+}
+
+.shell .dock-capsule .feed-vote .active-up {
+  color: var(--brand-strong);
+}
+
+.shell .dock-capsule .feed-vote .active-down {
+  color: var(--danger);
+}
+
+/* Support / Oppose above the actions. */
+.shell .dock-vote {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.shell .dock-vote:not(:has(button)) {
+  display: none;
+}
+
+.shell .dock-vote > * {
+  border-radius: 999px;
+  padding: 4px;
+}
+
+.shell .dock-vote .feed-vote {
+  gap: 2px;
+  color: var(--text-main);
+}
+
+.shell .dock-vote .feed-vote button {
+  min-height: 38px;
+  padding: 0 14px;
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shell .dock-vote .feed-vote .signal-percent {
+  font-weight: 800;
+}
+
+.shell .dock-vote .feed-vote .active-support {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .dock-vote .feed-vote .active-oppose {
+  background: color-mix(in srgb, var(--danger) 16%, transparent);
+  color: var(--danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell .dock-back,
+  .shell .dock-capsule button {
+    transition: none;
+  }
+}

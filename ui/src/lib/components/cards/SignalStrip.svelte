@@ -56,6 +56,7 @@
   }
 
   import '#lib/components/styles/cards.css';
+  import '#lib/components/styles/ux/feed.css';
 </script>
 
 <div

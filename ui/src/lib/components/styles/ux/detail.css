@@ -1,0 +1,129 @@
+/* Detail pages (ADR 0098): overrides of the ported detail.css. Tabs are plain words with an
+   underline on phones (as on Twitter's profile page) and a rounded strip on wide screens. */
+
+.shell .top-tab-row.top-tab-row {
+  border-radius: 999px;
+}
+
+.shell .top-tab-row .top-tab.top-tab {
+  border-radius: 999px;
+}
+
+@media (max-width: 1080px) {
+  .shell .top-tab-row.top-tab-row {
+    display: flex;
+    gap: 0;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 60%, transparent);
+    border-radius: 0;
+    background: color-mix(in srgb, var(--toolbar-background) 78%, transparent);
+    -webkit-backdrop-filter: var(--float-blur);
+    backdrop-filter: var(--float-blur);
+    box-shadow: none;
+  }
+
+  .shell .top-tab-row .top-tab.top-tab {
+    position: relative;
+    flex: 0 1 auto;
+    min-width: 0;
+    padding: 13px 2px 12px;
+    border: none;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    color: var(--text-soft);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .shell .top-tab-row .top-tab.active-tab {
+    color: var(--text-main);
+    font-weight: 800;
+  }
+
+  .shell .top-tab-row .top-tab.active-tab::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    border-radius: 4px 4px 0 0;
+    background: var(--brand);
+  }
+
+  .shell .top-tab-row .tab-icon.tab-icon {
+    display: none;
+  }
+}
+
+/* A request's roles: rows in the page with a pill to sign up (ADR 0098). */
+.shell .help-roles-page {
+  margin-top: 20px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.shell .help-roles-page .roles-heading {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.shell .help-roles-page .role-stack {
+  display: block;
+}
+
+.shell .help-roles-page .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 0;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell .help-roles-page .role-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0;
+}
+
+.shell .help-roles-page .role-copy strong {
+  font-size: 15.5px;
+}
+
+.shell .help-roles-page .role-copy span,
+.shell .help-roles-page .role-copy p {
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .help-roles-page .signup.signup {
+  flex: none;
+  width: auto;
+  min-width: 0;
+  min-height: 36px;
+  height: auto;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.shell .help-roles-page .signup.signup.selected,
+.shell .help-roles-page .signup.signup:disabled {
+  background: var(--panel-hover);
+  color: var(--text-main);
+}

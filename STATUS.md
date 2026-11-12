@@ -150,16 +150,33 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
   please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
   `governance`, `guests`.
-- **Detail pages, owner's choices so far (2026-11-13):** dock B (the dock replaces the nav
-  capsule inside a project, event or request; a round back button + one action capsule);
-  **Support and Oppose live in the dock, never in the page** ("no buttons in the page"; two
-  rows are fine); the Take part mockup (phase progress line, soft plan cards) and the Request
-  page mockup are approved. **Waiting on the owner:** version 2 of the mockup, where the vote
-  row is a small capsule above the actions and folds into a chip after voting. **Owner: dock
-  actions are icons without words and there is no ⋯ menu button; Support and Oppose keep
-  their words** (version 3 also keeps the word on the one call to action: Join, Sign up, Add
-  plan): https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
-  owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
+- **Detail pages (owner approved the mockup 2026-11-13; ADR 0098 to be written):** dock B (the
+  dock replaces the nav capsule inside a project, event or request: round back button + one
+  action capsule); Support and Oppose are a small capsule above the actions and **fold into a
+  percentage chip after voting** (tap it to reopen); dock actions are icons without words and
+  **no ⋯ menu button**, except the one call to action (Join, Sign up, Add plan, Vote, Phase)
+  and Support/Oppose; no buttons in the page content of projects and events; tabs are plain
+  words with an underline; Take part gets a phase progress line and soft plan cards; a
+  request's roles are rows in the page with a Sign up pill. "Do all detail phases."
+  Mockup: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the owner).
+- **Work in progress, branch `claude/ux-detail` (stacked on `claude/ux-controls`), pushed,
+  no PR yet:** `DetailActionDock.svelte` (back button, `.dock-capsule`, optional `vote`
+  snippet), `ProjectDock.svelte` (vote capsule + chip, icon Edit/Update),
+  `HelpRolesDock.svelte` (roles in the page, votes + Share in the dock),
+  `PhaseWorkToolbar.svelte` (web's row-packing script removed), `styles/ux/dock.css`,
+  `styles/ux/detail.css` (word tabs, request roles). `npm run check`/lint pass;
+  `governance.mjs` passed with an earlier state of this branch. **Not yet looked at after the
+  last edits:** whether Phase ▾ now shares the row with Add plan / Vote, the request page,
+  the Activity phase dock, the event dock, desktop. **Not started:** phase progress line,
+  plan cards, type + tags line and larger title on Details, when/where icon lines, ADR 0098,
+  tests for the chip. Known: with a stance chip, an open vote and edit rights the capsule
+  wraps to two rows at 390px (left wrapping on purpose).
+- **Screenshot trick used for this:** a temporary, uncommitted hook in `tests/e2e/lib.mjs`
+  `device()`: `if (process.env.UX_SHOTS) setInterval(() => page.screenshot({ path:
+  `${process.env.UX_SHOTS}/${id}-${n++}.png` }), 6000)`, then run any browser test with
+  `UX_SHOTS=<dir>` and crop the bottom 250px of each shot into a contact sheet.
+- Still to do from earlier rounds: notification cards still show a type stripe; the grey
+  type label on rail cards; flat comments on posts (approved, not built).
 - **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
   only runs once the branch has no conflicts), smoke live, update README Status; (b) build
   flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
