@@ -85,8 +85,15 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 ## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
   on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
-  polish, image posts and UX.md's code-health items. It does not touch project/event detail
-  pages or their dock, channel/community/platform pages, `native/`, `zomes/`, `dnas/`, `crates/`.
+  polish, image posts and UX.md's code-health items.
+- **Owner, 2026-11-13: the UX pass also covers project and event detail pages and request
+  pages ("this is very important").** The earlier "don't touch" rule for those pages is
+  lifted; it only existed so two sessions would not edit the same files. So: the UX session
+  restyles them (the dock as capsule-style pill groups first, mockups before building), in
+  `styles/ux/*.css` overrides and small markup changes; the parity session keeps changing
+  their behaviour. **Both: merge main before touching a detail-page file, keep PRs small,
+  and say in your "In flight" entry which detail-page files you have open.** Still off
+  limits for UX: `native/`, `zomes/`, `dnas/`, `crates/` (no integrity changes).
 - **Built on this branch (owner approved the mockups, 2026-11-12 evening):**
   - ADR 0095: the phone nav is a floating blurred capsule; the current tab is a tinted pill
     with its name (`MobileBottomNav.svelte`, `styles/ux/tokens.css`,
@@ -134,9 +141,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   (the page: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd, private to the owner; its
   source is not in the repo, rebuild it if needed).
 - **Known loose ends:** (1) the type label on right-rail cards is grey, not tinted as in the
-  feed (`styles/ux/rail.css`, first rule; cause not found). (2) `projects.mjs` failed once
-  more on `claude/ux-controls` after its author-name fix; the failing step was not read
-  (rerun it and look). (3) Browser tests not yet run against these branches: everything
+  feed (`styles/ux/rail.css`, first rule; cause not found). (2) `projects.mjs` passed on rerun (2026-11-13) after failing once in a long batch on a
+  tired node. (3) Browser tests not yet run against these branches: everything
   except shell, guests, help-requests, follows, private-events, messages, threads, rail, map,
   accounts (all passed). Feed rows no longer show an author, so any test that reads one from
   a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above).
