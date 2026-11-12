@@ -27,6 +27,9 @@ restart costs nothing but a few minutes of re-registration.
 
 - **Yourself:** desktop app → Settings → Network → paste `https://bootstrap.example.org` →
   Save and restart. The app tries it first and falls back to the built-in list.
+- **From the desktop app itself:** Settings → Network → Help the network runs the same server
+  inside the app on a port you forward, and announces it to every desktop (ADR 0094). A
+  server here is better for a machine that stays on.
 - **For everyone:** open a PR adding it to `SHIPPED` in `native/src/servers.rs` (after
   Railway's). Everyone must ship the same order (ADR 0091's consequences).
 

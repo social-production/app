@@ -9,7 +9,8 @@ pub fn config(server: &Server) -> NetworkConfig {
     let mut advanced: serde_json::Value =
         serde_json::from_str(sp_core::network::GOSSIP_TUNING_JSON).unwrap_or_default();
     if server.relay.starts_with("http://") {
-        // Local dev only: production relays are always https.
+        // Local dev, and desktops that help the network on a forwarded port (ADR 0094).
+        // iroh's traffic through a relay is end-to-end encrypted either way.
         advanced["irohTransport"] = serde_json::json!({ "relayAllowPlainText": true });
     }
     NetworkConfig {

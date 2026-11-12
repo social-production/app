@@ -78,7 +78,7 @@ community member can run a gateway later; it is the same seed-node image.
 3. **Several bootstrap/relay URLs** (S; built 2026-11-11, ADR 0091). A list in the app and a Settings field to add one;
    the app tries them in order (`native/src/servers.rs`; the first that answers `/health` at
    start). The guide: `docs/RUN-A-BOOTSTRAP.md`.
-3b. **"Help the network" mode on desktop** (M): the desktop app runs `kitsune2_bootstrap_srv`
+3b. **"Help the network" mode on desktop** (M; built 2026-11-12, ADR 0094: `native/src/helping.rs`, `announced.rs`, the health coordinator's `announce_server`/`list_servers`; the three-desktop test is still to do): the desktop app runs `kitsune2_bootstrap_srv`
    (and `iroh-relay` when given a domain) when the person turns it on and the node is
    reachable; it announces the URL in the directory; every app reads announced URLs into its
    list. Test: two desktops find each other through a third desktop's bootstrap with Railway's

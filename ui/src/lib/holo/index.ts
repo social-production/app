@@ -34,9 +34,13 @@ export {
 export { ACCOUNT_MOVED, GatewayError } from './gateway.ts';
 export { inNativeApp } from './nodes.ts';
 export {
+  helpNetworkState,
   networkServers,
   resetNetworkServer,
   saveNetworkServer,
+  setHelpNetwork,
+  type HelpSettings,
+  type HelpState,
   type NetworkServer,
   type NetworkServers,
 } from './servers.ts';

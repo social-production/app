@@ -8,12 +8,17 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-11)
+## Status (2026-11-12)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The desktop app finds places by itself (PR #144, 2026-11-12 10:31 am Melbourne, ADR 0093;
+  SEEDLESS step 5):** place search, naming "use my location" and the IP hint run on the
+  device (the same code as the gateway's, now the `services/geo` crate), so the place picker
+  works with no seed node. Browsers still use the gateway. No reset. Live place routes
+  checked after the deploy.
 - **Moving a website account to the desktop app (PR #142, 2026-11-12 5:26 am Melbourne,
   ADR 0092; SEEDLESS step 2):** when the desktop app's log-in brings your history over, the
   website stops hosting your account (no more running it in two places). Logging in on the

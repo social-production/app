@@ -14,6 +14,7 @@ import { gatewayApi, GatewayError } from './gateway.ts';
 import { guestRead, guestSeedOf } from './guest.ts';
 import { forgetSession, loadSession, type DeviceSession } from './keys.ts';
 import { describeGateway, homeGateway, inNativeApp } from './nodes.ts';
+import { shareServers } from './servers.ts';
 import { spaceOf } from './spaces.ts';
 
 export type Role = 'directory' | 'project' | 'conversation';
@@ -108,6 +109,7 @@ export async function attachNative(beforeShow?: () => Promise<void>): Promise<Ap
   const agent = (await client.appInfo())?.agent_pub_key;
   await beforeShow?.();
   emit({ status: 'connected', node: 'this device', agent: agent ? encodeHashToBase64(agent) : '' });
+  void shareServers(client).catch((e) => console.warn('bootstrap servers not shared:', e));
   return client;
 }
 

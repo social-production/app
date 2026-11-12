@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 8:41 am Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,9 +82,40 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight 2026-11-12: geocoding from the device (SEEDLESS step 5, ADR 0093), branch `claude/social-production-handoff-dsam61`
-**No DNA change** (gateway, native, UI), so no network reset. A PR is open (see the PR list);
-merge once CI is green, then smoke the live place search (`/locations/search?q=Melbourne`).
+## In flight 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), branch `claude/social-production-handoff-dsam61`
+**No DNA change** (health *coordinator*, native, UI): `hc dna hash` of all three DNAs equals the
+live seed's `/readyz`. No network reset.
+- **Settings → Network → Help the network** (desktop only, `HelpNetworkSettings.svelte`): a
+  switch, the port (8787 suggested) and the public address (`http(s)://host[:port]`, not
+  localhost). `set_help_network` saves `help-network.json` and restarts.
+- **`native/src/helping.rs`:** at start, when on, runs `kitsune2_bootstrap_srv` 0.5.2 (Railway's
+  server, with its iroh relay, QUIC discovery off) in-process on `0.0.0.0:<port>`;
+  `help_network_state` tells Settings whether it runs. This node's own entry is bootstrap
+  `http://127.0.0.1:<port>` + relay by its public address.
+- **Announcing:** health coordinator `announce_server(note)` (a link from path
+  `bootstrap_servers` to the author, the JSON note in the tag, ≤280 bytes) and `list_servers()`
+  (last 14 days, newest first). The UI's `shareServers` (`holo/servers.ts`, run from
+  `attachNative`) announces when helping, then hands every note to native `remember_servers`
+  (`native/src/announced.rs`: checks each address, keeps 8, `announced-servers.json`).
+- **Order at start** (`servers.rs` `with_learned`): saved, Railway, own (when helping),
+  announced, Holochain's public. While Railway answers, nothing changes for anyone.
+- Checked here: `npm run check -w ui` (0 errors), `npm run lint -w ui`, boundaries, sizes,
+  `cargo test -p native` (9 pass, incl. the real bootstrap server answering `/health` on a free
+  port), `build-happ.sh` + DNA hashes vs live, in Nix `cargo clippy -p native -p health -p
+  scenarios --all-targets -D warnings` (clean), `cargo fmt --check`, and the `health` scenario
+  file (3 pass, incl. new `announced_servers_reach_other_agents`). Not run: the other
+  scenario files (untouched) and the desktop smoke (CI's `desktop.yml`).
+- Not tested: three desktops finding each other through one's server with Railway's off
+  (needs machines with displays and a forwarded port; ADR 0094's consequences), and whether
+  iroh peers dial a plain `http://` relay across real routers (if not, helpers need https).
+- **Next:** open the PR (it also carries the 10:55 am README/STATUS docs commit), CI, merge,
+  live smoke (`/readyz` hashes unchanged; desktop smoke in CI). Then parity (PARITY summary).
+
+## Done 2026-11-12: geocoding from the device (SEEDLESS step 5, ADR 0093), PR #144 merged 23:31 UTC Nov 11 (10:31 am Melbourne)
+In flight: nothing. Live after the deploy (seed restarted 23:46 UTC = 10:46 am): UI 200,
+`/locations/search?q=Melbourne`, `/reverse` and `/ip-hint` answer, an empty query → 422
+`invalid_location_search` (the gateway's answers are unchanged after the move to `services/geo`).
+**No DNA change** (gateway, native, UI), so no network reset. CI green on the first run.
 - The gateway's geocoder (`services/gateway/src/geo/`) is now the crate **`services/geo`**
   (package `geo`; not `crates/sp_*`, since it makes HTTP calls). A refusal's status is a `u16`;
   the search checks are `geo::check_search`; `Settings::from_env_for("desktop app")` sets the
@@ -98,7 +129,7 @@ merge once CI is green, then smoke the live place search (`/locations/search?q=M
   `cargo test -p geo` (6 pass), `cargo test -p native places` (1 pass: the checks before any
   network call). Not run: a real desktop place search (needs the desktop app with a display
   and Nominatim; CI's desktop smoke doesn't search places), scenarios (none touched).
-- **Next after merge:** SEEDLESS 3b ("Help the network") alongside parity (PARITY summary:
+- **Next:** SEEDLESS 3b ("Help the network") alongside parity (PARITY summary:
   item 10, screens not compared yet; Deactivate account with the next directory reset).
 
 ## Done 2026-11-12: moving a hosted account to the desktop (SEEDLESS step 2's rest, ADR 0092), PR #142 merged 18:26 UTC Nov 11 (5:26 am Melbourne)
@@ -106,7 +137,7 @@ In flight: nothing. Live after the deploy (seed restarted 18:49 UTC; the UI at 1
 up, bootstrap lists the seed's agents, `POST /account/retire` with junk → 400, live
 `shell.mjs` and **live `retire.mjs` passed** (from a cloud session, Node needs
 `NODE_USE_ENV_PROXY=1 NODE_EXTRA_CA_CERTS=/root/.ccr/ca-bundle.crt` for its own `fetch`).
-**Next:** (5 is in flight, see above) SEEDLESS 3b ("Help the network"), alongside
+**Next:** (5 is done, see above) SEEDLESS 3b ("Help the network"), alongside
 parity (PARITY summary). Optional for step 2: resend a retirement on desktop start when no
 gateway answered at log-in (ADR 0092's consequences).
 - **CI lesson (2026-11-11):** GitHub's Ubuntu runners failed to resolve `security.ubuntu.com`

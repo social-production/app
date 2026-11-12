@@ -3,6 +3,8 @@
 //! so no websocket or admin port is opened. Same UI build as the browser PWA.
 
 mod account;
+mod announced;
+mod helping;
 mod keystore;
 mod network;
 mod places;
@@ -35,6 +37,9 @@ pub fn run() {
             account::account_state,
             account::open_account,
             account::sign_out,
+            announced::remember_servers,
+            helping::help_network_state,
+            helping::set_help_network,
             places::locations,
             servers::network_servers,
             servers::reset_network_servers,
@@ -57,7 +62,8 @@ pub fn run() {
             let data_dir = app.path().app_data_dir()?.join("holochain");
             std::fs::create_dir_all(&data_dir)?;
             let passphrase = keystore::passphrase(&data_dir)?;
-            let server = servers::choose(&data_dir);
+            let own = helping::start(&data_dir);
+            let server = servers::choose(&data_dir, own);
             app.manage(servers::managed_path(&data_dir));
             let config = HolochainPluginConfig::new(data_dir, network::config(&server));
             app.handle()
