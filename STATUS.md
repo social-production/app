@@ -128,11 +128,24 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   cards without the type stripe and History rows with an outcome stripe. All overrides start
   with `.shell` (the ported sheets load lazily, so plain overrides lose by load order).
   **ADR number 0097 is taken too.**
-- **Next here:** flat (Twitter-style) comments on posts; threads keep nested comments. Then
-  UX.md's code-health items. Image posts need their own ADR (a post's charter has no
-  attachment field: most likely an integrity change, so the owner decides when). Content
-  creation through plans (ADR 0059, owner's notes in UX.md) needs a project-network reset
-  and is not started.
+- **Owner approved all of round 2 (2026-11-12, late evening):** create menu, More menu (keep
+  the theme switch), bare icon buttons, right-rail cards, and flat comments on posts (mockup
+  only, not built). The owner likes reviewing mockups: keep publishing them before building
+  (the page: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd, private to the owner; its
+  source is not in the repo, rebuild it if needed).
+- **Known loose ends:** (1) the type label on right-rail cards is grey, not tinted as in the
+  feed (`styles/ux/rail.css`, first rule; cause not found). (2) `projects.mjs` failed once
+  more on `claude/ux-controls` after its author-name fix; the failing step was not read
+  (rerun it and look). (3) Browser tests not yet run against these branches: everything
+  except shell, guests, help-requests, follows, private-events, messages, threads, rail, map,
+  accounts (all passed). Feed rows no longer show an author, so any test that reads one from
+  a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above).
+- **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
+  only runs once the branch has no conflicts), smoke live, update README Status; (b) build
+  flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
+  code-health items; (d) ADRs first for image posts (a post's charter has no attachment
+  field: most likely an integrity change) and for creation through plans (ADR 0059 plus the
+  owner's 2026-11-12 notes in UX.md; needs a project-network reset). Neither is started.
 
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
