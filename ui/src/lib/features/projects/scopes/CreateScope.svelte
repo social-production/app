@@ -27,7 +27,9 @@
   const path = (slug: string) =>
     channel ? resolve('/channels/[slug]', { slug }) : resolve('/communities/[slug]', { slug });
   const missing = $derived(
-    [!check.ok && 'handle', !description.trim() && 'description'].filter((m): m is string => !!m),
+    [!check.ok && `${noun} handle`, !description.trim() && 'Description'].filter(
+      (m): m is string => !!m,
+    ),
   );
 
   async function create(): Promise<void> {

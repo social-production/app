@@ -91,3 +91,13 @@ export function parseInvite(raw: string): string | null {
   }
   return PRIVATE_SEED.test(seed) ? seed : null;
 }
+
+/** web's create-flow overview line for tags: "1 channel · 0 communities". */
+export function tagCounts(tags: string[]): string {
+  const kinds = tags.map((t) => tagScope(t)?.kind);
+  const channels = kinds.filter((k) => k === 'channel').length;
+  const communities = kinds.filter((k) => k === 'community').length;
+  return `${channels} ${channels === 1 ? 'channel' : 'channels'} · ${communities} ${
+    communities === 1 ? 'community' : 'communities'
+  }`;
+}

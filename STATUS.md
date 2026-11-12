@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 4:20 pm Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-12 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -81,6 +81,20 @@ otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators
 Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
+
+## In flight 2026-11-12: create flows compared with web (PARITY item 10), branch `claude/social-production-handoff-dsam61`
+UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
+(PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:
+project / event / thread / help; an event's "Channel tags" + "Add communities", a help
+request's required "Primary tag type" with always-shown extra fields), the Overview's tag row
+reads "N channels · M communities" (`tagCounts` in `domain/scopes.ts`), and "Still needed:"
+uses web's capitalised names. `tests/e2e/lib.mjs` `continueSteps` also tags an event's
+"Channel tags" field (labels now match exactly).
+**Found:** the Platform channel (PARITY "Whole web pages"): web's `/platform` is the
+`platform` channel's feed and `#platform` projects vote with the whole network. The app has a
+stub. Next parity item after this PR; it needs an ADR first.
+Checked: `npm run check -w ui` (0 errors, 0 warnings), `npm run lint -w ui`, boundaries, sizes.
+Browser tests: see below (filled in once run).
 
 ## Done 2026-11-12: "Help the network" (SEEDLESS step 3b, ADR 0094), PR #145 merged 03:21 UTC (2:21 pm Melbourne)
 In flight: nothing. Live after the deploy (seed restarted 03:35 UTC = 2:35 pm): `/readyz` DNA
