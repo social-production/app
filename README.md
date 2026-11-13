@@ -8,12 +8,17 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-12)
+## Status (2026-11-13)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The phone nav floats and feed cards are rows (PR #148, 2026-11-13 6:49 pm Melbourne,
+  ADRs 0096 and 0097; the UX pass, `docs/plans/UX.md`):** the bottom nav is a floating blurred
+  capsule with the current tab as a tinted pill; feed cards are Twitter-style rows with no
+  type stripe, larger text and a spread row of bare actions (comments, votes, members,
+  share). UI only, no reset.
 - **Create flows match web's (PR #147, 2026-11-12 10:00 pm Melbourne):** each create flow's
   tag step has web's own layout (an event's "Channel tags" and "Add communities", a help
   request's "Primary tag type"), the Overview counts channels and communities, and "Still

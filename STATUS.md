@@ -183,7 +183,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   (`UX_SHOTS=<dir>`, optional `UX_VIEW=360x740`, `UX_SCHEME=dark`): it screenshots whenever
   the dock's buttons or the tab change, keeps a rolling `latest-*.png` per device and logs
   page errors to `errors.txt`. The rolling shot is what showed the feed's 500 page.
-- **Leftovers, branch `claude/ux-leftovers` (stacked on `claude/ux-detail`), ADR 0100:**
+- **Leftovers, branch `claude/ux-leftovers` (stacked on `claude/ux-detail`), PR #154, ADR 0100:**
   (1) notification cards and post / thread pages lose the type stripe (`styles/ux/index.css`
   imports `feed.css`; the page's own stripe was a painted background, removed in
   `styles/ux/item.css`); (2) the rail's type label is tinted (`styles/ux/rail.css`);
@@ -210,7 +210,9 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   ~6:55 pm. Before that, both had failed only outside the UI: the Linux desktop smoke's
   sign-up timeout, and scenario shard 5 hitting the 2-hour limit inside `service_requests`
   (on both PRs; if it happens a third time, look at that scenario, not the runner).
-  **Next session: smoke live `shell.mjs` for #148 and update README Status; when green merge
+  Live after #148's deploy (7:20 pm Melbourne): UI 200, **live `shell.mjs` passed** and its
+  screenshots show the floating nav; README Status has #148 (on this branch).
+  **Next session: when green merge
   #150, then #153, then the leftovers PR (each contains the one before, so no further main
   merge is needed unless main moves).** Stop the local seed node if it is still running.
 - **Next here:** (a) the PRs above; (b) UX.md's code-health items; (c) **ask the owner
