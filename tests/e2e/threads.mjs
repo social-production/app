@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, signUp, tagTestChannel } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, signUp, tagTestChannel, feedChoice } from './lib.mjs';
 
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -46,8 +46,7 @@ const bob = await device({ viewport: { width: 390, height: 844 } });
 await signUp(bob, `Reader${stamp}`);
 for (let i = 0; ; i++) {
   await bob.goto(BASE);
-  await bob.getByRole('button', { name: 'Sort public feed by' }).click();
-  await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await feedChoice(bob, 'Sort public feed by', 'Most recent');
   await bob.locator('.surface').first().waitFor({ timeout: 60_000 }).catch(() => {});
   const card = bob.locator('.thread-card', { hasText: title });
   if (await card.count()) {
@@ -150,10 +149,8 @@ log('their profile shows it on the personal post card');
 // posts by people you don't follow; "Following only" leaves those out.
 async function homeShows(page, audience, text) {
   await page.goto(BASE);
-  await page.getByRole('button', { name: 'Choose personal audience' }).click();
-  await page.getByRole('menuitemradio', { name: audience }).click();
-  await page.getByRole('button', { name: 'Sort public feed by' }).click();
-  await page.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await feedChoice(page, 'Choose personal audience', audience);
+  await feedChoice(page, 'Sort public feed by', 'Most recent');
   const card = page.locator('.personal-post-card', { hasText: text });
   return card.first().waitFor({ timeout: 15_000 }).then(() => true, () => false);
 }

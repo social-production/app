@@ -4,6 +4,7 @@
   import ActivityHistory from '#lib/components/activities/ActivityHistory.svelte';
   import ActivityWizard from '#lib/components/activities/ActivityWizard.svelte';
   import DecisionHistoryCard from '#lib/components/governance/DecisionHistoryCard.svelte';
+  import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
   import { activityQuickPicks } from '#lib/domain/activityForm.ts';
   import { dayWindow, planOpen, scheduleDays } from '#lib/domain/eventSchedule.ts';
@@ -89,6 +90,13 @@
     ].sort((a, b) => b.at - a.at),
   );
 
+  // Upcoming and Past as tabs (ADR 0102), in place of web's fold at the bottom.
+  const hasPast = $derived(state.past.length + sw.history.length > 0);
+  const views = [
+    { value: 'upcoming' as const, label: 'Upcoming' },
+    { value: 'past' as const, label: 'Past activity' },
+  ];
+
   $effect(() => {
     state.highlighted = page.url.searchParams.get('activity');
     void state.load();
@@ -118,8 +126,17 @@
         </div>
       {/if}
     {/if}
-    <section class="scheduling-panel">
+    <section class="scheduling-panel" class:showing-past={hasPast && state.showing === 'past'}>
+      {#if hasPast}
+        <SegmentedChoice
+          value={state.showing}
+          ariaLabel="Activities shown"
+          options={views}
+          onChange={(v) => (state.showing = v)}
+        />
+      {/if}
       <ActivityCalendar
+        week
         activities={state.activities}
         selectedDay={state.selectedDay}
         selectedActivity={state.highlighted ?? ''}
@@ -132,55 +149,37 @@
           state.composing ? (state.composing = false) : state.openComposer(composerDay, planWindow)}
         extra={software && sw.governance?.canPropose ? dock : undefined}
       />
-      <section class="card-rail-section live-section">
-        {#if state.error && !state.composing}
-          <p class="validation-copy" role="alert">{state.error}</p>
-        {/if}
-        {#if !state.loaded}
-          <div class="empty-card">Loading activities…</div>
-        {:else if state.live.length === 0}
-          <div class="empty-card">
-            {planDays.length > 0
-              ? 'No activity scheduled yet. Click a marked plan day to add the first activity.'
-              : 'No activities scheduled yet.'}
-          </div>
-        {:else}
-          <ActivityAgenda
-            activities={state.live}
-            names={state.names}
-            {me}
-            planStageOf={(id) => stages.find((s) => s.id === id)?.label ?? null}
-            highlighted={state.highlighted}
-            readOnly={!me}
-            canSuggest={!!project?.amMember}
-            onCommit={state.commit}
-            onSuggest={state.suggest}
-            onDecline={state.decline}
-            searchPeople={state.searchPeople}
-          />
-        {/if}
-      </section>
-      {#if state.past.length + sw.history.length > 0}
-        <details class="history-section">
-          <summary class="history-summary">
-            <span>Past activity</span>
-            <svg
-              class="history-chevron"
-              aria-hidden="true"
-              viewBox="0 0 24 24"
-              width="18"
-              height="18"
-            >
-              <path
-                d="M6 9l6 6 6-6"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </summary>
+      {#if state.showing === 'upcoming' || !hasPast}
+        <section class="card-rail-section live-section">
+          {#if state.error && !state.composing}
+            <p class="validation-copy" role="alert">{state.error}</p>
+          {/if}
+          {#if !state.loaded}
+            <div class="empty-card">Loading activities…</div>
+          {:else if state.live.length === 0}
+            <div class="empty-card">
+              {planDays.length > 0
+                ? 'No activity scheduled yet. Click a marked plan day to add the first activity.'
+                : 'No activities scheduled yet.'}
+            </div>
+          {:else}
+            <ActivityAgenda
+              activities={state.live}
+              names={state.names}
+              {me}
+              planStageOf={(id) => stages.find((s) => s.id === id)?.label ?? null}
+              highlighted={state.highlighted}
+              readOnly={!me}
+              canSuggest={!!project?.amMember}
+              onCommit={state.commit}
+              onSuggest={state.suggest}
+              onDecline={state.decline}
+              searchPeople={state.searchPeople}
+            />
+          {/if}
+        </section>
+      {:else}
+        <section class="history-section past-tab" aria-label="Past activity">
           {#if sw.history.length === 0}
             {@render past(state.past)}
           {:else}
@@ -202,7 +201,7 @@
               {/each}
             </div>
           {/if}
-        </details>
+        </section>
       {/if}
     </section>
     {#if collectiveService}

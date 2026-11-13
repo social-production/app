@@ -5,10 +5,12 @@
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
   import {
+    defaultDay,
     defaultMonth,
     isoOf,
     monthDays,
     monthStart,
+    weekOf,
     type ToneOf,
   } from '#lib/domain/activityCalendar.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
@@ -30,6 +32,8 @@
     onCreate: () => void;
     /** A personal service's slots are green while open (web's slot `statusTone`). */
     toneOf?: ToneOf;
+    /** The UX pass's week strip (ADR 0102): one week shown, the month behind its name. */
+    week?: boolean;
     /** web's `dock-extra` slot: a software project's Pull request and Repository ▾. */
     extra?: Snippet | undefined;
   }
@@ -38,6 +42,10 @@
 
   // svelte-ignore state_referenced_locally
   let month = $state(defaultMonth(p.activities, Date.now(), p.selectedDay || p.planDays?.[0]));
+  // svelte-ignore state_referenced_locally
+  let cursor = $state(defaultDay(p.activities, Date.now(), p.selectedDay || p.planDays?.[0]));
+  let wholeMonth = $state(false);
+  const strip = $derived(!!p.week && !wholeMonth);
   let hoveredDay = $state('');
   // The plans load after the calendar: the first plan day, once known, picks the month.
   let seeded = false;
@@ -45,11 +53,16 @@
     const first = p.planDays?.[0];
     if (!first || seeded) return;
     seeded = true;
-    if (!p.selectedDay) month = defaultMonth(p.activities, Date.now(), first);
+    if (!p.selectedDay) {
+      month = defaultMonth(p.activities, Date.now(), first);
+      cursor = defaultDay(p.activities, Date.now(), first);
+    }
   });
   let hoveredActivity = $state('');
 
-  const days = $derived(monthDays(month, p.activities, Date.now(), p.toneOf));
+  const monthGrid = $derived(monthDays(month, p.activities, Date.now(), p.toneOf));
+  const days = $derived(strip ? weekOf(monthGrid, isoOf(cursor)) : monthGrid);
+  const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const label = $derived(month.toLocaleDateString([], { month: 'long', year: 'numeric' }));
   const zone = zoneOf(new Date());
   const today = isoOf(new Date());
@@ -62,9 +75,20 @@
 
   function shift(offset: number): void {
     // eslint-disable-next-line svelte/prefer-svelte-reactivity -- a throwaway copy
-    const next = new Date(month);
-    next.setMonth(next.getMonth() + offset);
+    const next = new Date(strip ? cursor : month);
+    if (strip) next.setDate(next.getDate() + offset * 7);
+    else next.setMonth(next.getMonth() + offset);
     month = monthStart(next);
+    cursor = strip ? next : month;
+  }
+
+  /** The month's name opens the whole month, and folds it back onto the picked day's week. */
+  function toggleMonth(): void {
+    wholeMonth = !wholeMonth;
+    if (!wholeMonth && agendaDay) {
+      cursor = new Date(`${agendaDay}T12:00`);
+      month = monthStart(cursor);
+    }
   }
 
   const past = (iso: string): boolean => iso < today;
@@ -76,11 +100,15 @@
   };
 </script>
 
-<div class="calendar-shell surface-card">
+<div
+  class="calendar-shell surface-card"
+  class:week-strip={strip}
+  class:week-month={p.week && !strip}
+>
   <div class="calendar-toolbar">
     <button
-      aria-label="Previous month"
-      title="Previous month"
+      aria-label={strip ? 'Previous week' : 'Previous month'}
+      title={strip ? 'Previous week' : 'Previous month'}
       class="month-button"
       type="button"
       onclick={() => shift(-1)}
@@ -96,14 +124,37 @@
         />
       </svg>
     </button>
-    <strong class="month-label"
-      >{label}{#if zone}
+    {#snippet monthName()}
+      {label}{#if zone}
         <span class="zone-label" title="Times are shown in your Display timezone">· {zone}</span
-        >{/if}</strong
-    >
+        >{/if}
+    {/snippet}
+    {#if p.week}
+      <button
+        class="month-label month-toggle"
+        type="button"
+        aria-expanded={wholeMonth}
+        title={wholeMonth ? 'Show one week' : 'Show the whole month'}
+        onclick={toggleMonth}
+      >
+        {@render monthName()}
+        <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
+          <path
+            d="M6 9l6 6 6-6"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.2"
+          />
+        </svg>
+      </button>
+    {:else}
+      <strong class="month-label">{@render monthName()}</strong>
+    {/if}
     <button
-      aria-label="Next month"
-      title="Next month"
+      aria-label={strip ? 'Next week' : 'Next month'}
+      title={strip ? 'Next week' : 'Next month'}
       class="month-button"
       type="button"
       onclick={() => shift(1)}
@@ -122,7 +173,7 @@
   </div>
 
   <div class="calendar-grid calendar-header-row">
-    {#each ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as weekday (weekday)}
+    {#each WEEKDAYS as weekday (weekday)}
       <span>
         <span class="weekday-full">{weekday}</span>
         <span class="weekday-short">{weekday.slice(0, 1)}</span>
@@ -130,7 +181,7 @@
     {/each}
   </div>
   <div class="calendar-grid">
-    {#each days as day (day.iso)}
+    {#each days as day, index (day.iso)}
       <div
         class="calendar-cell"
         class:muted-day={!day.inMonth}
@@ -157,6 +208,9 @@
           }
         }}
       >
+        {#if strip}
+          <span class="cell-weekday" aria-hidden="true">{WEEKDAYS[index % 7]?.slice(0, 1)}</span>
+        {/if}
         <span class="calendar-day-number">{day.day}</span>
         {#if planned.has(day.iso) && day.bars.length === 0}
           <span class="planned-indicator" aria-hidden="true"></span>

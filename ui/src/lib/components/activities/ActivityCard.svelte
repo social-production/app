@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { fillChip, placeLabel, signupTone, type Activity } from '#lib/domain/activities.ts';
@@ -46,6 +47,16 @@
   const a = $derived(p.activity);
   const chip = $derived(p.chip ?? fillChip(a));
   const place = $derived(placeLabel(a));
+  // The row's faces (ADR 0102): the first three people in, and "Join" while a role has room.
+  const people = $derived(a.roles.flatMap((r) => r.people));
+  const joinable = $derived(
+    !p.history &&
+      !p.chip &&
+      !p.readOnly &&
+      a.rolesOpen &&
+      a.myRole === null &&
+      a.roles.some((r) => r.maximum === null || r.people.length < r.maximum),
+  );
   const zone = $derived(zoneOf(new Date(a.startsAt / 1000)));
   const until = $derived(multiDayEnd(a.startsAt, a.endsAt));
   const shortDay = $derived(
@@ -106,11 +117,21 @@
           · {p.history.rating}{/if}</span
       >
     </span>
-    {#if p.history}
-      <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
-    {:else}
-      <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
-    {/if}
+    <span class="agenda-foot">
+      {#if !p.history && people.length > 0}
+        <span class="agenda-people" aria-hidden="true">
+          {#each people.slice(0, 3) as person (person)}
+            <AvatarBadge size="sm" name={p.names[person] ?? '…'} />
+          {/each}
+        </span>
+      {/if}
+      {#if p.history}
+        <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
+      {:else}
+        <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+      {/if}
+      {#if joinable}<span class="agenda-join">Join</span>{/if}
+    </span>
   </button>
 
   <OverlaySheet

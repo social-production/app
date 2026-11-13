@@ -160,3 +160,18 @@ export async function continueSteps(page, n = 1) {
     await page.getByRole('button', { name: 'Continue' }).click();
   }
 }
+
+/** The feed's scope tabs (ADR 0102): 'Home', 'Global' or 'Region'. */
+export const feedScope = (page, name) =>
+  page.getByRole('tablist', { name: 'Choose public feed scope' }).getByRole('tab', { name, exact: true }).click();
+
+/** One choice in the feed's filter sheet (ADR 0102): `group` is the menu's old name
+ * ('Sort public feed by', 'Choose personal audience', 'Filter public feed', 'Public feed time
+ * window'), `option` the choice's label. */
+export async function feedChoice(page, group, option) {
+  await page.getByRole('button', { name: 'Feed filters' }).click();
+  const sheet = page.getByRole('dialog', { name: /^Show in / });
+  await sheet.getByRole('radiogroup', { name: group }).getByRole('radio', { name: option, exact: true }).click();
+  await sheet.getByRole('button', { name: 'Show results' }).click();
+  await sheet.waitFor({ state: 'hidden' });
+}

@@ -10,19 +10,7 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
-import {
-  BASE,
-  browser,
-  device,
-  errors,
-  log,
-  phraseSignIn,
-  rail,
-  railShows,
-  signUp,
-  tagTestChannel,
-  TEST_CHANNEL,
-} from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, signUp, tagTestChannel, TEST_CHANNEL, feedChoice } from './lib.mjs';
 
 const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -63,8 +51,7 @@ let profile = '';
 // The feed card: when, where and sign-ups (the index reads new spaces within a minute).
 for (let i = 0; ; i++) {
   await helper.goto(BASE);
-  await helper.getByRole('button', { name: 'Sort public feed by' }).click();
-  await helper.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await feedChoice(helper, 'Sort public feed by', 'Most recent');
   await helper.locator('.surface').first().waitFor({ timeout: 60_000 }).catch(() => {});
   const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
