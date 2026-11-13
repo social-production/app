@@ -13,8 +13,8 @@
 
   /**
    * web's PostDetailPage header, laid out as the feed's post row opened up (ADR 0100): the
-   * author with web's ⋮ report menu (ADR 0071), the body, when it was posted, and the bare
-   * action row (comments, votes, Share, Sort).
+   * author and when they posted, with web's ⋮ report menu (ADR 0071), the body, and the soft
+   * action pills (votes, comments, Share) above the comments' heading and Sort.
    */
   let { state }: { state: DiscussionState } = $props();
 
@@ -27,11 +27,14 @@
   <section class="item-head post-head-detail">
     <div class="item-author">
       <AvatarBadge {name} />
-      <a
-        class="name header-name"
-        href={resolve('/profile/[agent]', { agent: project.creator })}
-        title={name}>{name}</a
-      >
+      <div class="item-author-text">
+        <a
+          class="name header-name"
+          href={resolve('/profile/[agent]', { agent: project.creator })}
+          title={name}>{name}</a
+        >
+        <span class="item-when">{postedAt(project.createdAt)}</span>
+      </div>
       <ReportControl
         id={state.id}
         itemLabel="post"
@@ -46,7 +49,6 @@
       <LinkedPostBody body={charter.description} variant="detail" />
     </RestrictionNotice>
 
-    <p class="item-when">{postedAt(project.createdAt)}</p>
     <DiscussionActions {state} kind="post" title={`${name}'s post`} />
   </section>
 {/if}

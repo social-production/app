@@ -96,11 +96,11 @@ await postComposer.fill('Cloves pointy end up.');
 await postComposer.press('Enter');
 const postComment = bob.locator('.comment-card.flat', { hasText: 'pointy end up' }).first();
 await postComment.waitFor({ timeout: 60_000 });
-// ADR 0100: a post's own row has the feed row's bare actions, and its comments are flat: a
+// ADR 0100: a post's own row has soft action pills and a Comments heading with Sort, and its comments are flat: a
 // reply sits at the same level, naming who it answers.
 const actions = bob.locator('.item-head .item-actions');
 await actions.getByLabel('1 comment').waitFor();
-await actions.getByRole('button', { name: 'Sort comments' }).waitFor();
+await bob.locator('.item-head .comments-head .icon-menu-trigger', { hasText: 'Oldest first' }).waitFor();
 await postComment.getByRole('button', { name: 'Reply' }).first().click();
 const postReply = bob.getByLabel('Write a reply...');
 await postReply.fill('About a hand apart.');

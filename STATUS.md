@@ -194,6 +194,12 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `domain/time.ts`); (5) **owner, 2026-11-13: "Let's use floating comment bars also"**: on
   phones the composer is a blurred capsule with a round back button in the nav's place
   (`BackButton.svelte`, shared with `DetailActionDock`), and a reply's bar floats too.
+  - **Owner chose mockup "A · Soft pills" (2026-11-13 night;
+    https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM): built.** Votes, comment count and
+    Share are rounded filled pills with no lines; a "Comments" heading has Sort as a word;
+    comment actions are small pills (threads too); a thread has type and tag chips on top
+    and the author underneath (owner's words). `threads.mjs` passed again after this;
+    looked at 390px light only (dark and desktop not re-shot after the pills).
   - **Session's choice, for the owner to confirm:** the nav capsule hides on post and thread
     pages on phones (as on detail pages), rather than stacking the bar above it.
   - **Checked (2026-11-13 evening, local seed node):** `npm run check -w ui` (0 errors),
@@ -202,8 +208,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
     `guests.mjs` **passed**; screenshots of a post and a thread at 390px light, 360px dark
     and desktop light and dark, signed in and out, with the bar empty, typed and replying.
   - **Not checked:** the rail's tinted type label (the local rail had no cards at 1280px);
-    scenarios (no Rust change); the other browser tests. A thread's comments still have
-    boxed votes (threads stay Reddit-style; restyle only if the owner asks).
+    scenarios (no Rust change); the other browser tests. 
 - **PRs (2026-11-13 evening):** **#148 merged 6:49 pm Melbourne** (nav + feed rows). Main
   (with #151's Platform channel) was merged down into `claude/ux-controls` (#150),
   `claude/ux-detail` (#153) and `claude/ux-leftovers`; CI restarted on #150 and #153 at

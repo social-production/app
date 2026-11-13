@@ -1,10 +1,11 @@
 <script lang="ts">
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
   import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { isHidden } from '#lib/domain/moderation.ts';
-  import { postedAt } from '#lib/domain/time.ts';
+  import { postedAt, relativeCompact } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
 
@@ -13,8 +14,8 @@
 
   /**
    * web's ThreadOverviewPanel, laid out as the feed's thread row opened up (ADR 0100): the
-   * type and tags, the title, the body, who started it and when, and the bare action row
-   * (comments, votes, Share, Sort).
+   * type and tags as chips on top, the title, the body, who started it and when underneath,
+   * and the soft action pills above the comments' heading and Sort.
    */
   let { state }: { state: DiscussionState } = $props();
 
@@ -39,10 +40,13 @@
       <h1>{charter.title}</h1>
       <p class="overview-copy">{charter.description}</p>
     </RestrictionNotice>
-    <p class="item-when">
+    <p class="item-by-row">
+      <AvatarBadge size="sm" {name} />
       <a class="item-by" href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>
       <PausedBadge agent={project.creator} />
-      <span>{postedAt(project.createdAt)}</span>
+      <span class="item-when" title={postedAt(project.createdAt)}
+        >{relativeCompact(project.createdAt)}</span
+      >
     </p>
     <DiscussionActions {state} kind="thread" title={charter.title} />
   </section>

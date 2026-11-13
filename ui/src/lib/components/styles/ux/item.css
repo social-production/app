@@ -1,6 +1,5 @@
 /* A post or thread page's own item (ADR 0100): the feed row opened up. The author or the type
-   line, the text at reading size, when it was written, then the feed row's bare actions
-   between two hairlines. Overrides of the ported cards.css and discussion.css; every rule
+   line, the text at reading size, then soft action pills and the comments' heading. Overrides of the ported cards.css and discussion.css; every rule
    starts with `.shell`. */
 
 .shell .item-head {
@@ -56,94 +55,288 @@
   line-height: 1.5;
 }
 
+.shell .item-head .item-author-text {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 1px;
+  min-width: 0;
+}
+
 .shell .item-head .item-when {
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+/* A thread: its type and tags are soft chips on top; who started it sits under the text. */
+.shell .surface .content .item-head .feed-card-top .surface-type-label,
+.shell .item-head .feed-card-top .tag-plain,
+.shell .item-head .feed-card-top .tag-overflow-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 26px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .item-head .feed-card-top .tag-plain,
+.shell .item-head .feed-card-top .tag-overflow-btn {
+  color: var(--text-main);
+}
+
+.shell .item-head .feed-card-top .feed-card-tags,
+.shell .item-head .feed-card-top .tag-list.plain {
+  gap: 6px;
+}
+
+.shell .item-head .feed-card-top .feed-card-tags > * + *::before,
+.shell .item-head .feed-card-top .tag-sep {
+  display: none;
+}
+
+.shell .item-head .item-by-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 2px 6px;
+  gap: 4px 7px;
   margin: 12px 0 0;
-  color: var(--text-soft);
-  font-size: 14px;
+}
+
+.shell .item-head .item-by-row .avatar-badge {
+  width: 26px;
+  height: 26px;
+  font-size: 10.5px;
 }
 
 .shell .item-head .item-by {
   color: var(--text-main);
+  font-size: 13.5px;
   font-weight: 700;
   text-decoration: none;
 }
 
-.shell .item-head .item-by ~ span:last-child::before {
+.shell .item-head .item-by-row .item-when::before {
   content: '·';
-  margin-right: 6px;
+  margin-right: 7px;
 }
 
+/* The actions: soft pills, no lines (Reddit's feel). */
 .shell .item-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 4px;
-  margin: 10px -8px 4px;
-  padding: 2px 0;
-  border-top: 1px solid var(--panel-border);
-  border-bottom: 1px solid var(--panel-border);
+  gap: 8px;
+  margin: 14px 0 0;
 }
 
-/* Share and Sort join the row as two more bare actions. */
-.shell .item-actions .detail-tools {
-  display: contents;
-}
-
-.shell .item-actions .detail-tool {
-  display: inline-flex;
-}
-
-.shell .item-actions .icon-menu-trigger,
+.shell .item-actions .feed-vote,
+.shell .item-pill,
 .shell .item-actions .share-button {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  width: 40px;
-  min-width: 40px;
-  height: 40px;
-  min-height: 40px;
-  padding: 0;
+  gap: 6px;
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 14px;
   border: none;
   border-radius: 999px;
-  background: transparent;
+  background: var(--panel-hover);
   box-shadow: none;
-  color: var(--text-soft);
+  color: var(--text-main);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  transition:
+    background-color 0.15s ease,
+    transform 0.12s ease;
 }
 
-.shell .item-actions .icon-menu-trigger svg,
+.shell .item-actions .feed-vote,
+.shell .comment-card .actions-row .feed-vote {
+  gap: 0;
+  padding: 0 3px;
+}
+
+.shell .item-actions .feed-vote button,
+.shell .comment-card .actions-row .feed-vote button {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  color: inherit;
+}
+
+.shell .item-actions .feed-vote:has(.vote-button.active-up),
+.shell .comment-card .actions-row .feed-vote:has(.vote-button.active-up) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .item-actions .feed-vote:has(.vote-button.active-down),
+.shell .comment-card .actions-row .feed-vote:has(.vote-button.active-down) {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
+
+.shell .item-actions .detail-tools,
+.shell .item-actions .detail-tool,
+.shell .comments-head .detail-tools,
+.shell .comments-head .detail-tool {
+  display: inline-flex;
+}
+
 .shell .item-actions .share-button svg {
-  width: 19px;
-  height: 19px;
+  width: 18px;
+  height: 18px;
+}
+
+.shell .item-actions .share-button .share-button-label {
+  display: inline;
+  color: inherit;
+  font: inherit;
+}
+
+.shell .item-actions .share-button:active,
+.shell .item-pill:active {
+  transform: scale(0.96);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .shell .item-actions .icon-menu-trigger:hover,
   .shell .item-actions .share-button:hover {
     background: var(--brand-soft);
     color: var(--brand-strong);
   }
 }
 
-.shell .item-actions .icon-menu-trigger.menu-open,
 .shell .item-actions .share-button.active-toggle {
   background: var(--brand-soft);
   color: var(--brand-strong);
+}
+
+/* "Comments" with Sort as a word at its right. */
+.shell .comments-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 18px 0 2px;
+}
+
+.shell .comments-head h2 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.005em;
+}
+
+.shell .comments-head .icon-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: auto;
+  height: 32px;
+  min-height: 32px;
+  padding: 0 10px;
+  margin-right: -10px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.shell .comments-head .icon-menu-trigger svg {
+  display: none;
+}
+
+.shell .comments-head .icon-menu-trigger .trigger-label {
+  display: inline;
+  color: inherit;
+}
+
+.shell .comments-head .icon-menu-trigger::after {
+  content: '';
+  width: 6px;
+  height: 6px;
+  margin: -3px 2px 0 3px;
+  border-right: 1.8px solid currentColor;
+  border-bottom: 1.8px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.shell .comments-head .icon-menu-trigger.menu-open {
+  background: var(--panel-hover);
+  color: var(--text-main);
+}
+
+/* Comment actions take the same pills, smaller (threads' nested comments too). */
+.shell .comment-card .actions-row .feed-vote,
+.shell .comment-card .actions-row .reply-button {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  height: 30px;
+  min-height: 30px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .comment-card .actions-row .feed-vote button {
+  width: 26px;
+  min-width: 26px;
+  height: 26px;
+  min-height: 26px;
+}
+
+.shell .comment-card .actions-row .feed-vote-icon {
+  width: 16px;
+  height: 16px;
+}
+
+.shell .comment-card .actions-row .reply-button {
+  gap: 5px;
+  width: auto;
+  padding: 0 11px;
+}
+
+.shell .comment-card .actions-row .reply-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+.shell .comment-card .actions-row .reply-button::after {
+  content: 'Reply';
+}
+
+.shell .comment-card.reply-open > .comment-self .actions-row .reply-button::after {
+  content: 'Cancel';
+}
+
+.shell .comment-card .actions-row,
+.shell .comment-card.flat .actions-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 0;
 }
 
 /* The ported page paints the type stripe as a background; the type line says it instead. */
 .shell .discussion-page .page .surface.has-accent {
   --surface-pad-x: 16px;
   background: var(--panel);
-}
-
-/* Wide screens: keep the actions near each other, as the feed rows do. */
-@media (min-width: 761px) {
-  .shell .item-actions {
-    justify-content: flex-start;
-    gap: 56px;
-  }
 }

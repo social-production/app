@@ -153,7 +153,7 @@
 
       <div class="actions-row">
         <VoteStrip
-          bare={flat}
+          bare
           support={comment.voteCount}
           oppose={0}
           mine={stance}
