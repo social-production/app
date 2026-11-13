@@ -162,7 +162,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `PlanCard`, `DetailPhaseContext`); Details leads with the type label, a 24px left-aligned
   title and when / where icon lines (`FactLine.svelte`); a request's roles are rows with a
   Sign up pill (`HelpRolesDock.svelte`).
-  - **Changed from the mockup, for the owner to confirm:** an open **Vote** (edit, update,
+  - **Changed from the mockup, owner approved 2026-11-13 ("it makes them stand out, this is
+    good": Vote and Support / Oppose first appear as their own separate pills):** an open **Vote** (edit, update,
     phase move) is its own pill above the capsule, beside Support / Oppose, not inside the
     capsule: with the stance chip, members and three icons it did not fit one row at 390px.
   - **Not done:** the type label still reads "Help request" (the rename to "Request" comes
