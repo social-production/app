@@ -1,4 +1,4 @@
-# 0096. Feed cards are Twitter-style rows: no type stripe, no author on collective items (UX pass)
+# 0097. Feed cards are Twitter-style rows: no type stripe, no author on collective items (UX pass)
 
 Status: **accepted** (2026-11-12, owner approved the mockups and chose to drop the author
 name). Plan: [`docs/plans/UX.md`](../plans/UX.md), "Cards and feed".

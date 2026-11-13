@@ -1,4 +1,4 @@
-/* Feed rows (ADR 0096): overrides of the ported cards.css, never edits to it. Twitter's phone
+/* Feed rows (ADR 0097): overrides of the ported cards.css, never edits to it. Twitter's phone
    rows: no type stripe, larger type, a spread row of bare icon actions. */
 
 /* The type is the top line's icon + label, not a stripe (rails and lists included). */

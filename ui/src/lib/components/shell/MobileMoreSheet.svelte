@@ -4,7 +4,7 @@
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import '#lib/components/styles/ux/menus.css';
 
-  /** The phone "More" tab's menu (ADR 0097): a floating panel above the nav capsule with
+  /** The phone "More" tab's menu (ADR 0098): a floating panel above the nav capsule with
    * web's MobileMoreSheet links (profile or sign in, Settings, About) and the theme. */
   type Theme = 'system' | 'light' | 'dark';
   const THEMES: [Theme, string][] = [

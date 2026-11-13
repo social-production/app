@@ -1,6 +1,6 @@
 /* UX pass tokens (docs/plans/UX.md). Loaded after app.css and the ported styles. */
 :root {
-  /* Floating controls (ADR 0095): translucent, blurred, lifted off the page. */
+  /* Floating controls (ADR 0096): translucent, blurred, lifted off the page. */
   --float-background: color-mix(in srgb, var(--panel-soft) 68%, transparent);
   --float-border: color-mix(in srgb, var(--text-main) 10%, transparent);
   --float-shadow: 0 10px 30px rgb(0 0 0 / 0.5), 0 1px 2px rgb(0 0 0 / 0.35);

@@ -12,7 +12,7 @@
     disabled?: boolean;
     labeled?: boolean;
     corner?: boolean;
-    /** Feed rows (ADR 0096): no box, drawn arrows, styled by styles/ux/feed.css. */
+    /** Feed rows (ADR 0097): no box, drawn arrows, styled by styles/ux/feed.css. */
     bare?: boolean;
     onSignal: (next: Stance | null) => Promise<void>;
   }

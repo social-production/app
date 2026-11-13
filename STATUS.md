@@ -95,14 +95,14 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   and say in your "In flight" entry which detail-page files you have open.** Still off
   limits for UX: `native/`, `zomes/`, `dnas/`, `crates/` (no integrity changes).
 - **Built on this branch (owner approved the mockups, 2026-11-12 evening):**
-  - ADR 0095: the phone nav is a floating blurred capsule; the current tab is a tinted pill
+  - ADR 0096: the phone nav is a floating blurred capsule; the current tab is a tinted pill
     with its name (`MobileBottomNav.svelte`, `styles/ux/tokens.css`,
     `--shell-bottom-nav-base` 56 → 80px in `app.css`).
-  - ADR 0096: feed rows (`FeedActions.svelte`, `FeedCardTop` type + clock, `bare` vote strips,
+  - ADR 0097: feed rows (`FeedActions.svelte`, `FeedCardTop` type + clock, `bare` vote strips,
     `styles/ux/feed.css`): no type stripe on any `FeedSurface`, larger text, bare spread
     actions with share, no author on collective rows, personal posts as Twitter rows.
-  - **ADR numbers 0095 and 0096 are taken here**; parity session, start at 0097 (or renumber
-    whichever merges second).
+  - Renumbered 2026-11-13 (main took 0095 for the Platform channel): the nav is ADR 0096,
+    feed rows 0097, controls 0098, detail pages 0099. Parity session, start at 0100.
 - **UX overrides of ported styles** live in `ui/src/lib/components/styles/ux/*.css`.
 - **Owner's UX directions (2026-11-12 evening), now in `docs/plans/UX.md`:** Twitter's phone
   app is the reference; icon buttons without labels or boxes (map, both rails); redesign the
@@ -116,7 +116,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
     (UX.md "Controls"). Reuse `styles/ux/tokens.css`'s `--float-*` tokens for those.
   - **Owner (2026-11-12): the project and event detail controls should look like the nav
     capsule** ("nav B": floating, blurred, fully rounded, the active item a tinted pill; see
-    `MobileBottomNav.svelte`'s styles and ADR 0095). Build the dock's pill groups that way.
+    `MobileBottomNav.svelte`'s styles and ADR 0096). Build the dock's pill groups that way.
   - `FeedSurface`'s `accent` prop draws nothing now; `LinksSection`, `LinkRequestsSection`,
     `LinkVoteHistory`, `DiscussionPage` and `MapDiscoveryCard` still pass it. Drop it when
     convenient.
@@ -130,11 +130,11 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   your project" after Bob writes in her project's chat, while a thread's "Replied to your
   comment" does arrive. Not caused by this branch; for the parity session to look at.
 - **Second piece, branch `claude/ux-controls` (stacked on `claude/ux-nav-feed`, PR #148), ADR
-  0097:** bare icon buttons (top bar, map filter capsule, left rail pills), the create menu
+  0098:** bare icon buttons (top bar, map filter capsule, left rail pills), the create menu
   and More menu as floating panels, theme default System with a switch in More, right-rail
   cards without the type stripe and History rows with an outcome stripe. All overrides start
   with `.shell` (the ported sheets load lazily, so plain overrides lose by load order).
-  **ADR number 0097 is taken too.**
+  
 - **Owner approved all of round 2 (2026-11-12, late evening):** create menu, More menu (keep
   the theme switch), bare icon buttons, right-rail cards, and flat comments on posts (mockup
   only, not built). The owner likes reviewing mockups: keep publishing them before building
@@ -184,6 +184,25 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   field: most likely an integrity change) and for creation through plans (ADR 0059 plus the
   owner's 2026-11-12 notes in UX.md; needs a project-network reset). Neither is started.
 
+## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
+**Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
+design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`
+projects voted on by every Full member, moderators from `BoardCandidacy` / `BoardVotes`
+directory links replayed by a new `crates/sp_board`, their merge capability on platform
+software projects, web's `PlatformBoardPanel` on `/platform` and the rail's Moderators link.
+**Owner, 2026-11-12: quorum must come from active participation**, not "voters on this item":
+ADR 0095's weekly `Active` link per Full member (directory), counted by any reader (full nodes
+hold them all), snapshotted per proposal (ADR 0033) with ADR 0040's challenge window. It also
+replaces ADR 0071's and 0074's populations. Ship with ADR 0088 (deactivation) in one
+directory + project reset. Order: `sp_board` + the active count (pure crates, unit tests),
+directory integrity, coordinators + scenarios, UI, browser tests.
+- **Done (pure crates, no zome uses them yet, DNA hashes unchanged):** `crates/sp_board`
+  (`replay`: candidate / moderator / grace / removed from candidacies and votes; checks at
+  each act and each Monday 00:00 UTC so readers agree; 10 tests from board.py's rules) and
+  `crates/sp_active` (`week_of`, `counted_week`, `weekly_active`; 3 tests). Checked: `cargo
+  test`, clippy `-D warnings`, fmt, sizes. **Next:** directory integrity (`BoardCandidacy`,
+  `BoardVotes`, `Active` links, plus ADR 0088's `Deactivated`), then coordinators.
+
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
   `claude/ux-*` branch. Split: UX owns the shell's bottom nav, feed cards, polish and
@@ -193,7 +212,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   PORTS files (which `port-styles.py` rewrites).
 - Moderators (web's platform board) are parity, with the Platform channel: PARITY.md.
 
-## In flight 2026-11-12: create flows compared with web (PARITY item 10), branch `claude/social-production-handoff-dsam61`
+## Done 2026-11-12: create flows compared with web (PARITY item 10), PR #147 merged 11:00 UTC (10:00 pm Melbourne)
+Live after the deploy: UI 200, seed node not restarted (UI only, up 4.1 h, 540 MB), **live `shell.mjs` passed**.
 UI only, no DNA change. The seven create flows compared with web's `features/create/**` source
 (PARITY "Create flows"): each scope step now has web's own layout (`ScopeTagsStep` `variant`:
 project / event / thread / help; an event's "Channel tags" + "Add communities", a help

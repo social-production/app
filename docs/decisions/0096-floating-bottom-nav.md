@@ -1,4 +1,4 @@
-# 0095. The phone's bottom nav is a floating capsule (UX pass)
+# 0096. The phone's bottom nav is a floating capsule (UX pass)
 
 Status: **accepted** (2026-11-12, owner chose option B from the mockups). Plan:
 [`docs/plans/UX.md`](../plans/UX.md), "Controls".

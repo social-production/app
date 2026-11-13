@@ -45,7 +45,7 @@ for (let i = 0; i < 20 && !(await pill.count()); i++) {
   await guest.reload();
 }
 await pill.waitFor();
-// Feed rows name no author (ADR 0096); the project's page does, and its author link opens
+// Feed rows name no author (ADR 0097); the project's page does, and its author link opens
 // Ann's profile, which lists her project (web's profile feed).
 await card.locator('a.title').click();
 await guest.locator('.content-meta-row a').first().click();
