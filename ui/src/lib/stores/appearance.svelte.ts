@@ -27,7 +27,7 @@ function read<T extends string>(key: string, allowed: readonly T[], fallback: T)
 }
 
 export const appearance = $state<Appearance>({
-  theme: read(KEYS.theme, ['light', 'dark', 'system'], 'light'),
+  theme: read(KEYS.theme, ['light', 'dark', 'system'], 'system'),
   accent: read(KEYS.accent, ACCENT_COLORS, 'green'),
   font: read(KEYS.font, ['inter', 'system', 'readable'], 'inter'),
   textSize: read(KEYS.textSize, ['small', 'medium', 'large'], 'medium'),

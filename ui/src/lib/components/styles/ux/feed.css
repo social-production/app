@@ -2,27 +2,27 @@
    rows: no type stripe, larger type, a spread row of bare icon actions. */
 
 /* The type is the top line's icon + label, not a stripe (rails and lists included). */
-.surface.has-accent {
+.shell .surface.has-accent {
   --surface-pad-x: 16px;
   border-left: none;
   padding-left: 16px;
 }
 
-.surface:has(.feed-actions) {
+.shell .surface:has(.feed-actions) {
   padding: 14px 16px 4px;
 }
 
-.surface .content .title,
-.surface .content a.title {
+.shell .surface:has(.feed-actions) .content .title,
+.shell .surface:has(.feed-actions) .content a.title {
   margin-top: 6px;
   font-size: 18px;
   line-height: 1.3;
   letter-spacing: -0.005em;
 }
 
-.surface:has(.feed-actions) .content .body,
-.surface:has(.feed-actions) .content .summary,
-.surface:has(.feed-actions) .content .linked-body.feed {
+.shell .surface:has(.feed-actions) .content .body,
+.shell .surface:has(.feed-actions) .content .summary,
+.shell .surface:has(.feed-actions) .content .linked-body.feed {
   margin-top: 5px;
   color: var(--text-main);
   font-size: 15.5px;
@@ -30,36 +30,36 @@
   line-height: 1.45;
 }
 
-.surface:has(.feed-actions) .content .latest-summary,
-.surface:has(.feed-actions) .content .location,
-.surface:has(.feed-actions) .content .signup-summary {
+.shell .surface:has(.feed-actions) .content .latest-summary,
+.shell .surface:has(.feed-actions) .content .location,
+.shell .surface:has(.feed-actions) .content .signup-summary {
   margin-top: 6px;
   color: var(--text-soft);
   font-size: 14px;
 }
 
 /* Top line: type · tags · clock, then private mark, stage and ⋮. */
-.feed-card-top {
+.shell .feed-card-top {
   padding-bottom: 0;
   color: var(--text-soft);
   font-size: 13.5px;
 }
 
-.feed-card-top .feed-card-tags {
+.shell .feed-card-top .feed-card-tags {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
   gap: 2px 0;
 }
 
-.feed-card-top .feed-card-tags > * + *::before {
+.shell .feed-card-top .feed-card-tags > * + *::before {
   content: '·';
   margin: 0 6px;
   color: var(--text-soft);
   font-weight: 400;
 }
 
-.surface .content .feed-card-top .surface-type-label {
+.shell .surface .content .feed-card-top .surface-type-label {
   display: inline-flex;
   align-items: center;
   gap: 5px;
@@ -70,12 +70,12 @@
   text-transform: none;
 }
 
-.feed-card-top .tag-list.plain {
+.shell .feed-card-top .tag-list.plain {
   display: inline-flex;
   font-size: 13.5px;
 }
 
-.feed-card-time {
+.shell .feed-card-time {
   flex: none;
   color: var(--text-soft);
   font-size: 13.5px;
@@ -83,7 +83,7 @@
   white-space: nowrap;
 }
 
-.feed-card-top .feed-card-stage {
+.shell .feed-card-top .feed-card-stage {
   padding: 3px 9px;
   border-radius: 999px;
   background: var(--panel-hover);
@@ -91,7 +91,7 @@
 }
 
 /* The action row. */
-.feed-actions {
+.shell .feed-actions {
   position: relative;
   z-index: 1;
   display: flex;
@@ -103,8 +103,8 @@
   margin: 6px -8px 0;
 }
 
-.feed-action,
-.feed-vote button {
+.shell .feed-action,
+.shell .feed-vote button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -128,18 +128,18 @@
     transform 0.12s ease;
 }
 
-.feed-action.static {
+.shell .feed-action.static {
   cursor: default;
 }
 
-.feed-action-icon,
-.feed-vote-icon {
+.shell .feed-action-icon,
+.shell .feed-vote-icon {
   width: 19px;
   height: 19px;
   flex: none;
 }
 
-.feed-vote {
+.shell .feed-vote {
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -149,68 +149,68 @@
   font-variant-numeric: tabular-nums;
 }
 
-.feed-vote .signal-percent,
-.feed-vote .vote-count {
+.shell .feed-vote .signal-percent,
+.shell .feed-vote .vote-count {
   min-width: 2.2em;
   text-align: center;
 }
 
-.feed-vote.disabled {
+.shell .feed-vote.disabled {
   opacity: 0.45;
 }
 
-.feed-vote.disabled button {
+.shell .feed-vote.disabled button {
   cursor: default;
 }
 
-.feed-vote .active-support,
-.feed-vote .active-up {
+.shell .feed-vote .active-support,
+.shell .feed-vote .active-up {
   color: var(--brand-strong);
 }
 
-.feed-vote .active-oppose,
-.feed-vote .active-down {
+.shell .feed-vote .active-oppose,
+.shell .feed-vote .active-down {
   color: var(--danger);
 }
 
-.feed-vote .vote-count.active-up,
-.feed-vote .vote-count.active-down {
+.shell .feed-vote .vote-count.active-up,
+.shell .feed-vote .vote-count.active-down {
   font-weight: 800;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  a.feed-action:hover,
-  button.feed-action:hover,
-  .feed-vote:not(.disabled) button:hover {
+  .shell a.feed-action:hover,
+  .shell button.feed-action:hover,
+  .shell .feed-vote:not(.disabled) button:hover {
     background: var(--brand-soft);
     color: var(--brand-strong);
   }
 }
 
-a.feed-action:active,
-button.feed-action:active,
-.feed-vote:not(.disabled) button:active {
+.shell a.feed-action:active,
+.shell button.feed-action:active,
+.shell .feed-vote:not(.disabled) button:active {
   background: var(--brand-soft);
   transform: scale(0.92);
 }
 
-.feed-action-note:empty {
+.shell .feed-action-note:empty {
   display: none;
 }
 
-.feed-action-note {
+.shell .feed-action-note {
   color: var(--brand-strong);
   white-space: nowrap;
 }
 
 /* A personal post: the avatar in its own column, everything else beside it. */
-.personal-post-card .post-row {
+.shell .personal-post-card .post-row {
   display: grid;
   grid-template-columns: 42px minmax(0, 1fr);
   column-gap: 12px;
 }
 
-.personal-post-card .post-row > .avatar-badge {
+.shell .personal-post-card .post-row > .avatar-badge {
   position: relative;
   z-index: 1;
   width: 42px;
@@ -218,14 +218,14 @@ button.feed-action:active,
   font-size: 15px;
 }
 
-.personal-post-card .post-head {
+.shell .personal-post-card .post-head {
   display: flex;
   align-items: center;
   gap: 6px;
   min-width: 0;
 }
 
-.personal-post-card .post-head .header-name {
+.shell .personal-post-card .post-head .header-name {
   position: relative;
   z-index: 1;
   min-width: 0;
@@ -236,24 +236,24 @@ button.feed-action:active,
   text-decoration: none;
 }
 
-.personal-post-card .post-head .feed-card-time::before {
+.shell .personal-post-card .post-head .feed-card-time::before {
   content: '·';
   margin-right: 6px;
 }
 
-.personal-post-card .post-head > :last-child:not(.feed-card-time) {
+.shell .personal-post-card .post-head > :last-child:not(.feed-card-time) {
   margin-left: auto;
 }
 
-.surface:has(.feed-actions) .content .post-main .linked-body.feed {
+.shell .surface:has(.feed-actions) .content .post-main .linked-body.feed {
   margin-top: 2px;
   line-clamp: 8;
   -webkit-line-clamp: 8;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .feed-action,
-  .feed-vote button {
+  .shell .feed-action,
+  .shell .feed-vote button {
     transition: none;
   }
 }

@@ -1,0 +1,153 @@
+/* Bare icon buttons and floating controls (ADR 0098): overrides of the ported shell.css,
+   map.css and the rails. No boxes around icons; the active one is a tinted circle. */
+
+/* Top bar: translucent, so the page blurs through as it scrolls. */
+.topbar {
+  border-bottom-color: color-mix(in srgb, var(--panel-border) 60%, transparent);
+  background: color-mix(in srgb, var(--toolbar-background) 78%, transparent);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+}
+
+.panel-toggle,
+.topbar .search-open-button,
+.topbar .search-close-button,
+.topbar .gear-button {
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+  transition:
+    background-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.12s ease;
+}
+
+.panel-toggle:active,
+.topbar .search-open-button:active,
+.topbar .gear-button:active {
+  transform: scale(0.9);
+}
+
+button.panel-toggle:hover:not(:disabled) {
+  color: var(--text-main);
+}
+
+button.panel-toggle[data-active='true'],
+button.panel-toggle[data-active='true']:hover,
+.topbar .gear-button.active-link {
+  border: none;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  button.panel-toggle:hover:not(:disabled),
+  .topbar .search-open-button:hover,
+  .topbar .gear-button:hover {
+    border: none;
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+}
+
+.panel-toggle-icon,
+.panel-toggle .panel-toggle-icon {
+  width: 22px;
+  height: 22px;
+}
+
+/* Left rail: its two actions are pills, not boxes. */
+.shell .left-rail .rail-action {
+  min-height: 42px;
+  border: none;
+  border-radius: 999px;
+}
+
+.shell .left-rail .feedback-button {
+  background: var(--panel-hover);
+}
+
+/* Map: bare round buttons; the filter row is a floating capsule like the nav. */
+.shell .map-panel .map-stage,
+.shell .map-panel .list-panel {
+  border-color: color-mix(in srgb, var(--panel-border) 60%, transparent);
+  border-radius: 20px;
+}
+
+.shell .map-panel .filter-panel-overlay {
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  gap: 2px;
+  padding: 5px 8px;
+  border: 1px solid var(--float-border);
+  border-radius: 999px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+}
+
+.shell .map-panel .icon-button,
+.shell .map-panel .filter-icon-button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+  transition:
+    background-color 0.16s ease,
+    transform 0.12s ease;
+}
+
+.shell .map-panel .icon-button:active {
+  transform: scale(0.9);
+}
+
+.shell .map-panel .icon-button.active {
+  border: none;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+/* The radius picker inside the capsule loses its box too. */
+.shell .map-panel .radius-combobox .input-shell {
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.shell .map-panel .radius-combobox .toggle-button {
+  border-left: none;
+}
+
+.shell .map-panel .fullscreen-button {
+  top: 10px;
+  right: 52px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid var(--float-border);
+  border-radius: 999px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  color: var(--text-main);
+  box-shadow: var(--float-shadow);
+}
+
+.shell .map-panel .maplibregl-ctrl-group {
+  overflow: hidden;
+  border-radius: 999px;
+  box-shadow: var(--float-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-toggle,
+  .topbar .search-open-button,
+  .topbar .gear-button,
+  .shell .map-panel .icon-button {
+    transition: none;
+  }
+}

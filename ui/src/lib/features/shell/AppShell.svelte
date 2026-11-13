@@ -15,7 +15,7 @@
   import Topbar from '#lib/components/shell/Topbar.svelte';
   import { connect } from '#lib/services/account.ts';
   import { getPerson } from '#lib/services/people.ts';
-  import { applyAppearance, appearance } from '#lib/stores/appearance.svelte.ts';
+  import { applyAppearance, appearance, setAppearance } from '#lib/stores/appearance.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
@@ -38,7 +38,7 @@
 
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
-  import '#lib/components/styles/ux/tokens.css';
+  import '#lib/components/styles/ux/index.css';
 
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
   let { children, mapPanel }: { children: Snippet; mapPanel?: Snippet<[() => void]> } = $props();
@@ -286,6 +286,8 @@
       settingsHref={resolve('/settings')}
       aboutHref={resolve('/about')}
       {isActive}
+      theme={appearance.theme}
+      onTheme={(theme) => setAppearance({ theme })}
       onClose={() => (moreOpen = false)}
     />
   {/if}

@@ -85,8 +85,15 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
 ## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
   on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
-  polish, image posts and UX.md's code-health items. It does not touch project/event detail
-  pages or their dock, channel/community/platform pages, `native/`, `zomes/`, `dnas/`, `crates/`.
+  polish, image posts and UX.md's code-health items.
+- **Owner, 2026-11-13: the UX pass also covers project and event detail pages and request
+  pages ("this is very important").** The earlier "don't touch" rule for those pages is
+  lifted; it only existed so two sessions would not edit the same files. So: the UX session
+  restyles them (the dock as capsule-style pill groups first, mockups before building), in
+  `styles/ux/*.css` overrides and small markup changes; the parity session keeps changing
+  their behaviour. **Both: merge main before touching a detail-page file, keep PRs small,
+  and say in your "In flight" entry which detail-page files you have open.** Still off
+  limits for UX: `native/`, `zomes/`, `dnas/`, `crates/` (no integrity changes).
 - **Built on this branch (owner approved the mockups, 2026-11-12 evening):**
   - ADR 0096: the phone nav is a floating blurred capsule; the current tab is a tinted pill
     with its name (`MobileBottomNav.svelte`, `styles/ux/tokens.css`,
@@ -122,9 +129,43 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   twice on this branch and once with main's `ui/` and `tests/`): Ann never gets "Replied to
   your project" after Bob writes in her project's chat, while a thread's "Replied to your
   comment" does arrive. Not caused by this branch; for the parity session to look at.
-- **Next here:** builds of the create menu, the More sheet, bare icon buttons
-  and the right-rail cards; then post comments; image posts need their own ADR (a post's
-  charter has no attachment field: most likely an integrity change, so the owner decides when).
+- **Second piece, branch `claude/ux-controls` (stacked on `claude/ux-nav-feed`, PR #148), ADR
+  0098:** bare icon buttons (top bar, map filter capsule, left rail pills), the create menu
+  and More menu as floating panels, theme default System with a switch in More, right-rail
+  cards without the type stripe and History rows with an outcome stripe. All overrides start
+  with `.shell` (the ported sheets load lazily, so plain overrides lose by load order).
+  
+- **Owner approved all of round 2 (2026-11-12, late evening):** create menu, More menu (keep
+  the theme switch), bare icon buttons, right-rail cards, and flat comments on posts (mockup
+  only, not built). The owner likes reviewing mockups: keep publishing them before building
+  (the page: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd, private to the owner; its
+  source is not in the repo, rebuild it if needed).
+- **Known loose ends:** (1) the type label on right-rail cards is grey, not tinted as in the
+  feed (`styles/ux/rail.css`, first rule; cause not found). (2) `projects.mjs` passed on rerun (2026-11-13) after failing once in a long batch on a
+  tired node. (3) Browser tests not yet run against these branches: everything
+  except shell, guests, help-requests, follows, private-events, messages, threads, rail, map,
+  accounts (all passed). Feed rows no longer show an author, so any test that reads one from
+  a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above). (5) **`events.mjs` fails on main too**
+  (2026-11-13, `877ced0`, with main's `ui/` and `tests/`): on the event's Participation tab
+  no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
+  please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
+  `governance`, `guests`.
+- **Detail pages, owner's choices so far (2026-11-13):** dock B (the dock replaces the nav
+  capsule inside a project, event or request; a round back button + one action capsule);
+  **Support and Oppose live in the dock, never in the page** ("no buttons in the page"; two
+  rows are fine); the Take part mockup (phase progress line, soft plan cards) and the Request
+  page mockup are approved. **Waiting on the owner:** version 2 of the mockup, where the vote
+  row is a small capsule above the actions and folds into a chip after voting. **Owner: dock
+  actions are icons without words and there is no ⋯ menu button; Support and Oppose keep
+  their words** (version 3 also keeps the word on the one call to action: Join, Sign up, Add
+  plan): https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
+  owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
+- **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
+  only runs once the branch has no conflicts), smoke live, update README Status; (b) build
+  flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
+  code-health items; (d) ADRs first for image posts (a post's charter has no attachment
+  field: most likely an integrity change) and for creation through plans (ADR 0059 plus the
+  owner's 2026-11-12 notes in UX.md; needs a project-network reset). Neither is started.
 
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
