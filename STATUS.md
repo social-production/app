@@ -82,6 +82,14 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## Handoff 2026-11-13 (afternoon): parity paused for the day; the owner is doing UX
+- The owner is working on UX for the rest of 2026-11-13 **on their own branch** (not
+  `claude/social-production-handoff-dsam61`). Next session: `git fetch`, merge `main` into the
+  working branch first, and check for an open UX PR before touching the shell, feed cards or
+  styles (the split in "Owner direction (2026-11-12): UX in parallel" still holds).
+- Nothing in flight on this branch once docs PR #152 merges. Parity resumes with ADR 0095's
+  rest (see "Next" just below).
+
 ## Done 2026-11-13: the Platform channel, moderators, weekly active, deactivation (ADRs 0095, 0088), PR #151 merged 03:17 UTC (2:17 pm Melbourne)
 **Live** after the deploy (seed restarted 03:38 UTC = 2:38 pm): `/readyz` directory
 `uhC0kiObR4…` and project `uhC0kYqtp…` (**both reset**; the directory hash matches a local
