@@ -30,7 +30,7 @@
   import { startBell } from './bellLoop.ts';
   import { MapToggle } from './mapToggle.svelte.ts';
   import { createLinks, surfaceLinks } from './createLinks.ts';
-  import { refuseIfDeactivated } from './deactivated.ts';
+  import { refuseIfDeactivated, showDeactivatedReason } from './deactivated.ts';
   import { railLinks, startMyScopes } from './myScopesLoop.ts';
   import { provideShellContexts } from './shellContexts.ts';
   import RightRailPanel from './RightRailPanel.svelte';
@@ -138,6 +138,7 @@
     }
   });
 
+  $effect(showDeactivatedReason);
   $effect(() => {
     const current = connection.current;
     if (current.status !== 'connected') return;
