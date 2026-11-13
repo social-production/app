@@ -192,7 +192,14 @@ async fn a_proposal_takes_its_type_from_its_leading_plan() {
         to: "phase-2".into(),
         reason: "The swap day fits better.".into(),
     };
-    pass(&net, 1, back).await;
+    // A return comes without its author's vote (web's revert), so both founders vote.
+    let back = pass(&net, 1, back).await;
+    let own = VoteInput {
+        proposal: back,
+        choice: "Yes",
+    };
+    let _: ActionHash = net.call(1, "governance", "vote", own).await;
+    net.settle().await;
     let view = project(&net, 0).await;
     assert_eq!(
         (view.phase.as_str(), view.stage.as_str()),
