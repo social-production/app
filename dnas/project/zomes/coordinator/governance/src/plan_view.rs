@@ -4,7 +4,7 @@
 
 use hdk::prelude::*;
 use project_integrity::{Plan, Proposal, ProposalKind};
-use sp_governance::plans::{criteria, required_plan_kind, Leader, PlanKind};
+use sp_governance::plans::{criteria, required_plan_kinds, Leader, PlanKind};
 use sp_governance::{phases::Shape, required_votes};
 
 use crate::apply::{self, Standing, State};
@@ -58,6 +58,9 @@ pub struct PlanBoard {
     pub plans: Vec<PlanView>,
     /// The kind of plan members can submit now (the current phase's), if any.
     pub open_kind: Option<PlanKind>,
+    /// Every kind this phase takes: one in a typed project, the three type-giving kinds in a
+    /// proposal's Plan phase (ADR 0059).
+    pub open_kinds: Vec<PlanKind>,
     /// The kind whose approved leader the next phase move needs, if any.
     pub gate: Option<PlanKind>,
     /// That kind's leader: the plan the next phase move would cite.
@@ -91,16 +94,18 @@ pub fn board() -> ExternResult<PlanBoard> {
         subtype: state.subtype(),
         include_access: false,
     };
-    let gate = required_plan_kind(shape, state.phase());
-    let gate_leader = gate.and_then(|kind| match plans::leader(&state.approved, kind) {
-        Leader::One(h) => Some(h),
+    let gates = required_plan_kinds(shape, state.phase());
+    let gate_leader = match plans::leader(&state.approved, &gates) {
+        Leader::One(h) if !gates.is_empty() => Some(h),
         _ => None,
-    });
+    };
+    let open_kinds = PlanKind::open_kinds(state.mode(), state.phase());
     let members = u32::try_from(crate::calls::member_snapshot()?.len()).unwrap_or(u32::MAX);
     Ok(PlanBoard {
         plans,
-        open_kind: PlanKind::for_phase(state.mode(), state.phase()),
-        gate,
+        open_kind: open_kinds.first().copied(),
+        open_kinds,
+        gate: gates.first().copied(),
         gate_leader,
         members,
         required: required_votes(members),
@@ -159,7 +164,7 @@ fn view_of(
         })
         .collect();
     let score = plans::score(&rated);
-    let leader = match plans::leader(&state.approved, plan.kind) {
+    let leader = match plans::leader(&state.approved, &plans::rivals(state.born(), plan.kind)) {
         Leader::One(h) if h == p.hash => Some(LeaderStatus::Leading),
         Leader::Tied(hs) if hs.contains(&p.hash) => Some(LeaderStatus::Tied),
         _ => None,

@@ -7,11 +7,12 @@
 
   // web's projectSubjectLabel, and `surfaceTypeLabel('event')`.
   const LABELS: Record<CharterMode, string> = {
+    proposal: 'Proposal',
     productive: 'Productive',
     'collective-service': 'Collective Service',
     'personal-service': 'Personal Service',
     event: 'Event',
-    'help-request': 'Help request',
+    'help-request': 'Request',
     thread: 'Thread',
     post: 'Post',
     channel: 'Channel',

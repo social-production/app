@@ -12,7 +12,14 @@ use super::ProjectCard;
 
 /// web fetches this many ranked rows before the distance filter.
 const RANKED_MAX: usize = 300;
-const PROJECT_MODES: [&str; 3] = ["productive", "collective-service", "personal-service"];
+/// The modes that are projects on the map and in Region; a `proposal` is one before its plan
+/// gives it a type (ADR 0059).
+const PROJECT_MODES: [&str; 4] = [
+    "proposal",
+    "productive",
+    "collective-service",
+    "personal-service",
+];
 /// web's `_online_region_items` also counts these labels as online.
 const ONLINE_LABELS: [&str; 3] = ["online", "remote", "virtual"];
 

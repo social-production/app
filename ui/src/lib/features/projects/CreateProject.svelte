@@ -4,8 +4,6 @@
   import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
-  import TypeSelector from '#lib/components/create/TypeSelector.svelte';
-  import { PROJECT_TYPES, REQUEST_MODES } from '#lib/domain/projects.ts';
   import { tagCounts } from '#lib/domain/scopes.ts';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
 
@@ -14,7 +12,8 @@
 
   import { CREATE_STEPS, CreateState } from './createState.svelte.ts';
 
-  /** web's CreateProjectPage: type → basics → location → scope (tags) → overview. */
+  /** web's CreateProjectPage without its Type step (ADR 0059): basics → location → scope
+   * (tags) → overview. */
   const s = new CreateState();
   const steps = CREATE_STEPS;
 
@@ -29,42 +28,18 @@
 </script>
 
 <CreateSheet
-  title="Create project"
-  description="A project is shared work people can find, join, and take part in."
+  title="New proposal"
+  description="A proposal is shared work people can find, join and shape. Its plan decides what it becomes."
   {steps}
   stepIndex={s.step}
   missing={s.missing}
-  submitLabel="Publish project"
+  submitLabel="Publish proposal"
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
   onClose={() => void goto(resolve('/'))}
 >
-  {#if s.stepId === 'type'}
-    <div class="form-stack">
-      <TypeSelector
-        label="Project type"
-        name="project-type"
-        selected={s.mode}
-        options={PROJECT_TYPES}
-        onSelect={(mode) => (s.mode = mode)}
-      />
-      {#if s.mode === 'personal-service'}
-        <TypeSelector
-          label="Service request mode"
-          name="service-request-mode"
-          selected={s.requestMode}
-          options={REQUEST_MODES}
-          onSelect={(mode) => (s.requestMode = mode)}
-        />
-      {/if}
-      {#if s.allowance !== null}
-        <p class="helper-text">
-          New members can start 2 projects a week ({s.allowance} left). Full members have no limit.
-        </p>
-      {/if}
-    </div>
-  {:else if s.stepId === 'basics'}
+  {#if s.stepId === 'basics'}
     <div class="form-stack">
       <label>
         <RequiredLabel>Title</RequiredLabel>
@@ -74,6 +49,14 @@
         <RequiredLabel>Proposal description</RequiredLabel>
         <textarea bind:value={s.description} rows="5" aria-required="true"></textarea>
       </label>
+      <p class="helper-text">
+        No type yet: it becomes a project, a service or an event when its members approve a plan.
+      </p>
+      {#if s.allowance !== null}
+        <p class="helper-text">
+          New members can start 2 proposals a week ({s.allowance} left). Full members have no limit.
+        </p>
+      {/if}
       <PolicyNotice />
     </div>
   {:else if s.stepId === 'location'}
@@ -92,18 +75,12 @@
   {:else}
     <div class="form-stack overview">
       <button class="overview-row" type="button" onclick={() => (s.step = 0)}>
-        <strong>Type</strong><span
-          >{s.typeLabel}{#if s.mode === 'personal-service'}
-            · {s.requestModeLabel}{/if}</span
-        >
+        <strong>Basics</strong><span>{s.title.trim() || 'Untitled proposal'}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
-        <strong>Basics</strong><span>{s.title.trim() || 'Untitled project'}</span>
-      </button>
-      <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
         <strong>Location</strong><span>{s.locationLabel}</span>
       </button>
-      <button class="overview-row" type="button" onclick={() => (s.step = 3)}>
+      <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
         <strong>Scope</strong><span>{tagCounts(s.tags)}</span>
       </button>
       {#if s.message}<p class="status-note">{s.message}</p>{/if}

@@ -75,6 +75,8 @@ export interface PlanBoard {
   plans: PlanView[];
   /** The kind members can submit now (the current phase's). */
   openKind: PlanKind | null;
+  /** Every kind this phase takes: one, or a proposal's three type-giving kinds (ADR 0059). */
+  openKinds: PlanKind[];
   /** The kind whose approved leader the next phase move needs, and that leader. */
   gate: PlanKind | null;
   gateLeader: string | null;
@@ -107,8 +109,48 @@ export function subtypeOptions(mode: ProjectMode): { value: ProjectSubtype; labe
   ];
 }
 
-/** The plan kind a phase of this mode takes (sp_governance `PlanKind::for_phase`). */
+/** What a proposal becomes when a plan of this kind leads it out of its Plan phase
+ * (sp_governance `PlanKind::makes`, ADR 0059), with the wizard's choice copy. */
+export const PLAN_MAKES: {
+  value: PlanKind;
+  mode: ProjectMode | 'event';
+  label: string;
+  summary: string;
+  makes: string;
+}[] = [
+  {
+    value: 'Production',
+    mode: 'productive',
+    label: 'Production plan',
+    summary: 'Build or produce something new. Makes this a productive project.',
+    makes: 'a productive project',
+  },
+  {
+    value: 'Organisation',
+    mode: 'collective-service',
+    label: 'Operations plan',
+    summary: 'Run or maintain something in use. Makes this a collective service.',
+    makes: 'a collective service',
+  },
+  {
+    value: 'Event',
+    mode: 'event',
+    label: 'Event plan',
+    summary: 'A dated occasion with a place. Makes this a public event.',
+    makes: 'a public event',
+  },
+];
+
+/** "Production plan · makes this a productive project", for a plan on a proposal. */
+export function planMakesLine(kind: PlanKind): string | null {
+  const made = PLAN_MAKES.find((m) => m.value === kind);
+  return made ? `${made.label} · makes this ${made.makes}` : null;
+}
+
+/** The plan kind a phase of this mode takes (sp_governance `PlanKind::for_phase`). A
+ * proposal's Plan phase takes three; this names the first (see `PlanBoard.openKinds`). */
 export function planKindFor(mode: CharterMode, phase: string): PlanKind | null {
+  if (mode === 'proposal') return phase === 'phase-2' ? 'Production' : null;
   if (mode === 'event') return phase === 'phase-2' ? 'Event' : null;
   const collective = mode === 'collective-service';
   if (mode === 'personal-service') return null;

@@ -2,7 +2,8 @@ import type { CreateLink } from '#lib/components/shell/CreateFab.svelte';
 
 import { resolve } from '$app/paths';
 
-/** web's createMenuItems: the content the app has so far, in web's order. */
+/** web's createMenuItems, in web's order. Since ADR 0059 a public project or event starts
+ * as a Proposal with no type; only private events are created as events. */
 export const createLinks: CreateLink[] = [
   {
     href: resolve('/create/post'),
@@ -18,20 +19,20 @@ export const createLinks: CreateLink[] = [
   },
   {
     href: resolve('/create/help-request'),
-    label: 'Help request',
+    label: 'Request',
     description: 'Ask for help with roles and schedule',
     icon: 'help-request',
   },
   {
     href: resolve('/create/project'),
-    label: 'Project',
-    description: 'Start a productive or service project',
+    label: 'Proposal',
+    description: 'Propose a project, a service or a public event',
     icon: 'project',
   },
   {
     href: resolve('/create/event'),
-    label: 'Event',
-    description: 'Plan a scheduled gathering',
+    label: 'Private event',
+    description: 'Invite people to a gathering',
     icon: 'event',
   },
 ];

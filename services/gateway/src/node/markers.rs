@@ -111,7 +111,14 @@ pub struct Marker {
     pub minimum_participants: Option<u32>,
 }
 
-const PROJECT_MODES: [&str; 3] = ["productive", "collective-service", "personal-service"];
+/// The modes that are projects on the map and in Region; a `proposal` is one before its plan
+/// gives it a type (ADR 0059).
+const PROJECT_MODES: [&str; 4] = [
+    "proposal",
+    "productive",
+    "collective-service",
+    "personal-service",
+];
 
 /// What a card is on the map, or `None` when web shows no pin for it.
 fn kind_of(card: &ProjectCard, filter: &str) -> Option<&'static str> {
@@ -140,8 +147,8 @@ fn subtitle(card: &ProjectCard, q: &MarkerQuery) -> String {
         .iter()
         .any(|a| (!q.upcoming_only || a.starts_at >= q.now) && a.committed < a.minimum);
     match card.mode.as_str() {
-        "productive" if phase.is_empty() => "Proposal".into(),
-        "productive" => phase.into(),
+        "productive" | "proposal" if phase.is_empty() => "Proposal".into(),
+        "productive" | "proposal" => phase.into(),
         "personal-service" => "Accepting requests".into(),
         _ if open_spots => "Open spots".into(),
         _ => phase.into(),

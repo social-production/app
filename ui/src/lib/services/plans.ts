@@ -41,6 +41,7 @@ interface PlanViewWire {
 interface PlanBoardWire {
   plans: PlanViewWire[];
   open_kind: PlanKind | null;
+  open_kinds?: PlanKind[];
   gate: PlanKind | null;
   gate_leader: ActionHash | null;
   members: number;
@@ -82,6 +83,7 @@ export async function listPlans(project: ProjectRef): Promise<PlanBoard> {
       average: p.average_x100 === null ? null : p.average_x100 / 100,
     })),
     openKind: wire.open_kind,
+    openKinds: wire.open_kinds ?? (wire.open_kind ? [wire.open_kind] : []),
     gate: wire.gate,
     gateLeader: wire.gate_leader ? hashToString(wire.gate_leader) : null,
     members: wire.members,

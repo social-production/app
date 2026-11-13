@@ -19,7 +19,8 @@ import { CreateState } from './createState.svelte.ts';
 
 /** web's CreateEventPage draft: the project draft plus audience, people, control and plan. */
 export class EventCreateState extends CreateState {
-  audience = $state<EventAudience>('public');
+  /** Private events only: a public event starts as a proposal (ADR 0059). */
+  audience = $state<EventAudience>('invite_only');
   /** web preselects organizer-controlled for private events. */
   chosenGovernance = $state<EventGovernance>('organizer_controlled');
   invitees = $state<Contact[]>([]);

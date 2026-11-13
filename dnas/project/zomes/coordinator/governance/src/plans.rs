@@ -6,6 +6,7 @@ use std::collections::BTreeMap;
 
 use hdk::prelude::*;
 use project_integrity::{ProposalKind, Rating};
+use sp_governance::phases::{Phase, PROPOSAL};
 use sp_governance::plans::{pick_leader, summarize, Candidate, Leader, PlanKind, Ratings, Score};
 
 use crate::decide::{Decision, Standing};
@@ -58,18 +59,30 @@ pub fn approved(
     Ok(out)
 }
 
-pub fn leader(approved: &[Approved], kind: PlanKind) -> Leader<ActionHash> {
+/// The kinds whose plans compete with a `kind` plan for the lead in a space founded as
+/// `born`: just `kind` in a typed project, every type-giving kind in a proposal (ADR 0059).
+pub fn rivals(born: &str, kind: PlanKind) -> Vec<PlanKind> {
+    let open = PlanKind::open_kinds(born, kind.phase());
+    if open.contains(&kind) {
+        open
+    } else {
+        vec![kind]
+    }
+}
+
+/// The leading approved plan among `kinds` (one kind, or a proposal's competing kinds).
+pub fn leader(approved: &[Approved], kinds: &[PlanKind]) -> Leader<ActionHash> {
     // Organizers set the plan (ADR 0061): their newest approved plan leads.
     if project_integrity::organized().unwrap_or(false) {
         return approved
             .iter()
             .rev()
-            .find(|a| a.kind == kind)
+            .find(|a| kinds.contains(&a.kind))
             .map_or(Leader::None, |a| Leader::One(a.hash.clone()));
     }
     let candidates: Vec<Candidate<ActionHash>> = approved
         .iter()
-        .filter(|a| a.kind == kind)
+        .filter(|a| kinds.contains(&a.kind))
         .map(|a| Candidate {
             id: a.hash.clone(),
             yes: a.yes,
@@ -80,18 +93,24 @@ pub fn leader(approved: &[Approved], kind: PlanKind) -> Leader<ActionHash> {
     pick_leader(&candidates)
 }
 
-/// The subtype of the leading production or operations plan, if there is one.
-pub fn live_subtype(approved: &[Approved]) -> Option<String> {
-    let kinds = [PlanKind::Production, PlanKind::Organisation];
-    kinds
-        .into_iter()
-        .find_map(|kind| match leader(approved, kind) {
-            Leader::One(hash) => approved
-                .iter()
-                .find(|a| a.hash == hash)
-                .and_then(|a| a.subtype.clone()),
+/// The plan leading the first plan phase of a space founded as `born`, if exactly one does.
+pub fn first_leader<'a>(approved: &'a [Approved], born: &str) -> Option<&'a Approved> {
+    let groups: Vec<Vec<PlanKind>> = if born == PROPOSAL {
+        vec![PlanKind::open_kinds(PROPOSAL, Phase::P2)]
+    } else {
+        vec![vec![PlanKind::Production], vec![PlanKind::Organisation]]
+    };
+    groups
+        .iter()
+        .find_map(|kinds| match leader(approved, kinds) {
+            Leader::One(hash) => approved.iter().find(|a| a.hash == hash),
             _ => None,
         })
+}
+
+/// The subtype of the leading production or operations plan, if there is one.
+pub fn live_subtype(approved: &[Approved], born: &str) -> Option<String> {
+    first_leader(approved, born).and_then(|a| a.subtype.clone())
 }
 
 /// Every rated criterion's ratings (rubric or value; integrity checked the criterion) from

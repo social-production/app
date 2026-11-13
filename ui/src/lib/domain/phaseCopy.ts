@@ -25,6 +25,12 @@ const OVERRIDES: Partial<Record<CharterMode, Record<string, string>>> = {
     'phase-1': 'One person offers this service.',
     'phase-2': 'This personal service is closed and no longer takes requests.',
   },
+  // A proposal has no type yet (ADR 0059).
+  proposal: {
+    'phase-1': 'Gather interest and name the values this should serve.',
+    'phase-2':
+      'Propose plans. The leading approved plan decides what this becomes: a project, a service or an event.',
+  },
   // web-backend `DEFAULT_EVENT_PHASE_COPY` (events use the app's phase ids, ADR 0057).
   event: {
     'phase-1': 'Gather interest and define the values this event should optimize for.',

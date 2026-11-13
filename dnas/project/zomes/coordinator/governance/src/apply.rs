@@ -3,8 +3,8 @@
 
 use hdk::prelude::*;
 use project_integrity::{Applied, AppliedRequests, AppliedUpdate, Charter, ProposalKind};
-use sp_governance::phases::{next_phase, Phase, Shape};
-use sp_governance::plans::required_plan_kind;
+use sp_governance::phases::{next_phase, Phase, Shape, PROPOSAL};
+use sp_governance::plans::required_plan_kinds;
 use sp_governance::returns::{can_return, reopens_subtype};
 
 pub use crate::decide::{Decision, Standing};
@@ -39,7 +39,14 @@ impl State {
             .unwrap_or("standard")
     }
 
+    /// The space's type now: what its leading plan made a proposal (ADR 0059), else the
+    /// charter's. A proposal still choosing its plan is a `proposal`.
     pub fn mode(&self) -> &str {
+        self.applied.mode.as_deref().unwrap_or(self.born())
+    }
+
+    /// The mode the space was founded with; a `proposal` stays one here whatever it became.
+    pub fn born(&self) -> &str {
         self.charter
             .as_ref()
             .map_or("productive", |c| c.mode.as_str())
@@ -68,7 +75,12 @@ pub fn state(standing: &mut Standing, roll: &Roll) -> ExternResult<State> {
     if applied.subtype.is_none() {
         // While the production/operations plan is still being chosen, its leader sets the
         // subtype live, as on web; leaving the phase freezes the cited plan's.
-        applied.subtype = plans::live_subtype(&approved);
+        applied.subtype = plans::live_subtype(&approved, mode);
+    }
+    if mode == PROPOSAL && applied.mode.is_none() {
+        applied.leading_mode = plans::first_leader(&approved, mode)
+            .and_then(|a| a.kind.makes())
+            .map(str::to_string);
     }
     Ok(State {
         charter,
@@ -112,11 +124,11 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
             }),
             ProposalKind::Phase { to, plan, .. } => {
                 let Some(c) = charter else { continue };
-                if let Some((next, subtype)) = phase_move(c, &out, phase, &to, plan, d.at, approved)
-                {
-                    phase = next;
-                    out.phase = Some(next.id().to_string());
-                    out.subtype = subtype.or(out.subtype);
+                if let Some(moved) = phase_move(c, &out, phase, &to, plan, d.at, approved) {
+                    phase = moved.to;
+                    out.phase = Some(moved.to.id().to_string());
+                    out.subtype = moved.subtype.or(out.subtype);
+                    out.mode = moved.mode.or(out.mode);
                 }
             }
             ProposalKind::Return { to, .. } => {
@@ -125,7 +137,10 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     phase = back;
                     out.phase = Some(back.id().to_string());
                     if reopens_subtype(back) {
+                        // Back in the first plan phase or before it: the subtype, and a
+                        // proposal's type, are open again (ADR 0040, 0059).
                         out.subtype = None;
+                        out.mode = None;
                     }
                 }
             }
@@ -153,10 +168,19 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
     out
 }
 
+/// What a passed phase move changed.
+struct Moved {
+    to: Phase,
+    /// The subtype the cited plan chose, if it chooses one.
+    subtype: Option<String>,
+    /// The type the cited plan gave a proposal (ADR 0059).
+    mode: Option<String>,
+}
+
 /// A phase move applies only as the next step from where the project is; leaving a plan
 /// phase also needs the cited plan approved (before this move closed) for that phase
-/// (web's `_ensure_project_phase_plan_gate`, ADR 0039). Returns the new phase and the subtype
-/// the cited plan chose.
+/// (web's `_ensure_project_phase_plan_gate`, ADR 0039). A proposal leaves its Plan phase as
+/// the type its cited plan makes it, into that type's next phase (ADR 0059).
 fn phase_move(
     charter: &Charter,
     so_far: &Applied,
@@ -165,31 +189,43 @@ fn phase_move(
     plan: Option<ActionHash>,
     at: Timestamp,
     approved: &[Approved],
-) -> Option<(Phase, Option<String>)> {
+) -> Option<Moved> {
     let current = so_far
         .subtype
         .clone()
         .unwrap_or_else(|| charter.subtype.clone());
+    let mode = so_far.mode.as_deref().unwrap_or(&charter.mode);
+    let kinds = required_plan_kinds(shape(mode, &current), phase);
     let mut chosen = None;
-    if let Some(kind) = required_plan_kind(shape(&charter.mode, &current), phase) {
+    let mut made = None;
+    if !kinds.is_empty() {
         let cited = approved
             .iter()
-            .find(|a| Some(&a.hash) == plan.as_ref() && a.kind == kind && a.at < at)?;
-        if kind.sets_subtype() {
+            .find(|a| Some(&a.hash) == plan.as_ref() && kinds.contains(&a.kind) && a.at < at)?;
+        if cited.kind.sets_subtype() {
             chosen.clone_from(&cited.subtype);
+        }
+        if mode == PROPOSAL {
+            made = cited.kind.makes().map(str::to_string);
         }
     }
     let subtype = chosen.clone().unwrap_or_else(|| current.clone());
-    next_phase(shape(&charter.mode, &subtype), phase)
+    let leaving_as = made.as_deref().unwrap_or(mode);
+    next_phase(shape(leaving_as, &subtype), phase)
         .filter(|n| n.id() == to)
-        .map(|n| (n, chosen))
+        .map(|to| Moved {
+            to,
+            subtype: chosen,
+            mode: made,
+        })
 }
 
 /// A return applies only to an earlier planning phase the project shows from where it is now
 /// (web's `revertablePhaseIds`), so a return decided after another move may no longer apply.
 fn phase_return(charter: &Charter, so_far: &Applied, phase: Phase, to: &str) -> Option<Phase> {
     let subtype = so_far.subtype.as_deref().unwrap_or(&charter.subtype);
-    Phase::parse(to).filter(|t| can_return(shape(&charter.mode, subtype), phase, *t))
+    let mode = so_far.mode.as_deref().unwrap_or(&charter.mode);
+    Phase::parse(to).filter(|t| can_return(shape(mode, subtype), phase, *t))
 }
 
 fn shape<'a>(mode: &'a str, subtype: &'a str) -> Shape<'a> {

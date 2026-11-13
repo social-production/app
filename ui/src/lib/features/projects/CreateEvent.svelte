@@ -48,8 +48,8 @@
 </script>
 
 <CreateSheet
-  title="Create event"
-  description="An event gathers people for a planned occasion. A public event starts as a proposal, and its dates are set when members approve its plan. A private event can get its dates now."
+  title="Private event"
+  description="A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one."
   steps={s.steps}
   stepIndex={s.step}
   {missing}

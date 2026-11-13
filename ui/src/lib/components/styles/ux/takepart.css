@@ -235,3 +235,41 @@
     transform: none;
   }
 }
+
+/* A proposal's plans (ADR 0059): each says what it would make, and Add plan first asks which
+   kind. */
+.shell .plan-card .plan-makes {
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .plan-kind-choice {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 16px;
+  border-radius: 20px;
+  background: var(--panel-hover);
+}
+
+.shell .plan-kind-choice .type-option {
+  border: none;
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.shell .plan-kind-choice .type-option.active {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.shell .plan-kind-continue {
+  height: 46px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--page-bg);
+  font-size: 15px;
+  font-weight: 700;
+}

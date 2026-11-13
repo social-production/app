@@ -37,8 +37,12 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         calls::my_membership()?.ok_or_else(|| guest("Join the project to propose changes."))?;
     let charter =
         calls::base_charter()?.ok_or_else(|| guest("This project has no charter yet."))?;
-    accepts(&charter.mode, &kind)?;
-    let saved = saves_at_once(&charter.mode)?;
+    // What the space is now: a proposal's plan may have given it its type (ADR 0059).
+    let mode = apply::applied()?
+        .mode
+        .unwrap_or_else(|| charter.mode.clone());
+    accepts(&mode, &kind)?;
+    let saved = saves_at_once(&mode)?;
     // Organizer-controlled events (ADR 0061): only organizers propose, and it applies at once.
     let organized = project_integrity::organized()?;
     let organizer =
@@ -123,6 +127,16 @@ fn accepts(mode: &str, kind: &ProposalKind) -> ExternResult<()> {
     let settings = matches!(kind, ProposalKind::RequestSettings { .. });
     if mode == "personal-service" && !settings {
         return Err(guest("Personal services don't take proposals."));
+    }
+    if mode == sp_governance::phases::PROPOSAL
+        && matches!(
+            kind,
+            ProposalKind::RequestSettings { .. } | ProposalKind::Software(_)
+        )
+    {
+        return Err(guest(
+            "A proposal takes this once its plan has made it a project or a service.",
+        ));
     }
     project_integrity::check_scope_kind(mode, kind).map_err(guest)
 }

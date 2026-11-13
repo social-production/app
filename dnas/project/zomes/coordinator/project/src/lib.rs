@@ -148,7 +148,11 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
     let (mode, subtype) = charter.as_ref().map_or(("productive", "standard"), |c| {
         (c.mode.as_str(), c.subtype.as_str())
     });
-    let (phases, next, returns, stage) = lifecycle(mode, subtype, current);
+    let (phases, mut next, returns, stage) = lifecycle(mode, subtype, current);
+    // A proposal's next phase is its leading plan's type's (ADR 0059).
+    if let (true, Some(leading)) = (next.is_none(), applied.leading_mode.as_deref()) {
+        next = lifecycle(leading, subtype, current).1;
+    }
     let requests = RequestSettingsView::of(mode, applied.requests.as_ref());
 
     let organizers = organizers::list()?;
@@ -248,6 +252,10 @@ fn merge(mut c: Charter, a: &Applied) -> Charter {
     // The production or operations plan chooses the subtype (ADR 0039).
     if let Some(s) = &a.subtype {
         c.subtype.clone_from(s);
+    }
+    // A proposal's leading plan gives it its type (ADR 0059).
+    if let Some(m) = &a.mode {
+        c.mode.clone_from(m);
     }
     c
 }

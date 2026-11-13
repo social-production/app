@@ -6,7 +6,8 @@ use std::cmp::Ordering;
 
 use serde::{Deserialize, Serialize};
 
-use crate::phases::{Phase, Shape, EVENT};
+use crate::phases::{Phase, Shape, EVENT, PROPOSAL};
+pub use crate::rubric::{criteria, Criterion};
 
 /// web's `phase_kind`. "organisation" is web's id for the operations plan.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize)]
@@ -60,7 +61,22 @@ impl PlanKind {
             "productive" => matches!(self, Self::Production | Self::Distribution),
             "collective-service" => matches!(self, Self::Organisation | Self::Access),
             EVENT => self == Self::Event,
+            // A proposal takes every kind that can give it a type (ADR 0059).
+            PROPOSAL => self.makes().is_some(),
             _ => false,
+        }
+    }
+
+    /// The type a proposal becomes when this plan leads it out of the Plan phase (ADR 0059):
+    /// a production plan makes a productive project, an operations plan a collective service,
+    /// an event plan an event. Second-phase plans make nothing.
+    #[must_use]
+    pub fn makes(self) -> Option<&'static str> {
+        match self {
+            Self::Production => Some("productive"),
+            Self::Organisation => Some("collective-service"),
+            Self::Event => Some(EVENT),
+            Self::Distribution | Self::Access => None,
         }
     }
 
@@ -70,6 +86,16 @@ impl PlanKind {
         Self::ALL
             .into_iter()
             .find(|k| k.allowed(mode) && k.phase() == phase)
+    }
+
+    /// Every kind of plan a project of `mode` takes in `phase`: one for a typed project, the
+    /// three type-giving kinds for a proposal in its Plan phase (ADR 0059).
+    #[must_use]
+    pub fn open_kinds(mode: &str, phase: Phase) -> Vec<Self> {
+        Self::ALL
+            .into_iter()
+            .filter(|k| k.allowed(mode) && k.phase() == phase)
+            .collect()
     }
 
     /// Production and operations plans choose the project's subtype (web's
@@ -91,65 +117,15 @@ pub fn required_plan_kind(shape: Shape<'_>, current: Phase) -> Option<PlanKind> 
     }
 }
 
-/// One rubric question. Value criteria (web's "How well does this plan satisfy …") come from
-/// project values (`values`).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct Criterion {
-    pub id: &'static str,
-    pub label: &'static str,
-}
-
-const SHARED: [Criterion; 2] = [
-    Criterion {
-        id: "rubric:description-clarity",
-        label: "Does the plan clearly explain what will happen and why?",
-    },
-    Criterion {
-        id: "rubric:achievability",
-        label: "Does this plan seem realistically achievable?",
-    },
-];
-/// web's `EVENT_RUBRIC`.
-const EVENT_RUBRIC: [Criterion; 2] = [
-    Criterion {
-        id: "rubric:timing-suitable",
-        label: "Is the timing and schedule realistic?",
-    },
-    Criterion {
-        id: "rubric:location-appropriate",
-        label: "Is the location appropriate and accessible?",
-    },
-];
-const PRODUCTION: Criterion = Criterion {
-    id: "rubric:production-approach",
-    label: "Is the proposed production approach appropriate?",
-};
-const SOFTWARE: Criterion = Criterion {
-    id: "rubric:repository-clear",
-    label: "Is the repository/setup clear enough?",
-};
-const DISTRIBUTION: Criterion = Criterion {
-    id: "rubric:access-approach",
-    label: "Is the access and request approach appropriate?",
-};
-
-/// web's `assessment_criteria_for_plan` (rubric part). `subtype` is the plan's own.
+/// As `required_plan_kind`, for a proposal too: leaving `current` needs an approved leading
+/// plan of any one of these kinds; empty when it needs none.
 #[must_use]
-pub fn criteria(kind: PlanKind, subtype: &str) -> Vec<Criterion> {
-    let mut out = SHARED.to_vec();
-    match kind {
-        PlanKind::Production | PlanKind::Organisation => {
-            out.push(PRODUCTION);
-            if subtype == "software" {
-                out.push(SOFTWARE);
-            }
-        }
-        // web's `elif plan_kind == "distribution"`: access plans get only the shared rubric.
-        PlanKind::Distribution => out.push(DISTRIBUTION),
-        PlanKind::Access => {}
-        PlanKind::Event => out.extend(EVENT_RUBRIC),
+pub fn required_plan_kinds(shape: Shape<'_>, current: Phase) -> Vec<PlanKind> {
+    match current {
+        Phase::P3 if shape.skips_distribution() => Vec::new(),
+        Phase::P2 | Phase::P3 => PlanKind::open_kinds(shape.mode, current),
+        _ => Vec::new(),
     }
-    out
 }
 
 /// A criterion rating is 1 (strongly oppose) to 5 (strongly support).

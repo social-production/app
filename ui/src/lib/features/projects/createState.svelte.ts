@@ -1,10 +1,7 @@
 import {
-  PROJECT_TYPES,
   type Charter,
-  REQUEST_MODES,
   type LocationChoice,
   type CharterMode,
-  type RequestMode,
   LOCATION_LABEL_MAX,
 } from '#lib/domain/projects.ts';
 import {
@@ -17,27 +14,24 @@ import {
 import { tagScope } from '#lib/domain/scopes.ts';
 import { explain } from '#lib/services/errors.ts';
 import { createProject, projectAllowance } from '#lib/services/projects.ts';
-import { saveRequestSettings } from '#lib/services/serviceRequests.ts';
 
 import type { EventStepId } from '#lib/domain/eventCreate.ts';
 
-type Step = { id: 'type' | EventStepId; title: string };
+type Step = { id: EventStepId; title: string };
 
 export const CREATE_STEPS: Step[] = [
-  { id: 'type', title: 'Type' },
   { id: 'basics', title: 'Basics' },
   { id: 'location', title: 'Location' },
   { id: 'scope', title: 'Scope' },
   { id: 'overview', title: 'Overview' },
 ];
 
-/** The create-project wizard's draft (web's CreateProjectPage state); `EventCreateState`
- * extends it for events. */
+/** The new-proposal wizard's draft (web's CreateProjectPage state without its Type step: a
+ * proposal has no type until its leading plan gives it one, ADR 0059); `EventCreateState`
+ * extends it for private events. */
 export class CreateState {
   step = $state(0);
-  mode = $state<CharterMode>('productive');
-  /** A personal service's request mode (web's `serviceRequestMode`, default both). */
-  requestMode = $state<RequestMode>('both');
+  mode = $state<CharterMode>('proposal');
   readonly steps: Step[] = $derived(CREATE_STEPS);
   title = $state('');
   description = $state('');
@@ -51,10 +45,6 @@ export class CreateState {
   allowance = $state<number | null>(null);
 
   readonly stepId = $derived(this.steps[this.step]?.id ?? 'basics');
-  readonly typeLabel = $derived(PROJECT_TYPES.find((t) => t.value === this.mode)?.label ?? '');
-  readonly requestModeLabel = $derived(
-    REQUEST_MODES.find((m) => m.value === this.requestMode)?.label ?? '',
-  );
   readonly locationLabel = $derived(
     this.intent === 'online'
       ? 'Online'
@@ -93,7 +83,7 @@ export class CreateState {
     return intentPlace(this.intent, this.placeValue, label);
   }
 
-  constructor(mode: CharterMode = 'productive') {
+  constructor(mode: CharterMode = 'proposal') {
     this.mode = mode;
   }
 
@@ -133,15 +123,6 @@ export class CreateState {
     this.message = undefined;
     try {
       const id = await createProject(this.charter());
-      // web-backend saves the mode at creation, with off-schedule requests only for "both";
-      // "both" with them on is already the app's default (ADR 0077).
-      if (this.mode === 'personal-service' && this.requestMode !== 'both') {
-        await saveRequestSettings(id, {
-          enabled: true,
-          mode: this.requestMode,
-          offSchedule: false,
-        });
-      }
       return id;
     } catch (e) {
       this.message = explain(e);

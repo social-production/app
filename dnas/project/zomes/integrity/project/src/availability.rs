@@ -81,7 +81,9 @@ pub fn validate_booking(
         return invalid("only services book requests");
     };
     match charter_at(space)? {
-        Some((charter, _)) if charter.mode == "collective-service" => {
+        // A proposal may have become a collective service (ADR 0059); the coordinator
+        // checks its type now, since validation cannot replay its decisions.
+        Some((charter, _)) if crate::applied::may_be(&charter.mode, "collective-service") => {
             Ok(ValidateCallbackResult::Valid)
         }
         Some((charter, creator)) if charter.mode == "personal-service" && &creator == author => {

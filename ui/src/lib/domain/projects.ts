@@ -11,10 +11,11 @@ import {
 } from './places.ts';
 
 export type ProjectMode = 'productive' | 'collective-service' | 'personal-service';
-/** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), or a
- * channel's or community's (ADR 0068). */
+/** A charter's mode: a project's, "event" (ADR 0057), "help-request" (ADR 0067), a channel's
+ * or community's (ADR 0068), or "proposal": a public project or event before its leading
+ * plan gives it its type (ADR 0059). */
 export type CharterMode =
-  ProjectMode | 'event' | 'help-request' | 'thread' | 'post' | 'channel' | 'community';
+  ProjectMode | 'proposal' | 'event' | 'help-request' | 'thread' | 'post' | 'channel' | 'community';
 export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
@@ -171,6 +172,8 @@ export function modeAccent(mode: CharterMode): string {
   if (mode === 'help-request') return 'var(--type-accent-help-request)';
   if (mode === 'thread') return 'var(--type-accent-thread)';
   if (mode === 'post') return 'var(--type-accent-post)';
+  // No type yet (ADR 0059): no type's colour either.
+  if (mode === 'proposal') return 'var(--text-soft)';
   if (mode === 'productive') return 'var(--type-accent-project-production)';
   return mode === 'personal-service'
     ? 'var(--type-accent-project-personal-service)'

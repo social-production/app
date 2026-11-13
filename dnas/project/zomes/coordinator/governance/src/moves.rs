@@ -3,8 +3,8 @@
 
 use hdk::prelude::*;
 use project_integrity::ProposalKind;
-use sp_governance::phases::{next_phase, signal_gate_met, Phase};
-use sp_governance::plans::{required_plan_kind, Leader};
+use sp_governance::phases::{next_phase, signal_gate_met, Phase, Shape, PROPOSAL};
+use sp_governance::plans::{required_plan_kinds, Leader};
 use sp_governance::returns::can_return;
 
 use crate::apply::State;
@@ -18,7 +18,31 @@ use crate::{calls, plans, reads};
 pub fn check_phase_move(state: &State, to: &str) -> ExternResult<Option<ActionHash>> {
     let shape = state.shape();
     let current = state.phase();
-    if next_phase(shape, current).map(Phase::id) != Some(to) {
+    let kinds = required_plan_kinds(shape, current);
+    let leader = match plans::leader(&state.approved, &kinds) {
+        Leader::One(plan) => Some(plan),
+        _ => None,
+    };
+    // A proposal leaves its Plan phase as the type its leading plan makes it (ADR 0059).
+    let made = (shape.mode == PROPOSAL)
+        .then(|| {
+            state
+                .approved
+                .iter()
+                .find(|a| Some(&a.hash) == leader.as_ref())
+        })
+        .flatten()
+        .and_then(|a| a.kind.makes().map(|mode| (mode, a.subtype.as_deref())));
+    let leaving = match made {
+        Some((mode, subtype)) => Shape {
+            mode,
+            subtype: subtype.unwrap_or(shape.subtype),
+            include_access: false,
+        },
+        None => shape,
+    };
+    let gated = !kinds.is_empty() && leader.is_none();
+    if !gated && next_phase(leaving, current).map(Phase::id) != Some(to) {
         return Err(guest("A project can only move to its next phase."));
     }
     // Organizer-controlled events skip signals (ADR 0061).
@@ -30,15 +54,12 @@ pub fn check_phase_move(state: &State, to: &str) -> ExternResult<Option<ActionHa
             ));
         }
     }
-    let Some(kind) = required_plan_kind(shape, current) else {
+    if kinds.is_empty() {
         return Ok(None);
-    };
-    match plans::leader(&state.approved, kind) {
-        Leader::One(plan) => Ok(Some(plan)),
-        _ => Err(guest(
-            "An approved plan is required before advancing this project phase.",
-        )),
     }
+    leader
+        .map(Some)
+        .ok_or_else(|| guest("An approved plan is required before advancing this project phase."))
 }
 
 /// web's revert request: an earlier planning phase the project shows, a reason, and no other

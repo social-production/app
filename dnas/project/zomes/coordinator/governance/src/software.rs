@@ -60,7 +60,7 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
 
 fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPubKey>> {
     let mut timed = Vec::new();
-    for lead in plan_lead::replay(&state.approved) {
+    for lead in plan_lead::replay(&state.approved, state.born()) {
         if !matches!(lead.kind, PlanKind::Production | PlanKind::Organisation) {
             continue;
         }

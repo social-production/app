@@ -28,9 +28,20 @@
     /** Open the sheet once (a vote link to this plan). */
     reveal?: boolean;
     onRevealDone?: (() => void) | undefined;
+    /** On a proposal: what this plan would make it ("Event plan · makes this …", ADR 0059). */
+    makes?: string | null;
   }
 
-  let { plan, authorName, canVote, onRate, onVote, reveal = false, onRevealDone }: Props = $props();
+  let {
+    plan,
+    authorName,
+    canVote,
+    onRate,
+    onVote,
+    reveal = false,
+    onRevealDone,
+    makes = null,
+  }: Props = $props();
 
   let open = $state(false);
   let revealed = $state(false);
@@ -79,6 +90,7 @@
         {/if}
       </span>
     </span>
+    {#if makes}<span class="plan-makes">{makes}</span>{/if}
     <span class="plan-lede collapsed-copy">{plan.plan.description}</span>
     <span class="plan-stage-list">
       {#each plan.plan.stages as stage, index (index)}
