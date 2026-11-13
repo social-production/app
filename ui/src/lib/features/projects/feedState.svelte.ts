@@ -26,13 +26,20 @@ export class FeedState {
     public personal?: FeedQuery['personal'],
   ) {}
 
+  /** Counts reloads, so an answer to an earlier request is dropped. Two overlapping loads
+   * (a sort change during the first load) used to append the same cards twice, and the
+   * feed's keyed list then crashed the page. */
+  #round = 0;
+
   async reload(): Promise<void> {
+    this.#round++;
     this.loading = true;
     this.items = [];
     await this.more();
   }
 
   async more(): Promise<void> {
+    const round = this.#round;
     this.loading = true;
     this.error = undefined;
     try {
@@ -45,12 +52,15 @@ export class FeedState {
         ...(this.tag ? { tag: this.tag } : {}),
         ...(this.personal ? { personal: this.personal } : {}),
       });
-      this.items = [...this.items, ...page.items.slice(0, PAGE)];
+      if (round !== this.#round) return;
+      const have = this.items.map((item) => item.id);
+      const fresh = page.items.slice(0, PAGE).filter((item) => !have.includes(item.id));
+      this.items = [...this.items, ...fresh];
       this.total = page.total;
     } catch (e) {
-      this.error = explain(e);
+      if (round === this.#round) this.error = explain(e);
     } finally {
-      this.loading = false;
+      if (round === this.#round) this.loading = false;
     }
   }
 

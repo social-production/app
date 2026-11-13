@@ -12,9 +12,11 @@
 @media (max-width: 1080px) {
   .shell .top-tab-row.top-tab-row {
     display: flex;
-    gap: 0;
-    justify-content: space-between;
+    gap: clamp(10px, 5vw, 22px);
+    justify-content: flex-start;
     padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
     border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 60%, transparent);
     border-radius: 0;
     background: color-mix(in srgb, var(--toolbar-background) 78%, transparent);

@@ -5,14 +5,15 @@
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
-  import { isEvent, takesSignals } from '#lib/domain/projects.ts';
+  import { isEvent, takesSignals, type Stance } from '#lib/domain/projects.ts';
 
   import DetailShare from './DetailShare.svelte';
   import type { DetailState } from './detailState.svelte.ts';
 
   /** web's Details dock: signals, join/members, Vote on edits and updates, Share +, and Edit and
    * Update for members. ADR 0099: Support and Oppose are a capsule above the actions until the
-   * person has a stance; then they fold into a chip that opens them again. */
+   * person has a stance; then they fold into a chip that opens them again. An open vote on
+   * an edit or update floats up there too, so the capsule stays one row of actions. */
   interface Props {
     detail: DetailState;
     membersOpen: boolean;
@@ -39,10 +40,31 @@
   const signals = $derived(
     !!project?.charter && takesSignals(project.charter.mode) && project.phase === 'phase-1',
   );
-  const total = $derived((project?.demand ?? 0) + (project?.opposition ?? 0));
-  const percent = $derived(
-    total > 0 ? `${Math.round(((project?.demand ?? 0) / total) * 100)}%` : '—',
+  // The stance just set here, until the project's own read catches up with it (a network
+  // read lags a write), so the strip folds into the chip at once.
+  let local = $state<{ mine: Stance | null; demand: number; opposition: number } | null>(null);
+  const stance = $derived(
+    local && local.mine !== (project?.mySignal ?? null)
+      ? local
+      : {
+          mine: project?.mySignal ?? null,
+          demand: project?.demand ?? 0,
+          opposition: project?.opposition ?? 0,
+        },
   );
+  const total = $derived(stance.demand + stance.opposition);
+  const percent = $derived(total > 0 ? `${Math.round((stance.demand / total) * 100)}%` : '—');
+
+  async function signal(next: Stance | null): Promise<void> {
+    const before = stance;
+    const count = (s: Stance): number =>
+      (s === 'Demand' ? before.demand : before.opposition) -
+      Number(before.mine === s) +
+      Number(next === s);
+    await detail.signal(next);
+    local = { mine: next, demand: count('Demand'), opposition: count('Oppose') };
+    voteOpen = false;
+  }
 </script>
 
 {#if detail.project?.charter}
@@ -50,33 +72,42 @@
   {@const charter = detail.project.charter}
   <DetailActionDock active>
     {#snippet vote()}
-      {#if signals && (!project.mySignal || voteOpen)}
+      {#if signals && (!stance.mine || voteOpen)}
         <div id="participation-signals">
           <SignalStrip
             labeled
             bare
-            support={project.demand}
-            oppose={project.opposition}
-            mine={project.mySignal}
-            onSignal={async (next) => {
-              await detail.signal(next);
-              voteOpen = false;
-            }}
+            support={stance.demand}
+            oppose={stance.opposition}
+            mine={stance.mine}
+            onSignal={signal}
           />
         </div>
       {/if}
+      {#if project.amMember}
+        <VoteDock
+          proposals={detail.openProposals.filter((p) => !isPhaseChange(p.kind))}
+          names={detail.names}
+          {charter}
+          stage={project.stage}
+          phaseLabel={detail.phaseLabel}
+          onVote={(p, c) => detail.vote(p, c)}
+          reveal={revealVote}
+          {onRevealDone}
+        />
+      {/if}
     {/snippet}
-    {#if signals && project.mySignal}
+    {#if signals && stance.mine}
       <button
         type="button"
         class="dock-chip"
-        class:opposed={project.mySignal === 'Oppose'}
+        class:opposed={stance.mine === 'Oppose'}
         aria-expanded={voteOpen}
-        aria-label={`You ${project.mySignal === 'Oppose' ? 'oppose' : 'support'} this, ${percent} support. Change`}
+        aria-label={`You ${stance.mine === 'Oppose' ? 'oppose' : 'support'} this, ${percent} support. Change`}
         title="Change your stance"
         onclick={() => (voteOpen = !voteOpen)}
       >
-        <svg aria-hidden="true" viewBox="0 0 24 24" class:flipped={project.mySignal === 'Oppose'}
+        <svg aria-hidden="true" viewBox="0 0 24 24" class:flipped={stance.mine === 'Oppose'}
           ><path
             d="M12 5.5 5 13h4v5.5h6V13h4L12 5.5Z"
             fill="none"
@@ -97,18 +128,6 @@
       onToggleJoin={() => detail.requestToggleJoin()}
       {onOpenMembers}
     />
-    {#if project.amMember}
-      <VoteDock
-        proposals={detail.openProposals.filter((p) => !isPhaseChange(p.kind))}
-        names={detail.names}
-        {charter}
-        stage={project.stage}
-        phaseLabel={detail.phaseLabel}
-        onVote={(p, c) => detail.vote(p, c)}
-        reveal={revealVote}
-        {onRevealDone}
-      />
-    {/if}
     <DetailShare {detail} />
     {#if detail.canPropose}
       <button type="button" class="dock-icon" aria-label="Edit" title="Edit" onclick={onEdit}>

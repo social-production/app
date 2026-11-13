@@ -1,5 +1,6 @@
 <script lang="ts">
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
+  import FactLine from '#lib/components/cards/FactLine.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
@@ -41,6 +42,7 @@
 <div class="project-overview">
   <div class="context-panel">
     <FeedCardTop
+      mode={charter.mode}
       tags={charter.tags}
       stage={project.stage}
       isPrivate={project.audience !== 'public'}
@@ -60,8 +62,8 @@
           <RestrictionNotice active={isHidden(moderation)}>
             <h1>{charter.title}</h1>
           </RestrictionNotice>
-          {#if timeLabel}<p class="live-fact">{timeLabel}</p>{/if}
-          {#if place}<p class="live-fact">{place}</p>{/if}
+          {#if timeLabel}<FactLine icon="when">{timeLabel}</FactLine>{/if}
+          {#if place}<FactLine icon="where">{place}</FactLine>{/if}
           <p class="overview-copy">{charter.description}</p>
           {#if latest !== null}
             <p class="overview-update">Update: {latest}</p>
