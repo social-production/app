@@ -13,15 +13,14 @@
   }
 
   let { card, onSignal }: Props = $props();
-  const authorName = $derived(card.creatorName || 'Unnamed');
 </script>
 
 {#if card.mode === 'help-request'}
-  <HelpRequestCard {card} {authorName} {onSignal} />
+  <HelpRequestCard {card} {onSignal} />
 {:else if card.mode === 'thread'}
-  <ThreadCard {card} {authorName} {onSignal} />
+  <ThreadCard {card} {onSignal} />
 {:else if card.mode === 'event'}
-  <EventCard {card} {authorName} {onSignal} />
+  <EventCard {card} {onSignal} />
 {:else}
-  <ProjectCard {card} {authorName} {onSignal} />
+  <ProjectCard {card} {onSignal} />
 {/if}

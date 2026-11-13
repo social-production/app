@@ -69,10 +69,12 @@ for (let i = 0; ; i++) {
   const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
     await card.getByText('0 signed up · 1 needed').waitFor();
-    // web's personal feed: the author link opens the asker's profile, which lists the request
-    // on web's PersonalHelpRequestCard.
-    // (Read the href: the feed re-renders its cards while it refreshes.)
-    profile = await card.locator('.content-meta-row a').first().getAttribute('href');
+    // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
+    // the asker's profile, which lists the request on web's PersonalHelpRequestCard.
+    await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
+    const author = helper.locator('.content-meta-row a').first();
+    await author.waitFor({ timeout: 60_000 });
+    profile = await author.getAttribute('href');
     break;
   }
   if (i >= 40) throw new Error('the help request never reached the feed');
