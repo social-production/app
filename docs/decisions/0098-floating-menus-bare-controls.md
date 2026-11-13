@@ -1,4 +1,4 @@
-# 0097. Bare icon buttons, floating create and More menus, outcome stripes in the rail's History (UX pass)
+# 0098. Bare icon buttons, floating create and More menus, outcome stripes in the rail's History (UX pass)
 
 Status: **accepted** (2026-11-12, owner approved the round 2 mockups). Plan:
 [`docs/plans/UX.md`](../plans/UX.md). Builds on ADR 0095 (the capsule and its tokens).
