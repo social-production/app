@@ -10,7 +10,7 @@
    * web's DetailActionDock: a detail page's action bar. While `active` it moves into the
    * app shell so it can stick to the bottom (phones) or float over the column (wide
    * desktop), and publishes its height as --detail-action-dock-height for page padding.
-   * ADR 0098: it floats in the nav capsule's style and takes the nav's place: a round back
+   * ADR 0099: it floats in the nav capsule's style and takes the nav's place: a round back
    * button, one capsule of actions (`children`), and above them the `vote` capsule.
    */
   let { active, vote, children }: { active: boolean; vote?: Snippet; children: Snippet } = $props();

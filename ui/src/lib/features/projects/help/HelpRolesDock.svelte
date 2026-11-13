@@ -47,7 +47,7 @@
   }
 </script>
 
-<!-- ADR 0098: the roles are part of the page; the dock holds the votes and Share. -->
+<!-- ADR 0099: the roles are part of the page; the dock holds the votes and Share. -->
 {#if help.activity && help.activity.roles.length > 0}
   <div class="help-roles help-roles-page">
     <h2 class="roles-heading">Roles</h2>

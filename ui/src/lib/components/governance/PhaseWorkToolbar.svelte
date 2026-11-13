@@ -6,7 +6,7 @@
   /**
    * web's PhaseWorkToolbar: a phase's work actions ("Add plan") and the Phase ▾ menu, moved into
    * the Take part dock (`#detail-participation-actions`). The phase menu portals itself into
-   * `#phase-nav-end`. ADR 0098: the dock is one capsule and lays the actions out itself
+   * `#phase-nav-end`. ADR 0099: the dock is one capsule and lays the actions out itself
    * (`styles/ux/dock.css`), so web's row-packing script is gone.
    */
   let { children, governance }: { children?: Snippet; governance?: Snippet } = $props();

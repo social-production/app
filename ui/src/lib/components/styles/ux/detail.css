@@ -1,4 +1,4 @@
-/* Detail pages (ADR 0098): overrides of the ported detail.css. Tabs are plain words with an
+/* Detail pages (ADR 0099): overrides of the ported detail.css. Tabs are plain words with an
    underline on phones (as on Twitter's profile page) and a rounded strip on wide screens. */
 
 .shell .top-tab-row.top-tab-row {
@@ -58,7 +58,7 @@
   }
 }
 
-/* A request's roles: rows in the page with a pill to sign up (ADR 0098). */
+/* A request's roles: rows in the page with a pill to sign up (ADR 0099). */
 .shell .help-roles-page {
   margin-top: 20px;
   padding: 0;

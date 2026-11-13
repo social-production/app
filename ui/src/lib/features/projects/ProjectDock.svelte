@@ -11,7 +11,7 @@
   import type { DetailState } from './detailState.svelte.ts';
 
   /** web's Details dock: signals, join/members, Vote on edits and updates, Share +, and Edit and
-   * Update for members. ADR 0098: Support and Oppose are a capsule above the actions until the
+   * Update for members. ADR 0099: Support and Oppose are a capsule above the actions until the
    * person has a stance; then they fold into a chip that opens them again. */
   interface Props {
     detail: DetailState;
