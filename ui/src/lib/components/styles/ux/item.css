@@ -1,0 +1,149 @@
+/* A post or thread page's own item (ADR 0100): the feed row opened up. The author or the type
+   line, the text at reading size, when it was written, then the feed row's bare actions
+   between two hairlines. Overrides of the ported cards.css and discussion.css; every rule
+   starts with `.shell`. */
+
+.shell .item-head {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.shell .item-head .item-author {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  min-width: 0;
+  margin-bottom: 10px;
+}
+
+.shell .item-head .item-author .avatar-badge {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  font-size: 15px;
+}
+
+.shell .item-head .item-author .header-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shell .surface .content .item-head .linked-body.detail {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 17px;
+  line-height: 1.45;
+}
+
+.shell .overview-shell.item-head h1 {
+  margin: 8px 0 0;
+  font-size: 22px;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.shell .overview-shell.item-head .overview-copy {
+  margin: 6px 0 0;
+  padding: 0;
+  color: var(--text-main);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.shell .item-head .item-when {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 2px 6px;
+  margin: 12px 0 0;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.shell .item-head .item-by {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shell .item-head .item-by ~ span:last-child::before {
+  content: '·';
+  margin-right: 6px;
+}
+
+.shell .item-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  margin: 10px -8px 4px;
+  padding: 2px 0;
+  border-top: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--panel-border);
+}
+
+/* Share and Sort join the row as two more bare actions. */
+.shell .item-actions .detail-tools {
+  display: contents;
+}
+
+.shell .item-actions .detail-tool {
+  display: inline-flex;
+}
+
+.shell .item-actions .icon-menu-trigger,
+.shell .item-actions .share-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  height: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-soft);
+}
+
+.shell .item-actions .icon-menu-trigger svg,
+.shell .item-actions .share-button svg {
+  width: 19px;
+  height: 19px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shell .item-actions .icon-menu-trigger:hover,
+  .shell .item-actions .share-button:hover {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+}
+
+.shell .item-actions .icon-menu-trigger.menu-open,
+.shell .item-actions .share-button.active-toggle {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+/* The ported page paints the type stripe as a background; the type line says it instead. */
+.shell .discussion-page .page .surface.has-accent {
+  --surface-pad-x: 16px;
+  background: var(--panel);
+}
+
+/* Wide screens: keep the actions near each other, as the feed rows do. */
+@media (min-width: 761px) {
+  .shell .item-actions {
+    justify-content: flex-start;
+    gap: 56px;
+  }
+}

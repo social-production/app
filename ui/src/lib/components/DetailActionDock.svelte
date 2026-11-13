@@ -1,8 +1,7 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import { resolve } from '$app/paths';
-
+  import BackButton from '#lib/components/BackButton.svelte';
   import '#lib/components/styles/detail.css';
   import '#lib/components/styles/ux/dock.css';
 
@@ -14,11 +13,6 @@
    * button, one capsule of actions (`children`), and above them the `vote` capsule.
    */
   let { active, vote, children }: { active: boolean; vote?: Snippet; children: Snippet } = $props();
-
-  function back(): void {
-    if (history.length > 1) history.back();
-    else location.assign(resolve('/'));
-  }
 
   let node = $state<HTMLDivElement>();
 
@@ -67,18 +61,7 @@
 <div class="detail-action-dock" bind:this={node}>
   {#if vote}<div class="dock-vote">{@render vote()}</div>{/if}
   <div class="dock-row">
-    <button class="dock-back" type="button" aria-label="Back" title="Back" onclick={back}>
-      <svg aria-hidden="true" viewBox="0 0 24 24"
-        ><path
-          d="M14.5 5.5 8 12l6.5 6.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2.2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        /></svg
-      >
-    </button>
+    <BackButton />
     <div class="dock-capsule">{@render children()}</div>
   </div>
 </div>

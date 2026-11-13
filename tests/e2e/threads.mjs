@@ -33,7 +33,7 @@ await composer.fill('Tomatoes did best for me.');
 await composer.press('Enter');
 const annComment = ann.locator('.comment-card', { hasText: 'Tomatoes did best' });
 await annComment.waitFor({ timeout: 60_000 });
-await ann.getByText('1 comment').waitFor();
+await ann.getByLabel('1 comment').waitFor();
 if (shots) await ann.screenshot({ path: `${shots}/thread.png` });
 log('founder one started a thread and commented');
 
@@ -74,7 +74,10 @@ await comment
     const note = await bob.locator('.status-note').allInnerTexts();
     throw new Error(`the reply never showed (page says: ${note.join(' | ') || 'nothing'}): ${e}`);
   });
-await bob.getByText('2 comments').waitFor();
+await bob.getByLabel('2 comments').waitFor();
+// Threads keep their nested comments (ADR 0100 flattens only a post's).
+assert.equal(await bob.locator('.comment-card.flat').count(), 0);
+if (shots) await bob.screenshot({ path: `${shots}/thread-reply.png`, fullPage: true });
 log('a new person voted, replied and voted the comment up');
 
 await bob.goto(BASE);
@@ -91,7 +94,25 @@ assert.equal(await subject.getAttribute('href'), url);
 const postComposer = bob.getByLabel('Write a comment...');
 await postComposer.fill('Cloves pointy end up.');
 await postComposer.press('Enter');
-await bob.locator('.comment-card', { hasText: 'pointy end up' }).waitFor({ timeout: 60_000 });
+const postComment = bob.locator('.comment-card.flat', { hasText: 'pointy end up' }).first();
+await postComment.waitFor({ timeout: 60_000 });
+// ADR 0100: a post's own row has the feed row's bare actions, and its comments are flat: a
+// reply sits at the same level, naming who it answers.
+const actions = bob.locator('.item-head .item-actions');
+await actions.getByLabel('1 comment').waitFor();
+await actions.getByRole('button', { name: 'Sort comments' }).waitFor();
+await postComment.getByRole('button', { name: 'Reply' }).first().click();
+const postReply = bob.getByLabel('Write a reply...');
+await postReply.fill('About a hand apart.');
+await postReply.press('Enter');
+const flatReply = bob.locator('.comment-card.flat', { hasText: 'a hand apart' }).last();
+await flatReply.waitFor({ timeout: 60_000 });
+assert.equal(await flatReply.locator('.replying-to').innerText(), `Replying to Reader${stamp}`);
+const [parentBox, replyBox] = [await postComment.boundingBox(), await flatReply.boundingBox()];
+assert.equal(Math.round(replyBox.x), Math.round(parentBox.x), 'a reply is not indented');
+await actions.getByLabel('2 comments').waitFor();
+if (shots) await bob.screenshot({ path: `${shots}/post.png`, fullPage: true });
+log(`post ${bob.url()} thread ${url}`);
 log('they published a post (its link to the thread is live) and commented on it');
 
 const profile = await bob.locator('.discussion-page .header-name').getAttribute('href');

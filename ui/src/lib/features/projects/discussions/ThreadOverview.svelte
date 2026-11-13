@@ -1,29 +1,31 @@
 <script lang="ts">
-  import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
-  import CountPill from '#lib/components/cards/CountPill.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
-  import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
-  import { countComments } from '#lib/domain/discussions.ts';
+  import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { isHidden } from '#lib/domain/moderation.ts';
+  import { postedAt } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
 
-  import DiscussionTools from './DiscussionTools.svelte';
+  import DiscussionActions from './DiscussionActions.svelte';
   import type { DiscussionState } from './discussionState.svelte.ts';
 
-  /** web's ThreadOverviewPanel: tags, title, body, votes, comments, byline, Share and Sort. */
+  /**
+   * web's ThreadOverviewPanel, laid out as the feed's thread row opened up (ADR 0100): the
+   * type and tags, the title, the body, who started it and when, and the bare action row
+   * (comments, votes, Share, Sort).
+   */
   let { state }: { state: DiscussionState } = $props();
 
   const project = $derived(state.project);
   const charter = $derived(state.project?.charter);
-  const count = $derived(countComments(state.comments));
+  const name = $derived(project ? (state.names[project.creator] ?? '…') : '…');
 </script>
 
 {#if project && charter}
-  <section class="overview-shell">
-    <FeedCardTop tags={charter.tags} stage="">
+  <section class="overview-shell item-head">
+    <FeedCardTop tags={charter.tags} stage="" mode="thread">
       <ReportControl
         id={state.id}
         itemLabel="thread"
@@ -37,28 +39,11 @@
       <h1>{charter.title}</h1>
       <p class="overview-copy">{charter.description}</p>
     </RestrictionNotice>
-    <div class="footer detail-footer no-truncate">
-      <div class="engagement-row feed-corner-actions">
-        <VoteStrip
-          corner
-          support={project.demand}
-          oppose={project.opposition}
-          mine={project.mySignal}
-          onSignal={(next) => state.vote(next)}
-        />
-        <span class="comment-link">
-          <CountPill label={`${count} ${count === 1 ? 'comment' : 'comments'}`} />
-        </span>
-      </div>
-      <div class="footer-meta">
-        <ContentMetaRow
-          fullName
-          authorName={state.names[project.creator] ?? '…'}
-          authorHref={resolve('/profile/[agent]', { agent: project.creator })}
-          createdAt={project.lastActivityAt ?? project.createdAt}
-        />
-      </div>
-      <DiscussionTools kind="thread" title={charter.title} bind:sortMode={state.sortMode} />
-    </div>
+    <p class="item-when">
+      <a class="item-by" href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>
+      <PausedBadge agent={project.creator} />
+      <span>{postedAt(project.createdAt)}</span>
+    </p>
+    <DiscussionActions {state} kind="thread" title={charter.title} />
   </section>
 {/if}

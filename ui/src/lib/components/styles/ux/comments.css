@@ -115,3 +115,71 @@
 .shell .comment-card.flat > .comment-self.highlighted {
   box-shadow: none;
 }
+
+/* The comment bar (ADR 0100). On phones it floats in the nav capsule's place, as the detail
+   dock does (ADR 0099): a round back button and the composer as one blurred capsule. */
+.shell .discussion-shell > .composer-card > .dock-back {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .shell:has(.discussion-shell) .mobile-bottom-nav {
+    display: none;
+  }
+
+  .shell .discussion-shell .composer-card {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    left: calc(var(--shell-nav-margin-x) + var(--shell-safe-left, 0px));
+    right: calc(var(--shell-nav-margin-x) + var(--shell-safe-right, 0px));
+    bottom: calc(var(--shell-nav-margin-bottom) + var(--shell-safe-bottom, 0px));
+    padding: 0;
+    border: none;
+    background: transparent;
+    pointer-events: none;
+  }
+
+  .shell .discussion-shell > .composer-card > .dock-back {
+    display: grid;
+  }
+
+  .shell .discussion-shell .composer-card > .composer-field {
+    flex: 1 1 auto;
+    pointer-events: auto;
+  }
+
+  .shell .discussion-shell .composer-card .composer-input {
+    min-height: 54px;
+    padding: 15px 56px 15px 20px;
+    border: 1px solid var(--float-border);
+    border-radius: 27px;
+    background: var(--float-background);
+    -webkit-backdrop-filter: var(--float-blur);
+    backdrop-filter: var(--float-blur);
+    box-shadow: var(--float-shadow);
+    font-size: 16px;
+  }
+
+  .shell .discussion-shell .composer-card .composer-send {
+    right: 9px;
+    bottom: 9px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+  }
+
+  /* The page's colour runs to the screen's edge under the floating bar. */
+  .shell:has(.discussion-shell) .main-content {
+    background: var(--panel);
+  }
+
+  .shell .discussion-page .page .surface {
+    border-bottom: none;
+  }
+
+  .shell .discussion-shell,
+  .shell .discussion-shell:has(.comment-card.reply-open) {
+    padding-bottom: 84px;
+  }
+}

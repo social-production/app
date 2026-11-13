@@ -7,6 +7,8 @@
   } from '#lib/domain/discussions.ts';
   import type { Moderation } from '#lib/domain/moderation.ts';
 
+  import BackButton from '#lib/components/BackButton.svelte';
+
   import type { CommentMentions } from './commentMentions.ts';
   import CommentComposer from './CommentComposer.svelte';
   import DiscussionComment from './DiscussionComment.svelte';
@@ -14,8 +16,9 @@
   import '#lib/components/styles/discussion.css';
 
   /**
-   * web's DiscussionPanel: the comment composer (docked at the bottom on phones) and the
-   * comments, top-level ones in the chosen order (ADR 0070).
+   * web's DiscussionPanel: the comment composer and the comments, top-level ones in the chosen
+   * order (ADR 0070). On phones the composer is a floating bar with a back button in the
+   * nav's place (ADR 0100).
    */
   interface Props {
     comments: Comment[];
@@ -62,6 +65,7 @@
 
 <section class:embedded class="discussion-shell" id="comments">
   <div class="composer-card">
+    <BackButton />
     <CommentComposer
       bind:value={draft}
       {signedIn}
