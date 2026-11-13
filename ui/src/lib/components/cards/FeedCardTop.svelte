@@ -17,7 +17,7 @@
    * web's ScopeSheet with them all), the stage right, with web's PrivateMark beside it for
    * private events. Channel and community tags carry their icon and open their page; free
    * tags from before channels search for themselves. web's slot (the ⋮ report menu) sits
-   * after the stage. Feed rows (ADR 0096) lead with the type as icon + label and end the
+   * after the stage. Feed rows (ADR 0097) lead with the type as icon + label and end the
    * left side with the clock.
    */
   let {

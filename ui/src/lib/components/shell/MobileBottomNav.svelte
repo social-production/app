@@ -75,7 +75,7 @@
 
 <style>
   /*
-    ADR 0095: a floating capsule, not an edge-to-edge bar. The page scrolls under it and
+    ADR 0096: a floating capsule, not an edge-to-edge bar. The page scrolls under it and
     shows through the blur; the current tab is a tinted pill that names itself.
   */
   .mobile-bottom-nav {

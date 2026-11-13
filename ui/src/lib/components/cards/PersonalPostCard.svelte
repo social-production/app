@@ -15,7 +15,7 @@
 
   /**
    * web's PersonalPostCard (personal feed and profiles, ADR 0070): laid out as a
-   * Twitter row (ADR 0096): the avatar in its own column, then the name and clock, the body
+   * Twitter row (ADR 0097): the avatar in its own column, then the name and clock, the body
    * (`LinkedPostBody`: its links live), web's ⋮, and the action row.
    */
   interface Props {

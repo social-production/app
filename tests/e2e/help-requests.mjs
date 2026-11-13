@@ -69,7 +69,7 @@ for (let i = 0; ; i++) {
   const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
     await card.getByText('0 signed up · 1 needed').waitFor();
-    // Feed rows name no author (ADR 0096); the request's own page does. Its author link opens
+    // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
     // the asker's profile, which lists the request on web's PersonalHelpRequestCard.
     await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
     const author = helper.locator('.content-meta-row a').first();

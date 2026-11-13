@@ -7,7 +7,7 @@
   import '#lib/components/styles/ux/feed.css';
 
   /**
-   * A feed row's action row (ADR 0096): comments, the votes (the slot), members, share.
+   * A feed row's action row (ADR 0097): comments, the votes (the slot), members, share.
    * Bare icon buttons spread across the row, as on Twitter's phone app.
    */
   interface Props {

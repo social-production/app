@@ -1,0 +1,12 @@
+[package]
+name = "sp_board"
+description = "Platform moderators (web-backend's services/board.py), replayed from candidacies and standing votes (ADR 0095). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+sp_active = { workspace = true }
+
+[lints]
+workspace = true
