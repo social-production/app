@@ -105,3 +105,24 @@ pub fn live_links_to(target: &ActionHash) -> ExternResult<Vec<ActionHash>> {
         .filter(|hash| !removed.contains(hash))
         .collect())
 }
+
+/// The caller's messages in this space listed as a post's photos (`media::TAG`), live or not.
+pub fn media() -> ExternResult<Vec<ActionHash>> {
+    let scoped: ScopedLinkType = LinkTypes::ChatMessages.try_into()?;
+    let space = AnyLinkableHash::from(anchor()?);
+    let creates = query(ChainQueryFilter::new().action_type(ActionType::CreateLink))?;
+    Ok(creates
+        .iter()
+        .filter_map(|r| match &r.action().data {
+            ActionData::CreateLink(c)
+                if c.zome_index == scoped.zome_index
+                    && c.link_type == scoped.zome_type
+                    && c.base_address == space
+                    && c.tag.0 == crate::media::TAG =>
+            {
+                c.target_address.clone().into_action_hash()
+            }
+            _ => None,
+        })
+        .collect())
+}

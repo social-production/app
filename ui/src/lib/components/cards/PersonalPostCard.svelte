@@ -9,6 +9,7 @@
   import FeedActions from './FeedActions.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import LinkedPostBody from './LinkedPostBody.svelte';
+  import PostPhotos from './PostPhotos.svelte';
   import VoteStrip from './VoteStrip.svelte';
 
   import '#lib/components/styles/cards.css';
@@ -51,6 +52,7 @@
           <CardReport {card} />
         </div>
         <LinkedPostBody body={card.summary} />
+        {#if card.moderation !== 'hidden'}<PostPhotos post={card.id} />{/if}
         <FeedActions
           commentHref={`${href}#comments`}
           commentCount={card.commentCount}

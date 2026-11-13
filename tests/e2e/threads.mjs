@@ -13,6 +13,11 @@ const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', im
 const stamp = Date.now().toString(36).slice(-4);
 const title = `Which seeds for spring ${stamp}`;
 const shots = process.argv[3];
+// A 1×1 PNG; the create form resizes photos as chats do.
+const PHOTO = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+  'base64',
+);
 
 const ann = await device({ viewport: { width: 390, height: 844 } });
 await phraseSignIn(ann, one.phrase.split(' '));
@@ -85,8 +90,19 @@ await bob.getByRole('button', { name: 'Create', exact: true }).click();
 await bob.getByRole('menuitem', { name: /Post/ }).click();
 const body = `Planting garlic this weekend ${stamp}`;
 await bob.getByLabel(/What's on your mind/).fill(`${body}\nAs discussed in ${url}`);
+// ADR 0101: a post carries photos, picked in the create form.
+await bob.getByLabel('Photos for this post').setInputFiles({ name: 'beds.png', mimeType: 'image/png', buffer: PHOTO });
+await bob.locator('.post-photo-pick img').waitFor({ timeout: 30_000 });
 await bob.getByRole('button', { name: 'Publish post' }).click();
 await bob.locator('.linked-body.detail', { hasText: body }).waitFor({ timeout: 120_000 });
+const shown = async (img) => (await img.evaluate((el) => el.naturalWidth)) > 0;
+const pagePhoto = bob.locator('.item-head .post-photos[data-count="1"] img');
+await pagePhoto.waitFor({ timeout: 60_000 });
+for (let i = 0; !(await shown(pagePhoto)); i++) {
+  if (i >= 60) throw new Error("the post's photo never loaded on its page");
+  await bob.waitForTimeout(1000);
+}
+assert.equal(await bob.locator('.comment-card').count(), 0, 'the photo is not a comment');
 assert.match(bob.url(), /\/posts\//);
 // web's LinkedPostBody: the thread's URL in the body is a link.
 const subject = bob.locator('.linked-body.detail a.linked-subject');
@@ -120,7 +136,10 @@ assert.match(profile, /^\/profile\//);
 for (let i = 0; ; i++) {
   await bob.goto(`${BASE}${profile}`);
   const card = bob.locator('.feed-stack .personal-post-card', { hasText: body });
-  if (await card.waitFor({ timeout: 10_000 }).then(() => true, () => false)) break;
+  if (await card.waitFor({ timeout: 10_000 }).then(() => true, () => false)) {
+    await card.locator('.post-photos img').waitFor({ timeout: 60_000 });
+    break;
+  }
   if (i >= 20) throw new Error('the post never reached the profile');
   await bob.waitForTimeout(3000);
 }

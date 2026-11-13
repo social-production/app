@@ -240,6 +240,57 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   change) or creation through plans (ADR 0059 plus the owner's 2026-11-12 notes in UX.md):
   both need a network reset.
 
+## In flight 2026-11-13 (night): photos on posts, branch `claude/image-posts` (stacked on `claude/ux-leftovers`, PR #154), ADR 0101
+- **Owner said go (2026-11-13). No reset was needed after all:** a post's photos are one chat
+  message by its author in the post's own space, listed with the link tag `media` so it is
+  not a comment (coordinator only; the three DNA hashes equal the live seed's `/readyz`).
+- `discussion.set_post_media` / `post_media` (`coordinator/discussion/src/media.rs`), the
+  create form's "Add photos" (up to four, resized like chat photos), `PostPhotos.svelte` on
+  the post page (opens full screen) and the feed row; the shell provides the reads
+  (`postPhotoSource.ts`, as `pausedAgents`).
+- **Checked:** `npm run check -w ui` (0 errors), lint, boundaries, sizes; `cargo fmt`,
+  clippy on `discussion`; scenario `threads` (new `a_post_carries_its_authors_photos`:
+  passed) and its older test; `threads.mjs` against a local seed node **passed** (it now
+  publishes a post with a photo, sees it on the post's page and the profile row, and checks
+  the photo is not a comment). Not run: the other scenarios and browser tests.
+
+## In flight 2026-11-13 (night): creation through plans (ADR 0059), NOT pushed yet
+**Owner, 2026-11-13: "yep go, feel free to reset network"; the word is "Proposal"; an
+operations plan can switch on "takes requests by calendar", and changing request settings
+later is a vote (the existing `RequestSettings` proposal).** Mockups the owner approved:
+https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv (private to the owner).
+- **Design (stage A, one project-network reset; directory and conversation hashes must not
+  change, so nothing goes in `sp_core` / `sp_service`):**
+  - Charter mode `proposal` (`sp_governance::phases::PROPOSAL`), phases Proposal → Plan.
+  - In its Plan phase a proposal takes production, operations and event plans together
+    (`PlanKind::open_kinds`, `required_plan_kinds`); **one leader across those kinds**
+    (`plans::rivals`, `plans::leader(approved, &kinds)`).
+  - Leaving the Plan phase, the cited leading plan gives the type (`PlanKind::makes`):
+    `Applied.mode` (new field, replayed in `apply.rs` `phase_move`), merged into the
+    project view's charter like the subtype. A return to phase 2 or 1 clears it.
+    `Applied.leading_mode` lets the view offer the right next phase before the move.
+  - Integrity reads only the charter, so it lets a `proposal` through where one type is
+    required (`applied::typed_as` / `may_be`); the coordinator checks the type it has now.
+- **Written, in `git stash` on the owner's PC ("creation-through-plans wip") when this
+  entry was made; unit tests pass (`cargo test -p sp_governance`, 43), clippy clean:**
+  the rules above, and scenario `tests/scenarios/tests/proposals.rs` (not run yet).
+- **Still to do:** run that scenario; the plan's "takes requests by calendar" option
+  (a `requests` field on operations plans → `Applied.requests` when the move cites it);
+  gateway lists (`PROJECT_MODES` in `markers.rs` / `region.rs`, stage labels); the UI
+  (create menu: Proposal, Request, Private event; the four-step proposal flow; Add plan's
+  kind choice; "makes this a …" on plan cards; the grey "Proposal" type label; remove the
+  personal-service create path); browser tests; an ADR 0059 addendum; then stage B
+  (refuse typed charters at creation, migrate the scenario and browser tests that found
+  typed projects: a second reset, fine before release).
+- **Redesign mockups the owner approved (2026-11-13), not built:** chats, profile,
+  onboarding (https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu) and the remaining screens
+  (https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH). Open question to the owner: keep
+  "no Edit profile button" on your own profile?
+- **Live smoke is blocked for this PC session** (the permission classifier refuses test
+  sign-ups on the live network). After #150's deploy sign-up failed twice within minutes of
+  the merge; unverified since. #153 merged 9:36 pm Melbourne. Someone must sign up once on
+  the live site, or run `shell.mjs` from a cloud session.
+
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
 design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`

@@ -4,6 +4,7 @@
 //! Photos and files and a private read mark came with ADR 0056.
 
 mod files;
+mod media;
 mod message_reports;
 mod own;
 mod reads;
@@ -107,6 +108,20 @@ pub fn delete_message(call: In<ActionHash>) -> ExternResult<()> {
     }
     delete_entry(id)?;
     Ok(())
+}
+
+/// Add up to four photos to your own post, once (ADR 0101); their parts are uploaded first.
+#[hdk_extern]
+pub fn set_post_media(call: In<Vec<Attachment>>) -> ExternResult<ActionHash> {
+    let attachments = enter(call)?;
+    media::set(attachments)
+}
+
+/// A post's photos; empty when it has none or they can't be reached yet.
+#[hdk_extern]
+pub fn post_media(call: In<()>) -> ExternResult<Vec<Attachment>> {
+    enter(call)?;
+    media::get()
 }
 
 /// One part of a file you're about to send (at most 1 MB); its hash goes in the message.
