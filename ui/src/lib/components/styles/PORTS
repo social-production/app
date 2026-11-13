@@ -153,3 +153,6 @@ software.css      .software-panel web/src/lib/features/projects/detail/component
 software.css      .software-wizard web/src/lib/features/projects/detail/components/SoftwareGovernanceWizard.svelte
 software.css      .software-governance-placeholder web/src/lib/features/projects/detail/lifecycle/productive/phases/ProductiveLifecyclePhaseFive.svelte
 collective-service.css .collective-service web/src/lib/features/projects/detail/lifecycle/collective-service/phases/CollectiveServicePhaseFive.svelte
+board.css         .platform-board web/src/lib/features/platform/board/PlatformBoardPanel.svelte
+board.css         .platform-board web/src/lib/features/platform/board/PlatformBoardMemberSection.svelte
+board.css         .platform-board web/src/lib/features/platform/board/PlatformBoardExplainerCard.svelte

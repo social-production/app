@@ -101,3 +101,24 @@ export function tagCounts(tags: string[]): string {
     communities === 1 ? 'community' : 'communities'
   }`;
 }
+
+/** The Platform channel (ADR 0095): fixed, with web's description; nobody manages it. */
+export const PLATFORM_SLUG = 'platform';
+export const PLATFORM_DESCRIPTION =
+  'The channel for the whole network. Follow it to see platform-wide projects, events, and governance.';
+
+export const isPlatform = (kind: ScopeKind, slug: string): boolean =>
+  kind === 'channel' && slugOf(slug) === PLATFORM_SLUG;
+
+/** The Platform channel before anyone has followed it (its record is written on first follow). */
+export const platformPlaceholder = (): Scope => ({
+  id: '',
+  kind: 'channel',
+  handle: PLATFORM_SLUG,
+  slug: PLATFORM_SLUG,
+  description: PLATFORM_DESCRIPTION,
+  members: 0,
+  creator: '',
+  createdAt: 0,
+  networkSeed: '',
+});

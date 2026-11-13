@@ -7,6 +7,7 @@
 //   node tests/desktop/smoke.mjs target/release/social-production
 //
 // No npm dependencies: plain fetch against the WebDriver API.
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const APP = resolve(process.argv[2] ?? 'target/release/social-production');
@@ -89,6 +90,21 @@ async function goto(path) {
   await wd('POST', `${S}/url`, { url: `${origin}${path}` });
 }
 
+const DONE = Symbol('done');
+
+/** Whether this build's directory DNA differs from the live seed's (`/readyz`). */
+async function resetsDirectory() {
+  const file = resolve('happ/directory-dna-hash.txt');
+  if (!existsSync(file)) return false;
+  const mine = readFileSync(file, 'utf8').trim();
+  const live = await fetch(`${SEED}/readyz`)
+    .then((r) => r.json())
+    .then((j) => j?.cells?.dnas?.directory)
+    .catch(() => undefined);
+  if (live) log(`directory DNA: this build ${mine}, live ${live}`);
+  return !!live && !!mine && live !== mine;
+}
+
 /** Whether the seed node's people index (GET /index/people) lists `name` within `timeout`. */
 async function waitForSeed(name, timeout) {
   const end = Date.now() + timeout;
@@ -135,6 +151,16 @@ try {
   await goto('/profile');
   await until('the profile name', `return document.body.innerText.includes(arguments[0])`, 60_000, name);
 
+  // A PR that changes the directory's integrity is a new network the live seed doesn't run
+  // until it is deployed, so nothing can hold this chain yet: the network half of the test
+  // runs on main after the deploy (desktop.yml's bundle writes the build's hash).
+  if (await resetsDirectory()) {
+    log('this build resets the directory network: the live seed runs the old one, so the');
+    log('sign-out / log-in-from-the-network half runs on main after the deploy');
+    log('PASS (device half)');
+    throw DONE;
+  }
+
   // Signing out removes the only copy until another node holds the chain (ADR 0090), so the
   // seed node must have it first: this also proves the desktop shares the live network.
   // (2026-11-11: listed after 59 s. If this fails, run scripts/check-bootstrap.sh: the
@@ -158,8 +184,10 @@ try {
   await until('the profile after log-in', `return document.body.innerText.includes(arguments[0])`, 180_000, name);
   log('PASS');
 } catch (error) {
-  console.error(error);
-  process.exitCode = 1;
+  if (error !== DONE) {
+    console.error(error);
+    process.exitCode = 1;
+  }
 } finally {
   await wd('DELETE', S).catch(() => undefined);
 }

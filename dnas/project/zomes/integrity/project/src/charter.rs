@@ -71,8 +71,17 @@ fn check_charter(c: &Charter) -> Result<(), String> {
 /// A channel or community (ADR 0068): the title is its handle, the subtype its join policy.
 /// A closed community lives in its own clone (a private seed); public scopes in the commons.
 fn check_scope_charter(c: &Charter) -> Result<(), String> {
-    sp_scope::check_scope(&c.mode, &c.title, &c.subtype)?;
     let in_clone = creator().map_err(|e| e.to_string())?.is_some();
+    if sp_scope::is_platform(&c.mode, &c.title) {
+        // The fixed Platform channel (ADR 0095), in the commons only.
+        sp_scope::check_platform(&c.description, &c.subtype, &c.tags)?;
+        return if in_clone {
+            Err("the Platform channel lives in the commons".into())
+        } else {
+            Ok(())
+        };
+    }
+    sp_scope::check_scope(&c.mode, &c.title, &c.subtype)?;
     match (c.subtype == "closed", in_clone) {
         (true, true) | (false, false) => Ok(()),
         (true, false) => Err("a closed community has its own private network".into()),

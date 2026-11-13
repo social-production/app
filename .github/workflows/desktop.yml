@@ -61,12 +61,16 @@ jobs:
       - run: nix develop --accept-flake-config --command npm ci
       - run: nix develop --accept-flake-config --command npm run build -w ui
       - run: nix develop --accept-flake-config --command bash scripts/build-happ.sh
+      # The smoke test compares it with the live seed's: a PR that resets the directory
+      # can't share the live network until it is deployed.
+      - run: nix develop --accept-flake-config --command hc dna hash dnas/directory/sp_directory.dna > happ/directory-dna-hash.txt
       - uses: actions/upload-artifact@v4
         with:
           name: bundle
           path: |
             ui/build
             happ/social_production.happ
+            happ/directory-dna-hash.txt
           retention-days: 3
 
   build:

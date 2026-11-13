@@ -30,6 +30,7 @@
   import { startBell } from './bellLoop.ts';
   import { MapToggle } from './mapToggle.svelte.ts';
   import { createLinks, surfaceLinks } from './createLinks.ts';
+  import { refuseIfDeactivated, showDeactivatedReason } from './deactivated.ts';
   import { railLinks, startMyScopes } from './myScopesLoop.ts';
   import { provideShellContexts } from './shellContexts.ts';
   import RightRailPanel from './RightRailPanel.svelte';
@@ -138,12 +139,14 @@
     }
   });
 
+  $effect(showDeactivatedReason);
   $effect(() => {
     const current = connection.current;
     if (current.status !== 'connected') return;
     void getPerson(current.agent).then((person) => {
       viewer.name = person.profile?.name ?? 'Profile';
     });
+    void refuseIfDeactivated(current.agent);
   });
 
   // web's isFeedDiscoveryPath: the "+" sits on the feed, platform and profile pages (and

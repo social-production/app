@@ -3,12 +3,14 @@
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import {
     addPasskey,
+    deactivateAccount,
     devicePasskeysAvailable,
     inNativeApp,
     listedOnNetwork,
     signOut,
   } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { getPerson } from '#lib/services/people.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   let { me }: { me: string } = $props();
@@ -34,6 +36,29 @@
       error = explain(e);
     } finally {
       busy = false;
+    }
+  }
+
+  // web's Deactivate account (ADR 0088): the app has no password, so you type your name.
+  let confirmName = $state('');
+  let deactivating = $state(false);
+  let deactivateError = $state<string>();
+
+  async function deactivate(): Promise<void> {
+    deactivateError = undefined;
+    deactivating = true;
+    try {
+      const name = (await getPerson(me)).profile?.name ?? '';
+      if (confirmName.trim() !== name.trim()) {
+        deactivateError = 'Type your name exactly as it shows on your profile.';
+        deactivating = false;
+        return;
+      }
+      await deactivateAccount();
+      await signOut();
+    } catch (e) {
+      deactivateError = explain(e) || 'Could not deactivate this account.';
+      deactivating = false;
     }
   }
 
@@ -84,6 +109,30 @@
       </div>
       <button class="button-secondary" type="button" onclick={leave}>Sign out</button>
     </div>
+
+    <form
+      class="setting-item account-form"
+      onsubmit={(e) => {
+        e.preventDefault();
+        void deactivate();
+      }}
+    >
+      <div>
+        <strong>Deactivate account</strong>
+        <p>
+          You will be signed out and cannot sign in again. Posts, threads, and vouches stay under
+          this username.
+        </p>
+      </div>
+      <label>
+        Type your name to confirm
+        <input autocomplete="off" bind:value={confirmName} />
+      </label>
+      {#if deactivateError}<p class="profile-image-error">{deactivateError}</p>{/if}
+      <button class="button-danger" disabled={deactivating || !confirmName.trim()} type="submit">
+        {deactivating ? 'Deactivating…' : 'Deactivate account'}
+      </button>
+    </form>
   </div>
 </section>
 

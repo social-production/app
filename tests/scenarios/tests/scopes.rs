@@ -158,3 +158,37 @@ async fn a_closed_community_lives_in_its_own_network() {
     assert_eq!(listed[0].author, agent(&net, 1));
     net.shut_down().await;
 }
+
+const PLATFORM_DESCRIPTION: &str = "The channel for the whole network. Follow it to see platform-wide projects, events, and governance.";
+
+/// The Platform channel (ADR 0095): a fixed scope with web's description, written by whoever
+/// first follows it, that takes no proposals.
+#[tokio::test(flavor = "multi_thread")]
+async fn the_platform_channel_is_fixed() {
+    let platform = Charter {
+        description: PLATFORM_DESCRIPTION.into(),
+        ..scope("channel", "platform", "open")
+    };
+    let net = Net::with_charter(2, 2, "platform", platform).await;
+    assert_eq!(members(&net, 1).await.len(), 2);
+    for bad in [
+        scope("channel", "platform", "open"),
+        Charter {
+            tags: vec!["#food".into()],
+            description: PLATFORM_DESCRIPTION.into(),
+            ..scope("channel", "platform", "open")
+        },
+    ] {
+        let refused: Result<ActionHash, String> =
+            net.try_call(0, "project", "create_charter", bad).await;
+        assert!(refused.is_err(), "only web's charter: {refused:?}");
+    }
+    let edit = ProposalKind::Edit {
+        title: None,
+        description: Some("Mine now".into()),
+        location: None,
+    };
+    let proposed: Result<ActionHash, String> = net.try_call(0, "governance", "propose", edit).await;
+    assert!(proposed.is_err(), "no proposals on the Platform channel");
+    net.shut_down().await;
+}
