@@ -27,8 +27,8 @@ then launch (no real users before; the FastAPI site is a prototype and gets wipe
 
 ## Owner notes, 2026-11-12
 - Twitter's phone app is the styling reference.
-- Chosen: the nav capsule with the current tab named (ADR 0095); feed rows without an author
-  on collective items (ADR 0096).
+- Chosen: the nav capsule with the current tab named (ADR 0096); feed rows without an author
+  on collective items (ADR 0097).
 - Icon buttons carry no labels and no boxes; the map's and both rails' buttons get that style.
 - Redesign the create (FAB) menu and the phone More sheet (More stays a tab in the nav).
 - Post comments become Twitter-style; threads keep Reddit-style nested comments.

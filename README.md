@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Create flows match web's (PR #147, 2026-11-12 10:00 pm Melbourne):** each create flow's
+  tag step has web's own layout (an event's "Channel tags" and "Add communities", a help
+  request's "Primary tag type"), the Overview counts channels and communities, and "Still
+  needed" uses web's field names. No reset.
 - **Desktop apps can help the network (PR #145, 2026-11-12 2:21 pm Melbourne, ADR 0094;
   SEEDLESS step 3b):** Settings → Network → Help the network runs a bootstrap server (with its
   relay) inside the desktop app on a port you forward, and announces it in the directory.

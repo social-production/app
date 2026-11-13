@@ -84,7 +84,7 @@ log('Bob joined and supported');
 const guest = await device();
 await waitInFeed(guest, title);
 const guestCard = guest.locator('.project-card', { hasText: title });
-// Feed rows name no author (ADR 0096): the type label leads the row instead.
+// Feed rows name no author (ADR 0097): the type label leads the row instead.
 await guestCard.locator('.surface-type-label').waitFor();
 await guestCard.getByRole('button', { name: /^Support/ }).click();
 // web's requireViewer: a notice with a Sign in link (not a redirect).
