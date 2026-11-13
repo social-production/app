@@ -113,7 +113,7 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   the commons; the Platform channel takes no proposals (`governance.rs`). Unit tests pass.
   Scenario `scopes::the_platform_channel_is_fixed` passes. Regression run passed locally:
   `scopes`, `identity`, `bot_reviews`. Not run yet: the other scenario shards, UI checks (no
-  UI change yet). No PR yet: open it once the UI part lands (one directory + project reset).
+  UI change yet). **Draft PR #151** (opened 2026-11-13 so CI checks the zomes); don't merge until the UI part lands on this branch (one directory + project reset).
   **Next:** platform-tagged voters (any Full member votes;
   population as ADR 0095), the UI calling `record_active`
   after meaningful actions and refusing deactivated sign-ins, then `/platform` + the board UI.
