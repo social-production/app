@@ -6,7 +6,10 @@
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
+  import PlatformBoardPanel from '#lib/components/board/PlatformBoardPanel.svelte';
   import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
+
+  import { BoardState } from './boardState.svelte.ts';
 
   import CommunityInvitePanel from './CommunityInvitePanel.svelte';
   import ScopeSettingsSheet from './ScopeSettingsSheet.svelte';
@@ -25,7 +28,14 @@
    * and invite panel; an invite link opens it by the seed in its fragment. Its feed is the
    * events listed on it, for members (ADR 0069).
    */
-  let { kind, slug, hash = '' }: { kind: ScopeKind; slug: string; hash?: string } = $props();
+  interface Props {
+    kind: ScopeKind;
+    slug: string;
+    hash?: string;
+    /** The Platform channel's `?board=1`: open the moderator board (ADR 0095). */
+    board?: boolean;
+  }
+  let { kind, slug, hash = '', board = false }: Props = $props();
 
   // The route re-creates this page per slug and fragment ({#key}), so reading the props once
   // is intended. A private community's invite link carries its seed in the fragment (ADR 0068).
@@ -35,11 +45,20 @@
   let inviteOpen = $state(!!s.invite);
   let settingsOpen = $state(false);
   let votesOpen = $state(false);
+  let boardOpen = $state(false);
+  $effect(() => {
+    if (board) boardOpen = true;
+  });
+  const boardState = new BoardState();
   const waiting = $derived(s.gov?.votable.length ?? 0);
   const noun = $derived(kind === 'channel' ? 'channel' : 'community');
 
   $effect(() => {
     void s.open();
+  });
+
+  $effect(() => {
+    if (s.platform && boardOpen && !boardState.board) void boardState.load();
   });
 
   async function redeem(): Promise<void> {
@@ -76,7 +95,7 @@
           <span class="scope-avatar" style="--avatar-size: 40px" aria-hidden="true">
             <SurfaceIcon icon={kind} size="md" />
           </span>
-          <h1>{scope.handle}</h1>
+          <h1>{s.platform ? 'Platform' : scope.handle}</h1>
           {#if scope.isPrivate}
             <span class="private-mark" title="Private: members only" aria-label="Private">
               <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
@@ -112,7 +131,7 @@
             <MembershipSplitButton
               joined={!!s.project?.amMember}
               count={s.project?.members.length ?? scope.members}
-              pending={s.joining || !s.project}
+              pending={s.joining || (!s.project && !!scope.id)}
               {membersOpen}
               noun={scope.handle}
               onToggleJoin={() => void s.toggleJoin()}
@@ -132,21 +151,35 @@
               {@render invitePanel()}
             </IconPopoverMenu>
           {/if}
-          <button
-            aria-label="Settings"
-            title="Settings"
-            class="icon-action"
-            class:menu-active={settingsOpen}
-            type="button"
-            onclick={() => (settingsOpen = true)}
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-              <path
-                d="M10.3 2h3.4l.5 2.4c.5.2 1 .4 1.5.6l2.1-1.2 2.4 2.4-1.2 2.1c.2.5.4 1 .6 1.5L22 10.3v3.4l-2.4.5c-.2.5-.4 1-.6 1.5l1.2 2.1-2.4 2.4-2.1-1.2c-.5.2-1 .4-1.5.6L13.7 22h-3.4l-.5-2.4c-.5-.2-1-.4-1.5-.6l-2.1 1.2-2.4-2.4 1.2-2.1c-.2-.5-.4-1-.6-1.5L2 13.7v-3.4l2.4-.5c.2-.5.4-1 .6-1.5L3.8 6.2l2.4-2.4 2.1 1.2c.5-.2 1-.4 1.5-.6L10.3 2Zm1.7 6.2A3.8 3.8 0 1 0 12 15.8 3.8 3.8 0 0 0 12 8.2Z"
-                fill="currentColor"
-              ></path>
-            </svg>
-          </button>
+          {#if s.platform}
+            <button
+              aria-expanded={boardOpen}
+              aria-label="Moderators"
+              title="Moderators"
+              class="icon-action"
+              class:menu-active={boardOpen}
+              type="button"
+              onclick={() => (boardOpen = !boardOpen)}
+            >
+              <ToolbarIcon name="shield" />
+            </button>
+          {:else}
+            <button
+              aria-label="Settings"
+              title="Settings"
+              class="icon-action"
+              class:menu-active={settingsOpen}
+              type="button"
+              onclick={() => (settingsOpen = true)}
+            >
+              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
+                <path
+                  d="M10.3 2h3.4l.5 2.4c.5.2 1 .4 1.5.6l2.1-1.2 2.4 2.4-1.2 2.1c.2.5.4 1 .6 1.5L22 10.3v3.4l-2.4.5c-.2.5-.4 1-.6 1.5l1.2 2.1-2.4 2.4-2.1-1.2c-.5.2-1 .4-1.5.6L13.7 22h-3.4l-.5-2.4c-.5-.2-1-.4-1.5-.6l-2.1 1.2-2.4-2.4 1.2-2.1c-.2-.5-.4-1-.6-1.5L2 13.7v-3.4l2.4-.5c.2-.5.4-1 .6-1.5L3.8 6.2l2.4-2.4 2.1 1.2c.5-.2 1-.4 1.5-.6L10.3 2Zm1.7 6.2A3.8 3.8 0 1 0 12 15.8 3.8 3.8 0 0 0 12 8.2Z"
+                  fill="currentColor"
+                ></path>
+              </svg>
+            </button>
+          {/if}
         </div>
       </div>
       <div class="scope-intro-prose">
@@ -171,10 +204,14 @@
         <section class="info-card"><p>Loading feed…</p></section>
       {:else if s.feed.items.length === 0}
         <section class="info-card">
-          <p>
-            No tagged posts, help, or events in this {noun} yet. Tag content with this {noun} to show
-            it here.
-          </p>
+          {#if s.platform}
+            <p>No platform activity yet.</p>
+          {:else}
+            <p>
+              No tagged posts, help, or events in this {noun} yet. Tag content with this {noun} to show
+              it here.
+            </p>
+          {/if}
         </section>
       {:else}
         {#each s.feed.items as card (card.id)}
@@ -195,6 +232,17 @@
       people={s.members}
       onClose={() => (membersOpen = false)}
     />
+    {#if s.platform}
+      <PlatformBoardPanel
+        open={boardOpen}
+        board={boardState.board}
+        people={boardState.people}
+        canVolunteer={boardState.canVolunteer}
+        onVolunteer={boardState.volunteer}
+        onVote={boardState.vote}
+        onClose={() => (boardOpen = false)}
+      />
+    {/if}
     {#if s.gov}
       <ScopeSettingsSheet
         open={settingsOpen}

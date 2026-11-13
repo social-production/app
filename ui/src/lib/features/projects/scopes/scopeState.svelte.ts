@@ -1,7 +1,14 @@
 import type { Contact } from '#lib/domain/messages.ts';
 import { displayName, type Person } from '#lib/domain/people.ts';
 import type { Project } from '#lib/domain/projects.ts';
-import { parseInvite, scopeTag, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
+import {
+  isPlatform,
+  parseInvite,
+  platformPlaceholder,
+  scopeTag,
+  type Scope,
+  type ScopeKind,
+} from '#lib/domain/scopes.ts';
 import {
   closedCommunity,
   communityEventCards,
@@ -10,7 +17,7 @@ import {
 import { explain } from '#lib/services/errors.ts';
 import { getPerson, myAgent } from '#lib/services/people.ts';
 import { getProject, joinProject } from '#lib/services/projects.ts';
-import { findScope, myScopes } from '#lib/services/scopes.ts';
+import { findScope, foundPlatform, myScopes } from '#lib/services/scopes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 import { showMyScopes } from '#lib/stores/myScopes.svelte.ts';
 
@@ -34,6 +41,8 @@ export class ScopeState {
   inviteWarning = $state(false);
   me = $state('');
   readonly feed: FeedState;
+  /** The fixed Platform channel (ADR 0095): no settings or votes; a moderator board. */
+  readonly platform: boolean;
 
   /** `invite`: a closed community's seed from an invite link's fragment (ADR 0068). */
   constructor(
@@ -42,6 +51,7 @@ export class ScopeState {
     readonly invite: string | null = null,
   ) {
     this.feed = new FeedState(() => '', undefined, scopeTag(kind, slug));
+    this.platform = isPlatform(kind, slug);
     if (invite) this.inviteDraft = invite;
   }
 
@@ -51,8 +61,14 @@ export class ScopeState {
       this.scope = invited
         ? await closedCommunity(this.invite as string)
         : await findScope(this.slug, this.kind);
+      // Nobody has followed the Platform channel yet: its record is written on first follow.
+      if (!this.scope && this.platform) this.scope = platformPlaceholder();
       this.loaded = true;
       if (!this.scope) return;
+      if (this.platform) {
+        await Promise.all([this.load(), this.feed.reload()]);
+        return;
+      }
       this.gov = new ScopeGovernance(this.scope.id, () => !!this.project?.amMember);
       // The index can't read a closed community: its feed is the events listed on it.
       await Promise.all([this.load(), this.scope.isPrivate ? null : this.feed.reload()]);
@@ -90,7 +106,7 @@ export class ScopeState {
   }
 
   private async load(): Promise<void> {
-    if (!this.scope) return;
+    if (!this.scope?.id) return;
     this.project = await getProject(this.scope.id);
     this.me ||= await myAgent().catch(() => '');
     this.members = await Promise.all(this.project.members.map(getPerson));
@@ -112,11 +128,19 @@ export class ScopeState {
 
   /** web's handleMembershipToggle: join, or leave. */
   async toggleJoin(): Promise<void> {
-    if (!this.scope || !this.project || this.joining) return;
+    if (!this.scope || this.joining) return;
+    if (!this.project && this.scope.id) return;
     if (!requireViewer(`Sign in to join ${this.scope.handle}.`)) return;
     this.joining = true;
     try {
-      await joinProject(this.scope.id, !this.project.amMember);
+      if (!this.scope.id) {
+        // The first follow writes the Platform channel; its writer is its first member.
+        this.scope = await foundPlatform();
+        await this.load();
+        if (!this.project?.amMember) await joinProject(this.scope.id, true);
+      } else {
+        await joinProject(this.scope.id, !this.project?.amMember);
+      }
       await this.load();
       // The left rail lists what you joined.
       showMyScopes(await myScopes().catch(() => []));
