@@ -42,6 +42,8 @@ then launch (no real users before; the FastAPI site is a prototype and gets wipe
 - Creation (extends ADR 0059): everything public starts as a proposal and becomes a type
   through its plans. Threads, posts, requests and private events stay separate kinds.
   "Help request" is renamed "Request".
+- 2026-11-13: the UX pass restyles project and event detail pages and request pages too
+  (very important to the owner); the earlier keep-out rule is lifted.
 - App icon: `assets/logo and app icons/logo dark mode.png` (green, white gears).
 
 ## Creation

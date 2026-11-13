@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-13 afternoon Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-13 evening Melbourne by a cloud session and the owner's PC UX session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -87,8 +87,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `claude/social-production-handoff-dsam61`). Next session: `git fetch`, merge `main` into the
   working branch first, and check for an open UX PR before touching the shell, feed cards or
   styles (the split in "Owner direction (2026-11-12): UX in parallel" still holds).
-- The owner's UX PR #148 (nav capsule, feed rows) merged to `main` on 2026-11-13; its notes are
-  in "UX 2026-11-12" below. Nothing in flight on this branch once docs PR #152 merges.
+- The owner's UX PRs #148 (nav capsule, feed rows), #150 (controls) and #153 (detail pages)
+  merged to `main` on 2026-11-13; their notes are in "UX 2026-11-12" below. Nothing in flight on this branch once docs PR #152 merges.
   Parity resumes with ADR 0095's rest (see "Next" just below).
 
 ## Done 2026-11-13: the Platform channel, moderators, weekly active, deactivation (ADRs 0095, 0088), PR #151 merged 03:17 UTC (2:17 pm Melbourne)
@@ -110,8 +110,15 @@ count. Then PARITY.md's next item.
 ## UX 2026-11-12: bottom nav + feed rows (ADRs 0096, 0097), PR #148 merged 2026-11-13
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
   on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
-  polish, image posts and UX.md's code-health items. It does not touch project/event detail
-  pages or their dock, channel/community/platform pages, `native/`, `zomes/`, `dnas/`, `crates/`.
+  polish, image posts and UX.md's code-health items.
+- **Owner, 2026-11-13: the UX pass also covers project and event detail pages and request
+  pages ("this is very important").** The earlier "don't touch" rule for those pages is
+  lifted; it only existed so two sessions would not edit the same files. So: the UX session
+  restyles them (the dock as capsule-style pill groups first, mockups before building), in
+  `styles/ux/*.css` overrides and small markup changes; the parity session keeps changing
+  their behaviour. **Both: merge main before touching a detail-page file, keep PRs small,
+  and say in your "In flight" entry which detail-page files you have open.** Still off
+  limits for UX: `native/`, `zomes/`, `dnas/`, `crates/` (no integrity changes).
 - **Built on this branch (owner approved the mockups, 2026-11-12 evening):**
   - ADR 0096: the phone nav is a floating blurred capsule; the current tab is a tinted pill
     with its name (`MobileBottomNav.svelte`, `styles/ux/tokens.css`,
@@ -147,9 +154,64 @@ count. Then PARITY.md's next item.
   twice on this branch and once with main's `ui/` and `tests/`): Ann never gets "Replied to
   your project" after Bob writes in her project's chat, while a thread's "Replied to your
   comment" does arrive. Not caused by this branch; for the parity session to look at.
-- **Next here:** builds of the create menu, the More sheet, bare icon buttons
-  and the right-rail cards; then post comments; image posts need their own ADR (a post's
-  charter has no attachment field: most likely an integrity change, so the owner decides when).
+- **Second piece, branch `claude/ux-controls` (stacked on `claude/ux-nav-feed`, PR #148), ADR
+  0098:** bare icon buttons (top bar, map filter capsule, left rail pills), the create menu
+  and More menu as floating panels, theme default System with a switch in More, right-rail
+  cards without the type stripe and History rows with an outcome stripe. All overrides start
+  with `.shell` (the ported sheets load lazily, so plain overrides lose by load order).
+  
+- **Owner approved all of round 2 (2026-11-12, late evening):** create menu, More menu (keep
+  the theme switch), bare icon buttons, right-rail cards, and flat comments on posts (mockup
+  only, not built). The owner likes reviewing mockups: keep publishing them before building
+  (the page: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd, private to the owner; its
+  source is not in the repo, rebuild it if needed).
+- **Known loose ends:** (1) the type label on right-rail cards is grey, not tinted as in the
+  feed (`styles/ux/rail.css`, first rule; cause not found). (2) `projects.mjs` passed on rerun (2026-11-13) after failing once in a long batch on a
+  tired node. (3) Browser tests not yet run against these branches: everything
+  except shell, guests, help-requests, follows, private-events, messages, threads, rail, map,
+  accounts (all passed). Feed rows no longer show an author, so any test that reads one from
+  a card needs the item's page instead. (4) `notifications.mjs` fails on main too (above). (5) **`events.mjs` fails on main too**
+  (2026-11-13, `877ced0`, with main's `ui/` and `tests/`): on the event's Participation tab
+  no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
+  please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
+  `governance`, `guests`.
+- **Detail pages, branch `claude/ux-detail` (stacked on `claude/ux-controls`), ADR 0099
+  (owner approved the mockup 2026-11-13, https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop,
+  private to the owner):** the dock replaces the nav capsule inside a project, event or
+  request (round back button + one capsule; `DetailActionDock.svelte`, `styles/ux/dock.css`);
+  actions are icons without words, no ⋯ menu, only the one call to action keeps its word;
+  Support / Oppose float above the capsule and fold into a percentage chip once you have a
+  stance (`ProjectDock.svelte`, which now keeps the stance it just set, since the page's own
+  read lags); tabs are plain words; Take part has a phase progress line ("Phase 2 of 5 ·
+  Production Plan") and soft plan cards with an approval bar (`styles/ux/takepart.css`,
+  `PlanCard`, `DetailPhaseContext`); Details leads with the type label, a 24px left-aligned
+  title and when / where icon lines (`FactLine.svelte`); a request's roles are rows with a
+  Sign up pill (`HelpRolesDock.svelte`).
+  - **Changed from the mockup, for the owner to confirm:** an open **Vote** (edit, update,
+    phase move) is its own pill above the capsule, beside Support / Oppose, not inside the
+    capsule: with the stance chip, members and three icons it did not fit one row at 390px.
+  - **Not done:** the type label still reads "Help request" (the rename to "Request" comes
+    with the creation work); a request's dock has votes + Share, not the mockup's Sign up
+    (roles sign up per row in the page).
+  - **Bug found and fixed here (also on main):** the home feed crashed with "500 Internal
+    Error" when a sort change overlapped the first load (two answers appended the same
+    cards; Svelte's keyed list throws on duplicates). `feedState.svelte.ts` now drops stale
+    answers. This was why `governance.mjs` failed at "the feed card shows the update".
+  - **Checked (2026-11-13, local seed node):** `npm run check -w ui` (0 errors), lint,
+    boundaries, sizes; screenshots of the dock and pages in Proposal (values), Plan,
+    Activity and Closed on a project and an event and on a request, at 390px light and dark,
+    360px dark and desktop light and dark; `governance.mjs` (now checks the chip, the dock
+    replacing the nav, the type label, the phase line and the plan bar) and
+    `help-requests.mjs` **passed**. Not run: scenarios (no Rust change), other browser tests.
+- **Screenshot trick:** a temporary, uncommitted hook in `tests/e2e/lib.mjs` `device()`
+  (`UX_SHOTS=<dir>`, optional `UX_VIEW=360x740`, `UX_SCHEME=dark`): it screenshots whenever
+  the dock's buttons or the tab change, keeps a rolling `latest-*.png` per device and logs
+  page errors to `errors.txt`. The rolling shot is what showed the feed's 500 page.
+- **Next here:** (a) leftovers on `claude/ux-leftovers`: type stripe on notification cards,
+  the grey type label on rail cards, flat Twitter-style comments on posts (ADR 0100);
+  (b) UX.md's code-health items; (c) **ask the owner before starting** image posts (a post's
+  charter has no attachment field: an integrity change) or creation through plans (ADR 0059
+  plus the owner's 2026-11-12 notes in UX.md): both need a network reset.
 
 ## Earlier 2026-11-12: the Platform channel and moderators (ADR 0095, proposed then built)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the

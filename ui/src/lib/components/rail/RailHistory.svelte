@@ -6,7 +6,6 @@
     type HistoryFilter,
   } from '#lib/domain/activityRailHistory.ts';
   import { isHelpKind } from '#lib/domain/helpRail.ts';
-  import { modeAccent } from '#lib/domain/projects.ts';
 
   /** web's History section: what ended, what you signed up for and the votes you cast. */
   let { items, onOpen }: { items: RailItem[]; onOpen: (item: RailItem) => void } = $props();
@@ -40,7 +39,8 @@
         {#each shown as item (item.id)}
           <button
             class="history-row"
-            style={`--row-accent: ${modeAccent(item.projectMode)};`}
+            class:outcome-passed={item.kind === 'vote' && item.outcome === 'passed'}
+            class:outcome-failed={item.kind === 'vote' && item.outcome === 'failed'}
             type="button"
             onclick={() => onOpen(item)}
           >

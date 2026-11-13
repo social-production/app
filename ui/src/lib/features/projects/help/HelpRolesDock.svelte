@@ -15,7 +15,7 @@
 
   /**
    * web's HelpRequestRolesSection: each role with its sign-ups and a Sign up / Leave / Full
-   * button, then web's Share menu (signed in) and the vote strip.
+   * button (in the page), and the dock with the vote strip and web's Share menu (signed in).
    */
   let { help }: { help: HelpState } = $props();
 
@@ -47,60 +47,58 @@
   }
 </script>
 
-<DetailActionDock active>
-  <div class="help-roles">
-    <div class="context-dock">
-      {#if help.activity && help.activity.roles.length > 0}
-        <div class="role-stack">
-          {#each help.activity.roles as role (role.index)}
-            {@const mine = help.activity.myRole === role.index}
-            <article class="role-bar">
-              <div class="role-copy">
-                <strong>{role.label}</strong>
-                {#if role.description}<p>{role.description}</p>{/if}
-                <span>
-                  {role.people.length} signed up
-                  {#if slotsOf(role.maximum) > 0}· {slotsOf(role.maximum)} needed{/if}
-                </span>
-              </div>
-              <button
-                class:selected={mine}
-                class="signup"
-                disabled={help.pending === role.index ||
-                  !help.activity.rolesOpen ||
-                  (!mine && !help.hasRoom(role))}
-                type="button"
-                onclick={() => void help.toggle(role)}
-              >
-                {label(role)}
-              </button>
-            </article>
-          {/each}
-        </div>
-      {/if}
-      {#if help.project}
-        <div class="signal-row">
-          {#if signedIn}
-            <ShareUserMenu
-              copyLinkUrl={url}
-              menuTitle="Share help request"
-              compact
-              shareTitle={help.project.charter?.title ?? null}
-              searchContacts={search}
-              submitShare={send}
-            />
-          {/if}
-          <VoteStrip
-            docked
-            support={help.project.demand}
-            oppose={help.project.opposition}
-            mine={help.project.mySignal}
-            onSignal={(next) => help.vote(next)}
-          />
-        </div>
-      {/if}
+<!-- ADR 0099: the roles are part of the page; the dock holds the votes and Share. -->
+{#if help.activity && help.activity.roles.length > 0}
+  <div class="help-roles help-roles-page">
+    <h2 class="roles-heading">Roles</h2>
+    <div class="role-stack">
+      {#each help.activity.roles as role (role.index)}
+        {@const mine = help.activity.myRole === role.index}
+        <article class="role-bar">
+          <div class="role-copy">
+            <strong>{role.label}</strong>
+            {#if role.description}<p>{role.description}</p>{/if}
+            <span>
+              {role.people.length} signed up
+              {#if slotsOf(role.maximum) > 0}· {slotsOf(role.maximum)} needed{/if}
+            </span>
+          </div>
+          <button
+            class:selected={mine}
+            class="signup"
+            disabled={help.pending === role.index ||
+              !help.activity.rolesOpen ||
+              (!mine && !help.hasRoom(role))}
+            type="button"
+            onclick={() => void help.toggle(role)}
+          >
+            {label(role)}
+          </button>
+        </article>
+      {/each}
     </div>
   </div>
+{/if}
+<DetailActionDock active>
+  {#if help.project}
+    <VoteStrip
+      bare
+      support={help.project.demand}
+      oppose={help.project.opposition}
+      mine={help.project.mySignal}
+      onSignal={(next) => help.vote(next)}
+    />
+    {#if signedIn}
+      <ShareUserMenu
+        copyLinkUrl={url}
+        menuTitle="Share help request"
+        compact
+        shareTitle={help.project.charter?.title ?? null}
+        searchContacts={search}
+        submitShare={send}
+      />
+    {/if}
+  {/if}
 </DetailActionDock>
 {#if help.roleMessage}<div class="help-roles">
     <p class="role-message">{help.roleMessage}</p>

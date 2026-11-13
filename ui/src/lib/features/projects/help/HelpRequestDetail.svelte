@@ -1,4 +1,5 @@
 <script lang="ts">
+  import FactLine from '#lib/components/cards/FactLine.svelte';
   import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -81,7 +82,7 @@
         {#if tab === 'context'}
           <div class="context-tab help-overview">
             <div class="context-panel">
-              <FeedCardTop tags={charter.tags} stage="">
+              <FeedCardTop mode="help-request" tags={charter.tags} stage="">
                 <ReportControl
                   id={help.id}
                   itemLabel="help request"
@@ -97,10 +98,10 @@
                     <h1>{charter.title}</h1>
                   </RestrictionNotice>
                   {#if help.activity}
-                    <p class="live-fact">{localDateTime(help.activity.startsAt)}</p>
+                    <FactLine icon="when">{localDateTime(help.activity.startsAt)}</FactLine>
                   {/if}
                   {#if charter.location_label}
-                    <p class="live-fact">{charter.location_label}</p>
+                    <FactLine icon="where">{charter.location_label}</FactLine>
                   {/if}
                   <p class="overview-copy">{charter.description}</p>
                 </div>
