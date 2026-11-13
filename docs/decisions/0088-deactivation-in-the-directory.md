@@ -32,6 +32,11 @@ can refuse a sign-in: a person's key works on any node, and the seed node will g
   after the author's own `Deactivated` link, so a chain never closes without the record readers
   look for. Project and conversation DNAs can't read the directory, so there readers ignore it
   (above).
+- **Built (2026-11-13): signing in is refused by the closed chain itself.** Every sign-in (a
+  browser through a gateway, or the desktop) grants the device a capability, a `CapGrant`
+  written to the directory chain; after `CloseChain` that write fails for everyone, so no
+  client or gateway needs its own check. The UI shows web's message for that error and also
+  signs out a session already open when the account was deactivated elsewhere.
 - **Confirm step:** web asks for the password; the app asks the person to type their username
   (it has no password) before writing the link.
 
