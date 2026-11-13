@@ -20,13 +20,12 @@ for (const [tag, viewport] of Object.entries(sizes)) {
   await signUp(page, `screens_${tag}`);
   await page.goto(`${BASE}/create/project`);
   await shot(page, `${tag}-create-type`);
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Title').fill(`Tool library (${tag})`);
   await page.getByLabel('Proposal description').fill('Lend and borrow tools across the street.');
   await shot(page, `${tag}-create-basics`);
   await continueSteps(page, 3);
   await shot(page, `${tag}-create-overview`);
-  await page.getByRole('button', { name: 'Publish project' }).click();
+  await page.getByRole('button', { name: 'Publish proposal' }).click();
   await page.locator('.project-detail h1').waitFor({ timeout: 120_000 });
   await shot(page, `${tag}-detail`);
   await page.goto(BASE);

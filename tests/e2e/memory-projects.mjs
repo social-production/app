@@ -20,13 +20,11 @@ for (let i = 0; i < count; i++) {
   const before = await indexed();
   await ann.goto(BASE);
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
-  await ann.getByRole('menuitem', { name: /Project/ }).click();
-  await ann.getByRole('radio', { name: /Productive project/ }).click();
-  await ann.getByRole('button', { name: 'Continue' }).click();
+  await ann.getByRole('menuitem', { name: /Proposal/ }).click();
   await ann.getByLabel('Title').fill(`Memory ${stamp} ${i}`);
   await ann.getByLabel('Proposal description').fill('Measuring the seed node.');
   await continueSteps(ann, 3);
-  await ann.getByRole('button', { name: 'Publish project' }).click();
+  await ann.getByRole('button', { name: 'Publish proposal' }).click();
   await ann.getByRole('heading', { name: `Memory ${stamp} ${i}` }).waitFor({ timeout: 180_000 });
   // The archivist joins on its next round (each minute).
   for (let t = 0; t < 60 && (await indexed()) <= before; t++) await ann.waitForTimeout(5000);

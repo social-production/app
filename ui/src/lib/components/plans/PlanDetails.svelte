@@ -1,12 +1,17 @@
 <script lang="ts">
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import { SUBTYPE_LABELS, type Plan, type PlanStage } from '#lib/domain/plans.ts';
+  import { REQUEST_MODES } from '#lib/domain/projects.ts';
 
   /** web's plan sheet sections: Overview, Details, Notes and Stages. */
   let { plan }: { plan: Plan } = $props();
 
   const hasDetails = $derived(
-    !!plan.subtype || !!plan.location || !!plan.recipients || !!plan.repository_url,
+    !!plan.subtype ||
+      !!plan.location ||
+      !!plan.recipients ||
+      !!plan.repository_url ||
+      !!plan.requests,
   );
 
   function day(value: string | null): string {
@@ -55,6 +60,12 @@
         <div class="fact">
           <dt>Licence</dt>
           <dd>{SOFTWARE_LICENSE_LABEL}</dd>
+        </div>
+      {/if}
+      {#if plan.requests}
+        <div class="fact">
+          <dt>Requests</dt>
+          <dd>{REQUEST_MODES.find((m) => m.value === plan.requests)?.label}</dd>
         </div>
       {/if}
       {#if plan.recipients}

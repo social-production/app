@@ -3,7 +3,7 @@
 // event plan. Used by events.mjs and activities.mjs.
 import { readFileSync } from 'node:fs';
 
-import { BASE, continueSteps, device, log, phraseSignIn } from './lib.mjs';
+import { BASE, addPlan, continueSteps, device, log, phraseSignIn } from './lib.mjs';
 
 export const founders = () =>
   JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
@@ -102,7 +102,7 @@ export const daysFromNow = (n) => isoDay(new Date(Date.now() + n * 24 * 60 * 60 
 export async function filePlan(page, { title, date, range, start, finish, place }) {
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
-  await page.getByRole('button', { name: 'Add plan' }).click();
+  await addPlan(page, 'Event plan');
   const wizard = page.getByRole('dialog', { name: /^Create event plan$/i });
   const next = () => wizard.getByRole('button', { name: 'Next' }).click();
   await wizard.getByPlaceholder('Plan title').fill(title);

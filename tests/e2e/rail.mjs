@@ -21,11 +21,10 @@ const coop = `Tool library ${stamp}`;
 async function create(page, title, personal) {
   await page.goto(`${BASE}/create/project`);
   if (personal) await page.getByRole('radio', { name: /Personal service/ }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Proposal description').fill('Made by the rail test.');
   await continueSteps(page, 3);
-  await page.getByRole('button', { name: 'Publish project' }).click();
+  await page.getByRole('button', { name: 'Publish proposal' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];
 }

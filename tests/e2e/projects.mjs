@@ -26,9 +26,7 @@ async function createChannel(page, handle) {
 // device's memory before the index lists it (a reload would wait on the index, ~1–3 min live).
 async function createProject(page, name, tag) {
   await page.getByRole('button', { name: 'Create', exact: true }).click();
-  await page.getByRole('menuitem', { name: /Project/ }).click();
-  await page.getByRole('radio', { name: /Productive project/ }).click();
-  await page.getByRole('button', { name: 'Continue' }).click();
+  await page.getByRole('menuitem', { name: /Proposal/ }).click();
   await page.getByLabel('Title').fill(name);
   await page.getByLabel('Proposal description').fill('Share seeds between gardens.\n\nMore detail later.');
   await page.getByRole('button', { name: 'Continue' }).click();
@@ -40,7 +38,7 @@ async function createProject(page, name, tag) {
   await page.getByText('Add more channels or communities').click();
   await tagTestChannel(page, 'Additional channel tags');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('button', { name: 'Publish project' }).click();
+  await page.getByRole('button', { name: 'Publish proposal' }).click();
 }
 
 /** Reload the feed until `text` shows (the archivist indexes every 15 s, plus gossip). */

@@ -18,7 +18,7 @@ import {
   type PlaceValue,
 } from './places.ts';
 import type { Plan, PlanKind } from './plans.ts';
-import { LOCATION_LABEL_MAX, type ProjectSubtype } from './projects.ts';
+import { LOCATION_LABEL_MAX, type ProjectSubtype, type RequestMode } from './projects.ts';
 
 export type PlanStepType =
   | 'plan-overview'
@@ -26,6 +26,7 @@ export type PlanStepType =
   | 'repository'
   | 'location'
   | 'distribution-location'
+  | 'requests'
   | 'demand-note'
   | 'schedule-mode'
   | 'schedule-date'
@@ -57,6 +58,8 @@ export interface PlanForm extends ScheduleForm {
   place: PlaceValue;
   sameAsProduction: boolean;
   recipients: string;
+  /** An operations plan's request mode; empty takes no requests (ADR 0059). */
+  requests: RequestMode | '';
   stages: { title: string; details: string; startDate: string; endDate: string }[];
 }
 
@@ -71,6 +74,7 @@ export function emptyPlanForm(subtype: ProjectSubtype): PlanForm {
     place: emptyPlaceValue(),
     sameAsProduction: false,
     recipients: '',
+    requests: '',
     stages: [{ title: '', details: '', startDate: '', endDate: '' }],
     ...emptyScheduleForm(),
   };
@@ -155,6 +159,13 @@ export function planSteps(kind: PlanKind, f: PlanForm): PlanStep[] {
         question: 'Where will production or operations happen?',
         helper: 'Choose the primary project or production site.',
       });
+    if (kind === 'Organisation')
+      steps.push({
+        id: 'requests',
+        question: 'Will this service take requests?',
+        helper:
+          'People outside the service can ask it for something. Members can change this later by a vote.',
+      });
   } else {
     steps.push({
       id: 'distribution-location',
@@ -216,6 +227,7 @@ export function planFromForm(kind: PlanKind, f: PlanForm): Plan {
       end_date: orNull(s.endDate),
     })),
     ...(event ? { schedule: scheduleFromForm(f) } : {}),
+    ...(kind === 'Organisation' && f.requests ? { requests: f.requests } : {}),
   };
 }
 

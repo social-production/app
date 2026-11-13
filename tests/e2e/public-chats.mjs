@@ -49,11 +49,10 @@ await signUp(bob, `bob${stamp}`);
 log('two accounts signed up');
 
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('Share tools between neighbours.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
 log('ann created the project');

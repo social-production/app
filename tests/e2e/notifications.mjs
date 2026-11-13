@@ -53,11 +53,10 @@ for (const page of [ann, bob]) {
 log('both founders signed in');
 
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('Swap seeds every spring.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
 // Moving on from the Proposal phase needs support (web's signal gate), as in governance.mjs.

@@ -60,7 +60,7 @@ One file per decision. To change a decision, write a new ADR that supersedes the
 - [0056](./0056-activities-and-roles.md) Activities and roles in projects, plus the waiting project-chat items (M5b)
 - [0057](./0057-events-as-project-clones.md) Events are project-DNA clones with mode "event"; directory listings take any kind (M5c)
 - [0058](./0058-places-and-the-map.md) Places and the map: OpenFreeMap tiles, Photon search through gateways, approximate by default (M6)
-- [0059](./0059-types-evolve-through-plans.md) Types evolve through plans; personal services go (after parity)
+- [0059](./0059-types-evolve-through-plans.md) Types evolve through plans; personal services go (stage A built 2026-11-14: charter mode `proposal`, the leading plan gives the type, an operations plan may switch requests on; one project-network reset)
 - [0060](./0060-jemalloc-on-the-seed-node.md) jemalloc as the gateway allocator (idle 1.1 GB → ~0.7 GB); test founders on the test network
 - [0061](./0061-private-events-and-organizers.md) Invite-only events: the seed says private or organizer-run; organizers are grant records (M5c part 2)
 - [0062](./0062-sqlite-readers-per-database.md) Cap SQLite readers per database on the seed node (memory per project)

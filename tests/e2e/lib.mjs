@@ -160,3 +160,15 @@ export async function continueSteps(page, n = 1) {
     await page.getByRole('button', { name: 'Continue' }).click();
   }
 }
+
+/** Opens the plan wizard from "Add plan". A proposal has no type yet (ADR 0059), so it asks
+ * which kind of plan first ('Production plan', 'Operations plan' or 'Event plan'); a project
+ * that already has its type goes straight to the wizard. */
+export async function addPlan(page, kind = 'Production plan') {
+  await page.getByRole('button', { name: 'Add plan' }).click();
+  const choice = page.locator('.plan-kind-choice');
+  await choice.or(page.getByRole('dialog')).first().waitFor({ timeout: 30_000 });
+  if (!(await choice.isVisible())) return;
+  await choice.getByRole('radio', { name: new RegExp(kind) }).click();
+  await choice.getByRole('button', { name: 'Continue' }).click();
+}

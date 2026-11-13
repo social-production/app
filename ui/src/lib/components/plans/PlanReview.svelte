@@ -2,6 +2,7 @@
   import { scheduleSummary } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import type { PlanForm, PlanStep, PlanStepType } from '#lib/domain/planForm.ts';
+  import { REQUEST_MODES } from '#lib/domain/projects.ts';
 
   /** web's plan wizard review step: every answer, each with an Edit link back to its step. */
   interface Props {
@@ -49,6 +50,13 @@
   {#if has('repository') && form.repositoryUrl}
     {@render row('Repository', form.repositoryUrl, 'repository')}
     {@render row('License', SOFTWARE_LICENSE_LABEL, 'repository')}
+  {/if}
+  {#if has('requests')}
+    {@render row(
+      'Requests',
+      REQUEST_MODES.find((m) => m.value === form.requests)?.label ?? 'No requests for now',
+      'requests',
+    )}
   {/if}
   {@render row('Support response', form.demandNote, 'demand-note')}
   {#each form.stages as stage, index (index)}

@@ -6,7 +6,7 @@
 import type { EventSchedule } from './eventSchedule.ts';
 import type { Place } from './places.ts';
 import type { ProposalStatus, VoteChoice } from './governance.ts';
-import type { CharterMode, ProjectMode, ProjectSubtype } from './projects.ts';
+import type { CharterMode, ProjectMode, ProjectSubtype, RequestMode } from './projects.ts';
 
 /** sp_governance::plans::PlanKind ("Organisation" is web's operations plan). */
 export type PlanKind = 'Production' | 'Distribution' | 'Organisation' | 'Access' | 'Event';
@@ -34,6 +34,9 @@ export interface Plan {
   stages: PlanStage[];
   /** Event plans only (ADR 0057). */
   schedule?: EventSchedule | null;
+  /** Operations plans only: how the service takes requests from the day this plan leads it
+   * out of the Plan phase; none means it takes none until a vote says so (ADR 0059). */
+  requests?: RequestMode | null;
 }
 
 export interface PlanCriterion {

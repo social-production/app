@@ -17,11 +17,10 @@ mkdirSync(shots, { recursive: true });
 
 async function create(page, title) {
   await page.goto(`${BASE}/create/project`);
-  await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('Proposal description').fill('Lend and fix tools together.');
   await continueSteps(page, 3);
-  await page.getByRole('button', { name: 'Publish project' }).click();
+  await page.getByRole('button', { name: 'Publish proposal' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url();
 }

@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps } from './lib.mjs';
+import { BASE, addPlan, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -17,11 +17,10 @@ const shots = process.env.E2E_OUT ?? 'screens';
 mkdirSync(shots, { recursive: true });
 await phraseSignIn(ann, one.phrase.split(' '));
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('Fix bikes together on Saturdays.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
 await ann.getByRole('button', { name: /^Support/ }).click();
@@ -157,7 +156,7 @@ log('the project moved to Production Plan');
 const planTitle = `Saturday workshop ${stamp}`;
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Add plan' }).click();
+await addPlan(ann, 'Production plan');
 const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
 await wizard.getByPlaceholder('Plan title').fill(planTitle);
 await wizard.getByPlaceholder('Describe the plan').fill('Open the workshop every Saturday morning.');

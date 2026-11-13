@@ -16,7 +16,7 @@
   } from '#lib/domain/planForm.ts';
   import type { PlaceSearch } from '#lib/domain/places.ts';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
-  import type { ProjectSubtype } from '#lib/domain/projects.ts';
+  import { REQUEST_MODES, type ProjectSubtype } from '#lib/domain/projects.ts';
 
   import PlanStagesEditor from './PlanStagesEditor.svelte';
 
@@ -129,6 +129,16 @@
         placeholder="Who receives what this project makes?"></textarea>
     </label>
   </div>
+{:else if step.id === 'requests'}
+  <select bind:value={form.requests} aria-label="Requests">
+    <option value="">No requests for now</option>
+    {#each REQUEST_MODES as option (option.value)}
+      <option value={option.value}>{option.label}</option>
+    {/each}
+  </select>
+  {#if form.requests}
+    <p class="helper-copy">{REQUEST_MODES.find((m) => m.value === form.requests)?.summary}</p>
+  {/if}
 {:else if step.id === 'demand-note'}
   <div class="signal-card" aria-label="Current support signals">
     <span class="signal-label">Current support signals</span>

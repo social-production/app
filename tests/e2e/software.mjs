@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
 import { advanceTo, signInFounders, until } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -26,11 +26,10 @@ const prTitle = `Morning timer ${stamp}`;
 const { ann, bob } = await signInFounders({ width: 390, height: 844 });
 
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
 await ann.getByLabel('Proposal description').fill('An app that waters the beds.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url().split('?')[0];
 await ann.getByRole('button', { name: /^Support/ }).click();
@@ -46,7 +45,7 @@ log('the founders moved the project to Production Plan');
 // Ann's production plan picks web's Software type and names the official repository.
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Add plan' }).click();
+await addPlan(ann, 'Production plan');
 const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
 const next = () => wizard.getByRole('button', { name: 'Next' }).click();
 await wizard.getByPlaceholder('Plan title').fill(planTitle);
