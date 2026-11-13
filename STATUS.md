@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-13 afternoon Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-13 evening Melbourne by a cloud session and the owner's PC UX session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,7 +82,32 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
+## Handoff 2026-11-13 (afternoon): parity paused for the day; the owner is doing UX
+- The owner is working on UX for the rest of 2026-11-13 **on their own branch** (not
+  `claude/social-production-handoff-dsam61`). Next session: `git fetch`, merge `main` into the
+  working branch first, and check for an open UX PR before touching the shell, feed cards or
+  styles (the split in "Owner direction (2026-11-12): UX in parallel" still holds).
+- The owner's UX PRs #148 (nav capsule, feed rows), #150 (controls) and #153 (detail pages)
+  merged to `main` on 2026-11-13; their notes are in "UX 2026-11-12" below. Nothing in flight on this branch once docs PR #152 merges.
+  Parity resumes with ADR 0095's rest (see "Next" just below).
+
+## Done 2026-11-13: the Platform channel, moderators, weekly active, deactivation (ADRs 0095, 0088), PR #151 merged 03:17 UTC (2:17 pm Melbourne)
+**Live** after the deploy (seed restarted 03:38 UTC = 2:38 pm): `/readyz` directory
+`uhC0kiObR4…` and project `uhC0kYqtp…` (**both reset**; the directory hash matches a local
+`hc dna hash`), UI 200, bootstrap 200, **live `shell.mjs` passed**, and a new live account
+opened `/platform?board=1` (heading, description, Moderators sheet). CI: all 13 checks green.
+**Railway lesson:** the first seed-node build failed with `build daemon returned an error <
+listing workers … buildkitd.sock: use of closed network connection>`: Railway's builder, not
+our code (a local Rust 1.95.0 build of the zomes and `gateway --features jemalloc` passed). The
+owner pressed Redeploy and it went through. A failed build keeps the old seed running, so the
+UI and seed briefly disagree; ask the owner to redeploy (no Railway access from a cloud session).
+**Next (parity, ADR 0095's rest):** platform-tagged projects voted on by any Full member
+(population from `weekly_active`, a project vote-rule change: project reset), moderators'
+merge capability on platform software projects (ADR 0087 reads `is_moderator` via the
+directory), and replacing ADR 0071/0074's "voters on this item" populations with the weekly
+count. Then PARITY.md's next item.
+
+## UX 2026-11-12: bottom nav + feed rows (ADRs 0096, 0097), PR #148 merged 2026-11-13
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
   on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
   polish, image posts and UX.md's code-health items.
@@ -188,7 +213,7 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   charter has no attachment field: an integrity change) or creation through plans (ADR 0059
   plus the owner's 2026-11-12 notes in UX.md): both need a network reset.
 
-## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
+## Earlier 2026-11-12: the Platform channel and moderators (ADR 0095, proposed then built)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
 design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`
 projects voted on by every Full member, moderators from `BoardCandidacy` / `BoardVotes`

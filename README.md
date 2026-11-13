@@ -8,12 +8,18 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-12)
+## Status (2026-11-13)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The Platform channel, moderators and Deactivate account (PR #151, 2026-11-13 2:17 pm
+  Melbourne, live 2:38 pm; ADRs 0095, 0088):** `/platform` is web's Platform channel (Join,
+  its feed); the shield button or the rail's Moderators link opens web's moderator board
+  (volunteer, withdraw, step down, yes/no votes; seats follow web's 66% rule with the quorum
+  from a weekly active count). Settings → Account → Deactivate account closes the account for
+  good. **Directory and project reset**: everyone signs up again (test data only).
 - **Create flows match web's (PR #147, 2026-11-12 10:00 pm Melbourne):** each create flow's
   tag step has web's own layout (an event's "Channel tags" and "Add communities", a help
   request's "Primary tag type"), the Overview counts channels and communities, and "Still
