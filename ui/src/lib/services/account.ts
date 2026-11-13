@@ -1,6 +1,6 @@
 /** Account flows for features (docs/IDENTITY.md): the recovery phrase always works;
  *  passkeys are an optional shortcut on devices that can store them. */
-import { peopleIndex, signUp, type AccountStep } from '#lib/holo/index.ts';
+import { callZome, peopleIndex, signUp, stringToHash, type AccountStep } from '#lib/holo/index.ts';
 
 import { saveProfile, viewer } from './people.ts';
 
@@ -59,4 +59,21 @@ export async function listedOnNetwork(): Promise<boolean | undefined> {
   } catch {
     return undefined;
   }
+}
+
+/** web's deactivateAccount (ADR 0088): a `Deactivated` record, then the account's directory
+ * chain closes for good. The caller signs out afterwards. */
+export async function deactivateAccount(): Promise<void> {
+  await callZome<number>('directory', 'identity', 'deactivate_account');
+}
+
+/** Whether `agent` deactivated its account (every client refuses to sign it in). */
+export async function isDeactivated(agent: string): Promise<boolean> {
+  const since = await callZome<number | null>(
+    'directory',
+    'identity',
+    'deactivated_since',
+    stringToHash(agent),
+  );
+  return since !== null;
 }
