@@ -9,6 +9,25 @@ pub const COMMUNITY: &str = "community";
 /// web-backend's `RESERVED_CHANNEL_SLUGS`: the platform's own channels.
 pub const RESERVED: [&str; 2] = ["platform", "stewardship"];
 
+/// The Platform channel (ADR 0095, web-backend `services/platform.py`): a fixed scope with
+/// web's handle and description, written by whoever first follows it; readers take the
+/// earliest. It has no manager, settings or proposals.
+pub const PLATFORM: &str = "platform";
+pub const PLATFORM_DESCRIPTION: &str = "The channel for the whole network. Follow it to see platform-wide projects, events, and governance.";
+
+#[must_use]
+pub fn is_platform(mode: &str, handle: &str) -> bool {
+    mode == CHANNEL && handle == PLATFORM
+}
+
+/// The Platform channel's charter: exactly web's description, open, with no tags.
+pub fn check_platform(description: &str, join_policy: &str, tags: &[String]) -> Result<(), String> {
+    if description != PLATFORM_DESCRIPTION || join_policy != "open" || !tags.is_empty() {
+        return Err("the Platform channel is fixed: web's description, open, no tags".into());
+    }
+    Ok(())
+}
+
 /// A community's join policy (web: `open` or `closed`); channels are always open.
 pub const JOIN_POLICIES: [&str; 2] = ["open", "closed"];
 
@@ -105,6 +124,11 @@ mod tests {
         );
         assert!(check_scope("event", "Food", "open").is_err());
         assert!(may_be_organizer_run(COMMUNITY, "closed"));
+        assert!(is_platform(CHANNEL, "platform"));
+        assert!(!is_platform(CHANNEL, "Platform") && !is_platform(COMMUNITY, "platform"));
+        assert!(check_platform(PLATFORM_DESCRIPTION, "open", &[]).is_ok());
+        assert!(check_platform("Mine now", "open", &[]).is_err());
+        assert!(check_platform(PLATFORM_DESCRIPTION, "open", &["#food".into()]).is_err());
         assert!(!may_be_organizer_run(COMMUNITY, "open"));
         assert!(!may_be_organizer_run(CHANNEL, "open"));
     }

@@ -4299,6 +4299,8 @@ dependencies = [
  "hdk",
  "identity_integrity",
  "serde",
+ "sp_active",
+ "sp_board",
  "sp_bot_review",
  "sp_follow",
  "sp_governance",
@@ -4319,6 +4321,7 @@ dependencies = [
  "holochain_serialized_bytes",
  "serde",
  "serde_bytes",
+ "sp_active",
  "sp_core",
  "sp_governance",
 ]

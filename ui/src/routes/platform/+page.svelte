@@ -1,5 +1,11 @@
 <script lang="ts">
-  import RouteStub from '#lib/components/shell/RouteStub.svelte';
+  import AccountGate from '#lib/features/account/AccountGate.svelte';
+  import ScopePage from '#lib/features/projects/scopes/ScopePage.svelte';
+
+  import { page } from '$app/state';
 </script>
 
-<RouteStub title="Platform" body="Platform proposals and moderation arrive in M6." />
+<!-- web's /platform: the Platform channel's scope page; `?board=1` opens the moderators. -->
+<AccountGate guests>
+  <ScopePage kind="channel" slug="platform" board={page.url.searchParams.get('board') === '1'} />
+</AccountGate>

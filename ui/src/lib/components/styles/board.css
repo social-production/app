@@ -1,0 +1,332 @@
+/* Ported from web/src/lib/features/platform/board/PlatformBoardPanel.svelte (ADR 0032, scripts/port-styles.py) */
+.platform-board .panel-copy {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.platform-board .board-toolbar {
+  display: grid;
+  gap: 8px;
+  padding: 10px 16px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
+
+.platform-board .board-toolbar input {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-soft);
+  color: var(--text-main);
+}
+
+.platform-board .rules-toggle {
+  width: fit-content;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.platform-board .explainer-sheet-body {
+  padding: 8px 16px 12px;
+}
+
+.platform-board .board-body {
+  display: grid;
+  gap: 12px;
+  padding: 4px 0 8px;
+}
+
+.platform-board .board-body .empty-row,
+.platform-board .board-body .volunteer-row,
+.platform-board .board-body .volunteer-feedback,
+.platform-board .board-body .frame-stack {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.platform-board .people-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.platform-board .empty-row {
+  margin: 0;
+  padding: 16px 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  text-align: center;
+}
+
+.platform-board .volunteer-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.platform-board .primary-button,
+.platform-board .secondary-button,
+.platform-board .text-button {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.platform-board .primary-button {
+  border: 0;
+  background: var(--brand);
+  color: var(--page-background);
+}
+
+.platform-board .secondary-button {
+  border: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-main);
+}
+
+.platform-board .text-button {
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+}
+
+.platform-board .volunteer-feedback {
+  width: 100%;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.platform-board .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Ported from web/src/lib/features/platform/board/PlatformBoardMemberSection.svelte (ADR 0032, scripts/port-styles.py) */
+.platform-board .member-section {
+  display: grid;
+  gap: 0;
+  min-width: 0;
+}
+
+.platform-board .member-section.follows-section .section-label {
+  border-top: 1px solid color-mix(in srgb, var(--panel-border) 75%, transparent);
+  margin-top: 4px;
+  padding-top: 12px;
+}
+
+.platform-board .section-label {
+  padding: 8px 16px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-soft);
+}
+
+.platform-board .person-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  align-items: start;
+  padding: 10px 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 75%, transparent);
+  min-width: 0;
+}
+
+.platform-board .person-row:hover {
+  background: color-mix(in srgb, var(--panel-hover) 70%, transparent);
+}
+
+.platform-board .person-row:last-child {
+  border-bottom: none;
+}
+
+.platform-board .person-row.warning {
+  box-shadow: inset 6px 0 0 color-mix(in srgb, var(--accent-warm) 70%, transparent);
+}
+
+.platform-board .person-row.healthy {
+  box-shadow: inset 6px 0 0 color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+.platform-board .person-avatar {
+  display: inline-flex;
+  padding-top: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.platform-board .person-body {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.platform-board .person-name {
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.platform-board .person-name strong {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.platform-board .status-copy {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.platform-board .person-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.platform-board .person-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+  min-width: 0;
+  flex: 1 1 140px;
+}
+
+.platform-board .vote-strip {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  min-height: 32px;
+  padding: 4px 6px;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  background: var(--panel-strong);
+  flex: 0 0 auto;
+}
+
+.platform-board .vote-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1;
+  border-radius: 999px;
+}
+
+.platform-board button.vote-button:hover {
+  background: color-mix(in srgb, var(--brand-soft) 88%, transparent);
+  color: var(--brand-strong);
+}
+
+.platform-board .signal-percent {
+  min-width: 28px;
+  text-align: center;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.platform-board .active-support {
+  color: #22c55e;
+}
+
+.platform-board .active-oppose {
+  color: #ef4444;
+}
+
+.platform-board .requirement-value {
+  color: var(--text-main);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.platform-board .requirement-copy {
+  color: var(--text-soft);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+@media (max-width: 640px) {
+  .platform-board .vote-strip {
+    gap: 4px;
+    min-height: 24px;
+    padding: 2px 4px;
+  }
+
+  .platform-board .vote-button {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .platform-board .signal-percent {
+    min-width: 22px;
+    font-size: 10px;
+  }
+}
+
+/* Ported from web/src/lib/features/platform/board/PlatformBoardExplainerCard.svelte (ADR 0032, scripts/port-styles.py) */
+.platform-board .role-rules {
+  display: grid;
+  gap: 8px;
+}
+
+.platform-board .rules-toggle {
+  width: fit-content;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.platform-board ul {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  font-size: 12px;
+  line-height: 1.5;
+}

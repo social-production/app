@@ -1,5 +1,11 @@
 import type { ProjectCard } from '#lib/domain/projects.ts';
-import { slugOf, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
+import {
+  PLATFORM_DESCRIPTION,
+  PLATFORM_SLUG,
+  slugOf,
+  type Scope,
+  type ScopeKind,
+} from '#lib/domain/scopes.ts';
 import { scopeIndex } from '#lib/holo/index.ts';
 
 import { createClosedCommunity, myClosedCommunities } from './closedCommunities.ts';
@@ -67,27 +73,43 @@ export async function createScope(
   if (kind === 'community' && closed) {
     return (await createClosedCommunity(handle, description, closed.organized)).slug;
   }
+  await found(kind, handle.trim(), description.trim());
+  return slug;
+}
+
+/** The Platform channel (ADR 0095): the earliest record, or a new one with web's charter
+ * (anyone may write it; readers take the earliest). Its creator is its first follower. */
+export async function foundPlatform(): Promise<Scope> {
+  return (
+    (await findScope(PLATFORM_SLUG, 'channel')) ??
+    (await found('channel', PLATFORM_SLUG, PLATFORM_DESCRIPTION))
+  );
+}
+
+async function found(kind: ScopeKind, handle: string, description: string): Promise<Scope> {
+  const slug = slugOf(handle);
   const id = await createProject({
-    title: handle.trim(),
-    description: description.trim(),
+    title: handle,
+    description,
     mode: kind,
     subtype: 'open',
     location_label: '',
     phase: '',
     tags: [],
   });
-  justCreated.set(slug, {
+  const scope: Scope = {
     id,
     kind,
-    handle: handle.trim(),
+    handle,
     slug,
-    description: description.trim(),
+    description,
     members: 1,
     creator: await myAgent(),
     createdAt: Date.now() * 1000,
     networkSeed: '',
-  });
-  return slug;
+  };
+  justCreated.set(slug, scope);
+  return scope;
 }
 
 /** The scopes you joined: the index's scopes whose space is among yours, then your closed

@@ -1,6 +1,7 @@
 //! Identity rules for the directory DNA (docs/GOVERNANCE.md#standing, docs/plans/M1-identity.md).
 //! Every rule here is re-checked by every validator. Pure maths lives in `sp_governance`.
 
+mod board;
 mod bot_review;
 mod chain;
 mod device;
@@ -14,9 +15,10 @@ mod vouch;
 
 use hdi::prelude::*;
 
+pub use board::{active_path, BOARD_NEUTRAL, BOARD_NO, BOARD_PATH, BOARD_YES, VOLUNTEER, WITHDRAW};
 pub use bot_review::{MARK_BOT, MARK_CLEAR, VOTE_BOT, VOTE_REAL};
 use chain::same_author;
-pub(crate) use chain::{earlier_creates, invalid, prev_action, typed_entry};
+pub(crate) use chain::{earlier_creates, invalid, prev_action, prev_action_of, typed_entry};
 pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
 
@@ -142,6 +144,11 @@ pub enum LinkTypes {
     BotMarks,
     BotReviewVotes,
     ReReviews,
+    // Moderators, weekly active and deactivation (ADRs 0095, 0088); never deleted.
+    BoardCandidacy,
+    BoardVotes,
+    Active,
+    Deactivated,
 }
 
 #[hdk_extern]
@@ -176,6 +183,17 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             link_type: LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews,
             ..
         }) => invalid("bot marks and review votes are never taken back; a newer one counts"),
+        FlatOp::Link(OpLink::DeleteLink {
+            link_type:
+                LinkTypes::BoardCandidacy
+                | LinkTypes::BoardVotes
+                | LinkTypes::Active
+                | LinkTypes::Deactivated,
+            ..
+        }) => invalid("moderator, active and deactivation links are never taken back"),
+        FlatOp::AgentActivity(OpActivity::CloseChain { action, .. }) => {
+            board::validate_close_chain(&prev_action_of(action.prev_action())?)
+        }
         FlatOp::Link(OpLink::DeleteLink {
             original_action,
             action,
@@ -244,6 +262,10 @@ fn validate_create_link(
         LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews => {
             bot_review::validate_create_link(link_type, action)
         }
+        LinkTypes::BoardCandidacy
+        | LinkTypes::BoardVotes
+        | LinkTypes::Active
+        | LinkTypes::Deactivated => board::validate_create_link(link_type, action),
         _ => Ok(ValidateCallbackResult::Valid),
     }
 }

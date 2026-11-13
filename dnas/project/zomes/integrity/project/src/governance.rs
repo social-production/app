@@ -147,6 +147,9 @@ fn check_space(p: &Proposal, author: &AgentPubKey) -> ExternResult<Result<(), St
     let Some((charter, founder)) = crate::charter_at(&p.space)? else {
         return Ok(Err("a proposal decides for a space".into()));
     };
+    if sp_scope::is_platform(&charter.mode, &charter.title) {
+        return Ok(Err("the Platform channel takes no proposals".into()));
+    }
     if let Err(reason) = check_scope_kind(&charter.mode, &p.kind) {
         return Ok(Err(reason));
     }
