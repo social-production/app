@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-13 afternoon Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-13 evening Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -162,7 +162,8 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   `PlanCard`, `DetailPhaseContext`); Details leads with the type label, a 24px left-aligned
   title and when / where icon lines (`FactLine.svelte`); a request's roles are rows with a
   Sign up pill (`HelpRolesDock.svelte`).
-  - **Changed from the mockup, for the owner to confirm:** an open **Vote** (edit, update,
+  - **Changed from the mockup, owner approved 2026-11-13 ("it makes them stand out, this is
+    good": Vote and Support / Oppose first appear as their own separate pills):** an open **Vote** (edit, update,
     phase move) is its own pill above the capsule, beside Support / Oppose, not inside the
     capsule: with the stance chip, members and three icons it did not fit one row at 390px.
   - **Not done:** the type label still reads "Help request" (the rename to "Request" comes
@@ -182,11 +183,62 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   (`UX_SHOTS=<dir>`, optional `UX_VIEW=360x740`, `UX_SCHEME=dark`): it screenshots whenever
   the dock's buttons or the tab change, keeps a rolling `latest-*.png` per device and logs
   page errors to `errors.txt`. The rolling shot is what showed the feed's 500 page.
-- **Next here:** (a) leftovers on `claude/ux-leftovers`: type stripe on notification cards,
-  the grey type label on rail cards, flat Twitter-style comments on posts (ADR 0100);
-  (b) UX.md's code-health items; (c) **ask the owner before starting** image posts (a post's
-  charter has no attachment field: an integrity change) or creation through plans (ADR 0059
-  plus the owner's 2026-11-12 notes in UX.md): both need a network reset.
+- **Leftovers, branch `claude/ux-leftovers` (stacked on `claude/ux-detail`), PR #154, ADR 0100:**
+  (1) notification cards and post / thread pages lose the type stripe (`styles/ux/index.css`
+  imports `feed.css`; the page's own stripe was a painted background, removed in
+  `styles/ux/item.css`); (2) the rail's type label is tinted (`styles/ux/rail.css`);
+  (3) flat Twitter-style comments on posts (`DiscussionPanel` / `DiscussionComment` `flat`,
+  `styles/ux/comments.css`), threads keep nesting; (4) **the post or thread itself is its
+  feed row opened up** (`PostHeader`, `ThreadOverview`, new `DiscussionActions.svelte`:
+  comment count, bare votes, Share, Sort between two hairlines; `postedAt` in
+  `domain/time.ts`); (5) **owner, 2026-11-13: "Let's use floating comment bars also"**: on
+  phones the composer is a blurred capsule with a round back button in the nav's place
+  (`BackButton.svelte`, shared with `DetailActionDock`), and a reply's bar floats too.
+  - **Owner chose mockup "A · Soft pills" (2026-11-13 night;
+    https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM): built.** Votes, comment count and
+    Share are rounded filled pills with no lines; a "Comments" heading has Sort as a word;
+    comment actions are small pills (threads too); a thread has type and tag chips on top
+    and the author underneath (owner's words). `threads.mjs` passed again after this;
+    looked at 390px light only (dark and desktop not re-shot after the pills).
+  - **Session's choice, for the owner to confirm:** the nav capsule hides on post and thread
+    pages on phones (as on detail pages), rather than stacking the bar above it.
+  - **Checked (2026-11-13 evening, local seed node):** `npm run check -w ui` (0 errors),
+    lint, boundaries, sizes; `threads.mjs` (now checks the action row, a flat reply with
+    "Replying to …" at its parent's indent, and that threads have no flat comments) and
+    `guests.mjs` **passed**; screenshots of a post and a thread at 390px light, 360px dark
+    and desktop light and dark, signed in and out, with the bar empty, typed and replying.
+  - **Not checked:** the rail's tinted type label (the local rail had no cards at 1280px);
+    scenarios (no Rust change); the other browser tests. 
+- **PRs (2026-11-13 evening):** **#148 merged 6:49 pm Melbourne** (nav + feed rows). Main
+  (with #151's Platform channel) was merged down into `claude/ux-controls` (#150),
+  `claude/ux-detail` (#153) and `claude/ux-leftovers`; CI restarted on #150 and #153 at
+  ~6:55 pm. Before that, both had failed only outside the UI: the Linux desktop smoke's
+  sign-up timeout, and scenario shard 5 hitting the 2-hour limit inside `service_requests`
+  (on both PRs; if it happens a third time, look at that scenario, not the runner).
+  Live after #148's deploy (7:20 pm Melbourne): UI 200, **live `shell.mjs` passed** and its
+  screenshots show the floating nav; README Status has #148 (on this branch).
+  **#150 merged 8:58 pm Melbourne** (controls, ADR 0098). **Live `shell.mjs` then FAILED
+  twice (9:00 and 9:03 pm) at sign-up** ("signed in" never showed); the signed-out checks
+  passed, UI 200, seed `/readyz` 200 with uptime ~2 h (not yet restarted by the merge),
+  bootstrap 200. Not diagnosed: sign-up worked live at 7:20 pm after #148 and works locally
+  on this branch. **First thing next session: rerun live `shell.mjs` once the seed has
+  restarted; if sign-up still fails, treat it as a broken deploy (compare with #150's
+  onboarding/top-bar changes, or revert #150 in a new PR).**
+  **Screen audit for the owner (2026-11-13 night):
+  https://claude.ai/artifact/VRsK1VYCpRrb97Dfeodo4a** (private to the owner): every app
+  screen at 390px beside local web's, ranked. No missing screens against web. Old look
+  remains on Messages and chats, Profile, Onboarding (do first, mockups before building),
+  then create flows, Notifications, channel / community headers, project Links and History
+  tabs, Search, People, Settings, Feedback, About. Bug seen: a long link in a chat message
+  runs past the bubble's right edge (`conversation` shot). Scripts for the audit were
+  scratch files, not in the repo.
+  **Then: when green merge
+  #150, then #153, then the leftovers PR (each contains the one before, so no further main
+  merge is needed unless main moves).** Stop the local seed node if it is still running.
+- **Next here:** (a) the PRs above; (b) UX.md's code-health items; (c) **ask the owner
+  before starting** image posts (a post's charter has no attachment field: an integrity
+  change) or creation through plans (ADR 0059 plus the owner's 2026-11-12 notes in UX.md):
+  both need a network reset.
 
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the

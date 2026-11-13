@@ -83,6 +83,7 @@
           sortMode={state.sortMode}
           {highlighted}
           embedded
+          flat={kind === 'post'}
           {signedIn}
           mentions={signedIn ? mentions : null}
           onSignIn={(message) => requireViewer(message)}

@@ -10,14 +10,18 @@
   import { myAgent } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
-  /** The detail footer's tools on web's thread and post pages: Share (signed in) and Sort. */
+  /**
+   * The tools of web's thread and post pages: Share (signed in) and Sort. ADR 0100 shows them
+   * apart, each with its word: Share among the item's pills, Sort beside "Comments".
+   */
   interface Props {
     kind: 'thread' | 'post';
     title: string;
     sortMode: CommentSort;
+    only: 'share' | 'sort';
   }
 
-  let { kind, title, sortMode = $bindable() }: Props = $props();
+  let { kind, title, sortMode = $bindable(), only }: Props = $props();
 
   const sortOptions: { value: CommentSort; label: string }[] = [
     { value: 'oldest', label: 'Oldest first' },
@@ -47,27 +51,29 @@
 </script>
 
 <div class="detail-tools">
-  {#if signedIn}
+  {#if only === 'share' && signedIn}
     <span class="detail-tool">
       <ShareUserMenu
         copyLinkUrl={url}
         menuTitle={kind === 'thread' ? 'Share thread' : 'Share post'}
-        compact
         shareTitle={title}
         searchContacts={search}
         submitShare={send}
       />
     </span>
   {/if}
-  <span class="detail-tool">
-    <IconMenuButton
-      value={sortMode}
-      ariaLabel="Sort comments"
-      defaultValue="oldest"
-      options={sortOptions}
-      onChange={(v) => (sortMode = v)}
-    >
-      <ToolbarIcon name="sort" />
-    </IconMenuButton>
-  </span>
+  {#if only === 'sort'}
+    <span class="detail-tool">
+      <IconMenuButton
+        showTriggerLabel
+        value={sortMode}
+        ariaLabel="Sort comments"
+        defaultValue="oldest"
+        options={sortOptions}
+        onChange={(v) => (sortMode = v)}
+      >
+        <ToolbarIcon name="sort" />
+      </IconMenuButton>
+    </span>
+  {/if}
 </div>

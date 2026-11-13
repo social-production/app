@@ -38,3 +38,11 @@ export function relativeTime(micros: number, nowMs = Date.now()): string {
   if (days < 7) return `${days}d ago`;
   return new Date(micros / 1000).toLocaleDateString();
 }
+
+/** When an opened post or thread was written: "3:12 pm · 13 Nov 2026" in the reader's locale. */
+export function postedAt(micros: number): string {
+  const at = new Date(micros / 1000);
+  const time = at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  const day = at.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  return `${time} · ${day}`;
+}

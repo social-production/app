@@ -1,5 +1,6 @@
 <script lang="ts">
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { bodyParts } from '#lib/components/chat/chatFormat.ts';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -26,6 +27,10 @@
     names: Record<string, string>;
     highlighted: string | null;
     embedded?: boolean;
+    /** Posts (ADR 0100): an avatar column, replies at the same level under their parent. */
+    flat?: boolean;
+    /** Flat replies name whose comment they answer. */
+    replyingTo?: string | null;
     signedIn: boolean;
     onSignIn: (message: string) => void;
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
@@ -42,6 +47,8 @@
     names,
     highlighted,
     embedded = false,
+    flat = false,
+    replyingTo = null,
     signedIn,
     onSignIn,
     onVote,
@@ -82,10 +89,13 @@
 <article
   id={`comment-${comment.id}`}
   class:embedded
+  class:flat
+  class:has-replies={comment.replies.length > 0}
   class:reply-open={replyOpen}
   class="comment-card"
 >
   <div bind:this={self} class:highlighted={isHighlighted} class="comment-self">
+    {#if flat}<span class="comment-avatar"><AvatarBadge size="sm" {name} /></span>{/if}
     <div class="topline">
       <a class="author-link" href={resolve('/profile/[agent]', { agent: comment.author })}>
         {name}
@@ -117,6 +127,9 @@
           <span>{revealed ? 'Hide again' : 'Hidden for serious harm report — reveal to read'}</span>
         </button>
       {/if}
+      {#if flat && replyingTo}
+        <p class="replying-to">Replying to <em>{replyingTo}</em></p>
+      {/if}
       {#if removed}
         <p class="body moderated">{removedLabel(moderation.report?.reason)}</p>
       {:else if !canReveal || revealed}
@@ -140,6 +153,7 @@
 
       <div class="actions-row">
         <VoteStrip
+          bare
           support={comment.voteCount}
           oppose={0}
           mine={stance}
@@ -209,6 +223,8 @@
           {names}
           {highlighted}
           {embedded}
+          {flat}
+          replyingTo={flat ? name : null}
           {signedIn}
           {onSignIn}
           {onVote}
