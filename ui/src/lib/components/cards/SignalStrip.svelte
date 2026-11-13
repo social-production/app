@@ -12,6 +12,8 @@
     disabled?: boolean;
     labeled?: boolean;
     corner?: boolean;
+    /** Feed rows (ADR 0097): no box, drawn arrows, styled by styles/ux/feed.css. */
+    bare?: boolean;
     onSignal: (next: Stance | null) => Promise<void>;
   }
 
@@ -22,6 +24,7 @@
     disabled = false,
     labeled = false,
     corner = false,
+    bare = false,
     onSignal,
   }: Props = $props();
 
@@ -55,7 +58,13 @@
   import '#lib/components/styles/cards.css';
 </script>
 
-<div class="vote-strip signal-strip" class:disabled class:labeled class:corner title={tooltip}>
+<div
+  class={bare ? 'feed-vote' : 'vote-strip signal-strip'}
+  class:disabled
+  class:labeled
+  class:corner={corner && !bare}
+  title={tooltip}
+>
   <button
     aria-label={`Support · ${shown.support}`}
     aria-pressed={shown.mine === 'Demand'}
@@ -65,7 +74,15 @@
     type="button"
     onclick={(e) => click('Demand', e)}
   >
-    ▲
+    {#if bare}<svg aria-hidden="true" viewBox="0 0 24 24" class="feed-vote-icon"
+        ><path
+          d="M12 5.5 5 13h4v5.5h6V13h4L12 5.5Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        /></svg
+      >{:else}▲{/if}
     {#if labeled}<span class="signal-label">Support</span><span class="signal-count"
         >{shown.support}</span
       >{/if}
@@ -83,6 +100,14 @@
     {#if labeled}<span class="signal-label">Oppose</span><span class="signal-count"
         >{shown.oppose}</span
       >{/if}
-    ▼
+    {#if bare}<svg aria-hidden="true" viewBox="0 0 24 24" class="feed-vote-icon"
+        ><path
+          d="M12 18.5 5 11h4V5.5h6V11h4l-7 7.5Z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+          stroke-linejoin="round"
+        /></svg
+      >{:else}▼{/if}
   </button>
 </div>

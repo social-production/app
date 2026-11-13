@@ -1,22 +1,22 @@
 <script lang="ts">
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
+  import { describeUpdate, relativeCompact } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
 
-  import ContentMetaRow from './ContentMetaRow.svelte';
-  import CountPill from './CountPill.svelte';
+  import FeedActions from './FeedActions.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import LinkedPostBody from './LinkedPostBody.svelte';
-  import PersonalFeedIdentity from './PersonalFeedIdentity.svelte';
   import VoteStrip from './VoteStrip.svelte';
 
   import '#lib/components/styles/cards.css';
 
   /**
-   * web's PersonalPostCard (personal feed and profiles, ADR 0070): the author's identity row,
-   * the post's body (`LinkedPostBody`: its links live), web's ⋮, votes and comments, and the
-   * clock.
+   * web's PersonalPostCard (personal feed and profiles, ADR 0070): laid out as a
+   * Twitter row (ADR 0097): the avatar in its own column, then the name and clock, the body
+   * (`LinkedPostBody`: its links live), web's ⋮, and the action row.
    */
   interface Props {
     card: ProjectCard;
@@ -36,33 +36,29 @@
     accent={modeAccent(card.mode)}
     contentRestricted={card.moderation === 'hidden'}
   >
-    <div class="card-header">
-      <div class="header-row">
-        <PersonalFeedIdentity
-          name={authorName}
-          href={resolve('/profile/[agent]', { agent: card.creator })}
-        />
-        <CardReport {card} />
-      </div>
-    </div>
-    <LinkedPostBody body={card.summary} />
-    <div class="footer">
-      <div class="engagement-row feed-corner-actions">
-        <VoteStrip corner support={card.demand} oppose={card.opposition} mine={null} {onSignal} />
-        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + web's #comments -->
-        <a class="comment-link" href={`${href}#comments`}>
-          <CountPill
-            label={`${card.commentCount} ${card.commentCount === 1 ? 'comment' : 'comments'}`}
-          />
-        </a>
-      </div>
-      <div class="footer-meta">
-        <ContentMetaRow
-          timeOnly
-          authorName=""
-          authorHref={resolve('/profile/[agent]', { agent: card.creator })}
-          createdAt={card.createdAt}
-        />
+    <div class="post-row">
+      <AvatarBadge name={authorName} />
+      <div class="post-main">
+        <div class="post-head">
+          <a
+            class="header-name"
+            href={resolve('/profile/[agent]', { agent: card.creator })}
+            title={authorName}>{authorName}</a
+          >
+          <span class="feed-card-time" title={describeUpdate(card.createdAt, null)}
+            >{relativeCompact(card.createdAt)}</span
+          >
+          <CardReport {card} />
+        </div>
+        <LinkedPostBody body={card.summary} />
+        <FeedActions
+          commentHref={`${href}#comments`}
+          commentCount={card.commentCount}
+          shareHref={href}
+          shareTitle={card.summary}
+        >
+          <VoteStrip bare support={card.demand} oppose={card.opposition} mine={null} {onSignal} />
+        </FeedActions>
       </div>
     </div>
   </FeedSurface>

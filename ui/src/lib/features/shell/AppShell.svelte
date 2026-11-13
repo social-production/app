@@ -38,6 +38,7 @@
 
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
+  import '#lib/components/styles/ux/tokens.css';
 
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
   let { children, mapPanel }: { children: Snippet; mapPanel?: Snippet<[() => void]> } = $props();

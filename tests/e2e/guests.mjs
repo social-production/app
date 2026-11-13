@@ -45,13 +45,16 @@ for (let i = 0; i < 20 && !(await pill.count()); i++) {
   await guest.reload();
 }
 await pill.waitFor();
-// web's profile feed: the author link opens Ann's profile, which lists her project.
-await card.locator('.content-meta-row a').first().click();
+// Feed rows name no author (ADR 0097); the project's page does, and its author link opens
+// Ann's profile, which lists her project (web's profile feed).
+await card.locator('a.title').click();
+await guest.locator('.content-meta-row a').first().click();
 await guest.waitForURL(/\/profile\//);
 await guest.locator('.feed-stack .personal-activity-card', { hasText: title }).waitFor({ timeout: 60_000 });
 await guest.screenshot({ path: `${out}/phone390-guest-profile-feed.png` });
 const authors = await guest.locator('.feed-stack .identity .header-name').allInnerTexts();
 assert.deepEqual([...new Set(authors)], [`ann${stamp}`], 'only her projects');
+await guest.goBack();
 await guest.goBack();
 log('the guest saw the project on its author\'s profile');
 await card.locator('a.title').click();

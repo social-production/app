@@ -5,23 +5,38 @@
   import PrivateMark from './PrivateMark.svelte';
   import { tagHref, tagIcon } from './tagLinks.ts';
 
+  import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
+  import { tagRef } from '#lib/domain/scopes.ts';
+  import type { CharterMode } from '#lib/domain/projects.ts';
+  import { activityInstant, describeUpdate, relativeCompact } from '#lib/domain/time.ts';
   import ScopeGlyph from '#lib/components/icons/ScopeGlyph.svelte';
   import ScopeSheet from '#lib/components/overlay/ScopeSheet.svelte';
-  import { tagRef } from '#lib/domain/scopes.ts';
 
   /**
    * web's FeedCardTop with TagList (plain): tags left (3 on desktop, 1 on phones; "+N" opens
    * web's ScopeSheet with them all), the stage right, with web's PrivateMark beside it for
    * private events. Channel and community tags carry their icon and open their page; free
    * tags from before channels search for themselves. web's slot (the ⋮ report menu) sits
-   * after the stage.
+   * after the stage. Feed rows (ADR 0097) lead with the type as icon + label and end the
+   * left side with the clock.
    */
   let {
     tags,
     stage,
     isPrivate = false,
+    mode = null,
+    createdAt = null,
+    updatedAt = null,
     children,
-  }: { tags: string[]; stage: string; isPrivate?: boolean; children?: Snippet } = $props();
+  }: {
+    tags: string[];
+    stage: string;
+    isPrivate?: boolean;
+    mode?: CharterMode | null;
+    createdAt?: number | null;
+    updatedAt?: number | null;
+    children?: Snippet;
+  } = $props();
 
   const phone = new MediaQuery('(max-width: 760px)');
   let sheetOpen = $state(false);
@@ -38,9 +53,10 @@
   import '#lib/components/styles/cards.css';
 </script>
 
-{#if tags.length > 0 || stage || isPrivate || children}
+{#if tags.length > 0 || stage || isPrivate || children || mode}
   <div class="feed-card-top">
     <div class="feed-card-tags">
+      {#if mode}<SurfaceTypeLabel projectMode={mode} />{/if}
       {#if tags.length > 0}
         <div class="tag-list plain">
           {#each visible as tag, index (tag.tag)}
@@ -64,6 +80,11 @@
           {/if}
         </div>
         <ScopeSheet open={sheetOpen} tags={refs} onClose={() => (sheetOpen = false)} />
+      {/if}
+      {#if createdAt !== null}
+        <span class="feed-card-time" title={describeUpdate(createdAt, updatedAt)}
+          >{relativeCompact(activityInstant(createdAt, updatedAt))}</span
+        >
       {/if}
     </div>
     <div class="feed-card-end">

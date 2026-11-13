@@ -25,6 +25,25 @@ then launch (no real users before; the FastAPI site is a prototype and gets wipe
 - Spacing, type scale, press states and transitions: the shine other social apps have.
 - Ask the owner: is the green gears image (2026-10-27) the app icon?
 
+## Owner notes, 2026-11-12
+- Twitter's phone app is the styling reference.
+- Chosen: the nav capsule with the current tab named (ADR 0096); feed rows without an author
+  on collective items (ADR 0097).
+- Icon buttons carry no labels and no boxes; the map's and both rails' buttons get that style.
+- Redesign the create (FAB) menu and the phone More sheet (More stays a tab in the nav).
+- Post comments become Twitter-style; threads keep Reddit-style nested comments.
+- Right-rail cards: no type stripe. A stripe only on History cards, meaning approved or not.
+- Project and event detail controls (the dock) take the nav capsule's style.
+- Image posts need a place for attachments first (none exists); to be built.
+- Round 2 mockups approved (create menu, More menu, bare icon buttons, rail cards, flat
+  comments on posts); build order is the session's choice.
+- Theme: the default follows the device ("System"); the More menu may carry a quick
+  light/dark switch as well as Settings.
+- Creation (extends ADR 0059): everything public starts as a proposal and becomes a type
+  through its plans. Threads, posts, requests and private events stay separate kinds.
+  "Help request" is renamed "Request".
+- App icon: `assets/logo and app icons/logo dark mode.png` (green, white gears).
+
 ## Creation
 - Types evolve through plans; personal services go (ADR 0059).
 

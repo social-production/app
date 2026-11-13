@@ -82,6 +82,50 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
+- The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
+  on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
+  polish, image posts and UX.md's code-health items. It does not touch project/event detail
+  pages or their dock, channel/community/platform pages, `native/`, `zomes/`, `dnas/`, `crates/`.
+- **Built on this branch (owner approved the mockups, 2026-11-12 evening):**
+  - ADR 0096: the phone nav is a floating blurred capsule; the current tab is a tinted pill
+    with its name (`MobileBottomNav.svelte`, `styles/ux/tokens.css`,
+    `--shell-bottom-nav-base` 56 → 80px in `app.css`).
+  - ADR 0097: feed rows (`FeedActions.svelte`, `FeedCardTop` type + clock, `bare` vote strips,
+    `styles/ux/feed.css`): no type stripe on any `FeedSurface`, larger text, bare spread
+    actions with share, no author on collective rows, personal posts as Twitter rows.
+  - Renumbered 2026-11-13 (main took 0095 for the Platform channel): the nav is ADR 0096,
+    feed rows 0097, controls 0098, detail pages 0099. Parity session, start at 0100.
+- **UX overrides of ported styles** live in `ui/src/lib/components/styles/ux/*.css`.
+- **Owner's UX directions (2026-11-12 evening), now in `docs/plans/UX.md`:** Twitter's phone
+  app is the reference; icon buttons without labels or boxes (map, both rails); redesign the
+  create (FAB) menu and the phone More sheet (More stays a nav tab); post comments become
+  Twitter-style, threads stay Reddit-style; right-rail cards lose the type stripe (a stripe
+  only on History cards, for approved or not); the app icon is
+  `../assets/logo and app icons/logo dark mode.png` (already the UI's icon set's design).
+- **For the parity session (not touched here):**
+  - The project/event dock now sits 80px above the screen edge on phones (it reads
+    `--shell-bottom-nav-offset`); it looks tall until it becomes floating pill groups
+    (UX.md "Controls"). Reuse `styles/ux/tokens.css`'s `--float-*` tokens for those.
+  - **Owner (2026-11-12): the project and event detail controls should look like the nav
+    capsule** ("nav B": floating, blurred, fully rounded, the active item a tinted pill; see
+    `MobileBottomNav.svelte`'s styles and ADR 0096). Build the dock's pill groups that way.
+  - `FeedSurface`'s `accent` prop draws nothing now; `LinksSection`, `LinkRequestsSection`,
+    `LinkVoteHistory`, `DiscussionPage` and `MapDiscoveryCard` still pass it. Drop it when
+    convenient.
+- **Checked (2026-11-12, local seed node, 390px):** `npm run check -w ui` (0 errors), lint,
+  boundaries, sizes; `check-fast.sh` on main after the pull; screenshots at 360, 390 and
+  desktop in light and dark; `shell`, `guests`, `help-requests`, `follows`,
+  `private-events`, `messages`, `threads` **passed**. Not run: scenarios (no Rust change),
+  the other browser tests.
+- **`notifications.mjs` fails locally on `main` too** (2026-11-12, `0bcc9e5`, fresh node,
+  twice on this branch and once with main's `ui/` and `tests/`): Ann never gets "Replied to
+  your project" after Bob writes in her project's chat, while a thread's "Replied to your
+  comment" does arrive. Not caused by this branch; for the parity session to look at.
+- **Next here:** builds of the create menu, the More sheet, bare icon buttons
+  and the right-rail cards; then post comments; image posts need their own ADR (a post's
+  charter has no attachment field: most likely an integrity change, so the owner decides when).
+
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
 design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`
