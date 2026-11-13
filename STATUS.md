@@ -182,11 +182,34 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   (`UX_SHOTS=<dir>`, optional `UX_VIEW=360x740`, `UX_SCHEME=dark`): it screenshots whenever
   the dock's buttons or the tab change, keeps a rolling `latest-*.png` per device and logs
   page errors to `errors.txt`. The rolling shot is what showed the feed's 500 page.
-- **Next here:** (a) leftovers on `claude/ux-leftovers`: type stripe on notification cards,
-  the grey type label on rail cards, flat Twitter-style comments on posts (ADR 0100);
-  (b) UX.md's code-health items; (c) **ask the owner before starting** image posts (a post's
-  charter has no attachment field: an integrity change) or creation through plans (ADR 0059
-  plus the owner's 2026-11-12 notes in UX.md): both need a network reset.
+- **Leftovers, branch `claude/ux-leftovers` (stacked on `claude/ux-detail`), pushed, no PR
+  yet, ADR 0100 NOT written yet:** (1) notification cards and post / thread pages lose the
+  type stripe (`styles/ux/index.css` now imports `feed.css`, which only loaded with feed
+  components); (2) the rail's type label is tinted (cause: the ported `.right-rail
+  .snapshot-row span` greyed the label's inner span; `styles/ux/rail.css`); (3) flat
+  Twitter-style comments on posts (`DiscussionPanel` / `DiscussionComment` `flat`, set for
+  posts in `DiscussionPage`; `styles/ux/comments.css`): avatar column, "Replying to …",
+  replies at the same level joined by a line, bare votes; threads keep nesting. Owner saw the
+  screenshot 2026-11-13: **comments look good, but the post page's header (the post itself:
+  boxed vote row, old type scale) has not taken the feed row's new style. Do that next**
+  (`PostHeader.svelte`, and `ThreadOverview.svelte`; reuse `FeedActions` / `bare` strips and
+  `styles/ux/feed.css`). Checked: `npm run check` (0 errors), lint; screenshots of a post
+  with a reply at 390 light and 360 dark; computed styles confirm no stripe on notification
+  cards. **Not checked:** the rail label after its fix, desktop comments, `threads.mjs`
+  (must still pass: threads stay nested), no browser test for flat comments yet.
+- **PRs when this session froze (2026-11-13, ~4:20 pm Melbourne, out of usage):** #148 (nav
+  + feed) and #150 (controls) were merged with main and renumbered (ADR 0096 to 0098; main
+  took 0095); CI was still running. #148: 11 passed, 2 scenario shards pending. #150: the
+  Linux desktop smoke failed twice on the known slow-runner sign-up timeout ("Setting up
+  your node…", `get_links` timeout; not UI), re-run requested, scenarios pending. **Next
+  session: when green, merge #148, then #150 (merge main into it first), then the detail PR;
+  smoke live `shell.mjs`; update README Status.** The local seed node may still be running
+  (`scripts/dev-seed.sh`, :8080); stop it if so.
+- **Next here:** (a) the PRs above; (b) the post page header, ADR 0100, a browser test for
+  flat comments, then the leftovers PR; (c) UX.md's code-health items; (d) **ask the owner
+  before starting** image posts (a post's charter has no attachment field: an integrity
+  change) or creation through plans (ADR 0059 plus the owner's 2026-11-12 notes in UX.md):
+  both need a network reset.
 
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the

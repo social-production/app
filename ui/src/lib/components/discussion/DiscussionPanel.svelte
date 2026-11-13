@@ -25,6 +25,8 @@
     sortMode: CommentSort;
     highlighted: string | null;
     embedded?: boolean;
+    /** Posts (ADR 0100): Twitter-style comments, replies at the same level. Threads nest. */
+    flat?: boolean;
     signedIn: boolean;
     onSignIn: (message: string) => void;
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
@@ -41,6 +43,7 @@
     sortMode,
     highlighted,
     embedded = false,
+    flat = false,
     signedIn,
     onSignIn,
     onVote,
@@ -76,6 +79,7 @@
         {names}
         {highlighted}
         {embedded}
+        {flat}
         {signedIn}
         {onSignIn}
         {onVote}

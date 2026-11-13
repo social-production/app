@@ -1,7 +1,11 @@
 /* The UX pass's styles (docs/plans/UX.md), loaded by AppShell after the ported styles. */
 @import './tokens.css';
 @import './controls.css';
+/* Also imported by the feed's components; here so that pages without a feed card (the
+   notifications list, a post or thread page) lose the type stripe too. */
+@import './feed.css';
 @import './menus.css';
 @import './rail.css';
 @import './detail.css';
 @import './takepart.css';
+@import './comments.css';
