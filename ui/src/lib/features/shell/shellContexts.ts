@@ -1,4 +1,6 @@
+import { providePostPhotoSource } from '#lib/components/cards/postPhotoSource.ts';
 import { providePlaceOnMap } from '#lib/components/map/placeOnMap.ts';
+import { postPhotoUrl, postPhotos } from '#lib/services/discussions.ts';
 import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
 import { providePaused } from './pausedProvider.svelte.ts';
@@ -9,4 +11,5 @@ export function provideShellContexts(): void {
   provideReports();
   providePaused();
   providePlaceOnMap({ show: (label) => openPlaceOnMap(label) });
+  providePostPhotoSource({ list: postPhotos, url: postPhotoUrl });
 }

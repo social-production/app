@@ -15,6 +15,33 @@ struct PostInput {
     reply_to: Option<ActionHash>,
 }
 
+/// Mirrors `discussion_integrity::Attachment`.
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+struct Attachment {
+    kind: String,
+    name: String,
+    mime: String,
+    size: u32,
+    chunks: Vec<ActionHash>,
+}
+
+#[derive(Deserialize, Debug)]
+struct MessageView {
+    body: String,
+}
+
+async fn photo(net: &Net, i: usize, name: &str) -> Attachment {
+    let bytes = serde_bytes::ByteBuf::from(vec![7u8; 2048]);
+    let chunk: ActionHash = net.call(i, "discussion", "upload_chunk", bytes).await;
+    Attachment {
+        kind: "image".into(),
+        name: name.into(),
+        mime: "image/jpeg".into(),
+        size: 2048,
+        chunks: vec![chunk],
+    }
+}
+
 #[derive(Serialize, Debug)]
 struct VoteInput {
     message: ActionHash,
@@ -144,5 +171,53 @@ async fn comments_nest_and_take_one_vote_each() {
         )
         .await;
     assert!(odd.is_err(), "only comments take votes");
+    net.shut_down().await;
+}
+
+/// ADR 0101: a post's author adds its photos once; everyone reads them back, and they are not
+/// one of the post's comments.
+#[tokio::test(flavor = "multi_thread")]
+async fn a_post_carries_its_authors_photos() {
+    let post = Charter {
+        title: "Planting garlic".into(),
+        description: "Planting garlic this weekend.".into(),
+        ..charter("post")
+    };
+    let net = Net::with_charter(2, 1, "post-photos", post).await;
+
+    let theirs = photo(&net, 1, "not-mine.jpg").await;
+    let refused: Result<ActionHash, String> = net
+        .try_call(1, "discussion", "set_post_media", vec![theirs])
+        .await;
+    assert!(refused.is_err(), "only the author adds photos");
+
+    let beds = photo(&net, 0, "beds.jpg").await;
+    let soil = photo(&net, 0, "soil.jpg").await;
+    let _: ActionHash = net
+        .call(
+            0,
+            "discussion",
+            "set_post_media",
+            vec![beds.clone(), soil.clone()],
+        )
+        .await;
+    let mine: Vec<Attachment> = net.call(0, "discussion", "post_media", ()).await;
+    assert_eq!(mine, vec![beds.clone(), soil.clone()], "seen at once");
+    let again: Result<ActionHash, String> = net
+        .try_call(0, "discussion", "set_post_media", vec![beds.clone()])
+        .await;
+    assert!(again.is_err(), "photos are added once");
+
+    let _: ActionHash = net
+        .call(1, "discussion", "post_message", comment("Lovely.", None))
+        .await;
+    net.settle().await;
+    let seen: Vec<Attachment> = net.call(1, "discussion", "post_media", ()).await;
+    assert_eq!(seen, vec![beds, soil], "the reader gets the photos");
+    for i in 0..2 {
+        let comments: Vec<MessageView> = net.call(i, "discussion", "list_messages", ()).await;
+        let bodies: Vec<&str> = comments.iter().map(|m| m.body.as_str()).collect();
+        assert_eq!(bodies, ["Lovely."], "the photos are not a comment");
+    }
     net.shut_down().await;
 }

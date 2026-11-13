@@ -7,7 +7,7 @@ use hdk::prelude::*;
 use sp_attachment::preview_text;
 use sp_core::chat::{preview, PAGE_MAX};
 
-use crate::{anchor, own, MessageView, ReplyRef};
+use crate::{anchor, media, own, MessageView, ReplyRef};
 
 /// One record: the local copy first (messages never change once written), then the network.
 pub fn record(hash: &ActionHash) -> ExternResult<Option<Record>> {
@@ -52,12 +52,14 @@ pub(crate) fn decode(record: &Record) -> ExternResult<Option<ChatMessage>> {
         .map_err(|e| wasm_error!(e))
 }
 
-/// The newest `PAGE_MAX` messages, oldest first. Deleted ones are gone with their link.
+/// The newest `PAGE_MAX` messages, oldest first. Deleted ones are gone with their link. A
+/// post's photos (`media`) are not among them.
 pub fn list() -> ExternResult<Vec<MessageView>> {
     let deleted = own::deleted()?;
+    let photos = media::own_ids()?;
     let mut found: BTreeMap<ActionHash, Record> = own::messages()?
         .into_iter()
-        .filter(|r| !deleted.contains(r.action_address()))
+        .filter(|r| !deleted.contains(r.action_address()) && !photos.contains(r.action_address()))
         .map(|r| (r.action_address().clone(), r))
         .collect();
 
@@ -70,6 +72,7 @@ pub fn list() -> ExternResult<Vec<MessageView>> {
     let mut seen = BTreeSet::new();
     for hash in links
         .into_iter()
+        .filter(|l| !media::is_media(l))
         .filter_map(|l| l.target.into_action_hash())
     {
         if wanted.len() >= PAGE_MAX {

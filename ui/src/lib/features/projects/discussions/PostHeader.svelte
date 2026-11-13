@@ -1,4 +1,5 @@
 <script lang="ts">
+  import PostPhotos from '#lib/components/cards/PostPhotos.svelte';
   import LinkedPostBody from '#lib/components/cards/LinkedPostBody.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -47,6 +48,7 @@
 
     <RestrictionNotice active={isHidden(state.moderation.value)}>
       <LinkedPostBody body={charter.description} variant="detail" />
+      <PostPhotos post={state.id} open />
     </RestrictionNotice>
 
     <DiscussionActions {state} kind="post" title={`${name}'s post`} />
