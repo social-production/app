@@ -217,7 +217,22 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   (on both PRs; if it happens a third time, look at that scenario, not the runner).
   Live after #148's deploy (7:20 pm Melbourne): UI 200, **live `shell.mjs` passed** and its
   screenshots show the floating nav; README Status has #148 (on this branch).
-  **Next session: when green merge
+  **#150 merged 8:58 pm Melbourne** (controls, ADR 0098). **Live `shell.mjs` then FAILED
+  twice (9:00 and 9:03 pm) at sign-up** ("signed in" never showed); the signed-out checks
+  passed, UI 200, seed `/readyz` 200 with uptime ~2 h (not yet restarted by the merge),
+  bootstrap 200. Not diagnosed: sign-up worked live at 7:20 pm after #148 and works locally
+  on this branch. **First thing next session: rerun live `shell.mjs` once the seed has
+  restarted; if sign-up still fails, treat it as a broken deploy (compare with #150's
+  onboarding/top-bar changes, or revert #150 in a new PR).**
+  **Screen audit for the owner (2026-11-13 night):
+  https://claude.ai/artifact/VRsK1VYCpRrb97Dfeodo4a** (private to the owner): every app
+  screen at 390px beside local web's, ranked. No missing screens against web. Old look
+  remains on Messages and chats, Profile, Onboarding (do first, mockups before building),
+  then create flows, Notifications, channel / community headers, project Links and History
+  tabs, Search, People, Settings, Feedback, About. Bug seen: a long link in a chat message
+  runs past the bubble's right edge (`conversation` shot). Scripts for the audit were
+  scratch files, not in the repo.
+  **Then: when green merge
   #150, then #153, then the leftovers PR (each contains the one before, so no further main
   merge is needed unless main moves).** Stop the local seed node if it is still running.
 - **Next here:** (a) the PRs above; (b) UX.md's code-health items; (c) **ask the owner
