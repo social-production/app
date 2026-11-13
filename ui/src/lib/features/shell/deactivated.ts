@@ -1,9 +1,10 @@
 import { isDeactivated, signOut } from '#lib/services/account.ts';
+import { DEACTIVATED } from '#lib/services/errors.ts';
 import { authNotice } from '#lib/stores/authNotice.svelte.ts';
 
 /** Signing out reloads the page, so the reason waits in session storage until it shows. */
 const KEY = 'sp.deactivated';
-const MESSAGE = 'This account was deactivated, so it can no longer sign in.';
+const MESSAGE = DEACTIVATED;
 
 /** ADR 0088: every client refuses a deactivated account, not a server. */
 export async function refuseIfDeactivated(agent: string): Promise<void> {

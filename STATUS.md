@@ -113,10 +113,25 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   the commons; the Platform channel takes no proposals (`governance.rs`). Unit tests pass.
   Scenario `scopes::the_platform_channel_is_fixed` passes. Regression run passed locally:
   `scopes`, `identity`, `bot_reviews`. Not run yet: the other scenario shards, UI checks (no
-  UI change yet). **Draft PR #151** (opened 2026-11-13 so CI checks the zomes); don't merge until the UI part lands on this branch (one directory + project reset).
-  **Next:** platform-tagged voters (any Full member votes;
-  population as ADR 0095), the UI calling `record_active`
-  after meaningful actions and refusing deactivated sign-ins, then `/platform` + the board UI.
+  UI change yet). **PR #151** (draft until CI is green; the UI is on it too, so it is the one directory + project reset).
+- **UI done on the branch (2026-11-13):** `/platform` is web's Platform channel page
+  (`ScopePage` with `platform`: title "Platform", no Settings/votes, the first Join writes the
+  fixed charter via `services/scopes.ts::foundPlatform`, readers take the earliest), the
+  shield **Moderators** button and `?board=1` (the rail link) open web's `PlatformBoardPanel`
+  (`components/board/*`, styles `board.css` via PORTS; state `scopes/boardState.svelte.ts`;
+  service `services/board.ts`). Settings → Account → **Deactivate account** (type your profile
+  name). Signing in again is refused because sign-in writes a cap grant to the closed directory
+  chain; `services/errors.ts` turns that into web-style "This account was deactivated…"; the
+  shell also signs out a deactivated session (`features/shell/deactivated.ts`).
+  `holo/active.ts` writes the weekly `Active` link after the first meaningful zome call of
+  the week (list in that file). Browser test `tests/e2e/platform.mjs` passes against
+  `cloud-seed.sh` (reruns are fine); `shell`, `accounts`, `scope-settings` pass too. Checks:
+  `npm run check/lint -w ui`, boundaries, sizes.
+  **Next:** wait for PR #151's CI, then merge (resets directory + project), smoke live,
+  README Status. After: platform-tagged voters (any Full member votes, population from the
+  weekly active count: needs a project vote-rule change, ADR 0095), moderators' merge
+  capability on platform software projects (ADR 0087 reads `is_moderator`), and replacing
+  ADR 0071/0074's populations with the weekly count.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own

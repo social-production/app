@@ -10,6 +10,7 @@
     signOut,
   } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { getPerson } from '#lib/services/people.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   let { me }: { me: string } = $props();
@@ -45,12 +46,14 @@
 
   async function deactivate(): Promise<void> {
     deactivateError = undefined;
-    if (confirmName.trim() !== viewer.name.trim()) {
-      deactivateError = 'Type your name exactly as it shows on your profile.';
-      return;
-    }
     deactivating = true;
     try {
+      const name = (await getPerson(me)).profile?.name ?? '';
+      if (confirmName.trim() !== name.trim()) {
+        deactivateError = 'Type your name exactly as it shows on your profile.';
+        deactivating = false;
+        return;
+      }
       await deactivateAccount();
       await signOut();
     } catch (e) {
