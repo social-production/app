@@ -183,8 +183,40 @@ directory integrity, coordinators + scenarios, UI, browser tests.
   (`replay`: candidate / moderator / grace / removed from candidacies and votes; checks at
   each act and each Monday 00:00 UTC so readers agree; 10 tests from board.py's rules) and
   `crates/sp_active` (`week_of`, `counted_week`, `weekly_active`; 3 tests). Checked: `cargo
-  test`, clippy `-D warnings`, fmt, sizes. **Next:** directory integrity (`BoardCandidacy`,
-  `BoardVotes`, `Active` links, plus ADR 0088's `Deactivated`), then coordinators.
+  test`, clippy `-D warnings`, fmt, sizes.
+- **Done on the branch (directory reset, not pushed as a PR yet):** identity integrity
+  `board.rs` (`BoardCandidacy` from the `board` path, `BoardVotes` on an account (never your
+  own), `Active` from `active.<week>` with one per person per week checked on the author's
+  chain, `Deactivated` on yourself; none deletable; a `CloseChain` is valid only right after
+  your own `Deactivated` link). ADR 0088 now closes the chain instead of scanning it on every
+  create (ADRs updated). Coordinator: `get_board`, `volunteer_board`, `vote_board`,
+  `is_moderator`, `record_active`, `weekly_active`, `deactivate_account`, `deactivated_since`,
+  test-only `submit_active_link` (`board.rs`, `active.rs`, `deactivation.rs`, `board_api.rs`).
+  Scenario `tests/scenarios/tests/board.rs` **passes locally** (`cloud-nix` + no-IPv6 shim, 7.8 min).
+  Project integrity: `sp_scope::{PLATFORM, PLATFORM_DESCRIPTION, is_platform, check_platform}`;
+  a `platform` channel charter is valid only with web's exact description, open, no tags, in
+  the commons; the Platform channel takes no proposals (`governance.rs`). Unit tests pass.
+  Scenario `scopes::the_platform_channel_is_fixed` passes. Regression run passed locally:
+  `scopes`, `identity`, `bot_reviews`. Not run yet: the other scenario shards, UI checks (no
+  UI change yet). **PR #151** (draft until CI is green; the UI is on it too, so it is the one directory + project reset).
+- **UI done on the branch (2026-11-13):** `/platform` is web's Platform channel page
+  (`ScopePage` with `platform`: title "Platform", no Settings/votes, the first Join writes the
+  fixed charter via `services/scopes.ts::foundPlatform`, readers take the earliest), the
+  shield **Moderators** button and `?board=1` (the rail link) open web's `PlatformBoardPanel`
+  (`components/board/*`, styles `board.css` via PORTS; state `scopes/boardState.svelte.ts`;
+  service `services/board.ts`). Settings → Account → **Deactivate account** (type your profile
+  name). Signing in again is refused because sign-in writes a cap grant to the closed directory
+  chain; `services/errors.ts` turns that into web-style "This account was deactivated…"; the
+  shell also signs out a deactivated session (`features/shell/deactivated.ts`).
+  `holo/active.ts` writes the weekly `Active` link after the first meaningful zome call of
+  the week (list in that file). Browser test `tests/e2e/platform.mjs` passes against
+  `cloud-seed.sh` (reruns are fine); `shell`, `accounts`, `scope-settings` pass too. Checks:
+  `npm run check/lint -w ui`, boundaries, sizes.
+  **Next:** wait for PR #151's CI, then merge (resets directory + project), smoke live,
+  README Status. After: platform-tagged voters (any Full member votes, population from the
+  weekly active count: needs a project vote-rule change, ADR 0095), moderators' merge
+  capability on platform software projects (ADR 0087 reads `is_moderator`), and replacing
+  ADR 0071/0074's populations with the weekly count.
 
 ## Owner direction (2026-11-12): UX in parallel; moderators are parity
 - A second session may run the UX pass (`docs/plans/UX.md`) alongside parity, on its own
@@ -278,6 +310,11 @@ up, bootstrap lists the seed's agents, `POST /account/retire` with junk → 400,
 **Next:** (5 is done, see above) SEEDLESS 3b ("Help the network"), alongside
 parity (PARITY summary). Optional for step 2: resend a retirement on desktop start when no
 gateway answered at log-in (ADR 0092's consequences).
+- **CI lesson (2026-11-13, PR #151):** a PR that resets the directory can't pass the desktop
+  smoke's "the seed node lists the new account" step: the live seed runs the old DNA until the
+  deploy. `desktop.yml`'s bundle now writes `happ/directory-dna-hash.txt` and the smoke stops
+  after the on-device half when it differs from the live `/readyz`; main's run after the
+  deploy covers the network half.
 - **CI lesson (2026-11-11):** GitHub's Ubuntu runners failed to resolve `security.ubuntu.com`
   for hours; `desktop.yml`'s apt step now retries. A desktop smoke's first `set_profile` can
   also time out on a slow runner network (`get_links … response timeout`); one re-run passed.

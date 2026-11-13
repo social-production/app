@@ -9,6 +9,7 @@ import {
   type Signal,
 } from '@holochain/client';
 
+import { noteCall } from './active.ts';
 import { deviceHasAccount, signOutOnDevice } from './device.ts';
 import { gatewayApi, GatewayError } from './gateway.ts';
 import { guestRead, guestSeedOf } from './guest.ts';
@@ -172,7 +173,9 @@ export async function callZome<T>(
   if (!ws && isGuest() && role === 'directory') return guestRead<T>(undefined, zome, fn, payload);
   if (!ws) throw new Error('Not signed in.');
   try {
-    return await ws.callZome<T>({ role_name: role, zome_name: zome, fn_name: fn, payload });
+    const out = await ws.callZome<T>({ role_name: role, zome_name: zome, fn_name: fn, payload });
+    noteCall(fn, recordActive);
+    return out;
   } catch (error) {
     if (String(error).toLowerCase().includes('closed')) client = undefined; // reconnect next call
     throw error;
@@ -202,5 +205,15 @@ export async function callCell<T>(
   const { ws } = await connection();
   const space = spaceOf(cellId);
   const input = space && !UNSCOPED.has(fn) ? { space, input: payload ?? null } : payload;
-  return ws.callZome<T>({ cell_id: cellId, zome_name: zome, fn_name: fn, payload: input });
+  const out = await ws.callZome<T>({
+    cell_id: cellId,
+    zome_name: zome,
+    fn_name: fn,
+    payload: input,
+  });
+  noteCall(fn, recordActive);
+  return out;
 }
+
+/** This week's `Active` link in the directory (ADR 0095). */
+const recordActive = () => callZome<boolean>('directory', 'identity', 'record_active');

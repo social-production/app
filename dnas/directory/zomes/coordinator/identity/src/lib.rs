@@ -1,8 +1,12 @@
 //! Identity API (directory DNA). Used by `ui/src/lib/services/people.ts` and the scenario
 //! tests. Reads are best-effort views; integrity validation is what enforces the rules.
 
+mod active;
+mod board;
+mod board_api;
 mod bot_notices;
 mod bot_review;
+mod deactivation;
 mod devices;
 mod feedback;
 mod follow_links;
@@ -15,6 +19,8 @@ mod standing;
 use hdk::prelude::*;
 use identity_integrity::{founder_agents, DirectoryProperties, Founder};
 
+pub use active::WeeklyActive;
+pub use board::{BoardRow, BoardView, BoardVote};
 pub use bot_review::{BotChoice, BotReviewView};
 pub use feedback::{FeedbackView, FeedbackVote, VoteDirection};
 pub use follows::{FollowRow, FollowStatus, FollowView};
