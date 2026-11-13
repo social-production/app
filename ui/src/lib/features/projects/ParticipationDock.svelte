@@ -10,7 +10,7 @@
   /**
    * web's Take part dock (ProjectDetailPage's participation DetailActionDock): Join for people
    * who aren't members yet, the phase's work toolbar (`PhaseWorkToolbar` moves in here), and the
-   * Vote control for everything but edits and updates.
+   * Vote control for everything but edits and updates (ADR 0099: it floats above the capsule).
    */
   interface Props {
     detail: DetailState;
@@ -43,6 +43,20 @@
   {@const project = detail.project}
   {@const charter = detail.project.charter}
   <DetailActionDock {active}>
+    {#snippet vote()}
+      {#if project.amMember}
+        <VoteDock
+          proposals={votes}
+          names={{ ...detail.names, ...detail.software.names }}
+          {charter}
+          stage={project.stage}
+          phaseLabel={detail.phaseLabel}
+          onVote={(p, c) => detail.vote(p, c)}
+          reveal={revealVote}
+          {onRevealDone}
+        />
+      {/if}
+    {/snippet}
     {#if charter.mode !== 'personal-service' && !project.amMember}
       <div class="participation-membership">
         <MembershipSplitButton
@@ -57,17 +71,5 @@
       </div>
     {/if}
     <div id="detail-participation-actions"></div>
-    {#if project.amMember}
-      <VoteDock
-        proposals={votes}
-        names={{ ...detail.names, ...detail.software.names }}
-        {charter}
-        stage={project.stage}
-        phaseLabel={detail.phaseLabel}
-        onVote={(p, c) => detail.vote(p, c)}
-        reveal={revealVote}
-        {onRevealDone}
-      />
-    {/if}
   </DetailActionDock>
 {/if}

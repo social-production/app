@@ -51,7 +51,10 @@
       onSelect={(id) => (selected = id)}
     />
     <DetailPhaseContext
-      kicker={phaseProgressLabel(project.phases, project.phase, shown)}
+      position={`Phase ${project.phases.findIndex((p) => p.id === shown) + 1} of ${project.phases.length}`}
+      kicker={shown === project.phase
+        ? ''
+        : phaseProgressLabel(project.phases, project.phase, shown)}
       title={detail.phaseLabel(shown)}
       summary={phaseSummary(project.charter?.mode, shown)}
     />

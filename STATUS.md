@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-12 evening Melbourne by a cloud session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-13 afternoon Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -150,22 +150,43 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   no `.calendar-cell.planned-day` ever shows. Not from the UX branches; parity session,
   please look. Passed on `claude/ux-controls` 2026-11-13: `projects`, `search`, `discover`,
   `governance`, `guests`.
-- **Detail pages, owner's choices so far (2026-11-13):** dock B (the dock replaces the nav
-  capsule inside a project, event or request; a round back button + one action capsule);
-  **Support and Oppose live in the dock, never in the page** ("no buttons in the page"; two
-  rows are fine); the Take part mockup (phase progress line, soft plan cards) and the Request
-  page mockup are approved. **Waiting on the owner:** version 2 of the mockup, where the vote
-  row is a small capsule above the actions and folds into a chip after voting. **Owner: dock
-  actions are icons without words and there is no ⋯ menu button; Support and Oppose keep
-  their words** (version 3 also keeps the word on the one call to action: Join, Sign up, Add
-  plan): https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop (private to the
-  owner). Not built. PRs: #148 (nav + feed), #150 (controls, stacked on #148).
-- **Next here:** (a) get PR #148 and the controls PR green and merged (merge main first; CI
-  only runs once the branch has no conflicts), smoke live, update README Status; (b) build
-  flat (Twitter-style) comments on posts, threads keep nested comments; (c) UX.md's
-  code-health items; (d) ADRs first for image posts (a post's charter has no attachment
-  field: most likely an integrity change) and for creation through plans (ADR 0059 plus the
-  owner's 2026-11-12 notes in UX.md; needs a project-network reset). Neither is started.
+- **Detail pages, branch `claude/ux-detail` (stacked on `claude/ux-controls`), ADR 0099
+  (owner approved the mockup 2026-11-13, https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop,
+  private to the owner):** the dock replaces the nav capsule inside a project, event or
+  request (round back button + one capsule; `DetailActionDock.svelte`, `styles/ux/dock.css`);
+  actions are icons without words, no ⋯ menu, only the one call to action keeps its word;
+  Support / Oppose float above the capsule and fold into a percentage chip once you have a
+  stance (`ProjectDock.svelte`, which now keeps the stance it just set, since the page's own
+  read lags); tabs are plain words; Take part has a phase progress line ("Phase 2 of 5 ·
+  Production Plan") and soft plan cards with an approval bar (`styles/ux/takepart.css`,
+  `PlanCard`, `DetailPhaseContext`); Details leads with the type label, a 24px left-aligned
+  title and when / where icon lines (`FactLine.svelte`); a request's roles are rows with a
+  Sign up pill (`HelpRolesDock.svelte`).
+  - **Changed from the mockup, for the owner to confirm:** an open **Vote** (edit, update,
+    phase move) is its own pill above the capsule, beside Support / Oppose, not inside the
+    capsule: with the stance chip, members and three icons it did not fit one row at 390px.
+  - **Not done:** the type label still reads "Help request" (the rename to "Request" comes
+    with the creation work); a request's dock has votes + Share, not the mockup's Sign up
+    (roles sign up per row in the page).
+  - **Bug found and fixed here (also on main):** the home feed crashed with "500 Internal
+    Error" when a sort change overlapped the first load (two answers appended the same
+    cards; Svelte's keyed list throws on duplicates). `feedState.svelte.ts` now drops stale
+    answers. This was why `governance.mjs` failed at "the feed card shows the update".
+  - **Checked (2026-11-13, local seed node):** `npm run check -w ui` (0 errors), lint,
+    boundaries, sizes; screenshots of the dock and pages in Proposal (values), Plan,
+    Activity and Closed on a project and an event and on a request, at 390px light and dark,
+    360px dark and desktop light and dark; `governance.mjs` (now checks the chip, the dock
+    replacing the nav, the type label, the phase line and the plan bar) and
+    `help-requests.mjs` **passed**. Not run: scenarios (no Rust change), other browser tests.
+- **Screenshot trick:** a temporary, uncommitted hook in `tests/e2e/lib.mjs` `device()`
+  (`UX_SHOTS=<dir>`, optional `UX_VIEW=360x740`, `UX_SCHEME=dark`): it screenshots whenever
+  the dock's buttons or the tab change, keeps a rolling `latest-*.png` per device and logs
+  page errors to `errors.txt`. The rolling shot is what showed the feed's 500 page.
+- **Next here:** (a) leftovers on `claude/ux-leftovers`: type stripe on notification cards,
+  the grey type label on rail cards, flat Twitter-style comments on posts (ADR 0100);
+  (b) UX.md's code-health items; (c) **ask the owner before starting** image posts (a post's
+  charter has no attachment field: an integrity change) or creation through plans (ADR 0059
+  plus the owner's 2026-11-12 notes in UX.md): both need a network reset.
 
 ## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the

@@ -2,6 +2,7 @@
   import type { Stance } from '#lib/domain/projects.ts';
 
   import '#lib/components/styles/cards.css';
+  import '#lib/components/styles/ux/feed.css';
 
   /**
    * web's VoteStrip in votes mode: ▲ count ▼. A help request's votes are its Support/Oppose

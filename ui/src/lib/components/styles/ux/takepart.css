@@ -1,0 +1,237 @@
+/* Take part and Details (ADR 0099): overrides of the ported governance.css, plans.css and
+   detail.css. The phase strip is a thin progress line with the phase named under it; plan
+   cards are soft rounded fills with approval as a bar; a detail page's title is larger and
+   its when and where are icon lines. Every rule starts with `.shell`. */
+
+/* The progress line: each phase is still a button (tap to read that phase). */
+.shell .phase-bar.phase-bar {
+  gap: 6px;
+  overflow: visible;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell .phase-bar .segment.segment {
+  min-height: 28px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.shell .phase-bar .segment::before {
+  content: '';
+  width: 100%;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--panel-border);
+  transition:
+    height 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.shell .phase-bar .segment.complete::before {
+  background: var(--brand);
+}
+
+.shell .phase-bar .segment.current::before {
+  background: color-mix(in srgb, var(--brand) 50%, var(--panel-border));
+}
+
+.shell .phase-bar .segment.active::before {
+  height: 9px;
+}
+
+.shell .phase-bar .segment .label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.shell .phase-context.phase-context {
+  gap: 4px;
+}
+
+.shell .phase-context .phase-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 6px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.shell .phase-context .phase-line .position::after {
+  content: ' ·';
+}
+
+.shell .phase-context .phase-line h2 {
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 800;
+  letter-spacing: 0;
+  line-height: 1.4;
+}
+
+.shell .phase-context .phase-line .kicker {
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .phase-context .phase-line .kicker::before {
+  content: '· ';
+}
+
+.shell .phase-context .summary {
+  font-size: 14.5px;
+}
+
+/* Plan cards. */
+.shell .plan-stack.plan-stack {
+  display: grid;
+  gap: 10px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell .plan-scope .plan-card.plan-card.plan-card {
+  gap: 5px;
+  margin-top: 0;
+  padding: 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shell .plan-scope .plan-card.plan-card:hover {
+    background: color-mix(in srgb, var(--brand-soft) 45%, var(--panel-hover));
+  }
+}
+
+.shell .plan-scope .plan-card:active {
+  transform: scale(0.99);
+}
+
+.shell .plan-scope .plan-card .plan-title {
+  font-size: 16px;
+}
+
+.shell .plan-scope .plan-card .plan-lede {
+  font-size: 14.5px;
+}
+
+.shell .plan-scope .plan-card .plan-stage-list {
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .plan-scope .plan-card .phase-badge,
+.shell .plan-scope .plan-card .assess-chip {
+  padding: 3px 9px;
+  border: none;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.shell .plan-scope .plan-card .phase-badge {
+  background: var(--brand-soft);
+}
+
+.shell .plan-scope .plan-card .assess-chip {
+  color: var(--on-brand);
+}
+
+.shell .plan-scope .plan-meter {
+  display: block;
+  height: 6px;
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--panel-border);
+}
+
+.shell .plan-scope .plan-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--brand);
+}
+
+.shell .plan-scope .plan-card .plan-footer-meta {
+  font-size: 13px;
+}
+
+/* Details: the type and tags line, a larger title, when and where as icon lines. */
+.shell .context-panel .feed-card-top .surface-type-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: color-mix(in srgb, var(--surface-accent) 55%, var(--text-main));
+  font-size: 13.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .project-overview .identity-copy {
+  /* The ported PersonalFeedIdentity rule centred this grid by accident (as ADR 0067 found on
+     requests); the title and text start at the left edge. */
+  justify-content: stretch;
+}
+
+.shell .project-overview h1,
+.shell .help-overview h1 {
+  font-size: 24px;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.shell .project-overview .overview-copy,
+.shell .help-overview .overview-copy {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.shell .fact-line.fact-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  color: var(--text-main);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.shell .fact-line svg {
+  flex: none;
+  width: 19px;
+  height: 19px;
+  margin-top: 1px;
+  color: var(--text-soft);
+}
+
+.shell .fact-line span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .shell .phase-bar .segment::before {
+    transition: none;
+  }
+
+  .shell .plan-scope .plan-card:active {
+    transform: none;
+  }
+}

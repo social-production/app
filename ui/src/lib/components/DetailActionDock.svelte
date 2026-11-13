@@ -1,14 +1,24 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import { resolve } from '$app/paths';
+
   import '#lib/components/styles/detail.css';
+  import '#lib/components/styles/ux/dock.css';
 
   /**
    * web's DetailActionDock: a detail page's action bar. While `active` it moves into the
    * app shell so it can stick to the bottom (phones) or float over the column (wide
    * desktop), and publishes its height as --detail-action-dock-height for page padding.
+   * ADR 0099: it floats in the nav capsule's style and takes the nav's place: a round back
+   * button, one capsule of actions (`children`), and above them the `vote` capsule.
    */
-  let { active, children }: { active: boolean; children: Snippet } = $props();
+  let { active, vote, children }: { active: boolean; vote?: Snippet; children: Snippet } = $props();
+
+  function back(): void {
+    if (history.length > 1) history.back();
+    else location.assign(resolve('/'));
+  }
 
   let node = $state<HTMLDivElement>();
 
@@ -55,5 +65,20 @@
 </script>
 
 <div class="detail-action-dock" bind:this={node}>
-  {@render children()}
+  {#if vote}<div class="dock-vote">{@render vote()}</div>{/if}
+  <div class="dock-row">
+    <button class="dock-back" type="button" aria-label="Back" title="Back" onclick={back}>
+      <svg aria-hidden="true" viewBox="0 0 24 24"
+        ><path
+          d="M14.5 5.5 8 12l6.5 6.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        /></svg
+      >
+    </button>
+    <div class="dock-capsule">{@render children()}</div>
+  </div>
 </div>

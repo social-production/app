@@ -53,6 +53,8 @@
   const actionChip = $derived(
     !canVote ? null : !allCriteriaRated(plan.criteria) ? 'Assess' : voteOpen ? 'Vote' : null,
   );
+  const votes = $derived(plan.tally.yes + plan.tally.no);
+  const approval = $derived(votes === 0 ? 0 : Math.round((plan.tally.yes / votes) * 100));
   const sheetId = $derived(`plan-sheet-${plan.id}`);
 </script>
 
@@ -83,6 +85,7 @@
         <span>{index + 1}. {stage.title}</span>
       {/each}
     </span>
+    <span class="plan-meter" aria-hidden="true"><i style:width={`${approval}%`}></i></span>
     <span class="plan-footer-meta">
       <span>
         {approvalLine(plan.tally)}{plan.average !== null ? ` · Avg ${plan.average.toFixed(1)}` : ''}

@@ -25,7 +25,19 @@ await ann.getByRole('button', { name: 'Publish project' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
 await ann.getByRole('button', { name: /^Support/ }).click();
-log('founder one created the project and supports it');
+// ADR 0099: the dock takes the nav's place; with a stance, Support and Oppose fold into a
+// chip in the capsule, and tapping it opens them again.
+const chip = ann.locator('.dock-capsule .dock-chip');
+await chip.waitFor({ timeout: 60_000 });
+assert.match((await chip.getAttribute('aria-label')) ?? '', /^You support this, 100% support/);
+assert.equal(await ann.getByRole('button', { name: /^Oppose/ }).count(), 0, 'the strip folded away');
+assert.equal(await ann.locator('.mobile-bottom-nav').isVisible(), false, 'the dock replaces the nav');
+await chip.click();
+await ann.getByRole('button', { name: /^Oppose/ }).waitFor();
+await chip.click();
+await ann.getByRole('button', { name: /^Oppose/ }).waitFor({ state: 'hidden' });
+assert.equal(await ann.locator('.context-panel .surface-type-label').innerText(), 'Productive');
+log('founder one created the project and supports it; the stance folds into a chip');
 
 const bob = await device();
 await phraseSignIn(bob, two.phrase.split(' '));
@@ -160,6 +172,10 @@ await wizard.getByPlaceholder('What happens in this stage?').fill('Borrow tools 
 await wizard.getByRole('button', { name: 'Next' }).click(); // → review
 await wizard.getByRole('button', { name: 'Submit Production Plan' }).click();
 await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
+// ADR 0099: the phase strip is a progress line named underneath; a plan's approval is a bar.
+assert.equal(await ann.locator('.phase-context .position').innerText(), 'Phase 2 of 5');
+assert.equal(await ann.locator('.phase-context h2').innerText(), 'Production Plan');
+assert.equal(await ann.locator('.plan-card', { hasText: planTitle }).locator('.plan-meter').count(), 1);
 log('founder one filed a production plan');
 
 /** Open the plan, rate every criterion "Support", vote Yes, and wait until the tally shows
