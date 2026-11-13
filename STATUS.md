@@ -225,6 +225,11 @@ up, bootstrap lists the seed's agents, `POST /account/retire` with junk → 400,
 **Next:** (5 is done, see above) SEEDLESS 3b ("Help the network"), alongside
 parity (PARITY summary). Optional for step 2: resend a retirement on desktop start when no
 gateway answered at log-in (ADR 0092's consequences).
+- **CI lesson (2026-11-13, PR #151):** a PR that resets the directory can't pass the desktop
+  smoke's "the seed node lists the new account" step: the live seed runs the old DNA until the
+  deploy. `desktop.yml`'s bundle now writes `happ/directory-dna-hash.txt` and the smoke stops
+  after the on-device half when it differs from the live `/readyz`; main's run after the
+  deploy covers the network half.
 - **CI lesson (2026-11-11):** GitHub's Ubuntu runners failed to resolve `security.ubuntu.com`
   for hours; `desktop.yml`'s apt step now retries. A desktop smoke's first `set_profile` can
   also time out on a slow runner network (`get_links … response timeout`); one re-run passed.
