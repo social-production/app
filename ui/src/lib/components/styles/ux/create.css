@@ -1,0 +1,39 @@
+/* A new proposal (Creating Through Plans mockup, ADR 0059): "Step 1 of 4 · Basics" under the
+   title, a segmented progress line instead of the step rail, and the "No type yet" note. */
+.create-sheet .step-count {
+  margin: 2px 0 0;
+  color: var(--text-soft);
+  font-size: 0.86rem;
+}
+
+.create-sheet .step-progress {
+  display: flex;
+  gap: 6px;
+  padding: 4px 0 2px;
+}
+
+.create-sheet .step-progress i {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--panel-hover);
+}
+
+.create-sheet .step-progress i.on {
+  background: var(--brand);
+}
+
+.create-sheet .soft-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 0.82rem;
+}
+
+.create-sheet .soft-note strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 0.85rem;
+}

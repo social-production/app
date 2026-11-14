@@ -21,8 +21,8 @@ type Step = { id: EventStepId; title: string };
 
 export const CREATE_STEPS: Step[] = [
   { id: 'basics', title: 'Basics' },
+  { id: 'scope', title: 'Tags' },
   { id: 'location', title: 'Location' },
-  { id: 'scope', title: 'Scope' },
   { id: 'overview', title: 'Overview' },
 ];
 

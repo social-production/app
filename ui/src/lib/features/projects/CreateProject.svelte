@@ -12,8 +12,8 @@
 
   import { CREATE_STEPS, CreateState } from './createState.svelte.ts';
 
-  /** web's CreateProjectPage without its Type step (ADR 0059): basics → location → scope
-   * (tags) → overview. */
+  /** web's CreateProjectPage without its Type step (ADR 0059), in the Creating Through Plans
+   * mockup's order: basics → tags → location → overview. */
   const s = new CreateState();
   const steps = CREATE_STEPS;
 
@@ -31,6 +31,7 @@
   title="New proposal"
   description="A proposal is shared work people can find, join and shape. Its plan decides what it becomes."
   {steps}
+  progress
   stepIndex={s.step}
   missing={s.missing}
   submitLabel="Publish proposal"
@@ -46,11 +47,16 @@
         <input bind:value={s.title} maxlength="200" aria-required="true" />
       </label>
       <label>
-        <RequiredLabel>Proposal description</RequiredLabel>
-        <textarea bind:value={s.description} rows="5" aria-required="true"></textarea>
+        <RequiredLabel>What do you propose?</RequiredLabel>
+        <textarea
+          bind:value={s.description}
+          rows="5"
+          aria-required="true"
+          placeholder="The idea, and why it is worth doing."></textarea>
       </label>
-      <p class="helper-text">
-        No type yet: it becomes a project, a service or an event when its members approve a plan.
+      <p class="soft-note">
+        <strong>No type yet</strong>It becomes a project, a service or an event when its members
+        approve a plan.
       </p>
       {#if s.allowance !== null}
         <p class="helper-text">
@@ -77,11 +83,11 @@
       <button class="overview-row" type="button" onclick={() => (s.step = 0)}>
         <strong>Basics</strong><span>{s.title.trim() || 'Untitled proposal'}</span>
       </button>
-      <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
-        <strong>Location</strong><span>{s.locationLabel}</span>
+      <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
+        <strong>Tags</strong><span>{tagCounts(s.tags)}</span>
       </button>
-      <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
-        <strong>Scope</strong><span>{tagCounts(s.tags)}</span>
+      <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
+        <strong>Location</strong><span>{s.locationLabel}</span>
       </button>
       {#if s.message}<p class="status-note">{s.message}</p>{/if}
     </div>
