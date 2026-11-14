@@ -92,7 +92,7 @@
 {#if lead && mode}
   <!-- A feed row (ADR 0102): the type's glyph, the channel in bold, then type · phase · clock. -->
   <div class="feed-card-top feed-lead">
-    <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} /></span>
+    <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} feedGlyph /></span>
     <div class="feed-lead-copy">
       {#if tags.length > 0}
         <div class="feed-lead-tags">{@render tagList()}</div>

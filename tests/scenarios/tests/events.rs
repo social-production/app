@@ -131,7 +131,7 @@ async fn an_event_moves_through_webs_event_lifecycle() {
     let view = event(&net, 0).await;
     assert_eq!(
         (view.phase.as_str(), view.stage.as_str()),
-        ("phase-2", "Event Plan")
+        ("phase-2", "Plan")
     );
     assert_eq!(view.next_phase.map(|s| s.id).as_deref(), Some("phase-5"));
 
