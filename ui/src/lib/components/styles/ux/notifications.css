@@ -1,0 +1,80 @@
+/* Notifications (owner approved 2026-11-13): one bold line per item, a green dot while
+   unread, no boxes, and "Mark all read" as a text link beside the heading. Overrides of the
+   ported notifications.css. */
+.shell .notifications-page .page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px var(--page-gutter) 6px;
+  border: none;
+  background: transparent;
+}
+
+.shell .notifications-page .page-header h1 {
+  font-size: 22px;
+  letter-spacing: -0.015em;
+}
+
+.shell .notifications-page .page-header p {
+  display: none;
+}
+
+.shell .notifications-page .page-header .secondary-button {
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.shell .notification-card {
+  padding: 11px var(--page-gutter);
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.shell .notification-card .title-text {
+  color: var(--text-soft);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.shell .notification-card.unread .title-text {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.shell .notification-card .body {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.shell .notification-card .unread-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.shell .notification-card .accept-button,
+.shell .notification-card .decline-button,
+.shell .notification-card .mark-read {
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .notification-card .accept-button {
+  background: var(--brand);
+  color: var(--on-brand);
+}

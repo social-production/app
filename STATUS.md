@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-13 evening Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-14 afternoon Melbourne by the owner's PC UX session; see the first "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -81,6 +81,196 @@ otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators
 Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
+
+## START HERE (2026-11-14, 8 pm Melbourne): where the owner's PC session stopped
+Two checkouts on the owner's PC: `app/` (branch `claude/creation-plans`) and `app-ux/` (a git
+worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app/target` and
+its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests
+at the same time. **Approved designs and the choice made on each are listed under "Approved
+designs" below; build them as drawn and do not redraw them.**
+1. **PR #156** (`claude/feed-activity-ux`) **is blocked by the Linux desktop smoke, which fails
+   on main too** (main's push run of 2026-11-13 21:29 UTC and three runs of this PR, all
+   "timed out waiting for the profile name"; the app log shows `identity` and `health`
+   `get_links response channel dropped: likely response timeout` and one sqlite "database
+   is locked"). The PR's first run (03:05 UTC) passed, so it is intermittent or load
+   related, not this PR's code. The live seed and bootstrap are up (`check-bootstrap.sh`: 5
+   agents per space; `/readyz` uptime 12.5 h, 4 apps). **Live sign-up has been unverified
+   since #150 and may be the same fault: diagnose this first** (does a desktop's first
+   `set_profile` reach the seed? compare with the last green main run, 2026-11-13 10:56 UTC,
+   before #153 to #155). Do not merge #156 on a red check without the owner's say. Its
+   other checks: 11 passed, scenarios shard 0 was still running at 9:20 pm Melbourne.
+   When it is green: merge, smoke
+   live read-only (this PC session may not sign up on live; ask the owner to), update README
+   Status.
+2. Then `claude/ux-topbar-map`: `git rebase main`, open its PR; then `claude/ux-chats-profile`
+   the same way.
+3. **`claude/ux-chats-profile`, seen rendered 2026-11-14 9 pm (390px; chats and the pin
+   bar in light and dark):** public feed rows indented under the channel name (design A's
+   header: glyph square, channel in bold, "type · phase · clock"); sign-up's way back is the
+   round floating back button at the bottom left; chats like Telegram (your bubble a soft
+   tint with the ordinary text colour, others' grey, **no tinted chat background**: owner);
+   the pin bar as a flat strip with a thin rail; the New message and Chat info sheets
+   (`styles/ux/sheets.css`, which also gives **every sheet** a round close button and a pill
+   action in its footer); **Settings as drawn (ADR 0105):** a profile row, then Profile and
+   Appearance as rows that show their value and open a small bottom sheet
+   (`components/settings/SettingRow`, `SettingChoice`); the other sections have the
+   grouped look but keep their old controls (Regional, Devices, Network, Privacy, Account:
+   convert them to rows next). Notifications (`styles/ux/notifications.css`): heading and
+   "Mark all read" link seen; the cards themselves not (the test account had none).
+   Dark chat checked again after the background was removed: neutral dark page, your bubble
+   a muted green tint, others' grey.
+   **Lesson: an `@import` after any rule in a CSS file is ignored.** Splitting `feed.css`
+   that way dropped the whole row header for one commit; `feedrow.css` is imported from
+   `index.css`.
+   Browser tests **passed** on this branch tonight: `accounts`, `messages` (light and dark),
+   `chat` (light and dark), `group-options` (pinning; light and dark), `shell`, `projects`,
+   `follows`, `threads`, `governance`. `group-options` then failed once with the New message
+   sheet stuck on "Sending…" (a new group chat can take minutes on a fresh node: STATUS
+   2026-11-10); rerun it. **Not re-shot after the last footer fix:** a sheet's footer (round
+   close, padded pill). Still to look at: the sheet footers across the app (filters, votes,
+   wizards), the "Messages" heading on phones (still hidden), Settings in dark.
+   `tests/e2e/lib.mjs`: `UX_SCHEME=dark` runs every device in the dark theme.
+   Remaining Screens still to build: create flows (progress line, floating Continue),
+   channel / community / Platform header, Links and History tabs as soft cards, Search
+   (chips), People rows, Feedback, and the rest of Settings' sections as rows.
+   **Owner, 2026-11-14 night, pointing at Creating Through Plans
+   (https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv): "like look at this"**: read it
+   beside the create menu and the proposal flow on `claude/creation-plans` and fix every
+   difference; this session did not open it.
+3b. **Owner, 2026-11-14 9:10 pm: rebuild "New message" as Telegram does it** (four reference
+   screenshots: `../assets/temp/telegram-new-message/` on the owner's PC). A full page, not
+   a form: a back arrow, "New message", a "New group" row on top, then people as rows (face,
+   name, a second line) with a search field. **Tapping a person opens the chat pane with
+   them directly** (empty: "No messages here yet"; the first message is sent from the
+   normal message bar, which is when the conversation gets created). **New group:** the same
+   list with "Who would you like to add?", tapping ticks a person (a green tick on the
+   face) and adds a chip above the search; "N selected" under the title; a round arrow
+   button bottom right goes on to name the group and create it. Today's
+   `ComposeMessageSheet` (Direct / Group switch, a message box, Send) was only restyled
+   (`styles/ux/sheets.css`); `ConversationView` needs a draft state for a chat that does
+   not exist yet. Not started.
+3c. **Feed row header now matches design A** (tinted glyph square, channel in bold with no
+   small icon, one grey "type · phase · clock" line, the body under the channel name):
+   `styles/ux/feedrow.css`, whose last block carries an extra class because the feed's
+   components load `feed.css` again after it. The glyphs are web's own type icons (house
+   for Productive, lines for a thread), not the mockup's cube and speech bubble, and the
+   type still reads "Productive", not "Project": ask the owner before changing either.
+4. **Owner, 2026-11-14 evening: some built screens drifted from what was decided** (named:
+   the soft phase bars inside project and event details, the create (+) menu, Settings).
+   Settings is not built yet. For the other two, open the artifacts (Detail Page Mockups
+   https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop, Nav and Feed Mockups
+   https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd) beside screenshots of the built screens
+   and fix every difference; this session did not get to it.
+5. `claude/creation-plans` (in `app/`): see its own entry ("creation through plans").
+
+### Approved designs (owner's private artifacts; read with the Artifact tool)
+- Nav and Feed (74TJNbHMNYBmvHWSohaDbd), Detail Pages (2Svg4vucNtbCK9E7ZyNnop), Post Header
+  option A (UZFHQJuuozrxSRXd9xZ2qM): built (PRs #148 to #154); see item 4 above.
+- Feed Headers and Activity Phase (2qLuYLhBCfvducCwtwGhGp): all of the session's picks. PR #156.
+- Top Bar and Map (P5n4eg23ikHPXH8W1BH1Vp): as drawn, except the map: style A with search
+  behind a button; on desktop the panel capsule sits beside the logo. `claude/ux-topbar-map`.
+- Chats, Profile, Onboarding (RT6knfQXdtDeFzDDLj2hMu): as drawn, "Edit profile" allowed,
+  plus item 3's notes. `claude/ux-chats-profile`.
+- Remaining Screens (CxWVNQtVsXgGijjQNvJRBH): approved, **not built** (channel and community
+  headers, **Settings**, notifications, search, people lists, create flows, feedback).
+- Creating Through Plans (GekVi8swuWXaMr9eKeZ5Mv): approved; `claude/creation-plans`.
+- Plan, Phase and Feedback Screens (QKBwCRmbKwcTPzgFWhex6t): approved as drawn ("these designs
+  look amazing"), **not built**; **Convert must be added** to the phase sheet and built.
+
+## In flight (UX) 2026-11-14: two more branches stacked on `claude/feed-activity-ux` (PR #156), pushed, no PRs yet
+**Order (owner): one PR per group, each from main after the one before merges.** When #156
+merges: `git rebase main` on `claude/ux-topbar-map`, open its PR; when that merges, the same
+for `claude/ux-chats-profile`. Both are UI only (no network reset).
+- **`claude/ux-topbar-map`, ADR 0103** (mockups https://claude.ai/artifact/P5n4eg23ikHPXH8W1BH1Vp):
+  the top bar (a search field at every width; Networks, Map and Activity in one capsule;
+  **owner, 2026-11-14: on desktop the capsule sits beside the logo, apart from Home /
+  Notifications / Messages**), the map's filters on phones (owner chose style A with the
+  search behind a button: `features/map/MapFilterCapsule.svelte`; "Open as list" is in the
+  results' header), About (sticky segmented tabs, summary cards), and on sign-up "Back to
+  feed", "Keep browsing without an account" and "Copy all 24 words". The desktop map bar
+  under the map is unchanged.
+- **`claude/ux-chats-profile`** (mockups https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu):
+  styles only plus small markup: `styles/ux/messages.css`, `chat.css`, `profile.css`,
+  `onboarding.css`; `Welcome.svelte` (logo, "Join Social Production", no boxes),
+  `SignupFlow.svelte` (progress line, note), `ProfileView.svelte` ("Edit profile" on your
+  own profile, to Settings). A link to something in the app shows as a card inside the
+  bubble; long links wrap (the bug from the audit).
+  **Not built from that mockup:** one "+" for photo and file (the two buttons stay), a
+  shared item's card with its date and place (the card shows the link's text), "Report as
+  bot" under a ⋯ menu (it stays a round icon), a group chat's squared avatar. ADR 0104.
+- **Checked (2026-11-14, local seed node, the build of `claude/ux-chats-profile` minus its
+  last small style fixes):** `npm run check -w ui` (0 errors), lint, boundaries, sizes;
+  browser tests **passed**: `guests`, `follows`, `region`, `bookings`, `map`, `shell`,
+  `messages`, `accounts` (and on the top bar build: `events`, `search`); screenshots at
+  390px light, 360px dark and desktop of the top bar, map, About, sign-up, messages, a
+  conversation and a profile were looked at. **Not re-shot after the last fixes:** the chat
+  header's left alignment, the phone "Messages" heading, and profile buttons without icons
+  on phones. Not run: scenarios (no Rust change), the other browser tests.
+- **Owner, 2026-11-14 (after seeing https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t): "these
+  designs look amazing"**: all seven sections are approved as drawn. **Convert must still be
+  built** (add it as a choice on the phase sheet; web has
+  `ProjectConversionWorkflowSection`; it needs an ADR and probably governance work), and
+  **the Settings page is still to build** (it is in the remaining-screens mockup). Build
+  list after the two branches above: remaining screens
+  (https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH: channel and community headers,
+  Settings, notifications, search, people lists, create flows, feedback), then the seven
+  sections (details, values, plan review, phase sheet + closed page + Convert, left rail,
+  Discover, feedback with comments).
+
+## In flight (UX) 2026-11-14: feed headers and the activity phase, branch `claude/feed-activity-ux`, ADR 0102
+**Owner approved the mockups ("lets use all your suggestions",
+https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
+- **Built:** Home / Global / Region word tabs and one "Feed filters" sheet (`FeedHeader`,
+  `SegmentedChoice`, `styles/ux/feedhead.css`); the feed row header (type glyph, channel in
+  bold, "type · phase · clock" under it: `FeedCardTop`, `styles/ux/feed.css`); the Activity
+  phase (Upcoming / Past activity tabs, a week strip with the month behind its name, soft
+  day-grouped cards with faces and "Join": `ActivityCalendar` `week`, `ActivityCard`,
+  `ActivityPhase`, `styles/ux/activity.css`); an opened activity (an icon leads each line,
+  Share and "Show on map" are pills, role buttons are pills: `styles/ux/activitysheet.css`,
+  whose rules start `.activity-ui.activity-ui` because the sheet is portaled outside `.shell`).
+  "Add activity" stays the brand pill in the Take part dock (the dock replaces the nav there,
+  so the mockup's floating pill is that pill).
+- **Two real bugs found by the browser tests and fixed here (both on main too):**
+  1. **A one-day event plan lost its plan day east of Greenwich.** A `date` plan stores no
+     end date, so a finish past UTC midnight (9 am to 1 pm in Melbourne) read as earlier than
+     the start: no day was marked and no activity could be added. `scheduleBounds`
+     (`domain/eventSchedule.ts`) now takes such a finish as the next UTC day. This was why
+     `events.mjs` failed on main on the owner's PC (CI runs in UTC and never saw it).
+  2. **"Source chain error … the source chain head has moved"** on Create channel / Publish
+     project when another write by the same person landed first (all public spaces share
+     one cell, ADR 0065). Holochain refuses such a call before running it, so
+     `holo/headRetry.ts` sends it again (up to three times); `callZome` and `callCell` use it.
+     The usual second writer was the app itself: the weekly `Active` link (ADR 0095) went out
+     right after `create_charter`, beside `create_listing` in the directory, so **a new
+     person's first project failed to publish**. `holo/active.ts` now writes it five seconds
+     later.
+     It failed `follows`, `region`, `bookings` and the test channel's creation locally.
+     `ensureTestChannel` (tests) also presses again if it still sees the message.
+- **`UX_SHOTS=<dir>`** is now a real option of `tests/e2e/lib.mjs` `device()`: a screenshot
+  of every device every four seconds (identical frames skipped), for reviewing a flow.
+- **Local node note:** `app-ux` is a git worktree; its `target` is a symlink to
+  `../app/target` (ignored) so it does not rebuild Holochain. Run `bash scripts/build-happ.sh`
+  in the checkout whose node you start, or the node runs the other branch's zomes.
+- **Checked (2026-11-14, local seed node built from this branch, 390px):** `npm run check -w
+  ui` (0 errors), lint, boundaries, sizes; screenshots of the home feed, the filter sheet,
+  the activity phase (upcoming, past, an opened activity, a past one) looked at. Browser
+  tests **passed**: `activities`, `governance`, `threads`, `help-requests`,
+  `closed-communities`, `software`; and after the two fixes above `events`, `guests`,
+  `follows` and `region` (each had failed on one of those two bugs). `bookings` and `map`:
+  see the `claude/ux-topbar-map` entry (stacked on this branch, same local node). Not run:
+  scenarios (no Rust change), the other browser tests.
+- **Approved, not built yet (owner, 2026-11-14: build all, one PR per group, each from main
+  after the previous merges):**
+  1. ~~Top bar, map filters, About, "Back to feed" on sign-up~~: built, see the entry above.
+  2. ~~Sign-up / log-in, messages, conversation, profile~~: built, see the entry above.
+  3. Channel and community headers, settings, notifications, search, people lists, create
+     flows, feedback: https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH
+- **Mockups waiting for the owner's OK (published 2026-11-14):**
+  https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t : project details and description (the
+  place opens the map), the proposal phase's values, plan review, the phase sheet and a
+  closed project, the left rail, Discover, and Feedback (web's type icon and percentage
+  votes kept; **new:** Twitter-style comments on a feedback item). One question in it:
+  whether a "Convert" choice is still wanted now that the leading plan sets the type.
 
 ## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",

@@ -20,6 +20,17 @@
   let answers = $state(['', '', '']);
   let progress = $state<AccountStep>('checking');
   let error = $state<string>();
+  let copied = $state(false);
+
+  /** The 24 words on the clipboard, in order, for pasting into a document or password manager. */
+  async function copyWords(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(words.join(' '));
+      copied = true;
+    } catch {
+      copied = false;
+    }
+  }
 
   const confirmed = $derived(
     positions.every((p, i) => answers[i]?.trim().toLowerCase() === words[p]),
@@ -37,6 +48,11 @@
   }
 </script>
 
+{#if step !== 'working'}
+  <div class="ob-steps" aria-hidden="true">
+    <i class:on={true}></i><i class:on={step !== 'name'}></i><i class:on={step === 'confirm'}></i>
+  </div>
+{/if}
 {#if step === 'name'}
   <form class="stack" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
@@ -52,6 +68,7 @@
     <div class="handle-line">
       {#if problem && name.trim().length >= 3}<p class="status-note">{problem}</p>{/if}
     </div>
+    <p class="ob-note">Next you get 24 words. They are your account; keep them somewhere safe.</p>
     <div class="button-row">
       <button class="button-primary" disabled={!!problem} type="submit">Next</button>
     </div>
@@ -64,6 +81,11 @@
       and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
     </p>
     <PhraseGrid {words} />
+    <div class="button-row">
+      <button class="button-secondary copy-words" type="button" onclick={() => void copyWords()}>
+        {copied ? 'Copied all 24 words' : 'Copy all 24 words'}
+      </button>
+    </div>
     <div class="button-row">
       <button class="button-primary" type="button" onclick={() => (step = 'confirm')}
         >I've written them down</button

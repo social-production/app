@@ -108,6 +108,27 @@ export function defaultMonth(activities: Activity[], now = Date.now(), day?: str
   return monthStart(next === undefined ? new Date(now) : new Date(next));
 }
 
+/** The week strip's first day (ADR 0102): the picked or first plan day (`day`), else the next
+ * upcoming activity's, else today. */
+export function defaultDay(activities: Activity[], now = Date.now(), day?: string): Date {
+  if (day) return new Date(`${day}T12:00`);
+  const next = activities
+    .map((a) => a.startsAt / 1000)
+    .sort((x, y) => x - y)
+    .find((t) => t >= now);
+  return new Date(next ?? now);
+}
+
+/** The seven days (Monday first) of `days` that hold `iso`. */
+export function weekOf(days: CalendarDay[], iso: string): CalendarDay[] {
+  const at = Math.max(
+    days.findIndex((d) => d.iso === iso),
+    0,
+  );
+  const start = at - (at % 7);
+  return days.slice(start, start + 7);
+}
+
 /** web's `setDefaultActivityTimes`: a picked day's first activity, else 18:00–19:00 that day
  * (the next hour if that has passed), else the next hour. */
 export function defaultTimes(

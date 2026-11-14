@@ -1,6 +1,8 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { fillChip, placeLabel, signupTone, type Activity } from '#lib/domain/activities.ts';
@@ -46,6 +48,16 @@
   const a = $derived(p.activity);
   const chip = $derived(p.chip ?? fillChip(a));
   const place = $derived(placeLabel(a));
+  // The row's faces (ADR 0102): the first three people in, and "Join" while a role has room.
+  const people = $derived(a.roles.flatMap((r) => r.people));
+  const joinable = $derived(
+    !p.history &&
+      !p.chip &&
+      !p.readOnly &&
+      a.rolesOpen &&
+      a.myRole === null &&
+      a.roles.some((r) => r.maximum === null || r.people.length < r.maximum),
+  );
   const zone = $derived(zoneOf(new Date(a.startsAt / 1000)));
   const until = $derived(multiDayEnd(a.startsAt, a.endsAt));
   const shortDay = $derived(
@@ -106,11 +118,21 @@
           · {p.history.rating}{/if}</span
       >
     </span>
-    {#if p.history}
-      <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
-    {:else}
-      <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
-    {/if}
+    <span class="agenda-foot">
+      {#if !p.history && people.length > 0}
+        <span class="agenda-people" aria-hidden="true">
+          {#each people.slice(0, 3) as person (person)}
+            <AvatarBadge size="sm" name={p.names[person] ?? '…'} />
+          {/each}
+        </span>
+      {/if}
+      {#if p.history}
+        <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
+      {:else}
+        <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+      {/if}
+      {#if joinable}<span class="agenda-join">Join</span>{/if}
+    </span>
   </button>
 
   <OverlaySheet
@@ -122,20 +144,25 @@
     onClose={() => (open = false)}
   >
     <div class="activity-body">
+      <p class="sheet-when sheet-line">
+        <ToolbarIcon name="clock" /><span>{dateLine(a.startsAt, a.endsAt)}</span>
+      </p>
       {#if place}
         {#if !a.online && a.place}
           <!-- eslint-disable svelte/no-navigation-without-resolve -- an outside map -->
           <a
-            class="sheet-place map-link"
+            class="sheet-place sheet-line map-link"
             href={mapHref}
             title="Show on map"
             target="_blank"
             rel="noopener noreferrer"
-            onclick={showOnMap}>{place}</a
+            onclick={showOnMap}><ToolbarIcon name="map-pin" /><span>{place}</span></a
           >
           <!-- eslint-enable svelte/no-navigation-without-resolve -->
         {:else}
-          <p class="sheet-place">{place}</p>
+          <p class="sheet-place sheet-line">
+            <ToolbarIcon name={a.online ? 'globe' : 'map-pin'} /><span>{place}</span>
+          </p>
         {/if}
       {/if}
       {#if a.online && a.meetingUrl}
@@ -144,9 +171,10 @@
           >Join meeting</a
         >
       {/if}
-      <p class="sheet-when">{dateLine(a.startsAt, a.endsAt)}</p>
       {#if p.planStage}
-        <p class="activity-stage">{p.planStage}</p>
+        <p class="activity-stage sheet-line">
+          <ToolbarIcon name="layers" /><span>{p.planStage}</span>
+        </p>
       {/if}
       {#if a.note.trim()}
         <section class="sheet-section">
@@ -169,14 +197,27 @@
         />
       {/if}
       {@render p.children?.()}
-      <button
-        class="text-button share-activity"
-        type="button"
-        title="Copy a link to this activity"
-        onclick={share}
-      >
-        {copied ? 'Link copied' : 'Share activity'}
-      </button>
+      <div class="sheet-actions">
+        <button
+          class="sheet-pill share-activity"
+          type="button"
+          title="Copy a link to this activity"
+          onclick={share}
+        >
+          <ToolbarIcon name="link" />{copied ? 'Link copied' : 'Share activity'}
+        </button>
+        {#if !a.online && a.place}
+          <!-- eslint-disable svelte/no-navigation-without-resolve -- an outside map -->
+          <a
+            class="sheet-pill"
+            href={mapHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            onclick={showOnMap}><ToolbarIcon name="map-pin" />Show on map</a
+          >
+          <!-- eslint-enable svelte/no-navigation-without-resolve -->
+        {/if}
+      </div>
     </div>
   </OverlaySheet>
 </div>

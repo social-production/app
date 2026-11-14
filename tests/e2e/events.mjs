@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, errors, log } from './lib.mjs';
+import { BASE, browser, errors, log, feedChoice } from './lib.mjs';
 import { advanceTo, approvePlan, createEvent, daysFromNow, filePlan, signInFounders } from './event-flow.mjs';
 
 const stamp = Date.now().toString(36).slice(-4);
@@ -46,8 +46,7 @@ const card = bob.locator('.event-card', { hasText: title });
 async function feedUntil(ready, tries) {
   for (let i = 0; i < tries && !(await ready()); i++) {
     await bob.goto(BASE);
-    await bob.getByRole('button', { name: 'Sort public feed by' }).click();
-    await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
+    await feedChoice(bob, 'Sort public feed by', 'Most recent');
     await bob.locator('.surface').first().waitFor({ timeout: 60_000 });
     if (await ready()) break;
     await bob.waitForTimeout(5000);
