@@ -187,6 +187,7 @@ async fn software_project() -> Net {
             end_date: None,
         }],
         schedule: None,
+        requests: None,
     });
     let plan = propose(&net, 1, plan).await;
     let board: PlanBoard = net.call(0, "governance", "list_plans", ()).await;

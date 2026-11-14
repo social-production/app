@@ -4,9 +4,8 @@
 //! (ADR 0030, 0061) and holds that one space under the same rules.
 //! Membership and signals are links from the space to their author, so they need no entries.
 //! Decisions are Proposal → Vote → Outcome records (ADR 0009, 0033), links to other projects
-//! (ADR 0042) and software pull requests (ADR 0086) among them. Values and importance votes
-//! (ADR 0041), activities with roles, suggestions and ratings (ADR 0056; taking a role is a
-//! link) and a personal service's weekly hours (ADR 0077) are records.
+//! (ADR 0042) and software pull requests (ADR 0086) among them. Values and their votes (ADR
+//! 0041), activities (ADR 0056) and a personal service's weekly hours (ADR 0077) are records.
 
 mod activity;
 mod applied;
@@ -61,6 +60,7 @@ pub struct Charter {
 
 /// What a proposal decides. An edit stores only what changes (as web does).
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
+#[allow(clippy::large_enum_variant)] // boxing the plan would change every caller
 pub enum ProposalKind {
     Edit {
         title: Option<String>,

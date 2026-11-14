@@ -129,6 +129,16 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     out.phase = Some(moved.to.id().to_string());
                     out.subtype = moved.subtype.or(out.subtype);
                     out.mode = moved.mode.or(out.mode);
+                    if let Some(mode) = moved.requests {
+                        // The cited operations plan switched requests on (ADR 0059); a
+                        // later `RequestSettings` vote changes them.
+                        out.requests = Some(AppliedRequests {
+                            enabled: true,
+                            off_schedule: mode == "both",
+                            mode,
+                            at: d.at,
+                        });
+                    }
                 }
             }
             ProposalKind::Return { to, .. } => {
@@ -141,6 +151,7 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                         // proposal's type, are open again (ADR 0040, 0059).
                         out.subtype = None;
                         out.mode = None;
+                        out.requests = None;
                     }
                 }
             }
@@ -175,6 +186,8 @@ struct Moved {
     subtype: Option<String>,
     /// The type the cited plan gave a proposal (ADR 0059).
     mode: Option<String>,
+    /// The request mode the cited operations plan switched on (ADR 0059).
+    requests: Option<String>,
 }
 
 /// A phase move applies only as the next step from where the project is; leaving a plan
@@ -198,6 +211,7 @@ fn phase_move(
     let kinds = required_plan_kinds(shape(mode, &current), phase);
     let mut chosen = None;
     let mut made = None;
+    let mut requests = None;
     if !kinds.is_empty() {
         let cited = approved
             .iter()
@@ -208,6 +222,7 @@ fn phase_move(
         if mode == PROPOSAL {
             made = cited.kind.makes().map(str::to_string);
         }
+        requests.clone_from(&cited.requests);
     }
     let subtype = chosen.clone().unwrap_or_else(|| current.clone());
     let leaving_as = made.as_deref().unwrap_or(mode);
@@ -217,6 +232,7 @@ fn phase_move(
             to,
             subtype: chosen,
             mode: made,
+            requests,
         })
 }
 

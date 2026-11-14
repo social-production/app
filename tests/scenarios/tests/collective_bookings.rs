@@ -118,6 +118,7 @@ async fn collective_in_activity() -> Net {
                 end_date: None,
             }],
             schedule: None,
+            requests: None,
         }),
     )
     .await;

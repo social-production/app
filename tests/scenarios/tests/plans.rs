@@ -56,6 +56,7 @@ fn draft(kind: PlanKind, title: &str, subtype: &str) -> Plan {
             end_date: None,
         }],
         schedule: None,
+        requests: None,
     }
 }
 

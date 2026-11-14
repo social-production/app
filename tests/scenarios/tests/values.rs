@@ -164,6 +164,7 @@ fn beds() -> Plan {
             end_date: None,
         }],
         schedule: None,
+        requests: None,
     }
 }
 

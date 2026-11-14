@@ -34,6 +34,10 @@ pub struct Plan {
     /// Event plans only, and required there (ADR 0057).
     #[serde(default)]
     pub schedule: Option<EventSchedule>,
+    /// Operations plans only (ADR 0059): how the service takes requests once this plan
+    /// leads it out of the Plan phase, one of `sp_service::MODES`; none for no requests.
+    #[serde(default)]
+    pub requests: Option<String>,
 }
 
 /// web's `EventPlanScheduleInput`, in UTC wall time (ADR 0057).
@@ -74,6 +78,7 @@ pub struct Rating {
 
 pub fn check(plan: &Plan) -> Result<(), String> {
     check_event_fields(plan)?;
+    check_requests(plan)?;
     crate::place::check_optional(plan.place.as_deref(), plan.location.as_deref())?;
     check_plan(&PlanFields {
         title: &plan.title,
@@ -94,6 +99,16 @@ pub fn check(plan: &Plan) -> Result<(), String> {
             })
             .collect(),
     })
+}
+
+/// Only an operations plan says how its service takes requests, in a known mode.
+fn check_requests(plan: &Plan) -> Result<(), String> {
+    match (plan.kind, plan.requests.as_deref()) {
+        (_, None) => Ok(()),
+        (PlanKind::Organisation, Some(mode)) if sp_service::MODES.contains(&mode) => Ok(()),
+        (PlanKind::Organisation, Some(_)) => Err("unknown request mode".into()),
+        _ => Err("only an operations plan takes requests".into()),
+    }
 }
 
 /// An event plan names its place and schedule; other plans have no schedule.

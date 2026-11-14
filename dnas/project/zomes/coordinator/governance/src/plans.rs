@@ -20,6 +20,8 @@ pub struct Approved {
     pub subtype: Option<String>,
     /// The repository a software plan names (ADR 0086).
     pub repository: Option<String>,
+    /// How an operations plan's service takes requests (ADR 0059), if it does.
+    pub requests: Option<String>,
     pub yes: u32,
     pub no: u32,
     /// When its Outcome closed it, and who closed it.
@@ -49,6 +51,7 @@ pub fn approved(
             kind: plan.kind,
             subtype: plan.subtype.clone(),
             repository: plan.repository_url.clone(),
+            requests: plan.requests.clone(),
             yes: d.yes,
             no: d.no,
             at: d.at,

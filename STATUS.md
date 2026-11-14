@@ -254,6 +254,40 @@ If every URL 404s again, ask the owner to check Railway usage/billing first.
   publishes a post with a photo, sees it on the post's page and the profile row, and checks
   the photo is not a comment). Not run: the other scenarios and browser tests.
 
+## In flight 2026-11-14: creation through plans (ADR 0059 stage A), branch `claude/creation-plans`, pushed, no PR yet
+**This is the newest word on this branch; the 2026-11-13 entry below is older.** It resets
+the project network on merge (owner approved). Directory and conversation DNA hashes equal
+the live seed's `/readyz` (checked 2026-11-14 evening:
+`https://seed-node-production.up.railway.app/readyz`).
+- **Done before today:** charter mode `proposal`, the leading plan gives the type, the UI's
+  create menu and four-step proposal form, "Add plan" asks the kind, the operations plan
+  wizard's step "Will this service take requests?", 20 browser tests moved mechanically to
+  the proposal flow (**none run yet**), `addPlan` in `tests/e2e/lib.mjs`.
+- **Done 2026-11-14 (zome side of the request option):** `Plan.requests: Option<String>`
+  (`#[serde(default)]`; operations plans only, one of `sp_service::MODES`;
+  `plan.rs` `check_requests`), carried on governance `Approved` and `Moved`; when the phase
+  move cites that plan, `Applied.requests = { enabled: true, mode, off_schedule: mode ==
+  "both" }`; a return that reopens the type clears it (`apply.rs`). The UI already sends
+  `requests` (`domain/planForm.ts`). Scenario `proposals` asserts both; its test was split
+  into three functions for clippy's 60 lines.
+- **Checked 2026-11-14:** scenario `proposals` **passed** before the request change (the
+  return needs both founders' votes: fixed test). After it: `cargo fmt`, workspace clippy
+  `-D warnings`, `check-sizes.sh`, `build-happ.sh` and the two DNA hashes pass; scenario
+  `plans` first test passed; **`proposals` (with the new assertions) and the rest of `plans`
+  were still running when this was written: rerun
+  `cargo test -p scenarios --test proposals --test plans -- --test-threads=1` inside Nix
+  (`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0`) and read the result.** Not run: the other
+  scenarios (`collective_bookings`, `private_events`, `software`, `values`, `events` only
+  gained `requests: None`), `npm run check -w ui`.
+- **To do:** (b) browser tests by hand: `event-flow.mjs` `createEvent` (public events start
+  as a proposal with an event plan), `bookings.mjs` / `service-requests.mjs` / `rail.mjs`'s
+  personal part (move to a collective service whose operations plan switches requests on),
+  `screens.mjs` (no type step), `projects.mjs:136` (the feed label is "Proposal"), stage
+  names (a proposal's phases are Proposal → Plan); then run them all against a node built
+  from this branch. (c) Owner's decision: the personal-service screens stay until stage B
+  (a second reset); nothing can create one now. (d) STATUS, README, PR, merge when green,
+  smoke live. Merge main first (PR #156 and the UX branches touch `ui/` and `tests/e2e/lib.mjs`).
+
 ## In flight 2026-11-13 (night): creation through plans (ADR 0059), NOT pushed yet
 **Owner, 2026-11-13: "yep go, feel free to reset network"; the word is "Proposal"; an
 operations plan can switch on "takes requests by calendar", and changing request settings

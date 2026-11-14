@@ -55,6 +55,7 @@ fn draft(schedule: Option<EventSchedule>, location: Option<&str>) -> Plan {
             end_date: None,
         }],
         schedule,
+        requests: None,
     }
 }
 
