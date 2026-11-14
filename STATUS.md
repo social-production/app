@@ -107,6 +107,13 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    network on merge** (owner approved). After the deploy: `/readyz` shows a new project
    hash; directory and conversation must be unchanged.
 5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+   **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
+   17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
+   rerun passed). #156 fixed the sign-up half (`set_profile`). The rest: the profile page
+   waits for `getPerson`, which needs `get_standing` (vouches come from the network), so a
+   slow link leaves "Loading…" and no name. Follow-up worth doing: render your own profile
+   from `get_profile` (own chain) first and fill standing in when it arrives. Until then, a
+   red desktop smoke whose log shows `get_links response channel dropped` gets one rerun.
 6. **Then the UX build list** (owner's message of 2026-11-14, items 4a to 4d): New message as
    Telegram does it; the Remaining Screens; the Plan, Phase and Feedback Screens with Convert;
    the phase bars and create menu against their mockups. The answers above come first.
