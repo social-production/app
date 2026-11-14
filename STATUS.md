@@ -82,6 +82,47 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight (UX) 2026-11-14: two more branches stacked on `claude/feed-activity-ux` (PR #156), pushed, no PRs yet
+**Order (owner): one PR per group, each from main after the one before merges.** When #156
+merges: `git rebase main` on `claude/ux-topbar-map`, open its PR; when that merges, the same
+for `claude/ux-chats-profile`. Both are UI only (no network reset).
+- **`claude/ux-topbar-map`, ADR 0103** (mockups https://claude.ai/artifact/P5n4eg23ikHPXH8W1BH1Vp):
+  the top bar (a search field at every width; Networks, Map and Activity in one capsule;
+  **owner, 2026-11-14: on desktop the capsule sits beside the logo, apart from Home /
+  Notifications / Messages**), the map's filters on phones (owner chose style A with the
+  search behind a button: `features/map/MapFilterCapsule.svelte`; "Open as list" is in the
+  results' header), About (sticky segmented tabs, summary cards), and on sign-up "Back to
+  feed", "Keep browsing without an account" and "Copy all 24 words". The desktop map bar
+  under the map is unchanged.
+- **`claude/ux-chats-profile`** (mockups https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu):
+  styles only plus small markup: `styles/ux/messages.css`, `chat.css`, `profile.css`,
+  `onboarding.css`; `Welcome.svelte` (logo, "Join Social Production", no boxes),
+  `SignupFlow.svelte` (progress line, note), `ProfileView.svelte` ("Edit profile" on your
+  own profile, to Settings). A link to something in the app shows as a card inside the
+  bubble; long links wrap (the bug from the audit).
+  **Not built from that mockup:** one "+" for photo and file (the two buttons stay), a
+  shared item's card with its date and place (the card shows the link's text), "Report as
+  bot" under a ⋯ menu (it stays a round icon), a group chat's squared avatar. Needs an ADR
+  (0104) before its PR.
+- **Checked (2026-11-14, local seed node, the build of `claude/ux-chats-profile` minus its
+  last small style fixes):** `npm run check -w ui` (0 errors), lint, boundaries, sizes;
+  browser tests **passed**: `guests`, `follows`, `region`, `bookings`, `map`, `shell`,
+  `messages`, `accounts` (and on the top bar build: `events`, `search`); screenshots at
+  390px light, 360px dark and desktop of the top bar, map, About, sign-up, messages, a
+  conversation and a profile were looked at. **Not re-shot after the last fixes:** the chat
+  header's left alignment, the phone "Messages" heading, and profile buttons without icons
+  on phones. Not run: scenarios (no Rust change), the other browser tests.
+- **Owner, 2026-11-14 (after seeing https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t): "these
+  designs look amazing"**: all seven sections are approved as drawn. **Convert must still be
+  built** (add it as a choice on the phase sheet; web has
+  `ProjectConversionWorkflowSection`; it needs an ADR and probably governance work), and
+  **the Settings page is still to build** (it is in the remaining-screens mockup). Build
+  list after the two branches above: remaining screens
+  (https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH: channel and community headers,
+  Settings, notifications, search, people lists, create flows, feedback), then the seven
+  sections (details, values, plan review, phase sheet + closed page + Convert, left rail,
+  Discover, feedback with comments).
+
 ## In flight (UX) 2026-11-14: feed headers and the activity phase, branch `claude/feed-activity-ux`, ADR 0102
 **Owner approved the mockups ("lets use all your suggestions",
 https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
@@ -126,12 +167,8 @@ https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
   scenarios (no Rust change), the other browser tests.
 - **Approved, not built yet (owner, 2026-11-14: build all, one PR per group, each from main
   after the previous merges):**
-  1. ~~Top bar, map filters, About, "Back to feed" on sign-up~~: built on
-     `claude/ux-topbar-map` (stacked on this branch), ADR 0103; the owner chose map style A
-     with the search behind a button, and asked for "Copy all 24 words" on sign-up (built).
-  2. Sign-up / log-in screens, messages list, conversation (and the long link running off
-     a chat bubble), profile (owner, 2026-11-14: an "Edit profile" button on your own profile
-     is fine): https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu
+  1. ~~Top bar, map filters, About, "Back to feed" on sign-up~~: built, see the entry above.
+  2. ~~Sign-up / log-in, messages, conversation, profile~~: built, see the entry above.
   3. Channel and community headers, settings, notifications, search, people lists, create
      flows, feedback: https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH
 - **Mockups waiting for the owner's OK (published 2026-11-14):**
