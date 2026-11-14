@@ -215,6 +215,7 @@
         onLeave={() => !s.isMobile && view.highlight(null)}
         onSelect={(id) => view.highlight(id, true)}
         {onClose}
+        onList={openList}
       />
     {/if}
   </div>
