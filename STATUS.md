@@ -273,10 +273,7 @@ the live seed's `/readyz` (checked 2026-11-14 evening:
 - **Checked 2026-11-14:** scenario `proposals` **passed** before the request change (the
   return needs both founders' votes: fixed test). After it: `cargo fmt`, workspace clippy
   `-D warnings`, `check-sizes.sh`, `build-happ.sh` and the two DNA hashes pass; scenario
-  `plans` first test passed; **`proposals` (with the new assertions) and the rest of `plans`
-  were still running when this was written: rerun
-  `cargo test -p scenarios --test proposals --test plans -- --test-threads=1` inside Nix
-  (`CARGO_PROFILE_DEV_DEBUG=0 CARGO_INCREMENTAL=0`) and read the result.** Not run: the other
+  `proposals` (with the new assertions) and `plans` **passed** (8:35 pm Melbourne). Not run: the other
   scenarios (`collective_bookings`, `private_events`, `software`, `values`, `events` only
   gained `requests: None`), `npm run check -w ui`.
 - **To do:** (b) browser tests by hand: `event-flow.mjs` `createEvent` (public events start
