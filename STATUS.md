@@ -82,7 +82,7 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## Done 2026-11-15: PR #156 merged 16:15 UTC Nov 14 (3:15 am Melbourne); the desktop smoke's sign-up fault
+## Done 2026-11-15: PR #156 merged 16:05 UTC Nov 14 (3:05 am Melbourne); the desktop smoke's sign-up fault
 - **Cause of the red Linux desktop smoke** ("timed out waiting for the profile name"):
   `identity::set_profile` asked the network for an existing profile (`get_links` on the
   agent) before writing a new person's first one, even when its own chain had answered. A

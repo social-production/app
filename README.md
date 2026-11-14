@@ -15,7 +15,7 @@ network of desktops, Raspberry Pis and phones.
 
 What works today:
 - **Feed tabs, channel-first feed rows and a week-strip activity phase (PR #156, 2026-11-15
-  3:15 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
+  3:05 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
   rows lead with the type's glyph and the channel; the Activity phase has Upcoming / Past
   tabs, a week strip and day-grouped cards. Also fixes desktop sign-up ending with no name
   when the network is slow. UI and coordinator only, no reset.
