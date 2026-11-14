@@ -1,6 +1,7 @@
 // Shared browser-test helpers: devices (fresh browser profiles), sign-up and sign-in,
 // against a local seed node (see accounts.mjs for how to run).
-import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 
 import { chromium } from 'playwright';
 
@@ -30,8 +31,28 @@ export async function device({ passkeys = false, viewport } = {}) {
     });
   }
   page.on('pageerror', (e) => errors.push(String(e)));
+  if (process.env.UX_SHOTS) watch(page);
   await page.goto(BASE);
   return page;
+}
+
+// UX_SHOTS=<dir>: a screenshot of every device every four seconds, for reviewing a flow's
+// screens afterwards (identical frames are skipped).
+let devices = 0;
+function watch(page) {
+  const id = ++devices;
+  let n = 0;
+  let last = '';
+  const timer = setInterval(async () => {
+    const shot = await page.screenshot().catch(() => null);
+    if (!shot) return page.isClosed() && clearInterval(timer);
+    const key = createHash('sha1').update(shot).digest('hex');
+    if (key === last) return;
+    last = key;
+    mkdirSync(process.env.UX_SHOTS, { recursive: true });
+    writeFileSync(`${process.env.UX_SHOTS}/d${id}-${String(++n).padStart(3, '0')}.png`, shot);
+  }, 4000);
+  timer.unref();
 }
 
 // The shell marks itself once the account is connected (any screen width).
@@ -113,12 +134,20 @@ export function ensureTestChannel() {
     await page.goto(`${BASE}/create/channel`);
     await page.getByLabel(/Channel handle/).fill(TEST_CHANNEL);
     await page.getByLabel(/Description/).fill('Made by the browser tests.');
-    await page.getByRole('button', { name: 'Create channel' }).click();
-    await page
-      .getByRole('heading', { name: TEST_CHANNEL })
-      .or(page.getByText('already used'))
-      .first()
-      .waitFor({ timeout: 120_000 });
+    // On a fresh node the week's first write can land beside this one ("the source chain
+    // head has moved"): press again.
+    const moved = page.getByText('head has moved');
+    for (let i = 0; i < 4; i++) {
+      await page.getByRole('button', { name: 'Create channel' }).click();
+      await page
+        .getByRole('heading', { name: TEST_CHANNEL })
+        .or(page.getByText('already used'))
+        .or(moved)
+        .first()
+        .waitFor({ timeout: 120_000 });
+      if (!(await moved.isVisible())) break;
+      await page.waitForTimeout(2000);
+    }
     await page.context().close();
   })();
   return testChannel;

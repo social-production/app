@@ -90,6 +90,10 @@
 }
 
 /* The filter sheet. */
+.feed-filter-sheet .overlay-body {
+  padding: 16px 18px;
+}
+
 .feed-filter-sheet .feed-filter-groups {
   display: grid;
   gap: 16px;
