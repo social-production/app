@@ -88,7 +88,11 @@ worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app
 its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests
 at the same time. **Approved designs and the choice made on each are listed under "Approved
 designs" below; build them as drawn and do not redraw them.**
-1. **PR #156** (`claude/feed-activity-ux`): CI was running at 8 pm. Merge when green, smoke
+1. **PR #156** (`claude/feed-activity-ux`): CI was running at 8:40 pm. Its Linux desktop
+   smoke failed once ("timed out waiting for the profile name", the known slow-runner
+   failure): re-run that job once the run ends (`gh run rerun 43575285056 --failed`); if it
+   fails again, check whether `holo/active.ts`'s five-second delay or `headRetry.ts` is
+   involved before blaming the runner. Merge when green, smoke
    live read-only (this PC session may not sign up on live; ask the owner to), update README
    Status.
 2. Then `claude/ux-topbar-map`: `git rebase main`, open its PR; then `claude/ux-chats-profile`
