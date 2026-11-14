@@ -220,3 +220,39 @@ export async function feedChoice(page, group, option) {
   await sheet.getByRole('button', { name: 'Show results' }).click();
   await sheet.waitFor({ state: 'hidden' });
 }
+
+/** A profile's Message button opens the chat with that person (empty until the first
+ * message); send `body` from the normal message bar and wait for the conversation. */
+export async function messageFromProfile(page, name, body, shot = async () => {}) {
+  await page.getByRole('link', { name: `Message ${name}` }).click({ timeout: 120_000 });
+  await page.waitForURL(/\/messages\?to=/, { timeout: 60_000 });
+  await page.locator('.identity-title', { hasText: name }).waitFor({ timeout: 120_000 });
+  await page.getByText('No messages here yet.').waitFor({ timeout: 60_000 });
+  await shot();
+  await page.getByRole('textbox', { name: 'Write a message...' }).fill(body);
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+  await page.waitForURL(/\/messages\?conversation=/, { timeout: 180_000 });
+}
+
+/** New message → New group as Telegram does it: tick the members, the round arrow, name
+ * the group, create it, then send `body` as its first message (if given). Starts from the
+ * chat list. `shot` is called on the member list and on the name step. */
+export async function startGroup(page, title, members, body, shot = async () => {}) {
+  await page.getByRole('button', { name: 'New message' }).click();
+  await page.getByRole('button', { name: 'New group' }).click();
+  for (const member of members) {
+    await page.getByRole('searchbox', { name: 'Search people' }).fill(member);
+    await page.getByRole('button', { name: member, pressed: false }).click({ timeout: 120_000 });
+  }
+  await page.getByText(`${members.length} selected`).waitFor();
+  await shot('members');
+  await page.getByRole('button', { name: 'Next' }).click();
+  await page.getByPlaceholder('Group name').fill(title);
+  await shot('name');
+  await page.getByRole('button', { name: 'Create group' }).click();
+  await page.waitForURL(/\/messages\?conversation=/, { timeout: 300_000 });
+  await page.locator('.identity-title', { hasText: title }).waitFor({ timeout: 120_000 });
+  if (!body) return;
+  await page.getByRole('textbox', { name: 'Write a message...' }).fill(body);
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
+}
