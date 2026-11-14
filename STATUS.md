@@ -121,6 +121,24 @@ designs" below; build them as drawn and do not redraw them.**
    Remaining Screens still to build: create flows (progress line, floating Continue),
    channel / community / Platform header, Links and History tabs as soft cards, Search
    (chips), People rows, Feedback, and Settings' row-and-sheet behaviour.
+3b. **Owner, 2026-11-14 9:10 pm: rebuild "New message" as Telegram does it** (four reference
+   screenshots: `../assets/temp/telegram-new-message/` on the owner's PC). A full page, not
+   a form: a back arrow, "New message", a "New group" row on top, then people as rows (face,
+   name, a second line) with a search field. **Tapping a person opens the chat pane with
+   them directly** (empty: "No messages here yet"; the first message is sent from the
+   normal message bar, which is when the conversation gets created). **New group:** the same
+   list with "Who would you like to add?", tapping ticks a person (a green tick on the
+   face) and adds a chip above the search; "N selected" under the title; a round arrow
+   button bottom right goes on to name the group and create it. Today's
+   `ComposeMessageSheet` (Direct / Group switch, a message box, Send) was only restyled
+   (`styles/ux/sheets.css`); `ConversationView` needs a draft state for a chat that does
+   not exist yet. Not started.
+3c. **Feed row header now matches design A** (tinted glyph square, channel in bold with no
+   small icon, one grey "type · phase · clock" line, the body under the channel name):
+   `styles/ux/feedrow.css`, whose last block carries an extra class because the feed's
+   components load `feed.css` again after it. The glyphs are web's own type icons (house
+   for Productive, lines for a thread), not the mockup's cube and speech bubble, and the
+   type still reads "Productive", not "Project": ask the owner before changing either.
 4. **Owner, 2026-11-14 evening: some built screens drifted from what was decided** (named:
    the soft phase bars inside project and event details, the create (+) menu, Settings).
    Settings is not built yet. For the other two, open the artifacts (Detail Page Mockups
