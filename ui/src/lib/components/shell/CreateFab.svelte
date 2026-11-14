@@ -8,6 +8,8 @@
     label: string;
     description: string;
     icon: SurfaceIconId;
+    /** A short tag after the label ("NEW"); the item is tinted. */
+    badge?: string;
   }
 </script>
 
@@ -71,12 +73,20 @@
       ></button>
     {/if}
     {#snippet item(link: CreateLink)}
-      <a class="create-menu-item" href={link.href} role="menuitem" onclick={() => (open = false)}>
+      <a
+        class="create-menu-item"
+        class:badged={!!link.badge}
+        href={link.href}
+        role="menuitem"
+        onclick={() => (open = false)}
+      >
         <span class="create-menu-icon-wrap"
           ><SurfaceIcon icon={link.icon} className="create-menu-icon" /></span
         >
         <span class="item-copy">
-          <span class="item-label">{link.label}</span>
+          <span class="item-label"
+            >{link.label}{#if link.badge}<small class="item-badge">{link.badge}</small>{/if}</span
+          >
           <span class="item-description">{link.description}</span>
         </span>
       </a>

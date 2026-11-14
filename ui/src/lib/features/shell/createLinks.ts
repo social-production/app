@@ -27,7 +27,8 @@ export const createLinks: CreateLink[] = [
     href: resolve('/create/project'),
     label: 'Proposal',
     description: 'Propose a project, a service or a public event',
-    icon: 'project',
+    icon: 'proposal',
+    badge: 'NEW',
   },
   {
     href: resolve('/create/event'),

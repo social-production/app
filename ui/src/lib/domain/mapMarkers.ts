@@ -84,7 +84,7 @@ export function markerItem(m: GatewayMarker): MapMarkerItem {
   };
 }
 
-const PROJECT_MODES = ['productive', 'collective-service', 'personal-service'] as const;
+const PROJECT_MODES = ['proposal', 'productive', 'collective-service', 'personal-service'] as const;
 type ProjectModeName = (typeof PROJECT_MODES)[number];
 
 /** web's `MapDiscoveryCard` `mapEntityKind`, as the app's card mode (label and accent). */

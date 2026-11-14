@@ -37,3 +37,21 @@
   color: var(--text-main);
   font-size: 0.85rem;
 }
+
+/* The create menu's Proposal (Creating Through Plans mockup): tinted, with a NEW tag. */
+.shell .create-fab .create-menu-item.badged {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .create-fab .create-menu-item.badged svg {
+  color: var(--brand-strong);
+}
+
+.shell .create-fab .create-menu-item .item-badge {
+  margin-left: 8px;
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}

@@ -47,6 +47,15 @@
         stroke-linecap="round"
         fill="none"
       />
+    {:else if icon === 'proposal'}
+      <!-- Creating Through Plans mockup: a proposal's star. -->
+      <path
+        d="M12 3.5 14 9l5.5.3-4.3 3.5 1.5 5.4L12 15l-4.7 3.2 1.5-5.4L4.5 9.3 10 9Z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+      />
     {:else if icon === 'project'}
       <path
         d="M5 8.5 12 4l7 4.5V18a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V8.5Z"

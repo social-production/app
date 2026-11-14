@@ -4,6 +4,7 @@
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import TypeSelector from '#lib/components/create/TypeSelector.svelte';
+  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { PLAN_MAKES, planMakesLine, type PlanKind, type Plan } from '#lib/domain/plans.ts';
   import { projectSubtype } from '#lib/domain/projects.ts';
   import { placeSearch } from '#lib/services/locations.ts';
@@ -90,10 +91,20 @@
       />
     {/if}
 
-    {#if choosing}
+    <!-- Creating Through Plans mockup: "Add a plan" is a small sheet asking the kind first. -->
+    <OverlaySheet
+      open={choosing}
+      title="Add a plan"
+      labelledById="plan-kind-title"
+      rootClass="setting-sheet plan-kind-sheet"
+      onClose={() => (choosing = false)}
+    >
+      {#snippet subtitle()}
+        <p class="setting-hint">What kind of thing should this become?</p>
+      {/snippet}
       <div class="plan-kind-choice">
         <TypeSelector
-          label="What kind of thing should this become?"
+          label="Plan kind"
           name="plan-kind"
           selected={chosen}
           options={PLAN_MAKES}
@@ -108,7 +119,7 @@
           }}>Continue</button
         >
       </div>
-    {/if}
+    </OverlaySheet>
 
     <div id="participation-plans">
       {#if plans.length === 0}

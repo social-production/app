@@ -90,7 +90,10 @@
         {/if}
       </span>
     </span>
-    {#if makes}<span class="plan-makes">{makes}</span>{/if}
+    {#if makes}<span class="plan-makes"
+        ><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13M13 7l5 5-5 5" /></svg
+        >{makes}</span
+      >{/if}
     <span class="plan-lede collapsed-copy">{plan.plan.description}</span>
     <span class="plan-stage-list">
       {#each plan.plan.stages as stage, index (index)}
