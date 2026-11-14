@@ -88,11 +88,18 @@ worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app
 its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests
 at the same time. **Approved designs and the choice made on each are listed under "Approved
 designs" below; build them as drawn and do not redraw them.**
-1. **PR #156** (`claude/feed-activity-ux`): CI was running at 8:40 pm. Its Linux desktop
-   smoke failed once ("timed out waiting for the profile name", the known slow-runner
-   failure): re-run that job once the run ends (`gh run rerun 43575285056 --failed`); if it
-   fails again, check whether `holo/active.ts`'s five-second delay or `headRetry.ts` is
-   involved before blaming the runner. Merge when green, smoke
+1. **PR #156** (`claude/feed-activity-ux`) **is blocked by the Linux desktop smoke, which fails
+   on main too** (main's push run of 2026-11-13 21:29 UTC and three runs of this PR, all
+   "timed out waiting for the profile name"; the app log shows `identity` and `health`
+   `get_links response channel dropped: likely response timeout` and one sqlite "database
+   is locked"). The PR's first run (03:05 UTC) passed, so it is intermittent or load
+   related, not this PR's code. The live seed and bootstrap are up (`check-bootstrap.sh`: 5
+   agents per space; `/readyz` uptime 12.5 h, 4 apps). **Live sign-up has been unverified
+   since #150 and may be the same fault: diagnose this first** (does a desktop's first
+   `set_profile` reach the seed? compare with the last green main run, 2026-11-13 10:56 UTC,
+   before #153 to #155). Do not merge #156 on a red check without the owner's say. Its
+   other checks: 11 passed, scenarios shard 0 was still running at 9:20 pm Melbourne.
+   When it is green: merge, smoke
    live read-only (this PC session may not sign up on live; ask the owner to), update README
    Status.
 2. Then `claude/ux-topbar-map`: `git rebase main`, open its PR; then `claude/ux-chats-profile`
