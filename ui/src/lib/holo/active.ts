@@ -37,7 +37,11 @@ export function noteCall(fn: string, record: () => Promise<unknown>): void {
   const week = weekOf(Date.now());
   if (week === recordedWeek) return;
   recordedWeek = week;
-  void record().catch(() => {
-    recordedWeek = -1; // try again on the next action
-  });
+  // A little later: the action that got here is often followed at once by another write to
+  // the directory (publishing lists the project), and two writes at once refuse one of them.
+  setTimeout(() => {
+    void record().catch(() => {
+      recordedWeek = -1; // try again on the next action
+    });
+  }, 5000);
 }

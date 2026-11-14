@@ -105,6 +105,10 @@ https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
      project when another write by the same person landed first (all public spaces share
      one cell, ADR 0065). Holochain refuses such a call before running it, so
      `holo/headRetry.ts` sends it again (up to three times); `callZome` and `callCell` use it.
+     The usual second writer was the app itself: the weekly `Active` link (ADR 0095) went out
+     right after `create_charter`, beside `create_listing` in the directory, so **a new
+     person's first project failed to publish**. `holo/active.ts` now writes it five seconds
+     later.
      It failed `follows`, `region`, `bookings` and the test channel's creation locally.
      `ensureTestChannel` (tests) also presses again if it still sees the message.
 - **`UX_SHOTS=<dir>`** is now a real option of `tests/e2e/lib.mjs` `device()`: a screenshot
@@ -116,9 +120,9 @@ https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
   ui` (0 errors), lint, boundaries, sizes; screenshots of the home feed, the filter sheet,
   the activity phase (upcoming, past, an opened activity, a past one) looked at. Browser
   tests **passed**: `activities`, `governance`, `threads`, `help-requests`,
-  `closed-communities`. `events`, `follows`, `region` and `bookings` **failed before the two
-  fixes above** (each on one of those two bugs); their reruns, and `software`, are recorded
-  in the `claude/ux-topbar-map` entry (stacked on this branch, same local node). Not run:
+  `closed-communities`, `software`; and after the two fixes above `events`, `guests`,
+  `follows` and `region` (each had failed on one of those two bugs). `bookings` and `map`:
+  see the `claude/ux-topbar-map` entry (stacked on this branch, same local node). Not run:
   scenarios (no Rust change), the other browser tests.
 - **Approved, not built yet (owner, 2026-11-14: build all, one PR per group, each from main
   after the previous merges):**
