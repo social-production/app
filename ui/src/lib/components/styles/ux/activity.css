@@ -1,0 +1,292 @@
+/* The activity phase (ADR 0102): Upcoming / Past tabs, a week strip with the month behind
+   its name, and activities as soft cards grouped by day. Overrides of the ported
+   activities.css, never edits to it. */
+.shell .activity-ui .scheduling-panel > .segmented {
+  margin-bottom: 4px;
+}
+
+.shell .activity-ui .scheduling-panel.showing-past .calendar-shell {
+  display: none;
+}
+
+/* The calendar loses its box in both views. */
+.shell .activity-ui .calendar-shell.week-strip,
+.shell .activity-ui .calendar-shell.week-month {
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.shell .activity-ui .calendar-shell.week-strip .calendar-toolbar,
+.shell .activity-ui .calendar-shell.week-month .calendar-toolbar {
+  flex-wrap: nowrap;
+  gap: 8px;
+}
+
+.shell .activity-ui .month-toggle {
+  display: inline-flex;
+  align-items: center;
+  flex: 1;
+  order: -1;
+  gap: 4px;
+  min-height: 36px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 17px;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shell .activity-ui .month-toggle svg {
+  color: var(--text-soft);
+  transition: transform 0.15s ease;
+}
+
+.shell .activity-ui .month-toggle[aria-expanded='true'] svg {
+  transform: rotate(180deg);
+}
+
+.shell .activity-ui .month-toggle .zone-label {
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.shell .activity-ui .calendar-shell.week-strip .month-button,
+.shell .activity-ui .calendar-shell.week-month .month-button {
+  width: 34px;
+  height: 34px;
+  border: none;
+  background: var(--panel-hover);
+}
+
+/* One week: seven soft columns of weekday letter, date and a dot per activity. */
+.shell .activity-ui .week-strip .calendar-header-row {
+  display: none;
+}
+
+.shell .activity-ui .week-strip .calendar-grid {
+  gap: 4px;
+}
+
+.shell .activity-ui .week-strip .calendar-cell {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 2px;
+  min-height: 0;
+  padding: 7px 0 8px;
+  border: none;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: none;
+  opacity: 1;
+  text-align: center;
+}
+
+.shell .activity-ui .week-strip .cell-weekday {
+  color: var(--text-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.shell .activity-ui .week-strip .calendar-day-number {
+  margin: 0;
+  padding: 0;
+  background: none;
+  color: var(--text-main);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .activity-ui .week-strip .past-day .calendar-day-number,
+.shell .activity-ui .week-strip .unplanned-day .calendar-day-number {
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.shell .activity-ui .week-strip .today-day .calendar-day-number {
+  color: var(--brand-strong);
+}
+
+.shell .activity-ui .week-strip .timeline-track,
+.shell .activity-ui .week-strip .planned-indicator {
+  display: none;
+}
+
+.shell .activity-ui .week-strip .activity-dots {
+  position: static;
+  display: flex;
+  min-height: 6px;
+}
+
+.shell .activity-ui .week-strip .planned-day {
+  background: var(--brand-soft);
+}
+
+.shell .activity-ui .week-strip .hovered-day {
+  background: var(--panel-hover);
+}
+
+.shell .activity-ui .week-strip .selected-day {
+  background: var(--brand);
+}
+
+.shell .activity-ui .week-strip .selected-day .calendar-day-number,
+.shell .activity-ui .week-strip .selected-day .cell-weekday {
+  color: var(--on-brand);
+}
+
+.shell .activity-ui .week-strip .selected-day .activity-dot {
+  background: var(--on-brand);
+}
+
+/* The whole month, opened from its name: borderless cells with soft corners. */
+.shell .activity-ui .week-month .calendar-grid {
+  gap: 3px;
+}
+
+.shell .activity-ui .week-month .calendar-cell {
+  border-color: transparent;
+  border-radius: 12px;
+  background: var(--panel-hover);
+}
+
+.shell .activity-ui .week-month .selected-day {
+  border-color: var(--brand);
+}
+
+/* Days and their activity cards. */
+.shell .activity-ui .agenda {
+  gap: 14px;
+}
+
+.shell .activity-ui .agenda-day-label {
+  margin: 0 0 8px 2px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .activity-ui .agenda-rows,
+.shell .activity-ui .history-rows {
+  display: grid;
+  gap: 8px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+
+.shell .activity-ui .agenda-rows > .rail-card + .rail-card,
+.shell .activity-ui .history-rows > .rail-card + .rail-card {
+  border-top: none;
+}
+
+.shell .activity-ui .agenda-row {
+  grid-template-columns: 52px minmax(0, 1fr);
+  align-items: start;
+  gap: 5px 10px;
+  min-height: 0;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.shell .activity-ui .activity-card-shell.agenda.agenda.agenda .agenda-row {
+  box-shadow: none;
+}
+
+.shell .activity-ui .agenda-row:hover,
+.shell .activity-ui .agenda-row:focus-visible,
+.shell .activity-ui .activity-card-shell.agenda.highlighted .agenda-row {
+  background: color-mix(in srgb, var(--brand-soft) 70%, var(--panel-hover));
+}
+
+.shell .activity-ui .agenda-time {
+  grid-row: 1 / span 2;
+  min-width: 0;
+  padding-right: 0;
+  border-right: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shell .activity-ui .agenda-time .agenda-end {
+  font-size: 12px;
+  white-space: normal;
+}
+
+.shell .activity-ui .agenda-main strong {
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.shell .activity-ui .agenda-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  grid-column: 2;
+  gap: 8px;
+  min-width: 0;
+}
+
+.shell .activity-ui .agenda-people {
+  display: inline-flex;
+}
+
+.shell .activity-ui .agenda-people .avatar-badge {
+  width: 24px;
+  height: 24px;
+  margin-left: -7px;
+  border: 2px solid var(--panel-hover);
+  font-size: 10px;
+}
+
+.shell .activity-ui .agenda-people .avatar-badge:first-child {
+  margin-left: 0;
+}
+
+.shell .activity-ui .agenda-chip.full,
+.shell .activity-ui .agenda-chip.locked {
+  background: var(--panel);
+  box-shadow: none;
+}
+
+.shell .activity-ui .agenda-join {
+  margin-left: auto;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.shell .activity-ui .history-section.past-tab {
+  padding-top: 0;
+  border-top: none;
+}
+
+.shell .activity-ui .empty-card {
+  padding: 18px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  font-size: 13.5px;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Past activity: the same soft cards, without the outcome stripe. */
+.shell .activity-ui .history-rows > .rail-card.rail-card {
+  border: none;
+  border-radius: 18px;
+  background: transparent;
+  box-shadow: none;
+}
