@@ -114,6 +114,11 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    slow link leaves "Loading…" and no name. Follow-up worth doing: render your own profile
    from `get_profile` (own chain) first and fill standing in when it arrives. Until then, a
    red desktop smoke whose log shows `get_links response channel dropped` gets one rerun.
+   **Scenario shard 5 hangs in `service_requests` now and then** (third time: #150 and #153
+   on 2026-11-13, #157 on 2026-11-14; the job is cancelled at 2 h, normally ~70 min). Its
+   `await_consistency` calls stop at 60 s, so the hang is in setup (`chat_network`) or a zome
+   call with no timeout. Next step: wrap each test body in `tokio::time::timeout` so a hang
+   fails within minutes and names the step, then fix what it names.
 6. **Then the UX build list** (owner's message of 2026-11-14, items 4a to 4d): New message as
    Telegram does it; the Remaining Screens; the Plan, Phase and Feedback Screens with Convert;
    the phase bars and create menu against their mockups. The answers above come first.
