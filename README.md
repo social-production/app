@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Feed tabs, channel-first feed rows and a week-strip activity phase (PR #156, 2026-11-15
+  3:15 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
+  rows lead with the type's glyph and the channel; the Activity phase has Upcoming / Past
+  tabs, a week strip and day-grouped cards. Also fixes desktop sign-up ending with no name
+  when the network is slow. UI and coordinator only, no reset.
 - **The phone nav floats and feed cards are rows (PR #148, 2026-11-13 6:49 pm Melbourne,
   ADRs 0096 and 0097; the UX pass, `docs/plans/UX.md`):** the bottom nav is a floating blurred
   capsule with the current tab as a tinted pill; feed cards are Twitter-style rows with no

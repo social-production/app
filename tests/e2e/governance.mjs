@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps, feedChoice } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -112,8 +112,7 @@ log('an update passed and shows in the header');
 const latest = bob.locator('.project-card', { hasText: title }).getByText('Latest: First repair night went well.');
 for (let i = 0; i < 45 && !(await latest.count()); i++) {
   await bob.goto(BASE);
-  await bob.getByRole('button', { name: 'Sort public feed by' }).click();
-  await bob.getByRole('menuitemradio', { name: 'Most recent' }).click();
+  await feedChoice(bob, 'Sort public feed by', 'Most recent');
   await bob.locator('.project-card').first().waitFor({ timeout: 60_000 });
   if (await latest.count()) break;
   await bob.waitForTimeout(3000);

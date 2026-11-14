@@ -1,0 +1,103 @@
+/* An opened activity: an icon leads each line, and the actions are pills. */
+.activity-ui.activity-ui .activity-body {
+  gap: 12px;
+}
+
+.activity-ui.activity-ui .sheet-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.activity-ui.activity-ui .sheet-line .toolbar-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--text-soft);
+}
+
+.activity-ui.activity-ui .sheet-line.map-link {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.activity-ui.activity-ui .sheet-section h3 {
+  color: var(--text-soft);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.activity-ui.activity-ui .role-list {
+  border-top: none;
+}
+
+.activity-ui.activity-ui .signup {
+  min-width: 0;
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  color: var(--on-brand);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.activity-ui.activity-ui .signup.selected,
+.activity-ui.activity-ui .signup:disabled {
+  background: var(--panel-hover);
+  color: var(--text-main);
+  box-shadow: none;
+}
+
+.activity-ui.activity-ui .role-copy .text-button {
+  justify-self: start;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.activity-ui.activity-ui .sheet-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.activity-ui.activity-ui .sheet-pill {
+  display: inline-flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.activity-ui.activity-ui .history-panel {
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.activity-ui.activity-ui .history-section-heading {
+  color: var(--text-soft);
+  font-size: 13px;
+  letter-spacing: 0;
+  text-transform: none;
+}

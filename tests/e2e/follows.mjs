@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, continueSteps, feedScope } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -125,8 +125,7 @@ log('ann\'s mention menu offers cat (followed) before bob (a follower)');
 // Home: Bob follows Ann, so her project is on his Home feed as a personal card.
 const seedSwap = `Seed swap ${stamp}`;
 await bob.goto(`${BASE}/`);
-await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
-await bob.getByRole('menuitemradio', { name: 'Home' }).click();
+await feedScope(bob, 'Home');
 await until(
   bob,
   `${BASE}/`,
@@ -137,8 +136,7 @@ const homeCard = bob.locator('.personal-activity-card', { hasText: seedSwap });
 assert.equal((await homeCard.locator('.identity .header-name').innerText()).trim(), `ann${stamp}`);
 assert.equal(await bob.locator('.project-card').count(), 0, 'bob joined no channel or community, so Home has no public rows');
 await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
-await bob.getByRole('button', { name: 'Choose public feed scope' }).click();
-await bob.getByRole('menuitemradio', { name: 'Global' }).click();
+await feedScope(bob, 'Global');
 await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
 assert.equal(await bob.locator('.personal-activity-card', { hasText: seedSwap }).count(), 0);
 log('bob\'s Home shows ann\'s project as a personal card; Global shows it once, as a public card');

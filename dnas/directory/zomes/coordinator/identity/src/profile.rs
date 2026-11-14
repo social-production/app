@@ -22,7 +22,15 @@ pub fn set(input: ProfileInput) -> ExternResult<ActionHash> {
         home_area: input.home_area.trim().to_string(),
         avatar: input.avatar,
     };
-    if let Some(original) = own_original()?.or(original_of(&me)?) {
+    // A restored chain (ADR 0090) holds its first profile, so the network is asked only when
+    // this chain has none. That read can time out on a desktop whose only peer is the seed
+    // behind the relay (desktop smoke, 2026-11-13/14): a new person's first profile must not
+    // wait on it, so an unanswered read counts as "no profile yet".
+    let original = match own_original()? {
+        Some(original) => Some(original),
+        None => original_of(&me).unwrap_or(None),
+    };
+    if let Some(original) = original {
         return update_entry(original, &EntryTypes::Profile(profile));
     }
     let hash = create_entry(&EntryTypes::Profile(profile))?;
