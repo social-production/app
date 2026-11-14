@@ -495,14 +495,36 @@ the live seed's `/readyz` (checked 2026-11-14 evening:
   `proposals` (with the new assertions) and `plans` **passed** (8:35 pm Melbourne). Not run: the other
   scenarios (`collective_bookings`, `private_events`, `software`, `values`, `events` only
   gained `requests: None`), `npm run check -w ui`.
-- **To do:** (b) browser tests by hand: `event-flow.mjs` `createEvent` (public events start
-  as a proposal with an event plan), `bookings.mjs` / `service-requests.mjs` / `rail.mjs`'s
-  personal part (move to a collective service whose operations plan switches requests on),
-  `screens.mjs` (no type step), `projects.mjs:136` (the feed label is "Proposal"), stage
-  names (a proposal's phases are Proposal → Plan); then run them all against a node built
-  from this branch. (c) Owner's decision: the personal-service screens stay until stage B
-  (a second reset); nothing can create one now. (d) STATUS, README, PR, merge when green,
-  smoke live. Merge main first (PR #156 and the UX branches touch `ui/` and `tests/e2e/lib.mjs`).
+- **Done 2026-11-15 (cloud session):** merged `claude/ux-chats-profile` (conflicts only in
+  `tests/e2e/governance.mjs` and `lib.mjs`) and #156's sign-up fix in. Compared with the
+  Creating Through Plans mockup and fixed: the new proposal's "Step N of 4" line and progress
+  line, steps in the order Basics, Tags, Location, Overview, "What do you propose?", the "No
+  type yet" note; the create menu's Proposal tinted with a star and NEW; "Add a plan" as a
+  small sheet; an arrow before "makes this a …"; the Plan phase's "The leading plan decides
+  what this becomes"; feed rows no longer read "Proposal · Proposal"; the map list labels a
+  proposal as one. **Bug found and fixed:** the gateway's feed, map and region cards kept
+  the mode from the directory listing, so a proposal that became an event still showed as
+  a proposal card (`services/gateway/src/node/cards.rs` now reads the project view's mode
+  and subtype). **Kept on purpose:** a proposal's progress line has 4 phases (the mockup
+  drew 5; an event has only 4). ADR 0059 addendum updated.
+- **Browser tests repaired and passing (2026-11-15, local seed built from this branch):**
+  `projects`, `screens`, `events`, `activities`, `governance`, `service-requests` (rewritten:
+  an operations plan switches requests on and a non-member requests with no vote),
+  `collective-requests`, `map`, `places`, `region`, `chat`, `follows`, `guests`, `links`,
+  `mentions`, `message-reports`, `notifications`, `public-chats`, `software`,
+  `memory-projects`, `accounts`, `shell` (Settings rows), `threads`, `help-requests`,
+  `private-events`, `closed-communities`, `search`, `messages`, `reports`, `platform`. Several needed a second run on a
+  restarted node: **the local seed tires after ~10 tests** (sign-ins time out, "database is
+  locked", index lag); restart `cloud-seed.sh` and warm it with a sign-up before trusting a
+  failure. Screens looked at in light and dark at 390px: create menu, every proposal step,
+  feed, Plan phase, Add a plan sheet, a plan card.
+- **Cannot run until stage B decides:** `bookings.mjs` and the first half of `rail.mjs`
+  create a personal service, which nothing can create any more (the screens stay until stage
+  B). Not run: `attachments`, `bot-reviews`, `calls`, `discover`, `group-options`,
+  `people-lag`, `regional`, `retire`, `scope-settings` (they create no proposals); scenarios
+  other than `proposals` and `plans` (CI runs them all on the PR).
+- **Next:** merge main in once `ux-chats-profile` has merged, open the PR, merge when green
+  (project network reset), check `/readyz` (new project hash, others unchanged).
 
 ## In flight 2026-11-13 (night): creation through plans (ADR 0059), NOT pushed yet
 **Owner, 2026-11-13: "yep go, feel free to reset network"; the word is "Proposal"; an
