@@ -53,3 +53,13 @@ request settings later is a vote.
 - **Stage B (a second project-network reset, before release):** refuse typed charters at
   creation, remove the personal-service rules, and move the scenario tests that still found
   typed projects onto proposals.
+- **Indexes (2026-11-15):** the gateway's feed, map and region cards take the mode and subtype
+  from the project's own view, not from the directory listing written at creation, so a
+  proposal shows as an event, project or service once its plan has made it one.
+- **Screens (2026-11-15), as the Creating Through Plans mockup draws them:** the new proposal
+  shows "Step N of 4 · …" with a progress line, in the order Basics, Tags, Location,
+  Overview, asks "What do you propose?" and says "No type yet" in a note; the create menu's
+  Proposal is tinted with a star and a NEW tag; "Add plan" opens a small "Add a plan" sheet;
+  each plan on a proposal says what it would make after an arrow. **One difference kept:** a
+  proposal's progress line has four phases (Proposal, Plan, Activity, Closed: the path every
+  type shares), where the mockup drew five, because an event has only four.

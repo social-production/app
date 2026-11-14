@@ -257,39 +257,3 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
-
-/* The sheet is portaled outside the shell. */
-.plan-kind-sheet .plan-kind-choice {
-  display: grid;
-  gap: 12px;
-  padding-bottom: 16px;
-}
-
-.plan-kind-sheet .plan-kind-choice .type-selector-label {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-}
-
-.plan-kind-sheet .plan-kind-choice .type-option {
-  border: none;
-  border-radius: 18px;
-  background: var(--panel-hover);
-}
-
-.plan-kind-sheet .plan-kind-choice .type-option.active {
-  background: var(--brand-soft);
-  box-shadow: inset 0 0 0 2px var(--brand);
-}
-
-.plan-kind-sheet .plan-kind-continue {
-  height: 46px;
-  border: none;
-  border-radius: 999px;
-  background: var(--brand);
-  color: var(--page-bg);
-  font-size: 15px;
-  font-weight: 700;
-}
