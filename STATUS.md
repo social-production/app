@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-13 evening Melbourne by the owner's PC UX session; see "In flight" and the newest "Done")
+# Status: where the P2P app stands (updated 2026-11-14 afternoon Melbourne by the owner's PC UX session; see the first "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -81,6 +81,65 @@ otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators
 Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
+
+## In flight (UX) 2026-11-14: feed headers and the activity phase, branch `claude/feed-activity-ux`, ADR 0102
+**Owner approved the mockups ("lets use all your suggestions",
+https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
+- **Built:** Home / Global / Region word tabs and one "Feed filters" sheet (`FeedHeader`,
+  `SegmentedChoice`, `styles/ux/feedhead.css`); the feed row header (type glyph, channel in
+  bold, "type · phase · clock" under it: `FeedCardTop`, `styles/ux/feed.css`); the Activity
+  phase (Upcoming / Past activity tabs, a week strip with the month behind its name, soft
+  day-grouped cards with faces and "Join": `ActivityCalendar` `week`, `ActivityCard`,
+  `ActivityPhase`, `styles/ux/activity.css`); an opened activity (an icon leads each line,
+  Share and "Show on map" are pills, role buttons are pills: `styles/ux/activitysheet.css`,
+  whose rules start `.activity-ui.activity-ui` because the sheet is portaled outside `.shell`).
+  "Add activity" stays the brand pill in the Take part dock (the dock replaces the nav there,
+  so the mockup's floating pill is that pill).
+- **Two real bugs found by the browser tests and fixed here (both on main too):**
+  1. **A one-day event plan lost its plan day east of Greenwich.** A `date` plan stores no
+     end date, so a finish past UTC midnight (9 am to 1 pm in Melbourne) read as earlier than
+     the start: no day was marked and no activity could be added. `scheduleBounds`
+     (`domain/eventSchedule.ts`) now takes such a finish as the next UTC day. This was why
+     `events.mjs` failed on main on the owner's PC (CI runs in UTC and never saw it).
+  2. **"Source chain error … the source chain head has moved"** on Create channel / Publish
+     project when another write by the same person landed first (all public spaces share
+     one cell, ADR 0065). Holochain refuses such a call before running it, so
+     `holo/headRetry.ts` sends it again (up to three times); `callZome` and `callCell` use it.
+     The usual second writer was the app itself: the weekly `Active` link (ADR 0095) went out
+     right after `create_charter`, beside `create_listing` in the directory, so **a new
+     person's first project failed to publish**. `holo/active.ts` now writes it five seconds
+     later.
+     It failed `follows`, `region`, `bookings` and the test channel's creation locally.
+     `ensureTestChannel` (tests) also presses again if it still sees the message.
+- **`UX_SHOTS=<dir>`** is now a real option of `tests/e2e/lib.mjs` `device()`: a screenshot
+  of every device every four seconds (identical frames skipped), for reviewing a flow.
+- **Local node note:** `app-ux` is a git worktree; its `target` is a symlink to
+  `../app/target` (ignored) so it does not rebuild Holochain. Run `bash scripts/build-happ.sh`
+  in the checkout whose node you start, or the node runs the other branch's zomes.
+- **Checked (2026-11-14, local seed node built from this branch, 390px):** `npm run check -w
+  ui` (0 errors), lint, boundaries, sizes; screenshots of the home feed, the filter sheet,
+  the activity phase (upcoming, past, an opened activity, a past one) looked at. Browser
+  tests **passed**: `activities`, `governance`, `threads`, `help-requests`,
+  `closed-communities`, `software`; and after the two fixes above `events`, `guests`,
+  `follows` and `region` (each had failed on one of those two bugs). `bookings` and `map`:
+  see the `claude/ux-topbar-map` entry (stacked on this branch, same local node). Not run:
+  scenarios (no Rust change), the other browser tests.
+- **Approved, not built yet (owner, 2026-11-14: build all, one PR per group, each from main
+  after the previous merges):**
+  1. ~~Top bar, map filters, About, "Back to feed" on sign-up~~: built on
+     `claude/ux-topbar-map` (stacked on this branch), ADR 0103; the owner chose map style A
+     with the search behind a button, and asked for "Copy all 24 words" on sign-up (built).
+  2. Sign-up / log-in screens, messages list, conversation (and the long link running off
+     a chat bubble), profile (owner, 2026-11-14: an "Edit profile" button on your own profile
+     is fine): https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu
+  3. Channel and community headers, settings, notifications, search, people lists, create
+     flows, feedback: https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH
+- **Mockups waiting for the owner's OK (published 2026-11-14):**
+  https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t : project details and description (the
+  place opens the map), the proposal phase's values, plan review, the phase sheet and a
+  closed project, the left rail, Discover, and Feedback (web's type icon and percentage
+  votes kept; **new:** Twitter-style comments on a feedback item). One question in it:
+  whether a "Convert" choice is still wanted now that the leading plan sets the type.
 
 ## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",

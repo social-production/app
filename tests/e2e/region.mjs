@@ -5,7 +5,7 @@
 //   node tests/e2e/region.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 
-import { BASE, browser, device, errors, log, signUp, tagTestChannel } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, tagTestChannel, feedScope } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 const stamp = Date.now().toString(36).slice(-4);
@@ -41,8 +41,7 @@ await regional.locator('.suggestions button').first().click({ timeout: 30_000 })
 
 // The feed's Region scope, from the default place; the index lists the project once read.
 await page.goto(BASE);
-await page.getByRole('button', { name: 'Choose public feed scope' }).click();
-await page.getByRole('menuitemradio', { name: 'Region' }).click();
+await feedScope(page, 'Region');
 const place = page.locator('.feed-page .place-search input');
 await page.waitForFunction((el) => el?.value.includes('Fitzroy'), await place.elementHandle(), {
   timeout: 30_000,
@@ -51,7 +50,7 @@ const card = page.locator('.feed-page .stack .surface', { hasText: title });
 for (let i = 0; i < 45 && !(await card.count()); i++) {
   await page.waitForTimeout(8_000);
   await page.reload();
-  await page.locator('.feed-page .toolbar-card-region').waitFor({ timeout: 60_000 });
+  await page.locator('.feed-page .feed-region-row').waitFor({ timeout: 60_000 });
 }
 await card.first().waitFor({ timeout: 30_000 });
 await page.screenshot({ path: `${out}/region-feed-390.png` });

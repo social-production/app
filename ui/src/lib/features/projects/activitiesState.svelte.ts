@@ -45,6 +45,8 @@ export class ActivitiesState {
   loaded = $state(false);
   error = $state('');
   composing = $state(false);
+  /** The Activity phase's tab (ADR 0102): upcoming activities, or past ones. */
+  showing = $state<'upcoming' | 'past'>('upcoming');
   busy = $state(false);
   form = $state<ActivityForm>(newActivityForm());
   selectedDay = $state('');

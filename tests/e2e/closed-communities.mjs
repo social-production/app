@@ -10,7 +10,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, signUp, feedScope } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -147,8 +147,7 @@ log('two joined the community event');
 
 // Home lists it too: web-backend's home feed includes your private communities' events.
 await b.goto(`${BASE}/`);
-await b.getByRole('button', { name: 'Choose public feed scope' }).click();
-await b.getByRole('menuitemradio', { name: 'Home' }).click();
+await feedScope(b, 'Home');
 await b.locator('.event-card', { hasText: title }).waitFor({ timeout: 120_000 });
 await b.screenshot({ path: `${out}/phone390-community-event-home.png` });
 log('two sees the community event on Home');
