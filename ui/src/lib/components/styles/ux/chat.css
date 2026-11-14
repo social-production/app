@@ -1,0 +1,142 @@
+/* Chat bubbles and the message bar (owner approved 2026-11-13): rounded bubbles, yours in
+   green on the right, a link to something in the app as a card, and long words and links
+   wrapping inside the bubble. Overrides of the ported chat.css. */
+.shell .chat-panel .message-copy {
+  max-width: min(78%, 34rem);
+  padding: 9px 14px;
+  border: none;
+  border-radius: 20px 20px 20px 6px;
+  background: var(--panel-hover);
+}
+
+.shell .chat-panel .chat-message.own .message-copy {
+  border-radius: 20px 20px 6px 20px;
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+/* A long link or word wraps instead of running past the bubble's edge. */
+.shell .chat-panel .message-copy,
+.shell .chat-panel .message-copy p,
+.shell .chat-panel .message-copy p a {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.shell .chat-panel .chat-message.own .message-copy p a,
+.shell .chat-panel .chat-message.own .message-copy .author-link,
+.shell .chat-panel .chat-message.own .message-copy .message-time,
+.shell .chat-panel .chat-message.own .message-copy .edited-mark,
+.shell .chat-panel .chat-message.own .message-copy .receipt {
+  color: color-mix(in srgb, var(--on-brand) 86%, transparent);
+}
+
+/* A link to a project, event, request, post or thread in the app reads as a card. */
+.shell .chat-panel .message-copy p a:not(.mention):not([target]) {
+  display: block;
+  margin: 4px 0 2px;
+  padding: 9px 12px;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .chat-panel .message-copy.photo-stack,
+.shell .chat-panel .chat-message.own .message-copy.photo-stack {
+  max-width: min(82%, 34rem);
+  padding: 0;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.shell .chat-panel .message-copy .message-photo {
+  border-radius: 18px;
+}
+
+.shell .chat-panel .reply-quote {
+  border: none;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--panel) 70%, transparent);
+}
+
+.shell .chat-panel .day-divider span {
+  padding: 3px 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shell .chat-panel .day-divider::before,
+.shell .chat-panel .day-divider::after {
+  display: none;
+}
+
+/* The message bar floats like the comment bar: round attach buttons, a pill field, a
+   round send button. */
+.shell .chat-panel .composer-card {
+  padding: 6px 12px 12px;
+  border-top: none;
+  background: transparent;
+}
+
+.shell .chat-panel .composer-row {
+  align-items: flex-end;
+  gap: 6px;
+  padding: 5px;
+  border: 1px solid var(--float-border);
+  border-radius: 26px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+}
+
+.shell .chat-panel .composer-input-shell {
+  min-height: 40px;
+  padding: 9px 6px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.shell .chat-panel .composer-row textarea {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+.shell .chat-panel .attach-button {
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.shell .chat-panel .send-button {
+  width: 40px;
+  height: 40px;
+  color: var(--on-brand);
+}
+
+.shell .chat-panel .send-button:disabled {
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  opacity: 1;
+}
+
+.shell .chat-panel .composer-context {
+  margin: 0 4px 6px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}

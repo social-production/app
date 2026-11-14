@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
 
   import CopyKey from '#lib/components/CopyKey.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
   import { acceptedCount, shownRows } from '#lib/domain/follows.ts';
@@ -9,6 +10,8 @@
   import { explain } from '#lib/services/errors.ts';
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
+
+  import { resolve } from '$app/paths';
 
   import BotButton from './BotButton.svelte';
   import BotReviewCard from './BotReviewCard.svelte';
@@ -161,6 +164,13 @@
                   onToggle={() => trust.toggleMark(viewing.agent)}
                 />
               {/if}
+            </div>
+          {:else if own}
+            <!-- Owner, 2026-11-14: an Edit profile button on your own profile is fine. -->
+            <div class="action-row">
+              <a class="action" href={resolve('/settings')}>
+                <ToolbarIcon name="pencil" /><span class="action-text">Edit profile</span>
+              </a>
             </div>
           {/if}
         {/snippet}

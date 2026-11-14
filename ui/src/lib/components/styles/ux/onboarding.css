@@ -1,0 +1,203 @@
+/* Sign-up and log-in (owner approved 2026-11-13): no boxes: the logo, one clear line, a soft
+   switch, large rounded fields and a full-width button, with the three steps as a progress
+   line. Overrides of the ported onboarding.css. */
+.shell .onboarding .page {
+  display: grid;
+  gap: 18px;
+  max-width: 440px;
+  margin-inline: auto;
+  padding: 28px 24px 24px;
+}
+
+.shell .onboarding .ob-head {
+  display: grid;
+  gap: 6px;
+}
+
+.shell .onboarding .ob-logo {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 10px;
+  border-radius: 16px;
+  background: var(--brand);
+}
+
+.shell .onboarding .ob-logo img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.shell .onboarding h1 {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 26px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.shell .onboarding .ob-head p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.shell .onboarding .panel {
+  display: grid;
+  gap: 14px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.shell .onboarding .choice-row {
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.shell .onboarding .toggle-chip {
+  flex: 1 1 0;
+  min-height: 36px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.shell .onboarding .toggle-chip.active {
+  background: var(--panel);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.14);
+}
+
+.shell .onboarding .helper-text {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.shell .onboarding .ob-steps {
+  display: flex;
+  gap: 6px;
+}
+
+.shell .onboarding .ob-steps i {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--panel-strong);
+}
+
+.shell .onboarding .ob-steps i.on {
+  background: var(--brand);
+}
+
+.shell .onboarding .stack {
+  display: grid;
+  gap: 12px;
+}
+
+.shell .onboarding label {
+  display: grid;
+  gap: 6px;
+}
+
+.shell .onboarding .field-label {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .onboarding input,
+.shell .onboarding textarea {
+  min-height: 52px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.shell .onboarding textarea {
+  padding-block: 14px;
+}
+
+.shell .onboarding input:focus-visible,
+.shell .onboarding textarea:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--brand) 60%, transparent);
+  outline-offset: 0;
+}
+
+.shell .onboarding .ob-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+}
+
+.shell .onboarding .button-row {
+  display: grid;
+  gap: 8px;
+}
+
+.shell .onboarding .button-primary,
+.shell .onboarding .button-secondary {
+  width: 100%;
+  min-height: 52px;
+  border: none;
+  border-radius: 999px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.shell .onboarding .button-primary {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.shell .onboarding .button-primary:disabled {
+  opacity: 0.45;
+}
+
+.shell .onboarding .button-secondary {
+  min-height: 44px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.shell .onboarding ol.grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  font-family: inherit;
+}
+
+.shell .onboarding ol.grid li {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 12px;
+  background: var(--panel-hover);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .onboarding ol.grid .n {
+  color: var(--text-soft);
+  font-weight: 500;
+}

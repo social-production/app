@@ -48,6 +48,11 @@
   }
 </script>
 
+{#if step !== 'working'}
+  <div class="ob-steps" aria-hidden="true">
+    <i class:on={true}></i><i class:on={step !== 'name'}></i><i class:on={step === 'confirm'}></i>
+  </div>
+{/if}
 {#if step === 'name'}
   <form class="stack" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
@@ -63,6 +68,7 @@
     <div class="handle-line">
       {#if problem && name.trim().length >= 3}<p class="status-note">{problem}</p>{/if}
     </div>
+    <p class="ob-note">Next you get 24 words. They are your account; keep them somewhere safe.</p>
     <div class="button-row">
       <button class="button-primary" disabled={!!problem} type="submit">Next</button>
     </div>

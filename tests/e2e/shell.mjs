@@ -59,7 +59,7 @@ log('signed out: More shows sign in and About');
 
 // web's isAuthSurface: onboarding shows only the brand.
 await guest.goto(`${BASE}/onboarding`);
-await guest.getByRole('heading', { name: 'Sign in or create an account' }).waitFor();
+await guest.getByRole('heading', { name: 'Join Social Production' }).waitFor();
 assert.equal(await guest.locator('.mobile-bottom-nav').count(), 0, 'no bottom nav');
 assert.equal(
   await guest.getByRole('button', { name: 'Open networks' }).count(),
