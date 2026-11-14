@@ -90,15 +90,16 @@ log('signed in: More shows the profile, Settings and About');
 
 // web's Appearance settings, kept on this device: Dark sticks across a reload.
 await ann.goto(`${BASE}/settings`);
-const themes = ann.getByRole('radiogroup', { name: 'Theme' });
-await themes.getByRole('radio', { name: 'Dark' }).click();
-await ann
-  .getByRole('radiogroup', { name: 'Accent colour' })
-  .getByRole('radio', { name: 'Blue' })
-  .click();
+// Settings as rows (ADR 0105): a row shows its value and opens a small sheet of choices.
+async function choose(label, option) {
+  await ann.getByRole('button', { name: new RegExp(`^${label}: `) }).click();
+  await ann.getByRole('radiogroup', { name: label }).getByRole('radio', { name: option }).click();
+}
+await choose('Theme', 'Dark');
+await choose('Accent', 'Blue');
 assert.equal(await ann.evaluate(() => document.documentElement.dataset.theme), 'dark');
 await ann.reload();
-await themes.getByRole('radio', { name: 'Dark', checked: true }).waitFor();
+await ann.getByRole('button', { name: 'Theme: Dark' }).waitFor();
 const root = await ann.evaluate(() => ({ ...document.documentElement.dataset }));
 assert.equal(root.theme, 'dark');
 assert.equal(root.accent, 'blue');

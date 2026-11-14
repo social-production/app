@@ -1,6 +1,6 @@
 // Software projects (ADR 0086) end to end at phone width, against a local seed node with the
 // dev founders (scripts/dev-seed.sh). Ann creates a project; both founders move it to
-// Production Plan and approve Ann's software plan (with its repository), then move it to
+// Plan phase and approve Ann's software plan (with its repository), then move it to
 // Activity, where web's software panel shows the repository and Ann as its merger. Ann submits
 // a pull request through web's wizard; Ann approves it in the panel, Bob from his rail
 // ("Vote · pull request" → Assess opens the wizard). Ann's rail then says "Action · merge
@@ -39,8 +39,8 @@ await bob.getByRole('button', { name: 'Join project' }).click();
 await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
 await bob.getByRole('button', { name: /^Support/ }).click();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
-await advanceTo(ann, bob, 'Production Plan');
-log('the founders moved the project to Production Plan');
+await advanceTo(ann, bob, 'Plan');
+log('the founders moved the proposal to its Plan phase');
 
 // Ann's production plan picks web's Software type and names the official repository.
 await ann.reload();

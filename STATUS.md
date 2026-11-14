@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-14 afternoon Melbourne by the owner's PC UX session; see the first "In flight")
+# Status: where the P2P app stands (updated 2026-11-15 morning Melbourne by a cloud session; start at "START HERE (2026-11-15)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,7 +82,36 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## START HERE (2026-11-14, 8 pm Melbourne): where the owner's PC session stopped
+## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
+**Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the
+owner's PC) continues the UX build list. Answers to the open questions (apply them first):
+- **Feed glyphs: use the mockups' own** (the cube for a project, the speech bubble for a
+  thread), not web's house and lines.
+- **"Project", not "Productive"**, wherever a type is named (feed rows, rail, map, chips).
+- **"Service", not "Collective service".**
+- **Plan phases are just "Plan"**: don't say which plan ("Production Plan", "Operations
+  Plan", "Event Plan" all read "Plan"). The stage labels come from
+  `sp_governance::phases::stage_label`; directory integrity links `sp_governance`, so after
+  changing it compare `hc dna hash` for all three DNAs with the live `/readyz` (a change that
+  moves the directory hash is a directory reset: ask first). Browser tests and scenarios
+  match on these names (`advanceTo(…, 'Production Plan')` etc.).
+
+**Where things stand:**
+1. **PR #156 merged** 3:05 am Melbourne (feed tabs, feed rows, activity phase). The desktop
+   smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
+2. **PR #157** (`claude/ux-topbar-map`, rebased on main) is open; merge when green.
+3. **Then `claude/ux-chats-profile`:** `git rebase main` once #157 merges, open its PR, merge
+   when green.
+4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
+   #156's fix; merge main into it, open its PR, merge when green. **It resets the project
+   network on merge** (owner approved). After the deploy: `/readyz` shows a new project
+   hash; directory and conversation must be unchanged.
+5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+6. **Then the UX build list** (owner's message of 2026-11-14, items 4a to 4d): New message as
+   Telegram does it; the Remaining Screens; the Plan, Phase and Feedback Screens with Convert;
+   the phase bars and create menu against their mockups. The answers above come first.
+
+## START HERE (2026-11-14, 8 pm Melbourne, superseded by the entry above): where the owner's PC session stopped
 Two checkouts on the owner's PC: `app/` (branch `claude/creation-plans`) and `app-ux/` (a git
 worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app/target` and
 its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests

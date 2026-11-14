@@ -20,7 +20,7 @@ const ann = await device({ viewport: { width: 390, height: 844 } });
 await phraseSignIn(ann, one.phrase.split(' '));
 await ann.goto(BASE);
 await ann.getByRole('button', { name: 'Create', exact: true }).click();
-await ann.getByRole('menuitem', { name: /Help request/ }).click();
+await ann.getByRole('menuitem', { name: /^Request/ }).click();
 const next = () => ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel(/^Title/).fill(title);
 await ann.getByLabel('What do you need?').fill('Friday morning, with a suitcase.');
