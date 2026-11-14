@@ -229,3 +229,28 @@
   background: transparent;
   color: inherit;
 }
+
+/* Small sheets (a setting, the feed's and the map's filters): on a phone they rise from the
+   bottom over the page, as drawn, in place of filling the screen. The classes are repeated
+   to outweigh the ported rule, which names the root with :not(:has()). */
+@media (max-width: 1080px) {
+  .overlay-root.setting-sheet.setting-sheet.setting-sheet,
+  .overlay-root.feed-filter-sheet.feed-filter-sheet.feed-filter-sheet {
+    align-items: end;
+    justify-items: stretch;
+  }
+
+  .overlay-root.setting-sheet.setting-sheet .overlay-sheet.overlay-sheet,
+  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-sheet.overlay-sheet {
+    align-self: end;
+    height: auto;
+    max-height: 88dvh;
+    border-radius: 26px 26px 0 0;
+    box-shadow: 0 -10px 40px rgb(0 0 0 / 0.22);
+  }
+
+  .overlay-root.setting-sheet.setting-sheet .overlay-header-copy,
+  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-header-copy {
+    padding-top: 18px;
+  }
+}

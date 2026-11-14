@@ -111,9 +111,14 @@ designs" below; build them as drawn and do not redraw them.**
    tint with the ordinary text colour, others' grey, **no tinted chat background**: owner);
    the pin bar as a flat strip with a thin rail; the New message and Chat info sheets
    (`styles/ux/sheets.css`, which also gives **every sheet** a round close button and a pill
-   action in its footer); Settings as grouped rows (`styles/ux/settings.css`, **CSS only:
-   rows do not yet show their value and open a small sheet as drawn**); Notifications
-   (`styles/ux/notifications.css`, not looked at yet).
+   action in its footer); **Settings as drawn (ADR 0105):** a profile row, then Profile and
+   Appearance as rows that show their value and open a small bottom sheet
+   (`components/settings/SettingRow`, `SettingChoice`); the other sections have the
+   grouped look but keep their old controls (Regional, Devices, Network, Privacy, Account:
+   convert them to rows next). Notifications (`styles/ux/notifications.css`): heading and
+   "Mark all read" link seen; the cards themselves not (the test account had none).
+   Dark chat checked again after the background was removed: neutral dark page, your bubble
+   a muted green tint, others' grey.
    **Lesson: an `@import` after any rule in a CSS file is ignored.** Splitting `feed.css`
    that way dropped the whole row header for one commit; `feedrow.css` is imported from
    `index.css`.
@@ -127,7 +132,11 @@ designs" below; build them as drawn and do not redraw them.**
    `tests/e2e/lib.mjs`: `UX_SCHEME=dark` runs every device in the dark theme.
    Remaining Screens still to build: create flows (progress line, floating Continue),
    channel / community / Platform header, Links and History tabs as soft cards, Search
-   (chips), People rows, Feedback, and Settings' row-and-sheet behaviour.
+   (chips), People rows, Feedback, and the rest of Settings' sections as rows.
+   **Owner, 2026-11-14 night, pointing at Creating Through Plans
+   (https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv): "like look at this"**: read it
+   beside the create menu and the proposal flow on `claude/creation-plans` and fix every
+   difference; this session did not open it.
 3b. **Owner, 2026-11-14 9:10 pm: rebuild "New message" as Telegram does it** (four reference
    screenshots: `../assets/temp/telegram-new-message/` on the owner's PC). A full page, not
    a form: a back arrow, "New message", a "New group" row on top, then people as rows (face,
