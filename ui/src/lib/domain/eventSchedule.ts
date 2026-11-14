@@ -76,7 +76,12 @@ export function scheduleBounds(s: EventSchedule): { start: number; end: number }
   const end = s.end_date ?? s.start_date;
   const at = (day: string, time: string | null): number =>
     Date.parse(`${day}T${time ?? '00:00'}:00Z`);
-  return { start: at(s.start_date, s.start_time), end: at(end, s.finish_time ?? s.start_time) };
+  const start = at(s.start_date, s.start_time);
+  const finish = at(end, s.finish_time ?? s.start_time);
+  // A one-day plan stores no end date, so a finish past UTC midnight (any morning east of
+  // Greenwich) reads as the start's UTC day: it is the day after.
+  const DAY = 24 * 60 * 60 * 1000;
+  return { start, end: !s.end_date && finish <= start ? finish + DAY : finish };
 }
 
 /** The local days the schedule covers (web's plan days, where activities can be scheduled). */
