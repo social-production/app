@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The phone nav floats and feed cards are rows (PR #148, 2026-11-13 6:49 pm Melbourne,
+  ADRs 0096 and 0097; the UX pass, `docs/plans/UX.md`):** the bottom nav is a floating blurred
+  capsule with the current tab as a tinted pill; feed cards are Twitter-style rows with no
+  type stripe, larger text and a spread row of bare actions (comments, votes, members,
+  share). UI only, no reset.
 - **The Platform channel, moderators and Deactivate account (PR #151, 2026-11-13 2:17 pm
   Melbourne, live 2:38 pm; ADRs 0095, 0088):** `/platform` is web's Platform channel (Join,
   its feed); the shield button or the rail's Moderators link opens web's moderator board

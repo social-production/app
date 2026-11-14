@@ -17,6 +17,11 @@
   text-transform: none;
 }
 
+/* The ported `.right-rail .snapshot-row span` greys every span, the label's text included. */
+.shell .right-rail .activity-topline .surface-type-label .label-copy {
+  color: inherit;
+}
+
 .shell .right-rail .activity-open-button strong {
   font-size: 15.5px;
   line-height: 1.3;

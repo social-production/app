@@ -1,3 +1,4 @@
+import type { ChatAttachment } from '#lib/domain/chat.ts';
 import type { Contact } from '#lib/domain/messages.ts';
 import type { Charter } from '#lib/domain/projects.ts';
 import { shareMessage } from '#lib/domain/share.ts';
@@ -12,7 +13,8 @@ import {
 } from '#lib/domain/discussions.ts';
 import { callCell, hashToString, stringToHash, type ActionHash } from '#lib/holo/index.ts';
 
-import { listMessages, postMessage, queued } from './chat.ts';
+import { projectAttachmentBlob, uploadProjectFiles } from './attachments.ts';
+import { listMessages, postMessage, queued, type AttachmentWire } from './chat.ts';
 import { getMessageModeration } from './moderation.ts';
 import { sendNewChat } from './messages.ts';
 import { cellFor, createProject } from './projects.ts';
@@ -35,9 +37,51 @@ export function createThread(title: string, body: string, tags: string[]): Promi
   return createProject(charter(THREAD_MODE, title.trim(), body, tags));
 }
 
-/** web's createPost: a public note on your personal feed. */
-export function createPost(body: string): Promise<string> {
-  return createProject(charter(POST_MODE, postTitle(body), body, []));
+/** `media::PHOTOS_MAX`: photos on one post (ADR 0101). */
+export const POST_PHOTOS_MAX = 4;
+
+/**
+ * web's createPost: a public note on your personal feed, with up to four photos (ADR 0101).
+ * The photos are written after the post; if that fails the post stands without them.
+ */
+export async function createPost(body: string, photos: File[] = []): Promise<string> {
+  const id = await createProject(charter(POST_MODE, postTitle(body), body, []));
+  if (photos.length) {
+    await queued(async () => {
+      const attachments = await uploadProjectFiles(id, photos);
+      await callCell<ActionHash>(await cellFor(id), 'discussion', 'set_post_media', attachments);
+    });
+  }
+  return id;
+}
+
+const photoLists = new Map<string, Promise<ChatAttachment[]>>();
+
+/** A post's photos, read once per post (they never change); an unreachable read is retried. */
+export function postPhotos(id: string): Promise<ChatAttachment[]> {
+  let list = photoLists.get(id);
+  if (!list) {
+    list = cellFor(id)
+      .then((cell) => callCell<AttachmentWire[]>(cell, 'discussion', 'post_media', null))
+      .then((wire) => wire.map((a) => ({ ...a, chunks: a.chunks.map(hashToString) })));
+    photoLists.set(id, list);
+    list.catch(() => photoLists.delete(id));
+  }
+  return list;
+}
+
+const photoUrls = new Map<string, Promise<string>>();
+
+/** One photo of a post as an object URL, kept for the session. */
+export function postPhotoUrl(id: string, photo: ChatAttachment): Promise<string> {
+  const key = photo.chunks.join('.');
+  let url = photoUrls.get(key);
+  if (!url) {
+    url = projectAttachmentBlob(id, photo).then((blob) => URL.createObjectURL(blob));
+    photoUrls.set(key, url);
+    url.catch(() => photoUrls.delete(key));
+  }
+  return url;
 }
 
 interface VoteWire {
