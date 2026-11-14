@@ -31,6 +31,19 @@
     { why: aboutWhy, how: aboutHow, decisions: aboutDecisions, network: aboutNetwork }[active],
   );
 
+  // Each section opens with its titled parts as summary cards (ADR 0103): the title and
+  // the first sentence of its text, so no words are added.
+  const summaries = $derived(
+    blocks
+      .filter((b) => b.title && b.paragraphs.length > 0)
+      .map((b) => ({ title: b.title ?? '', lead: firstSentence(b.paragraphs[0] ?? '') })),
+  );
+
+  function firstSentence(text: string): string {
+    const end = text.search(/[.!?](\s|$)/);
+    return end < 0 ? text : text.slice(0, end + 1);
+  }
+
   function selectSection(id: AboutTabId): void {
     const next = new URL(page.url.href);
     if (id === 'why') next.searchParams.delete('section');
@@ -52,7 +65,7 @@
 <div class="about-page">
   <section class="page">
     <header class="hero">
-      <p class="eyebrow">About</p>
+      <p class="eyebrow">About Social Production</p>
       <h1>Organising useful work together, for use rather than sale.</h1>
     </header>
 
@@ -75,6 +88,13 @@
 
       <article class="essay">
         <h2>{title}</h2>
+        {#if summaries.length > 1}
+          <ul class="about-summary" aria-label={`${title} in short`}>
+            {#each summaries as card (card.title)}
+              <li><strong>{card.title}</strong><span>{card.lead}</span></li>
+            {/each}
+          </ul>
+        {/if}
         {@render section(blocks)}
         {#if active === 'why'}
           <h3>Further reading</h3>

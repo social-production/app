@@ -1,0 +1,183 @@
+/* The top bar (ADR 0103): the logo, a search field you can type in straight away, and the
+   Networks, Map and Activity buttons together in one soft capsule whose open button lifts
+   to the panel colour. Overrides of the ported shell.css. */
+.shell .topbar .brand-mark {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  box-shadow: none;
+}
+
+.shell .topbar .brand-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.shell .topbar .brand strong {
+  font-size: 16px;
+  letter-spacing: -0.01em;
+}
+
+.shell .topbar .toolbar-center {
+  flex: 1 1 auto;
+  order: 1;
+  min-width: 0;
+  margin-left: 0;
+}
+
+.shell .topbar .toolbar-search {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 38px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  box-shadow: none;
+}
+
+.shell .topbar .toolbar-search:hover,
+.shell .topbar .toolbar-search:focus-within {
+  border: none;
+  background: var(--panel-hover);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+.shell .topbar .toolbar-search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 13px;
+  color: var(--text-soft);
+}
+
+.shell .topbar .toolbar-search-wrap .search-icon {
+  flex: none;
+  width: 17px;
+  height: 17px;
+}
+
+.shell .topbar .toolbar-search-input {
+  padding: 0 12px 0 0;
+  font-size: 15px;
+}
+
+.shell .topbar .toolbar-search-input::placeholder {
+  color: var(--text-soft);
+}
+
+.shell .topbar .toolbar-search-input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.shell .topbar .panel-controls {
+  flex: none;
+  flex-wrap: nowrap;
+  order: 2;
+  gap: 0;
+  padding: 3px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.shell .topbar .panel-toggle.panel-toggle {
+  width: 38px;
+  min-width: 0;
+  height: 32px;
+  min-height: 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.shell .topbar .panel-toggle .panel-toggle-icon {
+  width: 19px;
+  height: 19px;
+}
+
+.shell .topbar button.panel-toggle[data-active='true'],
+.shell .topbar button.panel-toggle[data-active='true']:hover {
+  background: var(--panel);
+  color: var(--brand-strong);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16);
+}
+
+.shell .topbar .panel-toggle-badge {
+  top: -4px;
+  right: -3px;
+}
+
+.shell .topbar .utility-nav {
+  order: 3;
+}
+
+/* Desktop: the wordmark, a centred search field, then the capsule and the links. */
+@media (min-width: 1081px) {
+  .shell .topbar {
+    gap: 14px;
+    padding-inline: 18px;
+  }
+
+  /* The panel buttons sit beside the logo, apart from Home, Notifications and Messages. */
+  .shell .topbar .panel-controls {
+    order: 0;
+  }
+
+  .shell .topbar .toolbar-center {
+    flex: 1 1 0;
+  }
+
+  .shell .topbar .toolbar-search {
+    flex: 0 1 380px;
+    max-width: 380px;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 1080px) {
+  .shell .topbar-compact {
+    gap: 8px;
+    padding-inline: 12px;
+  }
+
+  /* 16px keeps iOS from zooming the page when the field takes focus. */
+  .shell .topbar-compact .toolbar-search-input {
+    font-size: 16px;
+  }
+}
+
+/* Sign-up and log-in: a labelled way back, and a plain link under the form. */
+.shell .topbar .back-to-feed {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 38px;
+  padding: 0 14px 0 8px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .topbar .back-icon {
+  width: 18px;
+  height: 18px;
+}
+
+.shell .onboarding .keep-browsing {
+  margin: 4px 0 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  text-align: center;
+}
+
+.shell .onboarding .keep-browsing a {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.shell .onboarding .copy-words {
+  border-radius: 999px;
+}
