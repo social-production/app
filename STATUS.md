@@ -102,8 +102,7 @@ for `claude/ux-chats-profile`. Both are UI only (no network reset).
   bubble; long links wrap (the bug from the audit).
   **Not built from that mockup:** one "+" for photo and file (the two buttons stay), a
   shared item's card with its date and place (the card shows the link's text), "Report as
-  bot" under a ⋯ menu (it stays a round icon), a group chat's squared avatar. Needs an ADR
-  (0104) before its PR.
+  bot" under a ⋯ menu (it stays a round icon), a group chat's squared avatar. ADR 0104.
 - **Checked (2026-11-14, local seed node, the build of `claude/ux-chats-profile` minus its
   last small style fixes):** `npm run check -w ui` (0 errors), lint, boundaries, sizes;
   browser tests **passed**: `guests`, `follows`, `region`, `bookings`, `map`, `shell`,
