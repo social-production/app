@@ -8,8 +8,8 @@ export async function withHeadRetry<T>(call: () => Promise<T>): Promise<T> {
     try {
       return await call();
     } catch (error) {
-      // The client throws plain objects as well as Errors.
-      const text = error instanceof Error ? error.message : JSON.stringify(error ?? '');
+      // The browser client throws Errors, the desktop's IPC plain objects or strings.
+      const text = `${error instanceof Error ? error.message : ''} ${String(error)} ${JSON.stringify(error ?? '')}`;
       if (attempt >= 3 || !/head has moved/i.test(text)) throw error;
       await new Promise((done) => setTimeout(done, 200 * (attempt + 1)));
     }
