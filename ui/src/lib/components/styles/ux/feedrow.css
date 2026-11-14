@@ -1,0 +1,120 @@
+/* The feed row's header (ADR 0102) and the row's indent under it. Split from feed.css. */
+/* A feed row's header (ADR 0102): the type's glyph in a soft square, the channel in bold,
+   then type · phase · clock underneath; private mark and ⋮ at the right. */
+.shell .feed-card-top.feed-lead {
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 2px;
+}
+
+.shell .feed-lead-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.shell .surface .content .feed-lead-glyph .surface-type-label {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: color-mix(in srgb, var(--surface-accent) 16%, transparent);
+  color: color-mix(in srgb, var(--surface-accent) 60%, var(--text-main));
+}
+
+.shell .feed-lead-glyph .label-copy {
+  display: none;
+}
+
+.shell .feed-lead-glyph svg {
+  width: 18px;
+  height: 18px;
+}
+
+.shell .feed-lead-copy {
+  display: grid;
+  flex: 1 1 auto;
+  gap: 1px;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.shell .feed-lead-tags {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-width: 0;
+}
+
+.shell .feed-lead-tags .tag-list.plain {
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.shell .feed-lead-tags .tag-list .tag-plain,
+.shell .feed-lead-tags .tag-list .tag-overflow-btn {
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.shell .feed-lead-tags .tag-list .tag-plain span {
+  max-width: 14rem;
+}
+
+.shell .feed-lead-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .feed-lead-meta > * + *::before {
+  content: '·';
+  margin: 0 5px;
+  color: var(--text-soft);
+  font-weight: 400;
+}
+
+.shell .surface .content .feed-lead-meta .surface-type-label {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.shell .feed-lead-meta .surface-type-label svg {
+  display: none;
+}
+
+/* With no channel, the type itself is the bold line. */
+.shell .surface .content .feed-lead-meta.alone .surface-type-label {
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.shell .feed-card-top.feed-lead .feed-card-stage {
+  padding: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.shell .feed-lead .feed-card-time {
+  font-size: 13px;
+}
+
+/* Owner, 2026-11-14: a public row's title, text and actions start under the channel name,
+   leaving the glyph's column empty, as a post's text sits beside its author's face. */
+.shell .surface .content .feed-card-top.feed-lead ~ * {
+  margin-left: 46px;
+}

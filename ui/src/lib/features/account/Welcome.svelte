@@ -5,6 +5,8 @@
   import { resolve } from '$app/paths';
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
 
+  import BackButton from '#lib/components/BackButton.svelte';
+
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
 
@@ -84,6 +86,8 @@
         <PhraseSignIn />
       {/if}
     </section>
+    <!-- Owner, 2026-11-14: the way back floats at the bottom, like every other back button. -->
+    <div class="ob-back"><BackButton /></div>
     <p class="keep-browsing">
       Just looking? <a href={resolve('/')}>Keep browsing without an account</a>
     </p>

@@ -82,6 +82,51 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## START HERE (2026-11-14, 8 pm Melbourne): where the owner's PC session stopped
+Two checkouts on the owner's PC: `app/` (branch `claude/creation-plans`) and `app-ux/` (a git
+worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app/target` and
+its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests
+at the same time. **Approved designs and the choice made on each are listed under "Approved
+designs" below; build them as drawn and do not redraw them.**
+1. **PR #156** (`claude/feed-activity-ux`): CI was running at 8 pm. Merge when green, smoke
+   live read-only (this PC session may not sign up on live; ask the owner to), update README
+   Status.
+2. Then `claude/ux-topbar-map`: `git rebase main`, open its PR; then `claude/ux-chats-profile`
+   the same way.
+3. **Not yet seen rendered (last commit on `claude/ux-chats-profile`, owner's notes of
+   2026-11-14 evening):** (a) a public feed row's title, text and actions indented under the
+   channel name (`styles/ux/feedrow.css`, last rule: check `.feed-actions` is indented too);
+   (b) sign-up's way back is the round floating back button at the bottom left
+   (`Welcome.svelte` `.ob-back`), the top bar shows the logo again; (c) chats "just like
+   Telegram": your bubble is a soft tint (`--chat-bubble-own-bg`) with the ordinary text
+   colour, others' are the panel colour on a faintly tinted log, and the pin bar is a flat
+   strip with a thin rail (`styles/ux/chat.css`, `messages.css`). **The owner saw dark text
+   on a dark green bubble: look at a direct chat, a group chat, a project chat and a pinned
+   message in light AND dark, and run `messages.mjs`, `chat.mjs`, `shell.mjs`,
+   `accounts.mjs`, `projects.mjs` before the PR.** To look: `bash scripts/build-happ.sh` in
+   `app-ux`, start the node there, `UX_SHOTS=<dir> bash scripts/e2e-local.sh tests/e2e/messages.mjs`.
+4. **Owner, 2026-11-14 evening: some built screens drifted from what was decided** (named:
+   the soft phase bars inside project and event details, the create (+) menu, Settings).
+   Settings is not built yet. For the other two, open the artifacts (Detail Page Mockups
+   https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop, Nav and Feed Mockups
+   https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd) beside screenshots of the built screens
+   and fix every difference; this session did not get to it.
+5. `claude/creation-plans` (in `app/`): see its own entry ("creation through plans").
+
+### Approved designs (owner's private artifacts; read with the Artifact tool)
+- Nav and Feed (74TJNbHMNYBmvHWSohaDbd), Detail Pages (2Svg4vucNtbCK9E7ZyNnop), Post Header
+  option A (UZFHQJuuozrxSRXd9xZ2qM): built (PRs #148 to #154); see item 4 above.
+- Feed Headers and Activity Phase (2qLuYLhBCfvducCwtwGhGp): all of the session's picks. PR #156.
+- Top Bar and Map (P5n4eg23ikHPXH8W1BH1Vp): as drawn, except the map: style A with search
+  behind a button; on desktop the panel capsule sits beside the logo. `claude/ux-topbar-map`.
+- Chats, Profile, Onboarding (RT6knfQXdtDeFzDDLj2hMu): as drawn, "Edit profile" allowed,
+  plus item 3's notes. `claude/ux-chats-profile`.
+- Remaining Screens (CxWVNQtVsXgGijjQNvJRBH): approved, **not built** (channel and community
+  headers, **Settings**, notifications, search, people lists, create flows, feedback).
+- Creating Through Plans (GekVi8swuWXaMr9eKeZ5Mv): approved; `claude/creation-plans`.
+- Plan, Phase and Feedback Screens (QKBwCRmbKwcTPzgFWhex6t): approved as drawn ("these designs
+  look amazing"), **not built**; **Convert must be added** to the phase sheet and built.
+
 ## In flight (UX) 2026-11-14: two more branches stacked on `claude/feed-activity-ux` (PR #156), pushed, no PRs yet
 **Order (owner): one PR per group, each from main after the one before merges.** When #156
 merges: `git rebase main` on `claude/ux-topbar-map`, open its PR; when that merges, the same

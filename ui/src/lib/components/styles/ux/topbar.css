@@ -146,26 +146,7 @@
   }
 }
 
-/* Sign-up and log-in: a labelled way back, and a plain link under the form. */
-.shell .topbar .back-to-feed {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 38px;
-  padding: 0 14px 0 8px;
-  border-radius: 999px;
-  background: var(--panel-hover);
-  color: var(--text-main);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-}
-
-.shell .topbar .back-icon {
-  width: 18px;
-  height: 18px;
-}
-
+/* Sign-up and log-in: a plain link under the form. */
 .shell .onboarding .keep-browsing {
   margin: 4px 0 0;
   color: var(--text-soft);

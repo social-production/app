@@ -201,3 +201,15 @@
   color: var(--text-soft);
   font-weight: 500;
 }
+
+/* The way back to the feed: the round floating back button, where the nav would be. */
+.shell .onboarding .ob-back {
+  position: fixed;
+  left: 16px;
+  bottom: calc(12px + var(--shell-safe-bottom, 0px));
+  z-index: 5;
+}
+
+.shell .onboarding .page {
+  padding-bottom: 96px;
+}
