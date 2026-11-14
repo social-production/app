@@ -27,7 +27,7 @@ const { ann, bob } = await signInFounders({ width: 390, height: 844 });
 
 await ann.goto(`${BASE}/create/project`);
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('An app that waters the beds.');
+await ann.getByLabel('What do you propose?').fill('An app that waters the beds.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });

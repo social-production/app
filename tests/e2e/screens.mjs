@@ -21,7 +21,7 @@ for (const [tag, viewport] of Object.entries(sizes)) {
   await page.goto(`${BASE}/create/project`);
   await shot(page, `${tag}-create-type`);
   await page.getByLabel('Title').fill(`Tool library (${tag})`);
-  await page.getByLabel('Proposal description').fill('Lend and borrow tools across the street.');
+  await page.getByLabel('What do you propose?').fill('Lend and borrow tools across the street.');
   await shot(page, `${tag}-create-basics`);
   await continueSteps(page, 3);
   await shot(page, `${tag}-create-overview`);

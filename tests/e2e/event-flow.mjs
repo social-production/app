@@ -18,24 +18,23 @@ export async function signInFounders(viewport) {
   return { ann, bob };
 }
 
-/** Founder one creates a public event and supports it; founder two joins and supports it.
- * Returns the event's URL. */
+/** Founder one proposes what becomes a public event once an event plan leads it out of its
+ * Plan phase (ADR 0059: public events start as typeless proposals) and supports it; founder
+ * two joins and supports it. Returns its URL. */
 export async function createEvent(ann, bob, title) {
   await ann.goto(BASE);
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
-  await ann.getByRole('menuitem', { name: /Event/ }).click();
-  await ann.getByLabel('Event title').fill(title);
-  await ann.getByLabel('Description').fill('Weed, mulch and share lunch.');
-  await continueSteps(ann, 4);
-  await ann.getByText("Set when members approve the event's plan").waitFor();
-  await ann.getByRole('button', { name: 'Publish event' }).click();
+  await ann.getByRole('menuitem', { name: /Proposal/ }).click();
+  await ann.getByLabel('Title').fill(title);
+  await ann.getByLabel('What do you propose?').fill('Weed, mulch and share lunch.');
+  await continueSteps(ann, 3);
+  await ann.getByRole('button', { name: 'Publish proposal' }).click();
   await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-  if (!/\/events\//.test(ann.url())) throw new Error(`not an event URL: ${ann.url()}`);
   const eventUrl = ann.url().split('?')[0];
   await ann.getByRole('button', { name: /^Support/ }).click();
   await bob.goto(eventUrl);
   await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-  await bob.getByRole('button', { name: 'Join event' }).click();
+  await bob.getByRole('button', { name: /^Join / }).click();
   await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
   await bob.getByRole('button', { name: /^Support/ }).click();
   await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');

@@ -101,7 +101,7 @@ await ann.getByRole('button', { name: `Follow cat${stamp}` }).click();
 await ann.getByRole('button', { name: `Unfollow cat${stamp}` }).waitFor({ timeout: 60_000 });
 await ann.goto(`${BASE}/create/project`);
 await ann.getByLabel('Title').fill(`Seed swap ${stamp}`);
-await ann.getByLabel('Proposal description').fill('Swap seeds in spring.');
+await ann.getByLabel('What do you propose?').fill('Swap seeds in spring.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: `Seed swap ${stamp}` }).waitFor({ timeout: 120_000 });

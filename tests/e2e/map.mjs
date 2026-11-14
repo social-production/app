@@ -20,15 +20,15 @@ const next = () => page.getByRole('button', { name: 'Continue' }).click();
 await page.getByRole('button', { name: 'Create', exact: true }).click();
 await page.getByRole('menuitem', { name: /Proposal/ }).click();
 await page.getByLabel('Title').fill(title);
-await page.getByLabel('Proposal description').fill('Tools near the map.');
+await page.getByLabel('What do you propose?').fill('Tools near the map.');
+await next(); // → Tags
+await tagTestChannel(page);
 await next(); // → Location
 await page.getByRole('radio', { name: /Physical/ }).check();
 await page.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
 const suggestion = page.locator('.location-picker .suggestions button').first();
 await suggestion.waitFor({ timeout: 30_000 });
 await suggestion.click();
-await next(); // → Scope
-await tagTestChannel(page);
 await next(); // → Overview
 await page.getByRole('button', { name: 'Publish proposal' }).click();
 await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });

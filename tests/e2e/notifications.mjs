@@ -54,7 +54,7 @@ log('both founders signed in');
 
 await ann.goto(`${BASE}/create/project`);
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('Swap seeds every spring.');
+await ann.getByLabel('What do you propose?').fill('Swap seeds every spring.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });

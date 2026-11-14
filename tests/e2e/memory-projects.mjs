@@ -22,7 +22,7 @@ for (let i = 0; i < count; i++) {
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
   await ann.getByRole('menuitem', { name: /Proposal/ }).click();
   await ann.getByLabel('Title').fill(`Memory ${stamp} ${i}`);
-  await ann.getByLabel('Proposal description').fill('Measuring the seed node.');
+  await ann.getByLabel('What do you propose?').fill('Measuring the seed node.');
   await continueSteps(ann, 3);
   await ann.getByRole('button', { name: 'Publish proposal' }).click();
   await ann.getByRole('heading', { name: `Memory ${stamp} ${i}` }).waitFor({ timeout: 180_000 });

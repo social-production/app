@@ -23,7 +23,7 @@ await ann.goto(`${BASE}/create/project`);
 await ann.getByRole('radio', { name: /Personal service/ }).click();
 await ann.getByRole('radio', { name: /Calendar booking/ }).click();
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('Beginner piano, one hour at a time.');
+await ann.getByLabel('What do you propose?').fill('Beginner piano, one hour at a time.');
 await continueSteps(ann, 3);
 await ann.locator('.overview-row', { hasText: /Personal service\s*· Calendar booking/ }).waitFor();
 await ann.getByRole('button', { name: 'Publish proposal' }).click();

@@ -28,7 +28,7 @@ async function createProject(page, name, tag) {
   await page.getByRole('button', { name: 'Create', exact: true }).click();
   await page.getByRole('menuitem', { name: /Proposal/ }).click();
   await page.getByLabel('Title').fill(name);
-  await page.getByLabel('Proposal description').fill('Share seeds between gardens.\n\nMore detail later.');
+  await page.getByLabel('What do you propose?').fill('Share seeds between gardens.\n\nMore detail later.');
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('radio', { name: /Online/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();

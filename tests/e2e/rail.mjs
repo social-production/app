@@ -22,7 +22,7 @@ async function create(page, title, personal) {
   await page.goto(`${BASE}/create/project`);
   if (personal) await page.getByRole('radio', { name: /Personal service/ }).click();
   await page.getByLabel('Title').fill(title);
-  await page.getByLabel('Proposal description').fill('Made by the rail test.');
+  await page.getByLabel('What do you propose?').fill('Made by the rail test.');
   await continueSteps(page, 3);
   await page.getByRole('button', { name: 'Publish proposal' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });

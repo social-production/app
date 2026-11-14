@@ -18,7 +18,7 @@ mkdirSync(shots, { recursive: true });
 await phraseSignIn(ann, one.phrase.split(' '));
 await ann.goto(`${BASE}/create/project`);
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('Fix bikes together on Saturdays.');
+await ann.getByLabel('What do you propose?').fill('Fix bikes together on Saturdays.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
@@ -35,8 +35,9 @@ await chip.click();
 await ann.getByRole('button', { name: /^Oppose/ }).waitFor();
 await chip.click();
 await ann.getByRole('button', { name: /^Oppose/ }).waitFor({ state: 'hidden' });
-assert.equal(await ann.locator('.context-panel .surface-type-label').innerText(), 'Productive');
-log('founder one created the project and supports it; the stance folds into a chip');
+// ADR 0059: a new proposal has no type until a plan leads it out of its Plan phase.
+assert.equal(await ann.locator('.context-panel .surface-type-label').innerText(), 'Proposal');
+log('founder one created the proposal and supports it; the stance folds into a chip');
 
 const bob = await device();
 await phraseSignIn(bob, two.phrase.split(' '));
@@ -148,10 +149,12 @@ log('a value was added and both founders rated it');
 
 await advance(ann);
 await voteYes(bob, 'Participation');
-await until(bob, () => bob.locator('.feed-card-stage', { hasText: 'Production Plan' }), 'the phase move');
-log('the project moved to Production Plan');
+const planStage = () => bob.locator('.feed-card-stage', { hasText: /^\s*Plan\s*$/ });
+await until(bob, planStage, 'the phase move');
+log('the proposal moved to its Plan phase');
 
-// M3b: a production plan, rated and approved by both, lets the project leave Production Plan.
+// M3b: a production plan, rated and approved by both, lets the proposal leave its Plan phase
+// as a productive project.
 const planTitle = `Saturday workshop ${stamp}`;
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
@@ -171,8 +174,9 @@ await wizard.getByRole('button', { name: 'Next' }).click(); // → review
 await wizard.getByRole('button', { name: 'Submit Production Plan' }).click();
 await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
 // ADR 0099: the phase strip is a progress line named underneath; a plan's approval is a bar.
-assert.equal(await ann.locator('.phase-context .position').innerText(), 'Phase 2 of 5');
-assert.equal(await ann.locator('.phase-context h2').innerText(), 'Production Plan');
+// A proposal shows the shortest path every type has (sp_governance visible_phases).
+assert.equal(await ann.locator('.phase-context .position').innerText(), 'Phase 2 of 4');
+assert.equal(await ann.locator('.phase-context h2').innerText(), 'Plan');
 assert.equal(await ann.locator('.plan-card', { hasText: planTitle }).locator('.plan-meter').count(), 1);
 log('founder one filed a production plan');
 
@@ -213,9 +217,10 @@ await ann.getByRole('tab', { name: 'Participation' }).click();
 await ann.screenshot({ path: `${shots}/take-part-plan-390.png` });
 await advance(ann);
 await voteYes(bob, 'Participation');
-const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: 'Production Plan' });
+const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: /^\s*(Plan|Proposal)\s*$/ });
 await until(bob, pastPlan, 'the move past the plan');
-log('the approved plan let the project leave Production Plan');
+assert.equal(await bob.locator('.context-panel .surface-type-label').innerText(), 'Productive');
+log('the approved production plan made it a productive project as it left the Plan phase');
 
 // M3c: web's Phase menu → Return to an earlier phase; the other founder's vote sends it back.
 await ann.reload();
@@ -229,15 +234,15 @@ await returning.waitFor({ state: 'hidden', timeout: 60_000 });
 // Proposing a return is not a Yes (as on web), so both founders vote.
 await voteYes(bob, 'Participation');
 await voteYes(ann, 'Participation');
-const backToPlan = () => bob.locator('.feed-card-stage', { hasText: 'Production Plan' });
-await until(bob, backToPlan, 'the return to Production Plan');
-log('a return to Production Plan passed');
+// A return to the Plan phase reopens the type (ADR 0059).
+await until(bob, planStage, 'the return to the Plan phase');
+log('a return to the Plan phase passed');
 
 // web's History tab (`?tab=history`): every decision in one timeline, resolved ones under
 // Resolutions.
 const historyUrl = `${bob.url().split('?')[0]}?tab=history`;
 const resolutions = bob.locator('.history-group', { hasText: 'Resolutions' });
-for (const label of ['Edit decision', 'Update decision', 'Return to Production Plan', `Production plan · ${planTitle}`]) {
+for (const label of ['Edit decision', 'Update decision', 'Return to Plan', `Production plan · ${planTitle}`]) {
   for (let i = 0; ; i++) {
     await bob.goto(historyUrl);
     const card = resolutions.getByRole('button', { name: `${label}, Approved` }).first();
@@ -245,13 +250,14 @@ for (const label of ['Edit decision', 'Update decision', 'Return to Production P
     if (i >= 10) throw new Error(`History never listed ${label}`);
   }
 }
-await resolutions.getByRole('button', { name: 'Return to Production Plan, Approved' }).click();
-const decided = bob.getByRole('dialog', { name: 'Return to Production Plan' });
+await resolutions.getByRole('button', { name: 'Return to Plan, Approved' }).click();
+const decided = bob.getByRole('dialog', { name: 'Return to Plan' });
 await decided.getByText('The plan needs another look.').waitFor();
 // A decided return moved from the stage it left, not from today's stage.
 const outcome = await decided.locator('.outcome').innerText();
-assert.match(outcome, /to Production Plan\.$/);
-assert.doesNotMatch(outcome, /from Production Plan to/, outcome);
+// The return reopened the type (ADR 0059), so the stage it went back to reads "Plan".
+assert.match(outcome, /to Plan\.$/);
+assert.doesNotMatch(outcome, /from Plan to/, outcome);
 assert.equal(await decided.getByRole('button', { name: 'Yes', exact: true }).count(), 0, 'decided: no vote');
 await bob.screenshot({ path: `${shots}/history-390.png` });
 await decided.getByRole('button', { name: 'Close' }).click();

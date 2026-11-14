@@ -23,7 +23,7 @@ const activity = `Saturday repairs ${stamp}`;
 
 const { ann, bob: voter } = await signInFounders(phone);
 const projectUrl = await createEvent(ann, voter, title);
-await advanceTo(ann, voter, 'Event Plan');
+await advanceTo(ann, voter, 'Plan');
 const planTitle = `Repair fortnight ${stamp}`;
 const range = [daysFromNow(0), daysFromNow(14)];
 await filePlan(ann, { title: planTitle, range, start: '00:00', finish: '23:59', place: 'The shed' });
