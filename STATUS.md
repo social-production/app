@@ -97,18 +97,30 @@ designs" below; build them as drawn and do not redraw them.**
    Status.
 2. Then `claude/ux-topbar-map`: `git rebase main`, open its PR; then `claude/ux-chats-profile`
    the same way.
-3. **Not yet seen rendered (last commit on `claude/ux-chats-profile`, owner's notes of
-   2026-11-14 evening):** (a) a public feed row's title, text and actions indented under the
-   channel name (`styles/ux/feedrow.css`, last rule: check `.feed-actions` is indented too);
-   (b) sign-up's way back is the round floating back button at the bottom left
-   (`Welcome.svelte` `.ob-back`), the top bar shows the logo again; (c) chats "just like
-   Telegram": your bubble is a soft tint (`--chat-bubble-own-bg`) with the ordinary text
-   colour, others' are the panel colour on a faintly tinted log, and the pin bar is a flat
-   strip with a thin rail (`styles/ux/chat.css`, `messages.css`). **The owner saw dark text
-   on a dark green bubble: look at a direct chat, a group chat, a project chat and a pinned
-   message in light AND dark, and run `messages.mjs`, `chat.mjs`, `shell.mjs`,
-   `accounts.mjs`, `projects.mjs` before the PR.** To look: `bash scripts/build-happ.sh` in
-   `app-ux`, start the node there, `UX_SHOTS=<dir> bash scripts/e2e-local.sh tests/e2e/messages.mjs`.
+3. **`claude/ux-chats-profile`, seen rendered 2026-11-14 9 pm (390px; chats and the pin
+   bar in light and dark):** public feed rows indented under the channel name (design A's
+   header: glyph square, channel in bold, "type · phase · clock"); sign-up's way back is the
+   round floating back button at the bottom left; chats like Telegram (your bubble a soft
+   tint with the ordinary text colour, others' grey, **no tinted chat background**: owner);
+   the pin bar as a flat strip with a thin rail; the New message and Chat info sheets
+   (`styles/ux/sheets.css`, which also gives **every sheet** a round close button and a pill
+   action in its footer); Settings as grouped rows (`styles/ux/settings.css`, **CSS only:
+   rows do not yet show their value and open a small sheet as drawn**); Notifications
+   (`styles/ux/notifications.css`, not looked at yet).
+   **Lesson: an `@import` after any rule in a CSS file is ignored.** Splitting `feed.css`
+   that way dropped the whole row header for one commit; `feedrow.css` is imported from
+   `index.css`.
+   Browser tests **passed** on this branch tonight: `accounts`, `messages` (light and dark),
+   `chat` (light and dark), `group-options` (pinning; light and dark), `shell`, `projects`,
+   `follows`, `threads`, `governance`. `group-options` then failed once with the New message
+   sheet stuck on "Sending…" (a new group chat can take minutes on a fresh node: STATUS
+   2026-11-10); rerun it. **Not re-shot after the last footer fix:** a sheet's footer (round
+   close, padded pill). Still to look at: the sheet footers across the app (filters, votes,
+   wizards), the "Messages" heading on phones (still hidden), Settings in dark.
+   `tests/e2e/lib.mjs`: `UX_SCHEME=dark` runs every device in the dark theme.
+   Remaining Screens still to build: create flows (progress line, floating Continue),
+   channel / community / Platform header, Links and History tabs as soft cards, Search
+   (chips), People rows, Feedback, and Settings' row-and-sheet behaviour.
 4. **Owner, 2026-11-14 evening: some built screens drifted from what was decided** (named:
    the soft phase bars inside project and event details, the create (+) menu, Settings).
    Settings is not built yet. For the other two, open the artifacts (Detail Page Mockups

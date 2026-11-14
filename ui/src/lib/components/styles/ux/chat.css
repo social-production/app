@@ -1,18 +1,14 @@
 /* Chat bubbles and the message bar (owner approved 2026-11-13): rounded bubbles, yours in
    green on the right, a link to something in the app as a card, and long words and links
    wrapping inside the bubble. Overrides of the ported chat.css. */
-.shell .chat-panel .chat-log {
-  background: color-mix(in srgb, var(--brand-soft) 30%, var(--page-bg));
-}
-
 .shell .chat-panel .message-copy {
   max-width: min(78%, 34rem);
   padding: 7px 12px 6px;
   border: none;
   border-radius: 18px 18px 18px 6px;
-  background: var(--panel);
+  /* Grey on the page's own background (owner, 2026-11-14: no tinted chat background). */
+  background: var(--panel-hover);
   color: var(--text-main);
-  box-shadow: 0 1px 1px rgb(0 0 0 / 0.08);
 }
 
 /* Yours: a soft tint of the brand colour with the ordinary text colour, so it reads in

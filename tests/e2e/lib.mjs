@@ -18,7 +18,11 @@ export const errors = [];
 
 /** A fresh browser profile; `passkeys` adds a device passkey store (virtual authenticator). */
 export async function device({ passkeys = false, viewport } = {}) {
-  const context = await browser.newContext(viewport ? { viewport } : {});
+  // UX_SCHEME=dark: every device in the dark theme, for reviewing screenshots.
+  const context = await browser.newContext({
+    ...(viewport ? { viewport } : {}),
+    ...(process.env.UX_SCHEME ? { colorScheme: process.env.UX_SCHEME } : {}),
+  });
   const page = await context.newPage();
   const cdp = await context.newCDPSession(page);
   await cdp.send('WebAuthn.enable');
