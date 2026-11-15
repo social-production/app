@@ -89,9 +89,9 @@ export const aboutHow: Block[] = [
   {
     title: 'From idea to activity',
     paragraphs: [
-      'Every project starts as a proposal. While it collects signals, members add and rate the values it should keep to. Once at least 66% of the signals are Demand, members can vote to move on to planning: a production plan and a distribution plan for a productive project, an operations plan and an access plan for a collective service. Members can write competing plans, assess them against the agreed values and vote; the plan that leads is the one carried out.',
+      'Every project starts as a proposal. While it collects signals, members add and rate the values it should keep to. Once at least 66% of the signals are Demand, members can vote to move on to planning: a production plan and a distribution plan for a project, an operations plan and an access plan for a service. Members can write competing plans, assess them against the agreed values and vote; the plan that leads is the one carried out.',
       'In the Activity phase the plan becomes dated activities with roles. People sign up for roles, the activity goes ahead once its roles are filled, and afterwards the people who took part check in and rate how it went.',
-      'Alongside projects there are events, help requests (for one-off help with a time and roles), personal and collective services that people can request, and channels and communities for discussion.',
+      'Alongside projects there are events, help requests (for one-off help with a time and roles), services that people can request, and channels and communities for discussion.',
     ],
   },
 ];

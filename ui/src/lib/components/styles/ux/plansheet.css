@@ -420,3 +420,7 @@
   color: var(--danger);
   font-size: 13.5px;
 }
+
+.overlay-root.phase-move-sheet .overlay-body {
+  padding-inline: 18px;
+}

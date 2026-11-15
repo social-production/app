@@ -168,3 +168,18 @@
   display: grid;
   gap: 14px;
 }
+
+.value-sheet .add-value-form input {
+  min-height: 50px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.value-sheet .add-value-form input:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+}
