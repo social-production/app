@@ -80,7 +80,8 @@ impl Shape<'_> {
     }
 }
 
-/// web's `display_stage_label`.
+/// web's `display_stage_label`, except that the first plan phase reads just "Plan" for every
+/// type (owner, 2026-11-15).
 #[must_use]
 pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
     let phase = phase.effective();
@@ -90,7 +91,7 @@ pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
             _ => "Plan",
         },
         EVENT => match phase {
-            Phase::P2 => "Event Plan",
+            Phase::P2 => "Plan",
             Phase::P5 => "Activity",
             Phase::P7 => "Closed",
             _ => "Proposal",
@@ -103,14 +104,14 @@ pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
             }
         }
         "collective-service" => match phase {
-            Phase::P2 => "Operations Plan",
+            Phase::P2 => "Plan",
             Phase::P3 => "Access Plan",
             Phase::P5 => "Activity",
             Phase::P7 => "Closed",
             _ => "Proposal",
         },
         _ => match phase {
-            Phase::P2 => "Production Plan",
+            Phase::P2 => "Plan",
             Phase::P3 => "Distribution Plan",
             Phase::P5 => "Activity",
             Phase::P7 => "Closed",
@@ -203,7 +204,7 @@ mod tests {
 
     #[test]
     fn events_follow_webs_event_lifecycle() {
-        assert_eq!(stage_label(EVENT_SHAPE, P2), "Event Plan");
+        assert_eq!(stage_label(EVENT_SHAPE, P2), "Plan");
         assert_eq!(stage_label(EVENT_SHAPE, P5), "Activity");
         assert_eq!(visible_phases(EVENT_SHAPE, P1), vec![P1, P2, P5, P7]);
         assert_eq!(next_phase(EVENT_SHAPE, P1), Some(P2));
@@ -213,10 +214,10 @@ mod tests {
     }
 
     #[test]
-    fn labels_match_web() {
-        assert_eq!(stage_label(PRODUCTIVE, P2), "Production Plan");
+    fn labels_match_web_but_the_first_plan_phase_is_plain() {
+        assert_eq!(stage_label(PRODUCTIVE, P2), "Plan");
         assert_eq!(stage_label(PRODUCTIVE, P4), "Distribution Plan");
-        assert_eq!(stage_label(COLLECTIVE, P2), "Operations Plan");
+        assert_eq!(stage_label(COLLECTIVE, P2), "Plan");
         assert_eq!(stage_label(COLLECTIVE, P6), "Activity");
         assert_eq!(stage_label(PERSONAL, P1), "Activity");
         assert_eq!(stage_label(PERSONAL, P2), "Closed");

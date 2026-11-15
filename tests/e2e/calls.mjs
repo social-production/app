@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, device, errors, log, messageFromProfile, signUp } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -38,10 +38,7 @@ const bobKey = (await key.innerText()).trim();
 log('two accounts signed up');
 
 await ann.goto(`${BASE}/profile/${bobKey}`);
-await ann.getByRole('button', { name: `Message ${bobName}` }).click({ timeout: 120_000 });
-await ann.getByPlaceholder('Write a message…').fill(hello);
-await ann.getByRole('dialog').getByRole('button', { name: 'Send' }).click();
-await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
+await messageFromProfile(ann, bobName, hello);
 const chatUrl = ann.url();
 log('ann messaged bob');
 

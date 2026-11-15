@@ -125,15 +125,15 @@ export const PLAN_MAKES: {
     value: 'Production',
     mode: 'productive',
     label: 'Production plan',
-    summary: 'Build or produce something new. Makes this a productive project.',
-    makes: 'a productive project',
+    summary: 'Build or produce something new. Makes this a project.',
+    makes: 'a project',
   },
   {
     value: 'Organisation',
     mode: 'collective-service',
     label: 'Operations plan',
-    summary: 'Run or maintain something in use. Makes this a collective service.',
-    makes: 'a collective service',
+    summary: 'Run or maintain something in use. Makes this a service.',
+    makes: 'a service',
   },
   {
     value: 'Event',
@@ -144,7 +144,7 @@ export const PLAN_MAKES: {
   },
 ];
 
-/** "Production plan · makes this a productive project", for a plan on a proposal. */
+/** "Production plan · makes this a project", for a plan on a proposal. */
 export function planMakesLine(kind: PlanKind): string | null {
   const made = PLAN_MAKES.find((m) => m.value === kind);
   return made ? `${made.label} · makes this ${made.makes}` : null;
