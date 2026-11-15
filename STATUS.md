@@ -82,6 +82,28 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## Design artifacts (owner's mockups, newest first; add every new one here)
+The owner's list of 2026-11-15. They are references, not gospel: the built screens have moved
+on since, and later owner answers in this file win. Read them with the Artifact tool
+(`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
+frames under `project/*.dc.html`).
+1. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
+   https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
+2. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
+   https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t
+3. Top Bar and Map Redesign (approved but the map filters; `claude/ux-topbar-map`):
+   https://claude.ai/artifact/P5n4eg23ikHPXH8W1BH1Vp
+4. Feed Headers and Activity Phase (all picks, PR #156): https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp
+5. Creating Through Plans (approved; "Proposal"): https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv
+6. Remaining Screens (approved, built on `claude/ux-remaining-screens`):
+   https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH
+7. Chats, Profile, Onboarding (approved, `claude/ux-chats-profile`):
+   https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu
+8. https://claude.ai/artifact/VRsK1VYCpRrb97Dfeodo4a (in the owner's list; not yet described here)
+9. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
+10. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
+11. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+
 ## START HERE (2026-11-15 afternoon, owner's PC session): the UX build list, three branches
 Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
 this order, once creation-plans is on main; merge main in first):
