@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-15 morning Melbourne by a cloud session; start at "START HERE (2026-11-15)")
+# Status: where the P2P app stands (updated 2026-11-16 12:30 am Melbourne by a cloud session; start at "START HERE (2026-11-15)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -101,13 +101,14 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
 2. **PR #157 merged** 10:10 UTC Nov 15 (9:10 pm Melbourne): top bar, map capsule, About,
    sign-up helpers (UI only).
-3. **PR #159** (`claude/ux-chats-profile`, main merged in, no rebase) is open; merge when
-   green. Its sign-up keeps the floating back button (it replaces #157's "Back to feed").
-4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
-   #156's fix; merge main into it, open its PR, merge when green. **It resets the project
-   network on merge** (owner approved). After the deploy: `/readyz` shows a new project
-   hash; directory and conversation must be unchanged.
-5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+3. **PR #159 merged** 12:01 UTC Nov 15 (11:01 pm Melbourne): messages, chats, profiles,
+   sign-up, Settings rows (UI only). Its sign-up keeps the floating back button.
+4. **PR #160 merged** 13:21 UTC Nov 15 (12:21 am Nov 16 Melbourne): `claude/creation-plans`,
+   ADR 0059 stage A. **The project network was reset** (owner approved); directory and
+   conversation keep their networks. Expected project hash after the deploy:
+   `uhC0kNYqoKdcoI2u8vn7Pywpp8HOXVGDrzlzlq14qPuxRjh89iDF-` (see "After #160's deploy" below).
+   All UX branches are merged: **new UX work branches from `main`.**
+5. Docs PR #152 merged 2026-11-14.
    **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
    17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
    rerun passed). #156 fixed the sign-up half (`set_profile`). The rest: the profile page
