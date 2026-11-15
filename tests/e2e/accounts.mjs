@@ -20,16 +20,19 @@ assert.equal(await a.getByText('Save a passkey').count(), 0, 'no passkey offer w
 const annKey = await keyOf(a);
 
 await open(a, 'Settings');
-await a.getByLabel('Home area').fill('Brisbane, QLD');
-// A profile photo (a 4×4 PNG made here); the app resizes it before saving.
+// Each profile field is a row that opens a small sheet (ADR 0105).
+await a.getByRole('button', { name: /^Home area:/ }).click();
+await a.getByRole('textbox', { name: 'Home area' }).fill('Brisbane, QLD');
+await a.getByRole('button', { name: 'Save profile' }).click();
+await a.getByText('Saved.').waitFor({ timeout: 60_000 });
+await a.getByRole('button', { name: 'Home area: Brisbane, QLD' }).waitFor();
+// A profile photo (a 4×4 PNG made here); the app resizes it and saves it at once.
 await a.locator('#settings-profile input[type=file]').setInputFiles({
   name: 'me.png',
   mimeType: 'image/png',
   buffer: tinyPng(),
 });
-await a.getByText(/Picture resized/).waitFor({ timeout: 30_000 });
-await a.getByRole('button', { name: 'Save profile' }).click();
-await a.getByText('Saved.').waitFor({ timeout: 60_000 });
+await a.getByText(/Picture resized.*Saved\./).waitFor({ timeout: 60_000 });
 await a.reload();
 await signedIn(a);
 log('profile saved; reload kept the session');

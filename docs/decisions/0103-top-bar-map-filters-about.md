@@ -14,8 +14,9 @@ No feature is added or removed, except the two small sign-up helpers below.
 
 - **Top bar.** At every width: the logo, a search field you can type in at once (a soft
   pill; the phone's "open search" button is gone), and Networks, Map and Activity together
-  in one soft capsule whose open button lifts to the panel colour. Desktop keeps Home,
-  Notifications, Messages, About, the profile and Settings beside them.
+  in one soft capsule whose open button lifts to the panel colour. On desktop the capsule
+  sits beside the logo, apart from Home, Notifications and Messages (owner, 2026-11-14:
+  mixed together they read as one group); About, the profile and Settings stay at the right.
 - **Map filters (phones and fullscreen).** One capsule over the top of the map: a search
   button, the distance, "Upcoming" as an on/off chip with its word, and "Filters". Search
   opens a second bar under the capsule (the place field and "Use my location") only when

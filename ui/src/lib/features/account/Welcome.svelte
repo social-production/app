@@ -3,6 +3,9 @@
   import { explain } from '#lib/services/errors.ts';
 
   import { resolve } from '$app/paths';
+  import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
+
+  import BackButton from '#lib/components/BackButton.svelte';
 
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
@@ -48,16 +51,13 @@
 
 <div class="onboarding">
   <section class="page">
-    <section class="hero-card">
-      <h1>Sign in or create an account</h1>
-      <p>Sign in to post, follow people, and create projects, threads, and events.</p>
-    </section>
+    <header class="ob-head">
+      <span class="ob-logo"><img alt="" src={brandIcon} /></span>
+      <h1>Join Social Production</h1>
+      <p>Organise useful work with the people around you.</p>
+    </header>
 
     <section class="panel">
-      <p class="mode-hint">
-        Choose <strong>Sign up</strong> for a new account, or <strong>Log in</strong> if you already have
-        one.
-      </p>
       <div class="choice-row" role="tablist" aria-label="Account mode">
         {#each modes as option (option.value)}
           <button
@@ -86,6 +86,8 @@
         <PhraseSignIn />
       {/if}
     </section>
+    <!-- Owner, 2026-11-14: the way back floats at the bottom, like every other back button. -->
+    <div class="ob-back"><BackButton /></div>
     <p class="keep-browsing">
       Just looking? <a href={resolve('/')}>Keep browsing without an account</a>
     </p>

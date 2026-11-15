@@ -45,17 +45,11 @@
 </script>
 
 <header class="topbar" class:topbar-compact={p.compact} class:chrome-collapsed={p.collapsed}>
-  {#if p.auth}
-    <!-- Sign-up and log-in: the way back to the feed says so (ADR 0103). -->
-    <a class="back-to-feed" href={resolve('/')}>
-      <SvgGlyph name="chevron-left" className="back-icon" /><span>Back to feed</span>
-    </a>
-  {:else}
-    <a class="brand" href={resolve('/')} aria-label="Social Production home">
-      <span class="brand-mark"><img alt="" class="brand-icon" src={brandIcon} /></span>
-      <span><strong>Social Production</strong></span>
-    </a>
-
+  <a class="brand" href={resolve('/')} aria-label="Social Production home">
+    <span class="brand-mark"><img alt="" class="brand-icon" src={brandIcon} /></span>
+    <span><strong>Social Production</strong></span>
+  </a>
+  {#if !p.auth}
     <div class="panel-controls">
       <button
         aria-label="Open networks"
