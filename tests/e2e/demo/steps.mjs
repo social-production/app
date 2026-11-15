@@ -73,7 +73,7 @@ const stage = (page) => page.locator('.feed-card-stage').first();
 export async function advancePast(ann, bob, from) {
   await advance(ann);
   await voteYes(bob);
-  const moved = () => bob.locator('.feed-card-stage').filter({ hasNotText: from });
+  const moved = () => bob.locator('.feed-card-stage').filter({ hasNotText: new RegExp(`^\\s*${from}\\s*$`) });
   await until(bob, moved, `a stage after ${from}`);
   return (await stage(bob).innerText()).trim();
 }
