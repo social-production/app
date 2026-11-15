@@ -113,6 +113,7 @@ try {
   await page.locator(".project-detail h1").waitFor({ timeout: 120_000 });
   await shot("detail");
   for (const tab of ["Participation", "Links", "History"]) {
+    // The Participation tab reads "Take part" on a phone; its name stays Participation.
     await page.getByRole("tab", { name: tab }).click();
     await page.waitForTimeout(2500);
     await shot(`detail-${tab.toLowerCase().replace(" ", "-")}`);
