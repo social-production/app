@@ -11,13 +11,16 @@ cd "$(dirname "$0")/.."
 shard=${1:-0}
 shards=${2:-1}
 
-# Minutes per file on CI's runners (PR #75, 2026-10-30). Update when a file's time changes a lot.
+# Minutes per file on CI's runners. Measured on PR #158 (2026-11-15) where a file ran there,
+# else PR #75 (2026-10-30). Update when a file's time changes a lot: a shard over CI's
+# two-hour limit is cancelled mid-file (shard 5 lost service_requests that way, 2026-11-14).
 declare -A minutes=(
-  [governance]=45 [private_events]=50 [activities]=30 [discussion]=27 [plans]=27
-  [scopes]=25 [projects]=22 [identity]=21 [health]=21 [groups]=18 [events]=14
-  [follows]=12 [values]=11 [challenges]=11 [links]=9 [help_requests]=9 [attachments]=9
-  [messages]=8 [reverts]=7 [receipts]=6 [calls]=5 [feedback]=3 [scale]=0
-  [reports]=23 [bot_reviews]=10 [chat_reports]=10 [proposals]=12
+  [private_events]=63 [scopes]=55 [reports]=43 [service_requests]=40 [governance]=31
+  [threads]=31 [activities]=30 [plans]=28 [challenges]=22 [values]=22 [collective_bookings]=22
+  [identity]=21 [health]=21 [discussion]=20 [groups]=18 [chat_reports]=17 [projects]=15
+  [events]=14 [reverts]=14 [places]=14 [follows]=12 [proposals]=12 [bot_reviews]=10
+  [links]=10 [software]=10 [help_requests]=9 [attachments]=9 [messages]=8 [calls]=5
+  [feedback]=5 [receipts]=4 [scale]=0
 )
 NEW_FILE_MINUTES=15
 
