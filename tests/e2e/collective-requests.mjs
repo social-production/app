@@ -172,8 +172,8 @@ const activityRow = () => rail(ann).locator('.activity-row', { hasText: ask });
 await railShows(ann, activityRow, 'the planned activity', 30_000);
 await activityRow().locator('.activity-open-button').click();
 const sheet = ann.getByRole('dialog', { name: ask });
-await sheet.getByRole('button', { name: 'Take role' }).click();
-await sheet.getByRole('button', { name: 'Leave role' }).waitFor({ timeout: 60_000 });
+await sheet.getByRole('button', { name: 'Join', exact: true }).click();
+await sheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
 log('ann took the Service lead role from her rail');
 
 assert.deepEqual(errors, [], `page errors: ${errors.join('\n')}`);

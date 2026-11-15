@@ -77,18 +77,17 @@ export const minimumOf = (a: Activity): number => a.roles.reduce((n, r) => n + r
 export const committedOf = (a: Activity): number =>
   a.roles.reduce((n, r) => n + r.people.length, 0);
 
-/** web's "Take role" / "Leave role" / "Role full". */
-export function roleButton(role: ActivityRole, mine: boolean): string {
-  if (mine) return 'Leave role';
-  return role.maximum === null || role.people.length < role.maximum ? 'Take role' : 'Role full';
+/** A role's pill (Feed Headers and Activity Phase §3, as a help request's): "Join", "Leave",
+ * or "Full" once every place is taken. */
+export function roleButton(role: ActivityRole, mine: boolean): 'Join' | 'Leave' | 'Full' {
+  if (mine) return 'Leave';
+  return role.maximum === null || role.people.length < role.maximum ? 'Join' : 'Full';
 }
 
-/** web's `roleCapacity`: "0 of 2 filled · 1 more needed". */
-export function roleCapacity(role: ActivityRole): string {
-  const capacity = role.maximum ?? role.required;
-  const short = Math.max(0, role.required - role.people.length);
-  const filled = `${role.people.length} of ${capacity} filled`;
-  return short > 0 ? `${filled} · ${short} more needed` : filled;
+/** A role's line under its name: "Mika, Jo · 2 of 2", or "0 of 2" while nobody is in. */
+export function roleLine(role: ActivityRole, nameOf: (agent: string) => string): string {
+  const count = `${role.people.length} of ${role.maximum ?? role.required}`;
+  return role.people.length ? `${role.people.map(nameOf).join(', ')} · ${count}` : count;
 }
 
 /** web's agenda chip (CollapsibleActivityCard `fillChipLabel` / `fillChipTone`). */

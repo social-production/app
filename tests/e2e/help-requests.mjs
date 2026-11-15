@@ -151,7 +151,7 @@ for (let i = 0; ; i++) {
   if (i >= 40) throw new Error('the share never reached the helper');
 }
 await shared.first().getByText(title).waitFor();
-await shared.first().getByText('Help request', { exact: true }).waitFor();
+assert.match(await shared.first().locator('.note-by').innerText(), /^Help request · /);
 await shared.first().click();
 await helper.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);

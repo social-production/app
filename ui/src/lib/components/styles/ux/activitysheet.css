@@ -31,25 +31,88 @@
   text-transform: none;
 }
 
+.activity-ui.activity-ui .activity-note {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Roles: rows split by a hairline, who is in on one line, the actions as pills. */
 .activity-ui.activity-ui .role-list {
+  display: grid;
+  gap: 0;
   border-top: none;
 }
 
-.activity-ui.activity-ui .signup {
+.activity-ui.activity-ui .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+  border: none;
+  background: none;
+}
+
+.activity-ui.activity-ui .role-bar + .role-bar {
+  border-top: 1px solid var(--panel-border);
+}
+
+.activity-ui.activity-ui .role-copy {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.activity-ui.activity-ui .role-copy strong {
+  font-size: 14.5px;
+}
+
+.activity-ui.activity-ui .role-copy > span {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  overflow-wrap: anywhere;
+}
+
+.activity-ui.activity-ui .role-copy input {
+  margin-top: 6px;
+}
+
+.activity-ui.activity-ui .signup,
+.activity-ui.activity-ui .role-suggest {
+  flex: none;
   min-width: 0;
   min-height: 34px;
   padding: 0 16px;
+  border: none;
   border-radius: 999px;
-  color: var(--on-brand);
+  font: inherit;
   font-size: 13px;
   font-weight: 700;
+  cursor: pointer;
 }
 
-.activity-ui.activity-ui .signup.selected,
-.activity-ui.activity-ui .signup:disabled {
+.activity-ui.activity-ui .signup {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.activity-ui.activity-ui .role-suggest,
+.activity-ui.activity-ui .signup.selected {
   background: var(--panel-hover);
   color: var(--text-main);
   box-shadow: none;
+}
+
+.activity-ui.activity-ui .role-full {
+  flex: none;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 700;
 }
 
 .activity-ui.activity-ui .role-copy .text-button {
