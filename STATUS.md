@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-15 morning Melbourne by a cloud session; start at "START HERE (2026-11-15)")
+# Status: where the P2P app stands (updated 2026-11-15 evening Melbourne by the owner's PC session; start at "START HERE (2026-11-15 afternoon)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -169,11 +169,36 @@ this order, once creation-plans is on main; merge main in first):
      internal mode id (renaming it would be a reset for nothing visible).
    - Notifications rebuilt as drawn (Remaining Screens §2): round type icon, one bold line,
      time, a green dot that marks it read.
-   - **Mockups waiting for the owner:** Invites, a help request, software Take part and a pull
-     request (https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV). Build them once approved.
-**Still to do:** Convert (ADR 0106, needs the owner's answers and a project reset); check the
-activity phase and About against their mockups; README Status. The create menu and the Take part phase line were
-compared with their mockups and already match (menu items follow Creating Through Plans).
+   - Invites, a help request (Asked by, place row, roles "N of M filled" with Join), software
+     Take part and a pull request: built as drawn (https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV,
+     approved). A proposal's Details copies the request's header (`ux/feedrow.css`).
+   - **Convert built (ADR 0106, accepted; project network reset, owner OK'd).** A "Convert to
+     a new proposal" move on the phase sheet (not events, not in Proposal or Closed; a reason
+     is required). Passing closes the project (`Applied.converted`) and its Take part offers
+     "Start the new proposal" (`/create?continues=<id>`); the new proposal and the old one
+     link each other (`LinkTypes::Lineage`, extern `link_lineage`, `ProjectView.lineage`):
+     "Continues the work of" on Details, "Where the work continues" on the closed page.
+     Members join the new one themselves; the old chat stays. **New project hash
+     `uhC0kQTrPUR3ws7xm6TdriTNccbjgmKVnxdjhGyr_jpvreXjIaYly`** (directory as above,
+     conversation unchanged). Scenarios `convert`, `feedback_comments`, `reverts` passed.
+   - An opened activity drawn as approved (Feed Headers and Activity Phase §3): no section
+     headings, one row per role ("Mika, Jo · 2 of 2"), Join / Leave / Full / Suggest pills
+     (`domain/activities.ts` `roleButton`, `roleLine`). The agenda, week strip, faces and
+     Past tab already matched. About already follows Feedback's type and segmented control.
+   - A closed proposal's phase reads "Closed" (`stage_label`; no DNA hash moved, checked).
+     Notifications gets an empty state.
+   - New browser test `tests/e2e/convert.mjs` (one founder: support, advance, convert, start
+     the new proposal, both links).
+   - **Browser tests on the new hApp, all passed:** `accounts`, `governance`, `help-requests`,
+     `software`, `guests`, `activities`, `collective-requests`, `convert`, `ux-review`
+     (screens looked at in light and dark: closed page, phase sheet with Convert, About,
+     Invites, Notifications, Feedback, activity sheet). **Not run on this branch yet:**
+     `private-events`, `closed-communities`, `platform`, `map`, `region`, `links`,
+     `mentions`, `group-options`, `attachments`, `calls`, `events`, `discover`.
+**Still to do:** run the tests listed above; open the PRs in order
+(labels, new-message, remaining-screens, plan-screens) once creation-plans is on main. The
+create menu and the Take part phase line already match their mockups. README Status
+changes when these merge (it lists what is live).
 
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
 **Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the
