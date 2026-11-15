@@ -22,7 +22,14 @@ async function part(name, run) {
     log(`✓ ${name} (${Math.round((Date.now() - start) / 1000)} s)`);
   } catch (e) {
     failed.push(name);
-    log(`✗ ${name}: ${String(e?.message ?? e).split('\n')[0]}`);
+    const where = String(e?.stack ?? '')
+      .split('\n')
+      .filter((l) => l.includes('/e2e/demo'))
+      .map((l) => l.trim().replace(/^at .*\/e2e\//, ''))
+      .slice(0, 3)
+      .join(' < ');
+    log(`✗ ${name}: ${String(e?.message ?? e).split('\n')[0]} [${where}]`);
+    if (process.env.DEMO_SHOTS) await ann.screenshot({ path: `${process.env.DEMO_SHOTS}/${name.replace(/\W+/g, '-')}.png` }).catch(() => {});
   }
 }
 
