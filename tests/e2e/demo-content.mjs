@@ -29,7 +29,7 @@ async function part(name, run) {
 const { ann, bob } = await signInFounders(phone);
 // The seed allows 5 sign-ups or restores per network a day; the founders' first log-ins after
 // a fresh seed are restores, which leaves three.
-const names = ['maya_k', 'tomas.b', 'priya_r'];
+const names = ['maya_k', 'tomas_b', 'priya_r'];
 const people = {};
 const accounts = [];
 for (const name of names) {
