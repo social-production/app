@@ -52,8 +52,7 @@
   <section class="closed-summary">
     <div class="closed-banner">
       <span class="closed-chip"
-        >Closed{#if closing}
-          · {when}{/if}</span
+        >Closed{#if closing}{` · ${when}`}{/if}</span
       >
       <strong>This {noun} has finished</strong>
       {#if closing}
@@ -76,7 +75,6 @@
           <span><small>Where the work continues</small>Its new proposal</span>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
         </a>
-        <!-- eslint-enable svelte/no-navigation-without-resolve -->
       {:else if lineage?.converted && project.amMember}
         <!-- eslint-disable svelte/no-navigation-without-resolve -- built from resolve() -->
         <a
@@ -86,6 +84,7 @@
           <span><small>Converted</small>Start the new proposal</span>
           <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
         </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
       {/if}
       <button type="button" onclick={onActivity}>
         <span><small>Past activity</small>Its activities and roles</span>
