@@ -3,7 +3,8 @@
 // if it fails. The two dev founders (Full standing) carry proposals through their votes, so
 // one becomes a project, one a service that takes requests and one an event; two stay
 // proposals. Three new people join, support, comment, ask for help and message each other.
-// Their recovery phrases are written to `accounts file` so you can log in as them.
+// A new member can start 2 things (proposals, threads, help requests) a week, so the founders
+// start the rest. Their recovery phrases are written to `accounts file` so you can log in as them.
 //   node tests/e2e/demo-content.mjs <ui url> <accounts file>
 import { writeFileSync } from 'node:fs';
 
@@ -163,7 +164,7 @@ await part('two proposals still gathering support', async () => {
   });
   for (const p of [maya, leo, ann].filter((p) => p && p !== priya)) await s.joinAndSupport(p, tools.url, tools.title);
   const mural = { title: 'Street mural on Hope Lane' };
-  mural.url = await s.propose(leo ?? bob, {
+  mural.url = await s.propose(priya ?? bob, {
     ...mural,
     tag: 'neighbourhood',
     text: 'Local kids and artists paint the long grey wall by the station: a river of native birds.',
@@ -190,7 +191,7 @@ await part('threads with comments and replies', async () => {
 });
 
 await part('help requests', async () => {
-  await c.helpRequest(grace ?? ann, {
+  await c.helpRequest(bob, {
     title: 'Lift to the station on Friday',
     text: 'I have a big suitcase and my train leaves at 7:40 am.',
     place: 'Corner of Elm and Hope Lane',

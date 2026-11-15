@@ -87,8 +87,9 @@ export async function answer(page, name, text) {
     await page.waitForTimeout(4000);
   }
   await row.click();
-  await page.getByPlaceholder('Write a message…').fill(text);
-  await page.getByPlaceholder('Write a message…').press('Enter');
+  const box = page.getByRole('textbox', { name: 'Write a message...' });
+  await box.fill(text);
+  await box.press('Enter');
   await page.locator('.chat-log').getByText(text).first().waitFor({ timeout: 60_000 });
 }
 
