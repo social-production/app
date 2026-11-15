@@ -108,6 +108,17 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    conversation keep their networks. Expected project hash after the deploy:
    `uhC0kNYqoKdcoI2u8vn7Pywpp8HOXVGDrzlzlq14qPuxRjh89iDF-` (see "After #160's deploy" below).
    All UX branches are merged: **new UX work branches from `main`.**
+   **After #160's deploy (checked 2026-11-16 ~1:25 am Melbourne): the seed is up but hosts
+   nothing.** Railway reported the seed-node deploy a success at 13:33 UTC; `/readyz` says
+   `conductor: true`, `apps: 0`, `dnas: {}`, ~93 MB and 13 threads for 20+ minutes (after
+   earlier project resets it held ~650 MB with apps within 30 s). `/index/projects` and
+   `/index/people` are empty. The process restarted once more at ~13:53 UTC with no new
+   deploy. The bundle's hashes are right (`hc dna hash` on the built hApp: directory and
+   conversation equal the old live ones, project `uhC0kNYqoKdc…`), and #160 changed nothing in
+   the gateway's start-up, so the archivist's install (warm-up, then each 15 s index round)
+   is failing or hanging on Railway. **Needs the seed-node logs** (look for "warm-up failed",
+   "archivist round failed", "removed N apps", a panic, or "database or disk is full" on the
+   `/data` volume).
 5. Docs PR #152 merged 2026-11-14.
    **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
    17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
