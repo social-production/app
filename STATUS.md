@@ -119,6 +119,14 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    is failing or hanging on Railway. **Needs the seed-node logs** (look for "warm-up failed",
    "archivist round failed", "removed N apps", a panic, or "database or disk is full" on the
    `/data` volume).
+   **Logs (owner, 2026-11-16 8:30 am Melbourne):** every round ends `archivist round failed
+   error=admin call: … ConnectionAborted`, with `lair connection recv loop ended` /
+   `incoming channel error: internal` from the keystore: the in-process lair fails each
+   request, so nothing installs. **Fix: a one-time fresh start** (owner: "I dont care about
+   wiping accounts, its all prototype"): `services/gateway/src/wipe.rs` clears `/data` once
+   (the keystore, the conductor and `gateway.sqlite`) when its `generation` file is not
+   `2026-11-16`, and logs the free space before and after. **Every account is gone after it**;
+   sign up again. Only `DATA_DIR=/data` is ever cleared. To wipe again, bump `GENERATION`.
 5. Docs PR #152 merged 2026-11-14.
    **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
    17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
