@@ -9,6 +9,8 @@
     danger?: boolean;
     /** A return's target phase; none for the move on. */
     to?: string;
+    /** Convert: close and continue as a new proposal (ADR 0106). */
+    convert?: boolean;
   }
 </script>
 

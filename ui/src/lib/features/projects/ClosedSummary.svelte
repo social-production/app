@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { resolve } from '$app/paths';
+
   import type { DetailState } from './detailState.svelte.ts';
 
   /**
    * A closed project's Take part (Plan, Phase and Feedback Screens, 4): the closing reason
    * and its vote lead, then what the project did and links to its past activity and its
-   * decisions. A row to where the work continues waits for Convert (ADR 0106).
+   * decisions. A converted one (ADR 0106) offers its members "Start the new proposal" until
+   * one exists, then links "Where the work continues".
    */
   interface Props {
     detail: DetailState;
@@ -16,10 +19,23 @@
   const project = $derived(detail.project);
   const closing = $derived(
     detail.proposals
-      .filter((p) => 'Phase' in p.kind && p.kind.Phase.to === 'phase-7' && p.status === 'Passed')
+      .filter(
+        (p) =>
+          p.status === 'Passed' &&
+          (('Phase' in p.kind && p.kind.Phase.to === 'phase-7') || 'Convert' in p.kind),
+      )
       .sort((a, b) => b.createdAt - a.createdAt)[0] ?? null,
   );
-  const reason = $derived(closing && 'Phase' in closing.kind ? closing.kind.Phase.reason : '');
+  const reason = $derived(
+    !closing
+      ? ''
+      : 'Phase' in closing.kind
+        ? closing.kind.Phase.reason
+        : 'Convert' in closing.kind
+          ? closing.kind.Convert.reason
+          : '',
+  );
+  const lineage = $derived(detail.project?.lineage);
   const when = $derived(
     new Date((closing?.closedAt ?? closing?.createdAt ?? 0) / 1000).toLocaleDateString(undefined, {
       day: 'numeric',
@@ -55,6 +71,22 @@
       <div><b>{project.updates.length}</b>updates</div>
     </div>
     <div class="closed-rows">
+      {#if lineage?.continuedBy}
+        <a href={resolve('/projects/[id]', { id: lineage.continuedBy })}>
+          <span><small>Where the work continues</small>Its new proposal</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
+        </a>
+        <!-- eslint-enable svelte/no-navigation-without-resolve -->
+      {:else if lineage?.converted && project.amMember}
+        <!-- eslint-disable svelte/no-navigation-without-resolve -- built from resolve() -->
+        <a
+          class="closed-start"
+          href={`${resolve('/create/project')}?continues=${encodeURIComponent(detail.id)}`}
+        >
+          <span><small>Converted</small>Start the new proposal</span>
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
+        </a>
+      {/if}
       <button type="button" onclick={onActivity}>
         <span><small>Past activity</small>Its activities and roles</span>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>

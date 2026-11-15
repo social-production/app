@@ -88,6 +88,14 @@
           · {started}
         </span>
       </p>
+      {#if project.lineage.continues}
+        <a class="detail-place" href={resolve('/projects/[id]', { id: project.lineage.continues })}>
+          <span class="lineage-copy"
+            ><small>Continues the work of</small><strong>A converted project</strong></span
+          >
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
+        </a>
+      {/if}
       {#if timeLabel}<FactLine icon="when">{timeLabel}</FactLine>{/if}
       <PlaceRow {place} />
       {#if charter.description.trim()}

@@ -100,6 +100,8 @@ export interface Project {
   amOrganizer: boolean;
   /** A service's request settings (ADR 0076; web's `requestSystem.settings`). */
   requests: RequestSettings;
+  /** Convert (ADR 0106): converted, and the project ids either side. */
+  lineage: { converted: boolean; continues: string | null; continuedBy: string | null };
 }
 
 /** web's request modes: listed slots, written messages, or both. */

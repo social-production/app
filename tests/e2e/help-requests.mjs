@@ -97,7 +97,7 @@ const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
 await driver.getByRole('button', { name: 'Join', exact: true }).click();
 await driver.getByRole('button', { name: 'Leave' }).waitFor({ timeout: 60_000 });
-await driver.getByText('1 signed up · 1 needed').waitFor();
+await driver.locator('.role-copy span', { hasText: /^1 needed · (?!nobody)/ }).waitFor();
 log('a helper signed up as driver');
 // Stay on the page until the sign-up shows (above), then the rail reads it.
 await railShows(helper, () => helpRow(helper, 'You signed up'), 'the signed-up help request', 20_000);

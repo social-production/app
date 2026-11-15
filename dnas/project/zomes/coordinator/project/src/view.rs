@@ -36,6 +36,8 @@ pub struct ProjectView {
     /// A service's request settings (ADR 0076): the newest saved or voted ones, else web's
     /// defaults for its mode.
     pub requests: RequestSettingsView,
+    /// Convert (ADR 0106): whether it was converted, and the projects either side.
+    pub lineage: crate::LineageView,
 }
 
 /// One phase as the stepper shows it (ids and labels from `sp_governance::phases`).

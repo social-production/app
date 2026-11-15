@@ -36,6 +36,7 @@ function proposalKindLabel(p: Proposal, stageLabel: (id: string) => string): str
   if ('Update' in kind) return 'Update decision';
   if ('Edit' in kind) return 'Edit decision';
   if ('Return' in kind) return `Return to ${stageLabel(kind.Return.to)}`;
+  if ('Convert' in kind) return 'Convert to a new proposal';
   if ('Phase' in kind) {
     const to = stageLabel(kind.Phase.to);
     return to === 'Closed' ? 'Close project' : `Advance to ${to}`;

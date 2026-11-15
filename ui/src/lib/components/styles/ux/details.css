@@ -291,3 +291,23 @@
   stroke-width: 2;
   stroke-linecap: round;
 }
+
+.shell .context-panel .lineage-copy {
+  display: grid;
+  flex: 1;
+}
+
+.shell .context-panel .lineage-copy small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .context-panel .lineage-copy strong {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.shell .closed-summary .closed-rows .closed-start span {
+  color: var(--brand-strong);
+  font-weight: 700;
+}

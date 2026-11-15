@@ -22,6 +22,7 @@ mod plan;
 mod scope_item;
 mod software;
 mod space;
+mod util;
 mod value;
 
 use hdi::prelude::*;
@@ -40,6 +41,7 @@ pub use software::SoftwareRequest;
 pub use space::{
     charter_at, creator, creator_in_seed, space_creator, space_in_seed, SPACE_SEED_WORD,
 };
+pub(crate) use util::{invalid, typed_entry};
 pub use value::{Importance, Value};
 
 #[hdk_entry_helper]
@@ -103,6 +105,10 @@ pub enum ProposalKind {
     },
     /// A software project's pull request, merge, merge capability or repository (ADR 0086).
     Software(SoftwareRequest),
+    /// Close this and continue the work as a new proposal (ADR 0106).
+    Convert {
+        reason: String,
+    },
 }
 
 #[hdk_entry_helper]
@@ -225,6 +231,9 @@ pub enum LinkTypes {
     /// A personal service → its creator's weekly hours; deleting the link removes them
     /// (ADR 0077).
     Availability,
+    /// Space → itself; tag `[0]` (continues from) or `[1]` (continued by) + the other
+    /// project's id (Convert, ADR 0106).
+    Lineage,
 }
 
 #[hdk_extern]
@@ -282,19 +291,4 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         }
         _ => Ok(ValidateCallbackResult::Valid),
     }
-}
-
-pub(crate) fn invalid(reason: &str) -> ExternResult<ValidateCallbackResult> {
-    Ok(ValidateCallbackResult::Invalid(reason.to_string()))
-}
-
-/// Decode a record's entry using its declared entry type (never by guessing from bytes).
-pub(crate) fn typed_entry(record: &Record) -> ExternResult<Option<EntryTypes>> {
-    let Some(entry) = record.entry().as_option() else {
-        return Ok(None);
-    };
-    let Some(EntryType::App(def)) = record.action().entry_type() else {
-        return Ok(None);
-    };
-    EntryTypes::deserialize_from_type(def.zome_index, def.entry_index, entry)
 }

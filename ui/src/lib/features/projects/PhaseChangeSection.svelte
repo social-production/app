@@ -52,9 +52,11 @@
   }
 
   async function file(move: PhaseMove, reason: string): Promise<void> {
-    const done = move.to
-      ? await detail.proposeReturn(move.to, reason)
-      : await detail.proposeNextPhase(reason);
+    const done = move.convert
+      ? await detail.proposeConvert(reason)
+      : move.to
+        ? await detail.proposeReturn(move.to, reason)
+        : await detail.proposeNextPhase(reason);
     if (done) moving = false;
   }
 
@@ -81,6 +83,18 @@
               : 'Members vote to move on. Proposing counts as your Yes.'),
         disabled: !allowed,
         danger: closing,
+      });
+    // Convert (ADR 0106): any phase after Proposal, until it closes; not for events.
+    if (!event && project.phase !== 'phase-1' && project.phase !== 'phase-7')
+      moves.push({
+        id: 'convert',
+        label: 'Convert to a new proposal',
+        detail: phaseVoteOpen
+          ? lockReason()
+          : 'Closes this and continues its work as a new proposal with the same title, place and tags. Members vote on it.',
+        disabled: phaseVoteOpen || detail.saving,
+        danger: true,
+        convert: true,
       });
     for (const phase of project.returns)
       moves.push({

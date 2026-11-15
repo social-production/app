@@ -1,52 +1,37 @@
-# 0106. Convert: close a project and continue its work as another type
+# 0106. Convert: close a project and continue its work as a new proposal
 
-Status: **proposed** (2026-11-15). The owner asked for Convert on the phase sheet (Plan, Phase
-and Feedback Screens, 2026-11-14: "Convert must still be built"). **Not built:** it changes
-project integrity, so the project network resets when it merges. Owner to confirm the reset
-and the open questions below.
+Status: **accepted** (2026-11-15). The owner asked for Convert on the phase sheet (Plan, Phase
+and Feedback Screens, 2026-11-14) and, on 2026-11-15, approved the project network reset
+("reset is fine, it is all mock data, do what you think is best").
 
 ## Context
+web lets members close a project with the outcome "convert": it closes and a successor of
+another mode starts, with the tags and memberships carried over and a permanent "Converted
+to" / "Converted from" link (web-backend `services/projects/phases/conversion.py`).
 
-web lets members close a project with the outcome "convert": the project closes and a
-successor of another mode or subtype starts (web-backend `services/projects/phases/
-conversion.py`). Tags and memberships carry over; plans, signals, roles, requests and
-inventory stay on the predecessor; a permanent "Converted to" / "Converted from" link joins
-the two and cannot be removed through the Links tab.
+Since ADR 0059 a public project starts as a typeless proposal and its approved plan gives it
+its type. So the successor here is a new **proposal**, and its plan decides whether it
+becomes a project, a service or an event. No target type is chosen when converting.
 
-Since ADR 0059 a proposal gets its type from its approved plan, so a new idea never needs to
-convert. Convert is for work that changes shape later: a built project that becomes a
-service that runs it, or a one-off event that becomes a recurring service.
-
-## Decision (proposed)
-
-1. **The phase sheet gains a third kind of choice** under the move on and the returns:
-   "Convert to a service" (or "Convert to a project", or "Convert to an event", for the
-   types it is not). It opens on any phase after Proposal, in danger red like Close, with
-   "Closes this and starts a <type> with the same members and tags. Members vote on it."
-2. **One proposal kind**, `Convert { to: mode, subtype }`, beside `Phase` and `Return` in the
-   project zome's governance integrity. It passes on the same rule as Close (the phase
-   vote's majority). Passing closes the project (phase-7, `close_outcome = convert`).
-3. **The successor is a new proposal clone made by whoever filed the conversion**, once it
-   passes (the network has no server to make it). It starts in the type's Plan phase with
-   the predecessor's title, description, place and tags, and invites the predecessor's
-   members (each joins by accepting, as with any invite). Until it exists, the closed page
-   says "Waiting for <name> to start the <type>", and any member may start it instead.
-4. **Lineage** is two link entries: the predecessor's `ConvertedTo(successor)` written with
-   the close, the successor's `ConvertedFrom(predecessor)` in its charter. Both show on the
-   Links tab under their own heading, with no sever vote.
-5. The closed project's page (Plan, Phase and Feedback Screens, 4) shows "Where the work
-   continues" as a row linking the successor.
-
-## Open questions for the owner
-
-- Reset: the project network resets on merge. Land it with another integrity change to
-  reset once?
-- Should members be moved into the successor automatically (they would be members without
-  accepting), or invited (as proposed)?
-- May a converted project keep its chat history visible from the successor (a link), or
-  should the chat be copied?
+## Decision
+1. **A new proposal kind, `Convert { reason }`** (project integrity). It is offered on the
+   phase sheet as "Convert to a new proposal" (in danger red) in any phase after Proposal
+   and before Closed, for projects and services, not events. One phase vote at a time, a
+   reason, and the proposer's own Yes, as for a phase move. Channels and communities don't
+   convert.
+2. **Passing it closes the project** (the fold moves it to `phase-7` and sets
+   `Applied.converted`).
+3. **The new proposal is started by a member** from the closed project's Take part ("Start
+   the new proposal"): the create flow opens at `/create/project?continues=<id>` with the
+   title, description and tags filled in. Its members join it the usual way (they are not
+   moved: each person joins their own copy of a network, and the feed and the closed page
+   lead them there).
+4. **Lineage** is one link type, `Lineage`, from a space to itself with the tag `[0]`
+   (continues from) or `[1]` (continued by) + the other project's id. Whoever starts the new
+   proposal writes both. The project view returns `lineage { converted, continues,
+   continued_by }`. The closed page shows "Where the work continues"; the new proposal's
+   Details shows "Continues the work of".
+5. The chat stays on the converted project and is reachable from it; nothing is copied.
 
 ## Consequences
-
-New integrity: a project network reset. The scenario `governance` gains a conversion
-test; browser test `governance.mjs` gains a convert step.
+A project network reset. Scenario `convert` covers the vote, the close and the lineage.
