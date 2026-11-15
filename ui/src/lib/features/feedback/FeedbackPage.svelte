@@ -1,7 +1,6 @@
 <script lang="ts">
   import FeedbackCard from '#lib/components/feedback/FeedbackCard.svelte';
   import FeedbackComposeSheet from '#lib/components/feedback/FeedbackComposeSheet.svelte';
-  import FeedbackDetailSheet from '#lib/components/feedback/FeedbackDetailSheet.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import {
     emptyFeedbackCopy,
@@ -9,6 +8,9 @@
     type FeedbackFilter,
     type FeedbackSort,
   } from '#lib/domain/feedback.ts';
+
+  import { goto } from '$app/navigation';
+  import { resolve } from '$app/paths';
 
   import { FeedbackState } from './feedbackState.svelte.ts';
 
@@ -75,7 +77,7 @@
         <FeedbackCard
           {item}
           pendingVote={fb.voting.includes(item.id)}
-          onOpen={() => void fb.open(item.id)}
+          onOpen={() => void goto(resolve('/feedback/[id]', { id: item.id }))}
           onVote={(vote) => void fb.vote(item.id, vote)}
         />
       {/each}
@@ -99,12 +101,4 @@
   message={fb.composeMessage}
   onSubmit={(input) => void fb.submit(input)}
   onClose={() => (fb.composeOpen = false)}
-/>
-
-<FeedbackDetailSheet
-  item={fb.detail}
-  authorName={fb.detail ? (fb.names[fb.detail.author] ?? 'Someone') : ''}
-  pendingVote={fb.detail ? fb.voting.includes(fb.detail.id) : false}
-  onVote={(vote) => fb.detail && void fb.vote(fb.detail.id, vote)}
-  onClose={() => (fb.detailId = null)}
 />

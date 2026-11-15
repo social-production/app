@@ -6,6 +6,7 @@ mod bot_review;
 mod chain;
 mod device;
 mod feedback;
+mod feedback_comment;
 mod follow;
 mod founders;
 mod listing;
@@ -20,6 +21,7 @@ pub use bot_review::{MARK_BOT, MARK_CLEAR, VOTE_BOT, VOTE_REAL};
 use chain::same_author;
 pub(crate) use chain::{earlier_creates, invalid, prev_action, prev_action_of, typed_entry};
 pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
+pub use feedback_comment::{FeedbackComment, FEEDBACK_COMMENT_MAX};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
 
 #[hdk_entry_helper]
@@ -119,6 +121,7 @@ pub enum EntryTypes {
     DeviceLink(DeviceLink),
     ProjectListing(ProjectListing),
     Feedback(Feedback),
+    FeedbackComment(FeedbackComment),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -149,6 +152,9 @@ pub enum LinkTypes {
     BoardVotes,
     Active,
     Deactivated,
+    // Feedback comments: item → comment; comment → the person who likes it.
+    FeedbackComments,
+    FeedbackCommentLikes,
 }
 
 #[hdk_extern]
@@ -218,6 +224,7 @@ fn validate_create(
         EntryTypes::DeviceLink(d) => device::validate_create(d, action),
         EntryTypes::ProjectListing(l) => listing::validate_create(l, action),
         EntryTypes::Feedback(f) => feedback::validate_fields(f),
+        EntryTypes::FeedbackComment(c) => feedback_comment::validate_create(c),
     }
 }
 
@@ -259,6 +266,8 @@ fn validate_create_link(
         | LinkTypes::RequiresFollowApproval => follow::validate_create_link(link_type, action),
         LinkTypes::AllFeedback => feedback::validate_listing_link(action),
         LinkTypes::FeedbackVotes => feedback::validate_vote_link(action),
+        LinkTypes::FeedbackComments => feedback_comment::validate_comment_link(action),
+        LinkTypes::FeedbackCommentLikes => feedback_comment::validate_like_link(action),
         LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews => {
             bot_review::validate_create_link(link_type, action)
         }

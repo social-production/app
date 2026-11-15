@@ -43,7 +43,12 @@
   </span>
   <span class="title-wrap">
     <span class="feedback-title">{item.title}</span>
-    <small>{item.kind === 'bug' ? 'Bug' : 'Suggestion'} · {relativeCompact(item.createdAt)}</small>
+    <small
+      >{item.kind === 'bug' ? 'Bug' : 'Suggestion'} · {relativeCompact(
+        item.createdAt,
+      )}{#if item.comments}
+        · {item.comments} {item.comments === 1 ? 'reply' : 'replies'}{/if}</small
+    >
   </span>
   <div class="votes">
     <FeedbackVoteStrip
