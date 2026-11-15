@@ -92,8 +92,10 @@ assert.equal(
 log("a New member sees the board without Volunteer");
 
 await bob.goto(`${BASE}/settings`);
-await bob.getByLabel("Type your name to confirm").fill(name);
 await bob.getByRole("button", { name: "Deactivate account" }).click();
+const deactivate = bob.getByRole("dialog", { name: "Deactivate account" });
+await deactivate.getByLabel("Type your name to confirm").fill(name);
+await deactivate.getByRole("button", { name: "Deactivate account" }).click();
 await bob
   .locator('.shell[data-signed-in="false"]')
   .waitFor({ timeout: 60_000 });

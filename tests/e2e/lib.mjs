@@ -98,6 +98,7 @@ export async function phraseSignIn(page, words) {
 export async function signOut(page) {
   await open(page, 'Settings');
   await page.getByRole('button', { name: 'Sign out' }).click();
+  await page.getByRole('dialog', { name: 'Sign out' }).getByRole('button', { name: 'Sign out' }).click();
   // Signing out reloads the page; wait until it has, before navigating anywhere.
   await page.locator('.shell[data-signed-in="false"]').waitFor({ timeout: 60_000 });
   await page.waitForLoadState('load');
@@ -219,6 +220,23 @@ export async function feedChoice(page, group, option) {
   await sheet.getByRole('radiogroup', { name: group }).getByRole('radio', { name: option, exact: true }).click();
   await sheet.getByRole('button', { name: 'Show results' }).click();
   await sheet.waitFor({ state: 'hidden' });
+}
+
+/** Settings → Regional → Default location: search for `query` in the row's sheet, take the
+ * first suggestion and close the sheet. Returns the suggestion's label. */
+export async function setDefaultPlace(page, query) {
+  const regional = page.locator('#settings-regional');
+  await regional.getByRole('heading', { name: 'Regional' }).waitFor({ timeout: 60_000 });
+  await regional.getByRole('button', { name: /^Default location/ }).click();
+  const sheet = page.getByRole('dialog', { name: 'Default location' });
+  await sheet.getByRole('textbox', { name: 'Place' }).fill(query);
+  const suggestion = sheet.locator('.suggestions button').first();
+  await suggestion.waitFor({ timeout: 30_000 });
+  const label = (await suggestion.innerText()).trim();
+  await suggestion.click();
+  await sheet.getByRole('button', { name: 'Close' }).click();
+  await sheet.waitFor({ state: 'hidden' });
+  return label;
 }
 
 /** A profile's Message button opens the chat with that person (empty until the first

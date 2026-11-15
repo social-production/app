@@ -6,8 +6,10 @@
   import '#lib/components/styles/create.css';
 
   /**
-   * web's CreateFlowLayout + CreateWizard: a wide sheet with a step rail, the current step,
-   * and Back/Continue (Cancel/Publish at the ends). Closing with typed text asks first.
+   * web's CreateFlowLayout + CreateWizard: a wide sheet with the current step and
+   * Back/Continue (Cancel/Publish at the ends). A flow with several steps says "Step 1 of 4 ·
+   * Basics" over a progress line (Remaining Screens, 1: every create flow shares this).
+   * Closing with typed text asks first.
    */
   interface Props {
     title: string;
@@ -25,9 +27,6 @@
     onStep: (index: number) => void;
     onSubmit: () => void;
     onClose: () => void;
-    /** "Step 1 of 4 · Basics" and a progress line instead of the step rail (the proposal
-     * flow, Creating Through Plans mockup). */
-    progress?: boolean;
     children: Snippet;
   }
 
@@ -37,6 +36,7 @@
   let confirming = $state(false);
 
   const last = $derived(p.stepIndex === p.steps.length - 1);
+  const stepped = $derived(p.steps.length > 1);
 
   function hasTypedText(): boolean {
     const inputs = fields?.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>(
@@ -66,26 +66,15 @@
   onClose={close}
 >
   {#snippet subtitle()}
-    {#if p.progress}<p class="sheet-description step-count">
+    {#if stepped}<p class="sheet-description step-count">
         Step {p.stepIndex + 1} of {p.steps.length} · {p.steps[p.stepIndex]?.title}
       </p>
-    {:else if p.stepIndex === 0}<p class="sheet-description">{p.description}</p>{/if}
+    {:else}<p class="sheet-description">{p.description}</p>{/if}
   {/snippet}
   {#snippet toolbar()}
-    {#if p.progress}<div class="step-progress" aria-hidden="true">
+    {#if stepped}<div class="step-progress" aria-hidden="true">
         {#each p.steps as step, index (step.id)}<i class:on={index <= p.stepIndex}></i>{/each}
-      </div>
-    {:else if p.steps.length > 1}<nav class="step-rail" aria-label="Create steps">
-        {#each p.steps as step, index (step.id)}
-          <button
-            class="step-chip"
-            class:active={index === p.stepIndex}
-            class:complete={index < p.stepIndex}
-            type="button"
-            onclick={() => go(index)}>{step.title}</button
-          >
-        {/each}
-      </nav>{/if}
+      </div>{/if}
   {/snippet}
   <div class="sheet-form">
     <div class="sheet-fields" bind:this={fields}>

@@ -7,7 +7,16 @@
 //   node tests/e2e/map.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 
-import { BASE, device, browser, errors, log, signUp, tagTestChannel } from './lib.mjs';
+import {
+  BASE,
+  device,
+  browser,
+  errors,
+  log,
+  setDefaultPlace,
+  signUp,
+  tagTestChannel,
+} from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 const stamp = Date.now().toString(36).slice(-4);
@@ -36,10 +45,7 @@ log('created', title);
 
 // Fitzroy as the default location, so the map starts there (web's Regional settings).
 await page.goto(`${BASE}/settings`);
-const regional = page.locator('#settings-regional');
-await regional.getByRole('heading', { name: 'Regional' }).waitFor({ timeout: 60_000 });
-await regional.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
-await regional.locator('.suggestions button').first().click({ timeout: 30_000 });
+await setDefaultPlace(page, 'Fitzroy Melbourne');
 
 // The top bar's map button opens the panel; the index lists the project once it has read it.
 const mapButton = page.getByRole('button', { name: 'Open map' });

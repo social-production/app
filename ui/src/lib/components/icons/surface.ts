@@ -3,6 +3,7 @@ export type SurfaceIconId =
   | 'project'
   | 'cube'
   | 'bubble'
+  | 'bulb'
   | 'proposal'
   | 'event'
   | 'thread'

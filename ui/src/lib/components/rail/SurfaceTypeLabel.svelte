@@ -1,5 +1,6 @@
 <script lang="ts">
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import { modeAccent, type CharterMode } from '#lib/domain/projects.ts';
 
   /** web's SurfaceTypeLabel for a project, an event or a help request. */
@@ -19,7 +20,7 @@
     channel: 'Channel',
     community: 'Community',
   };
-  const typeIcon = $derived(
+  const typeIcon: SurfaceIconId = $derived(
     projectMode === 'event' ||
       projectMode === 'help-request' ||
       projectMode === 'channel' ||
@@ -30,16 +31,17 @@
         ? 'community'
         : 'project',
   );
-  // A feed row's glyph (owner, 2026-11-15): the mockups' cube for a project and speech
-  // bubble for a thread, not web's house and lines.
+  // A feed row's glyph (owner, 2026-11-15): the mockups' own, not web's house and lines.
+  const FEED_GLYPHS: Partial<Record<SurfaceIconId, SurfaceIconId>> = {
+    project: 'cube',
+    thread: 'bubble',
+  };
   const icon = $derived(
     !feedGlyph
       ? typeIcon
-      : typeIcon === 'project'
-        ? 'cube'
-        : typeIcon === 'thread'
-          ? 'bubble'
-          : typeIcon,
+      : projectMode === 'proposal'
+        ? 'bulb'
+        : (FEED_GLYPHS[typeIcon] ?? typeIcon),
   );
 </script>
 

@@ -39,6 +39,16 @@
         stroke-width="1.8"
         stroke-linejoin="round"
       />
+    {:else if icon === 'bulb'}
+      <!-- Feed Headers mockup: a proposal's lightbulb in a feed row. -->
+      <path
+        d="M9 17h6M10 20.5h4M8 14a6 6 0 1 1 8 0c-.7.7-1 1.5-1 3H9c0-1.5-.3-2.3-1-3z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
     {:else if icon === 'thread'}
       <path
         d="M5 6h14M5 12h10M5 18h12"
