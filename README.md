@@ -17,8 +17,9 @@ What works today:
 - **Everything starts as a proposal (PR #160, 2026-11-16 12:21 am Melbourne, ADR 0059 stage
   A):** Create → Proposal is four steps (Basics, Tags, Location, Overview); the leading plan
   decides whether it becomes a project, a service or an event as it leaves its Plan phase, and
-  an operations plan can switch requests on with no settings vote. **Project network reset**:
-  old projects, events and services are gone (test data only); accounts stay.
+  an operations plan can switch requests on with no settings vote. **Project network reset**,
+  and the seed node then started from empty data (its keystore had stopped answering), so
+  **every account is gone: sign up again** (test data only).
 - **Chats, profiles, sign-up and Settings in the soft look (PR #159, 2026-11-15 11:01 pm
   Melbourne, ADRs 0104, 0105):** a Personal / Public switch in Messages, rounded bubbles,
   word buttons on profiles, a boxless sign-up, Settings as rows that open small sheets. UI only.
