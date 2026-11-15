@@ -190,12 +190,14 @@ this order, once creation-plans is on main; merge main in first):
    - New browser test `tests/e2e/convert.mjs` (one founder: support, advance, convert, start
      the new proposal, both links).
    - **Browser tests on the new hApp, all passed:** `accounts`, `governance`, `help-requests`,
-     `software`, `guests`, `activities`, `collective-requests`, `convert`, `ux-review`
-     (screens looked at in light and dark: closed page, phase sheet with Convert, About,
-     Invites, Notifications, Feedback, activity sheet). **Not run on this branch yet:**
-     `private-events`, `closed-communities`, `platform`, `map`, `region`, `links`,
-     `mentions`, `group-options`, `attachments`, `calls`, `events`, `discover`.
-**Still to do:** run the tests listed above; open the PRs in order
+     `software`, `guests`, `activities`, `collective-requests`, `convert`, `notifications`,
+     `events`, `discover`, `private-events`, `closed-communities` (fixed: "Join with invite"
+     is now in the header and the panel), `platform`, `map`, `region`, `links`, `mentions`,
+     `group-options`, `attachments`, `calls`, `ux-review` (screens looked at in light and
+     dark: closed page, phase sheet with Convert, About, Invites, Notifications, Feedback,
+     activity sheet). The first sign-up after a seed restart can take over 120 s, so the
+     warm-up `accounts` run may time out once; rerun it.
+**Still to do:** open the PRs in order
 (labels, new-message, remaining-screens, plan-screens) once creation-plans is on main. The
 create menu and the Take part phase line already match their mockups. README Status
 changes when these merge (it lists what is live).
