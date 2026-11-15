@@ -16,19 +16,17 @@ await signUp(page, `region${stamp}`);
 const next = () => page.getByRole('button', { name: 'Continue' }).click();
 
 await page.getByRole('button', { name: 'Create', exact: true }).click();
-await page.getByRole('menuitem', { name: /Project/ }).click();
-await page.getByRole('radio', { name: /Productive project/ }).click();
-await next();
+await page.getByRole('menuitem', { name: /Proposal/ }).click();
 await page.getByLabel('Title').fill(title);
-await page.getByLabel('Proposal description').fill('Tools for the street.');
+await page.getByLabel('What do you propose?').fill('Tools for the street.');
+await next(); // → Tags
+await tagTestChannel(page);
 await next(); // → Location
 await page.getByRole('radio', { name: /Physical/ }).check();
 await page.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
 await page.locator('.location-picker .suggestions button').first().click({ timeout: 30_000 });
-await next(); // → Scope
-await tagTestChannel(page);
 await next(); // → Overview
-await page.getByRole('button', { name: 'Publish project' }).click();
+await page.getByRole('button', { name: 'Publish proposal' }).click();
 await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = page.url();
 log('created', title);

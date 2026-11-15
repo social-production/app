@@ -99,7 +99,10 @@
       {/if}
       <div class="feed-lead-meta" class:alone={tags.length === 0}>
         <SurfaceTypeLabel projectMode={mode} />
-        {#if stage}<span class="feed-card-stage">{stage}</span>{/if}
+        <!-- A proposal in its Proposal phase would read "Proposal · Proposal". -->
+        {#if stage && !(mode === 'proposal' && stage === 'Proposal')}
+          <span class="feed-card-stage">{stage}</span>
+        {/if}
         {@render clock()}
       </div>
     </div>

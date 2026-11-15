@@ -73,6 +73,7 @@ fn event_plan() -> ProposalKind {
             start_time: Some("12:00".into()),
             finish_time: Some("15:00".into()),
         }),
+        requests: None,
     })
 }
 

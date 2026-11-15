@@ -3,7 +3,9 @@
   import PlanWizard from '#lib/components/plans/PlanWizard.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
-  import type { PlanKind, Plan } from '#lib/domain/plans.ts';
+  import TypeSelector from '#lib/components/create/TypeSelector.svelte';
+  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
+  import { PLAN_MAKES, planMakesLine, type PlanKind, type Plan } from '#lib/domain/plans.ts';
   import { projectSubtype } from '#lib/domain/projects.ts';
   import { placeSearch } from '#lib/services/locations.ts';
 
@@ -29,8 +31,31 @@
 
   const project = $derived(detail.project);
   const board = $derived(detail.plans);
-  const plans = $derived(board?.plans.filter((p) => p.plan.kind === kind) ?? []);
-  const canSubmit = $derived(!!project?.amMember && board?.openKind === kind);
+  // A proposal's Plan phase takes every type-giving kind side by side (ADR 0059).
+  const typeless = $derived(project?.charter?.mode === 'proposal');
+  const kinds = $derived<PlanKind[]>(typeless ? PLAN_MAKES.map((m) => m.value) : [kind]);
+  const plans = $derived(board?.plans.filter((p) => kinds.includes(p.plan.kind)) ?? []);
+  const canSubmit = $derived(
+    !!project?.amMember && !!board?.openKinds.some((open) => kinds.includes(open)),
+  );
+  /** The kind of the plan being written: the phase's own, or the one picked on a proposal. */
+  let chosen = $state<PlanKind>('Production');
+  let choosing = $state(false);
+  const writing = $derived(typeless ? chosen : kind);
+  const writingMode = $derived(
+    typeless ? (PLAN_MAKES.find((m) => m.value === chosen)?.mode ?? 'productive') : null,
+  );
+
+  function add(): void {
+    if (composing || choosing) {
+      composing = false;
+      choosing = false;
+    } else if (typeless) {
+      choosing = true;
+    } else {
+      composing = true;
+    }
+  }
   const production = $derived(
     board?.plans.find((p) => p.plan.kind === 'Production' && p.leader === 'Leading')?.plan,
   );
@@ -50,8 +75,8 @@
     {#if canSubmit}
       <PlanWizard
         open={composing}
-        {kind}
-        mode={project.charter.mode}
+        kind={writing}
+        mode={writingMode ?? project.charter.mode}
         subtype={projectSubtype(project.charter.subtype)}
         {productionLocation}
         places={placeSearch}
@@ -66,6 +91,36 @@
       />
     {/if}
 
+    <!-- Creating Through Plans mockup: "Add a plan" is a small sheet asking the kind first. -->
+    <OverlaySheet
+      open={choosing}
+      title="Add a plan"
+      labelledById="plan-kind-title"
+      rootClass="setting-sheet plan-kind-sheet"
+      onClose={() => (choosing = false)}
+    >
+      {#snippet subtitle()}
+        <p class="setting-hint">What kind of thing should this become?</p>
+      {/snippet}
+      <div class="plan-kind-choice">
+        <TypeSelector
+          label="Plan kind"
+          name="plan-kind"
+          selected={chosen}
+          options={PLAN_MAKES}
+          onSelect={(value) => (chosen = value)}
+        />
+        <button
+          class="plan-kind-continue"
+          type="button"
+          onclick={() => {
+            choosing = false;
+            composing = true;
+          }}>Continue</button
+        >
+      </div>
+    </OverlaySheet>
+
     <div id="participation-plans">
       {#if plans.length === 0}
         <div class="phase-empty">
@@ -78,6 +133,7 @@
             <PlanCard
               {plan}
               authorName={detail.names[plan.author] ?? '…'}
+              makes={typeless ? planMakesLine(plan.plan.kind) : null}
               canVote={project.amMember}
               reveal={revealPlan === plan.id}
               {onRevealDone}
@@ -91,12 +147,7 @@
 
     <PhaseWorkToolbar>
       {#if canSubmit}
-        <RoundPlusButton
-          standout
-          active={composing}
-          label="Add plan"
-          onclick={() => (composing = !composing)}
-        />
+        <RoundPlusButton standout active={composing || choosing} label="Add plan" onclick={add} />
       {/if}
     </PhaseWorkToolbar>
   </section>

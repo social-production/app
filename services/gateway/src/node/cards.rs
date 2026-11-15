@@ -68,6 +68,9 @@ pub struct Profile {
 #[derive(Debug, Deserialize)]
 pub struct Charter {
     pub mode: String,
+    /// The production or operations plan chooses it (ADR 0039).
+    #[serde(default)]
+    pub subtype: String,
     pub title: String,
     pub description: String,
     pub location_label: String,
@@ -169,6 +172,12 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
             l.title.clone_from(&c.title);
             l.summary = sp_core::project::summary_of(&c.description);
             l.location_label.clone_from(&c.location_label);
+            // A proposal takes its type from the plan that led it out of its Plan phase (ADR
+            // 0059): the listing keeps the mode it was created with, the project's view has it.
+            l.mode.clone_from(&c.mode);
+            if !c.subtype.is_empty() {
+                l.subtype.clone_from(&c.subtype);
+            }
         }
         l.phase.clone_from(&p.stage);
     }

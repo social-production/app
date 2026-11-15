@@ -61,6 +61,11 @@ impl Phase {
 /// Plan (`phase-2`), Activity (`phase-5`) and Closed (`phase-7`), as web's event lifecycle.
 pub const EVENT: &str = "event";
 
+/// The charter mode of a proposal (ADR 0059): a public project or event before it has a type.
+/// Its phases are Proposal and Plan; the plan its members approve gives it its type
+/// (`PlanKind::makes`), and from then on it has that type's phases.
+pub const PROPOSAL: &str = "proposal";
+
 /// The project shape that decides which phases exist (mode, subtype, access plan opted in).
 #[derive(Clone, Copy, Debug)]
 pub struct Shape<'a> {
@@ -80,6 +85,10 @@ impl Shape<'_> {
 pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
     let phase = phase.effective();
     match shape.mode {
+        PROPOSAL => match phase {
+            Phase::P1 => "Proposal",
+            _ => "Plan",
+        },
         EVENT => match phase {
             Phase::P2 => "Event Plan",
             Phase::P5 => "Activity",
@@ -117,7 +126,8 @@ pub fn visible_phases(shape: Shape<'_>, current: Phase) -> Vec<Phase> {
     match shape.mode {
         "personal-service" if current == P2 => vec![P1, P2],
         "personal-service" => vec![P1],
-        EVENT => vec![P1, P2, P5, P7],
+        // Until its plan gives it a type, a proposal shows the shortest path every type has.
+        EVENT | PROPOSAL => vec![P1, P2, P5, P7],
         "collective-service" if shape.include_access || current == P3 => vec![P1, P2, P3, P5, P7],
         "collective-service" => vec![P1, P2, P5, P7],
         _ if shape.skips_distribution() => vec![P1, P2, P5, P7],
@@ -133,6 +143,10 @@ pub fn next_phase(shape: Shape<'_>, current: Phase) -> Option<Phase> {
     }
     if current == Phase::P6 {
         return Some(Phase::P7);
+    }
+    // A proposal leaves its Plan phase as the type its plan makes it, never as a proposal.
+    if shape.mode == PROPOSAL {
+        return (current == Phase::P1).then_some(Phase::P2);
     }
     Phase::ALL
         .into_iter()

@@ -26,6 +26,7 @@ pub struct Plan {
     /// Event plans only (ADR 0057).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub schedule: Option<EventSchedule>,
+    pub requests: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]

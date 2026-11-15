@@ -31,7 +31,7 @@ const ann = await device();
 await phraseSignIn(ann, one.phrase.split(" "));
 await ann.goto(BASE);
 await ann.getByRole("button", { name: "Create", exact: true }).click();
-await ann.getByRole("menuitem", { name: /Event/ }).click();
+await ann.getByRole("menuitem", { name: /Private event/ }).click();
 const next = () => ann.getByRole("button", { name: "Continue" }).click();
 await ann.getByLabel("Event title").fill(title);
 await ann.getByLabel("Description").fill("Lunch, then cake.");

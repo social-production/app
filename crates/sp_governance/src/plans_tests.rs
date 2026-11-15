@@ -140,3 +140,45 @@ fn leader_is_best_ratio_then_rating() {
     let rated = candidate("r", 1, 0, &[&[1]]);
     assert_eq!(pick_leader(&[unrated, rated]), Leader::One("r"));
 }
+
+/// ADR 0059: a proposal takes the three type-giving plans in its Plan phase, and each says
+/// what it makes.
+#[test]
+fn a_proposal_takes_every_type_giving_plan() {
+    use crate::phases::{next_phase, stage_label, visible_phases, Shape, PROPOSAL};
+    let shape = Shape {
+        mode: PROPOSAL,
+        subtype: "standard",
+        include_access: false,
+    };
+    let open = PlanKind::open_kinds(PROPOSAL, Phase::P2);
+    assert_eq!(
+        open,
+        [
+            PlanKind::Production,
+            PlanKind::Organisation,
+            PlanKind::Event
+        ]
+    );
+    assert_eq!(required_plan_kinds(shape, Phase::P2), open);
+    assert!(required_plan_kinds(shape, Phase::P1).is_empty());
+    assert!(PlanKind::open_kinds(PROPOSAL, Phase::P3).is_empty());
+    assert_eq!(PlanKind::Production.makes(), Some("productive"));
+    assert_eq!(PlanKind::Organisation.makes(), Some("collective-service"));
+    assert_eq!(PlanKind::Event.makes(), Some("event"));
+    assert_eq!(PlanKind::Distribution.makes(), None);
+    assert_eq!(PlanKind::Access.makes(), None);
+    // A typed project still takes exactly one kind per plan phase.
+    assert_eq!(
+        PlanKind::open_kinds("productive", Phase::P2),
+        [PlanKind::Production]
+    );
+    assert_eq!(stage_label(shape, Phase::P1), "Proposal");
+    assert_eq!(stage_label(shape, Phase::P2), "Plan");
+    assert_eq!(
+        visible_phases(shape, Phase::P2),
+        [Phase::P1, Phase::P2, Phase::P5, Phase::P7]
+    );
+    assert_eq!(next_phase(shape, Phase::P1), Some(Phase::P2));
+    assert_eq!(next_phase(shape, Phase::P2), None, "it leaves as its type");
+}

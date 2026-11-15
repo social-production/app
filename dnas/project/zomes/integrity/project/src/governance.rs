@@ -261,8 +261,14 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
             mode: requests,
             reason,
             ..
-        } => sp_service::check_settings(mode, requests, reason),
-        ProposalKind::Software(_) if !sp_software::takes_software(mode) => {
+        } => sp_service::check_settings(
+            crate::applied::typed_as(mode, "collective-service"),
+            requests,
+            reason,
+        ),
+        ProposalKind::Software(_)
+            if !sp_software::takes_software(crate::applied::typed_as(mode, "productive")) =>
+        {
             Err("only productive projects and collective services take software proposals".into())
         }
         _ => Ok(()),

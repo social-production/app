@@ -9,6 +9,7 @@ pub mod plans;
 pub mod projects;
 pub mod quorum;
 pub mod returns;
+pub mod rubric;
 pub mod standing;
 pub mod tally;
 pub mod values;

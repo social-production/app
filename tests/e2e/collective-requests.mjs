@@ -1,5 +1,5 @@
 // Collective service requests (ADR 0089) end to end at phone width. The two founders take a
-// collective service to its Activity phase (operations plan, votes), then vote requests on in
+// proposal to its Activity phase as a collective service (operations plan, votes), then vote requests on in
 // Settings ▾ → Request settings (reason, Start vote, a Yes from Take part). Cleo, who isn't a
 // member, sends a request; Bob (any member) opens Requests → Plan request, which opens the
 // activity wizard with the request filled in, and creates the activity with its role. Cleo's
@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, continueSteps, device, errors, log, rail, railShows, signUp } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, signUp } from './lib.mjs';
 import { advanceTo, signInFounders, until, voteYes } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -22,12 +22,10 @@ const ask = `Fix my flat ${stamp}`;
 
 const { ann, bob } = await signInFounders(phone);
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('radio', { name: /Collective service/ }).click();
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('We fix bikes together.');
+await ann.getByLabel('What do you propose?').fill('We fix bikes together.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url().split('?')[0];
 await ann.getByRole('button', { name: /^Support/ }).click();
@@ -37,12 +35,12 @@ await bob.getByRole('button', { name: 'Join project' }).click();
 await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
 await bob.getByRole('button', { name: /^Support/ }).click();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
-await advanceTo(ann, bob, 'Operations Plan');
-log('the founders moved the collective service to Operations Plan');
+await advanceTo(ann, bob, 'Plan');
+log('the founders moved the proposal to its Plan phase');
 
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Add plan' }).click();
+await addPlan(ann, 'Operations plan');
 const wizard = ann.getByRole('dialog', { name: 'Create Operations Plan' });
 const nextPlan = () => wizard.getByRole('button', { name: 'Next' }).click();
 await wizard.getByPlaceholder('Plan title').fill(planTitle);
@@ -50,6 +48,7 @@ await wizard.getByPlaceholder('Describe the plan').fill('Open the shed on Thursd
 await nextPlan(); // → plan type
 await nextPlan(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('The shed');
+await nextPlan(); // → requests (left off: the members vote them on below)
 await nextPlan();
 await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both of us asked.');
 await nextPlan();
@@ -79,7 +78,7 @@ await until(bob, () => bob.locator('.plan-card', { hasText: planTitle }), 'the p
 await assessPlan(bob, 2);
 await until(bob, () => bob.locator('.plan-card.leading', { hasText: planTitle }), 'the plan to lead');
 await advanceTo(ann, bob, 'Activity');
-log('the operations plan leads and the service reached Activity');
+log('the operations plan made it a collective service as it reached Activity');
 
 /** The Participation tab, reloaded until `name`'s toolbar button shows; then press it. */
 async function press(page, name) {

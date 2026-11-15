@@ -25,6 +25,9 @@
     onStep: (index: number) => void;
     onSubmit: () => void;
     onClose: () => void;
+    /** "Step 1 of 4 · Basics" and a progress line instead of the step rail (the proposal
+     * flow, Creating Through Plans mockup). */
+    progress?: boolean;
     children: Snippet;
   }
 
@@ -63,10 +66,16 @@
   onClose={close}
 >
   {#snippet subtitle()}
-    {#if p.stepIndex === 0}<p class="sheet-description">{p.description}</p>{/if}
+    {#if p.progress}<p class="sheet-description step-count">
+        Step {p.stepIndex + 1} of {p.steps.length} · {p.steps[p.stepIndex]?.title}
+      </p>
+    {:else if p.stepIndex === 0}<p class="sheet-description">{p.description}</p>{/if}
   {/snippet}
   {#snippet toolbar()}
-    {#if p.steps.length > 1}<nav class="step-rail" aria-label="Create steps">
+    {#if p.progress}<div class="step-progress" aria-hidden="true">
+        {#each p.steps as step, index (step.id)}<i class:on={index <= p.stepIndex}></i>{/each}
+      </div>
+    {:else if p.steps.length > 1}<nav class="step-rail" aria-label="Create steps">
         {#each p.steps as step, index (step.id)}
           <button
             class="step-chip"

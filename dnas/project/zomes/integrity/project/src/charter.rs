@@ -4,6 +4,7 @@
 
 use hdi::prelude::*;
 use sp_core::project::{check_fields, CharterFields, DESCRIPTION_MAX, MODES, SUBTYPES};
+use sp_governance::phases::PROPOSAL;
 
 use crate::{creator, invalid, Charter};
 
@@ -53,6 +54,12 @@ fn check_charter(c: &Charter) -> Result<(), String> {
         (MODES[0], SUBTYPES[0])
     } else if sp_scope::is_scope(&c.mode) {
         check_scope_charter(c)?;
+        (MODES[0], SUBTYPES[0])
+    } else if c.mode == PROPOSAL {
+        // A proposal has no type yet (ADR 0059); its leading plan gives it one.
+        if c.subtype != SUBTYPES[0] {
+            return Err("a proposal has no subtype until a plan gives it one".into());
+        }
         (MODES[0], SUBTYPES[0])
     } else {
         (c.mode.as_str(), c.subtype.as_str())

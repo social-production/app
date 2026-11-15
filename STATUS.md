@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-15 early morning Melbourne by a cloud session; see "Done 2026-11-15" and the first "In flight")
+# Status: where the P2P app stands (updated 2026-11-15 morning Melbourne by a cloud session; start at "START HERE (2026-11-15)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -82,7 +82,52 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
-## START HERE (2026-11-14, 8 pm Melbourne): where the owner's PC session stopped
+## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
+**Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the
+owner's PC) continues the UX build list. Answers to the open questions (apply them first):
+- **Feed glyphs: use the mockups' own** (the cube for a project, the speech bubble for a
+  thread), not web's house and lines.
+- **"Project", not "Productive"**, wherever a type is named (feed rows, rail, map, chips).
+- **"Service", not "Collective service".**
+- **Plan phases are just "Plan"**: don't say which plan ("Production Plan", "Operations
+  Plan", "Event Plan" all read "Plan"). The stage labels come from
+  `sp_governance::phases::stage_label`; directory integrity links `sp_governance`, so after
+  changing it compare `hc dna hash` for all three DNAs with the live `/readyz` (a change that
+  moves the directory hash is a directory reset: ask first). Browser tests and scenarios
+  match on these names (`advanceTo(…, 'Production Plan')` etc.).
+
+**Where things stand:**
+1. **PR #156 merged** 3:05 am Melbourne (feed tabs, feed rows, activity phase). The desktop
+   smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
+2. **PR #157 merged** 10:10 UTC Nov 15 (9:10 pm Melbourne): top bar, map capsule, About,
+   sign-up helpers (UI only).
+3. **PR #159** (`claude/ux-chats-profile`, main merged in, no rebase) is open; merge when
+   green. Its sign-up keeps the floating back button (it replaces #157's "Back to feed").
+4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
+   #156's fix; merge main into it, open its PR, merge when green. **It resets the project
+   network on merge** (owner approved). After the deploy: `/readyz` shows a new project
+   hash; directory and conversation must be unchanged.
+5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+   **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
+   17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
+   rerun passed). #156 fixed the sign-up half (`set_profile`). The rest: the profile page
+   waits for `getPerson`, which needs `get_standing` (vouches come from the network), so a
+   slow link leaves "Loading…" and no name. Follow-up worth doing: render your own profile
+   from `get_profile` (own chain) first and fill standing in when it arrives. Until then, a
+   red desktop smoke whose log shows `get_links response channel dropped` gets one rerun.
+   **Scenario shard 5 "hanging" in `service_requests` was an overloaded shard, not a hang**
+   (found 2026-11-15, PR #158): the shard table in `scripts/check-scenarios.sh` was from
+   2026-10-30 and some files had doubled (`scopes` 55 min on CI) or were never listed
+   (`service_requests` ~40 min), so shard 5 reached `service_requests` at ~90 min and CI
+   cancelled it at the 2-hour limit while it was passing. The table now holds today's CI
+   minutes (~85 min per shard). **When a shard is cancelled at 2 h, re-measure the files
+   (each shard's log prints `finished in …s` per file) and update the table.** Each step of
+   `service_requests` also has a 15-minute limit (`tests/scenarios/tests/common/steps.rs`).
+6. **Then the UX build list** (owner's message of 2026-11-14, items 4a to 4d): New message as
+   Telegram does it; the Remaining Screens; the Plan, Phase and Feedback Screens with Convert;
+   the phase bars and create menu against their mockups. The answers above come first.
+
+## START HERE (2026-11-14, 8 pm Melbourne, superseded by the entry above): where the owner's PC session stopped
 Two checkouts on the owner's PC: `app/` (branch `claude/creation-plans`) and `app-ux/` (a git
 worktree, branch `claude/ux-chats-profile`; its `target` is a symlink to `../app/target` and
 its `node_modules` are symlinks: never commit them). Do not run scenarios and browser tests
@@ -489,6 +534,59 @@ count. Then PARITY.md's next item.
   passed) and its older test; `threads.mjs` against a local seed node **passed** (it now
   publishes a post with a photo, sees it on the post's page and the profile row, and checks
   the photo is not a comment). Not run: the other scenarios and browser tests.
+
+## In flight 2026-11-14: creation through plans (ADR 0059 stage A), branch `claude/creation-plans`, pushed, no PR yet
+**This is the newest word on this branch; the 2026-11-13 entry below is older.** It resets
+the project network on merge (owner approved). Directory and conversation DNA hashes equal
+the live seed's `/readyz` (checked 2026-11-14 evening:
+`https://seed-node-production.up.railway.app/readyz`).
+- **Done before today:** charter mode `proposal`, the leading plan gives the type, the UI's
+  create menu and four-step proposal form, "Add plan" asks the kind, the operations plan
+  wizard's step "Will this service take requests?", 20 browser tests moved mechanically to
+  the proposal flow (**none run yet**), `addPlan` in `tests/e2e/lib.mjs`.
+- **Done 2026-11-14 (zome side of the request option):** `Plan.requests: Option<String>`
+  (`#[serde(default)]`; operations plans only, one of `sp_service::MODES`;
+  `plan.rs` `check_requests`), carried on governance `Approved` and `Moved`; when the phase
+  move cites that plan, `Applied.requests = { enabled: true, mode, off_schedule: mode ==
+  "both" }`; a return that reopens the type clears it (`apply.rs`). The UI already sends
+  `requests` (`domain/planForm.ts`). Scenario `proposals` asserts both; its test was split
+  into three functions for clippy's 60 lines.
+- **Checked 2026-11-14:** scenario `proposals` **passed** before the request change (the
+  return needs both founders' votes: fixed test). After it: `cargo fmt`, workspace clippy
+  `-D warnings`, `check-sizes.sh`, `build-happ.sh` and the two DNA hashes pass; scenario
+  `proposals` (with the new assertions) and `plans` **passed** (8:35 pm Melbourne). Not run: the other
+  scenarios (`collective_bookings`, `private_events`, `software`, `values`, `events` only
+  gained `requests: None`), `npm run check -w ui`.
+- **Done 2026-11-15 (cloud session):** merged `claude/ux-chats-profile` (conflicts only in
+  `tests/e2e/governance.mjs` and `lib.mjs`) and #156's sign-up fix in. Compared with the
+  Creating Through Plans mockup and fixed: the new proposal's "Step N of 4" line and progress
+  line, steps in the order Basics, Tags, Location, Overview, "What do you propose?", the "No
+  type yet" note; the create menu's Proposal tinted with a star and NEW; "Add a plan" as a
+  small sheet; an arrow before "makes this a …"; the Plan phase's "The leading plan decides
+  what this becomes"; feed rows no longer read "Proposal · Proposal"; the map list labels a
+  proposal as one. **Bug found and fixed:** the gateway's feed, map and region cards kept
+  the mode from the directory listing, so a proposal that became an event still showed as
+  a proposal card (`services/gateway/src/node/cards.rs` now reads the project view's mode
+  and subtype). **Kept on purpose:** a proposal's progress line has 4 phases (the mockup
+  drew 5; an event has only 4). ADR 0059 addendum updated.
+- **Browser tests repaired and passing (2026-11-15, local seed built from this branch):**
+  `projects`, `screens`, `events`, `activities`, `governance`, `service-requests` (rewritten:
+  an operations plan switches requests on and a non-member requests with no vote),
+  `collective-requests`, `map`, `places`, `region`, `chat`, `follows`, `guests`, `links`,
+  `mentions`, `message-reports`, `notifications`, `public-chats`, `software`,
+  `memory-projects`, `accounts`, `shell` (Settings rows), `threads`, `help-requests`,
+  `private-events`, `closed-communities`, `search`, `messages`, `reports`, `platform`. Several needed a second run on a
+  restarted node: **the local seed tires after ~10 tests** (sign-ins time out, "database is
+  locked", index lag); restart `cloud-seed.sh` and warm it with a sign-up before trusting a
+  failure. Screens looked at in light and dark at 390px: create menu, every proposal step,
+  feed, Plan phase, Add a plan sheet, a plan card.
+- **Cannot run until stage B decides:** `bookings.mjs` and the first half of `rail.mjs`
+  create a personal service, which nothing can create any more (the screens stay until stage
+  B). Not run: `attachments`, `bot-reviews`, `calls`, `discover`, `group-options`,
+  `people-lag`, `regional`, `retire`, `scope-settings` (they create no proposals); scenarios
+  other than `proposals` and `plans` (CI runs them all on the PR).
+- **Next:** merge main in once `ux-chats-profile` has merged, open the PR, merge when green
+  (project network reset), check `/readyz` (new project hash, others unchanged).
 
 ## In flight 2026-11-13 (night): creation through plans (ADR 0059), NOT pushed yet
 **Owner, 2026-11-13: "yep go, feel free to reset network"; the word is "Proposal"; an

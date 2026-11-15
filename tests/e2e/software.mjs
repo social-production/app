@@ -1,6 +1,6 @@
 // Software projects (ADR 0086) end to end at phone width, against a local seed node with the
 // dev founders (scripts/dev-seed.sh). Ann creates a project; both founders move it to
-// Production Plan and approve Ann's software plan (with its repository), then move it to
+// Plan phase and approve Ann's software plan (with its repository), then move it to
 // Activity, where web's software panel shows the repository and Ann as its merger. Ann submits
 // a pull request through web's wizard; Ann approves it in the panel, Bob from his rail
 // ("Vote · pull request" → Assess opens the wizard). Ann's rail then says "Action · merge
@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
 import { advanceTo, signInFounders, until } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -26,11 +26,10 @@ const prTitle = `Morning timer ${stamp}`;
 const { ann, bob } = await signInFounders({ width: 390, height: 844 });
 
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('An app that waters the beds.');
+await ann.getByLabel('What do you propose?').fill('An app that waters the beds.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url().split('?')[0];
 await ann.getByRole('button', { name: /^Support/ }).click();
@@ -40,13 +39,13 @@ await bob.getByRole('button', { name: 'Join project' }).click();
 await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
 await bob.getByRole('button', { name: /^Support/ }).click();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
-await advanceTo(ann, bob, 'Production Plan');
-log('the founders moved the project to Production Plan');
+await advanceTo(ann, bob, 'Plan');
+log('the founders moved the proposal to its Plan phase');
 
 // Ann's production plan picks web's Software type and names the official repository.
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Add plan' }).click();
+await addPlan(ann, 'Production plan');
 const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
 const next = () => wizard.getByRole('button', { name: 'Next' }).click();
 await wizard.getByPlaceholder('Plan title').fill(planTitle);

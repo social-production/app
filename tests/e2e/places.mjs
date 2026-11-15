@@ -21,11 +21,11 @@ await signUp(page, `places${stamp}`);
 const next = () => page.getByRole('button', { name: 'Continue' }).click();
 
 await page.getByRole('button', { name: 'Create', exact: true }).click();
-await page.getByRole('menuitem', { name: /Project/ }).click();
-await page.getByRole('radio', { name: /Productive project/ }).click();
-await next();
+await page.getByRole('menuitem', { name: /Proposal/ }).click();
 await page.getByLabel('Title').fill(title);
-await page.getByLabel('Proposal description').fill('Lend drills and ladders.');
+await page.getByLabel('What do you propose?').fill('Lend drills and ladders.');
+await next(); // → Tags
+await tagTestChannel(page);
 await next(); // → Location
 await page.getByRole('radio', { name: /Physical/ }).check();
 
@@ -39,11 +39,9 @@ await suggestion.click();
 assert.equal(await field.inputValue(), label.slice(0, 160).trim());
 log('picked', label);
 
-await next(); // → Scope
-await tagTestChannel(page);
 await next(); // → Overview
 await page.locator('.overview-row', { hasText: 'Location' }).getByText(label.slice(0, 40)).waitFor();
-await page.getByRole('button', { name: 'Publish project' }).click();
+await page.getByRole('button', { name: 'Publish proposal' }).click();
 await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 
 const charter = sent.find((b) => b.includes(title) && b.includes('provider_id'));
@@ -73,17 +71,15 @@ log('an edit proposed the new place', moved);
 // A typed-only name has no place, as on web.
 await page.goto(BASE);
 await page.getByRole('button', { name: 'Create', exact: true }).click();
-await page.getByRole('menuitem', { name: /Project/ }).click();
-await page.getByRole('radio', { name: /Productive project/ }).click();
-await next();
+await page.getByRole('menuitem', { name: /Proposal/ }).click();
 await page.getByLabel('Title').fill(`${title} two`);
-await page.getByLabel('Proposal description').fill('A second shed.');
-await next();
+await page.getByLabel('What do you propose?').fill('A second shed.');
+await next(); // → Tags
+await tagTestChannel(page);
+await next(); // → Location
 await page.getByRole('radio', { name: /Physical/ }).check();
 await field.fill('Behind the hall');
-await next();
-await tagTestChannel(page);
-await next();
+await next(); // → Overview
 await page.locator('.overview-row', { hasText: 'Behind the hall' }).waitFor();
 log('a typed place name is kept as typed');
 

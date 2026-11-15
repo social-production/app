@@ -15,10 +15,10 @@ mkdirSync(shots, { recursive: true });
 
 const { ann, bob } = await signInFounders({ width: 390, height: 844 });
 const eventUrl = await createEvent(ann, bob, title);
-log('founder one created the event; founder two joined; both support it');
+log('founder one proposed the event; founder two joined; both support it');
 
-await advanceTo(ann, bob, 'Event Plan');
-log('the event moved to Event Plan');
+await advanceTo(ann, bob, 'Plan');
+log('the proposal moved to its Plan phase');
 
 const iso = daysFromNow(14);
 const day = new Date(`${iso}T12:00`);
@@ -28,7 +28,10 @@ log('founder one filed an event plan');
 await approvePlan(ann, bob, planTitle);
 log('both approved the event plan; it leads');
 
-// web's EventOverviewHeader: the leading plan's time and place.
+await advanceTo(ann, bob, 'Activity');
+log('the approved event plan made it an event as it moved to Activity');
+
+// web's EventOverviewHeader: the leading plan's time and place (an event since the move).
 await bob.reload();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 60_000 });
 const facts = await bob.locator('.live-fact').allInnerTexts();
@@ -36,9 +39,6 @@ assert.ok(facts.some((f) => /9:00|09:00/.test(f) && /1:00|13:00/.test(f)), `time
 assert.ok(facts.includes('Allotment 4'), `place: ${facts}`);
 await bob.screenshot({ path: `${shots}/event-details-390.png` });
 log(`the event shows its plan's time and place: ${facts.join(' | ')}`);
-
-await advanceTo(ann, bob, 'Activity');
-log('the approved plan let the event move to Activity');
 
 // web's EventCard in the feed, linking to /events/<id>.
 const card = bob.locator('.event-card', { hasText: title });

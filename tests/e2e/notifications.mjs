@@ -53,11 +53,10 @@ for (const page of [ann, bob]) {
 log('both founders signed in');
 
 await ann.goto(`${BASE}/create/project`);
-await ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('Proposal description').fill('Swap seeds every spring.');
+await ann.getByLabel('What do you propose?').fill('Swap seeds every spring.');
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish project' }).click();
+await ann.getByRole('button', { name: 'Publish proposal' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
 // Moving on from the Proposal phase needs support (web's signal gate), as in governance.mjs.
@@ -137,7 +136,7 @@ await bob.waitForURL(/open=vote/, { timeout: 60_000 });
 await bob.locator('.choice-bar .choice.yes').click({ timeout: 120_000 });
 await bob.waitForURL((url) => !url.search.includes('open=vote'), { timeout: 60_000 });
 // Leaving before the vote lands would cancel it; reloading the project also writes the Outcome.
-for (let i = 0; !(await bob.locator('.feed-card-stage', { hasText: 'Production Plan' }).count()); i++) {
+for (let i = 0; !(await bob.locator('.feed-card-stage', { hasText: /^\s*Plan\s*$/ }).count()); i++) {
   if (i >= 40) throw new Error('timed out waiting for the phase move');
   await bob.waitForTimeout(3000);
   await bob.reload();

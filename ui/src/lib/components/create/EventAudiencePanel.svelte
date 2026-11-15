@@ -36,21 +36,6 @@
         <input
           type="radio"
           name="event-audience"
-          value="public"
-          checked={audience === 'public'}
-          onchange={() => onAudience('public')}
-        />
-        <span>
-          <strong>Public</strong>
-          <span class="hint"
-            >Discoverable through channel/community tags. Always collaborative.</span
-          >
-        </span>
-      </label>
-      <label class="control-option">
-        <input
-          type="radio"
-          name="event-audience"
           value="private_community"
           checked={audience === 'private_community'}
           onchange={() => onAudience('private_community')}
