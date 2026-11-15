@@ -1,6 +1,6 @@
 # 0095. The Platform channel and its moderators
 
-Status: **proposed** (2026-11-12). Parity items "The Platform channel" and "Moderators"
+Status: **accepted**, built 2026-11-13 (PR #151): the Platform channel, moderators, the weekly active count; platform-tagged voters and the merge capability are next. Proposed 2026-11-12. Parity items "The Platform channel" and "Moderators"
 (`docs/plans/PARITY.md`; owner 2026-11-12: "we also don't have moderators"). Follows
 [0068](./0068-channels-and-communities.md) (scopes), [0033](./0033-project-governance-checks.md)
 (populations), [0074](./0074-bot-reviews.md) (votes on an account, replayed) and

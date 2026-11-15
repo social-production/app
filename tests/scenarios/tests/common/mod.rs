@@ -9,6 +9,7 @@ pub mod chats;
 pub mod links;
 pub mod net;
 pub mod plans;
+pub mod steps;
 use holochain::sweettest::{SweetAgents, SweetCell, SweetConductorBatch, SweetDnaFile};
 use identity_integrity::{DirectoryProperties, Founder};
 
