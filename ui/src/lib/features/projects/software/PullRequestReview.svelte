@@ -2,6 +2,7 @@
   import VoteChoiceBar from '#lib/components/governance/VoteChoiceBar.svelte';
   import {
     canVote,
+    stageFilled,
     externalUrl,
     voteRequirementLine,
     voteSummaryLine,
@@ -9,8 +10,9 @@
   } from '#lib/domain/software.ts';
 
   /**
-   * web's SoftwareGovernanceWizard `vote-pr` and `record-merge` steps: the pull request's
-   * details, then its vote (or, for a merger, the merge ID and link fields as children).
+   * web's SoftwareGovernanceWizard `vote-pr` and `record-merge` steps, as drawn (Invites,
+   * Help Requests and Software Screens, 4): the three-step line, the pull request's details
+   * as a soft list, then its vote (or, for a merger, the merge ID and link fields).
    */
   interface Props {
     pr: SoftwarePullRequest;
@@ -24,6 +26,21 @@
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- the pull request's links are off the app -->
+<div class="pr-review-steps" aria-label={`Step ${stageFilled(pr.stage)} of 3`}>
+  {#each [1, 2, 3] as step (step)}
+    <i class:done={step < stageFilled(pr.stage)} class:now={step === stageFilled(pr.stage)}></i>
+  {/each}
+</div>
+<p class="pr-review-step">
+  Step {stageFilled(pr.stage)} of 3 ·
+  <b>{['Approval', 'Merge', 'Confirmation'][stageFilled(pr.stage) - 1]}</b>, then {stageFilled(
+    pr.stage,
+  ) === 1
+    ? 'a merge is recorded, then members confirm it'
+    : stageFilled(pr.stage) === 2
+      ? 'members confirm it'
+      : 'it is done'}
+</p>
 {#if mode === 'vote-pr'}
   <h2>{pr.title}</h2>
   <p class="helper-copy">

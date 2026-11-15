@@ -54,6 +54,7 @@ interface ProjectWire {
   organizers: AgentPubKey[];
   am_organizer: boolean;
   requests?: { enabled: boolean; mode: RequestMode; off_schedule: boolean };
+  lineage?: { converted: boolean; continues: string | null; continued_by: string | null };
 }
 
 const directory = <T>(fn: string, payload?: unknown) =>
@@ -200,7 +201,19 @@ export async function getProject(id: string): Promise<Project> {
     requests: p.requests
       ? { enabled: p.requests.enabled, mode: p.requests.mode, offSchedule: p.requests.off_schedule }
       : { enabled: false, mode: 'both', offSchedule: false },
+    lineage: {
+      converted: p.lineage?.converted ?? false,
+      continues: p.lineage?.continues ?? null,
+      continuedBy: p.lineage?.continued_by ?? null,
+    },
   };
+}
+
+/** Convert (ADR 0106): on project `id`, name `other` as the project it continues from, or
+ * (`continuedBy`) the proposal that continues it. */
+export async function linkLineage(id: string, other: string, continuedBy: boolean): Promise<void> {
+  const { cell } = await cellOf(id);
+  await callCell<unknown>(cell, 'project', 'link_lineage', { other, continued_by: continuedBy });
 }
 
 export async function joinProject(id: string, join: boolean): Promise<void> {

@@ -60,6 +60,11 @@ if (process.env.ONLY !== "create") {
     page.locator("#settings-account .set-row").first(),
   );
   await visit("people", "/people", () => page.locator(".people-row").first());
+  await visit("about", "/about", () => page.getByRole("heading").first());
+  await visit("notifications", "/notifications", () =>
+    page.getByRole("heading", { name: "Notifications" }),
+  );
+  await visit("invites", "/invites", () => page.getByRole("heading", { name: "Invites" }));
   await visit("search", `/search?q=${TEST_CHANNEL}`, () =>
     page.locator(".type-chips"),
   );
@@ -107,14 +112,37 @@ try {
   await page.getByRole("button", { name: "Publish proposal" }).click();
   await page.locator(".project-detail h1").waitFor({ timeout: 120_000 });
   await shot("detail");
-  for (const tab of ["Take part", "Links", "History"]) {
+  for (const tab of ["Participation", "Links", "History"]) {
     await page.getByRole("tab", { name: tab }).click();
     await page.waitForTimeout(2500);
     await shot(`detail-${tab.toLowerCase().replace(" ", "-")}`);
   }
+  // Add value with its rating, and the one-sheet phase move.
+  await page.getByRole("tab", { name: "Participation" }).click();
+  await page.getByRole("button", { name: "Add value" }).click();
+  await page.getByPlaceholder(/^Add a value/).fill("Quiet at night");
+  await page.getByRole("button", { name: "Importance 8 of 10" }).click();
+  await shot("add-value", { full: false });
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Phase", exact: true }).click();
+  await page
+    .getByPlaceholder("State why this phase change should happen now.")
+    .waitFor();
+  await shot("phase-sheet", { full: false });
+  await page.keyboard.press("Escape");
   await page.goto(BASE);
   await page.getByRole("button", { name: "Create", exact: true }).click();
   await shot("create-menu", { full: false });
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "Open networks" }).click();
+  await page.locator(".left-rail .rail-find").waitFor();
+  await shot("left-rail", { full: false });
+  await page.getByRole("button", { name: "Discover" }).click();
+  await page
+    .getByRole("radiogroup", { name: "Filter channels and communities" })
+    .waitFor();
+  await page.waitForTimeout(2000);
+  await shot("discover", { full: false });
 } catch (error) {
   log(`MISSED the proposal screens: ${String(error).split("\n")[0]}`);
   await page.screenshot({ path: `${out}/MISSED-proposal.png` }).catch(() => {});

@@ -197,9 +197,7 @@ export class DetailState {
     return this.file({ Edit: edit });
   }
 
-  proposeUpdate(body: string): Promise<boolean> {
-    return this.file({ Update: { body } });
-  }
+  proposeUpdate = (body: string): Promise<boolean> => this.file({ Update: { body } });
 
   proposeNextPhase(reason: string): Promise<boolean> {
     const next = this.project?.nextPhase;
@@ -208,10 +206,12 @@ export class DetailState {
       : Promise.resolve(false);
   }
 
-  /** web's return request (`revert-requests`). Returns true when filed. */
-  proposeReturn(to: string, reason: string): Promise<boolean> {
-    return this.file({ Return: { to, reason } });
-  }
+  /** Close this and continue its work as a new proposal (ADR 0106). True when filed. */
+  proposeConvert = (reason: string): Promise<boolean> => this.file({ Convert: { reason } });
+
+  /** web's return request (`revert-requests`). True when filed. */
+  proposeReturn = (to: string, reason: string): Promise<boolean> =>
+    this.file({ Return: { to, reason } });
 
   async challenge(proposal: string): Promise<void> {
     try {

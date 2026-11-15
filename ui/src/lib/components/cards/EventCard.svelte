@@ -1,11 +1,11 @@
 <script lang="ts">
   import CardReport from '#lib/components/moderation/CardReport.svelte';
-  import { implementedLabel } from '#lib/domain/eventSchedule.ts';
   import { localDateTime } from '#lib/domain/helpRequests.ts';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
 
   import { resolve } from '$app/paths';
 
+  import CardFacts from './CardFacts.svelte';
   import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
@@ -13,7 +13,7 @@
 
   /**
    * web's public-feed EventCard (styles/cards.css, `.event-card`). An event is a listing with
-   * mode "event" (ADR 0057); the place line starts with the leading plan's start time.
+   * mode "event" (ADR 0057); its leading plan's start time and place sit on their own rows.
    */
   interface Props {
     card: ProjectCard;
@@ -25,7 +25,6 @@
   const href = $derived(resolve('/events/[id]', { id: card.id }));
   const closed = $derived(card.phase === 'Closed');
   const when = $derived(localDateTime(card.scheduledAt ?? null));
-  const place = $derived([when, implementedLabel(card.locationLabel)].filter(Boolean).join(' · '));
 
   import '#lib/components/styles/cards.css';
 </script>
@@ -48,9 +47,7 @@
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
-    {#if place}
-      <p class="location">{place}</p>
-    {/if}
+    <CardFacts {when} place={card.locationLabel} />
     <FeedActions
       commentHref={`${href}?tab=chat`}
       commentCount={card.commentCount}

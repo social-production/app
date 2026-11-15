@@ -9,6 +9,7 @@ mod bot_review;
 mod deactivation;
 mod devices;
 mod feedback;
+mod feedback_comments;
 mod follow_links;
 mod follows;
 mod listings;
@@ -23,6 +24,7 @@ pub use active::WeeklyActive;
 pub use board::{BoardRow, BoardView, BoardVote};
 pub use bot_review::{BotChoice, BotReviewView};
 pub use feedback::{FeedbackView, FeedbackVote, VoteDirection};
+pub use feedback_comments::{FeedbackCommentLike, FeedbackCommentView, NewFeedbackComment};
 pub use follows::{FollowRow, FollowStatus, FollowView};
 pub use listings::{Allowance, ListingInput, ListingView};
 pub use profile::ProfileInput;
@@ -239,6 +241,24 @@ pub fn get_feedback(id: ActionHash) -> ExternResult<Option<FeedbackView>> {
 #[hdk_extern]
 pub fn vote_feedback(input: FeedbackVote) -> ExternResult<Option<FeedbackView>> {
     feedback::vote(input)
+}
+
+#[hdk_extern]
+pub fn add_feedback_comment(input: NewFeedbackComment) -> ExternResult<FeedbackCommentView> {
+    feedback_comments::add(input)
+}
+
+/// An item's comments, oldest first.
+#[hdk_extern]
+pub fn list_feedback_comments(id: ActionHash) -> ExternResult<Vec<FeedbackCommentView>> {
+    feedback_comments::list(id)
+}
+
+#[hdk_extern]
+pub fn like_feedback_comment(
+    input: FeedbackCommentLike,
+) -> ExternResult<Option<FeedbackCommentView>> {
+    feedback_comments::like(input)
 }
 
 #[derive(Serialize, Deserialize, Debug)]

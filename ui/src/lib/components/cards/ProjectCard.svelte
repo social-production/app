@@ -4,6 +4,7 @@
 
   import { resolve } from '$app/paths';
 
+  import CardFacts from './CardFacts.svelte';
   import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
@@ -40,6 +41,7 @@
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
+    <CardFacts place={card.locationLabel} />
     <FeedActions
       commentHref={`${href}?tab=chat`}
       commentCount={card.commentCount}

@@ -59,7 +59,7 @@ for (let i = 0; ; i++) {
     // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
     // the asker's profile, which lists the request on web's PersonalHelpRequestCard.
     await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
-    const author = helper.locator('.content-meta-row a').first();
+    const author = helper.locator('.detail-by a').first();
     await author.waitFor({ timeout: 60_000 });
     profile = await author.getAttribute('href');
     break;
@@ -95,9 +95,9 @@ log("the helper's rail lists it as open help in their channel");
 await helper.goto(url);
 const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
-await driver.getByRole('button', { name: 'Sign up' }).click();
+await driver.getByRole('button', { name: 'Join', exact: true }).click();
 await driver.getByRole('button', { name: 'Leave' }).waitFor({ timeout: 60_000 });
-await driver.getByText('1 signed up · 1 needed').waitFor();
+await driver.locator('.role-copy span', { hasText: /^1 needed · (?!nobody)/ }).waitFor();
 log('a helper signed up as driver');
 // Stay on the page until the sign-up shows (above), then the rail reads it.
 await railShows(helper, () => helpRow(helper, 'You signed up'), 'the signed-up help request', 20_000);
@@ -120,7 +120,7 @@ log("the asker's rail lists it as their request");
 await ann.goto(url);
 
 await driver.getByRole('button', { name: 'Leave' }).click();
-await driver.getByRole('button', { name: 'Sign up' }).waitFor({ timeout: 60_000 });
+await driver.getByRole('button', { name: 'Join', exact: true }).waitFor({ timeout: 60_000 });
 log('the helper left the role');
 
 // web's Share menu: share outside the app (Copy link), then send to the helper by name.
@@ -151,7 +151,7 @@ for (let i = 0; ; i++) {
   if (i >= 40) throw new Error('the share never reached the helper');
 }
 await shared.first().getByText(title).waitFor();
-await shared.first().getByText('Help request', { exact: true }).waitFor();
+assert.match(await shared.first().locator('.note-by').innerText(), /^Help request · /);
 await shared.first().click();
 await helper.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);

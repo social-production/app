@@ -1,17 +1,29 @@
 <script lang="ts">
+  import FactLine from '#lib/components/cards/FactLine.svelte';
+  import { zoneOf } from '#lib/domain/activityTime.ts';
+  import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import { SUBTYPE_LABELS, type Plan, type PlanStage } from '#lib/domain/plans.ts';
   import { REQUEST_MODES } from '#lib/domain/projects.ts';
+  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
-  /** web's plan sheet sections: Overview, Details, Notes and Stages. */
-  let { plan }: { plan: Plan } = $props();
+  /** An opened plan read top to bottom like a page (Plan, Phase and Feedback Screens, 3):
+   * what, when, where (opens the map), stages as numbered steps, its answer to support, and
+   * the rest of its facts as a soft list. */
+  let { plan, onMap }: { plan: Plan; onMap?: () => void } = $props();
 
-  const hasDetails = $derived(
-    !!plan.subtype ||
-      !!plan.location ||
-      !!plan.recipients ||
-      !!plan.repository_url ||
-      !!plan.requests,
+  const place = $derived(plan.location?.trim() ?? '');
+  const mappable = $derived(!!place && place.toLowerCase() !== 'online');
+  const when = $derived(plan.schedule ? scheduleLine(plan.schedule, zoneOf) : '');
+  const facts = $derived(
+    [
+      plan.subtype ? ['Type', SUBTYPE_LABELS[plan.subtype]] : null,
+      plan.subtype === 'software' ? ['Licence', SOFTWARE_LICENSE_LABEL] : null,
+      plan.requests
+        ? ['Takes requests', REQUEST_MODES.find((m) => m.value === plan.requests)?.label ?? '']
+        : null,
+      plan.recipients ? ['Recipients', plan.recipients] : null,
+    ].filter((f): f is [string, string] => f !== null),
   );
 
   function day(value: string | null): string {
@@ -33,47 +45,60 @@
     const trimmed = url.trim();
     return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
   }
+
+  function showPlace(e: MouseEvent): void {
+    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    e.preventDefault();
+    onMap?.();
+    openPlaceOnMap(place);
+  }
 </script>
 
-<section class="plan-section">
-  <h3>Overview</h3>
+<div class="plan-read">
   <p class="plan-body">{plan.description}</p>
-</section>
+  {#if when}<FactLine icon="when">{when}</FactLine>{/if}
+  {#if mappable}
+    <a
+      class="plan-place"
+      href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(place)}`}
+      rel="noopener noreferrer"
+      onclick={showPlace}
+    >
+      <FactLine icon="where"><strong>{place}<small>Show on the map</small></strong></FactLine>
+      <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
+    </a>
+  {:else if place}
+    <FactLine icon="where">{place}</FactLine>
+  {/if}
 
-{#if hasDetails}
-  <section class="plan-section">
-    <h3>Details</h3>
+  {#if plan.stages.length > 0}
+    <ol class="stage-list">
+      {#each plan.stages as stage, index (index)}
+        <li class="stage-item">
+          <span class="stage-num">{index + 1}</span>
+          <div class="stage-copy">
+            <strong>{stage.title}</strong>
+            {#if stageDates(stage)}<span class="stage-meta">{stageDates(stage)}</span>{/if}
+            {#if stage.details}<p>{stage.details}</p>{/if}
+          </div>
+        </li>
+      {/each}
+    </ol>
+  {/if}
+
+  <div class="plan-note">
+    <small>How it answers support</small>
+    {plan.demand_note}
+  </div>
+
+  {#if facts.length > 0 || plan.repository_url}
     <dl class="plan-facts">
-      {#if plan.subtype}
+      {#each facts as [label, value] (label)}
         <div class="fact">
-          <dt>Subtype</dt>
-          <dd>{SUBTYPE_LABELS[plan.subtype]}</dd>
+          <dt>{label}</dt>
+          <dd>{value}</dd>
         </div>
-      {/if}
-      {#if plan.location}
-        <div class="fact">
-          <dt>Location</dt>
-          <dd>{plan.location}</dd>
-        </div>
-      {/if}
-      {#if plan.subtype === 'software'}
-        <div class="fact">
-          <dt>Licence</dt>
-          <dd>{SOFTWARE_LICENSE_LABEL}</dd>
-        </div>
-      {/if}
-      {#if plan.requests}
-        <div class="fact">
-          <dt>Requests</dt>
-          <dd>{REQUEST_MODES.find((m) => m.value === plan.requests)?.label}</dd>
-        </div>
-      {/if}
-      {#if plan.recipients}
-        <div class="fact">
-          <dt>Recipients</dt>
-          <dd>{plan.recipients}</dd>
-        </div>
-      {/if}
+      {/each}
       {#if plan.repository_url}
         <div class="fact">
           <dt>Repository</dt>
@@ -86,29 +111,5 @@
         </div>
       {/if}
     </dl>
-  </section>
-{/if}
-
-<section class="plan-section">
-  <h3>Notes</h3>
-  <article class="note-card">
-    <span class="note-label">Support response</span>
-    <p>{plan.demand_note}</p>
-  </article>
-</section>
-
-<section class="plan-section">
-  <h3>Stages</h3>
-  <ol class="stage-list">
-    {#each plan.stages as stage, index (index)}
-      <li class="stage-item">
-        <span class="stage-num">{index + 1}</span>
-        <div class="stage-copy">
-          <strong>{stage.title}</strong>
-          {#if stageDates(stage)}<span class="stage-meta">{stageDates(stage)}</span>{/if}
-          <p>{stage.details}</p>
-        </div>
-      </li>
-    {/each}
-  </ol>
-</section>
+  {/if}
+</div>

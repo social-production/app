@@ -178,6 +178,7 @@
             names={detail.names}
             moderation={moderation.value}
             onModeration={(next) => moderation.set(next)}
+            onMembers={() => (sheet = 'members')}
           />
         </div>
         <div

@@ -30,6 +30,7 @@
   let deciding = $state('');
 
   let error = $state('');
+  let loaded = $state(false);
 
   $effect(() => {
     untrack(() => void refresh());
@@ -42,6 +43,7 @@
     } catch (e) {
       error = explain(e);
     }
+    loaded = true;
   }
 
   /** web's "Mark read" (also when a card is opened). */
@@ -149,6 +151,12 @@
 
   {#if error}
     <p class="error-note">{error}</p>
+  {/if}
+
+  {#if loaded && !error && notifications.items.length === 0}
+    <p class="notes-empty">
+      Nothing yet. Votes, replies, roles and invites from your projects show up here.
+    </p>
   {/if}
 
   <div class="stack">

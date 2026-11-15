@@ -83,7 +83,9 @@
           <div class="wizard">
             <div class="step-body">{@render p.children()}</div>
             {#if p.missing.length}
-              <p class="missing-note" role="status">Still needed: {p.missing.join(', ')}.</p>
+              <p class="missing-note" role="status">
+                Still needed: {p.missing.map((m) => m.replace(/\.$/, '')).join(', ')}.
+              </p>
             {/if}
           </div>
         </div>

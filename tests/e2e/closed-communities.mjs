@@ -98,7 +98,8 @@ await retry('two was never removed', async () => {
   await b.goto('about:blank');
   await b.goto(link);
   await b.getByRole('heading', { name: handle }).waitFor({ timeout: 60_000 });
-  await b.getByText('Join with invite').waitFor({ timeout: 10_000 });
+  // The header's button and the invite panel both say it.
+  await b.getByText('Join with invite').first().waitFor({ timeout: 10_000 });
   return true;
 });
 await b.screenshot({ path: `${out}/phone390-community-join-invite.png` });

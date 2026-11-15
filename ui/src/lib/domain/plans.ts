@@ -96,6 +96,11 @@ export const PLAN_KIND_NAMES: Record<PlanKind, string> = {
   Event: 'event plan',
 };
 
+/** "Production plan", "Operations plan"… (an opened plan's kind line). */
+export const PLAN_KIND_LABELS: Record<PlanKind, string> = Object.fromEntries(
+  Object.entries(PLAN_KIND_NAMES).map(([k, v]) => [k, v.charAt(0).toUpperCase() + v.slice(1)]),
+) as Record<PlanKind, string>;
+
 /** web-backend `_subtype_label`. */
 export const SUBTYPE_LABELS: Record<ProjectSubtype, string> = {
   standard: 'Standard',
