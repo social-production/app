@@ -133,8 +133,24 @@ this order, once creation-plans is on main; merge main in first):
    - Browser tests: `governance` passed with §1 to §3; **not yet run after §4 to §6:**
      `governance`, `service-requests`, `event-flow`, `notifications`, `discover`, then
      `collective-requests`, `software`, `events`, `activities`.
-**Still to do:** the Feedback item page with comments (new data in the directory DNA = a
-reset: ask the owner); README Status. The create menu and the Take part phase line were
+   **Later on the same branch (owner, 2026-11-15 afternoon):**
+   - **Directory reset approved by the owner.** Feedback items open on their own page
+     (`/feedback/<id>`, `features/feedback/FeedbackItemPage`): flat comments with "Replying
+     to …", likes, the post page's floating comment bar. Directory integrity gains
+     `FeedbackComment` and links `FeedbackComments`, `FeedbackCommentLikes` (ADR 0054's
+     feedback); coordinator `feedback_comments.rs`. **New directory hash
+     `uhC0koVynnrz_2MHJg-B1OXJ8-Nwtk-2f4fMinVtTrehMuvBV42yB`** (project and conversation
+     unchanged). Scenarios `feedback` and `feedback_comments` passed.
+   - Feed cards: the date on its own line, the place on its own soft row that opens the map
+     (`components/cards/CardFacts`; events, projects, services, help requests).
+   - "Service" everywhere a person reads it (About too); `collective-service` stays the
+     internal mode id (renaming it would be a reset for nothing visible).
+   - Notifications rebuilt as drawn (Remaining Screens §2): round type icon, one bold line,
+     time, a green dot that marks it read.
+   - **Mockups waiting for the owner:** Invites, a help request, software Take part and a pull
+     request (https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV). Build them once approved.
+**Still to do:** Convert (ADR 0106, needs the owner's answers and a project reset); check the
+activity phase and About against their mockups; README Status. The create menu and the Take part phase line were
 compared with their mockups and already match (menu items follow Creating Through Plans).
 
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
