@@ -47,7 +47,7 @@ await pill.waitFor();
 // Feed rows name no author (ADR 0097); the project's page does, and its author link opens
 // Ann's profile, which lists her project (web's profile feed).
 await card.locator('a.title').click();
-await guest.locator('.content-meta-row a').first().click();
+await guest.locator('.detail-by a').first().click();
 await guest.waitForURL(/\/profile\//);
 await guest.locator('.feed-stack .personal-activity-card', { hasText: title }).waitFor({ timeout: 60_000 });
 await guest.screenshot({ path: `${out}/phone390-guest-profile-feed.png` });

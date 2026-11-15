@@ -1,7 +1,4 @@
 /* A project's or event's Details tab (Plan, Phase and Feedback Screens, 1). */
-.shell .context-panel .feed-card-top.feed-lead .feed-card-time {
-  display: none;
-}
 
 .shell .project-overview .context-panel {
   display: grid;

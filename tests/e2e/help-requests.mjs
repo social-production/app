@@ -59,7 +59,7 @@ for (let i = 0; ; i++) {
     // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
     // the asker's profile, which lists the request on web's PersonalHelpRequestCard.
     await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
-    const author = helper.locator('.content-meta-row a').first();
+    const author = helper.locator('.detail-by a').first();
     await author.waitFor({ timeout: 60_000 });
     profile = await author.getAttribute('href');
     break;
@@ -95,7 +95,7 @@ log("the helper's rail lists it as open help in their channel");
 await helper.goto(url);
 const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
-await driver.getByRole('button', { name: 'Sign up' }).click();
+await driver.getByRole('button', { name: 'Join', exact: true }).click();
 await driver.getByRole('button', { name: 'Leave' }).waitFor({ timeout: 60_000 });
 await driver.getByText('1 signed up · 1 needed').waitFor();
 log('a helper signed up as driver');
@@ -120,7 +120,7 @@ log("the asker's rail lists it as their request");
 await ann.goto(url);
 
 await driver.getByRole('button', { name: 'Leave' }).click();
-await driver.getByRole('button', { name: 'Sign up' }).waitFor({ timeout: 60_000 });
+await driver.getByRole('button', { name: 'Join', exact: true }).waitFor({ timeout: 60_000 });
 log('the helper left the role');
 
 // web's Share menu: share outside the app (Copy link), then send to the helper by name.

@@ -3,6 +3,7 @@
   import FactLine from '#lib/components/cards/FactLine.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
+  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
   import { tagHref } from '#lib/components/cards/tagLinks.ts';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
@@ -13,7 +14,6 @@
   import type { Charter, Project } from '#lib/domain/projects.ts';
   import { tagRef } from '#lib/domain/scopes.ts';
   import { relativeTime } from '#lib/domain/time.ts';
-  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
   import { resolve } from '$app/paths';
 
@@ -45,7 +45,6 @@
   );
   const timeLabel = $derived(leading?.schedule ? scheduleLine(leading.schedule, zoneOf) : '');
   const place = $derived((leading?.location || charter.location_label).trim());
-  const mappable = $derived(!!place && place.toLowerCase() !== 'online');
   const update = $derived(project.updates[0] ?? null);
   /** web strips a leading "Update:" so the line doesn't say it twice. */
   const latest = $derived(update?.body.replace(/^\s*update:\s*/i, '') ?? null);
@@ -57,12 +56,6 @@
     }),
   );
   const going = $derived(project.members.slice(0, 3));
-
-  function showPlace(e: MouseEvent): void {
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
-    e.preventDefault();
-    openPlaceOnMap(place);
-  }
 </script>
 
 <div class="project-overview">
@@ -96,27 +89,14 @@
         </span>
       </p>
       {#if timeLabel}<FactLine icon="when">{timeLabel}</FactLine>{/if}
-      {#if mappable}
-        <a
-          class="detail-place"
-          href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(place)}`}
-          rel="noopener noreferrer"
-          onclick={showPlace}
-        >
-          <FactLine icon="where">
-            <strong>{place}<small>Show on the map</small></strong>
-          </FactLine>
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
-        </a>
-      {:else if place}
-        <FactLine icon="where">{place}</FactLine>
-      {/if}
+      <PlaceRow {place} />
       {#if charter.description.trim()}
         <FoldedText text={charter.description} className="overview-copy" />
       {/if}
-      {#if charter.tags.length > 0}
+      {#if charter.tags.length > 1}
+        <!-- The first tag leads the header; the rest are chips. -->
         <div class="detail-tags">
-          {#each charter.tags.map(tagRef) as tag (tag.tag)}
+          {#each charter.tags.slice(1).map(tagRef) as tag (tag.tag)}
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- tagHref resolves -->
             <a href={tagHref(tag)}>{tag.label}</a>
           {/each}

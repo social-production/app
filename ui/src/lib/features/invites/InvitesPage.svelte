@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import { endedAgo } from '#lib/domain/activityHistory.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
@@ -46,8 +47,13 @@
   }
 </script>
 
-<section class="invites">
-  <h1>Invites</h1>
+<section class="invites invites-ux">
+  <header class="invites-head">
+    <h1>Invites</h1>
+    {#if !loading && invites.length > 0}
+      <span>{invites.length} waiting for your answer</span>
+    {/if}
+  </header>
   {#if error}<p class="muted" role="alert">{error}</p>{/if}
   {#if loading}
     <p class="muted">Loading invites…</p>
@@ -61,15 +67,30 @@
       {#each invites as invite (invite.seed)}
         {@const when = invite.schedule ? scheduleLine(invite.schedule, zoneOf) : ''}
         <li>
-          <p class="kind">
-            {invite.kind === 'community'
-              ? 'Private community'
-              : 'Private event'}{#if invite.invitedBy}
-              · from {invite.invitedBy}{/if} · {endedAgo(invite.at)}
-          </p>
-          <strong>{invite.title}</strong>
-          {#if when}<span class="when">{when}</span>{/if}
+          <div class="invite-head">
+            <span class="invite-glyph" data-kind={invite.kind}>
+              <SurfaceIcon icon={invite.kind === 'community' ? 'community' : 'event'} size="md" />
+            </span>
+            <span class="invite-who">
+              <strong>{invite.title}</strong>
+              <span class="kind"
+                >{invite.kind === 'community'
+                  ? 'Private community'
+                  : 'Private event'}{#if invite.invitedBy}
+                  · from {invite.invitedBy}{/if} · {endedAgo(invite.at)}</span
+              >
+            </span>
+          </div>
           {#if invite.description}<p class="description">{invite.description}</p>{/if}
+          {#if when}
+            <p class="when">
+              <svg aria-hidden="true" viewBox="0 0 24 24"
+                ><rect x="4" y="5" width="16" height="15" rx="2" /><path
+                  d="M4 9h16M8 3v4M16 3v4"
+                /></svg
+              >{when}
+            </p>
+          {/if}
           <div class="actions">
             <button
               class="decline"
@@ -87,5 +108,6 @@
         </li>
       {/each}
     </ul>
+    <p class="muted">When someone invites you to a private community or event, it shows up here.</p>
   {/if}
 </section>

@@ -116,7 +116,8 @@
 
 /* Owner, 2026-11-14: a public row's title, text and actions start under the channel name,
    leaving the glyph's column empty, as a post's text sits beside its author's face. */
-.shell .surface .content .feed-card-top.feed-lead ~ * {
+.shell .surface .content .feed-card-top.feed-lead ~ *,
+.shell .context-panel .feed-card-top.feed-lead ~ * {
   margin-left: 44px;
 }
 
@@ -128,7 +129,8 @@
   border-radius: 11px;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label {
   display: grid;
   place-items: center;
   width: 100%;
@@ -139,31 +141,37 @@
   color: color-mix(in srgb, var(--surface-accent, var(--brand)) 88%, var(--text-main));
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg {
   display: block;
   width: 19px;
   min-width: 19px;
   height: 19px;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .label-copy {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .label-copy,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph .label-copy {
   display: none;
 }
 
 /* The channel is the bold line, without its own small icon. */
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg {
   display: none;
 }
 
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain,
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn {
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-plain,
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn {
   color: var(--text-main);
   font-size: 14px;
   font-weight: 700;
 }
 
 /* "Project · Plan phase · 2h": one soft grey line, the type not coloured. */
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .surface-type-label {
   padding: 0;
   background: none;
   color: var(--text-soft);
@@ -171,13 +179,17 @@
   font-weight: 500;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg {
   display: none;
 }
 
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-meta,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta,
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-stage,
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-time {
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .feed-card-stage,
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-time,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .feed-card-time {
   padding: 0;
   background: none;
   color: var(--text-soft);
@@ -185,7 +197,8 @@
   font-weight: 500;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label {
   color: var(--text-main);
   font-size: 14px;
   font-weight: 700;
