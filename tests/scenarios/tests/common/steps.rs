@@ -5,8 +5,9 @@
 use std::future::Future;
 use std::time::{Duration, Instant};
 
-/// Longer than any step takes on a slow CI runner, far shorter than the job's limit.
-const STEP_LIMIT: Duration = Duration::from_mins(8);
+/// Longer than any step takes on a slow CI runner (starting a two-agent project network took
+/// 4.6 min locally, shutting it down 1.5 min), far shorter than the job's two hours.
+const STEP_LIMIT: Duration = Duration::from_mins(15);
 
 /// Run `fut`, failing the test with `label` if it takes longer than `STEP_LIMIT`. Each step's
 /// time is printed, so a failing test's captured output shows how far it got. The step is
