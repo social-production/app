@@ -1,21 +1,22 @@
 <script lang="ts">
+  import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import { implementedLabel } from '#lib/domain/eventSchedule.ts';
-  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
   /**
    * A feed card's when and where (owner, 2026-11-15): the date on its own line, then the
    * place on a separate soft row that opens the app's map on it. "Online" is not a place.
    */
   let { when = '', place = '' }: { when?: string; place?: string | null } = $props();
+  const map = placeOnMap();
 
   const where = $derived(implementedLabel(place));
   const mappable = $derived(!!where && where.toLowerCase() !== 'online');
 
   function show(e: MouseEvent): void {
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     e.stopPropagation();
-    openPlaceOnMap(where);
+    map.show(where);
   }
 </script>
 

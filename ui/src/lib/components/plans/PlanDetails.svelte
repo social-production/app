@@ -1,16 +1,17 @@
 <script lang="ts">
+  import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import FactLine from '#lib/components/cards/FactLine.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import { SUBTYPE_LABELS, type Plan, type PlanStage } from '#lib/domain/plans.ts';
   import { REQUEST_MODES } from '#lib/domain/projects.ts';
-  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
   /** An opened plan read top to bottom like a page (Plan, Phase and Feedback Screens, 3):
    * what, when, where (opens the map), stages as numbered steps, its answer to support, and
    * the rest of its facts as a soft list. */
   let { plan, onMap }: { plan: Plan; onMap?: () => void } = $props();
+  const map = placeOnMap();
 
   const place = $derived(plan.location?.trim() ?? '');
   const mappable = $derived(!!place && place.toLowerCase() !== 'online');
@@ -47,10 +48,10 @@
   }
 
   function showPlace(e: MouseEvent): void {
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     onMap?.();
-    openPlaceOnMap(place);
+    map.show(place);
   }
 </script>
 

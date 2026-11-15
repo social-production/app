@@ -1,19 +1,20 @@
 <script lang="ts">
-  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
+  import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
 
   import FactLine from './FactLine.svelte';
 
   /** A detail page's place (Plan, Phase and Feedback Screens §1): a soft row that opens the
    * app's map on it; "online" stays a plain line. */
   let { place }: { place: string } = $props();
+  const map = placeOnMap();
 
   const where = $derived(place.trim());
   const mappable = $derived(!!where && where.toLowerCase() !== 'online');
 
   function show(e: MouseEvent): void {
-    if (e.metaKey || e.ctrlKey || e.shiftKey) return;
+    if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
-    openPlaceOnMap(where);
+    map.show(where);
   }
 </script>
 
