@@ -109,9 +109,32 @@ this order, once creation-plans is on main; merge main in first):
    `search`, `regional`. **Not run:** `accounts`, `platform`, `map`, `region`, `links`.
    Looked at in light and dark: Settings, People, Search, channel header, Feedback, New
    message, New group.
-**Still to do:** the Feedback item page with comments (new data in the directory DNA =
-a reset: ask the owner); Plan, Phase and Feedback Screens §1 to §6 plus Convert on the
-phase sheet (needs an ADR); README Status. The create menu and the Take part phase line were
+4. **`claude/ux-plan-screens`** (Plan, Phase and Feedback Screens §1 to §6, UI only):
+   - §1 Details (`ContextPanel`): the channel header, "Started by" under the title, the place
+     as a row that opens the map, the description folded after six lines
+     (`components/cards/FoldedText`), tags as chips, the latest update in its own block, an
+     event's faces of who is going.
+   - §2 values: round 1–10 targets, a "You: 8" / "Rate this" chip, the average as a bar,
+     the author in the ⋯ sheet; Add value asks your rating in the same sheet.
+   - §3 the plan sheet (`components/plans/PlanSheet`): reads like a page with the result and
+     "Review this plan" at the bottom; the review shows "Question N of M" with five large
+     targets and keeps "Yes, approve" / "No" in view.
+   - §4 every phase move on one sheet (`governance/PhaseMoveSheet`; AdvanceSheet and
+     ReturnSheet deleted), "Start the vote"; a closed project's Take part leads with the
+     closing reason and vote (`ClosedSummary`; it counts people, decisions and updates, not
+     activities and ratings, which the page doesn't load).
+   - §5 the left rail: a field that opens Discover with your words, soft glyph rows, the open
+     one tinted, Discover beside Feedback. §6 Discover: a segmented filter, Join pills that
+     join in place, "Start … yourself".
+   - Also fixed for every create flow: soft fields and the photo button (create sheets are
+     portaled outside `.shell`, so their rules scope to `.create-sheet`).
+   - **Convert: ADR 0106, proposed, not built** (a project network reset; three questions
+     for the owner in it).
+   - Browser tests: `governance` passed with §1 to §3; **not yet run after §4 to §6:**
+     `governance`, `service-requests`, `event-flow`, `notifications`, `discover`, then
+     `collective-requests`, `software`, `events`, `activities`.
+**Still to do:** the Feedback item page with comments (new data in the directory DNA = a
+reset: ask the owner); README Status. The create menu and the Take part phase line were
 compared with their mockups and already match (menu items follow Creating Through Plans).
 
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next

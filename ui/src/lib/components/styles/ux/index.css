@@ -26,6 +26,10 @@
 @import './scopes.css';
 @import './feedback.css';
 @import './links.css';
+@import './details.css';
+@import './values.css';
+@import './plansheet.css';
+@import './discover.css';
 @import './onboarding.css';
 @import './settings.css';
 @import './notifications.css';

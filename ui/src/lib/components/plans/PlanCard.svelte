@@ -1,17 +1,16 @@
 <script lang="ts">
-  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { VoteChoice } from '#lib/domain/governance.ts';
   import {
     allCriteriaRated,
     approvalLine,
+    PLAN_KIND_LABELS,
     planChip,
     type PlanRating,
     type PlanView,
   } from '#lib/domain/plans.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
 
-  import PlanAssess from './PlanAssess.svelte';
-  import PlanDetails from './PlanDetails.svelte';
+  import PlanSheet from './PlanSheet.svelte';
 
   import '#lib/components/styles/plans.css';
 
@@ -66,7 +65,6 @@
   );
   const votes = $derived(plan.tally.yes + plan.tally.no);
   const approval = $derived(votes === 0 ? 0 : Math.round((plan.tally.yes / votes) * 100));
-  const sheetId = $derived(`plan-sheet-${plan.id}`);
 </script>
 
 <div class="plan-scope" style="display: contents">
@@ -110,20 +108,13 @@
   </button>
 </div>
 
-<OverlaySheet
+<PlanSheet
   {open}
-  title={plan.plan.title}
-  labelledById={sheetId}
-  rootClass="plan-scope"
-  wide
+  {plan}
+  {authorName}
+  kindLine={makes ?? PLAN_KIND_LABELS[plan.plan.kind]}
+  {canVote}
+  {onRate}
+  {onVote}
   onClose={close}
->
-  {#snippet subtitle()}
-    {#if chip}<p class="sheet-kicker">{chip}</p>{/if}
-    <p class="sheet-author">{authorName} · {relativeCompact(plan.createdAt)}</p>
-  {/snippet}
-  <div class="plan-sheet">
-    <PlanDetails plan={plan.plan} />
-    <PlanAssess {plan} {canVote} {onRate} {onVote} />
-  </div>
-</OverlaySheet>
+/>

@@ -1,29 +1,35 @@
 <script lang="ts">
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import { VALUE_LABEL_MAX } from '#lib/domain/values.ts';
+  import { IMPORTANCE_OPTIONS, VALUE_LABEL_MAX, type Importance } from '#lib/domain/values.ts';
+
+  import DiscreteScale from './DiscreteScale.svelte';
 
   import '#lib/components/styles/values.css';
 
-  /** web's AddValueSheet: one line, "What should this achieve?". */
+  /** web's AddValueSheet, with your own rating in the same step so a new value never sits
+   * unrated by its author (Plan, Phase and Feedback Screens, 2). */
   interface Props {
     open: boolean;
     pending: boolean;
     message: string | undefined;
-    onSubmit: (label: string) => void;
+    onSubmit: (label: string, importance: Importance) => void;
     onClose: () => void;
   }
 
   let { open, pending, message, onSubmit, onClose }: Props = $props();
 
   let value = $state('');
+  let importance = $state<Importance | 0>(0);
 
   $effect(() => {
-    if (open) value = '';
+    if (!open) return;
+    value = '';
+    importance = 0;
   });
 
   function submit(event: SubmitEvent): void {
     event.preventDefault();
-    onSubmit(value.trim());
+    if (importance) onSubmit(value.trim(), importance);
   }
 </script>
 
@@ -44,13 +50,23 @@
         placeholder="Add a value, for example: should make use of unused space"
       />
     </label>
+    <div class="field">
+      <span class="field-label">How much does it matter to you?</span>
+      <DiscreteScale
+        options={IMPORTANCE_OPTIONS}
+        selectedValue={importance}
+        leftLabel="Unnecessary"
+        rightLabel="Required"
+        onSelect={(n) => (importance = n as Importance)}
+      />
+    </div>
   </form>
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-cancel" type="button" onclick={onClose}>Cancel</button>
       <button
         class="sheet-submit"
-        disabled={pending || !value.trim()}
+        disabled={pending || !value.trim() || !importance}
         form="add-value-form"
         type="submit">{pending ? 'Working...' : 'Add value'}</button
       >

@@ -24,21 +24,19 @@ for (let i = 0; ; i++) {
   if (i >= 20) throw new Error(`${TEST_CHANNEL} never appeared in Discover`);
   await guest.reload();
 }
-assert.match(await row.first().locator('.scope-meta').innerText(), /^\d+ members?$/);
+assert.match(await row.first().locator('.scope-meta').innerText(), /^Channel · \d+ members?$/);
 await guest.screenshot({ path: `${out}/phone390-discover.png` });
 log('Discover lists the test channel');
 
-const filter = sheet.getByRole('button', { name: 'Filter channels and communities' });
-await filter.click();
-await guest.getByRole('menuitemradio', { name: 'Communities' }).click();
+const filter = sheet.getByRole('radiogroup', { name: 'Filter channels and communities' });
+await filter.getByRole('radio', { name: 'Communities' }).click();
 await row.first().waitFor({ state: 'detached' });
-await filter.click();
-await guest.getByRole('menuitemradio', { name: 'Channels' }).click();
-await sheet.getByPlaceholder('Search channels').fill(TEST_CHANNEL);
-await sheet.getByPlaceholder('Search channels').fill(`${TEST_CHANNEL}-nothing-here`);
+await filter.getByRole('radio', { name: 'Channels' }).click();
+await sheet.getByPlaceholder('Find channels and communities').fill(TEST_CHANNEL);
+await sheet.getByPlaceholder('Find channels and communities').fill(`${TEST_CHANNEL}-nothing-here`);
 await sheet.getByText('No matches.').waitFor({ timeout: 10_000 });
-await sheet.getByPlaceholder('Search channels').fill(TEST_CHANNEL);
-await row.first().click();
+await sheet.getByPlaceholder('Find channels and communities').fill(TEST_CHANNEL);
+await row.first().locator('.scope-row-link').click();
 await guest.waitForURL(`**/channels/${TEST_CHANNEL}`);
 await guest.getByRole('heading', { name: TEST_CHANNEL }).waitFor({ timeout: 60_000 });
 assert.equal(await sheet.count(), 0, 'the sheet closed');

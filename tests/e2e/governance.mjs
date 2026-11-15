@@ -36,7 +36,7 @@ await ann.getByRole('button', { name: /^Oppose/ }).waitFor();
 await chip.click();
 await ann.getByRole('button', { name: /^Oppose/ }).waitFor({ state: 'hidden' });
 // ADR 0059: a new proposal has no type until a plan leads it out of its Plan phase.
-assert.equal(await ann.locator('.context-panel .surface-type-label').innerText(), 'Proposal');
+assert.equal(await ann.locator('.context-panel .feed-lead-meta .surface-type-label').innerText(), 'Proposal');
 log('founder one created the proposal and supports it; the stance folds into a chip');
 
 const bob = await device();
@@ -80,10 +80,10 @@ async function voteYes(page, tab) {
 /** web's Phase ▾ menu: choose "Advance to …", then say why in its sheet. */
 async function advance(page) {
   await page.getByRole('button', { name: 'Phase', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / }).click();
-  const sheet = page.getByRole('dialog', { name: /^Advance to / });
+  const sheet = page.getByRole('dialog', { name: 'Where should this go next?' });
+  await sheet.getByRole('radio', { name: /^Advance to / }).click();
   await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
-  await sheet.getByRole('button', { name: /^Advance to / }).click();
+  await sheet.getByRole('button', { name: 'Start the vote' }).click();
   await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 }
 
@@ -101,10 +101,11 @@ await ann.getByRole('button', { name: 'Update', exact: true }).click();
 await ann.locator('.update-sheet textarea').fill('First repair night went well.');
 await ann.getByRole('button', { name: 'Post update' }).click();
 await voteYes(bob);
-// web's header shows only the newest update, on one line under the description.
+// The Details tab shows only the newest update, in its own block (Plan, Phase and Feedback
+// Screens, 1).
 const updateLine = () => bob.locator('.overview-update', { hasText: 'First repair night' });
 await until(bob, updateLine, 'the update');
-assert.equal((await updateLine().innerText()).trim(), 'Update: First repair night went well.');
+assert.match((await updateLine().innerText()).trim(), /^Latest update · .+\nFirst repair night went well\.$/);
 assert.equal(await bob.locator('.update-card').count(), 0, 'no separate updates list (web)');
 await bob.locator('.context-panel').screenshot({ path: `${shots}/update-line-390.png` });
 log('an update passed and shows in the header');
@@ -131,19 +132,20 @@ const valueLabel = `Quiet at night ${stamp}`;
 await ann.getByRole('button', { name: 'Add value' }).click();
 const valueSheet = ann.getByRole('dialog', { name: 'Add value' });
 await valueSheet.getByPlaceholder(/^Add a value/).fill(valueLabel);
+await valueSheet.getByRole('button', { name: 'Importance 8 of 10' }).click();
 await valueSheet.getByRole('button', { name: 'Add value' }).click();
 await valueSheet.waitFor({ state: 'hidden', timeout: 60_000 });
 /** Rate the value 8/10 and wait until the reload carries the vote. */
 async function rateValue(page) {
   const card = page.locator('.value-card', { hasText: valueLabel });
   await card.getByRole('button', { name: 'Importance 8 of 10' }).click();
-  await card.getByText('Your vote: 8/10').waitFor({ timeout: 60_000 });
+  await card.getByText('You: 8').waitFor({ timeout: 60_000 });
 }
 await rateValue(ann);
 await until(bob, () => bob.locator('.value-card', { hasText: valueLabel }), 'the value');
 await bob.getByRole('tab', { name: 'Participation' }).click();
 await rateValue(bob);
-await bob.locator('.value-card', { hasText: 'Community average: 8/10' }).waitFor({ timeout: 120_000 });
+await bob.locator('.value-card .value-average[aria-label="Community average: 8/10"]').waitFor({ timeout: 120_000 });
 await ann.screenshot({ path: `${shots}/take-part-values-390.png` });
 log('a value was added and both founders rated it');
 
@@ -194,14 +196,15 @@ async function assess(page, yes, fromRail = false) {
     await page.getByRole('tab', { name: 'Participation' }).click();
     await page.locator('.plan-card', { hasText: planTitle }).click();
   }
+  await page.getByRole('button', { name: 'Review this plan' }).click();
   const sheet = page.locator('.plan-sheet');
   await sheet.locator('.criterion-row', { hasText: valueLabel }).getByText('Shared value').waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
     await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
     await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
   }
-  await sheet.getByRole('button', { name: 'Yes', exact: true }).click();
-  await sheet.getByText('Your vote is final once cast.').waitFor({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'Yes, approve' }).click();
+  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
 }
 
@@ -219,17 +222,17 @@ await advance(ann);
 await voteYes(bob, 'Participation');
 const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: /^\s*(Plan|Proposal)\s*$/ });
 await until(bob, pastPlan, 'the move past the plan');
-assert.equal(await bob.locator('.context-panel .surface-type-label').innerText(), 'Project');
+assert.equal(await bob.locator('.context-panel .feed-lead-meta .surface-type-label').innerText(), 'Project');
 log('the approved production plan made it a productive project as it left the Plan phase');
 
 // M3c: web's Phase menu → Return to an earlier phase; the other founder's vote sends it back.
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await ann.getByRole('button', { name: 'Phase', exact: true }).click();
-await ann.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Return to an earlier phase/ }).click();
-const returning = ann.getByRole('dialog', { name: /^Return to / });
-await returning.getByPlaceholder(/return to an earlier planning phase/).fill('The plan needs another look.');
-await returning.getByRole('button', { name: 'Return', exact: true }).click();
+const returning = ann.getByRole('dialog', { name: 'Where should this go next?' });
+await returning.getByRole('radio', { name: /^Return to Plan/ }).click();
+await returning.getByPlaceholder('State why this phase change should happen now.').fill('The plan needs another look.');
+await returning.getByRole('button', { name: 'Start the vote' }).click();
 await returning.waitFor({ state: 'hidden', timeout: 60_000 });
 // Proposing a return is not a Yes (as on web), so both founders vote.
 await voteYes(bob, 'Participation');

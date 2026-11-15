@@ -2,24 +2,23 @@
   import { tick } from 'svelte';
 
   import { portal } from '#lib/components/actions/portal.ts';
-  import AdvanceSheet from '#lib/components/governance/AdvanceSheet.svelte';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
-  import ReturnSheet from '#lib/components/governance/ReturnSheet.svelte';
+  import PhaseMoveSheet, { type PhaseMove } from '#lib/components/governance/PhaseMoveSheet.svelte';
   import { planGateMessage, signalGateMet } from '#lib/domain/phaseCopy.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
   /**
-   * web's ProjectPhaseChangeSection: the gate note, the Phase ▾ menu (advance or close, and
-   * return to an earlier phase) and the sheets that ask why, on the current phase.
+   * web's ProjectPhaseChangeSection: the gate note and the Phase ▾ button, which opens every
+   * move (advance or close, and each return) on one sheet with the reason (Plan, Phase and
+   * Feedback Screens, 4).
    */
   let { detail, shown }: { detail: DetailState; shown: string } = $props();
 
   const project = $derived(detail.project);
   const currentVisible = $derived(shown === project?.phase);
   const phaseVoteOpen = $derived(detail.phaseVoteOpen);
-  let returning = $state(false);
-  let advancing = $state(false);
+  let moving = $state(false);
   const signalGatePasses = $derived(
     project?.phase !== 'phase-1' || signalGateMet(project.demand, project.opposition),
   );
@@ -52,68 +51,59 @@
     return planGate;
   }
 
-  async function fileAdvance(reason: string): Promise<void> {
-    if (await detail.proposeNextPhase(reason)) advancing = false;
+  async function file(move: PhaseMove, reason: string): Promise<void> {
+    const done = move.to
+      ? await detail.proposeReturn(move.to, reason)
+      : await detail.proposeNextPhase(reason);
+    if (done) moving = false;
   }
 
-  async function fileReturn(to: string, reason: string): Promise<void> {
-    if (await detail.proposeReturn(to, reason)) returning = false;
-  }
-
-  // web's phaseMenuItems: the move on (advance, or close from the last phase) and the return.
-  const items = $derived.by((): PhaseMenuItem[] => {
-    if (!detail.canPropose) return [];
-    const items: PhaseMenuItem[] = [];
-    const next = project?.nextPhase;
+  // Every move on one sheet: the move on (advance, or close from the last phase), then each
+  // earlier phase it can return to.
+  const moves = $derived.by((): PhaseMove[] => {
+    if (!detail.canPropose || !project) return [];
+    const moves: PhaseMove[] = [];
+    const next = project.nextPhase;
     const allowed = gatePasses && !phaseVoteOpen && !detail.saving;
     const locked = allowed ? '' : lockReason();
-    const onSelect = (): void => {
-      detail.sheetMessage = undefined;
-      advancing = true;
-    };
     if (next)
-      items.push(
-        closing
-          ? {
-              id: 'close',
-              glyph: '×',
-              label: event ? 'Close event' : 'Close project',
-              detail:
-                locked ||
-                (event
-                  ? `Ends the event and keeps its record. ${how}`
-                  : 'Members vote to finish the project. Proposing counts as your Yes.'),
-              disabled: !allowed,
-              onSelect,
-            }
-          : {
-              id: 'advance',
-              glyph: '›',
-              label: `Advance to ${next.label}`,
-              detail:
-                locked || (event ? how : 'Members vote to move on. Proposing counts as your Yes.'),
-              disabled: !allowed,
-              onSelect,
-            },
-      );
-    if ((project?.returns.length ?? 0) > 0)
-      items.push({
-        id: 'return',
-        glyph: '‹',
-        label: 'Return to an earlier phase',
+      moves.push({
+        id: 'advance',
+        label: closing ? (event ? 'Close event' : 'Close project') : `Advance to ${next.label}`,
+        detail:
+          locked ||
+          (closing
+            ? event
+              ? `Ends the event and keeps its record. ${how}`
+              : 'Ends the work here. Members vote on it.'
+            : event
+              ? how
+              : 'Members vote to move on. Proposing counts as your Yes.'),
+        disabled: !allowed,
+        danger: closing,
+      });
+    for (const phase of project.returns)
+      moves.push({
+        id: `return-${phase.id}`,
+        label: `Return to ${phase.label}`,
         detail: phaseVoteOpen
           ? lockReason()
           : event
             ? `Go back and rework the plan. ${how}`
             : 'Members vote to go back and rework the plans.',
         disabled: phaseVoteOpen || detail.saving,
-        onSelect: () => {
-          detail.sheetMessage = undefined;
-          returning = true;
-        },
+        to: phase.id,
       });
-    return items;
+    return moves;
   });
+
+  const open = (): void => {
+    detail.sheetMessage = undefined;
+    moving = true;
+  };
+  const items = $derived<PhaseMenuItem[]>(
+    moves.length ? [{ id: 'moves', glyph: '›', label: 'Phase', detail: '', onSelect: open }] : [],
+  );
 </script>
 
 {#if project && currentVisible && (phaseVoteOpen || detail.canPropose)}
@@ -123,48 +113,27 @@
         {signalGatePasses ? planGate : 'Advance unlocks after this project gets a Support signal.'}
       </p>
     {/if}
-    {#if detail.sheetMessage && !returning && !advancing}
+    {#if detail.sheetMessage && !moving}
       <p class="warning-card" role="alert">{detail.sheetMessage}</p>
     {/if}
     {#if items.length > 0 && endHost}
       <div class="phase-nav-side end" use:portal={endHost}>
-        <PhaseMenu
-          {items}
-          currentPhaseLabel={detail.phaseLabel(project.phase)}
-          labelledById="project-phase-menu"
-        />
+        <PhaseMenu {items} onOpen={open} />
       </div>
     {:else if items.length > 0}
       <div class="change-action-row">
         <div class="action-group action-group-right">
-          <PhaseMenu
-            {items}
-            currentPhaseLabel={detail.phaseLabel(project.phase)}
-            labelledById="project-phase-menu"
-          />
+          <PhaseMenu {items} onOpen={open} />
         </div>
       </div>
     {/if}
   </div>
-  <AdvanceSheet
-    open={advancing}
-    title={closing
-      ? event
-        ? 'Close event'
-        : 'Close project'
-      : `Advance to ${project.nextPhase?.label ?? 'the next phase'}`}
-    {closing}
+  <PhaseMoveSheet
+    open={moving}
+    {moves}
     pending={detail.saving}
     message={detail.sheetMessage}
-    onSubmit={(reason) => void fileAdvance(reason)}
-    onClose={() => (advancing = false)}
-  />
-  <ReturnSheet
-    open={returning}
-    phases={project.returns}
-    pending={detail.saving}
-    message={detail.sheetMessage}
-    onSubmit={(to, reason) => void fileReturn(to, reason)}
-    onClose={() => (returning = false)}
+    onSubmit={(move, reason) => void file(move, reason)}
+    onClose={() => (moving = false)}
   />
 {/if}

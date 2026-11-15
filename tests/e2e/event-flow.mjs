@@ -73,10 +73,10 @@ export async function advance(page) {
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.getByRole('button', { name: 'Phase', exact: true }).click();
-  await page.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / }).click();
-  const sheet = page.getByRole('dialog', { name: /^Advance to / });
+  const sheet = page.getByRole('dialog', { name: 'Where should this go next?' });
+  await sheet.getByRole('radio', { name: /^Advance to / }).click();
   await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
-  await sheet.getByRole('button', { name: /^Advance to / }).click();
+  await sheet.getByRole('button', { name: 'Start the vote' }).click();
   try {
     await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
   } catch (e) {
@@ -135,14 +135,15 @@ export async function filePlan(page, { title, date, range, start, finish, place 
 export async function assess(page, planTitle, yes) {
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.locator('.plan-card', { hasText: planTitle }).click();
+  await page.getByRole('button', { name: 'Review this plan' }).click();
   const sheet = page.locator('.plan-sheet');
   await sheet.getByText('Is the timing and schedule realistic?').waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
     await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
     await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
   }
-  await sheet.getByRole('button', { name: 'Yes', exact: true }).click();
-  await sheet.getByText('Your vote is final once cast.').waitFor({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'Yes, approve' }).click();
+  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
   await page.keyboard.press('Escape');
 }
