@@ -14,11 +14,22 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Feed tabs, channel-first feed rows and a week-strip activity phase (PR #156, 2026-11-15
+  3:05 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
+  rows lead with the type's glyph and the channel; the Activity phase has Upcoming / Past
+  tabs, a week strip and day-grouped cards. Also fixes desktop sign-up ending with no name
+  when the network is slow. UI and coordinator only, no reset.
 - **The phone nav floats and feed cards are rows (PR #148, 2026-11-13 6:49 pm Melbourne,
   ADRs 0096 and 0097; the UX pass, `docs/plans/UX.md`):** the bottom nav is a floating blurred
   capsule with the current tab as a tinted pill; feed cards are Twitter-style rows with no
   type stripe, larger text and a spread row of bare actions (comments, votes, members,
   share). UI only, no reset.
+- **The Platform channel, moderators and Deactivate account (PR #151, 2026-11-13 2:17 pm
+  Melbourne, live 2:38 pm; ADRs 0095, 0088):** `/platform` is web's Platform channel (Join,
+  its feed); the shield button or the rail's Moderators link opens web's moderator board
+  (volunteer, withdraw, step down, yes/no votes; seats follow web's 66% rule with the quorum
+  from a weekly active count). Settings → Account → Deactivate account closes the account for
+  good. **Directory and project reset**: everyone signs up again (test data only).
 - **Create flows match web's (PR #147, 2026-11-12 10:00 pm Melbourne):** each create flow's
   tag step has web's own layout (an event's "Channel tags" and "Add communities", a help
   request's "Primary tag type"), the Overview counts channels and communities, and "Still
