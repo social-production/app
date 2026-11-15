@@ -82,6 +82,38 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## START HERE (2026-11-15 afternoon, owner's PC session): the UX build list, three branches
+Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
+this order, once creation-plans is on main; merge main in first):
+1. **`claude/ux-labels`** (the owner's answers): every type's first plan phase reads just
+   "Plan" (`sp_governance::phases::stage_label`); "Project" not "Productive", "Service" not
+   "Collective service"; feed rows use the mockups' glyphs (cube, speech bubble, lightbulb
+   for a proposal: `SurfaceTypeLabel`'s `feedGlyph`). **No DNA hash moves**: directory and
+   conversation equal live `/readyz`, project equals creation-plans' build. Browser tests
+   `accounts`, `governance`, `events` passed; scenarios `governance.rs`/`events.rs` updated
+   but not run.
+2. **`claude/ux-new-message`** (Telegram's New message): `features/messages/NewMessagePage`
+   (`?new=message`, `?new=group`), `NewGroupName`, `DraftChatView` (`?to=<agent>`: an empty
+   chat; the first message creates it). The profile's Message is a link to `?to=`.
+   `ComposeMessageSheet` is gone. `tests/e2e/lib.mjs` has `messageFromProfile` and
+   `startGroup`. `messages` passed and its screens were looked at; **not run:** `mentions`,
+   `group-options`, `attachments`, `calls`.
+3. **`claude/ux-remaining-screens`**: Settings' other sections as rows
+   (`components/settings/SettingSwitch`, `SettingPanel`; `lib.mjs` `setDefaultPlace`, sign
+   out confirms in a sheet), People rows, Search (pill field, type chips, feed-style rows),
+   the channel/community/Platform header (`scopes/ScopeHeader.svelte`), the Feedback list
+   (Plan, Phase and Feedback Screens §7: segmented kinds, word tabs, % pill, floating Add
+   feedback), Links and History as soft cards, every multi-step create flow with "Step N of
+   M" and a progress line. `tests/e2e/ux-review.mjs` shoots these at 390px light and dark
+   (`ONLY=create` for the create flows and a proposal's tabs). Passed: `shell`, `follows`,
+   `search`, `regional`. **Not run:** `accounts`, `platform`, `map`, `region`, `links`.
+   Looked at in light and dark: Settings, People, Search, channel header, Feedback, New
+   message, New group.
+**Still to do:** the Feedback item page with comments (new data in the directory DNA =
+a reset: ask the owner); Plan, Phase and Feedback Screens §1 to §6 plus Convert on the
+phase sheet (needs an ADR); README Status. The create menu and the Take part phase line were
+compared with their mockups and already match (menu items follow Creating Through Plans).
+
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
 **Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the
 owner's PC) continues the UX build list. Answers to the open questions (apply them first):

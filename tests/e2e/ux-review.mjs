@@ -40,37 +40,43 @@ async function shot(name, { full = true } = {}) {
 async function visit(name, path, ready, options) {
   try {
     await page.goto(`${BASE}${path}`);
-    await ready().waitFor({ timeout: 90_000 });
+    await ready().waitFor({ timeout: 45_000 });
     await shot(name, options);
     log(`shot ${name}`);
   } catch (error) {
     log(`MISSED ${name}: ${String(error).split("\n")[0]}`);
+    await page
+      .screenshot({ path: `${out}/MISSED-${name}.png` })
+      .catch(() => {});
   }
 }
 
 await signUp(page, `review${stamp}`);
 await ensureTestChannel();
 
-await visit("settings", "/settings", () =>
-  page.locator("#settings-account .set-row").first(),
-);
-await visit("people", "/people", () => page.locator(".people-row").first());
-await visit("search", `/search?q=${TEST_CHANNEL}`, () =>
-  page.locator(".type-chips"),
-);
-await visit("search-empty", "/search", () => page.locator(".type-chips"));
-await visit("channel", `/channels/${TEST_CHANNEL}`, () =>
-  page.locator(".scope-hero"),
-);
-await visit("feedback", "/feedback", () =>
-  page.getByRole("heading", { name: "Feedback" }),
-);
-await visit("new-message", "/messages?new=message", () =>
-  page.getByRole("heading", { name: "New message" }),
-);
-await visit("new-group", "/messages?new=group", () =>
-  page.getByRole("heading", { name: "New group" }),
-);
+// ONLY=create: just the create flows and the proposal screens.
+if (process.env.ONLY !== "create") {
+  await visit("settings", "/settings", () =>
+    page.locator("#settings-account .set-row").first(),
+  );
+  await visit("people", "/people", () => page.locator(".people-row").first());
+  await visit("search", `/search?q=${TEST_CHANNEL}`, () =>
+    page.locator(".type-chips"),
+  );
+  await visit("search-empty", "/search", () => page.locator(".type-chips"));
+  await visit("channel", `/channels/${TEST_CHANNEL}`, () =>
+    page.locator(".scope-hero"),
+  );
+  await visit("feedback", "/feedback", () =>
+    page.getByRole("heading", { name: "Feedback" }),
+  );
+  await visit("new-message", "/messages?new=message", () =>
+    page.getByRole("heading", { name: "New message" }),
+  );
+  await visit("new-group", "/messages?new=group", () =>
+    page.getByRole("heading", { name: "New group" }),
+  );
+}
 for (const kind of [
   "post",
   "thread",
@@ -82,7 +88,7 @@ for (const kind of [
   await visit(
     `create-${kind}`,
     `/create/${kind}`,
-    () => page.locator("main form, main .page").first(),
+    () => page.getByRole("dialog").first(),
     {
       full: false,
     },
@@ -107,10 +113,11 @@ try {
     await shot(`detail-${tab.toLowerCase().replace(" ", "-")}`);
   }
   await page.goto(BASE);
-  await page.getByRole("button", { name: "Create" }).first().click();
+  await page.getByRole("button", { name: "Create", exact: true }).click();
   await shot("create-menu", { full: false });
 } catch (error) {
   log(`MISSED the proposal screens: ${String(error).split("\n")[0]}`);
+  await page.screenshot({ path: `${out}/MISSED-proposal.png` }).catch(() => {});
 }
 
 log(errors.length ? `page errors: ${errors.join("\n")}` : "no page errors");
