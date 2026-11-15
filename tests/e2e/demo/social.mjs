@@ -100,3 +100,44 @@ export async function keyOf(page) {
   await key.waitFor({ timeout: 60_000 });
   return (await key.innerText()).trim();
 }
+
+/** A post, with an optional photo (a PNG buffer). */
+export async function post(page, { text, photo }) {
+  await page.goto(BASE);
+  await page.getByRole('button', { name: 'Create', exact: true }).click();
+  await page.getByRole('menuitem', { name: /Post/ }).click();
+  await page.getByLabel(/What's on your mind/).fill(text);
+  if (photo) {
+    await page
+      .getByLabel('Photos for this post')
+      .setInputFiles({ name: 'garden.png', mimeType: 'image/png', buffer: photo });
+    await page.locator('.post-photo-pick img').waitFor({ timeout: 30_000 });
+  }
+  await page.getByRole('button', { name: 'Publish post' }).click();
+  await page.locator('.linked-body.detail').first().waitFor({ timeout: 120_000 });
+}
+
+/** A made-up photo of raised garden beds, drawn as SVG and rendered to a PNG by the browser. */
+export async function gardenPhoto(page) {
+  const beds = [0, 1, 2]
+    .map((i) => {
+      const x = 60 + i * 370;
+      const plants = Array.from({ length: 7 }, (_, j) => {
+        const cx = x + 30 + j * 40;
+        return `<circle cx="${cx}" cy="${560 - (j % 2) * 14}" r="${22 + (j % 3) * 5}" fill="${['#3f8f3a', '#5aa83f', '#2f7a34'][j % 3]}"/>`;
+      }).join('');
+      return `<rect x="${x}" y="570" width="320" height="120" rx="10" fill="#8a5a33"/><rect x="${x}" y="570" width="320" height="22" fill="#a06b3e"/>${plants}`;
+    })
+    .join('');
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900">
+    <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8ec5f0"/><stop offset="1" stop-color="#dff1fb"/></linearGradient></defs>
+    <rect width="1200" height="900" fill="url(#sky)"/><circle cx="1000" cy="150" r="70" fill="#ffd75e"/>
+    <path d="M0 480 Q300 400 600 470 T1200 450 V900 H0 Z" fill="#9bcf6b"/><rect y="700" width="1200" height="200" fill="#7ab55c"/>
+    ${beds}<rect x="1110" y="420" width="16" height="200" fill="#6b4a2b"/><circle cx="1118" cy="400" r="70" fill="#4e9a45"/></svg>`;
+  const shot = await page.context().newPage();
+  await shot.setViewportSize({ width: 1200, height: 900 });
+  await shot.setContent(`<body style="margin:0">${svg}</body>`);
+  const png = await shot.screenshot({ type: 'png' });
+  await shot.close();
+  return png;
+}

@@ -2,7 +2,7 @@
 // something real-looking in them (owner, 2026-11-16). Not a test: each part logs and moves on
 // if it fails. The two dev founders (Full standing) carry proposals through their votes, so
 // one becomes a project, one a service that takes requests and one an event; two stay
-// proposals. Three new people join, support, comment, ask for help and message each other.
+// proposals. Three new people join, support, comment, post (one with a photo), ask for help and message each other.
 // A new member can start 2 things (proposals, threads, help requests) a week, so the founders
 // start the rest. Their recovery phrases are written to `accounts file` so you can log in as them.
 //   node tests/e2e/demo-content.mjs <ui url> <accounts file>
@@ -30,7 +30,8 @@ async function part(name, run) {
       .slice(0, 3)
       .join(' < ');
     log(`✗ ${name}: ${String(e?.message ?? e).split('\n')[0]} [${where}]`);
-    if (process.env.DEMO_SHOTS) await ann.screenshot({ path: `${process.env.DEMO_SHOTS}/${name.replace(/\W+/g, '-')}.png` }).catch(() => {});
+    if (process.env.DEMO_SHOTS)
+      await ann.screenshot({ path: `${process.env.DEMO_SHOTS}/${name.replace(/\W+/g, '-')}.png` }).catch(() => {});
   }
 }
 
@@ -188,6 +189,16 @@ await part('threads with comments and replies', async () => {
   });
   await c.comment(grace ?? ann, t2, 'The tip on Station Road takes them for free on weekends.');
   await c.comment(bob, t2, 'Bring the tubes to the repair co-op: we patch the good ones.');
+});
+
+await part('a post and a post with a photo', async () => {
+  await c.post(maya ?? bob, {
+    text: 'First tomato of the season! Small, but it’s mine. 🍅 Thanks everyone for the tips.',
+  });
+  await c.post(ann, {
+    text: 'The beds are in at Elm Street. Twelve of them, soil and all. Watering roster starts Monday.',
+    photo: await c.gardenPhoto(ann),
+  });
 });
 
 await part('help requests', async () => {
