@@ -60,6 +60,11 @@ if (process.env.ONLY !== "create") {
     page.locator("#settings-account .set-row").first(),
   );
   await visit("people", "/people", () => page.locator(".people-row").first());
+  await visit("about", "/about", () => page.getByRole("heading").first());
+  await visit("notifications", "/notifications", () =>
+    page.getByRole("heading", { name: "Notifications" }),
+  );
+  await visit("invites", "/invites", () => page.getByRole("heading", { name: "Invites" }));
   await visit("search", `/search?q=${TEST_CHANNEL}`, () =>
     page.locator(".type-chips"),
   );
