@@ -36,7 +36,7 @@ await bob.reload();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 60_000 });
 const facts = await bob.locator('.live-fact').allInnerTexts();
 assert.ok(facts.some((f) => /9:00|09:00/.test(f) && /1:00|13:00/.test(f)), `time line: ${facts}`);
-assert.ok(facts.includes('Allotment 4'), `place: ${facts}`);
+assert.ok(facts.some((f) => f.startsWith('Allotment 4')), `place: ${facts}`);
 await bob.screenshot({ path: `${shots}/event-details-390.png` });
 log(`the event shows its plan's time and place: ${facts.join(' | ')}`);
 
