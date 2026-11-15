@@ -2,6 +2,8 @@
   import { devicePasskeysAvailable, signInWithPasskey } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
 
+  import { resolve } from '$app/paths';
+
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
 
@@ -84,5 +86,8 @@
         <PhraseSignIn />
       {/if}
     </section>
+    <p class="keep-browsing">
+      Just looking? <a href={resolve('/')}>Keep browsing without an account</a>
+    </p>
   </section>
 </div>

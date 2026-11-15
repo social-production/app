@@ -1,0 +1,206 @@
+/* The map's filters on phones and in fullscreen (ADR 0103): one capsule over the top of the
+   map; search opens a second bar under it only when asked. Overrides of the ported map.css. */
+.shell .map-panel .map-filter-top.filter-panel-overlay {
+  top: 10px;
+  right: 10px;
+  bottom: auto;
+  left: 10px;
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.shell .map-panel .map-filter-capsule,
+.shell .map-panel .map-search-bar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 5px;
+  border: 1px solid var(--float-border);
+  border-radius: 999px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+  pointer-events: auto;
+}
+
+.shell .map-panel .map-filter-capsule {
+  justify-content: space-between;
+}
+
+.shell .map-panel .capsule-icon,
+.shell .map-panel .capsule-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 38px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.shell .map-panel .capsule-icon {
+  width: 38px;
+}
+
+.shell .map-panel .capsule-chip {
+  position: relative;
+  padding: 0 12px;
+}
+
+.shell .map-panel .capsule-icon.active,
+.shell .map-panel .capsule-chip.active {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .map-panel .capsule-chip.narrowed::after {
+  content: '';
+  position: absolute;
+  top: 6px;
+  right: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.shell .map-panel .capsule-icon:disabled {
+  opacity: 0.4;
+}
+
+.shell .map-panel .map-filter-capsule .radius-combobox.compact {
+  flex: 0 1 96px;
+  min-width: 84px;
+  max-width: 110px;
+}
+
+.shell .map-panel .map-filter-capsule .radius-combobox .toggle-button {
+  width: 18px;
+}
+
+.shell .map-panel .map-filter-capsule .radius-input {
+  padding: 4px 2px 4px 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.shell .map-panel .map-search-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.shell .map-panel .map-search-field input {
+  border: none;
+  background: transparent;
+  font-size: 16px;
+}
+
+.shell .map-panel .capsule-icon.locate {
+  background: var(--panel-hover);
+}
+
+/* The map's own buttons move below the capsule (and below the search bar when it is open). */
+.shell .map-panel .map-stage:has(.map-filter-top) .fullscreen-button {
+  top: 68px;
+  right: 10px;
+}
+
+.shell .map-panel .map-stage:has(.map-filter-top) .maplibregl-ctrl-top-right {
+  top: 106px;
+}
+
+.shell .map-panel .map-stage:has(.map-search-bar) .fullscreen-button {
+  top: 124px;
+}
+
+.shell .map-panel .map-stage:has(.map-search-bar) .maplibregl-ctrl-top-right {
+  top: 162px;
+}
+
+/* The results' header on phones: how many, and Open as list. */
+.shell .map-panel .results-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 4px;
+  font-size: 15px;
+}
+
+.shell .map-panel .results-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* The filter sheet's extras. */
+.map-filter-sheet .custom-range {
+  justify-self: start;
+  min-height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.map-filter-sheet .custom-range.on {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.map-filter-sheet .custom-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.map-filter-sheet .custom-dates label {
+  display: grid;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.map-filter-sheet .custom-dates input {
+  min-height: 44px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 14px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ResolvedPathname } from '$app/types';
   import { resolve } from '$app/paths';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import MapDiscoveryCard from '#lib/components/map/MapDiscoveryCard.svelte';
   import { markerRoute, type MapMarkerItem } from '#lib/domain/mapMarkers.ts';
   import type { MapPanelState } from './panelState.svelte.ts';
@@ -12,9 +13,11 @@
     onLeave: () => void;
     onSelect: (id: string) => void;
     onClose: () => void;
+    /** web's "Open as list", in the results' header on phones (ADR 0103). */
+    onList: () => void;
   }
 
-  let { s, onHover, onLeave, onSelect, onClose }: Props = $props();
+  let { s, onHover, onLeave, onSelect, onClose, onList }: Props = $props();
 
   /** The item's page, with web's `?activity=` (the path is resolved; the query rides along). */
   function hrefOf(item: MapMarkerItem): ResolvedPathname {
@@ -44,6 +47,14 @@
   {:else if s.listItems.length === 0}
     <p class="empty-state">No physical map-eligible items in this radius for the selected time.</p>
   {:else}
+    {#if s.overlayFilters}
+      <header class="results-head">
+        <strong>{s.listItems.length} near here</strong>
+        <button aria-label="Open as list" class="results-list" type="button" onclick={onList}>
+          <ToolbarIcon name="list" /><span>List</span>
+        </button>
+      </header>
+    {/if}
     <div class="card-list">
       {#each s.listItems as item (item.id)}
         <MapDiscoveryCard

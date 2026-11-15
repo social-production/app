@@ -36,7 +36,6 @@
 
   let p: Props = $props();
 
-  let searchExpanded = $state(false);
   let query = $state('');
 
   function submit(event: SubmitEvent): void {
@@ -45,164 +44,134 @@
   }
 </script>
 
-<header
-  class="topbar"
-  class:search-expanded={p.compact && searchExpanded}
-  class:topbar-compact={p.compact}
-  class:chrome-collapsed={p.collapsed}
->
-  {#if p.compact && searchExpanded}
-    <form class="toolbar-search toolbar-search-expanded" role="search" onsubmit={submit}>
-      <button
-        aria-label="Close search"
-        title="Close search"
-        class="search-close-button"
-        type="button"
-        onclick={() => (searchExpanded = false)}
-      >
-        <SvgGlyph name="close" className="search-icon" />
-      </button>
-      <div class="toolbar-search-wrap">
-        <input
-          aria-label="Search"
-          bind:value={query}
-          class="toolbar-search-input"
-          placeholder="Search…"
-          type="search"
-        />
-      </div>
-    </form>
+<header class="topbar" class:topbar-compact={p.compact} class:chrome-collapsed={p.collapsed}>
+  {#if p.auth}
+    <!-- Sign-up and log-in: the way back to the feed says so (ADR 0103). -->
+    <a class="back-to-feed" href={resolve('/')}>
+      <SvgGlyph name="chevron-left" className="back-icon" /><span>Back to feed</span>
+    </a>
   {:else}
     <a class="brand" href={resolve('/')} aria-label="Social Production home">
       <span class="brand-mark"><img alt="" class="brand-icon" src={brandIcon} /></span>
       <span><strong>Social Production</strong></span>
     </a>
 
-    {#if !p.auth}
-      <div class="panel-controls">
-        <button
-          aria-label="Open networks"
-          title="Networks"
-          aria-expanded={p.leftOpen}
-          class="panel-toggle"
-          data-active={p.leftOpen}
-          type="button"
-          onclick={p.toggleLeft}
-        >
-          <GroupsIcon className="panel-toggle-icon groups-icon" />
-        </button>
-        <button
-          aria-label="Open map"
-          title="Map"
-          aria-expanded={p.mapOpen ?? false}
-          class="panel-toggle panel-toggle-map"
-          data-active={p.mapOpen ?? false}
-          type="button"
-          onclick={() => p.toggleMap?.()}
-        >
-          <SvgGlyph name="map" className="panel-toggle-icon" />
-        </button>
-        <button
-          aria-label="Open activity"
-          title="Activity"
-          aria-expanded={p.rightOpen}
-          class="panel-toggle panel-toggle-right"
-          data-active={p.rightOpen}
-          type="button"
-          onclick={p.toggleRight}
-        >
-          <SvgGlyph name="activity" className="panel-toggle-icon" />
-          {#if (p.activityCount ?? 0) > 0}
-            <span class="panel-toggle-badge">
-              <CountBadge count={p.activityCount ?? 0} />
-            </span>
-          {/if}
-        </button>
-      </div>
-
-      <div class="toolbar-center">
-        {#if p.compact}
-          <button
-            aria-label="Open search"
-            title="Open search"
-            class="search-open-button"
-            type="button"
-            onclick={() => (searchExpanded = true)}
-          >
-            <SvgGlyph name="search" className="search-icon" />
-          </button>
-        {:else}
-          <form class="toolbar-search" role="search" onsubmit={submit}>
-            <div class="toolbar-search-wrap">
-              <input
-                aria-label="Search"
-                bind:value={query}
-                class="toolbar-search-input"
-                placeholder="Search…"
-                type="search"
-              />
-            </div>
-          </form>
-          <nav class="primary-nav" aria-label="Primary">
-            <a
-              aria-label="Home"
-              class:active-link={p.isActive('/')}
-              class="nav-link nav-link-icon"
-              href={resolve('/')}><ToolbarIcon name="home" /></a
-            >
-            <a
-              aria-label="Notifications"
-              title="Notifications"
-              class:active-link={p.isActive('/notifications')}
-              class="nav-link nav-link-icon"
-              href={resolve('/notifications')}
-              ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
-                  count={p.notificationCount ?? 0}
-                />{/if}</a
-            >
-            <a
-              aria-label="Messages"
-              title="Messages"
-              class:active-link={p.isActive('/messages')}
-              class="nav-link nav-link-icon"
-              href={resolve('/messages')}
-              ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
-                  count={p.messageCount ?? 0}
-                />{/if}</a
-            >
-          </nav>
+    <div class="panel-controls">
+      <button
+        aria-label="Open networks"
+        title="Networks"
+        aria-expanded={p.leftOpen}
+        class="panel-toggle"
+        data-active={p.leftOpen}
+        type="button"
+        onclick={p.toggleLeft}
+      >
+        <GroupsIcon className="panel-toggle-icon groups-icon" />
+      </button>
+      <button
+        aria-label="Open map"
+        title="Map"
+        aria-expanded={p.mapOpen ?? false}
+        class="panel-toggle panel-toggle-map"
+        data-active={p.mapOpen ?? false}
+        type="button"
+        onclick={() => p.toggleMap?.()}
+      >
+        <SvgGlyph name="map" className="panel-toggle-icon" />
+      </button>
+      <button
+        aria-label="Open activity"
+        title="Activity"
+        aria-expanded={p.rightOpen}
+        class="panel-toggle panel-toggle-right"
+        data-active={p.rightOpen}
+        type="button"
+        onclick={p.toggleRight}
+      >
+        <SvgGlyph name="activity" className="panel-toggle-icon" />
+        {#if (p.activityCount ?? 0) > 0}
+          <span class="panel-toggle-badge">
+            <CountBadge count={p.activityCount ?? 0} />
+          </span>
         {/if}
-      </div>
+      </button>
+    </div>
 
-      <nav class="utility-nav" aria-label="Utilities">
+    <div class="toolbar-center">
+      <!-- ADR 0103: search is a field you can type in straight away, at every width. -->
+      <form class="toolbar-search" role="search" onsubmit={submit}>
+        <div class="toolbar-search-wrap">
+          <SvgGlyph name="search" className="search-icon" />
+          <input
+            aria-label="Search"
+            bind:value={query}
+            class="toolbar-search-input"
+            enterkeyhint="search"
+            placeholder="Search"
+            type="search"
+          />
+        </div>
+      </form>
+      {#if !p.compact}
+        <nav class="primary-nav" aria-label="Primary">
+          <a
+            aria-label="Home"
+            class:active-link={p.isActive('/')}
+            class="nav-link nav-link-icon"
+            href={resolve('/')}><ToolbarIcon name="home" /></a
+          >
+          <a
+            aria-label="Notifications"
+            title="Notifications"
+            class:active-link={p.isActive('/notifications')}
+            class="nav-link nav-link-icon"
+            href={resolve('/notifications')}
+            ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
+                count={p.notificationCount ?? 0}
+              />{/if}</a
+          >
+          <a
+            aria-label="Messages"
+            title="Messages"
+            class:active-link={p.isActive('/messages')}
+            class="nav-link nav-link-icon"
+            href={resolve('/messages')}
+            ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
+                count={p.messageCount ?? 0}
+              />{/if}</a
+          >
+        </nav>
+      {/if}
+    </div>
+
+    <nav class="utility-nav" aria-label="Utilities">
+      {#if !p.compact}
+        <a class:active-link={p.isActive('/about')} class="utility-link" href={resolve('/about')}
+          >About</a
+        >
+      {/if}
+      {#if p.signedIn}
         {#if !p.compact}
-          <a class:active-link={p.isActive('/about')} class="utility-link" href={resolve('/about')}
-            >About</a
+          <a
+            class:active-link={p.isActive('/profile')}
+            class="utility-link"
+            href={resolve('/profile')}>{p.viewerName}</a
           >
-        {/if}
-        {#if p.signedIn}
-          {#if !p.compact}
+          <div class="settings-wrap">
             <a
-              class:active-link={p.isActive('/profile')}
-              class="utility-link"
-              href={resolve('/profile')}>{p.viewerName}</a
+              aria-label="Settings"
+              title="Settings"
+              class:active-link={p.isActive('/settings')}
+              class="gear-button"
+              href={resolve('/settings')}
             >
-            <div class="settings-wrap">
-              <a
-                aria-label="Settings"
-                title="Settings"
-                class:active-link={p.isActive('/settings')}
-                class="gear-button"
-                href={resolve('/settings')}
-              >
-                <SvgGlyph name="gear" className="gear-icon" />
-              </a>
-            </div>
-          {/if}
-        {:else if !p.compact}
-          <button class="utility-link" type="button" onclick={p.onSignIn}>Sign in / Sign up</button>
+              <SvgGlyph name="gear" className="gear-icon" />
+            </a>
+          </div>
         {/if}
-      </nav>
-    {/if}
+      {:else if !p.compact}
+        <button class="utility-link" type="button" onclick={p.onSignIn}>Sign in / Sign up</button>
+      {/if}
+    </nav>
   {/if}
 </header>

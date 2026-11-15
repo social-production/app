@@ -1,0 +1,103 @@
+/* About (ADR 0103): a calmer headline, the four sections as one segmented control that
+   stays at the top while you read, and summary cards opening each section. Overrides of
+   the ported about.css. */
+.shell .about-page .page {
+  max-width: 680px;
+}
+
+.shell .about-page .eyebrow {
+  color: var(--brand-strong);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .about-page h1 {
+  font-size: clamp(27px, 4.4vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.shell .about-page .reader {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.shell .about-page .tab-row {
+  position: sticky;
+  top: calc(var(--topbar-height, 53px) + 8px);
+  /* Paints the gap above it, so the text does not show between the bar and the tabs. */
+  box-shadow: 0 -10px 0 2px var(--page-bg);
+  z-index: 2;
+  display: flex;
+  gap: 0;
+  padding: 4px;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--panel-hover) 88%, transparent);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+}
+
+.shell .about-page .tab.tab {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 36px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.shell .about-page .tab.tab.active-tab {
+  background: var(--panel);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16);
+}
+
+.shell .about-page .essay {
+  max-width: 62ch;
+}
+
+.shell .about-page .essay p {
+  font-size: 15.5px;
+  line-height: 1.6;
+}
+
+.shell .about-page .about-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shell .about-page .about-summary li {
+  display: grid;
+  align-content: start;
+  gap: 3px;
+  padding: 12px 13px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.shell .about-page .about-summary strong {
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.shell .about-page .discover {
+  border-radius: 999px;
+}

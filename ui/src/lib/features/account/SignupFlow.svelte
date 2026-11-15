@@ -20,6 +20,17 @@
   let answers = $state(['', '', '']);
   let progress = $state<AccountStep>('checking');
   let error = $state<string>();
+  let copied = $state(false);
+
+  /** The 24 words on the clipboard, in order, for pasting into a document or password manager. */
+  async function copyWords(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(words.join(' '));
+      copied = true;
+    } catch {
+      copied = false;
+    }
+  }
 
   const confirmed = $derived(
     positions.every((p, i) => answers[i]?.trim().toLowerCase() === words[p]),
@@ -64,6 +75,11 @@
       and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
     </p>
     <PhraseGrid {words} />
+    <div class="button-row">
+      <button class="button-secondary copy-words" type="button" onclick={() => void copyWords()}>
+        {copied ? 'Copied all 24 words' : 'Copy all 24 words'}
+      </button>
+    </div>
     <div class="button-row">
       <button class="button-primary" type="button" onclick={() => (step = 'confirm')}
         >I've written them down</button
