@@ -99,9 +99,10 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
 **Where things stand:**
 1. **PR #156 merged** 3:05 am Melbourne (feed tabs, feed rows, activity phase). The desktop
    smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
-2. **PR #157** (`claude/ux-topbar-map`, rebased on main) is open; merge when green.
-3. **Then `claude/ux-chats-profile`:** `git rebase main` once #157 merges, open its PR, merge
-   when green.
+2. **PR #157 merged** 10:10 UTC Nov 15 (9:10 pm Melbourne): top bar, map capsule, About,
+   sign-up helpers (UI only).
+3. **PR #159** (`claude/ux-chats-profile`, main merged in, no rebase) is open; merge when
+   green. Its sign-up keeps the floating back button (it replaces #157's "Back to feed").
 4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
    #156's fix; merge main into it, open its PR, merge when green. **It resets the project
    network on merge** (owner approved). After the deploy: `/readyz` shows a new project
@@ -261,7 +262,28 @@ for `claude/ux-chats-profile`. Both are UI only (no network reset).
   sections (details, values, plan review, phase sheet + closed page + Convert, left rail,
   Discover, feedback with comments).
 
-## In flight (UX) 2026-11-14: feed headers and the activity phase, branch `claude/feed-activity-ux`, ADR 0102
+## Done 2026-11-15: PR #156 merged 16:05 UTC Nov 14 (3:05 am Melbourne); the desktop smoke's sign-up fault
+- **Cause of the red Linux desktop smoke** ("timed out waiting for the profile name"):
+  `identity::set_profile` asked the network for an existing profile (`get_links` on the
+  agent) before writing a new person's first one, even when its own chain had answered. A
+  fresh desktop's only peer is the seed behind the relay, and that read sometimes times out
+  ("get_links response channel dropped"), so `set_profile` failed and no profile was ever
+  written. Fix (coordinator only, no DNA hash change, on #156 as `c450841`): the network is
+  asked only when the chain has no profile, and an unanswered read counts as "none yet".
+  The next desktop run passed in full (sign up, profile, the seed holds it, sign out, log in
+  with the words); the app log only prints on failure, so it does not show whether the
+  timeout path was taken.
+- **"It fails on main too" was mostly deploy timing:** main's failing runs (62, 65) ran while
+  their own merge was redeploying the seed (run 65 at 21:39 UTC; the seed restarted 21:47).
+  Push runs on `main` race their deploy; read a red desktop run on a merge commit with that
+  in mind.
+- **Live sign-up in a browser is still unverified since #150** (the hosted agent lives on the
+  seed itself, so this fault is unlikely there, and #150's failed live smoke was minutes after
+  its merge, also during a redeploy). Cloud and PC sessions may not create live accounts: the
+  owner should sign up once on https://ui-production-333c.up.railway.app.
+- Then: `claude/ux-topbar-map` rebased on main and opened as **PR #157**.
+
+## Done (merged as PR #156) 2026-11-14: feed headers and the activity phase, branch `claude/feed-activity-ux`, ADR 0102
 **Owner approved the mockups ("lets use all your suggestions",
 https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
 - **Built:** Home / Global / Region word tabs and one "Feed filters" sheet (`FeedHeader`,
@@ -316,7 +338,32 @@ https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp).** UI only, no network reset.
   votes kept; **new:** Twitter-style comments on a feedback item). One question in it:
   whether a "Convert" choice is still wanted now that the leading plan sets the type.
 
-## In flight (UX) 2026-11-12: bottom nav + feed rows, branch `claude/ux-nav-feed` (owner's PC session)
+## Handoff 2026-11-13 (afternoon): parity paused for the day; the owner is doing UX
+- The owner is working on UX for the rest of 2026-11-13 **on their own branch** (not
+  `claude/social-production-handoff-dsam61`). Next session: `git fetch`, merge `main` into the
+  working branch first, and check for an open UX PR before touching the shell, feed cards or
+  styles (the split in "Owner direction (2026-11-12): UX in parallel" still holds).
+- The owner's UX PRs #148 (nav capsule, feed rows), #150 (controls) and #153 (detail pages)
+  merged to `main` on 2026-11-13; their notes are in "UX 2026-11-12" below. Nothing in flight on this branch once docs PR #152 merges.
+  Parity resumes with ADR 0095's rest (see "Next" just below).
+
+## Done 2026-11-13: the Platform channel, moderators, weekly active, deactivation (ADRs 0095, 0088), PR #151 merged 03:17 UTC (2:17 pm Melbourne)
+**Live** after the deploy (seed restarted 03:38 UTC = 2:38 pm): `/readyz` directory
+`uhC0kiObR4…` and project `uhC0kYqtp…` (**both reset**; the directory hash matches a local
+`hc dna hash`), UI 200, bootstrap 200, **live `shell.mjs` passed**, and a new live account
+opened `/platform?board=1` (heading, description, Moderators sheet). CI: all 13 checks green.
+**Railway lesson:** the first seed-node build failed with `build daemon returned an error <
+listing workers … buildkitd.sock: use of closed network connection>`: Railway's builder, not
+our code (a local Rust 1.95.0 build of the zomes and `gateway --features jemalloc` passed). The
+owner pressed Redeploy and it went through. A failed build keeps the old seed running, so the
+UI and seed briefly disagree; ask the owner to redeploy (no Railway access from a cloud session).
+**Next (parity, ADR 0095's rest):** platform-tagged projects voted on by any Full member
+(population from `weekly_active`, a project vote-rule change: project reset), moderators'
+merge capability on platform software projects (ADR 0087 reads `is_moderator` via the
+directory), and replacing ADR 0071/0074's "voters on this item" populations with the weekly
+count. Then PARITY.md's next item.
+
+## UX 2026-11-12: bottom nav + feed rows (ADRs 0096, 0097), PR #148 merged 2026-11-13
 - The UX pass (`docs/plans/UX.md`) runs beside parity (split: "Owner direction (2026-11-12)",
   on PR #147's branch until it merges). This session owns the phone bottom nav, feed cards,
   polish, image posts and UX.md's code-health items.
@@ -578,7 +625,7 @@ https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv (private to the owner).
   the merge; unverified since. #153 merged 9:36 pm Melbourne. Someone must sign up once on
   the live site, or run `shell.mjs` from a cloud session.
 
-## In flight 2026-11-12: the Platform channel and moderators (ADR 0095, proposed)
+## Earlier 2026-11-12: the Platform channel and moderators (ADR 0095, proposed then built)
 **Next to build** (parity), on `claude/social-production-handoff-dsam61`. ADR 0095 has the
 design: the `platform` channel as a fixed scope (`sp_scope`, project reset), `#platform`
 projects voted on by every Full member, moderators from `BoardCandidacy` / `BoardVotes`
