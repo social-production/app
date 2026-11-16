@@ -126,7 +126,10 @@
 }
 
 /* A thread takes the shared header, flush at the page edge like every detail page. */
+/* (feedrow.css indents a feed row's body by 44px with `.shell .surface .content …`, so this
+   carries the same classes plus .item-head to win.) */
 .shell .item-head .feed-card-top.feed-lead ~ *,
+.shell .surface .content .item-head .feed-card-top.feed-lead ~ *,
 .shell .item-head .feed-card-top.feed-lead ~ * .feed-card-top ~ * {
   margin-left: 0;
 }
