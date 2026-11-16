@@ -34,6 +34,7 @@
   import { provideShellContexts } from './shellContexts.ts';
   import RightRailPanel from './RightRailPanel.svelte';
   import ScopeDiscoverSheet from './ScopeDiscoverSheet.svelte';
+  import { isFeedSurface, ScrollChrome } from './scrollChrome.svelte.ts';
 
   import '#lib/components/shell/shell.css';
   import '#lib/components/styles/additions.css';
@@ -141,14 +142,15 @@
     void refuseIfDeactivated(current.agent);
   });
 
-  // web's isFeedDiscoveryPath: the "+" sits on the feed, platform and profile pages (and
-  // channel/community feeds once they exist), never on onboarding or over the map.
-  const showCreateFab = $derived(
-    !authSurface &&
-      !map.open &&
-      (['/', '/platform', '/profile'].includes(page.url.pathname) ||
-        /^\/(profile|channels|communities)\/[^/]+$/.test(page.url.pathname)),
-  );
+  // web's isFeedDiscoveryPath: the "+" sits on feeds, never on onboarding or over the map.
+  const feed = $derived(!authSurface && !map.open && isFeedSurface(page.url.pathname));
+  const showCreateFab = $derived(feed);
+  // Phone feeds slide the bars away while you scroll down (scrollChrome.svelte.ts).
+  const scroll = new ScrollChrome(() => ({
+    on: compact && feed && !immersive,
+    path: page.url.pathname,
+  }));
+  const slid = $derived(scroll.hidden && !leftOpen && !rightOpen && !moreOpen);
 
   function isActive(href: string): boolean {
     const path = page.url.pathname;
@@ -185,11 +187,12 @@
   class:shell-map-open={map.open || mapPage}
   class:shell-map-page={mapPage}
   class:feed-chrome-collapsed={immersive}
+  class:shell-chrome-slid={slid}
   style={`--left-width: ${leftOpen && !compact && !authSurface ? '262px' : '0px'}; --right-width: ${rightOpen && !compact && !authSurface ? '292px' : '0px'}; --topbar-height: ${shellTopbarHeight}px; --topbar-natural-height: ${topbarHeight}px; --compact-content-offset: 0px; --shell-bottom-nav-offset: ${bottomNav}; --install-banner-offset: 0px; --shell-scroll-pad: ${bottomNav}; --shell-dock-safe-bottom: ${bottomNav === '0px' ? 'var(--shell-safe-bottom)' : '0px'}; --main-frame-max-width: ${frameMaxWidth};`}
 >
   <Topbar
     {compact}
-    collapsed={immersive || authSurface}
+    collapsed={immersive || authSurface || slid}
     {signedIn}
     {guest}
     viewerName={viewer.name}
@@ -266,6 +269,7 @@
       {tabs}
       {isActive}
       moreActive={moreOpen}
+      collapsed={slid}
       onMore={toggleMore}
       onNavigate={() => {
         closeCompact();

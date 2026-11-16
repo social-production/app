@@ -162,3 +162,13 @@
 .shell .onboarding .copy-words {
   border-radius: 999px;
 }
+
+/* While a phone feed scrolls down the bars slide away (features/shell/scrollChrome.svelte.ts)
+   and the "+" drops into the bottom nav's place, as on other social apps. */
+.shell .create-fab-shell {
+  transition: transform 0.22s ease;
+}
+
+.shell.shell-chrome-slid .create-fab-shell:not(.menu-open) {
+  transform: translateY(var(--shell-bottom-nav-base));
+}
