@@ -135,7 +135,7 @@
           </div>
         {/if}
         {#if chatOpened}
-          <div hidden={tab !== 'chat'} inert={tab !== 'chat'}>
+          <div class="request-chat" hidden={tab !== 'chat'} inert={tab !== 'chat'}>
             <ProjectChat
               projectId={id}
               seed={project.networkSeed}
@@ -145,9 +145,9 @@
               highlighted={commentLink}
               onWrote={() => (commentLink = null)}
               copy={{
-                title: 'Help request chat',
+                title: 'Request chat',
                 placeholder: 'Write a message...',
-                empty: 'No help request chat yet.',
+                empty: 'No messages yet.',
               }}
             />
           </div>
