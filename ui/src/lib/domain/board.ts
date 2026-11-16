@@ -79,3 +79,6 @@ export function boardOrder(
       name(a).localeCompare(name(b), undefined, { sensitivity: 'base' }),
   );
 }
+
+/** A project tagged #platform takes a network vote: any Full member can vote (ADR 0095). */
+export const isNetworkVote = (tags: readonly string[]): boolean => tags.includes('#platform');

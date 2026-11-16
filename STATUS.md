@@ -166,9 +166,13 @@ frames under `project/*.dc.html`).
   (`/create/project?tag=platform` preselects #platform). The sheet: a summary (or the
   quorum-0 note), Seated / Candidates rows (`components/board/BoardRow.svelte`, wording in
   `domain/board.ts`), your row first with "You" and no vote buttons, Volunteer / Withdraw /
-  Step down each through `BoardConfirmSheet`, and `BoardHowSheet`'s five steps. Left out
-  until ADR 0095's rest ships (they would be untrue before): the "Every Full member votes on
-  #platform projects" line, "Network vote" on cards, and "merge" in what moderators do.
+  Step down each through `BoardConfirmSheet`, and `BoardHowSheet`'s five steps. Also shown
+  (owner: "you can add these things even if they arent true at the moment... its all
+  prototype"): the header's "Any Full member can vote on #platform projects" line and its
+  `NetworkVoteSheet`, "Network vote" in place of the stage on #platform rows
+  (`FeedCardTop`), the same line in the vote sheet (`VoteDecisionBody`), and "merge approved
+  changes on platform software projects" in what moderators do. **Not enforced yet:** these
+  are ADR 0095's rest (branch `claude/platform-voters`); until it ships, only members vote.
   Checked: `platform.mjs` passed (updated for the confirm step); page, sheet, confirm and
   steps at 390px light and dark. Open its PR after `claude/ux-profiles` merges.
 - **`claude/ux-profiles`** = polish + the Profiles and Comments screens (artifact 0 above); UI

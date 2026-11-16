@@ -36,8 +36,8 @@
     }
     const seat =
       quorum === 0
-        ? "Nobody voted last week, so you'll be seated straight away. Once people are active, your seat needs their votes."
-        : `You'll be listed as a candidate. Once ${quorum} people have voted and at least 66% say yes, you're seated.`;
+        ? "Nobody voted last week, so you'll be seated straight away. Once people are active, your seat needs their votes. Moderators merge approved changes on platform software projects."
+        : `You'll be listed as a candidate. Once ${quorum} people have voted and at least 66% say yes, you're seated, and you can merge approved changes on platform software projects.`;
     return {
       title: 'Volunteer as moderator?',
       body: [seat, 'You can step down any time.'],

@@ -23,7 +23,7 @@
     ],
     [
       'What moderators do',
-      "Carry out platform decisions after members approve them. They don't decide on their own, and they can't block anything.",
+      "Merge the changes members approved on platform software projects. Nothing else: they don't decide on their own, and they can't block anything.",
     ],
   ];
 </script>

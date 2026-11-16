@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
 
   import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
+  import NetworkVoteSheet from '#lib/components/board/NetworkVoteSheet.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -59,6 +60,7 @@
     if (n === undefined) return 'The whole network';
     return n === 0 ? 'Nobody active last week' : `${n.toLocaleString()} active last week`;
   });
+  let networkOpen = $state(false);
   const faces = $derived((board?.moderators ?? []).slice(0, 3));
   const more = $derived(Math.max(0, (board?.moderators.length ?? 0) - 3));
 </script>
@@ -188,6 +190,13 @@
           </button>
         {/if}
       </div>
+      {#if s.platform}
+        <button class="scope-rule" type="button" onclick={() => (networkOpen = true)}>
+          <ToolbarIcon name="people" />
+          <span>Any Full member can vote on #platform projects</span>
+          <b>How</b>
+        </button>
+      {/if}
     </div>
     {#if waiting > 0}
       <!-- Sits just left of the + button while a decision is waiting for this viewer. -->
@@ -202,4 +211,12 @@
       </button>
     {/if}
   </section>
+{/if}
+
+{#if s.platform}
+  <NetworkVoteSheet
+    open={networkOpen}
+    weeklyActive={board?.weeklyActive ?? null}
+    onClose={() => (networkOpen = false)}
+  />
 {/if}
