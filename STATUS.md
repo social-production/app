@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-15 morning Melbourne by a cloud session; start at "START HERE (2026-11-15)")
+# Status: where the P2P app stands (updated 2026-11-16 late morning Melbourne by the owner's PC session; start at "START HERE (2026-11-16)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -81,6 +81,46 @@ otherwise be more clones). Phase 0 (measure) first, then integrity, coordinators
 Every Railway URL returned "Application not found". Cause: the owner's Railway usage limit; they
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
+
+## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
+The last PC session's stacked UX branches (labels → new-message → remaining-screens →
+plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
+conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
+`claude/ux-plan-screens`.
+1. **PR #162 `claude/ux-screens`** = main + labels + Telegram's New message + the Remaining
+   Screens. UI only: `hc dna hash` equals main's build (directory `uhC0kiObR4…`, project
+   `uhC0kNYqoKd…`, conversation `uhC0k1AJBcn…`). Local browser tests passed: `accounts` (on
+   the second run; the first sign-up after a seed start times out), `messages`, `shell`,
+   `search`, `follows`, `regional`, `governance`, `events`, `mentions`, `group-options`,
+   `attachments`, `calls`, `platform`, `map`, `region`, `links`, `scope-settings`,
+   `public-chats`, `message-reports`, `chat`, `ux-review`. **The desktop smoke failed for a
+   real reason**: Settings' network line and Sign out now sit behind rows that open sheets;
+   `tests/desktop/smoke.mjs` reads the row and signs out through the sheet (fixed, rerunning).
+   Merge when green.
+2. **PR #163 `claude/ux-plan-convert`** = #162 + plan-screens (Plan, Phase and Feedback
+   Screens, Convert, feedback comments). **Resets the directory (`uhC0koVynnrz…`) and the
+   project network (`uhC0kQTrPUR3…`)**; conversation unchanged. **Owner, 2026-11-16: merge
+   once CI is green, after #162; then re-run `tests/e2e/demo-content.mjs` on live** (the
+   owner's other work runs in tandem, so the demo content is seeded before and re-seeded
+   after). Fixed on it: place rows called a store from components (layer rule); they use the
+   shell's `placeOnMap` context. Local browser tests: rerunning (the first run never started:
+   the seed took longer than 400 s to come up).
+3. **`claude/ux-polish`** (stacked on #163, local only until #163 merges): signed-out visitors
+   see no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`, Topbar
+   `guest`, FeedHeader `guest`; hidden only once the status is `signed-out`, not while
+   connecting); sign-up has no top bar (`authSurface` collapses it like an open chat). **Not
+   looked at in the browser yet.**
+   **Waiting on the owner (2026-11-16):** the owner found the create flows "rough and boxy and
+   confusing", Links and History not modernised, feed cards' time and place, and the filter
+   sheets wrapping. Mockups (build only after the owner answers):
+   - Polish pass (feed cards, feed and map filters, map bar at the bottom, Region, every create
+     step, Links, History): https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
+   - Map and Region filters (first round, superseded by the page above):
+     https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
+   Today's 390px screenshots of every create step come from `ONLY=create node
+   tests/e2e/ux-scan.mjs` (the private event stops at step 3: the scan adds no invitees).
+   Also seen and not yet fixed: a help request's "Still needed: … is required., …" has doubled
+   full stops; the empty Search page shows bare words (platform, community, project, event).
 
 ## START HERE (2026-11-15 afternoon, owner's PC session): the UX build list, three branches
 Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
