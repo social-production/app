@@ -74,12 +74,23 @@ interface BotNoticeWire {
 
 /** Openings and closings of your own review and of those you marked or voted on. */
 export async function myBotNotices(): Promise<BotNotice[]> {
-  const wire = await identity<BotNoticeWire[]>('my_bot_review_notices');
-  return wire.map((n) => ({
+  return (await identity<BotNoticeWire[]>('my_bot_review_notices')).map(fromWire);
+}
+
+/** Reviews of people you share a project or chat with that ask you to vote (web's
+ * `bot-review-vote`; the zome asks only full members). */
+export async function voteAskNotices(people: string[]): Promise<BotNotice[]> {
+  if (people.length === 0) return [];
+  const accounts = people.map(stringToHash);
+  return (await identity<BotNoticeWire[]>('bot_review_vote_notices', accounts)).map(fromWire);
+}
+
+function fromWire(n: BotNoticeWire): BotNotice {
+  return {
     account: hashToString(n.account),
     kind: n.kind,
     isAppeal: n.is_appeal,
     at: n.at,
     reReviewFrom: n.re_review_from,
-  }));
+  };
 }

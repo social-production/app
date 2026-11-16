@@ -1,7 +1,6 @@
 //! What web's bot review notifications are made from (ADR 0074): the openings and closings of
-//! your own review, and of reviews of accounts you marked or voted on. web also tells full
-//! members who share a space with the account; that needs every space's members and is left
-//! out here.
+//! your own review, and of reviews of accounts you marked or voted on, and (`asked_to_vote`)
+//! the openings of reviews of people you share a space with, whose members the device knows.
 
 use std::collections::BTreeMap;
 
@@ -10,6 +9,10 @@ use identity_integrity::LinkTypes;
 use sp_bot_review::{Logged, APPEAL_AFTER_US};
 
 use crate::bot_review::state;
+use crate::standing::own_proof;
+
+/// web's `MAX_REVIEW_NOTICES`: the most accounts one call looks at.
+const MAX_ACCOUNTS: usize = 100;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BotNotice {
@@ -80,6 +83,45 @@ pub fn mine() -> ExternResult<Vec<BotNotice>> {
     for (account, since) in my_reviewed_accounts()? {
         if account != me {
             out.extend(notices_of(&account, since, false)?);
+        }
+    }
+    Ok(out)
+}
+
+/// web's `bot-review-vote`: the openings (not re-reviews) of reviews of `accounts`, the
+/// people the caller shares a project or chat with. Only full members are asked, and never
+/// about an account whose bot mark of theirs is live (they know already).
+pub fn asked_to_vote(accounts: Vec<AgentPubKey>) -> ExternResult<Vec<BotNotice>> {
+    let me = agent_info()?.agent_initial_pubkey;
+    if own_proof()?.is_none() {
+        return Ok(Vec::new());
+    }
+    let mut out = Vec::new();
+    let mut seen = std::collections::BTreeSet::new();
+    for account in accounts {
+        if account == me || !seen.insert(account.clone()) || seen.len() > MAX_ACCOUNTS {
+            continue;
+        }
+        let Some(s) = state(&account)? else {
+            continue;
+        };
+        if s.markers.contains(&me) {
+            continue;
+        }
+        for logged in &s.log {
+            if let Logged::Opened {
+                at,
+                is_appeal: false,
+            } = logged
+            {
+                out.push(BotNotice {
+                    account: account.clone(),
+                    kind: "vote".into(),
+                    is_appeal: false,
+                    at: Timestamp(*at),
+                    re_review_from: None,
+                });
+            }
         }
     }
     Ok(out)
