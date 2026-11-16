@@ -1,0 +1,237 @@
+/* Parts of the create flows (Polish Pass mockups, 2026-11-16): the one search for channels and
+   communities with ticked rows and chips, the feed-card preview, and the overview's Edit rows.
+   Portaled outside the shell, so scoped to the create sheet. */
+.create-sheet .tag-step {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .tag-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 50px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.create-sheet .tag-search svg,
+.create-sheet .create-preview svg {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.create-sheet.create-sheet .tag-search input {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-main);
+  font-size: 16px;
+  outline: none;
+}
+
+.create-sheet .tag-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.create-sheet .tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 6px 0 13px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.create-sheet .tag-chip small {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.create-sheet .tag-chip button {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.create-sheet .tag-hint,
+.create-sheet .tag-empty,
+.create-sheet .create-preview figcaption {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .tag-results {
+  display: grid;
+}
+
+.create-sheet .tag-result {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-sheet .tag-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-weight: 700;
+}
+
+.create-sheet .tag-glyph.community {
+  border-radius: 50%;
+}
+
+.create-sheet .tag-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.create-sheet .tag-copy strong {
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.create-sheet .tag-copy small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.create-sheet .tag-tick {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--panel-border);
+  color: var(--on-brand);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.create-sheet .tag-result.on .tag-tick {
+  background: var(--brand);
+  box-shadow: none;
+}
+
+/* The preview: the feed row as it will appear. */
+.create-sheet .create-preview {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.create-sheet .create-preview-card.shell {
+  min-height: 0;
+  overflow: visible;
+  padding: 14px 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.create-sheet .create-preview-scope {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.create-sheet .create-preview-title {
+  display: block;
+  margin-top: 6px;
+  font-size: 18px;
+  line-height: 1.3;
+}
+
+.create-sheet .create-preview-body {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+/* The overview's rows: what was chosen, with Edit that goes back to it. */
+.create-sheet.create-sheet .overview-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 0;
+  padding: 12px 0;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  text-align: left;
+}
+
+.create-sheet.create-sheet .overview-row strong {
+  flex: none;
+  width: 84px;
+  color: var(--text-soft);
+  font-weight: 500;
+}
+
+.create-sheet.create-sheet .overview-row span {
+  flex: 1;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.create-sheet.create-sheet .overview-row em {
+  flex: none;
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-style: normal;
+  font-weight: 600;
+}

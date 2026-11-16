@@ -32,7 +32,7 @@ await page.getByLabel('What do you propose?').fill('Tools for the street.');
 await next(); // → Tags
 await tagTestChannel(page);
 await next(); // → Location
-await page.getByRole('radio', { name: /Physical/ }).check();
+await page.getByRole('radio', { name: 'In person' }).check();
 await page.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
 await page.locator('.location-picker .suggestions button').first().click({ timeout: 30_000 });
 await next(); // → Overview

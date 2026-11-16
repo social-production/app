@@ -32,11 +32,10 @@ async function createProject(page, name, tag) {
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('radio', { name: /Online/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
-  // web's scope step: the primary channel tag, then the shared test channel as a second one
-  // (so the card shows web's "+1" on phones).
-  await pickScopeTag(page, 'Primary channel tag', tag);
-  await page.getByText('Add more channels or communities').click();
-  await tagTestChannel(page, 'Additional channel tags');
+  // The scope step: the project's own channel first (its main tag), then the shared test
+  // channel as a second one (so the card shows web's "+1" on phones).
+  await pickScopeTag(page, 'Search channels and communities', tag);
+  await tagTestChannel(page);
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Publish proposal' }).click();
 }

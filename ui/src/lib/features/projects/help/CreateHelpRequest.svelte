@@ -70,7 +70,7 @@
         search={searchPlaces}
         failure={searchFailure}
         allowLater={false}
-        helperText="Help requests need a physical or online location so people know where to show up."
+        helperText="Where people should come, or that it happens online."
         onIntent={(i) => (s.intent = i)}
         onPlace={(p) => s.setPlace(p)}
       />
