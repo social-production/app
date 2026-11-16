@@ -55,7 +55,12 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
 - iPhones get Web Push only for the site added to the Home Screen (iOS 16.4 and later); the
   switch says so there.
 - Mobile (Tauri on Android/iOS) would need the platform's push service (FCM/APNs) to wake a
-  closed app. That waits for the mobile builds.
+  closed app. That waits for the mobile builds. The owner's direction (2026-11-16): the waking
+  should not depend on one central seed. A desktop that helps the network (ADR 0094) can do
+  the seed's part for others: hold their push subscriptions, receive their signals and send the
+  push, so seeds and helping desktops share it.
+- A desktop app that starts with the computer and stays in the tray gets nearly every
+  notification without a seed; that option comes with the desktop's OS notifications.
 - The bot-review vote notification (parity item 1) is built first with its card, then gets its
   signal with the rest.
 - Order of work: (1) the signals and the desktop's OS notifications, testable in scenarios;
