@@ -5,7 +5,6 @@
   import PlaceFact from '#lib/components/detail/PlaceFact.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
-  import { tagHref } from '#lib/components/cards/tagLinks.ts';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
   import { isHidden, type Moderation } from '#lib/domain/moderation.ts';
@@ -14,7 +13,6 @@
   import type { PlanBoard } from '#lib/domain/plans.ts';
   import { namesLine } from '#lib/domain/people.ts';
   import type { Charter, Project } from '#lib/domain/projects.ts';
-  import { tagRef } from '#lib/domain/scopes.ts';
   import { relativeTime } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
@@ -22,7 +20,7 @@
   /**
    * A project's or event's Details tab (Plan, Phase and Feedback Screens, 1): the channel
    * header, the title, who started it and when, the date (events), the place as a row that
-   * opens the app's map, the description folded after about six lines, the tags as chips,
+   * opens the app's map, the description folded after about six lines (tags live only in the header, owner 17 Nov),
    * the latest update in its own soft block, and for an event the faces of who is going.
    * An event shows its leading plan's time and place, as web-backend copies them onto the
    * event (`_sync_event_schedule_from_leading_plan`).
@@ -144,15 +142,6 @@
         <FoldedText text={charter.description} className="overview-copy" />
       {/if}
       {#if !event}{@render facts()}{/if}
-      {#if charter.tags.length > 1}
-        <!-- The first tag leads the header; the rest are chips. -->
-        <div class="detail-tags">
-          {#each charter.tags.slice(1).map(tagRef) as tag (tag.tag)}
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- tagHref resolves -->
-            <a href={tagHref(tag)}>{tag.label}</a>
-          {/each}
-        </div>
-      {/if}
       {#if update && latest !== null}
         <div class="overview-update">
           <small>Latest update · {relativeTime(update.at)}</small>

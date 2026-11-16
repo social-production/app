@@ -68,6 +68,11 @@
   max-width: 14rem;
 }
 
+/* The comma between tags hugs the word before it ("gardening, +1"), not the flex gap. */
+.shell .feed-lead-tags .tag-list .tag-sep {
+  margin-left: -4px;
+}
+
 .shell .feed-lead-meta {
   display: flex;
   align-items: center;
