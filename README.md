@@ -14,6 +14,15 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Push notifications, first half (PRs #166, #168, 2026-11-16 6:03 and 7:45 pm Melbourne, ADR
+  0108):** Settings → Notifications has "Push notifications on this device" and "Show what it's
+  about"; the seed keeps browsers' push subscriptions and listens for notice signals from the
+  people it hosts. The zomes don't send those signals yet, so no push arrives yet. No reset.
+- **Sign-ups (PR #170, 2026-11-16 7:45 pm Melbourne):** the seed allows 50 sign-ups or restores
+  per address a day (was 5).
+- **Demo content on live (2026-11-16 evening):** demo people (maya_k, tomas_b, priya_r) with a
+  project, a service with a request, an event, proposals, threads, posts, help requests and
+  direct messages (`tests/e2e/demo-content.mjs`, fixed for the new create flows in PR #173).
 - **Profiles and comments (PR #172, 2026-11-16 8:20 pm Melbourne):** Home and profiles show
   Global's rows, with comment rows; your profile has a cover photo, camera buttons and an edit
   sheet; comments show their author's photo and use one composer with a Replying-to bar; feed
