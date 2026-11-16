@@ -50,6 +50,11 @@ impl Pusher {
         store::remove(&self.pool, endpoint, Some(agent)).await
     }
 
+    /// The agents to listen for: those with push on somewhere.
+    pub async fn agents(&self) -> anyhow::Result<Vec<String>> {
+        store::agents(&self.pool).await
+    }
+
     /// Push `notice` to every browser of `agent` that has its category on. Subscriptions the
     /// push service calls gone are forgotten. Returns how many pushes were taken.
     pub async fn notify(&self, agent: &str, notice: &Notice) -> anyhow::Result<usize> {

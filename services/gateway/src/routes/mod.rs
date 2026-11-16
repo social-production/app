@@ -41,6 +41,8 @@ pub struct AppState {
     pub read_limit: Arc<SignupLimit>,
     /// Web Push to the browsers of hosted agents (ADR 0108).
     pub pusher: Arc<::push::Pusher>,
+    /// Whose signals the seed node hears for push (ADR 0108).
+    pub listeners: crate::notices::Listeners,
     /// When this process started (`/readyz` uptime).
     pub started: std::time::Instant,
 }
