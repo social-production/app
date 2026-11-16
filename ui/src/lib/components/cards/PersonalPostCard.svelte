@@ -52,7 +52,12 @@
           <CardReport {card} />
         </div>
         <LinkedPostBody body={card.summary} />
-        {#if card.moderation !== 'hidden'}<PostPhotos post={card.id} />{/if}
+        {#if card.moderation !== 'hidden'}<PostPhotos
+            post={card.id}
+            postHref={href}
+            caption={card.summary}
+            commentCount={card.commentCount}
+          />{/if}
         <FeedActions
           commentHref={`${href}#comments`}
           commentCount={card.commentCount}
