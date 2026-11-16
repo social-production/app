@@ -137,7 +137,8 @@ export async function assess(page, planTitle, yes) {
   await page.locator('.plan-card', { hasText: planTitle }).click();
   await page.getByRole('button', { name: 'Review this plan' }).click();
   const sheet = page.locator('.plan-sheet');
-  await sheet.getByText('Is the timing and schedule realistic?').waitFor();
+  // Any kind of plan: wait for its first question.
+  await sheet.locator('.criterion-row').first().waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
     await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
     await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
