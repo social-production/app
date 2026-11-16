@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import CountBadge from '#lib/components/icons/CountBadge.svelte';
   import ChatRow from '#lib/components/messages/ChatRow.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -189,7 +190,7 @@
           {#if tab === 'public'}
             {@render publicList()}
           {:else if (openId || toAgent) && !inbox.loaded}
-            <div class="empty-state">Loading chats…</div>
+            <SkeletonRows kind="row" count={5} />
           {:else if inbox.error && inbox.chats.length === 0}
             <div class="empty-state">{inbox.error}</div>
           {:else if inbox.chats.length === 0}
@@ -261,7 +262,7 @@
 
 {#snippet publicList()}
   {#if openProject && !publicChats.loaded}
-    <div class="empty-state">Loading chats…</div>
+    <SkeletonRows kind="row" count={5} />
   {:else if publicChats.error && publicChats.chats.length === 0}
     <div class="empty-state">{publicChats.error}</div>
   {:else if publicChats.chats.length === 0}

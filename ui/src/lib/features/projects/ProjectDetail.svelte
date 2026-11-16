@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
@@ -153,7 +155,7 @@
         <p class="tab-loading">{removedLabel(moderation.value.report?.reason)}</p>
       </section>
     {:else if !detail.project?.charter}
-      <section class="hero-card"><p class="tab-loading">Loading project…</p></section>
+      <LoadingLine /><SkeletonDetail />
     {:else}
       {@const project = detail.project}
       {@const charter = detail.project.charter}

@@ -47,8 +47,8 @@ async function waitInFeed(page, text, path = '/') {
     await page.goto(`${BASE}${path}`);
     await page.locator('.feed-page').waitFor();
     await page.locator('.empty-card, .project-card').first().waitFor({ timeout: 60_000 });
-    // "Loading feed..." is an .empty-card too; count only once the feed has loaded.
-    await page.getByText('Loading feed...').waitFor({ state: 'detached', timeout: 60_000 });
+    // Count only once the feed has loaded (its skeleton rows are gone).
+    await page.locator('.feed-page .skeleton-list').waitFor({ state: 'detached', timeout: 60_000 });
     if (await page.locator('.project-card', { hasText: text }).count()) return (Date.now() - t0) / 1000;
     if (Date.now() - t0 > 180_000) throw new Error(`${text} not in the feed after 3 min`);
     await page.waitForTimeout(3000);
@@ -156,7 +156,7 @@ for (let i = 0; ; i++) {
   await bob.goto(`${BASE}/channels/${channel}`);
   await bob.getByRole('heading', { name: channel }).waitFor({ timeout: 60_000 });
   const card = bob.locator('.project-card', { hasText: title });
-  await bob.getByText(/Loading feed/).waitFor({ state: 'detached', timeout: 60_000 });
+  await bob.locator('.feed-page .skeleton-list').waitFor({ state: 'detached', timeout: 60_000 });
   if (await card.count()) break;
   if (i >= 20) throw new Error('the project never showed on its channel page');
   await bob.waitForTimeout(3000);

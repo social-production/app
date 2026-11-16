@@ -4,6 +4,8 @@
   import { connect, signOut } from '#lib/services/account.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import OpeningScreen from '#lib/components/loading/OpeningScreen.svelte';
+
   import Welcome from './Welcome.svelte';
 
   import '#lib/components/styles/onboarding.css';
@@ -35,12 +37,5 @@
     </section>
   </div>
 {:else}
-  <p class="connecting">Connecting…</p>
+  <OpeningScreen />
 {/if}
-
-<style>
-  .connecting {
-    padding: 24px var(--page-gutter);
-    color: var(--text-soft);
-  }
-</style>

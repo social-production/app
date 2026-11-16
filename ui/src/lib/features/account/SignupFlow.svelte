@@ -54,7 +54,7 @@
   </div>
 {/if}
 {#if step === 'name'}
-  <form class="stack" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
+  <form class="stack" data-step="name" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
       <span class="field-label">Username</span>
       <input
@@ -74,11 +74,11 @@
     </div>
   </form>
 {:else if step === 'phrase'}
-  <div class="stack">
+  <div class="stack" data-step="phrase">
     <p class="field-label">Your recovery phrase</p>
-    <p>
-      These 24 words <strong>are</strong> your account — you log in with them. Write them down on paper
-      and keep them safe. Anyone with them can act as you; without them, a lost device means a lost account.
+    <p class="ob-phrase-note">
+      These 24 words <strong>are</strong> your account. Write them down and keep them safe: anyone with
+      them can act as you, and without them a lost device means a lost account.
     </p>
     <PhraseGrid {words} />
     <div class="button-row">
@@ -93,7 +93,7 @@
     </div>
   </div>
 {:else if step === 'confirm'}
-  <form class="stack" onsubmit={(e) => (e.preventDefault(), void finish())}>
+  <form class="stack" data-step="confirm" onsubmit={(e) => (e.preventDefault(), void finish())}>
     <p class="field-label">Check your phrase</p>
     {#each positions as position, i (position)}
       <label>
@@ -108,10 +108,12 @@
     {/each}
     {#if error}<p class="status-note">{error}</p>{/if}
     <div class="button-row">
-      <button class="button-primary" disabled={!confirmed} type="submit">Create account</button>
       <button class="button-secondary" type="button" onclick={() => (step = 'phrase')}
         >Show the words again</button
       >
+    </div>
+    <div class="button-row">
+      <button class="button-primary" disabled={!confirmed} type="submit">Create account</button>
     </div>
   </form>
 {:else}

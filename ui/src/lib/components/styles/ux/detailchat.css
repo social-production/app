@@ -1,0 +1,39 @@
+/* Owner's fix 3a (2026-11-17): the Chat tab of projects, events and requests looks like
+   Messenger. The page's tabs name the chat, so there's no "# project-chat" strip, an empty
+   chat is Messenger's one soft card in the middle, and a request's chat fills the screen
+   down to its composer as the others do (its tab wraps the chat in one more element). */
+.shell .chat-shell .chat-panel .chat-log-stack:has(> .empty-state) {
+  align-content: center;
+  min-height: 100%;
+}
+
+.shell .chat-shell .chat-panel .chat-log-stack > .empty-state {
+  justify-self: center;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+@media (max-width: 1080px) {
+  .shell .help-request-page .chat-tab-active > .request-chat:not([hidden]) {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .shell .help-request-page .chat-tab-active > .request-chat > .chat-shell {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+}
