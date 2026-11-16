@@ -132,7 +132,13 @@ frames under `project/*.dc.html`).
    dock's big "Join a role" button (each role already has its own Join); analyse the dock once
    you've joined, as it gets crowded (the member-list button can go, since Details shows the
    count; check whether the member list itself was modernised); show Share before joining too.
-   Mockup again before building the dock changes. Originally: the sign-up banner (A: a
+   v2-v4 (same link) draw these. Owner on v2: signed out, keep the networks (left rail) and map
+   buttons in the top bar (no right rail signed out; the right rail needs modernising later); the
+   joined dock (stance, Update, Share, ⋯ with Edit/Members/Copy link/Leave) is good; threads and
+   posts are good, but there are no @usernames: show only the name where you read, hide the key
+   (the person page's "Profile key" row goes), and modernise the member list in this pass. v3
+   draws names (key tag only in pickers when two names clash; Share profile gives a link; full key
+   stays in Settings) and the member list page: **waiting on the owner for those two**. Originally: the sign-up banner (A: a
    Sign up pill plus a floating join card, recommended; B: the pill only), and an analysis of the
    detail pages measured on live. Proposals, projects, events and requests indent their header
    body to x=61 (the feed row's icon column) while tabs and sections sit at 16, giving four left
