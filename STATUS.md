@@ -138,7 +138,11 @@ frames under `project/*.dc.html`).
    posts are good, but there are no @usernames: show only the name where you read, hide the key
    (the person page's "Profile key" row goes), and modernise the member list in this pass. v3
    draws names (key tag only in pickers when two names clash; Share profile gives a link; full key
-   stays in Settings) and the member list page: **waiting on the owner for those two**. Originally: the sign-up banner (A: a
+   stays in Settings) and the member list page. v5 **approved** ("looks great"): every event,
+   public or private, has Members and Invited sides (Invited = sent an invitation, not joined yet,
+   with who invited them and when); private events list organisers first; every row's second line
+   is where they live and their standing (no "Started it"). Before building, check whether
+   organisers can read the full invite list (it may need a zome change, so a reset: ask first). Originally: the sign-up banner (A: a
    Sign up pill plus a floating join card, recommended; B: the pill only), and an analysis of the
    detail pages measured on live. Proposals, projects, events and requests indent their header
    body to x=61 (the feed row's icon column) while tabs and sections sit at 16, giving four left
