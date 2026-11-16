@@ -37,6 +37,9 @@
           if (textSize) document.documentElement.dataset.textSize = textSize;
           if (accent) document.documentElement.dataset.accent = accent;
           if (font) document.documentElement.dataset.font = font;
+          if (localStorage.getItem('sp_back_buttons') === 'off') {
+            document.documentElement.dataset.backButtons = 'off';
+          }
         } catch (e) {}
       })();
     </script>
