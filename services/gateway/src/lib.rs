@@ -5,6 +5,7 @@ mod auth;
 mod config;
 mod hex;
 mod node;
+mod notices;
 mod routes;
 mod store;
 mod wipe;
@@ -31,9 +32,12 @@ pub async fn serve(
     let store = store::Store::open(&config.data_dir).await?;
     // The UI's origin names this gateway to the push services (ADR 0108).
     let pusher = Arc::new(push::Pusher::open(store.pool().clone(), &config.rp_origin).await?);
+    let listeners = notices::Listeners::default();
+    listeners.start_all(&node, &pusher).await;
     let state = routes::AppState {
         store,
         pusher,
+        listeners,
         passkeys: Arc::new(auth::passkeys::Passkeys::new(
             &config.rp_id,
             &config.rp_origin,

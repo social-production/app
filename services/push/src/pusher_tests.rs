@@ -48,6 +48,9 @@ async fn subscriptions_and_the_key_are_kept_per_agent() -> anyhow::Result<()> {
         .subscribe("bob", &saved("http://push.example/4", &[]))
         .await
         .is_err());
+    let mut agents = pusher.agents().await?;
+    agents.sort();
+    assert_eq!(agents, vec!["ann".to_string(), "bob".to_string()]);
     let ann = store::of_agent(&pool, "ann").await?;
     assert_eq!(ann.len(), 2);
     assert_eq!(ann[1].muted, vec!["comments".to_string()]);

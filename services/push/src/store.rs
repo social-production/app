@@ -99,6 +99,14 @@ pub(crate) async fn remove(
     Ok(done.rows_affected() > 0)
 }
 
+/// Every agent with push on in at least one browser.
+pub(crate) async fn agents(pool: &SqlitePool) -> anyhow::Result<Vec<String>> {
+    let rows = sqlx::query("select distinct agent from push_subscriptions")
+        .fetch_all(pool)
+        .await?;
+    Ok(rows.into_iter().map(|r| r.get("agent")).collect())
+}
+
 /// Every browser `agent` switched push on in.
 pub(crate) async fn of_agent(pool: &SqlitePool, agent: &str) -> anyhow::Result<Vec<Saved>> {
     let rows = sqlx::query(

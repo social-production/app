@@ -127,15 +127,18 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
   (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 50 sign-ups or
   restores per IP a day, and a restart resets the count). The desktop session updates `tests/e2e/demo/*` to the new tag search in
   ux-polish.
-- **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only). `claude/push-gateway` (PR #166): the `services/push` crate (VAPID key, RFC 8291 encryption, sender, subscriptions in `gateway.sqlite`, `Pusher::notify` with muted categories and "Show what it's about"; `cargo test -p push`, and Node decrypted its output); gateway routes `GET /push/key`, `POST /push/subscribe`, `POST /push/unsubscribe` (device secret, as `/session/cells`); `ui/static/sw.js` and `ui/src/lib/holo/push.ts` (`turnPushOn`/`turnPushOff`). Nothing sends yet. Next: the signals from the zomes (after #163, it touches the same coordinators), the gateway listening to hosted agents' signals and calling `notify`, the desktop's OS notifications, and the Settings switch (after #162). Not tested: a real push through a browser's push service.
-- **Push, next steps found (2026-11-16):** the gateway must hear hosted apps' signals. In
-  Holochain 0.7 `Conductor::subscribe_to_app_signals(app_id)` (a `broadcast::Receiver<Signal>`)
-  exists only under `test_utils` (`vendor/holochain/src/conductor/conductor.rs` ~4110); add it
-  to the vendored patch outside the feature (ADR 0053: re-apply the patch, note it in
-  vendor/README.md), subscribe per hosted app at start and after each install, and call
-  `Pusher::notify(agent, notice)` for signals shaped `{ "notice": { kind, category, title, body,
-  link } }`. The alternative (an app-websocket client per hosted app) costs a socket and a token
-  per account.
+- **Merged 2026-11-16:** #167 (lighter CI) 5:19 pm, #165 (ADR 0108) 5:28 pm, #166 (push
+  building blocks) 6:03 pm Melbourne, all green; the seed restarted with #166 at 6:16 pm and `GET /push/key` answers 200. `claude/push-signals` is PR #168.
+- **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only). `claude/push-gateway` (PR #166, merged): the `services/push` crate (VAPID key, RFC 8291 encryption, sender, subscriptions in `gateway.sqlite`, `Pusher::notify` with muted categories and "Show what it's about"; `cargo test -p push`, and Node decrypted its output); gateway routes `GET /push/key`, `POST /push/subscribe`, `POST /push/unsubscribe` (device secret, as `/session/cells`); `ui/static/sw.js` and `ui/src/lib/holo/push.ts` (`turnPushOn`/`turnPushOff`). Nothing sends yet. Next: the signals from the zomes (after #163, it touches the same coordinators), the gateway listening to hosted agents' signals and calling `notify`, the desktop's OS notifications, and the Settings switch (after #162). Not tested: a real push through a browser's push service.
+- **Push, the seed listens (`claude/push-signals`, PR #168):** the vendored holochain
+  patch adds a public `Conductor::app_signals(app_id)` (vendor/README.md). The gateway
+  (`services/gateway/src/notices.rs`) listens, from start and from each `/push/subscribe`, to the
+  apps of everyone with push on; a signal shaped `{ "notice": { kind, category, title, body, link
+  } }` calls `Pusher::notify`. A listener stops when the app is no longer hosted. Still to do: the
+  zomes send the signals (`recv_remote_signal` re-emits them; after #163) and desktop OS
+  notifications. Settings has "Push notifications" and "Show what it's about" under the
+  categories (`features/settings/PushSettings.svelte`, `stores/push.svelte.ts`; looked at 390px
+  light and dark against a local seed); signing out turns push off in that browser.
 - **Settings item 2 overlaps the UX branches:** the display timezone touches ~60 date calls in
   19 files (domain/ plus components/activities, plans, create, features/projects/scopes), and
   "Separate Public and Personal feeds" changes Home's tabs in `features/projects/`. Proposed: do

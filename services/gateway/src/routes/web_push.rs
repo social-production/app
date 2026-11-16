@@ -66,6 +66,7 @@ pub async fn subscribe(
         .subscribe(&agent, &saved)
         .await
         .map_err(|e| ApiError::bad_request(e.to_string()))?;
+    state.listeners.listen(&state.node, &state.pusher, &agent);
     Ok(Json(Done { ok: true }))
 }
 
