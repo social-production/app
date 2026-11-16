@@ -16,6 +16,7 @@ import { gatewayApi, GatewayError } from './gateway.ts';
 import { guestRead, guestSeedOf } from './guest.ts';
 import { forgetSession, loadSession, type DeviceSession } from './keys.ts';
 import { describeGateway, homeGateway, inNativeApp } from './nodes.ts';
+import { turnPushOff } from './push.ts';
 import { shareServers } from './servers.ts';
 import { spaceOf } from './spaces.ts';
 
@@ -147,7 +148,11 @@ export async function attach(
 export async function signOut(): Promise<void> {
   const gateway = homeGateway();
   if (inNativeApp()) await signOutOnDevice();
-  else if (gateway) await forgetSession(gateway);
+  else if (gateway) {
+    // No pushes for this account in this browser once signed out (ADR 0108).
+    await turnPushOff().catch(() => undefined);
+    await forgetSession(gateway);
+  }
   client = undefined;
   deviceSession = undefined;
   window.location.reload();
