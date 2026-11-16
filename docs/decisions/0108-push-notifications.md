@@ -28,11 +28,11 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
 - **Browsers: Web Push from the seed.** The gateway listens to the app signals of the agents it
   hosts. Settings → Notifications gets "Push notifications on this device": switching it on asks
   the browser for permission, registers a small service worker (`ui/static/sw.js`) and sends the
-  browser's push subscription to `POST /push/subscribe` (signed like `/session/resume`), with the
+  browser's push subscription to `POST /push/subscribe` (with the device secret, as `/session/cells` takes it), with the
   categories switched off on that device. The gateway keeps subscriptions in `gateway.sqlite`
   (agent, endpoint, keys, muted categories) and, for each signal to a hosted agent, sends an
   encrypted Web Push (VAPID, RFC 8291) to each of that agent's subscriptions whose category is on.
-  Tapping the notification opens its link. `DELETE /push/subscribe` and signing out remove it; a
+  Tapping the notification opens its link. `POST /push/unsubscribe` and signing out remove it; a
   410 from the push service removes it too. The VAPID key pair is made on first start and kept in
   `gateway.sqlite`.
 - **Desktop: the OS's own notifications.** The desktop app gets the same signals from its own
@@ -55,7 +55,12 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
 - iPhones get Web Push only for the site added to the Home Screen (iOS 16.4 and later); the
   switch says so there.
 - Mobile (Tauri on Android/iOS) would need the platform's push service (FCM/APNs) to wake a
-  closed app. That waits for the mobile builds.
+  closed app. That waits for the mobile builds. The owner's direction (2026-11-16): the waking
+  should not depend on one central seed. A desktop that helps the network (ADR 0094) can do
+  the seed's part for others: hold their push subscriptions, receive their signals and send the
+  push, so seeds and helping desktops share it.
+- A desktop app that starts with the computer and stays in the tray gets nearly every
+  notification without a seed; that option comes with the desktop's OS notifications.
 - The bot-review vote notification (parity item 1) is built first with its card, then gets its
   signal with the rest.
 - Order of work: (1) the signals and the desktop's OS notifications, testable in scenarios;

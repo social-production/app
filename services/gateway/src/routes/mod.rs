@@ -12,6 +12,7 @@ pub mod public;
 mod region;
 pub mod retire;
 pub mod session;
+mod web_push;
 pub mod ws_proxy;
 
 use std::sync::Arc;
@@ -38,6 +39,8 @@ pub struct AppState {
     pub signin_limit: Arc<SignupLimit>,
     /// Guest reads (`/public/read`) per IP per day.
     pub read_limit: Arc<SignupLimit>,
+    /// Web Push to the browsers of hosted agents (ADR 0108).
+    pub pusher: Arc<::push::Pusher>,
     /// When this process started (`/readyz` uptime).
     pub started: std::time::Instant,
 }
@@ -55,6 +58,9 @@ pub fn router(state: AppState) -> Router {
         .route("/account/retire", post(retire::retire))
         .route("/session/resume", post(session::resume))
         .route("/session/cells", post(session::cells))
+        .route("/push/key", get(web_push::key))
+        .route("/push/subscribe", post(web_push::subscribe))
+        .route("/push/unsubscribe", post(web_push::unsubscribe))
         .route("/index/projects", get(index::projects))
         .route("/index/people", get(index::people))
         .route("/index/paused", get(index::paused))
