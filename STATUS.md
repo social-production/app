@@ -87,10 +87,14 @@ The owner's list of 2026-11-15. They are references, not gospel: the built scree
 on since, and later owner answers in this file win. Read them with the Artifact tool
 (`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
 frames under `project/*.dc.html`).
-1. Polish Pass Mockups (2026-11-16, **waiting on the owner**): feed cards, feed and map
-   filters, the map bar, Region, every create step, Links, History:
-   https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
-2. Map and Region Filters (2026-11-16, first round, superseded by 1):
+1. **Polish Pass Mockups (2026-11-16, approved: "everything is brilliant"; building on
+   `claude/ux-polish`)**: feed cards, feed and map filters, the map bar, Region, every create
+   step, Links, History: https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
+   Owner's additions: the map bar centred at the bottom (option A); hide the map credit
+   (OpenStreetMap/CARTO require it, so it collapses to MapLibre's small ⓘ); Region option A,
+   with a distance box in its sheet you can also type a custom distance into; the map's
+   result cards look like Global feed cards.
+2. Map and Region Filters (2026-11-16, first round; map A and Region A chosen, superseded by 1):
    https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
@@ -131,14 +135,14 @@ conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
    after). Fixed on it: place rows called a store from components (layer rule); they use the
    shell's `placeOnMap` context. Local browser tests: rerunning (the first run never started:
    the seed took longer than 400 s to come up).
-3. **`claude/ux-polish`** (stacked on #163, local only until #163 merges): signed-out visitors
+3. **`claude/ux-polish`** (stacked on #163, pushed; its PR opens once #163 merges): signed-out visitors
    see no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`, Topbar
    `guest`, FeedHeader `guest`; hidden only once the status is `signed-out`, not while
    connecting); sign-up has no top bar (`authSurface` collapses it like an open chat). **Not
    looked at in the browser yet.**
-   **Waiting on the owner (2026-11-16):** the owner found the create flows "rough and boxy and
-   confusing", Links and History not modernised, feed cards' time and place, and the filter
-   sheets wrapping. Mockups (build only after the owner answers):
+   **Approved 2026-11-16 and being built here:** the owner found the create flows "rough and
+   boxy and confusing", Links and History not modernised, feed cards' time and place, and the
+   filter sheets wrapping. The Polish Pass page (Design artifacts, item 1) answers all of them:
    - Polish pass (feed cards, feed and map filters, map bar at the bottom, Region, every create
      step, Links, History): https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
    - Map and Region filters (first round, superseded by the page above):
