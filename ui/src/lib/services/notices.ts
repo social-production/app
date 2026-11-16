@@ -40,3 +40,16 @@ export async function notify(
     /* Best effort. */
   }
 }
+
+/** Tell the people a message @mentions (`found`), as their mention cards say (ADR 0047). */
+export function notifyMentions(
+  found: Promise<string[]>,
+  where: string,
+  body: string,
+  link: string,
+): void {
+  void found.then(
+    (to) => notify(to, 'mention', (me) => `${me} mentioned you ${where}`, body, link),
+    () => undefined,
+  );
+}

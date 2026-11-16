@@ -29,6 +29,7 @@
     pinChatMessage,
     postChatMessage,
   } from '#lib/services/messages.ts';
+  import { notifyMentions } from '#lib/services/notices.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { callRequest } from '#lib/stores/callRequest.svelte.ts';
 
@@ -72,7 +73,12 @@
   const thread = new ChatState(
     {
       list: () => listChatMessages(seed),
-      post: (body, replyTo, files) => inTurn(() => postChatMessage(seed, body, replyTo, files)),
+      post: async (body, replyTo, files) => {
+        const id = await inTurn(() => postChatMessage(seed, body, replyTo, files));
+        const link = `${location.pathname}?conversation=${encodeURIComponent(seed)}`;
+        notifyMentions(mentions.mentioned(body), 'in a chat', body, link);
+        return id;
+      },
       file: (attachment) => attachmentBlob(seed, attachment),
       remove: (id) => inTurn(() => deleteChatMessage(seed, id)),
       edit: (id, body) => inTurn(() => editChatMessage(seed, id, body)),
