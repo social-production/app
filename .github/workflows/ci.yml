@@ -1,9 +1,9 @@
 name: ci
 
-# While the app is a prototype (owner, 2026-11-16), a PR runs only what its files can break:
-# docs-only PRs run nothing, UI and other changes run the fast check, and the ~2 h scenarios run
-# when a PR touches zomes, DNAs, Rust crates, services, the scenarios or the toolchain. Main gets
-# the fast check on each merge and everything every night, or on demand (Run workflow).
+# While the app is a prototype (owner, 2026-11-16), PRs get only the fast check (minutes):
+# docs-only PRs run nothing, everything else runs scripts/check-fast.sh. The ~2 h scenarios run
+# only on main, every night (~3 am Melbourne) or on demand (Run workflow). Bring the scenarios
+# back to PRs once there is a stable release with real users.
 on:
   push:
     branches: [main]
@@ -44,9 +44,8 @@ jobs:
           files=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$PR/files" --paginate --jq '.[].filename')
           printf '%s\n' "$files"
           code=$(printf '%s\n' "$files" | grep -vE '(\.md$|^docs/)' || true)
-          deep=$(printf '%s\n' "$files" | grep -E '^(zomes|dnas|crates|services|happ|vendor|tests/scenarios)/|^(Cargo\.(toml|lock)|flake\.(nix|lock)|package(-lock)?\.json|scripts/(build-happ|check-scenarios|check-fast)\.sh)$' || true)
           echo "check=$([ -n "$code" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
-          echo "scenarios=$([ -n "$deep" ] && echo true || echo false)" >> "$GITHUB_OUTPUT"
+          echo "scenarios=false" >> "$GITHUB_OUTPUT"
 
   check:
     needs: changes

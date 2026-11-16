@@ -82,6 +82,13 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## CI is minutes on PRs while this is a prototype (owner, 2026-11-16)
+PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing). The ~2 h scenarios and
+the desktop builds run on main nightly (ci ~3 am, desktop ~3:30 am Melbourne) and on demand (Run
+workflow). Run locally the scenarios a change could break before pushing, and check the nightly
+run at the start of each session. Put the scenarios back on PRs once there is a stable release
+with real users.
+
 ## In flight (parity, cloud session) 2026-11-16, 1:30 pm Melbourne
 Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
 #163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this

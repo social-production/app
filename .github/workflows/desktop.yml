@@ -3,22 +3,11 @@ name: desktop
 # The desktop app (native/, ADR 0021/0090) built on Linux, Windows and macOS, with a smoke
 # test of the real app on Linux (SEEDLESS step 1). The UI and the hApp are built once in
 # Nix and handed to the stock-toolchain builds, which is how a person would build the app.
+# While the app is a prototype (owner, 2026-11-16) it runs on main and nightly, not on PRs.
 on:
   workflow_dispatch:
-  pull_request:
-    paths:
-      - Cargo.toml
-      - Cargo.lock
-      - native/**
-      - services/geo/**
-      - ui/**
-      - crates/**
-      - zomes/**
-      - dnas/**
-      - happ/**
-      - vendor/**
-      - tests/desktop/**
-      - .github/workflows/desktop.yml
+  schedule:
+    - cron: '47 16 * * *' # ~3:30 am Melbourne, after ci's nightly run starts
   push:
     branches: [main]
     paths:
