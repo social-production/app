@@ -1,0 +1,105 @@
+/* Detail Pages Cleanup §3–4 and Profiles and Comments §4, as drawn (owner, 17 Nov: "copy the
+   mockups"). A thread's header is the shared one: its channel is plain bold text beside the
+   icon, not a chip. The item's and the comments' actions are plain icons and words, not pills.
+   Replies sit indented under their comment with no rule beside them. Loaded after item.css. */
+
+.shell .item-head .feed-card-top.feed-lead .tag-plain,
+.shell .item-head .feed-card-top.feed-lead .tag-overflow-btn {
+  display: inline;
+  min-height: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 700;
+}
+
+.shell .item-head .feed-card-top.feed-lead .tag-list.plain {
+  gap: 4px;
+}
+
+.shell .item-head .feed-card-top.feed-lead .tag-sep {
+  display: inline;
+}
+
+/* ↑ 4 ↓   💬 3   ⇪ Share */
+.shell .item-actions {
+  gap: 18px;
+  margin-top: 12px;
+}
+
+.shell .item-actions .feed-vote,
+.shell .item-actions .item-pill,
+.shell .item-actions .share-button,
+.shell .comment-card .actions-row .feed-vote,
+.shell .comment-card .actions-row .reply-button {
+  height: auto;
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.shell .item-actions .feed-vote button,
+.shell .comment-card .actions-row .feed-vote button {
+  width: 24px;
+  min-width: 24px;
+  height: 28px;
+  min-height: 28px;
+}
+
+.shell .item-actions .feed-vote:has(.vote-button.active-up),
+.shell .comment-card .actions-row .feed-vote:has(.vote-button.active-up) {
+  background: transparent;
+  color: var(--brand-strong);
+}
+
+.shell .item-actions .feed-vote:has(.vote-button.active-down),
+.shell .comment-card .actions-row .feed-vote:has(.vote-button.active-down) {
+  background: transparent;
+  color: var(--danger);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .shell .item-actions .share-button:hover {
+    background: transparent;
+    color: var(--text-main);
+  }
+}
+
+/* ↑ 1 ↓   Reply   ⋯ */
+.shell .comment-card .actions-row {
+  gap: 16px;
+}
+
+.shell .comment-card .reply-stack {
+  margin-left: 42px;
+  padding-left: 0;
+  border-left: none;
+}
+
+/* The comment's text sits straight under the name at reading size (14.5px), as drawn. The
+   ported .body keeps white-space: pre-wrap, which also kept the template's own indentation;
+   only the comment's text keeps its line breaks now. */
+/* (cards.css sets .surface .content .body to 13px with an 8px top margin, and loads later.) */
+.shell .comment-card .body,
+.shell .surface .content .comment-card .body {
+  margin-top: 0;
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 1.4;
+  white-space: normal;
+}
+
+.shell .comment-card .body .body-text {
+  white-space: pre-wrap;
+}
+
+/* Every item's menu is ⋯ (cards, detail headers, comments), as each mockup draws it, not ⋮. */
+.shell .report-trigger .menu-dots {
+  transform: rotate(90deg);
+}

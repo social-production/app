@@ -137,11 +137,10 @@
           · {started}
         </span>
       </p>
-      {#if event}{@render facts()}{/if}
+      {@render facts()}
       {#if charter.description.trim()}
         <FoldedText text={charter.description} className="overview-copy" />
       {/if}
-      {#if !event}{@render facts()}{/if}
       {#if update && latest !== null}
         <div class="overview-update">
           <small>Latest update · {relativeTime(update.at)}</small>

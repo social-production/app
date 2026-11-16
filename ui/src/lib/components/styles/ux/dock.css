@@ -314,6 +314,12 @@
   gap: 8px;
 }
 
+/* Support / Oppose sits centred over the dock (Detail Pages Cleanup §3); an open vote's own
+   button keeps the right edge (Channel Pictures note). */
+.shell .dock-vote > #participation-signals {
+  align-self: center;
+}
+
 .shell .dock-vote:not(:has(button)) {
   display: none;
 }
