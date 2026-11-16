@@ -8,3 +8,11 @@ html[data-back-buttons='off'] .dock-back {
 html[data-back-buttons='off'] .shell .dock-row.dock-row {
   grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
 }
+
+/* Sign-up's bottom button (fix 3e) takes the back button's place too. */
+html[data-back-buttons='off']
+  .shell:not(:has(.mobile-bottom-nav))
+  .onboarding
+  .button-row:has(.button-primary) {
+  left: 16px;
+}
