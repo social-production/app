@@ -18,8 +18,10 @@
   let description = $state('');
   let pending = $state(false);
   let error = $state('');
+  let sent = $state(false);
 
   function close(): void {
+    sent = false;
     reason = 'spam';
     description = '';
     error = '';
@@ -32,7 +34,7 @@
     error = '';
     try {
       await reports.report(target.id, reason, description);
-      close();
+      sent = true;
     } catch (e) {
       error = reports.explain(e);
     } finally {
@@ -46,6 +48,7 @@
   itemLabel="comment"
   {pending}
   {error}
+  {sent}
   bind:reason
   bind:description
   onClose={close}

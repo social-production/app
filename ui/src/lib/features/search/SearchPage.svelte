@@ -2,7 +2,6 @@
   import { untrack } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
-  import SearchSuggestionsList from '#lib/components/search/SearchSuggestionsList.svelte';
   import {
     formatSearchMeta,
     readSearchType,
@@ -12,11 +11,10 @@
     type SearchType,
   } from '#lib/domain/search.ts';
   import { search } from '#lib/services/search.ts';
+  import { openSearch } from '#lib/stores/searchOverlay.svelte.ts';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
-
-  import { createLiveSearchScheduler } from './liveSearch.ts';
 
   import '#lib/components/styles/search.css';
 
@@ -38,20 +36,15 @@
     { value: 'user', label: 'People' },
   ];
 
-  const liveSearch = createLiveSearchScheduler();
   let draft = $state(untrack(() => query));
   let results = $state<SearchResultItem[]>([]);
   let loaded = $state(false);
-  let liveResults = $state<SearchResultItem[]>([]);
-  let liveLoading = $state(false);
-  let showSuggestions = $state(false);
 
   // A new ?q= or ?type= (submitting, a chip, the filter) loads its results.
   $effect(() => {
     const [q, t] = [query, type];
     untrack(() => {
       draft = q;
-      showSuggestions = false;
       loaded = false;
       void search(q, t).then(
         (found) => ((results = found), (loaded = true)),
@@ -68,23 +61,13 @@
     return parts.length ? `${resolve('/search')}?${parts.join('&')}` : resolve('/search');
   }
 
-  function live(): void {
-    showSuggestions = true;
-    liveSearch.schedule(draft, type, (found, loading) => {
-      liveResults = found;
-      liveLoading = loading;
-    });
-  }
-
   function submit(event: SubmitEvent): void {
     event.preventDefault();
-    showSuggestions = false;
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- built from resolve('/search')
     void goto(searchHref(draft.trim(), type));
   }
 
   function open(href: string): void {
-    showSuggestions = false;
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- the app's own paths
     void goto(href);
   }
@@ -103,20 +86,14 @@
             aria-label="Search"
             class="search-input"
             bind:value={draft}
-            oninput={live}
-            onfocus={() => draft.trim() && live()}
-            onblur={() => setTimeout(() => (showSuggestions = false), 150)}
+            readonly
+            onfocus={(event) => {
+              event.currentTarget.blur();
+              openSearch(draft);
+            }}
             placeholder="Channels, communities, projects, usernames..."
             type="search"
           />
-          {#if showSuggestions && draft.trim()}
-            <SearchSuggestionsList
-              loading={liveLoading}
-              overlay
-              results={liveResults}
-              onSelect={open}
-            />
-          {/if}
         </div>
       </form>
 

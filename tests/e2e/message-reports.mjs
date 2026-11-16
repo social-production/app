@@ -57,7 +57,8 @@ await ann
   .click();
 const composer = ann.locator('.report-composer');
 await composer.getByLabel("What's wrong?").fill('Adverts for pills.');
-await composer.getByRole('button', { name: 'Submit report' }).click();
+await composer.getByRole('button', { name: 'Send report' }).click();
+await composer.getByRole('button', { name: 'Done' }).click();
 await annComment
   .locator('.report-trigger .status-token', { hasText: 'Under review' })
   .waitFor({ timeout: 60_000 });
@@ -123,9 +124,10 @@ const annBubble = await openChat(ann, chatSpam);
 await annBubble.locator('.message-time').first().click();
 await ann.getByRole('menuitem', { name: 'Report', exact: true }).click();
 const chatComposer = ann.locator('.report-composer');
-await chatComposer.getByLabel('Reason').selectOption('serious-harm');
+await chatComposer.getByRole('radio', { name: /^Serious harm/ }).check();
 await chatComposer.getByLabel("What's wrong?").fill('Selling drugs.');
-await chatComposer.getByRole('button', { name: 'Submit report' }).click();
+await chatComposer.getByRole('button', { name: 'Send report' }).click();
+await chatComposer.getByRole('button', { name: 'Done' }).click();
 const hidden = ann.locator('.chat-log .hidden-toggle', { hasText: HIDDEN });
 await hidden.waitFor({ timeout: 60_000 });
 assert.equal(await ann.locator('.chat-log').getByText(chatSpam).count(), 0, 'the text is hidden');

@@ -50,16 +50,23 @@
       const chat = publicChats.chats.find((c) => c.id === at.id);
       const mute = {
         label: chat?.muted ? 'Unmute' : 'Mute',
+        icon: chat?.muted ? 'bell' : 'mute',
         onSelect: () => apply(at, { muted: !chat?.muted }),
       };
       if (at.header) return [mute];
       return [
         {
           label: chat?.pinned ? 'Unpin' : 'Pin',
+          icon: 'pin',
           onSelect: () => apply(at, { pinned: !chat?.pinned }),
         },
         mute,
-        { label: 'Delete', onSelect: () => apply(at, { hidden: true }) },
+        {
+          label: 'Delete',
+          icon: 'trash',
+          danger: true,
+          onSelect: () => apply(at, { hidden: true }),
+        },
       ];
     }
     const chat = inbox.all.find((c) => c.id === at.id);
@@ -68,18 +75,31 @@
     const group = chat.kind === 'group';
     const list: ChatMenuItem[] = [];
     if (partner)
-      list.push({ label: 'View profile', href: resolve('/profile/[agent]', { agent: partner }) });
+      list.push({
+        label: 'View profile',
+        icon: 'user',
+        href: resolve('/profile/[agent]', { agent: partner }),
+      });
     list.push(
-      { label: chat.pinned ? 'Unpin' : 'Pin', onSelect: () => apply(at, { pinned: !chat.pinned }) },
-      { label: chat.muted ? 'Unmute' : 'Mute', onSelect: () => apply(at, { muted: !chat.muted }) },
+      {
+        label: chat.pinned ? 'Unpin' : 'Pin',
+        icon: 'pin',
+        onSelect: () => apply(at, { pinned: !chat.pinned }),
+      },
+      {
+        label: chat.muted ? 'Unmute' : 'Mute',
+        icon: chat.muted ? 'bell' : 'mute',
+        onSelect: () => apply(at, { muted: !chat.muted }),
+      },
     );
-    if (group) list.push({ label: 'Chat info', onSelect: () => onInfo(at.id) });
+    if (group) list.push({ label: 'Chat info', icon: 'info', onSelect: () => onInfo(at.id) });
     // web: deleting a group from your list is leaving it.
     const del = group ? () => leave(at.id) : () => apply(at, { hidden: true });
-    list.push({ label: 'Delete', onSelect: del });
+    list.push({ label: 'Delete chat', icon: 'trash', danger: true, onSelect: del });
     if (group) {
       list.push({
         label: 'Leave group',
+        icon: 'leave',
         danger: true,
         onSelect: () => (leaving = { id: at.id, started: chat.manager === inbox.me }),
       });

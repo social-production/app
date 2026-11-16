@@ -30,14 +30,13 @@ assert.match(url, /\/posts\//);
 const profile = await bob.locator('.discussion-page .header-name').getAttribute('href');
 log('a new person published a post');
 
-// The author's own menu: Copy link, and Report says they can't.
+// The author's own menu: Copy link, and no Report row (owner, 2026-11-16).
 await bob.getByRole('button', { name: 'Report post' }).click();
 const own = bob.getByRole('dialog', { name: 'Options' });
 await own.getByRole('menuitem', { name: 'Copy link' }).waitFor();
-await own.getByRole('menuitem', { name: 'Report post' }).click();
-await own.getByText("You can't report yourself").waitFor();
+assert.equal(await own.getByRole('menuitem', { name: 'Report post' }).count(), 0, 'no Report row');
 await own.getByRole('button', { name: 'Close' }).click();
-log("the author's ⋮ offers Copy link and says they can't report themselves");
+log("the author's ⋮ offers Copy link and no Report");
 
 const ann = await device(phone);
 await phraseSignIn(ann, one.phrase.split(' '));
@@ -49,10 +48,11 @@ await ann
   .getByRole('menuitem', { name: 'Report post' })
   .click();
 const composer = ann.locator('.report-composer');
-await composer.getByLabel('Reason').selectOption('spam');
+await composer.getByRole('radio', { name: /^Spam/ }).check();
 await composer.getByLabel("What's wrong?").fill('Adverts for pills.');
 if (shots) await ann.screenshot({ path: `${shots}/report-composer.png` });
-await composer.getByRole('button', { name: 'Submit report' }).click();
+await composer.getByRole('button', { name: 'Send report' }).click();
+await composer.getByRole('button', { name: 'Done' }).click();
 await ann
   .locator('.discussion-page .report-trigger .status-token', {
     hasText: 'Under review',

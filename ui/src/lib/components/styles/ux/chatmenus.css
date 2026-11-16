@@ -1,0 +1,55 @@
+/* The chat menu (⋮ on a chat, a row's long press) and a message's menu as one floating card:
+   an icon on each row, the red items below a line (Chats, Search and Reports mockups §2, §4). */
+.shell .messages-page .chat-row-menu,
+.shell .chat-panel .bubble-menu {
+  min-width: 212px;
+  max-width: calc(100vw - 16px);
+  padding: 6px;
+  border: 1px solid var(--float-border);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: var(--float-shadow);
+}
+
+.shell .messages-page .chat-row-menu a,
+.shell .messages-page .chat-row-menu button,
+.shell .chat-panel .bubble-menu a,
+.shell .chat-panel .bubble-menu button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  color: var(--text-main);
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.shell .messages-page .chat-row-menu :is(a, button):hover,
+.shell .chat-panel .bubble-menu :is(a, button):hover {
+  background: var(--panel-hover);
+}
+
+.shell .messages-page .chat-row-menu .toolbar-icon,
+.shell .chat-panel .bubble-menu .toolbar-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--text-soft);
+}
+
+.shell .messages-page .chat-row-menu .menu-danger,
+.shell .messages-page .chat-row-menu .menu-danger .toolbar-icon,
+.shell .chat-panel .bubble-menu .menu-danger,
+.shell .chat-panel .bubble-menu .menu-danger .toolbar-icon {
+  color: var(--danger);
+}
+
+.shell .messages-page .chat-row-menu .menu-divider,
+.shell .chat-panel .bubble-menu .menu-divider {
+  height: 1px;
+  margin: 4px 8px;
+  border: none;
+  background: var(--panel-border);
+}

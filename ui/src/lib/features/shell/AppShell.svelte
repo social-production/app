@@ -18,6 +18,7 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { myScopes } from '#lib/stores/myScopes.svelte.ts';
+  import { openSearch } from '#lib/stores/searchOverlay.svelte.ts';
   import * as bell from '#lib/stores/notifications.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { countActionable } from '#lib/domain/activityRail.ts';
@@ -206,7 +207,7 @@
     {toggleRight}
     mapOpen={map.open}
     toggleMap={() => map.toggle()}
-    onSearch={(q) => goto(resolve(`/search?q=${encodeURIComponent(q)}`))}
+    onSearch={openSearch}
     onSignIn={() => goto(resolve('/onboarding'))}
     auth={authSurface}
   />

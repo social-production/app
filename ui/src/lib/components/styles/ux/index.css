@@ -23,10 +23,14 @@
 @import './messages.css';
 @import './newmessage.css';
 @import './chat.css';
+@import './chathead.css';
+@import './chatmenus.css';
+@import './chatabout.css';
 @import './profile.css';
 @import './profileedit.css';
 @import './people.css';
 @import './search.css';
+@import './searchoverlay.css';
 @import './scopes.css';
 @import './feedback.css';
 @import './links.css';
@@ -50,3 +54,4 @@
 @import './createevent.css';
 @import './pills.css';
 @import './region.css';
+@import './reportsheet.css';

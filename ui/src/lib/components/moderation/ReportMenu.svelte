@@ -24,7 +24,7 @@
     open: boolean;
     pending: boolean;
     copyUrl: string;
-    /** "You can't report yourself" (the parent shows it instead of the Report item). */
+    /** Your own item: no Report row (owner, 2026-11-16: no dead "You can't report yourself"). */
     blocked: boolean;
     loading: boolean;
     /** Why the last report or vote was refused (web toasts it). */
@@ -54,7 +54,6 @@
     onVote,
   }: Props = $props();
 
-  let showingBlocked = $state(false);
   let copyLabel = $state('Copy link');
   const status = $derived(moderationStatusLabel(moderation, report));
   const canVote = $derived(
@@ -66,10 +65,7 @@
   const title = $derived(report ? resolutionLabel(report.resolution) : 'Options');
 
   $effect(() => {
-    if (!open) {
-      showingBlocked = false;
-      copyLabel = 'Copy link';
-    }
+    if (!open) copyLabel = 'Copy link';
   });
 
   /** web shows a "Link copied" toast; the app has no toasts, so the item says it. */
@@ -84,9 +80,10 @@
     onToggle();
   }
 
-  function compose(): void {
-    if (blocked) showingBlocked = true;
-    else onCompose();
+  const canShare = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+
+  function share(): void {
+    void navigator.share({ url: copyUrl }).then(onClose, () => undefined);
   }
 
   function backdrop(event: MouseEvent): void {
@@ -123,15 +120,18 @@
   <div class="report-ui" use:portal>
     <div class="report-menu-backdrop" role="presentation" onclick={backdrop}>
       <div
-        aria-labelledby="report-menu-title"
+        aria-label={title}
         aria-modal="true"
         class="report-menu"
+        class:action-sheet={!report}
         role="dialog"
         tabindex="-1"
       >
-        <header class="menu-header">
-          <h2 class="menu-title" id="report-menu-title">{title}</h2>
-        </header>
+        {#if report}
+          <header class="menu-header">
+            <h2 class="menu-title">{title}</h2>
+          </header>
+        {/if}
         <div class="menu-body">
           {#if error}<p class="menu-label" role="alert">{error}</p>{/if}
           {#if copyUrl && !report}
@@ -147,6 +147,21 @@
               >
               <span>{copyLabel}</span>
             </button>
+            {#if canShare}
+              <button class="menu-item" role="menuitem" type="button" onclick={share}>
+                <svg aria-hidden="true" viewBox="0 0 24 24"
+                  ><path
+                    d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  /></svg
+                >
+                <span>Share</span>
+              </button>
+            {/if}
           {/if}
           {#if report}
             <div class="review-field">
@@ -165,23 +180,16 @@
             </div>
           {:else if loading}
             <p class="menu-label">Loading…</p>
-          {:else if showingBlocked}
-            <p class="menu-label">You can't report yourself</p>
-          {:else}
-            <button class="menu-item" role="menuitem" type="button" onclick={compose}>
+          {:else if !blocked}
+            <button class="menu-item menu-danger" role="menuitem" type="button" onclick={onCompose}>
               <svg aria-hidden="true" viewBox="0 0 24 24"
                 ><path
-                  d="M5 5h10l4 4v10H5V5Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                /><path
-                  d="M9 13h6M9 16h4"
+                  d="M6 21V4M6 4h11l-2.5 4.5L17 13H6"
                   fill="none"
                   stroke="currentColor"
                   stroke-width="1.8"
                   stroke-linecap="round"
+                  stroke-linejoin="round"
                 /></svg
               >
               <span>Report {itemLabel}</span>

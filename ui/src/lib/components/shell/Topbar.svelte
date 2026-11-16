@@ -42,7 +42,7 @@
 
   function submit(event: SubmitEvent): void {
     event.preventDefault();
-    if (query.trim()) p.onSearch(query.trim());
+    p.onSearch(query.trim());
   }
 </script>
 
@@ -98,13 +98,19 @@
       <form class="toolbar-search" role="search" onsubmit={submit}>
         <div class="toolbar-search-wrap">
           <SvgGlyph name="search" className="search-icon" />
+          <!-- The field opens the full-screen search (Chats, Search and Reports mockups §3). -->
           <input
             aria-label="Search"
             bind:value={query}
             class="toolbar-search-input"
             enterkeyhint="search"
             placeholder="Search"
+            readonly
             type="search"
+            onfocus={(event) => {
+              event.currentTarget.blur();
+              p.onSearch(query);
+            }}
           />
         </div>
       </form>

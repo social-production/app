@@ -172,6 +172,10 @@
             <img class="message-photo" alt={photo.name} use:photoSrc={photo} />
           </button>
         {/each}
+        <!-- No caption: the time is a dark pill on the picture (Telegram). -->
+        {#if !caption && files.length === 0}
+          <div class="message-footer photo-footer on-photo">{@render stamp()}</div>
+        {/if}
       </div>
     {/if}
     {#if files.length > 0}
@@ -211,11 +215,11 @@
               <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
             {:else}{part.text}{/if}
           {/each}
-          {#if photos.length === 0}<span class="message-footer">{@render stamp()}</span>{/if}
+          <span class="message-footer">{@render stamp()}</span>
         </p>
       </div>
     {/if}
-    {#if photos.length > 0 || (!caption && files.length === 0 && !removed)}
+    {#if !caption && !removed && ((photos.length > 0 && files.length > 0) || (photos.length === 0 && files.length === 0))}
       <div class="message-footer photo-footer">{@render stamp()}</div>
     {/if}
     {#if canReply && !message.own}

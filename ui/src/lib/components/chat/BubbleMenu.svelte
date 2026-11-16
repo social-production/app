@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { ChatLine } from '#lib/domain/chat.ts';
 
   import { openReport } from './chatReports.ts';
@@ -32,34 +33,33 @@
   const report = $derived(openReport(m.moderation));
 </script>
 
-<div class="bubble-menu" role="menu" style="left: {p.x}px; top: {p.y}px">
-  <a role="menuitem" href={resolve('/profile/[agent]', { agent: m.author })} onclick={p.onClose}
-    >View profile</a
+{#snippet item(icon: string, label: string, run: () => void, danger = false)}
+  <button type="button" role="menuitem" class:menu-danger={danger} onclick={run}
+    ><ToolbarIcon name={icon} />{label}</button
   >
-  {#if p.canWrite && sent}
-    <button type="button" role="menuitem" onclick={() => p.onReply(m)}>Reply</button>
-  {/if}
-  <button type="button" role="menuitem" onclick={() => p.onCopy(m)}>Copy</button>
-  {#if p.canPin && sent}
-    <button type="button" role="menuitem" onclick={() => p.onPin(m)}
-      >{m.pinned ? 'Unpin' : 'Pin'}</button
+{/snippet}
+
+<!-- The floating card of the Chats mockups: an icon on each row, Delete and Report in red
+     below a line. -->
+<div class="bubble-menu" role="menu" style="left: {p.x}px; top: {p.y}px">
+  {#if p.canWrite && sent}{@render item('reply', 'Reply', () => p.onReply(m))}{/if}
+  {@render item('copy', 'Copy', () => p.onCopy(m))}
+  {#if p.canPin && sent}{@render item('pin', m.pinned ? 'Unpin' : 'Pin', () => p.onPin(m))}{/if}
+  {#if p.canEdit && p.canWrite && m.own && sent}{@render item('pencil', 'Edit', () =>
+      p.onEdit(m),
+    )}{/if}
+  {#if !m.own}
+    <a role="menuitem" href={resolve('/profile/[agent]', { agent: m.author })} onclick={p.onClose}
+      ><ToolbarIcon name="user" />View profile</a
     >
-  {/if}
-  {#if p.canEdit && p.canWrite && m.own && sent}
-    <button type="button" role="menuitem" onclick={() => p.onEdit(m)}>Edit</button>
-  {/if}
-  {#if m.own && sent}
-    <button type="button" role="menuitem" onclick={() => p.onDelete(m)}>Delete</button>
-  {/if}
-  {#if !m.own && sent && p.onReport}
-    <button type="button" role="menuitem" onclick={() => p.onReport?.(m)}>Report</button>
   {/if}
   {#if report && p.onVote}
-    <button type="button" role="menuitem" onclick={() => p.onVote?.(m, report, true)}
-      >Vote to remove</button
-    >
-    <button type="button" role="menuitem" onclick={() => p.onVote?.(m, report, false)}
-      >Vote to keep</button
-    >
+    {@render item('thumb-down', 'Vote to remove', () => p.onVote?.(m, report, true))}
+    {@render item('thumb-up', 'Vote to keep', () => p.onVote?.(m, report, false))}
+  {/if}
+  {#if sent && (m.own || p.onReport)}
+    <hr class="menu-divider" />
+    {#if m.own}{@render item('trash', 'Delete', () => p.onDelete(m), true)}{/if}
+    {#if !m.own && p.onReport}{@render item('flag', 'Report', () => p.onReport?.(m), true)}{/if}
   {/if}
 </div>

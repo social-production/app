@@ -6,10 +6,10 @@
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import { withReceipts } from '#lib/components/chat/chatFormat.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
-  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
-  import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
   import GroupInfoSheet from '#lib/components/messages/GroupInfoSheet.svelte';
-  import PinBar from '#lib/components/messages/PinBar.svelte';
+
+  import ChatAboutPage from './ChatAboutPage.svelte';
+  import ChatHeader from './ChatHeader.svelte';
   import type { ChatPin, ChatSummary } from '#lib/domain/messages.ts';
   import { attachmentBlob } from '#lib/services/attachments.ts';
   import {
@@ -45,9 +45,25 @@
     onInfoClose: () => void;
     onMenu: (x: number, y: number) => void;
     onBack: () => void;
+    /** The chat's page (tap the face or name), `?about=1`. */
+    about: boolean;
+    onAbout: (open: boolean) => void;
+    onInfo: () => void;
+    onOpenChat: (id: string) => void;
   }
 
-  let { chat, inbox, infoOpen, onInfoClose, onMenu, onBack }: Props = $props();
+  let {
+    chat,
+    inbox,
+    infoOpen,
+    onInfoClose,
+    onMenu,
+    onBack,
+    about,
+    onAbout,
+    onInfo,
+    onOpenChat,
+  }: Props = $props();
 
   // The page keys this view by chat, so the first chat and names are the ones to keep.
   // svelte-ignore state_referenced_locally
@@ -132,74 +148,40 @@
 
   $effect(() => mentions.watch(thread.messages.map((m) => m.body)));
 
+  function call(): void {
+    callRequest.next = {
+      seed,
+      name: title,
+      peer: chat.members.find((m) => m !== inbox.me) ?? null,
+    };
+  }
+
+  const partner = $derived(
+    chat.kind === 'direct' ? chat.members.find((m) => m !== inbox.me) : null,
+  );
+  const groups = $derived(
+    inbox.all
+      .filter((c) => c.kind === 'group' && c.member && !!partner && c.members.includes(partner))
+      .map((c) => ({ id: c.id, title: inbox.title(c), count: c.members.length })),
+  );
+
   function jump(id: string): void {
     focus = { id, n: (focus?.n ?? 0) + 1 };
   }
 </script>
 
-<header class="chat-header" class:with-call={chat.kind === 'direct'}>
-  <button
-    class="back-button"
-    type="button"
-    aria-label="Back to chats"
-    title="Back to chats"
-    onclick={onBack}
-  >
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
-      <path
-        d="M15 5l-7 7 7 7"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.4"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      />
-    </svg>
-  </button>
-  <div class="chat-identity">
-    <button
-      class="identity-trigger"
-      type="button"
-      aria-label="Chat options"
-      onclick={(event) => onMenu(event.clientX, event.clientY)}
-    >
-      <div>
-        <h2>
-          <span class="identity-title">{title}</span>
-          <ChatMarks muted={chat.muted} header />
-        </h2>
-        {#if chat.kind === 'group'}<p class="identity-note">Group</p>{/if}
-      </div>
-      <AvatarBadge size="md" name={title} />
-    </button>
-  </div>
-  {#if chat.kind === 'direct'}
-    <button
-      class="call-button"
-      type="button"
-      aria-label={`Call ${title}`}
-      title={`Call ${title}`}
-      onclick={() =>
-        (callRequest.next = {
-          seed,
-          name: title,
-          peer: chat.members.find((m) => m !== inbox.me) ?? null,
-        })}
-    >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"
-        />
-      </svg>
-    </button>
-  {/if}
-  <PinBar {pins} canUnpin={chat.canPin} onJump={jump} onUnpin={(id) => void thread.pin(id, true)} />
-</header>
+<ChatHeader
+  {chat}
+  {title}
+  me={inbox.me}
+  {pins}
+  {onBack}
+  onAbout={() => onAbout(true)}
+  onCall={call}
+  {onMenu}
+  onJump={jump}
+  onUnpin={(id) => void thread.pin(id, true)}
+/>
 
 <ChatPanel
   {lines}
@@ -223,6 +205,28 @@
   mentionSearch={mentions.search}
   mentionAgent={mentions.agentOf}
 />
+
+{#if about}
+  <ChatAboutPage
+    {chat}
+    {title}
+    me={inbox.me}
+    names={inbox.names}
+    {lines}
+    {groups}
+    fileUrl={thread.fileUrl}
+    onBack={() => onAbout(false)}
+    {onMenu}
+    onCall={call}
+    onPrefs={(prefs) => void inbox.setPrefs(chat.id, prefs)}
+    onEditGroup={onInfo}
+    onJump={(id) => {
+      onAbout(false);
+      jump(id);
+    }}
+    {onOpenChat}
+  />
+{/if}
 
 {#if chat.kind === 'group'}
   <GroupInfoSheet

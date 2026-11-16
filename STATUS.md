@@ -124,6 +124,42 @@ frames under `project/*.dc.html`).
    the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
+2e. Detail Pages Cleanup (2026-11-16 night, **approved, not built**: "designs are great"). Owner's
+   choices: sign-up option A, but signed out the Sign up button sits permanently on the bottom dock
+   (a card in the corner would cover the left/right panels and the map); one layout for all types;
+   threads take the shared header. Posts keep the author's face and name on top (no type or
+   channel), and the comment sections stay as they are. Owner's notes for the build: a request drops the
+   dock's big "Join a role" button (each role already has its own Join); analyse the dock once
+   you've joined, as it gets crowded (the member-list button can go, since Details shows the
+   count; check whether the member list itself was modernised); show Share before joining too.
+   v2-v4 (same link) draw these. Owner on v2: signed out, keep the networks (left rail) and map
+   buttons in the top bar (no right rail signed out; the right rail needs modernising later); the
+   joined dock (stance, Update, Share, ⋯ with Edit/Members/Copy link/Leave) is good; threads and
+   posts are good, but there are no @usernames: show only the name where you read, hide the key
+   (the person page's "Profile key" row goes), and modernise the member list in this pass. v3
+   draws names (key tag only in pickers when two names clash; Share profile gives a link; full key
+   stays in Settings) and the member list page. v5 **approved** ("looks great"): every event,
+   public or private, has Members and Invited sides (Invited = sent an invitation, not joined yet,
+   with who invited them and when); private events list organisers first; every row's second line
+   is where they live and their standing (no "Started it"). Before building, check whether
+   organisers can read the full invite list (it may need a zome change, so a reset: ask first). Originally: the sign-up banner (A: a
+   Sign up pill plus a floating join card, recommended; B: the pill only), and an analysis of the
+   detail pages measured on live. Proposals, projects, events and requests indent their header
+   body to x=61 (the feed row's icon column) while tabs and sections sit at 16, giving four left
+   edges on an event. Proposed: one layout for all types, flush at 16, with a shared icon, channel
+   and kind header, facts as one grouped card, sentence-case sections and no page border:
+   https://claude.ai/artifact/UJEVvZ1b93rpoJoKMrWaMp
+2d. Chats, Search and Reports (2026-11-16 evening, **approved: "all brilliant"**; v2 adds the owner's
+   one change, chats like Telegram: a three-capsule header, bubbles with the time inside and a
+   tail, a photo's time as a dark pill on it; building on `claude/ux-chat-fixes`): §1 shows the chat
+   fixes already built on `claude/ux-chat-fixes` (face before name; one message capsule with no
+   inner ring that always fits its text). Proposed: a ⋮ chat menu as an icon card and a
+   Telegram-style person page (big photo, Call/Mute/Search/Profile, bio and key, Media, Files,
+   Links and Groups tabs; a group gets Members first); a full-screen search like Reddit's and
+   Substack's (recent searches kept on the phone, channels to explore, grouped suggestions as you
+   type, one scrolling row of filters); ⋮ as a bottom action sheet, and a report sheet with the two
+   reasons as cards with examples, then a confirmation. Asks: full page vs sheet, what search shows
+   before typing, keep two reasons: https://claude.ai/artifact/WTvJhtdqQ9FtWrc94N9i4m
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
 4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
@@ -140,6 +176,91 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-17): two cloud sessions replace the owner's PC session for the day
+The owner is away from the PC on 2026-11-17. One cloud session does **UX**, one does **parity**.
+They message each other (ListAgents / SendMessage) when a PR opens or merges, before pushing to
+a branch the other might touch, and before starting an ADR. ADR numbers: **0109 goes to the
+parity session** (below); the UX session takes 0111 and up if it needs one; parity continues 0110+.
+
+### Where things stand (12:15 am Melbourne, 2026-11-17)
+- Merged and live: #171 polish, #172 profiles, #174 platform screens, #175 bot-review vote.
+- **#176 `claude/ux-scroll-chrome`** (main merged in, fast checks clean locally): phone feeds
+  slide the top and bottom bars away on scroll. Merge when green.
+- **#177 `claude/ux-chat-fixes`** (contains #176 and main):
+  Telegram-style chats, the chat person page, full-screen search, the new report sheets
+  (details in the 2026-11-16 entry below). Merge after #176, when green.
+- After each merge: smoke live read-only at 390px (signed out, plus a demo account if needed),
+  add a README Status line, update this file.
+
+### UX session: the plan, in order
+1. **Merge #176, then #177** (above), each once its fast check is green.
+2. **Detail Pages Cleanup** (design artifact 2e, v5 approved: "looks great";
+   https://claude.ai/artifact/UJEVvZ1b93rpoJoKMrWaMp, sections 4 to 6 win over 1 to 3). Branch
+   `claude/ux-detail-pages` from main. UI only unless the invite list needs a zome change.
+   - One layout for proposal, project, event, request and thread: the shared icon + channel +
+     kind header, everything flush at 16px, facts as one grouped card of rows, sentence-case
+     section headings with counts ("Roles · 0 of 2 filled", no empty bar), no page border.
+     Threads take the shared header; **posts keep the author's face and name** on top; comment
+     sections stay as they are.
+   - Signed out: no sign-up banner. **Sign up sits in the middle of the bottom bar** on every
+     page; the top bar keeps the logo, search, networks (left rail) and map, but **no right
+     rail** signed out. A detail page's dock says "Sign up to join". Share is always on the dock
+     (today an event only shows it once you've joined).
+   - Requests: the dock loses "Join a role" (each role has its own Join).
+   - Joined dock: stance chip, Update (labelled), Share, ⋯ (Edit, Members, Copy link, Leave).
+     The member count leaves the dock; the Details "N members" row opens the list.
+   - **New (owner, 2026-11-17): the dock sizes to its buttons**: a dock with one or two
+     buttons is a short capsule, not a full-width bar with empty space.
+   - Names without keys: no @usernames exist. Where you read (posts, comments, chats, headers,
+     the person page) show only the name; drop the person page's "Profile key" row
+     (`ChatAboutPage`). Where you pick someone (new message, @mention, invites, member search)
+     the second line is place + standing, and the 4-character `keyTag` shows only when two
+     people in the list share a name. Share profile copies a link; the full key stays in
+     Settings > Account. `displayName()` in `domain/people.ts` adds the tag everywhere today.
+   - Member list: a full page (replaces `PeopleSheet` / `EventMembersSheet` for projects and
+     events). Search, then rows of face, name, "place · standing"; your row says You. **Every
+     event, public and private, has Members and Invited sides** (Invited = sent an invitation,
+     not joined yet, with who invited them and when); private events list organisers first;
+     no "Started it" line. Organiser actions (Make organiser, Remove) move into a row ⋯ menu.
+     **Check first** whether organisers can read every invitation for an event; if that needs
+     an integrity change, it is a reset: ask the owner (and stop if the directory hash moves).
+3. **Owner's fixes of 2026-11-17** (mockup page first for 3b to 3f, one artifact, wait for OK;
+   3a and 3g are bugs, fix and show before/after shots):
+   a. **Detail chats match Messenger.** The Chat tab of requests, projects, events and
+      proposals should look like the new chats (bubbles with the time inside and tails, the
+      composer, the menus). Requests are the most broken, and still say "Help request chat".
+   b. **The loading indicator at the top** of pages (shown while data loads) needs a modern
+      look (e.g. a thin progress line or skeleton rows).
+   c. **The app's opening loading screen** needs a modern look.
+   d. **Settings > the Region feed's distance:** preset choices you tap (not only typing a
+      number), plus a custom value, matching the approved Region sheet (Polish Pass: a dropdown
+      you can also type into). Its place search field is janky too; redo it.
+   e. **Sign-up is one full screen with no scrolling**, fitting the phone's height (check 360x640,
+      390x844, 430x932).
+   f. **A Settings switch to hide the back buttons** (the floating back on detail pages,
+      sign-up and others), since Android has a system back. On by default; per device.
+   g. **Bug: with the left or right panel open, the dock bar shows straight cut-off lines above
+      it.** Find and fix (likely the panels' backdrop or the dock's blur being clipped).
+   h. Later, not now: the right rail needs a modern redesign (mockup first).
+4. Keep `STATUS.md` current; every new design artifact goes in "Design artifacts".
+
+### Parity session: the plan
+- Its own list in "In flight (parity, cloud session)" below, then **ADR 0109**: one project
+  network reset carrying ADR 0095's rest (#platform projects voted on by any Full member, the
+  moderators' merge capability, weekly-count populations; branch `claude/platform-voters`) and
+  Channel Pictures (design 2c, approved). **Stop and ask the owner if the directory hash would
+  move.** Message the UX session first, since it changes screens the UX session is building.
+
+### Rules for both (owner's)
+`claude/<topic>` branches, one PR each, never push to main; merge main in, never rebase; merge
+a PR once CI is green (merging deploys). Times in Melbourne. Commit messages are one plain
+sentence. Files <=300 lines. Never run scenarios and browser tests at the same time. Look at
+every changed screen at 390px, light and dark. Demo accounts on live are fine to use; make no
+other live accounts. Mockups first for UX work (publish an artifact, wait for the OK).
+Prototype copy may run ahead of the backend ("every Full member **can** vote"). Don't run
+Prettier on `tests/e2e` (its own quote style). Whoever merges updates this file and the README
+Status.
+
 ## START HERE (2026-11-16 afternoon, owner's PC session): #162 merged, #163 carries one more reset, two UI branches stacked on it
 - **#162 merged 2:44 pm Melbourne** (UI only, no reset).
 - **Coordination with the cloud session (agreed 2026-11-16):** ADR 0107 is ours (covers and
@@ -150,6 +271,31 @@ frames under `project/*.dc.html`).
   touch the feed, create, plan, activity and project files these branches change). Next
   session the two sessions message each other directly (ListAgents / SendMessage): post when
   a PR opens or merges, or when you need a file the other owns.
+- **`claude/ux-chat-fixes` (stacked on ux-scroll-chrome; the approved Chats, Search and
+  Reports page, design artifact 2d, with the owner's Telegram change):**
+  - **Chats:** the header is three floating capsules (back; face and name, which open the chat's
+    page; call and ⋮), and the pinned message is a capsule under them (`ChatHeader.svelte`,
+    `ux/chathead.css`). Bubbles keep the time in the corner, on the last line when it fits; an
+    invisible spacer reserves that room. The last bubble of a run (by side) gets a tail, and a
+    captionless photo shows its time as a dark pill on the picture. The ⋮ and message menus
+    are icon cards (`ux/chatmenus.css`, icons in `toolbarIcons.ts`). The message bar has no
+    inner ring.
+  - **Chat page** (`ChatAboutPage.svelte`, `?conversation=…&about=1`, so back returns to the
+    chat): the photo, Call/Mute/Pin/Profile, bio and key, then Media/Files/Links/Groups; a group
+    shows Members first, with Edit/Info opening the old group sheet. "Search in chat" is left out
+    until there is a chat search (Pin took its tile).
+  - **Search** (`features/search/SearchOverlay.svelte`, mounted in `routes/+layout.svelte`):
+    the top bar's field (read-only) and the results page's field open it. Recent searches are
+    kept in localStorage only (`recentSearches.ts`), channels to explore come from
+    `listScopes`, and suggestions are grouped by kind. On desktop it's a panel at the top. The
+    result filters are one sideways-scrolling row.
+  - **Reports:** ⋮ is a bottom action sheet (Copy link, Share where `navigator.share` exists,
+    Report in red), and your own items show no Report row. The form has two reason cards in a
+    "Reason" radio group, then "Send report", then the "Thanks, it's under review" confirmation
+    with Done.
+  - **Tests:** reports, message-reports, messages, chat and group-options pass locally (their
+    selectors changed: "Chat menu", the radio, "Send report", Done). Everything was checked at
+    390px light and dark against the local seed.
 - **`claude/ux-scroll-chrome` (stacked on ux-platform, owner's ask 2026-11-16 evening):** on
   phone feeds (home, platform, profiles, channels, communities) the top bar and bottom nav slide
   away while you scroll down and return as soon as you scroll up; the "+" drops into the nav's

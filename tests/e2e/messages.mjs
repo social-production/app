@@ -108,7 +108,8 @@ await ann.locator('.chat-message', { hasText: answer }).first().locator('.messag
 await ann.getByRole('menuitem', { name: 'Report', exact: true }).click();
 const composer = ann.locator('.report-composer');
 await composer.getByLabel("What's wrong?").fill('Testing a report.');
-await composer.getByRole('button', { name: 'Submit report' }).click();
+await composer.getByRole('button', { name: 'Send report' }).click();
+await composer.getByRole('button', { name: 'Done' }).click();
 await ann.locator('.chat-log').getByText('Removed for spam').waitFor({ timeout: 60_000 });
 assert.equal(await ann.locator('.chat-log').getByText(answer).count(), 0, 'the text is gone');
 await ann.screenshot({ path: `${out}/phone390-dm-report.png` });

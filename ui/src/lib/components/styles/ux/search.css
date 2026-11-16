@@ -51,10 +51,20 @@
   font-size: 16px;
 }
 
+/* One row that scrolls sideways (Chats, Search and Reports mockups §3), not three lines. */
 .shell .search-page .type-chips {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 6px;
+  margin-inline: -16px;
+  padding: 2px 16px 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.shell .search-page .type-chip {
+  flex: none;
+  white-space: nowrap;
 }
 
 .shell .search-page .type-chip {

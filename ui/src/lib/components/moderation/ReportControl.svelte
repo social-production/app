@@ -53,6 +53,7 @@
   let loaded = $state<Moderation | null>(null);
   let reason = $state<ReportReason>('spam');
   let description = $state('');
+  let sent = $state(false);
   let error = $state('');
   let voteError = $state('');
 
@@ -94,6 +95,7 @@
 
   function closeComposer(): void {
     composerOpen = false;
+    sent = false;
     reason = 'spam';
     description = '';
     error = '';
@@ -104,7 +106,7 @@
     error = '';
     try {
       apply(await actions.report(id, reason, description, message));
-      closeComposer();
+      sent = true;
     } catch (e) {
       error = actions.explain(e);
     } finally {
@@ -157,6 +159,7 @@
   {itemLabel}
   {pending}
   {error}
+  {sent}
   bind:reason
   bind:description
   onClose={closeComposer}

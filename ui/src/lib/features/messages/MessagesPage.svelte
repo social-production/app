@@ -36,6 +36,7 @@
 
   const openId = $derived(page.url.searchParams.get('conversation'));
   const openProject = $derived(page.url.searchParams.get('project'));
+  const about = $derived(page.url.searchParams.get('about') === '1');
   const active = $derived(inbox.all.find((c) => c.id === openId && c.member) ?? null);
   const activeProject = $derived(publicChats.chats.find((c) => c.id === openProject) ?? null);
   const composing = $derived(page.url.searchParams.get('new'));
@@ -89,8 +90,8 @@
     };
   });
 
-  function open(id: string | null, param = 'conversation', replaceState = false): void {
-    const href = id ? `/messages?${param}=${encodeURIComponent(id)}` : '/messages';
+  function open(id: string | null, param = 'conversation', replaceState = false, more = ''): void {
+    const href = id ? `/messages?${param}=${encodeURIComponent(id)}${more}` : '/messages';
     void goto(resolve(href as '/messages'), { replaceState });
   }
 
@@ -141,6 +142,11 @@
             onInfoClose={() => (infoOpen = false)}
             onMenu={(x, y) => openMenu('personal', active.id, x, y, true)}
             onBack={() => open(null)}
+            {about}
+            onAbout={(show) =>
+              show ? open(active.id, 'conversation', false, '&about=1') : history.back()}
+            onInfo={() => (infoOpen = true)}
+            onOpenChat={(id) => open(id)}
           />
         {/key}
       {:else if draft}
