@@ -59,7 +59,7 @@ export async function helpRequest(page, { title, text, place, tag, roles }) {
   await pickScopeTag(page, TAG_SEARCH, tag);
   await next(); // → Roles
   for (const [i, [role, details]] of roles.entries()) {
-    if (i > 0) await page.getByRole('button', { name: 'Add role' }).click();
+    if (i > 0) await page.getByRole('button', { name: 'Add a role' }).click();
     await page.getByLabel('Role title').nth(i).fill(role);
     await page.getByLabel('Role details').nth(i).fill(details);
   }
