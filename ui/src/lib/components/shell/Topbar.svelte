@@ -75,22 +75,25 @@
       >
         <SvgGlyph name="map" className="panel-toggle-icon" />
       </button>
-      <button
-        aria-label="Open activity"
-        title="Activity"
-        aria-expanded={p.rightOpen}
-        class="panel-toggle panel-toggle-right"
-        data-active={p.rightOpen}
-        type="button"
-        onclick={p.toggleRight}
-      >
-        <SvgGlyph name="activity" className="panel-toggle-icon" />
-        {#if (p.activityCount ?? 0) > 0}
-          <span class="panel-toggle-badge">
-            <CountBadge count={p.activityCount ?? 0} />
-          </span>
-        {/if}
-      </button>
+      <!-- Detail Pages Cleanup §4: the activity rail is for signed-in people. -->
+      {#if !p.guest}
+        <button
+          aria-label="Open activity"
+          title="Activity"
+          aria-expanded={p.rightOpen}
+          class="panel-toggle panel-toggle-right"
+          data-active={p.rightOpen}
+          type="button"
+          onclick={p.toggleRight}
+        >
+          <SvgGlyph name="activity" className="panel-toggle-icon" />
+          {#if (p.activityCount ?? 0) > 0}
+            <span class="panel-toggle-badge">
+              <CountBadge count={p.activityCount ?? 0} />
+            </span>
+          {/if}
+        </button>
+      {/if}
     </div>
 
     <div class="toolbar-center">

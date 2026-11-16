@@ -1,7 +1,7 @@
 <script lang="ts">
   import CopyKey from '#lib/components/CopyKey.svelte';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
-  import { displayName, type Person } from '#lib/domain/people.ts';
+  import { taggedName, type Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
     deviceRequests,
@@ -65,7 +65,7 @@
       value={paired.length ? paired.map((d) => d.profile?.name ?? 'Unnamed').join(', ') : 'None'}
     >
       {#each paired as device (device.agent)}
-        <p class="setting-line">{displayName(device)}</p>
+        <p class="setting-line">{taggedName(device)}</p>
       {:else}
         <p class="setting-hint">No other devices paired yet.</p>
       {/each}
@@ -75,7 +75,7 @@
       <div class="set-row set-action">
         <span class="set-row-label">
           Pairing request
-          <small>From {displayName(request.from)}</small>
+          <small>From {taggedName(request.from)}</small>
         </span>
         <button class="set-pill" type="button" onclick={() => act(request.link, 'Device paired.')}
           >Confirm</button

@@ -40,6 +40,22 @@ export function keyTag(agent: string): string {
   return agent.slice(5, 9);
 }
 
-export function displayName(person: Pick<Person, 'agent' | 'profile'>): string {
-  return `${person.profile?.name ?? 'Unnamed'} · ${keyTag(person.agent)}`;
+/** Someone's name where you read it: just the name (Detail Pages Cleanup §5; there are no
+ * @usernames, and pickers add the key tag only when two names clash). */
+export function displayName(person: Pick<Person, 'profile'>): string {
+  return person.profile?.name || 'Unnamed';
+}
+
+/** A name with its 4-character key tag, where every row has the same name (your devices). */
+export function taggedName(person: Pick<Person, 'agent' | 'profile'>): string {
+  return `${displayName(person)} · ${keyTag(person.agent)}`;
+}
+
+/** "Unnamed, Priya and 2 more": the first two first names of `names`, then how many more
+ * there are out of `total` (a detail page's people row). */
+export function namesLine(names: string[], total = names.length): string {
+  const first = names.slice(0, 2).map((n) => n.trim().split(/\s+/)[0] || 'Unnamed');
+  const more = total - first.length;
+  if (more <= 0) return first.length === 2 ? `${first[0]} and ${first[1]}` : (first[0] ?? '');
+  return `${first.join(', ')} and ${more} more`;
 }

@@ -5,28 +5,37 @@
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
   import PausedBadge from '#lib/components/people/PausedBadge.svelte';
   import { isHidden } from '#lib/domain/moderation.ts';
-  import { postedAt, relativeCompact } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
+
+  import '#lib/components/styles/ux/detailfacts.css';
 
   import DiscussionActions from './DiscussionActions.svelte';
   import type { DiscussionState } from './discussionState.svelte.ts';
 
   /**
-   * web's ThreadOverviewPanel, laid out as the feed's thread row opened up (ADR 0100): the
-   * type and tags as chips on top, the title, the body, who started it and when underneath,
-   * and the soft action pills above the comments' heading and Sort.
+   * web's ThreadOverviewPanel (ADR 0100). Detail Pages Cleanup §3: the shared header (the
+   * thread icon, the channel and "Thread · 12m"), the title, "Asked by" with the date, the
+   * body, then the votes, comment count and Share in one row above the comments.
    */
   let { state }: { state: DiscussionState } = $props();
 
   const project = $derived(state.project);
   const charter = $derived(state.project?.charter);
   const name = $derived(project ? (state.names[project.creator] ?? '…') : '…');
+  const started = $derived(
+    project
+      ? new Date(project.createdAt / 1000).toLocaleDateString(undefined, {
+          day: 'numeric',
+          month: 'short',
+        })
+      : '',
+  );
 </script>
 
 {#if project && charter}
   <section class="overview-shell item-head">
-    <FeedCardTop tags={charter.tags} stage="" mode="thread">
+    <FeedCardTop tags={charter.tags} stage="" mode="thread" createdAt={project.createdAt}>
       <ReportControl
         id={state.id}
         itemLabel="thread"
@@ -38,16 +47,17 @@
     </FeedCardTop>
     <RestrictionNotice active={isHidden(state.moderation.value)}>
       <h1>{charter.title}</h1>
+      <p class="detail-by thread-by">
+        <AvatarBadge size="sm" {name} />
+        <span>
+          Asked by
+          <a href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>
+          <PausedBadge agent={project.creator} />
+          · {started}
+        </span>
+      </p>
       <p class="overview-copy">{charter.description}</p>
     </RestrictionNotice>
-    <p class="item-by-row">
-      <AvatarBadge size="sm" {name} />
-      <a class="item-by" href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>
-      <PausedBadge agent={project.creator} />
-      <span class="item-when" title={postedAt(project.createdAt)}
-        >{relativeCompact(project.createdAt)}</span
-      >
-    </p>
     <DiscussionActions {state} kind="thread" title={charter.title} />
   </section>
 {/if}

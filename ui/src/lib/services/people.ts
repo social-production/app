@@ -120,3 +120,17 @@ export async function pairingOf(agent: string): Promise<Pairing> {
     devices: wire.devices.map(hashToString),
   };
 }
+
+// One read per person while the app is open, for pickers that re-render as you type.
+const picked = new Map<string, Promise<Person>>();
+
+/** `getPerson`, remembered (a picker row's place and standing). */
+export function cachedPerson(agent: string): Promise<Person> {
+  let found = picked.get(agent);
+  if (!found) {
+    found = getPerson(agent);
+    found.catch(() => picked.delete(agent));
+    picked.set(agent, found);
+  }
+  return found;
+}

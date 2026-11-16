@@ -1,9 +1,10 @@
 <script lang="ts">
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
-  import FactLine from '#lib/components/cards/FactLine.svelte';
+  import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
+  import FactRow from '#lib/components/detail/FactRow.svelte';
+  import PlaceFact from '#lib/components/detail/PlaceFact.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
-  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
   import { tagHref } from '#lib/components/cards/tagLinks.ts';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
@@ -11,6 +12,7 @@
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import type { PlanBoard } from '#lib/domain/plans.ts';
+  import { namesLine } from '#lib/domain/people.ts';
   import type { Charter, Project } from '#lib/domain/projects.ts';
   import { tagRef } from '#lib/domain/scopes.ts';
   import { relativeTime } from '#lib/domain/time.ts';
@@ -33,11 +35,14 @@
     /** web's ReportControl in the header (ADR 0071). */
     moderation: Moderation;
     onModeration: (next: Moderation) => void;
-    /** Opens the member list (an event's "N going"). */
+    /** Opens the member list (the "N going" / "N members" row). */
     onMembers?: () => void;
+    /** Opens Take part (the phase row). */
+    onPhase?: () => void;
   }
 
-  let { project, charter, plans, names, moderation, onModeration, onMembers }: Props = $props();
+  let { project, charter, plans, names, moderation, onModeration, onMembers, onPhase }: Props =
+    $props();
 
   const event = $derived(charter.mode === 'event');
   const leading = $derived(
@@ -56,7 +61,53 @@
     }),
   );
   const going = $derived(project.members.slice(0, 3));
+  const count = $derived(project.members.length);
+  const peopleTitle = $derived(
+    event ? `${count} going` : `${count} ${count === 1 ? 'member' : 'members'}`,
+  );
+  const peopleLine = $derived(
+    namesLine(
+      project.members.slice(0, 2).map((a) => names[a] ?? ''),
+      count,
+    ),
+  );
+  const phase = $derived(project.phases.find((p) => p.id === project.phase)?.label ?? '');
+  const planCount = $derived(plans?.plans.length ?? 0);
+  const phaseLine = $derived(
+    planCount > 0 ? `${planCount} ${planCount === 1 ? 'plan' : 'plans'}` : '',
+  );
 </script>
+
+{#snippet facts()}
+  <DetailFacts>
+    {#if project.lineage.continues}
+      <FactRow
+        icon="lineage"
+        title="A converted project"
+        sub="Continues the work of"
+        href={resolve('/projects/[id]', { id: project.lineage.continues })}
+      />
+    {/if}
+    {#if timeLabel}<FactRow icon="when" title={timeLabel} />{/if}
+    <PlaceFact {place} />
+    {#if count > 0}
+      <FactRow
+        icon="people"
+        title={peopleTitle}
+        sub={peopleLine}
+        label={`${count} members`}
+        onclick={() => onMembers?.()}
+      >
+        {#snippet aside()}
+          {#each going as agent (agent)}<AvatarBadge size="sm" name={names[agent] ?? ''} />{/each}
+        {/snippet}
+      </FactRow>
+    {/if}
+    {#if !event && phase}
+      <FactRow icon="phase" title={`${phase} phase`} sub={phaseLine} onclick={() => onPhase?.()} />
+    {/if}
+  </DetailFacts>
+{/snippet}
 
 <div class="project-overview">
   <div class="context-panel">
@@ -88,19 +139,11 @@
           · {started}
         </span>
       </p>
-      {#if project.lineage.continues}
-        <a class="detail-place" href={resolve('/projects/[id]', { id: project.lineage.continues })}>
-          <span class="lineage-copy"
-            ><small>Continues the work of</small><strong>A converted project</strong></span
-          >
-          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
-        </a>
-      {/if}
-      {#if timeLabel}<FactLine icon="when">{timeLabel}</FactLine>{/if}
-      <PlaceRow {place} />
+      {#if event}{@render facts()}{/if}
       {#if charter.description.trim()}
         <FoldedText text={charter.description} className="overview-copy" />
       {/if}
+      {#if !event}{@render facts()}{/if}
       {#if charter.tags.length > 1}
         <!-- The first tag leads the header; the rest are chips. -->
         <div class="detail-tags">
@@ -115,14 +158,6 @@
           <small>Latest update · {relativeTime(update.at)}</small>
           {latest}
         </div>
-      {/if}
-      {#if event && project.members.length > 0}
-        <button class="detail-going" type="button" onclick={() => onMembers?.()}>
-          <span class="detail-faces">
-            {#each going as agent (agent)}<AvatarBadge size="sm" name={names[agent] ?? ''} />{/each}
-          </span>
-          <span><strong>{project.members.length} going</strong></span>
-        </button>
       {/if}
     </div>
   </div>

@@ -3,20 +3,22 @@
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
   import { isEvent, takesSignals, type Stance } from '#lib/domain/projects.ts';
 
   import DetailShare from './DetailShare.svelte';
   import type { DetailState } from './detailState.svelte.ts';
+  import DockMore from './DockMore.svelte';
+  import JoinActions from './JoinActions.svelte';
 
-  /** web's Details dock: signals, join/members, Vote on edits and updates, Share +, and Edit and
-   * Update for members. ADR 0099: Support and Oppose are a capsule above the actions until the
-   * person has a stance; then they fold into a chip that opens them again. An open vote on
-   * an edit or update floats up there too, so the capsule stays one row of actions. */
+  /** web's Details dock: signals, Vote on edits and updates, Join, Share, and Update for
+   * members. ADR 0099: Support and Oppose are a capsule above the actions until the person
+   * has a stance; then they fold into a chip that opens them again. An open vote on an edit or
+   * update floats up there too. Detail Pages Cleanup §4: before you join, Join (or "Sign up to
+   * join") and Share; once joined, the stance chip, Update, Share and ⋯ (Edit, Members, Copy
+   * link, Leave). The member count lives in Details. */
   interface Props {
     detail: DetailState;
-    membersOpen: boolean;
     onOpenMembers: () => void;
     onEdit: () => void;
     onUpdate: () => void;
@@ -27,7 +29,6 @@
 
   let {
     detail,
-    membersOpen,
     onOpenMembers,
     onEdit,
     onUpdate,
@@ -97,7 +98,7 @@
         />
       {/if}
     {/snippet}
-    {#if signals && stance.mine}
+    {#if signals && stance.mine && project.amMember}
       <button
         type="button"
         class="dock-chip"
@@ -119,23 +120,22 @@
         <span>{percent}</span>
       </button>
     {/if}
-    <MembershipSplitButton
-      joined={project.amMember}
-      count={project.members.length}
-      pending={detail.joining}
-      {membersOpen}
-      noun={isEvent(project.charter?.mode) ? 'event' : 'project'}
-      onToggleJoin={() => detail.requestToggleJoin()}
-      {onOpenMembers}
-    />
-    <DetailShare {detail} />
-    {#if detail.canPropose}
-      <button type="button" class="dock-icon" aria-label="Edit" title="Edit" onclick={onEdit}>
-        <ToolbarIcon name="pencil" />
-      </button>
-      <button type="button" class="dock-icon" aria-label="Update" title="Update" onclick={onUpdate}>
-        <ToolbarIcon name="loudspeaker" />
-      </button>
+    {#if !project.amMember}
+      <JoinActions {detail} />
+    {:else}
+      {#if detail.canPropose}
+        <button type="button" class="dock-labelled" onclick={onUpdate}>
+          <ToolbarIcon name="loudspeaker" />Update
+        </button>
+      {/if}
+      <DetailShare {detail} />
+      <DockMore
+        noun={isEvent(charter.mode) ? 'event' : 'project'}
+        canEdit={detail.canPropose}
+        {onEdit}
+        onMembers={onOpenMembers}
+        onLeave={() => detail.requestToggleJoin()}
+      />
     {/if}
   </DetailActionDock>
 {/if}

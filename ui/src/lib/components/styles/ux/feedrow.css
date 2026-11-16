@@ -116,8 +116,7 @@
 
 /* Owner, 2026-11-14: a public row's title, text and actions start under the channel name,
    leaving the glyph's column empty, as a post's text sits beside its author's face. */
-.shell .surface .content .feed-card-top.feed-lead ~ *,
-.shell .context-panel .feed-card-top.feed-lead ~ * {
+.shell .surface .content .feed-card-top.feed-lead ~ * {
   margin-left: 44px;
 }
 

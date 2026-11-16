@@ -1,0 +1,105 @@
+/* The joined dock's ⋯ menu (Detail Pages Cleanup §4), in the chat menus' card style. */
+
+.shell .dock-capsule .dock-more {
+  position: relative;
+  display: flex;
+}
+
+.shell .dock-more-backdrop.dock-more-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  min-height: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: default;
+}
+
+.shell .dock-more-card {
+  position: absolute;
+  right: -5px;
+  bottom: calc(100% + 12px);
+  z-index: 1;
+  display: grid;
+  min-width: 212px;
+  padding: 6px;
+  border: 1px solid var(--float-border);
+  border-radius: 18px;
+  background: var(--panel);
+  box-shadow: var(--float-shadow);
+}
+
+.shell .dock-capsule .dock-more-card button {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.shell .dock-more-card button:hover {
+  background: var(--panel-hover);
+}
+
+.shell .dock-more-card .toolbar-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--text-soft);
+}
+
+.shell .dock-more-card hr {
+  width: 100%;
+  margin: 4px 0;
+  border: 0;
+  border-top: 1px solid var(--panel-border);
+}
+
+.shell .dock-capsule .dock-more-card .danger,
+.shell .dock-more-card .danger .toolbar-icon {
+  color: var(--danger, #d64545);
+}
+
+/* A labelled action (Update, Join, Sign up to join): a pill that sizes to its words. */
+.shell .dock-capsule .dock-labelled {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 16px;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .dock-capsule .dock-labelled .toolbar-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.shell .dock-capsule .dock-labelled.primary {
+  padding: 0 22px;
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+/* The dock sizes to its buttons: a dock with one or two is a short capsule (owner, 17 Nov). */
+.shell .detail-action-dock .dock-capsule {
+  flex: 0 1 auto;
+}
+
+.shell .detail-action-dock .dock-capsule .dock-icon,
+.shell .detail-action-dock .dock-capsule .share-button {
+  flex: 0 0 44px;
+}
