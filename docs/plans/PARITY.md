@@ -45,8 +45,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
    The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
    page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
-   web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088
-   (owner 2026-11-10: in the directory), not built yet (a directory reset).
+   web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088,
+   built 2026-11-12/13 (a `Deactivated` link, then the chain closes).
    web's Change password doesn't apply (passkeys and the recovery phrase).
    The seven create flows were compared with web's source 2026-11-12 (see "Create flows").
 

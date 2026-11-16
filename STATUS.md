@@ -224,8 +224,8 @@ conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
      https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
    Today's 390px screenshots of every create step come from `ONLY=create node
    tests/e2e/ux-scan.mjs` (the private event stops at step 3: the scan adds no invitees).
-   Also seen and not yet fixed: a help request's "Still needed: … is required., …" has doubled
-   full stops; the empty Search page shows bare words (platform, community, project, event).
+   (Both things seen then are fixed: the create sheet's hint now reads "To continue, add: …",
+   and Search has kind chips since #162.)
 
 ## START HERE (2026-11-15 afternoon, owner's PC session, superseded by the 2026-11-16 entry): the UX build list, three branches
 Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
