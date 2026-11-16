@@ -2,6 +2,9 @@
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
   import { notificationsOff, setNotificationCategory } from '#lib/stores/notifications.svelte.ts';
+  import { pushChoicesChanged } from '#lib/stores/push.svelte.ts';
+
+  import PushSettings from './PushSettings.svelte';
 
   /** web's Notifications settings for the kinds the app has; on this device. */
   const options: { id: NotificationCategory; title: string; description: string }[] = [
@@ -54,8 +57,12 @@
         label={option.title}
         note={option.description}
         checked={enabled}
-        onToggle={() => setNotificationCategory(option.id, !enabled)}
+        onToggle={() => {
+          setNotificationCategory(option.id, !enabled);
+          void pushChoicesChanged();
+        }}
       />
     {/each}
   </div>
+  <PushSettings />
 </section>
