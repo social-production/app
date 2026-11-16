@@ -97,8 +97,10 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
   (`services/gateway/src/notices.rs`) listens, from start and from each `/push/subscribe`, to the
   apps of everyone with push on; a signal shaped `{ "notice": { kind, category, title, body, link
   } }` calls `Pusher::notify`. A listener stops when the app is no longer hosted. Still to do: the
-  zomes send the signals (`recv_remote_signal` re-emits them; after #163), desktop OS
-  notifications, and the Settings switch.
+  zomes send the signals (`recv_remote_signal` re-emits them; after #163) and desktop OS
+  notifications. Settings has "Push notifications" and "Show what it's about" under the
+  categories (`features/settings/PushSettings.svelte`, `stores/push.svelte.ts`; looked at 390px
+  light and dark against a local seed); signing out turns push off in that browser.
 - **Settings item 2 overlaps the UX branches:** the display timezone touches ~60 date calls in
   19 files (domain/ plus components/activities, plans, create, features/projects/scopes), and
   "Separate Public and Personal feeds" changes Home's tabs in `features/projects/`. Proposed: do
