@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 late morning Melbourne by the owner's PC session; start at "START HERE (2026-11-16)")
+# Status: where the P2P app stands (updated 2026-11-16 afternoon Melbourne by the owner's PC session; start at "START HERE (2026-11-16 afternoon)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -87,6 +87,15 @@ The owner's list of 2026-11-15. They are references, not gospel: the built scree
 on since, and later owner answers in this file win. Read them with the Artifact tool
 (`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
 frames under `project/*.dc.html`).
+0. **Profiles and Comments (2026-11-16 afternoon, approved: "all artifacts look great, i take
+   your discretion go ahead!"; building on `claude/ux-profiles`)**: Home and profile cards as
+   Global rows, the profile's cover / camera buttons / Edit profile sheet / tabs, "commented"
+   rows, one comment composer with a Replying-to bar, photos full screen:
+   https://claude.ai/artifact/9N8yzimwCoGkWXpUr3Lp4C
+   Claude's calls on its open questions: one reset (ADR 0107's records ride in #163); no
+   Photos tab; the key leaves the profile only. The page called the key "for support only",
+   which was wrong: Settings › Account's "Your key" is what others paste to vouch for you or
+   pair a device, so it stays there as it was.
 1. **Polish Pass Mockups (2026-11-16, approved: "everything is brilliant"; building on
    `claude/ux-polish`)**: feed cards, feed and map filters, the map bar, Region, every create
    step, Links, History: https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
@@ -112,6 +121,25 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-16 afternoon, owner's PC session): #162 merged, #163 carries one more reset, two UI branches stacked on it
+- **#162 merged 2:44 pm Melbourne** (UI only, no reset).
+- **#163 `claude/ux-plan-convert`** now also carries ADR 0107 (profile covers and comment notes:
+  `Cover` + `CommentNote` entries, `AgentToCover` / `AgentToComments` links, scenario `notes`
+  passed locally). Directory hash `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`, conversation
+  unchanged. Main merged in and pushed; merge it once CI is green (owner approved), then the
+  cloud session re-runs `tests/e2e/demo-content.mjs`. Local browser tests on #163: 17 passed
+  in one batch; `notifications`, `private-events`, `closed-communities` and `guests` failed
+  there on a seed up ~1.5 h and passed alone on a fresh one (`event-flow.mjs` is a helper,
+  not a test).
+- **`claude/ux-polish`** (Polish Pass) = #163 + the polish work; UI only. Open its PR after #163.
+- **`claude/ux-profiles`** = polish + the Profiles and Comments screens (artifact 0 above); UI
+  only. Home and profiles use the Global row (`PersonalSpaceCard` → `SpaceCard`, with
+  `FeedSurface`'s `context` line); `CommentActivityCard` rows from `services/profileNotes.ts`;
+  `ProfileHero` cover + camera buttons, `EditProfileSheet`, `ProfileFeed` tabs + filter sheet;
+  `DiscussionPanel` owns the one composer and its reply bar; `PhotoViewer` counts, swipes and
+  takes a footer. Comment notes are written in the chain's write queue and awaited: leaving
+  the page mid-write dropped them.
+
 ## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
 The last PC session's stacked UX branches (labels → new-message → remaining-screens →
 plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
