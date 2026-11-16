@@ -1,0 +1,22 @@
+[package]
+name = "push"
+description = "Web Push (ADR 0107): VAPID keys, the RFC 8291 payload encryption and the sender, used by the gateway to push notifications to the browsers of the agents it hosts."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+publish = false
+
+[dependencies]
+anyhow = "1"
+# Both already in the tree through Holochain.
+base64 = "0.22"
+ring = "0.17"
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+serde = { workspace = true }
+serde_json = "1"
+
+[dev-dependencies]
+tokio = { workspace = true }
+
+[lints]
+workspace = true

@@ -91,7 +91,7 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
   (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 5 sign-ups or
   restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
   ux-polish.
-- **Push notifications:** ADR 0107 accepted by the owner (PR #165, docs only); next: the gateway side in a `services/push` crate.
+- **Push notifications:** ADR 0107 accepted by the owner (PR #165, docs only). `claude/push-gateway`: the `services/push` crate (VAPID keys, RFC 8291 encryption, the sender; `cargo test -p push`, and a Node decrypt of its output matched). Next: wire it into the gateway (subscriptions table in `gateway.sqlite`, `/push/key`, `POST`/`DELETE /push/subscribe`, listening to hosted agents' signals); the gateway can't be built in a cloud session's disk, so CI is its build.
 - **Settings rows** (separate Public/Personal feeds, display timezone, Privacy's three switches):
   start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
   `RegionalSettings.svelte`. Settings is this session's after #162.
