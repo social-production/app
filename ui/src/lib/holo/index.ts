@@ -45,6 +45,7 @@ export {
   type NetworkServers,
 } from './servers.ts';
 export { acceptSignals, onSignal, sendSignal } from './signals.ts';
+export { enableNotices, onNotice, sendNotice, type Notice } from './notices.ts';
 export {
   pushIsOn,
   pushSupported,

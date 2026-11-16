@@ -1,0 +1,16 @@
+[package]
+name = "notices"
+description = "Notices coordinator zome: tell people about a new card as it happens (ADR 0108)."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+hdk = { workspace = true }
+serde = { workspace = true }
+
+[lints]
+workspace = true

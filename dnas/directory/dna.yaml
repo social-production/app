@@ -36,3 +36,6 @@ coordinator:
       path: ../../target/wasm32-unknown-unknown/zome/identity.wasm
       dependencies:
         - name: identity_integrity
+    # No integrity of its own: notices are signals, never stored (ADR 0108).
+    - name: notices
+      path: ../../target/wasm32-unknown-unknown/zome/notices.wasm
