@@ -88,3 +88,27 @@ pub fn require_in_organized(
     }
     Ok(None)
 }
+
+/// Someone sent `agent` an invitation to this event (ADR 0111), so every organizer can list
+/// who is invited and by whom. The inbox invite itself stays encrypted to the invitee.
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct Invite {
+    pub agent: AgentPubKey,
+    /// The inviter's `Organizer` record in a private event (`None` for its creator).
+    pub grant: Option<ActionHash>,
+}
+
+/// In a private event only organizers invite; anyone may record inviting someone to a public one.
+pub fn validate_invite(
+    i: &Invite,
+    action: &TypedAction<CreateData>,
+) -> ExternResult<ValidateCallbackResult> {
+    if &i.agent == action.author() {
+        return invalid("you can't invite yourself");
+    }
+    if audience()?.is_private() && !is_organizer(action.author(), i.grant.as_ref())? {
+        return invalid("only organizers can invite people to a private event");
+    }
+    Ok(ValidateCallbackResult::Valid)
+}

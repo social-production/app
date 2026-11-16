@@ -1,4 +1,5 @@
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
+import { enableNotices, onNotice } from '#lib/services/notices.ts';
 import { myNotifications } from '#lib/services/notifications.ts';
 import { unreadMessageCount } from '#lib/services/unread.ts';
 import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
@@ -20,7 +21,12 @@ export function startBell(onMessages: () => boolean): () => void {
   };
   void refresh();
   const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
+  // Other people's apps may now tell this one about new cards (ADR 0108); one arriving
+  // refreshes the bell at once instead of at the next round.
+  void enableNotices().catch(() => undefined);
+  const quiet = onNotice(() => void refresh());
   return () => {
+    quiet();
     stop();
     bell.showNotifications([]);
     messageBadge.unread = 0;

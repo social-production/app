@@ -39,7 +39,8 @@ pub fn validate_create(
         | LinkTypes::Activities
         | LinkTypes::ActivityToSuggestions
         | LinkTypes::ActivityToRatings
-        | LinkTypes::Organizers => Ok(ValidateCallbackResult::Valid),
+        | LinkTypes::Organizers
+        | LinkTypes::Invites => Ok(ValidateCallbackResult::Valid),
         LinkTypes::Recent if is_space(&action.target_address)? => Ok(ValidateCallbackResult::Valid),
         LinkTypes::Recent => invalid("a recent-activity link points at a space"),
         LinkTypes::ScopeItems => crate::scope_item::validate(action),
