@@ -150,6 +150,15 @@ frames under `project/*.dc.html`).
   touch the feed, create, plan, activity and project files these branches change). Next
   session the two sessions message each other directly (ListAgents / SendMessage): post when
   a PR opens or merges, or when you need a file the other owns.
+- **Lighter CI (cloud session's #167, owner-approved, open at 5:14 pm):** once it merges,
+  docs-only PRs run no CI, UI-only PRs run only the fast check, and the ~2 h scenarios run only
+  when a PR touches `zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`,
+  `tests/scenarios/`, `Cargo.*`, `flake.*`, the root `package*.json` or the build/check
+  scripts. Main runs everything nightly (~3 am Melbourne); a red nightly is fixed first. Open
+  PRs pick up the rules on their next push, so ux-polish, ux-profiles and ux-platform should
+  each take minutes. The cloud session's `claude/push-signals` (on #166) adds Settings →
+  Notifications → "On this device" (`features/settings/PushSettings.svelte`,
+  `stores/push.svelte.ts`) and makes `holo/connection.ts` `signOut` turn push off first.
 - **#163 `claude/ux-plan-convert`** now also carries ADR 0107 (profile covers and comment notes:
   `Cover` + `CommentNote` entries, `AgentToCover` / `AgentToComments` links, scenario `notes`
   passed locally). Directory hash `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`, conversation
