@@ -211,3 +211,8 @@
   font-weight: 700;
   text-decoration: none;
 }
+
+/* Full screen means the page goes away behind the photo. */
+.photo-viewer .scrim {
+  background: rgb(0 0 0 / 0.94);
+}

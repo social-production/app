@@ -53,13 +53,13 @@
       post: async (body, replyTo, files) => {
         const id = await postMessage(projectId, body, replyTo, files);
         const answered = replyTo ? chat.messages.find((m) => m.id === replyTo)?.author : null;
-        void noteComment(projectId, id, body, answered ?? null);
+        await noteComment(projectId, id, body, answered ?? null);
         return id;
       },
       file: (attachment) => projectAttachmentBlob(projectId, attachment),
       remove: async (id) => {
         await deleteMessage(projectId, id);
-        void unnoteComment(id);
+        await unnoteComment(id);
       },
       viewer,
       names: namesOf,

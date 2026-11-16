@@ -58,13 +58,15 @@
   }: Props = $props();
 
   let draft = $state('');
-  let replying = $state<{ id: string; name: string } | null>(null);
+  let replying = $state<{ id: string; author: string } | null>(null);
+  // Names may arrive after Reply is pressed.
+  const replyName = $derived(replying ? (names[replying.author] ?? 'Unnamed') : '');
   let focus = $state(0);
   const sorted = $derived(sortComments(comments, sortMode));
 
-  function startReply(id: string, name: string): void {
+  function startReply(id: string, author: string): void {
     if (!signedIn) return onSignIn('Sign in to reply.');
-    replying = { id, name };
+    replying = { id, author };
     focus++;
   }
 
@@ -81,14 +83,14 @@
   <div class="composer-card" class:replying={!!replying}>
     {#if replying}
       <div class="reply-bar">
-        <span>Replying to <b>{replying.name}</b></span>
+        <span>Replying to <b>{replyName}</b></span>
         <button type="button" aria-label="Cancel reply" onclick={() => (replying = null)}>×</button>
       </div>
     {/if}
     <BackButton />
     <CommentComposer
       bind:value={draft}
-      placeholder={replying ? `Reply to ${replying.name}` : 'Add a comment'}
+      placeholder={replying ? `Reply to ${replyName}` : 'Add a comment'}
       submitLabel={replying ? 'Post reply' : 'Post comment'}
       {focus}
       {signedIn}

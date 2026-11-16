@@ -132,7 +132,7 @@ export class DiscussionState {
     try {
       const id = await addComment(this.id, body, parent);
       // ADR 0107: the note lists it on your profile and followers' Home.
-      void noteComment(this.id, id, body, parent ? authorOf(this.comments, parent) : null);
+      await noteComment(this.id, id, body, parent ? authorOf(this.comments, parent) : null);
       await this.fetch();
       return true;
     } catch (e) {

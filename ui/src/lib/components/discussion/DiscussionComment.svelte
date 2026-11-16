@@ -34,8 +34,8 @@
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
     /** The comment the composer answers now (outlined). */
     replyTarget?: string | null;
-    /** Reply: the composer answers this comment. */
-    onReply: (parent: string, name: string) => void;
+    /** Reply: the composer answers this comment (by its author). */
+    onReply: (parent: string, author: string) => void;
     /** A report or vote changed this comment's state. */
     onModeration: (id: string, next: Moderation) => void;
     mentions?: CommentMentions | null;
@@ -81,7 +81,7 @@
   class:embedded
   class:flat
   class:has-replies={comment.replies.length > 0}
-  class:reply-open={replyTarget === comment.id}
+  class:answering={replyTarget === comment.id}
   class:sending={comment.sending}
   class="comment-card"
 >
@@ -162,7 +162,7 @@
             class="reply-button"
             type="button"
             aria-label="Reply"
-            onclick={() => onReply(comment.id, name)}
+            onclick={() => onReply(comment.id, comment.author)}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path
@@ -181,7 +181,6 @@
                 stroke-linecap="round"
               />
             </svg>
-            <span>Reply</span>
           </button>
           <ReportControl
             id={space}

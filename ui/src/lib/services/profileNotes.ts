@@ -10,6 +10,7 @@ import {
   type AgentPubKey,
 } from '#lib/holo/index.ts';
 
+import { queued } from './chat.ts';
 import { namesOf } from './people.ts';
 
 /** Profile covers and comment notes in the directory (ADR 0107). */
@@ -28,7 +29,8 @@ export async function setCover(cover: Avatar | null): Promise<void> {
 
 /**
  * Note a comment you just wrote in a space's chat, so profiles and followers' Home can list
- * it. Best effort: the comment stands if the note fails.
+ * it. Callers wait for it (leaving the page mid-call drops it). Best effort: the comment
+ * stands if the note fails.
  */
 export async function noteComment(
   space: string,
@@ -38,17 +40,22 @@ export async function noteComment(
 ): Promise<void> {
   const excerpt = excerptOf(body);
   if (!excerpt) return;
-  await identity<ActionHash>('note_comment', {
-    space: stringToHash(space),
-    message: stringToHash(message),
-    reply_to: replyTo ? stringToHash(replyTo) : null,
-    excerpt,
-  }).catch(() => undefined);
+  // In the chain's write queue (a write racing another one on the same chain can fail).
+  await queued(() =>
+    identity<ActionHash>('note_comment', {
+      space: stringToHash(space),
+      message: stringToHash(message),
+      reply_to: replyTo ? stringToHash(replyTo) : null,
+      excerpt,
+    }),
+  ).catch(() => undefined);
 }
 
 /** Take back the note of a comment you deleted. */
 export async function unnoteComment(message: string): Promise<void> {
-  await identity<null>('unnote_comment', stringToHash(message)).catch(() => undefined);
+  await queued(() => identity<null>('unnote_comment', stringToHash(message))).catch(
+    () => undefined,
+  );
 }
 
 interface NoteWire {

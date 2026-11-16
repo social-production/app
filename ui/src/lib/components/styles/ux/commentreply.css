@@ -28,6 +28,12 @@
   gap: 4px;
 }
 
+/* The fold button fills the rest of the name row; it must not make the row tall. */
+.shell .comment-card:not(.flat) .collapse-hit {
+  height: 22px;
+  min-height: 0;
+}
+
 .shell .comment-card:not(.flat) .author-link {
   color: var(--text-main);
   font-weight: 700;

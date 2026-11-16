@@ -78,7 +78,7 @@
     </button>
     <input
       bind:this={coverInput}
-      class="sr-only"
+      hidden
       type="file"
       accept="image/*"
       aria-label="Cover photo"
@@ -89,7 +89,7 @@
     />
     <input
       bind:this={photoInput}
-      class="sr-only"
+      hidden
       type="file"
       accept="image/*"
       aria-label="Profile photo"

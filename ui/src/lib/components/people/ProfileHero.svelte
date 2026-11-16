@@ -65,7 +65,7 @@
         d="m21 16-5-5-8 8"
       /></svg
     >
-    <input class="sr-only" type="file" accept="image/*" onchange={(e) => picked(e, onFile)} />
+    <input hidden type="file" accept="image/*" onchange={(e) => picked(e, onFile)} />
   </label>
 {/snippet}
 
