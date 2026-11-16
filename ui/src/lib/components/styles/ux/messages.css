@@ -168,11 +168,25 @@
   background: transparent;
 }
 
+/* The face first, then the name, as in other messaging apps (the ported rule is a grid with
+   the face at the far end). */
 .shell .messages-page .identity-trigger {
+  display: flex;
   flex-direction: row-reverse;
   justify-content: flex-end;
+  align-items: center;
   gap: 10px;
+  min-width: 0;
   text-align: left;
+}
+
+.shell .messages-page .identity-trigger > div {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.shell .messages-page .identity-trigger > :not(div) {
+  flex: none;
 }
 
 .shell .messages-page .identity-trigger h2 {

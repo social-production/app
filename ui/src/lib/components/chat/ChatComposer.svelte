@@ -46,8 +46,13 @@
   let mentionCursor = 0;
   let mentionTimer: ReturnType<typeof setTimeout> | undefined;
 
+  // The field fits its text whenever the text changes: typing, but also a failed send putting
+  // the text back, an edit or a mention (it was clipped to one line after those).
   $effect(() => {
-    if (field && draft === '') field.style.height = '';
+    void draft;
+    if (!field) return;
+    field.style.height = 'auto';
+    field.style.height = `${Math.min(field.scrollHeight, COMPOSER_MAX_HEIGHT)}px`;
   });
 
   // Starting an edit puts the message's text in the field.
@@ -55,17 +60,8 @@
     const message = p.editing;
     if (!message) return;
     draft = message.body;
-    void Promise.resolve().then(() => {
-      grow();
-      field?.focus();
-    });
+    void Promise.resolve().then(() => field?.focus());
   });
-
-  function grow(): void {
-    if (!field) return;
-    field.style.height = 'auto';
-    field.style.height = `${Math.min(field.scrollHeight, COMPOSER_MAX_HEIGHT)}px`;
-  }
 
   async function submit(): Promise<void> {
     if (p.signIn) return p.signIn();
@@ -230,10 +226,7 @@
           bind:value={draft}
           maxlength={MESSAGE_MAX}
           onfocus={p.onFocus}
-          oninput={() => {
-            syncMentions();
-            grow();
-          }}
+          oninput={syncMentions}
           onkeydown={keydown}
           placeholder={p.placeholder}
           aria-label={p.placeholder}
