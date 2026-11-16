@@ -20,16 +20,19 @@
   let {
     feed,
     signedIn,
+    guest = false,
     filter = $bindable(),
-  }: { feed: HomeFeedState; signedIn: boolean; filter: FeedFilter } = $props();
+  }: { feed: HomeFeedState; signedIn: boolean; guest?: boolean; filter: FeedFilter } = $props();
 
   let open = $state(false);
 
-  const scopes: { value: FeedScope; label: string }[] = [
+  const allScopes: { value: FeedScope; label: string }[] = [
     { value: 'home', label: 'Home' },
     { value: 'global', label: 'Global' },
     { value: 'region', label: 'Region' },
   ];
+  // Home is the feed of who you follow: someone signed out has none, so it isn't offered.
+  const scopes = $derived(guest ? allScopes.filter((s) => s.value !== 'home') : allScopes);
   const audiences: { value: HomeAudience; label: string }[] = [
     { value: 'following', label: 'Following only' },
     { value: 'popular', label: 'Following + popular' },
