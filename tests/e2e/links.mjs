@@ -148,6 +148,11 @@ log('both projects voted to sever: the link is historical');
 await ann.goto(urlA);
 await historyCard(ann, 'Sever link decision', 'approved');
 log("A's History lists the approved sever decision");
+await ann.screenshot({ path: `${shots}/history-phone-390.png`, fullPage: true });
+await ann.getByRole('tab', { name: 'Links' }).click();
+await ann.getByRole('button', { name: /^Show past link votes/ }).click();
+await ann.waitForTimeout(1500);
+await ann.screenshot({ path: `${shots}/links-past-390.png`, fullPage: true });
 
 assert.deepEqual(errors, [], 'no page errors');
 log('links ok');
