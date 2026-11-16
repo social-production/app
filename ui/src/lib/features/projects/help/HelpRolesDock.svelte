@@ -12,6 +12,7 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import type { HelpState } from './helpState.svelte.ts';
+  import GuestShare from '../GuestShare.svelte';
 
   /**
    * web's HelpRequestRolesSection as drawn (Invites, Help Requests and Software Screens, 2):
@@ -107,6 +108,8 @@
         searchContacts={search}
         submitShare={send}
       />
+    {:else}
+      <GuestShare title={help.project.charter?.title ?? ''} />
     {/if}
   {/if}
 </DetailActionDock>
