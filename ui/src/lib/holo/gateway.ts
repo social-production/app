@@ -84,6 +84,19 @@ export interface CellsBody {
   dnaHashes: number[][];
 }
 
+/** A signed-in device, as `/session/cells` and the push routes check it. */
+export interface Device {
+  signingKey: number[];
+  deviceSecret: number[];
+}
+
+/** A browser's push subscription and its choices (ADR 0108). */
+export interface PushBody extends Device {
+  subscription: { endpoint: string; keys: { p256dh: string; auth: string } };
+  muted: string[];
+  details: boolean;
+}
+
 export const gatewayApi = {
   pow: (g: string) => post<{ challenge: string; bits: number }>(g, '/account/pow'),
   open: (g: string, body: OpenBody) => post<GatewaySession>(g, '/account/open', body),
@@ -98,6 +111,10 @@ export const gatewayApi = {
     post<{ retired: boolean }>(g, '/account/retire', body),
   resume: (g: string, signingKey: number[]) => post<Resumed>(g, '/session/resume', { signingKey }),
   cells: (g: string, body: CellsBody) => post<{ granted: number }>(g, '/session/cells', body),
+  pushKey: (g: string) => get<{ publicKey: string }>(g, '/push/key', {}),
+  pushSubscribe: (g: string, body: PushBody) => post<{ ok: boolean }>(g, '/push/subscribe', body),
+  pushUnsubscribe: (g: string, body: Device & { endpoint: string }) =>
+    post<{ ok: boolean }>(g, '/push/unsubscribe', body),
   projects: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/projects', query),
   people: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/people', query),
   scopes: <T>(g: string, query: Record<string, string>) => get<T>(g, '/index/scopes', query),

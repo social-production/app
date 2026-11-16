@@ -5,7 +5,25 @@ What the P2P app still lacks or does differently from web, found by comparing th
 live UI). Port each item from web's own components; never invent (STATUS "Owner decisions").
 Tick items off as they ship, with the PR number. Add findings as you compare more screens.
 
-## What's left for full parity (summary, 2026-11-05, after ADR 0075)
+## The last list before the FastAPI site shuts down (owner, 2026-11-16)
+"I think this could all be knocked out quickly and we can shut down the fastapi." What is left,
+in the order the cloud session builds it:
+1. **The bot review vote notification** (`bot-review-vote`: everyone sharing a space with the
+   person under review is asked to vote), with its UX.
+2. **The Settings rows:** separate Public and Personal feeds, a display timezone (also web's
+   timezone selects in service bookings), Privacy's three "hide … from non-followers /
+   personal feeds" switches.
+3. **Push notifications** (new: web has none). ADR [0108](../decisions/0108-push-notifications.md)
+   (accepted): remote signals from the writer, Web Push from the seed, OS notifications on desktop.
+4. **One language besides English: Russian** (owner's priority). Needs an ADR (string
+   catalogue, how the language is chosen). It touches nearly every screen, so it goes after
+   the UX branches of the moment have merged, to avoid conflicts.
+5. Compare the signed-in screens not compared yet (item 10 below) while building the above.
+Not gaps any more: **personal services were removed on purpose** (ADR 0059: everything starts
+as a proposal; the bookings screens go with them in stage B). The Platform channel,
+moderators and Deactivate account shipped in PR #151.
+
+## What's left for full parity (summary, 2026-11-05, after ADR 0075; superseded by the list above)
 The open boxes below, grouped by size. Asset management is not part of parity (owner,
 2026-10-31). Order is the cloud session's (STATUS "Next").
 1. ~~Moderation, rest~~ (done 2026-11-05: reports in direct and group chats with web's 1:1
@@ -272,7 +290,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
 - [x] Software project governance (pull requests / merge flow) in the Activity phase
   (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved`: 2026-11-09, ADR 0087).
-- [ ] **The Platform channel** (found 2026-11-12): web's `/platform` is the `platform`
+- [x] **The Platform channel** (found 2026-11-12; shipped in PR #151, ADR 0095): web's `/platform` is the `platform`
   channel's scope page (`DirectoryFeedLayout`: description "The channel for the whole
   network…", Follow, its projects and events; web-backend `services/platform.py` creates the
   channel on demand). Projects tagged `#platform` take the whole network as their vote
@@ -280,7 +298,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   personal service can't use the tag. The app reserves the slug (`domain/scopes.ts`), shows a
   stub at `/platform`, and links `#platform` tags there. Needs an ADR (who may create the
   channel record; the population rule is a governance change).
-- [ ] **Moderators** (owner, 2026-11-12: "we also don't have moderators"; this overrides the
+- [x] **Moderators** (shipped in PR #151, ADR 0095; owner, 2026-11-12: "we also don't have moderators"; this overrides the
   2026-10-31 note that filed the platform board under asset management): web's moderator board
   on the Platform page (`features/platform/board/*`: moderators and candidates, volunteer,
   `castModeratorVote`, "How moderator roles work": moderators execute approved platform
