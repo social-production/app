@@ -124,6 +124,15 @@ frames under `project/*.dc.html`).
    the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
+2d. Chats, Search and Reports (2026-11-16 evening, **waiting on the owner**): §1 shows the chat
+   fixes already built on `claude/ux-chat-fixes` (face before name; one message capsule with no
+   inner ring that always fits its text). Proposed: a ⋮ chat menu as an icon card and a
+   Telegram-style person page (big photo, Call/Mute/Search/Profile, bio and key, Media, Files,
+   Links and Groups tabs; a group gets Members first); a full-screen search like Reddit's and
+   Substack's (recent searches kept on the phone, channels to explore, grouped suggestions as you
+   type, one scrolling row of filters); ⋮ as a bottom action sheet, and a report sheet with the two
+   reasons as cards with examples, then a confirmation. Asks: full page vs sheet, what search shows
+   before typing, keep two reasons: https://claude.ai/artifact/WTvJhtdqQ9FtWrc94N9i4m
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
 4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
