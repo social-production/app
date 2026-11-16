@@ -48,7 +48,7 @@ impl Store {
         Ok(Self { pool })
     }
 
-    /// The database, for the push subscriptions kept beside it (ADR 0107).
+    /// The database, for the push subscriptions kept beside it (ADR 0108).
     #[must_use]
     pub fn pool(&self) -> &SqlitePool {
         &self.pool

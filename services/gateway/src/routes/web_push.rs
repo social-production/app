@@ -1,4 +1,4 @@
-//! Web Push subscriptions (ADR 0107). A signed-in browser that switched push on sends its
+//! Web Push subscriptions (ADR 0108). A signed-in browser that switched push on sends its
 //! push subscription here, proving it is the device that signed in with its device secret
 //! (as `/session/cells` does). The pushes themselves start from signals (`::push::Pusher`).
 

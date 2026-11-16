@@ -1,6 +1,6 @@
 [package]
 name = "push"
-description = "Web Push (ADR 0107): VAPID keys, the RFC 8291 payload encryption and the sender, used by the gateway to push notifications to the browsers of the agents it hosts."
+description = "Web Push (ADR 0108): VAPID keys, the RFC 8291 payload encryption and the sender, used by the gateway to push notifications to the browsers of the agents it hosts."
 edition.workspace = true
 license.workspace = true
 version.workspace = true

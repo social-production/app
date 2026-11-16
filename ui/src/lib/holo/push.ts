@@ -1,4 +1,4 @@
-// Web Push in a browser (ADR 0107): the service worker, the browser's permission and its push
+// Web Push in a browser (ADR 0108): the service worker, the browser's permission and its push
 // subscription, saved on the gateway that hosts this account. The desktop app shows its own
 // notifications instead, so none of this runs there.
 import { gatewayApi } from './gateway.ts';

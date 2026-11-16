@@ -20,7 +20,7 @@ lair_keystore_api = "=0.7.1"
 mr_bundle = "=0.7.1"
 # Turns off transparent huge pages for the process (ADR 0066).
 nix = { version = "0.31", default-features = false, features = ["process", "fs"] }
-# Web Push to hosted agents' browsers (ADR 0107).
+# Web Push to hosted agents' browsers (ADR 0108).
 push = { workspace = true }
 rand = "0.8"
 rmpv = { version = "1", features = ["with-serde"] }

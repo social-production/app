@@ -90,7 +90,7 @@ export interface Device {
   deviceSecret: number[];
 }
 
-/** A browser's push subscription and its choices (ADR 0107). */
+/** A browser's push subscription and its choices (ADR 0108). */
 export interface PushBody extends Device {
   subscription: { endpoint: string; keys: { p256dh: string; auth: string } };
   muted: string[];

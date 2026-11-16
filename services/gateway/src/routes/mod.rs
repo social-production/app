@@ -39,7 +39,7 @@ pub struct AppState {
     pub signin_limit: Arc<SignupLimit>,
     /// Guest reads (`/public/read`) per IP per day.
     pub read_limit: Arc<SignupLimit>,
-    /// Web Push to the browsers of hosted agents (ADR 0107).
+    /// Web Push to the browsers of hosted agents (ADR 0108).
     pub pusher: Arc<::push::Pusher>,
     /// When this process started (`/readyz` uptime).
     pub started: std::time::Instant,

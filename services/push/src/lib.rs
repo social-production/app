@@ -1,4 +1,4 @@
-//! Web Push for the gateway (ADR 0107): a browser that switched push on gives the gateway a
+//! Web Push for the gateway (ADR 0108): a browser that switched push on gives the gateway a
 //! push subscription (an endpoint at its push service plus two keys). For each signal to an
 //! agent the gateway hosts, it encrypts the notice to each of that agent's subscriptions
 //! (RFC 8291) and sends it with a VAPID signature (RFC 8292).

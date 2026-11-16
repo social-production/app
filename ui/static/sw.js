@@ -1,4 +1,4 @@
-// The service worker for Web Push (ADR 0107). The gateway encrypts each push to this browser;
+// The service worker for Web Push (ADR 0108). The gateway encrypts each push to this browser;
 // the browser decrypts it and hands this worker the notice: { kind, category, title, body, link }.
 // It only shows notifications and opens their links: no caching, no fetch handling.
 self.addEventListener('install', () => self.skipWaiting());
