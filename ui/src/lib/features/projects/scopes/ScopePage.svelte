@@ -1,10 +1,6 @@
 <script lang="ts">
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
-  import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
-  import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
-  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
-  import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import PlatformBoardPanel from '#lib/components/board/PlatformBoardPanel.svelte';
   import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
@@ -12,6 +8,7 @@
   import { BoardState } from './boardState.svelte.ts';
 
   import CommunityInvitePanel from './CommunityInvitePanel.svelte';
+  import ScopeHeader from './ScopeHeader.svelte';
   import ScopeSettingsSheet from './ScopeSettingsSheet.svelte';
   import { ScopeState, redeemInvite, sendInvite } from './scopeState.svelte.ts';
   import ScopeVoteSheet from './ScopeVoteSheet.svelte';
@@ -89,115 +86,17 @@
     </section>
   {:else}
     {@const scope = s.scope}
-    <section class="scope-header">
-      <div class="title-row">
-        <div class="title-block">
-          <span class="scope-avatar" style="--avatar-size: 40px" aria-hidden="true">
-            <SurfaceIcon icon={kind} size="md" />
-          </span>
-          <h1>{s.platform ? 'Platform' : scope.handle}</h1>
-          {#if scope.isPrivate}
-            <span class="private-mark" title="Private: members only" aria-label="Private">
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
-                <path
-                  d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-          {/if}
-        </div>
-        <div class="action-row">
-          {#if scope.isPrivate && !s.project?.amMember}
-            <IconPopoverMenu
-              open={inviteOpen}
-              active={inviteOpen}
-              chip
-              ariaLabel={`Join ${scope.handle} with invite, ${s.project?.members.length ?? scope.members} members`}
-              menuLabel="Join with invite"
-              minWidth={300}
-              onOpenChange={(o) => (inviteOpen = o)}
-            >
-              {#snippet icon()}
-                <ToolbarIcon name="person-plus" />
-                <span>{s.project?.members.length ?? scope.members}</span>
-              {/snippet}
-              {@render invitePanel()}
-            </IconPopoverMenu>
-          {:else}
-            <MembershipSplitButton
-              joined={!!s.project?.amMember}
-              count={s.project?.members.length ?? scope.members}
-              pending={s.joining || (!s.project && !!scope.id)}
-              {membersOpen}
-              noun={scope.handle}
-              onToggleJoin={() => void s.toggleJoin()}
-              onOpenMembers={() => (membersOpen = true)}
-            />
-          {/if}
-          {#if scope.isPrivate && s.project?.amMember}
-            <IconPopoverMenu
-              open={inviteOpen}
-              active={inviteOpen}
-              ariaLabel={`Invite people to ${scope.handle}`}
-              menuLabel="Invite people"
-              minWidth={300}
-              onOpenChange={(o) => (inviteOpen = o)}
-            >
-              {#snippet icon()}<ToolbarIcon name="person-plus" />{/snippet}
-              {@render invitePanel()}
-            </IconPopoverMenu>
-          {/if}
-          {#if s.platform}
-            <button
-              aria-expanded={boardOpen}
-              aria-label="Moderators"
-              title="Moderators"
-              class="icon-action"
-              class:menu-active={boardOpen}
-              type="button"
-              onclick={() => (boardOpen = !boardOpen)}
-            >
-              <ToolbarIcon name="shield" />
-            </button>
-          {:else}
-            <button
-              aria-label="Settings"
-              title="Settings"
-              class="icon-action"
-              class:menu-active={settingsOpen}
-              type="button"
-              onclick={() => (settingsOpen = true)}
-            >
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-                <path
-                  d="M10.3 2h3.4l.5 2.4c.5.2 1 .4 1.5.6l2.1-1.2 2.4 2.4-1.2 2.1c.2.5.4 1 .6 1.5L22 10.3v3.4l-2.4.5c-.2.5-.4 1-.6 1.5l1.2 2.1-2.4 2.4-2.1-1.2c-.5.2-1 .4-1.5.6L13.7 22h-3.4l-.5-2.4c-.5-.2-1-.4-1.5-.6l-2.1 1.2-2.4-2.4 1.2-2.1c-.2-.5-.4-1-.6-1.5L2 13.7v-3.4l2.4-.5c.2-.5.4-1 .6-1.5L3.8 6.2l2.4-2.4 2.1 1.2c.5-.2 1-.4 1.5-.6L10.3 2Zm1.7 6.2A3.8 3.8 0 1 0 12 15.8 3.8 3.8 0 0 0 12 8.2Z"
-                  fill="currentColor"
-                ></path>
-              </svg>
-            </button>
-          {/if}
-        </div>
-      </div>
-      <div class="scope-intro-prose">
-        <p>{s.project?.charter?.description ?? scope.description}</p>
-      </div>
-      {#if waiting > 0}
-        <!-- Sits just left of the + button while a decision is waiting for this viewer. -->
-        <button
-          class="vote-fab"
-          type="button"
-          aria-label={`Vote: ${waiting} waiting for your vote`}
-          onclick={() => (votesOpen = true)}
-        >
-          Vote
-          <span class="vote-fab-count">{waiting}</span>
-        </button>
-      {/if}
-    </section>
+    <ScopeHeader
+      {s}
+      {kind}
+      {waiting}
+      {invitePanel}
+      bind:membersOpen
+      bind:inviteOpen
+      bind:settingsOpen
+      bind:boardOpen
+      onVotes={() => (votesOpen = true)}
+    />
 
     <div class="stack">
       {#if s.feed.loading && s.feed.items.length === 0}

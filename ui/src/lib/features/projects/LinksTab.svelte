@@ -72,7 +72,7 @@
   {:else}
     <LinksSection
       title="Active links"
-      description="Approved connections to related projects and events. Active links stay voteable so members can sever them."
+      description=""
       items={frame.active}
       emptyMessage="No active links yet."
       allowSever={frame.canPropose}
@@ -94,8 +94,8 @@
       onVote={(id, side, choice) => void links.vote(id, side, choice)}
     />
     <LinksSection
-      title="Historical links"
-      description="Inactive or past links stay visible for lineage."
+      title="Past links"
+      description=""
       items={frame.historical}
       emptyMessage="No historical links yet."
       allowSever={false}

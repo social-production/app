@@ -140,8 +140,8 @@ export const TAGS_MAX = 10;
 export const TAG_MAX = 40;
 
 export const MODE_LABELS: Record<ProjectMode, string> = {
-  productive: 'Productive',
-  'collective-service': 'Collective service',
+  productive: 'Project',
+  'collective-service': 'Service',
   'personal-service': 'Personal service',
 };
 
@@ -203,13 +203,13 @@ export interface ProjectTypeOption {
 export const PROJECT_TYPES: ProjectTypeOption[] = [
   {
     value: 'productive',
-    label: 'Productive project',
+    label: 'Project',
     summary:
       'Build or produce something new — e.g. construction, materials, tools, or software from scratch.',
   },
   {
     value: 'collective-service',
-    label: 'Collective service',
+    label: 'Service',
     summary:
       'Maintain, update, or operate something already in use — e.g. keep software running, dinner service, shared care.',
   },

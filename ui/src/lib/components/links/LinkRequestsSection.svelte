@@ -51,11 +51,7 @@
 <section class="request-stack">
   <div class="section-heading">
     <div class="heading-copy">
-      <h2>Pending link requests</h2>
-      <p>
-        Search for a project or event, explain why they should be linked, then start a vote. Both
-        sides must approve.
-      </p>
+      <h2>Votes open</h2>
     </div>
     {#if canPropose}
       <button class="propose-link-button" type="button" onclick={onCompose}>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
   import { notificationsOff, setNotificationCategory } from '#lib/stores/notifications.svelte.ts';
 
@@ -49,24 +50,12 @@
   <div class="card stack flush">
     {#each options as option (option.id)}
       {@const enabled = on(option.id)}
-      <div class="setting-item">
-        <div>
-          <strong>{option.title}</strong>
-          <p>{option.description}</p>
-        </div>
-        <button
-          aria-checked={enabled}
-          aria-label={option.title}
-          class="switch"
-          class:on={enabled}
-          role="switch"
-          type="button"
-          onclick={() => setNotificationCategory(option.id, !enabled)}
-        >
-          <span class="switch-thumb"></span>
-          <span class="sr-only">{enabled ? 'On' : 'Off'}</span>
-        </button>
-      </div>
+      <SettingSwitch
+        label={option.title}
+        note={option.description}
+        checked={enabled}
+        onToggle={() => setNotificationCategory(option.id, !enabled)}
+      />
     {/each}
   </div>
 </section>

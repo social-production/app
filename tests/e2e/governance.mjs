@@ -219,7 +219,7 @@ await advance(ann);
 await voteYes(bob, 'Participation');
 const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: /^\s*(Plan|Proposal)\s*$/ });
 await until(bob, pastPlan, 'the move past the plan');
-assert.equal(await bob.locator('.context-panel .surface-type-label').innerText(), 'Productive');
+assert.equal(await bob.locator('.context-panel .surface-type-label').innerText(), 'Project');
 log('the approved production plan made it a productive project as it left the Plan phase');
 
 // M3c: web's Phase menu → Return to an earlier phase; the other founder's vote sends it back.

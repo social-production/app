@@ -18,8 +18,14 @@
 @import './mapfilters.css';
 @import './about.css';
 @import './messages.css';
+@import './newmessage.css';
 @import './chat.css';
 @import './profile.css';
+@import './people.css';
+@import './search.css';
+@import './scopes.css';
+@import './feedback.css';
+@import './links.css';
 @import './onboarding.css';
 @import './settings.css';
 @import './notifications.css';

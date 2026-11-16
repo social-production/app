@@ -249,7 +249,11 @@ export async function mentionPool(known?: ChatSummary[]): Promise<MentionPool> {
  * that person (web's start_direct_conversation reuses it). `known` saves reading every chat
  * when the caller already has the list. Returns the chat's id.
  */
-export async function sendNewChat(chat: NewChat, known?: ChatSummary[]): Promise<string> {
+export async function sendNewChat(
+  chat: NewChat,
+  known?: ChatSummary[],
+  files: File[] = [],
+): Promise<string> {
   const [only] = chat.members;
   if (chat.kind === 'direct' && only) {
     const chats =
@@ -261,10 +265,13 @@ export async function sendNewChat(chat: NewChat, known?: ChatSummary[]): Promise
       (c) => c?.kind === 'direct' && c.members.length === 2 && c.members.includes(only.agent),
     );
     if (existing) {
-      await postChatMessage(existing.id, chat.body, null);
+      await postChatMessage(existing.id, chat.body, null, files);
       return existing.id;
     }
   }
   const members = chat.members.map((m) => m.agent);
-  return startChat(chat.kind, members, chat.title || null, chat.body);
+  // A group may start empty (New group names it and creates it; the first message follows).
+  const seed = await startChat(chat.kind, members, chat.title || null, null);
+  if (chat.body || files.length > 0) await postChatMessage(seed, chat.body, null, files);
+  return seed;
 }

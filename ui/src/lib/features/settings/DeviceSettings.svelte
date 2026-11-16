@@ -1,5 +1,6 @@
 <script lang="ts">
   import CopyKey from '#lib/components/CopyKey.svelte';
+  import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import { displayName, type Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
@@ -17,6 +18,7 @@
   let mainKey = $state('');
   let status = $state<string>();
   let error = $state<string>();
+  let pairing = $state(false);
 
   const canSend = $derived(mainKey.trim().startsWith('uhCAk') && mainKey.trim() !== me);
 
@@ -58,70 +60,75 @@
     Each app install has its own key. Pair it with your main account so people see one person.
   </p>
   <div class="card stack flush">
-    <div class="setting-item">
-      <div>
-        <strong>Paired devices</strong>
-        {#each paired as device (device.agent)}
-          <p>{displayName(device)}</p>
-        {:else}
-          <p>No other devices paired yet.</p>
-        {/each}
-      </div>
-    </div>
+    <SettingPanel
+      label="Paired devices"
+      value={paired.length ? paired.map((d) => d.profile?.name ?? 'Unnamed').join(', ') : 'None'}
+    >
+      {#each paired as device (device.agent)}
+        <p class="setting-line">{displayName(device)}</p>
+      {:else}
+        <p class="setting-hint">No other devices paired yet.</p>
+      {/each}
+    </SettingPanel>
 
     {#each requests as request (request.link.device + request.link.primary)}
-      <div class="setting-item">
-        <div>
-          <strong>Pairing request</strong>
-          <p>From {displayName(request.from)}</p>
-        </div>
-        <button
-          class="button-primary"
-          type="button"
-          onclick={() => act(request.link, 'Device paired.')}>Confirm</button
+      <div class="set-row set-action">
+        <span class="set-row-label">
+          Pairing request
+          <small>From {displayName(request.from)}</small>
+        </span>
+        <button class="set-pill" type="button" onclick={() => act(request.link, 'Device paired.')}
+          >Confirm</button
         >
       </div>
     {/each}
 
-    <div class="setting-item">
-      <div>
-        <strong>This device's key</strong>
-        <p>Paste it on your main account, or paste the main account's key below.</p>
-      </div>
-      <CopyKey value={me} label="Copy this device's key" />
-    </div>
-
-    <form
-      class="setting-item account-form"
-      onsubmit={(e) => {
-        e.preventDefault();
-        void act(
-          { primary: mainKey.trim(), device: me },
-          'Request sent. Confirm it on your main account.',
-        );
-      }}
+    <SettingPanel
+      label="This device’s key"
+      value={me}
+      key
+      hint="Paste it on your main account, or paste the main account’s key under “Pair with my main account”."
     >
-      <div>
-        <strong>Pair with my main account</strong>
-        <p>Paste the key from "Copy my key" on your main account.</p>
-      </div>
-      <label>
-        Main account key
-        <input bind:value={mainKey} placeholder="uhCAk…" spellcheck="false" />
-      </label>
-      <p class:profile-image-error={!!error} class:bio-saved={!error} class="status-line">
-        {error ?? status ?? ''}
-      </p>
-      <button class="button-secondary" disabled={!canSend} type="submit"
-        >Send pairing request</button
-      >
-    </form>
+      <CopyKey value={me} label="Copy this device's key" />
+    </SettingPanel>
+
+    <SettingPanel
+      label="Pair with my main account"
+      value=""
+      hint="Paste the key from “Copy my key” on your main account."
+      bind:open={pairing}
+    >
+      <input
+        bind:value={mainKey}
+        aria-label="Main account key"
+        placeholder="uhCAk…"
+        spellcheck="false"
+      />
+      {#snippet footer()}
+        <div class="sheet-actions">
+          <button
+            class="sheet-submit"
+            disabled={!canSend}
+            type="button"
+            onclick={() => {
+              pairing = false;
+              void act(
+                { primary: mainKey.trim(), device: me },
+                'Request sent. Confirm it on your main account.',
+              );
+            }}>Send pairing request</button
+          >
+        </div>
+      {/snippet}
+    </SettingPanel>
   </div>
+  <p class:profile-image-error={!!error} class:bio-saved={!error} class="status-line">
+    {error ?? status ?? ''}
+  </p>
 </section>
 
 <style>
   .status-line {
     min-height: 1.5em;
-    margin: 0;
   }
 </style>

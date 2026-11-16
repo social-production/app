@@ -148,7 +148,6 @@
               {#if !viewerPaused}
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
-                  viewer={me.agent}
                 />
                 <VouchButton
                   person={shown}
