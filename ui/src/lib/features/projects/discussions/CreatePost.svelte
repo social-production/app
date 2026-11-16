@@ -1,12 +1,12 @@
 <script lang="ts">
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
-  import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import {
     compressChatPhoto,
     rejectOutgoingAttachment,
   } from '#lib/components/chat/attachmentLimits.ts';
   import { createPost, POST_PHOTOS_MAX } from '#lib/services/discussions.ts';
   import { explain } from '#lib/services/errors.ts';
+  import { viewer } from '#lib/stores/viewer.svelte.ts';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -18,6 +18,7 @@
    * web's CreatePostPage: one public note for your personal feed (ADR 0070), with up to four
    * photos (ADR 0101), each resized to fit 1 MB as chat photos are.
    */
+  const initials = $derived(viewer.name.slice(0, 2).toUpperCase());
   let body = $state(page.url.searchParams.get('prefill')?.trim() ?? '');
   let submitting = $state(false);
   let statusMessage = $state('');
@@ -82,21 +83,22 @@
   canSubmit={body.trim().length > 0}
   submitLabel="Publish post"
   submittingLabel="Posting..."
+  composer
   {submitting}
   onStep={() => undefined}
   onSubmit={() => void publish()}
   onClose={() => void goto(resolve('/'))}
 >
   <div class="composer">
-    <p class="audience-cue">Public</p>
-    <label>
-      <RequiredLabel>What's on your mind?</RequiredLabel>
+    <div class="composer-row">
+      <span class="composer-avatar" aria-hidden="true">{initials}</span>
       <textarea
         bind:value={body}
-        rows="8"
-        placeholder="Share a direct post to your personal timeline..."
+        rows="6"
+        aria-label="What's on your mind?"
+        placeholder="What's on your mind?"
         aria-required="true"></textarea>
-    </label>
+    </div>
     {#if photos.length > 0}
       <div class="post-photo-picks">
         {#each photos as photo, i (photo.url)}
@@ -118,32 +120,35 @@
       aria-label="Photos for this post"
       onchange={() => void pick()}
     />
-    <button
-      class="post-photo-add"
-      type="button"
-      disabled={photos.length >= POST_PHOTOS_MAX || submitting}
-      onclick={() => picker?.click()}
-    >
-      <svg aria-hidden="true" viewBox="0 0 24 24"
-        ><rect
-          x="3.5"
-          y="5.5"
-          width="17"
-          height="13"
-          rx="2.5"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-        /><circle cx="8.5" cy="10" r="1.4" fill="currentColor" /><path
-          d="m20.5 15.5-4.5-4.5-7.500 7.500"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.8"
-          stroke-linejoin="round"
-        /></svg
+    <div class="composer-tools">
+      <button
+        class="post-photo-add"
+        type="button"
+        disabled={photos.length >= POST_PHOTOS_MAX || submitting}
+        onclick={() => picker?.click()}
       >
-      Add photos
-    </button>
+        <svg aria-hidden="true" viewBox="0 0 24 24"
+          ><rect
+            x="3.5"
+            y="5.5"
+            width="17"
+            height="13"
+            rx="2.5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+          /><circle cx="8.5" cy="10" r="1.4" fill="currentColor" /><path
+            d="m20.5 15.5-4.5-4.5-7.500 7.500"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linejoin="round"
+          /></svg
+        >
+        Add photos
+      </button>
+      <span class="composer-audience">Public · your feed</span>
+    </div>
     {#if statusMessage}<p class="status-note">{statusMessage}</p>{/if}
   </div>
 </CreateSheet>

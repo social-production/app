@@ -26,6 +26,8 @@
     /** One-step forms (web's non-wizard CreateFlowLayout) just disable Publish. */
     canSubmit?: boolean;
     submitting: boolean;
+    /** A post: one field, Post at the top right and no dock (Polish Pass mockups). */
+    composer?: boolean;
     onStep: (index: number) => void;
     onSubmit: () => void;
     onClose: () => void;
@@ -98,6 +100,17 @@
     <button class="create-close" type="button" aria-label="Close" title="Close" onclick={close}
       >×</button
     >
+    {#if p.composer}
+      <button
+        class="composer-submit"
+        class:faded={blocked}
+        type="button"
+        aria-label={p.submitLabel}
+        aria-disabled={blocked}
+        disabled={p.submitting}
+        onclick={advance}>{p.submitting ? (p.submittingLabel ?? 'Posting...') : 'Post'}</button
+      >
+    {/if}
   {/snippet}
   {#snippet subtitle()}
     {#if stepped}<p class="sheet-description step-count">
@@ -115,7 +128,9 @@
         <div class="body">
           <div class="wizard">
             {#if question}<h3 class="step-question">{question}</h3>
-            {:else if !stepped && p.description}<p class="step-intro">{p.description}</p>{/if}
+            {:else if !stepped && !p.composer && p.description}<p class="step-intro">
+                {p.description}
+              </p>{/if}
             <div class="step-body">{@render p.children()}</div>
             {#if tried && hint}
               <p class="missing-note" role="status">To continue, add: {hint}.</p>
@@ -126,7 +141,7 @@
     </div>
   </div>
   {#snippet footer()}
-    <div class="sheet-actions">
+    <div class="sheet-actions" class:composer-dock={p.composer}>
       {#if p.stepIndex > 0}
         <button class="sheet-cancel create-back" type="button" onclick={() => go(p.stepIndex - 1)}
           >Back</button

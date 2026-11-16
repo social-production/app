@@ -32,9 +32,9 @@ await tagTestChannel(ann);
 await next(); // → Roles
 await ann.getByLabel('Role title').fill('Driver');
 await ann.getByLabel('Role details').fill('A car with a big boot.');
-await ann.getByRole('button', { name: 'Add role' }).click();
+await ann.getByRole('button', { name: 'Add a role' }).click();
 await ann.getByLabel('Role title').nth(1).fill('Company');
-await ann.getByLabel('Slots needed').nth(1).fill('0');
+await ann.getByLabel('People needed', { exact: true }).nth(1).fill('0');
 await next(); // → Overview
 await ann.getByText('2 roles').waitFor();
 await ann.getByRole('button', { name: 'Publish help request' }).click();
