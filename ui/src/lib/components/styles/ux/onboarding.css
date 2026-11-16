@@ -213,3 +213,88 @@
 .shell .onboarding .page {
   padding-bottom: 96px;
 }
+
+/* Owner's fix 3e (2026-11-17): every sign-up step fits the phone's screen with no scrolling
+   (360×640, 390×844, 430×932). The step's main button rides at the bottom beside the round
+   back button, where the thumb is, and on top of the keyboard when it is open (the viewport
+   resizes with it). Steps after the name drop the welcome lines to make room. */
+@media (max-width: 1080px) {
+  .shell .onboarding .page {
+    gap: 14px;
+    min-height: 100dvh;
+    padding: 20px 20px calc(84px + var(--shell-safe-bottom, 0px));
+  }
+
+  .shell .onboarding .ob-head {
+    gap: 4px;
+  }
+
+  .shell .onboarding .ob-logo {
+    width: 44px;
+    height: 44px;
+    margin-bottom: 6px;
+    border-radius: 13px;
+  }
+
+  .shell .onboarding .ob-logo img {
+    width: 32px;
+    height: 32px;
+  }
+
+  .shell .onboarding h1 {
+    font-size: 23px;
+  }
+
+  .shell .onboarding .button-row:has(.button-primary) {
+    position: fixed;
+    right: 16px;
+    bottom: calc(12px + var(--shell-safe-bottom, 0px));
+    left: 82px;
+    z-index: 5;
+  }
+
+  .shell .onboarding .button-row:has(.button-primary) .button-primary {
+    min-height: 54px;
+    box-shadow: var(--float-shadow);
+  }
+
+  .shell .onboarding:has([data-step='phrase'], [data-step='confirm']) .ob-head p,
+  .shell .onboarding:has([data-step='phrase'], [data-step='confirm']) .helper-text,
+  .shell .onboarding:has([data-step='phrase'], [data-step='confirm']) .keep-browsing {
+    display: none;
+  }
+
+  .shell .onboarding:has([data-step='phrase'], [data-step='confirm']) .ob-logo {
+    display: none;
+  }
+
+  .shell .onboarding .ob-phrase-note {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: 13.5px;
+    line-height: 1.4;
+  }
+
+  .shell .onboarding ol.grid {
+    gap: 5px;
+  }
+
+  .shell .onboarding ol.grid li {
+    padding: 6px 8px;
+    font-size: 12.5px;
+  }
+
+  .shell .onboarding [data-step='confirm'] input {
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 1080px) and (max-height: 700px) {
+  .shell .onboarding .ob-head p {
+    display: none;
+  }
+
+  .shell .onboarding ol.grid li {
+    padding: 4px 8px;
+  }
+}
