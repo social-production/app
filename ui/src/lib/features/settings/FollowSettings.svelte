@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import type { FollowRow } from '#lib/domain/follows.ts';
   import { explain } from '#lib/services/errors.ts';
   import {
@@ -88,25 +89,13 @@
     counts and who appears as your follower.
   </p>
   <div class="card stack flush">
-    <div class="setting-item">
-      <div>
-        <strong>Require approval to follow you</strong>
-        <p>When on, new followers must be approved before they can see follower-only content.</p>
-      </div>
-      <button
-        aria-checked={approval}
-        aria-label="Require approval to follow you"
-        class="switch"
-        class:on={approval}
-        disabled={pending === 'approval'}
-        role="switch"
-        type="button"
-        onclick={() => run('approval', () => setFollowApproval(!approval))}
-      >
-        <span class="switch-thumb"></span>
-        <span class="sr-only">{approval ? 'On' : 'Off'}</span>
-      </button>
-    </div>
+    <SettingSwitch
+      label="Require approval to follow you"
+      note="New followers must be approved before they see follower-only content."
+      checked={approval}
+      disabled={pending === 'approval'}
+      onToggle={() => void run('approval', () => setFollowApproval(!approval))}
+    />
   </div>
   {#if error}<p class="warning-card" role="alert">{error}</p>{/if}
 </section>

@@ -6,15 +6,16 @@
   import { page } from '$app/state';
   import CountBadge from '#lib/components/icons/CountBadge.svelte';
   import ChatRow from '#lib/components/messages/ChatRow.svelte';
-  import ComposeMessageSheet from '#lib/components/messages/ComposeMessageSheet.svelte';
-  import type { NewChat } from '#lib/domain/messages.ts';
+  import type { Contact } from '#lib/domain/messages.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
 
   import ChatMenus, { type MenuAt } from './ChatMenus.svelte';
   import ConversationView from './ConversationView.svelte';
+  import DraftChatView from './DraftChatView.svelte';
   import { InboxState } from './inboxState.svelte.ts';
+  import NewMessagePage from './NewMessagePage.svelte';
   import PublicChatView from './PublicChatView.svelte';
   import { PublicState } from './publicState.svelte.ts';
 
@@ -23,11 +24,11 @@
   /**
    * web's MessagesPage: the Personal list (direct and group chats, newest first) with the
    * New message button, the Public list (your projects' chats), and a chat opened from either
-   * (`?conversation=<id>` or `?project=<id>`).
+   * (`?conversation=<id>` or `?project=<id>`). New message is Telegram's (`?new=message`,
+   * `?new=group`); `?to=<agent>` is the chat with someone, empty until the first message.
    */
   const inbox = new InboxState();
   const publicChats = new PublicState();
-  let composing = $state(false);
   let tab = $state<'personal' | 'public'>('personal');
   let menu = $state<MenuAt | null>(null);
   let infoOpen = $state(false);
@@ -37,7 +38,27 @@
   const openProject = $derived(page.url.searchParams.get('project'));
   const active = $derived(inbox.all.find((c) => c.id === openId && c.member) ?? null);
   const activeProject = $derived(publicChats.chats.find((c) => c.id === openProject) ?? null);
-  const chatOpen = $derived(!!active || !!activeProject);
+  const composing = $derived(page.url.searchParams.get('new'));
+  const toAgent = $derived(page.url.searchParams.get('to'));
+  let draft = $state<Contact | null>(null);
+  const chatOpen = $derived(!!active || !!activeProject || !!draft);
+
+  // `?to=`: your chat with that person if you have one, else an empty one to write into.
+  $effect(() => {
+    const agent = toAgent;
+    if (!agent || !inbox.loaded) return void (draft = null);
+    const existing = inbox.directWith(agent);
+    if (existing) return open(existing.id, 'conversation', true);
+    if (draft?.agent === agent) return;
+    draft = { agent, name: inbox.names[agent] ?? '…' };
+    void inbox.everyone().then(
+      (all) => {
+        const found = all.find((c) => c.agent === agent);
+        if (found && toAgent === agent) draft = found;
+      },
+      () => undefined,
+    );
+  });
 
   // untrack: a refresh reads list state, which must not re-run (and so stop) this effect.
   $effect(() => {
@@ -62,15 +83,15 @@
   });
 
   $effect(() => {
-    chatChrome.immersive = chatOpen;
+    chatChrome.immersive = chatOpen || !!composing;
     return () => {
       chatChrome.immersive = false;
     };
   });
 
-  function open(id: string | null, param = 'conversation'): void {
+  function open(id: string | null, param = 'conversation', replaceState = false): void {
     const href = id ? `/messages?${param}=${encodeURIComponent(id)}` : '/messages';
-    void goto(resolve(href as '/messages'));
+    void goto(resolve(href as '/messages'), { replaceState });
   }
 
   function openMenu(list: MenuAt['list'], id: string, x: number, y: number, header = false): void {
@@ -84,16 +105,13 @@
     infoOpen = true;
   }
 
-  /** web's handleComposeTrigger: New message always starts a personal chat. */
-  function compose(): void {
-    tab = 'personal';
-    composing = true;
+  async function createGroup(members: Contact[], title: string): Promise<void> {
+    open(await inbox.send({ kind: 'group', members, title, body: '' }), 'conversation', true);
   }
 
-  async function send(chat: NewChat): Promise<void> {
-    const id = await inbox.send(chat);
-    composing = false;
-    open(id);
+  async function first(person: Contact, body: string, files: File[]): Promise<void> {
+    const id = await inbox.send({ kind: 'direct', members: [person], title: '', body }, files);
+    open(id, 'conversation', true);
   }
 </script>
 
@@ -125,6 +143,24 @@
             onBack={() => open(null)}
           />
         {/key}
+      {:else if draft}
+        {@const person = draft}
+        {#key person.agent}
+          <DraftChatView
+            {person}
+            onFirst={(body, files) => first(person, body, files)}
+            onBack={() => open(null)}
+          />
+        {/key}
+      {:else if composing}
+        <NewMessagePage
+          group={composing === 'group'}
+          people={() => inbox.everyone()}
+          onBack={() => (composing === 'group' ? open('message', 'new', true) : open(null))}
+          onPerson={(person) => open(person.agent, 'to', true)}
+          onGroup={() => open('group', 'new')}
+          onCreate={createGroup}
+        />
       {:else if activeProject}
         {#key activeProject.id}
           <PublicChatView
@@ -146,7 +182,7 @@
         <div class="conversation-list">
           {#if tab === 'public'}
             {@render publicList()}
-          {:else if openId && !inbox.loaded}
+          {:else if (openId || toAgent) && !inbox.loaded}
             <div class="empty-state">Loading chats…</div>
           {:else if inbox.error && inbox.chats.length === 0}
             <div class="empty-state">{inbox.error}</div>
@@ -175,7 +211,7 @@
           type="button"
           aria-label="New message"
           title="New message"
-          onclick={compose}
+          onclick={() => open('message', 'new')}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">
             <path
@@ -242,10 +278,3 @@
     {/each}
   {/if}
 {/snippet}
-
-<ComposeMessageSheet
-  open={composing}
-  search={(q) => inbox.search(q)}
-  onSend={send}
-  onClose={() => (composing = false)}
-/>

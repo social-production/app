@@ -4,15 +4,22 @@
   interface Props {
     label: string;
     value: string;
+    /** The value is a key: shown whole, in small type. */
+    key?: boolean;
     onOpen: () => void;
   }
 
-  let { label, value, onOpen }: Props = $props();
+  let { label, value, key = false, onOpen }: Props = $props();
 </script>
 
-<button class="set-row" type="button" aria-label={`${label}: ${value}`} onclick={onOpen}>
+<button
+  class="set-row"
+  type="button"
+  aria-label={value && !key ? `${label}: ${value}` : label}
+  onclick={onOpen}
+>
   <span class="set-row-label">{label}</span>
-  <span class="set-row-value">{value}</span>
+  <span class="set-row-value" class:key>{value}</span>
   <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16">
     <path
       d="M9.5 6.5 15 12l-5.5 5.5"

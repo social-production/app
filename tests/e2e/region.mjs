@@ -5,7 +5,17 @@
 //   node tests/e2e/region.mjs http://localhost:4174 [screenshot dir]
 import assert from 'node:assert/strict';
 
-import { BASE, browser, device, errors, log, signUp, tagTestChannel, feedScope } from './lib.mjs';
+import {
+  BASE,
+  browser,
+  device,
+  errors,
+  feedScope,
+  log,
+  setDefaultPlace,
+  signUp,
+  tagTestChannel,
+} from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 const stamp = Date.now().toString(36).slice(-4);
@@ -32,10 +42,7 @@ const projectUrl = page.url();
 log('created', title);
 
 await page.goto(`${BASE}/settings`);
-const regional = page.locator('#settings-regional');
-await regional.getByRole('heading', { name: 'Regional' }).waitFor({ timeout: 60_000 });
-await regional.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
-await regional.locator('.suggestions button').first().click({ timeout: 30_000 });
+await setDefaultPlace(page, 'Fitzroy Melbourne');
 
 // The feed's Region scope, from the default place; the index lists the project once read.
 await page.goto(BASE);

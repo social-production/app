@@ -36,10 +36,10 @@
 
 <div class="profile-page">
   <section class="page">
-    <section class="hero-section">
+    <header class="people-head">
       <h1>People</h1>
-      <p class="profile-bio">Open someone's profile to vouch for them.</p>
-    </section>
+      <p>Open someone's profile to vouch for them.</p>
+    </header>
     {#if error}<p class="warning-card">{error}</p>{/if}
     {#if !loaded}
       <p class="end-copy">Loading people…</p>
@@ -54,9 +54,3 @@
     {/if}
   </section>
 </div>
-
-<style>
-  .people {
-    padding: 12px var(--page-gutter);
-  }
-</style>

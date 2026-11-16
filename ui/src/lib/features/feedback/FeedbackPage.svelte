@@ -1,10 +1,7 @@
 <script lang="ts">
-  import { MediaQuery } from 'svelte/reactivity';
-
   import FeedbackCard from '#lib/components/feedback/FeedbackCard.svelte';
   import FeedbackComposeSheet from '#lib/components/feedback/FeedbackComposeSheet.svelte';
   import FeedbackDetailSheet from '#lib/components/feedback/FeedbackDetailSheet.svelte';
-  import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import {
     emptyFeedbackCopy,
@@ -17,9 +14,10 @@
 
   import '#lib/components/styles/feedback.css';
 
-  /** web's FeedbackPage: bugs and suggestions with votes, filter and sort, compose and detail. */
+  /** web's FeedbackPage: bugs and suggestions with votes, compose and detail. The filter and
+   * the order are in view (Plan, Phase and Feedback Screens, 7), not behind icons. */
   const filterOptions: { value: FeedbackFilter; label: string }[] = [
-    { value: 'all', label: 'All feedback' },
+    { value: 'all', label: 'All' },
     { value: 'bugs', label: 'Bugs' },
     { value: 'suggestions', label: 'Suggestions' },
   ];
@@ -29,7 +27,6 @@
   ];
 
   const fb = new FeedbackState();
-  const labels = new MediaQuery('(min-width: 720px)');
   let filter = $state<FeedbackFilter>('all');
   let sort = $state<FeedbackSort>('trending');
   const items = $derived(shownFeedback(fb.items, filter, sort, Date.now() * 1000));
@@ -40,51 +37,38 @@
 </script>
 
 <section class="feedback-page">
-  <div class="page-hero">
-    <div class="hero-copy">
-      <p class="eyebrow">Platform feedback</p>
-      <h1>Feedback</h1>
-      <p class="hero-body">
-        Track bugs, share suggestions, and vote on what the platform should fix or improve next. The
-        code is on <a href="https://github.com/social-production" rel="noreferrer" target="_blank"
-          >GitHub</a
-        >.
-      </p>
+  <header class="feedback-head">
+    <h1>Feedback</h1>
+    <div class="feedback-seg" role="radiogroup" aria-label="Filter feedback">
+      {#each filterOptions as option (option.value)}
+        <button
+          role="radio"
+          aria-checked={filter === option.value}
+          class:on={filter === option.value}
+          type="button"
+          onclick={() => (filter = option.value)}>{option.label}</button
+        >
+      {/each}
     </div>
-    <button class="create-button" type="button" onclick={() => fb.compose()}>
-      <ToolbarIcon name="plus" />
-      <span>Add feedback</span>
-    </button>
-  </div>
-
-  <div class="toolbar">
-    <IconMenuButton
-      value={filter}
-      ariaLabel="Filter feedback"
-      defaultValue="all"
-      options={filterOptions}
-      showTriggerLabel={labels.current}
-      onChange={(v) => (filter = v)}
-    >
-      <ToolbarIcon name="filter" />
-    </IconMenuButton>
-    <IconMenuButton
-      value={sort}
-      ariaLabel="Sort feedback"
-      options={sortOptions}
-      showTriggerLabel={labels.current}
-      onChange={(v) => (sort = v)}
-    >
-      <ToolbarIcon name={sort === 'recent' ? 'clock' : 'sort'} />
-    </IconMenuButton>
+  </header>
+  <div class="feedback-tabs" role="tablist" aria-label="Sort feedback">
+    {#each sortOptions as option (option.value)}
+      <button
+        role="tab"
+        aria-selected={sort === option.value}
+        class:on={sort === option.value}
+        type="button"
+        onclick={() => (sort = option.value)}>{option.label}</button
+      >
+    {/each}
   </div>
 
   {#if fb.error}
-    <div class="status-card warning">{fb.error}</div>
+    <p class="feedback-note warning">{fb.error}</p>
   {:else if fb.loading}
-    <div class="status-card">Loading feedback…</div>
+    <p class="feedback-note">Loading feedback…</p>
   {:else if items.length === 0}
-    <div class="status-card">{emptyFeedbackCopy(filter)}</div>
+    <p class="feedback-note">{emptyFeedbackCopy(filter)}</p>
   {:else}
     <div class="feedback-list">
       {#each items as item (item.id)}
@@ -97,6 +81,16 @@
       {/each}
     </div>
   {/if}
+  <p class="feedback-source">
+    The code is on <a href="https://github.com/social-production" rel="noreferrer" target="_blank"
+      >GitHub</a
+    >.
+  </p>
+
+  <button class="feedback-fab" type="button" onclick={() => fb.compose()}>
+    <ToolbarIcon name="plus" />
+    <span>Add feedback</span>
+  </button>
 </section>
 
 <FeedbackComposeSheet

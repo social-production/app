@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import { explain } from '#lib/services/errors.ts';
   import {
     networkServers,
@@ -16,6 +17,8 @@
   let busy = $state(false);
   let error = $state<string>();
 
+  /** A server's address without its scheme, short enough for a row. */
+  const host = (address: string): string => address.replace(/^https?:\/\//, '');
   const canSave = $derived(url.trim().startsWith('https://') && !busy);
 
   $effect(() => {
@@ -42,52 +45,49 @@
       built-in list, and uses the first that answers.
     </p>
     <div class="card stack flush">
-      <div class="setting-item">
-        <div>
-          <strong>In use</strong>
-          <p class="server-url">{servers.current.bootstrap}</p>
-          {#if servers.fixed}<p>Set when the app was started; it can't be changed here.</p>{/if}
-        </div>
-      </div>
+      <SettingPanel
+        label="In use"
+        value={host(servers.current.bootstrap)}
+        hint={servers.fixed ? 'Set when the app was started; it can’t be changed here.' : ''}
+      >
+        <p class="setting-line server-url">{servers.current.bootstrap}</p>
+      </SettingPanel>
 
       {#if !servers.fixed}
-        <form
-          class="setting-item account-form"
-          onsubmit={(e) => {
-            e.preventDefault();
-            void run(() => saveNetworkServer(url));
-          }}
+        <SettingPanel
+          label="Your server"
+          value={servers.saved ? host(servers.saved.bootstrap) : 'None'}
+          hint="A community copy of the bootstrap server. Saving restarts the app."
         >
-          <div>
-            <strong>Your server</strong>
-            <p>
-              {servers.saved ? servers.saved.bootstrap : 'None saved.'} Saving restarts the app.
-            </p>
-          </div>
-          <label>
-            Server address
-            <input
-              bind:value={url}
-              placeholder="https://bootstrap.example.org"
-              spellcheck="false"
-              inputmode="url"
-            />
-          </label>
-          {#if error}<p class="profile-image-error">{error}</p>{/if}
-          <div class="server-actions">
-            <button class="button-secondary" disabled={!canSave} type="submit">
-              {busy ? 'Restarting…' : 'Save and restart'}
-            </button>
-            {#if servers.saved}
+          <input
+            bind:value={url}
+            aria-label="Server address"
+            placeholder="https://bootstrap.example.org"
+            spellcheck="false"
+            inputmode="url"
+          />
+          {#if error}<p class="setting-hint error">{error}</p>{/if}
+          {#snippet footer()}
+            <div class="sheet-actions">
+              {#if servers?.saved}
+                <button
+                  class="sheet-cancel"
+                  disabled={busy}
+                  type="button"
+                  onclick={() => run(resetNetworkServer)}>Use the built-in list</button
+                >
+              {/if}
               <button
-                class="button-secondary"
-                disabled={busy}
+                class="sheet-submit"
+                disabled={!canSave}
                 type="button"
-                onclick={() => run(resetNetworkServer)}>Use the built-in list</button
+                onclick={() => run(() => saveNetworkServer(url))}
               >
-            {/if}
-          </div>
-        </form>
+                {busy ? 'Restarting…' : 'Save and restart'}
+              </button>
+            </div>
+          {/snippet}
+        </SettingPanel>
       {/if}
       <HelpNetworkSettings />
     </div>
@@ -97,10 +97,5 @@
 <style>
   .server-url {
     overflow-wrap: anywhere;
-  }
-  .server-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
   }
 </style>

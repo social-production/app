@@ -1,9 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
-  import IconMenuButton from '#lib/components/IconMenuButton.svelte';
-  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
-  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import SearchSuggestionsList from '#lib/components/search/SearchSuggestionsList.svelte';
   import {
     formatSearchMeta,
@@ -26,17 +24,18 @@
   let { query, typeParam }: { query: string; typeParam: string | null } = $props();
   const type = $derived(readSearchType(typeParam));
 
-  // web's options, in its order, for the kinds the app has (no activities yet; PARITY.md).
-  const typeOptions: { value: SearchType; label: string; icon?: SurfaceIconId }[] = [
+  // web's options, in its order, for the kinds the app has (no activities yet; PARITY.md),
+  // as a row of chips (Remaining Screens, 5).
+  const typeOptions: { value: SearchType; label: string }[] = [
     { value: 'all', label: 'All' },
-    { value: 'project', label: 'Projects', icon: 'project' },
-    { value: 'thread', label: 'Threads', icon: 'thread' },
-    { value: 'event', label: 'Events', icon: 'event' },
-    { value: 'help_request', label: 'Help requests', icon: 'help-request' },
-    { value: 'post', label: 'Posts', icon: 'post' },
-    { value: 'channel', label: 'Channels', icon: 'channel' },
-    { value: 'community', label: 'Communities', icon: 'community' },
-    { value: 'user', label: 'Users', icon: 'user' },
+    { value: 'project', label: 'Projects' },
+    { value: 'thread', label: 'Threads' },
+    { value: 'event', label: 'Events' },
+    { value: 'help_request', label: 'Help requests' },
+    { value: 'post', label: 'Posts' },
+    { value: 'channel', label: 'Channels' },
+    { value: 'community', label: 'Communities' },
+    { value: 'user', label: 'People' },
   ];
 
   const liveSearch = createLiveSearchScheduler();
@@ -95,13 +94,11 @@
   <section class="page">
     <header class="page-header">
       <h1>Search</h1>
-      {#if query.trim()}
-        <p>Showing results for "{query}".</p>
-      {:else}
-        <p>Search channels, communities, projects, events, and profiles.</p>
-      {/if}
       <form class="search-form" role="search" onsubmit={submit}>
         <div class="search-input-wrap">
+          <svg aria-hidden="true" class="search-glyph" viewBox="0 0 24 24">
+            <circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" />
+          </svg>
           <input
             aria-label="Search"
             class="search-input"
@@ -121,24 +118,24 @@
             />
           {/if}
         </div>
-        <button class="primary-button" type="submit">Search</button>
       </form>
 
-      <div class="filter-row">
-        <IconMenuButton
-          value={type}
-          ariaLabel="Filter search"
-          defaultValue="all"
-          options={typeOptions}
-          showOptionIcons
-          showTriggerLabel
-          onChange={(next) => open(searchHref(draft.trim() || query.trim(), next))}
-        >
-          <ToolbarIcon name="filter" />
-        </IconMenuButton>
+      <div class="type-chips" role="radiogroup" aria-label="Filter search">
+        {#each typeOptions as option (option.value)}
+          <button
+            role="radio"
+            aria-checked={type === option.value}
+            class="type-chip"
+            class:on={type === option.value}
+            type="button"
+            onclick={() => open(searchHref(draft.trim() || query.trim(), option.value))}
+            >{option.label}</button
+          >
+        {/each}
       </div>
 
       {#if !query.trim()}
+        <p class="search-lede">Search channels, communities, projects, events, and profiles.</p>
         <div class="chip-row">
           {#each suggestedQueries as chip (chip)}
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- built from resolve('/search') -->
@@ -150,20 +147,25 @@
 
     <div class="stack">
       {#if query.trim() && loaded && results.length === 0}
-        <section class="result-card">
+        <section class="result-card none">
           <h2>No results</h2>
           <p>Try a channel name, community name, project title, or username.</p>
         </section>
       {:else if query.trim()}
         {#each results as result (result.id)}
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the app's own paths -->
-          <a class="result-card" href={result.href}>
-            <div class="topline">
-              <span class="kind-chip">{searchKindLabels[result.kind]}</span>
-              <span>{formatSearchMeta(result.meta, result.kind)}</span>
+          <a class="result-card" class:person={result.kind === 'profile'} href={result.href}>
+            {#if result.kind === 'profile'}<AvatarBadge size="md" name={result.title} />{/if}
+            <div class="result-copy">
+              <div class="topline">
+                <span class={`kind-chip kind-${result.kind}`}>{searchKindLabels[result.kind]}</span>
+                {#if formatSearchMeta(result.meta, result.kind) !== searchKindLabels[result.kind]}
+                  <span>{formatSearchMeta(result.meta, result.kind)}</span>
+                {/if}
+              </div>
+              <h2>{result.title}</h2>
+              {#if result.summary}<p>{result.summary}</p>{/if}
             </div>
-            <h2>{result.title}</h2>
-            <p>{result.summary}</p>
           </a>
         {/each}
       {/if}

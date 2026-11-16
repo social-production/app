@@ -127,25 +127,38 @@ export class InboxState {
 
   unreadTotal = $derived(this.chats.reduce((sum, c) => sum + c.unread, 0));
 
+  /** Everyone with a profile but yourself, for New message's list and group members. */
+  async everyone(): Promise<Contact[]> {
+    this.people ??= contacts();
+    try {
+      this.me ||= await myAgent();
+      return (await this.people).filter((c) => c.agent !== this.me);
+    } catch (e) {
+      this.people = undefined; // read the directory again next time
+      throw e;
+    }
+  }
+
   /** People matching `query` by name, not yourself (web's getMessageContacts, 8 at most). */
   async search(query: string): Promise<Contact[]> {
-    this.people ??= contacts();
     const needle = query.trim().toLowerCase();
-    let everyone: Contact[] = [];
-    try {
-      everyone = await this.people;
-    } catch {
-      this.people = undefined; // try the directory again on the next keystroke
-    }
-    return everyone
-      .filter((c) => c.agent !== this.me && c.name.toLowerCase().includes(needle))
-      .slice(0, 8);
+    const everyone = await this.everyone().catch(() => []);
+    return everyone.filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 8);
+  }
+
+  /** Your direct chat with this person, if you have one. */
+  directWith(agent: string): ChatSummary | null {
+    return (
+      this.chats.find(
+        (c) => c.kind === 'direct' && c.members.length === 2 && c.members.includes(agent),
+      ) ?? null
+    );
   }
 
   /** Start a chat (or reuse your direct chat with that person); returns its id. */
-  async send(chat: NewChat): Promise<string> {
+  async send(chat: NewChat, files: File[] = []): Promise<string> {
     try {
-      const id = await inTurn(() => sendNewChat(chat, this.all));
+      const id = await inTurn(() => sendNewChat(chat, this.all, files));
       await this.refresh();
       return id;
     } catch (e) {

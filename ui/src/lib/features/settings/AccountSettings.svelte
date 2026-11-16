@@ -1,5 +1,6 @@
 <script lang="ts">
   import CopyKey from '#lib/components/CopyKey.svelte';
+  import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import {
     addPasskey,
@@ -74,65 +75,73 @@
 <section class="settings-section" id="settings-account">
   <h2>Account</h2>
   <div class="card stack flush">
-    <div class="setting-item">
-      <div>
-        <strong>Your key</strong>
-        <p>Others paste it to vouch for you or pair a device.</p>
-      </div>
+    <SettingPanel
+      label="Your key"
+      value={me}
+      key
+      hint="Others paste it to vouch for you or pair a device."
+    >
       <CopyKey value={me} />
-    </div>
+    </SettingPanel>
 
     {#if passkeys}
-      <div class="setting-item">
-        <div>
-          <strong>Passkey</strong>
-          <p>
-            Sign in on this device with fingerprint, face or screen lock. Your 24 words always work
-            too.
-          </p>
-          {#if error}<p class="profile-image-error">{error}</p>{:else if message}<p
-              class="bio-saved"
-            >
-              {message}
-            </p>{/if}
-        </div>
-        <button class="button-secondary" disabled={busy} type="button" onclick={savePasskey}>
-          {busy ? 'Waiting…' : 'Save a passkey'}
-        </button>
-      </div>
+      <SettingPanel
+        label="Passkey"
+        value=""
+        hint="Sign in on this device with fingerprint, face or screen lock. Your 24 words always work too."
+      >
+        {#if error}<p class="setting-hint error">{error}</p>{:else if message}<p
+            class="setting-hint"
+          >
+            {message}
+          </p>{/if}
+        {#snippet footer()}
+          <div class="sheet-actions">
+            <button class="sheet-submit" disabled={busy} type="button" onclick={savePasskey}>
+              {busy ? 'Waiting…' : 'Save a passkey'}
+            </button>
+          </div>
+        {/snippet}
+      </SettingPanel>
     {/if}
 
-    <div class="setting-item">
-      <div>
-        <strong>Sign out</strong>
-        <p>Sign out on this device. Sign back in with your 24 words.</p>
-      </div>
-      <button class="button-secondary" type="button" onclick={leave}>Sign out</button>
-    </div>
-
-    <form
-      class="setting-item account-form"
-      onsubmit={(e) => {
-        e.preventDefault();
-        void deactivate();
-      }}
+    <SettingPanel
+      label="Sign out"
+      value=""
+      hint="Sign out on this device. Sign back in with your 24 words."
     >
-      <div>
-        <strong>Deactivate account</strong>
-        <p>
-          You will be signed out and cannot sign in again. Posts, threads, and vouches stay under
-          this username.
-        </p>
-      </div>
-      <label>
-        Type your name to confirm
-        <input autocomplete="off" bind:value={confirmName} />
-      </label>
-      {#if deactivateError}<p class="profile-image-error">{deactivateError}</p>{/if}
-      <button class="button-danger" disabled={deactivating || !confirmName.trim()} type="submit">
-        {deactivating ? 'Deactivating…' : 'Deactivate account'}
-      </button>
-    </form>
+      {#snippet footer()}
+        <div class="sheet-actions">
+          <button class="sheet-submit" type="button" onclick={leave}>Sign out</button>
+        </div>
+      {/snippet}
+    </SettingPanel>
+
+    <SettingPanel
+      label="Deactivate account"
+      value=""
+      hint="You will be signed out and cannot sign in again. Posts, threads, and vouches stay under this username."
+    >
+      <input
+        autocomplete="off"
+        bind:value={confirmName}
+        aria-label="Type your name to confirm"
+        placeholder="Type your name to confirm"
+      />
+      {#if deactivateError}<p class="setting-hint error">{deactivateError}</p>{/if}
+      {#snippet footer()}
+        <div class="sheet-actions">
+          <button
+            class="sheet-submit danger"
+            disabled={deactivating || !confirmName.trim()}
+            type="button"
+            onclick={() => void deactivate()}
+          >
+            {deactivating ? 'Deactivating…' : 'Deactivate account'}
+          </button>
+        </div>
+      {/snippet}
+    </SettingPanel>
   </div>
 </section>
 
