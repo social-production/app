@@ -186,14 +186,14 @@ parity session** (below); the UX session takes 0111 and up if it needs one; pari
 - Merged and live: #171 polish, #172 profiles, #174 platform screens, #175 bot-review vote.
 - **#176 `claude/ux-scroll-chrome`** (main merged in, fast checks clean locally): phone feeds
   slide the top and bottom bars away on scroll. Merge when green.
-- **`claude/ux-chat-fixes`** (contains #176 and main; its PR opens right after this note):
+- **#177 `claude/ux-chat-fixes`** (contains #176 and main):
   Telegram-style chats, the chat person page, full-screen search, the new report sheets
   (details in the 2026-11-16 entry below). Merge after #176, when green.
 - After each merge: smoke live read-only at 390px (signed out, plus a demo account if needed),
   add a README Status line, update this file.
 
 ### UX session: the plan, in order
-1. **Merge #176, then the ux-chat-fixes PR** (above).
+1. **Merge #176, then #177** (above), each once its fast check is green.
 2. **Detail Pages Cleanup** (design artifact 2e, v5 approved: "looks great";
    https://claude.ai/artifact/UJEVvZ1b93rpoJoKMrWaMp, sections 4 to 6 win over 1 to 3). Branch
    `claude/ux-detail-pages` from main. UI only unless the invite list needs a zome change.
