@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
   import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
   import FactRow from '#lib/components/detail/FactRow.svelte';
@@ -80,7 +82,7 @@
         <p class="tab-loading">{removedLabel(help.moderation.value.report?.reason)}</p>
       </section>
     {:else if !help.project?.charter}
-      <section class="hero-card"><p class="tab-loading">Loading help request…</p></section>
+      <LoadingLine /><SkeletonDetail />
     {:else}
       {@const project = help.project}
       {@const charter = help.project.charter}
@@ -138,7 +140,7 @@
           </div>
         {/if}
         {#if chatOpened}
-          <div hidden={tab !== 'chat'} inert={tab !== 'chat'}>
+          <div class="request-chat" hidden={tab !== 'chat'} inert={tab !== 'chat'}>
             <ProjectChat
               projectId={id}
               seed={project.networkSeed}

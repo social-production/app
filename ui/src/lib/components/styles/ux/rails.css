@@ -1,0 +1,16 @@
+/* Owner's fix 3g (2026-11-17): on phones the side panels and their scrim stopped at the old
+   edge-to-edge bottom nav's band, so since the nav and the detail dock float (ADR 0096,
+   0099) a strip of page showed under them with straight cut-off edges. They now run to the
+   bottom of the screen; the floating nav stays above them and the dock sits under the scrim. */
+@media (max-width: 1080px) {
+  .shell .rail-backdrop {
+    bottom: 0;
+  }
+
+  .shell .rail {
+    bottom: 0;
+    padding-bottom: calc(
+      12px + var(--shell-bottom-nav-offset, 0px) + var(--shell-safe-bottom, 0px)
+    );
+  }
+}

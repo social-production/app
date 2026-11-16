@@ -13,6 +13,7 @@
   import { connect } from '#lib/services/account.ts';
   import { getPerson } from '#lib/services/people.ts';
   import { applyAppearance, appearance, setAppearance } from '#lib/stores/appearance.svelte.ts';
+  import { applyBackButtons } from '#lib/stores/backButtons.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
@@ -83,10 +84,10 @@
     return () => media.removeEventListener('change', apply);
   });
 
-  // web's root layout: apply the appearance settings; "system" keeps following the device.
+  // web's root layout: apply the appearance settings (and fix 3f's back buttons, read in apply).
   $effect(() => {
     const query = window.matchMedia('(prefers-color-scheme: dark)');
-    const apply = (): void => applyAppearance(query.matches);
+    const apply = (): void => (applyAppearance(query.matches), applyBackButtons());
     void [appearance.theme, appearance.accent, appearance.font, appearance.textSize];
     apply();
     query.addEventListener('change', apply);

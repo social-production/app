@@ -7,6 +7,7 @@ import { explain } from '#lib/services/errors.ts';
 import { devicePlace, searchPlaces } from '#lib/services/locations.ts';
 import { regionFeed } from '#lib/services/region.ts';
 import { readDefaultLocation, writeDefaultLocation } from '#lib/stores/defaultLocation.svelte.ts';
+import { readRegionRadius } from '#lib/stores/regionRadius.svelte.ts';
 
 /**
  * web's PublicFeed Region scope: a centre (your default place, a link's, a searched place or
@@ -35,6 +36,7 @@ export class RegionFeedState {
   /** web's `hydrateRegionCenter`: your default place. */
   hydrate(me: string | null): void {
     this.me = me;
+    this.radius = readRegionRadius();
     const saved = readDefaultLocation(me);
     if (saved?.place.latitude != null && saved.place.longitude != null) {
       this.setCenter(saved.place.latitude, saved.place.longitude, saved.place.displayLabel);

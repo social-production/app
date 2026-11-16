@@ -1,0 +1,18 @@
+/* Owner's fix 3f (2026-11-17): Settings › Appearance › "Show back buttons" off (this device)
+   hides every round back button; the system back gesture does the job. AppShell and app.html
+   put the choice on <html>. The dock's capsule stays in the middle on its own. */
+html[data-back-buttons='off'] .dock-back {
+  display: none;
+}
+
+html[data-back-buttons='off'] .shell .dock-row.dock-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr);
+}
+
+/* Sign-up's bottom button (fix 3e) takes the back button's place too. */
+html[data-back-buttons='off']
+  .shell:not(:has(.mobile-bottom-nav))
+  .onboarding
+  .button-row:has(.button-primary) {
+  left: 16px;
+}

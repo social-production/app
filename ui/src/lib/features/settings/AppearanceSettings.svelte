@@ -1,5 +1,6 @@
 <script lang="ts">
   import SettingChoice from '#lib/components/settings/SettingChoice.svelte';
+  import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import {
     ACCENT_COLORS,
     appearance,
@@ -8,6 +9,7 @@
     type TextSize,
     type ThemeMode,
   } from '#lib/stores/appearance.svelte.ts';
+  import { backButtons, setBackButtons } from '#lib/stores/backButtons.svelte.ts';
 
   /** web's Appearance section: type size, theme, accent colour and font, kept on this device.
    * web's language (coming soon), feed split and timezone rows wait for those features. */
@@ -71,6 +73,12 @@
       value={appearance.font}
       options={fonts}
       onChange={(font) => setAppearance({ font })}
+    />
+    <SettingSwitch
+      label="Show back buttons"
+      note="On this device. Turn off if your phone has its own back gesture."
+      checked={backButtons.shown}
+      onToggle={() => setBackButtons(!backButtons.shown)}
     />
   </div>
 </section>
