@@ -135,11 +135,40 @@ conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
    after). Fixed on it: place rows called a store from components (layer rule); they use the
    shell's `placeOnMap` context. Local browser tests: rerunning (the first run never started:
    the seed took longer than 400 s to come up).
-3. **`claude/ux-polish`** (stacked on #163, pushed; its PR opens once #163 merges): signed-out visitors
-   see no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`, Topbar
-   `guest`, FeedHeader `guest`; hidden only once the status is `signed-out`, not while
-   connecting); sign-up has no top bar (`authSurface` collapses it like an open chat). **Not
-   looked at in the browser yet.**
+3. **`claude/ux-polish`** (stacked on #163, pushed; its PR opens once #163 merges). Built
+   from the approved Polish Pass page (Design artifacts, item 1):
+   - Signed out: no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`,
+     Topbar/FeedHeader `guest`, hidden only once the status is `signed-out`); sign-up has no
+     top bar.
+   - Map: the capsule is centred at the bottom (search and Upcoming as icons), its sheet's
+     choices are pills that wrap whole (`components/PillChoice`), the credit is MapLibre's
+     compact ⓘ top-left, closed until tapped (`maps/load.ts`), results are drawn as feed rows
+     (`MapDiscoveryCard`, `ux/mapcards.css`).
+   - Region: a "Near … · 25 km" line under the tabs; the place field, a typeable distance box
+     (`RadiusCombobox`) and the online switch are at the top of the filter sheet
+     (`RegionControls`, `ux/region.css`). Filter sheets keep their side margin
+     (`ux/pills.css`: the ported sheet body zeroed it).
+   - Feed cards: the place button gains a map mark; the date line is darker.
+   - Links: "Propose a link" at the top, the venue as a place row, linked projects as rows
+     (`LinkCard`), each open vote one card with a bar per project (`LinkVoteCard`), past links
+     and votes in one fold (`LinksPast`). "Start sever vote" reads "End this link".
+   - History: Open (vote cards with an inline Yes/No) above Decided (rows with Passed/Failed).
+     Link decisions read "Link with …" / "End the link with …".
+   - Create flows: × top left, centred title with "Step N of M", one progress line, a question
+     per step, Back + Continue (faded until complete; tapping says "To continue, add: …" and
+     focuses the field), the rule as a chip with "Read". One search for channels and
+     communities with ticked rows (`ScopeTagsStep`; tests use `TAG_SEARCH` in `lib.mjs`),
+     In person / Online / Not yet, a feed-card preview on the last step (`CreatePreview`), a
+     request's date and times as rows and roles as cards with −/+ (`HelpRolesStep`), a private
+     event's guests as rows with an Organiser pill (`InviteList`), a post as a composer with Post
+     top right (`CreateSheet composer`), a channel's # inside its field.
+   - **Not as drawn (decided while building):** request roles are edited in place on their
+     cards (a sheet over the create sheet was awkward); a private event keeps its separate
+     audience and guest steps (merging them changes the event state's per-step checks); the
+     map preview on the place step is left out.
+   - Browser tests updated for the new words (`End this link`, `Past links`, `Decided`,
+     `In person`, `Add a role`, `People needed`, `.invite-row`, `.region-near`). **Not yet run
+     on this branch, and no screens looked at yet** (the seed was busy with #163's batch).
    **Approved 2026-11-16 and being built here:** the owner found the create flows "rough and
    boxy and confusing", Links and History not modernised, feed cards' time and place, and the
    filter sheets wrapping. The Polish Pass page (Design artifacts, item 1) answers all of them:
