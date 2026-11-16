@@ -1,4 +1,7 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
+  import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
@@ -81,7 +84,7 @@
 
 <section class="directory-page">
   {#if !s.loaded}
-    <section class="info-card"><p>Loading {noun}…</p></section>
+    <LoadingLine /><SkeletonDetail />
   {:else if !s.scope}
     <section class="info-card">
       <p>{s.error ?? `No ${noun} has the handle "${slug}" yet.`}</p>
@@ -104,7 +107,7 @@
 
     <div class="stack">
       {#if s.feed.loading && s.feed.items.length === 0}
-        <section class="info-card"><p>Loading feed…</p></section>
+        <SkeletonRows count={3} />
       {:else if s.feed.items.length === 0}
         <section class="info-card">
           {#if s.platform}

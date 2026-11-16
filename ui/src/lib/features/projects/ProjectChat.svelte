@@ -148,6 +148,7 @@
     emptyCopy={chat.loaded ? copy.empty : 'Loading chat…'}
     {embedded}
     fitViewport={embedded}
+    showHeader={false}
     paused={chat.paused}
     error={chat.error}
     onSend={(body, replyTo, files) => chat.send(body, replyTo, files)}

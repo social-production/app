@@ -4,6 +4,8 @@
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
 
+  import OpeningScreen from '#lib/components/loading/OpeningScreen.svelte';
+
   import Welcome from './Welcome.svelte';
 
   import '#lib/components/styles/onboarding.css';
@@ -17,12 +19,5 @@
 {#if connection.current.status === 'signed-out' || connection.current.status === 'offline'}
   <Welcome />
 {:else}
-  <p class="connecting">Connecting…</p>
+  <OpeningScreen />
 {/if}
-
-<style>
-  .connecting {
-    padding: 24px var(--page-gutter);
-    color: var(--text-soft);
-  }
-</style>

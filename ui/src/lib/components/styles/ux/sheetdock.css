@@ -1,0 +1,72 @@
+/* Owner, 17 Nov: "on a lot of sheets there is separate buttons like continue or x, they should
+   both be on the dock". A sheet's footer is now the detail dock (ADR 0099): the × is the dock's
+   round floating button on the left and the actions sit in one floating capsule in the middle.
+   A capsule too wide to stay centred beside the × moves right. Loaded after sheets.css; the
+   doubled classes outweigh the ported sheets.css (sheets are portaled outside `.shell`). */
+.overlay-root.overlay-root .overlay-footer,
+.overlay-root.overlay-root .overlay-footer.inline-close,
+.overlay-root.overlay-root .overlay-footer:has(.sheet-actions) {
+  display: grid;
+  grid-template-columns: minmax(54px, 1fr) minmax(0, auto) minmax(0, 1fr);
+  align-items: end;
+  column-gap: 10px;
+}
+
+.overlay-root.overlay-root .overlay-footer .sheet-close,
+.overlay-root.overlay-root .overlay-footer.inline-close .sheet-close {
+  grid-column: 1;
+  justify-self: start;
+  width: 54px;
+  height: 54px;
+  border: 1px solid var(--float-border);
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+}
+
+/* Only a close: one round × in the middle would look lost, so it is a "× Close" capsule there. */
+.overlay-root.overlay-root .overlay-footer.inline-close.close-only .sheet-close {
+  grid-column: 2;
+  justify-self: center;
+  width: auto;
+  padding: 0 22px;
+}
+
+/* Everything after the × goes in the capsule; a footer without a .sheet-actions wrapper
+   puts its own buttons in the middle column too. */
+.overlay-root.overlay-root .overlay-footer > :not(.sheet-close) {
+  grid-column: 2;
+}
+
+.overlay-root.overlay-root .overlay-footer .sheet-actions {
+  display: flex;
+  gap: 4px;
+  min-width: min(240px, 100%);
+  min-height: 54px;
+  padding: 5px;
+  border: 1px solid var(--float-border);
+  border-radius: 27px;
+  background: var(--float-background);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
+}
+
+.overlay-root.overlay-root
+  .overlay-footer
+  .sheet-actions:not(:has(:not(.sheet-dismiss-duplicate))) {
+  display: none;
+}
+
+.overlay-root.overlay-root .overlay-footer .sheet-actions > .sheet-submit,
+.overlay-root.overlay-root .overlay-footer .sheet-actions > .sheet-cancel {
+  flex: 1 1 auto;
+  min-height: 44px;
+  padding: 0 22px;
+  white-space: nowrap;
+}
+
+.overlay-root.overlay-root .overlay-footer .sheet-actions > .sheet-cancel {
+  background: transparent;
+}

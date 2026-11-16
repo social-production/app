@@ -1,6 +1,7 @@
 <script lang="ts">
   import { untrack } from 'svelte';
 
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import CommentActivityCard from '#lib/components/cards/CommentActivityCard.svelte';
   import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -89,7 +90,7 @@
   {#if feed.error}
     <section class="empty-card"><p>{feed.error}</p></section>
   {:else if feed.loading && rows.length === 0}
-    <section class="empty-card"><p>Loading activity…</p></section>
+    <SkeletonRows count={2} />
   {:else if rows.length === 0}
     <section class="empty-card">
       <p>{tab === 'comments' ? 'No comments yet.' : 'Nothing here yet.'}</p>

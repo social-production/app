@@ -4,6 +4,8 @@
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   import type { ResolvedPathname } from '$app/types';
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import CommentActivityCard from '#lib/components/cards/CommentActivityCard.svelte';
   import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
   import ProjectActivityCard from '#lib/components/cards/ProjectActivityCard.svelte';
@@ -75,7 +77,7 @@
     {#if feed.error}
       <section class="empty-card"><p>{feed.error}</p></section>
     {:else if feed.loading && feed.rows.length === 0}
-      <section class="empty-card"><p>Loading feed...</p></section>
+      <LoadingLine /><SkeletonRows count={4} />
     {:else if feed.shownScope === 'region' && !feed.region.hasCenter}
       <section class="empty-card">
         <p>Choose a place or enable device location to load the region feed.</p>

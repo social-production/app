@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import { endedAgo } from '#lib/domain/activityHistory.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
@@ -56,7 +58,7 @@
   </header>
   {#if error}<p class="muted" role="alert">{error}</p>{/if}
   {#if loading}
-    <p class="muted">Loading invites…</p>
+    <LoadingLine /><SkeletonRows kind="row" count={3} />
   {:else if invites.length === 0}
     <p class="muted">
       No invites waiting. When someone invites you to a private community or event, it shows up
