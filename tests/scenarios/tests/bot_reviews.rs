@@ -41,8 +41,11 @@ struct StandingAt {
     at: Timestamp,
 }
 
-/// Five directory agents: ann, bob, cat and dan are founders (Full); eve is New. Dan is the
-/// account under review.
+/// Six directory agents: ann, bob, cat, dan and fay are founders (Full); eve is New. Dan is
+/// the account under review; fay shares a space with him and never marks.
+/// The New member.
+const EVE: usize = 5;
+
 struct Net {
     conductors: SweetConductorBatch,
     cells: Vec<SweetCell>,
@@ -95,8 +98,8 @@ impl Net {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn three_marks_open_a_review_that_pauses_a_bot() {
-    let mut conductors = SweetConductorBatch::standard(5).await;
-    let cells = common::directory_network(&mut conductors, 4).await;
+    let mut conductors = SweetConductorBatch::standard(6).await;
+    let cells = common::directory_network(&mut conductors, 5).await;
     let net = Net { conductors, cells };
     marks_open_the_review(&net).await;
     votes_uphold_it(&net).await;
@@ -107,7 +110,7 @@ async fn three_marks_open_a_review_that_pauses_a_bot() {
 
 async fn marks_open_the_review(net: &Net) {
     assert!(
-        net.refused(4, "set_bot_mark", net.choice(true)).await,
+        net.refused(EVE, "set_bot_mark", net.choice(true)).await,
         "a New member can't mark"
     );
     assert!(
@@ -127,7 +130,7 @@ async fn marks_open_the_review(net: &Net) {
         "no re-review while not paused"
     );
     assert!(
-        net.refused(4, "vote_bot_review", net.choice(true)).await,
+        net.refused(EVE, "vote_bot_review", net.choice(true)).await,
         "only full members vote"
     );
 }
@@ -155,7 +158,7 @@ async fn the_paused_account_is_read_only(net: &Net) {
     let full: bool = net.call(4, "full_standing_before", at).await;
     assert!(!full, "a paused founder's votes no longer count");
     let eve = BotChoice {
-        account: net.cells[4].agent_pubkey().clone(),
+        account: net.cells[EVE].agent_pubkey().clone(),
         bot: true,
     };
     assert!(
@@ -175,4 +178,12 @@ async fn notices_follow_the_review(net: &Net) {
     let markers: Vec<BotNotice> = net.call(0, "my_bot_review_notices", ()).await;
     assert!(markers.iter().all(|n| n.account == net.dan()));
     assert_eq!(markers.len(), 2);
+    let dan = vec![net.dan()];
+    let fay: Vec<BotNotice> = net.call(4, "bot_review_vote_notices", dan.clone()).await;
+    let kinds: Vec<&str> = fay.iter().map(|n| n.kind.as_str()).collect();
+    assert_eq!(kinds, ["vote"], "a full member who shares a space is asked to vote");
+    let marker: Vec<BotNotice> = net.call(0, "bot_review_vote_notices", dan.clone()).await;
+    assert!(marker.is_empty(), "whoever marked knows already");
+    let eve: Vec<BotNotice> = net.call(EVE, "bot_review_vote_notices", dan).await;
+    assert!(eve.is_empty(), "only full members are asked");
 }

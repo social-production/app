@@ -84,6 +84,14 @@ pub fn my_bot_review_notices(_: ()) -> ExternResult<Vec<bot_notices::BotNotice>>
     bot_notices::mine()
 }
 
+/// web's `bot-review-vote`: reviews of people you share a space with (the device passes them).
+#[hdk_extern]
+pub fn bot_review_vote_notices(
+    accounts: Vec<AgentPubKey>,
+) -> ExternResult<Vec<bot_notices::BotNotice>> {
+    bot_notices::asked_to_vote(accounts)
+}
+
 #[hdk_extern]
 pub fn set_bot_mark(choice: BotChoice) -> ExternResult<ActionHash> {
     bot_review::set_mark(choice)
