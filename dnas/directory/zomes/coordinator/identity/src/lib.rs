@@ -13,6 +13,7 @@ mod feedback_comments;
 mod follow_links;
 mod follows;
 mod listings;
+mod notes;
 mod profile;
 mod records;
 mod standing;
