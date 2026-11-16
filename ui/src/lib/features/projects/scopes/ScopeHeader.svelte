@@ -2,8 +2,12 @@
   import type { Snippet } from 'svelte';
 
   import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
+  import NetworkVoteSheet from '#lib/components/board/NetworkVoteSheet.svelte';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import type { Board } from '#lib/domain/board.ts';
+  import type { Person } from '#lib/domain/people.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
   import type { ScopeState } from './scopeState.svelte.ts';
@@ -23,6 +27,9 @@
     inviteOpen: boolean;
     settingsOpen: boolean;
     boardOpen: boolean;
+    /** The Platform's moderator board: its faces and the weekly active count (ADR 0095). */
+    board?: Board | null;
+    people?: Record<string, Person>;
     onVotes: () => void;
   }
 
@@ -35,6 +42,8 @@
     inviteOpen = $bindable(),
     settingsOpen = $bindable(),
     boardOpen = $bindable(),
+    board = null,
+    people = {},
     onVotes,
   }: Props = $props();
 
@@ -43,6 +52,17 @@
   const count = $derived(s.project?.members.length ?? scope?.members ?? 0);
   const pending = $derived(s.joining || (!s.project && !!scope?.id));
   const typeName = $derived(kind === 'channel' ? 'Channel' : 'Community');
+  // The Platform counts people active last week (what its votes are sized from), not members
+  // (Platform and Moderators mockups §1).
+  const sub = $derived.by(() => {
+    if (!s.platform) return `${typeName} · ${count} ${count === 1 ? 'member' : 'members'}`;
+    const n = board?.weeklyActive;
+    if (n === undefined) return 'The whole network';
+    return n === 0 ? 'Nobody active last week' : `${n.toLocaleString()} active last week`;
+  });
+  let networkOpen = $state(false);
+  const faces = $derived((board?.moderators ?? []).slice(0, 3));
+  const more = $derived(Math.max(0, (board?.moderators.length ?? 0) - 3));
 </script>
 
 {#if scope}
@@ -50,11 +70,14 @@
     <div class="scope-cover" aria-hidden="true"></div>
     <div class="scope-hero-body">
       <span class="scope-avatar" aria-hidden="true">
-        {#if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}
+        {#if s.platform}<ToolbarIcon
+            name="globe"
+          />{:else if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}
       </span>
       <div class="scope-hero-title">
         <h1>
           {s.platform ? 'Platform' : scope.handle}
+          {#if s.platform}<span class="scope-kind-chip">Whole network</span>{/if}
           {#if scope.isPrivate}
             <span class="private-mark" title="Private: members only" aria-label="Private">
               <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
@@ -69,7 +92,7 @@
             </span>
           {/if}
         </h1>
-        <p class="scope-hero-sub">{typeName} · {count} {count === 1 ? 'member' : 'members'}</p>
+        <p class="scope-hero-sub">{sub}</p>
       </div>
       <div class="scope-intro-prose">
         <p>{s.project?.charter?.description ?? scope.description}</p>
@@ -104,13 +127,13 @@
             onclick={() => void s.toggleJoin()}>{joined ? 'Joined' : 'Join'}</button
           >
         {/if}
-        <button
-          aria-expanded={membersOpen}
-          aria-label={`${count} members`}
-          class="scope-pill membership-count"
-          type="button"
-          onclick={() => (membersOpen = true)}>Members</button
-        >
+        {#if !s.platform}<button
+            aria-expanded={membersOpen}
+            aria-label={`${count} members`}
+            class="scope-pill membership-count"
+            type="button"
+            onclick={() => (membersOpen = true)}>Members</button
+          >{/if}
         {#if scope.isPrivate && joined}
           <IconPopoverMenu
             open={inviteOpen}
@@ -124,18 +147,30 @@
             {@render invitePanel()}
           </IconPopoverMenu>
         {/if}
-        <span class="scope-action-gap"></span>
+        {#if !s.platform}<span class="scope-action-gap"></span>{/if}
         {#if s.platform}
           <button
             aria-expanded={boardOpen}
             aria-label="Moderators"
-            title="Moderators"
-            class="icon-action"
-            class:menu-active={boardOpen}
+            class="scope-pill board-pill"
             type="button"
             onclick={() => (boardOpen = !boardOpen)}
           >
-            <ToolbarIcon name="shield" />
+            {#if faces.length > 0}
+              <span class="board-faces" aria-hidden="true">
+                {#each faces as m (m.agent)}
+                  <AvatarBadge
+                    size="sm"
+                    name={people[m.agent]?.profile?.name ?? ''}
+                    avatar={people[m.agent]?.profile?.avatar ?? null}
+                  />
+                {/each}
+                {#if more > 0}<span class="board-more">+{more}</span>{/if}
+              </span>
+            {:else}
+              <ToolbarIcon name="shield" />
+            {/if}
+            Moderators
           </button>
         {:else}
           <button
@@ -155,6 +190,13 @@
           </button>
         {/if}
       </div>
+      {#if s.platform}
+        <button class="scope-rule" type="button" onclick={() => (networkOpen = true)}>
+          <ToolbarIcon name="people" />
+          <span>Any Full member can vote on #platform projects</span>
+          <b>How</b>
+        </button>
+      {/if}
     </div>
     {#if waiting > 0}
       <!-- Sits just left of the + button while a decision is waiting for this viewer. -->
@@ -169,4 +211,12 @@
       </button>
     {/if}
   </section>
+{/if}
+
+{#if s.platform}
+  <NetworkVoteSheet
+    open={networkOpen}
+    weeklyActive={board?.weeklyActive ?? null}
+    onClose={() => (networkOpen = false)}
+  />
 {/if}

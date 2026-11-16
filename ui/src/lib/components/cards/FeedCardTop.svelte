@@ -6,6 +6,7 @@
   import { tagHref, tagIcon } from './tagLinks.ts';
 
   import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
+  import { isNetworkVote } from '#lib/domain/board.ts';
   import { tagRef } from '#lib/domain/scopes.ts';
   import type { CharterMode } from '#lib/domain/projects.ts';
   import { activityInstant, describeUpdate, relativeCompact } from '#lib/domain/time.ts';
@@ -38,6 +39,10 @@
     updatedAt?: number | null;
     children?: Snippet;
   } = $props();
+  // A #platform project takes a network vote (ADR 0095); threads and posts take none.
+  const network = $derived(
+    isNetworkVote(tags) && mode !== null && mode !== 'thread' && mode !== 'post',
+  );
 
   const phone = new MediaQuery('(max-width: 760px)');
   let sheetOpen = $state(false);
@@ -100,7 +105,9 @@
       <div class="feed-lead-meta" class:alone={tags.length === 0}>
         <SurfaceTypeLabel projectMode={mode} />
         <!-- A proposal in its Proposal phase would read "Proposal · Proposal". -->
-        {#if stage && !(mode === 'proposal' && stage === 'Proposal')}
+        {#if network}
+          <span class="feed-card-stage network-vote">Network vote</span>
+        {:else if stage && !(mode === 'proposal' && stage === 'Proposal')}
           <span class="feed-card-stage">{stage}</span>
         {/if}
         {@render clock()}

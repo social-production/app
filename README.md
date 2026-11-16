@@ -14,6 +14,14 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Profiles and comments (PR #172, 2026-11-16 8:20 pm Melbourne):** Home and profiles show
+  Global's rows, with comment rows; your profile has a cover photo, camera buttons and an edit
+  sheet; comments show their author's photo and use one composer with a Replying-to bar; feed
+  photos open full screen with swipe and zoom. UI only, no reset.
+- **Polish pass (PR #171, 2026-11-16 8:01 pm Melbourne):** create flows ask one question per
+  step and preview the feed card before publishing; the map's filters are a bottom capsule;
+  Links and History show vote cards; signed-out visitors see no Notifications or Messages. UI
+  only, no reset.
 - **Plans, phases and feedback redrawn, Convert, profile covers and comment notes (PR #163,
   2026-11-16 7:25 pm Melbourne, live 7:39 pm; ADRs 0106, 0107):** the Plan, Phase and
   Feedback screens in the soft look; a phase-sheet vote converts a project into a new

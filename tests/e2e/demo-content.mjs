@@ -6,17 +6,22 @@
 // A new member can start 2 things (proposals, threads, help requests) a week, so the founders
 // start the rest. Their recovery phrases are written to `accounts file` so you can log in as them.
 //   node tests/e2e/demo-content.mjs <ui url> <accounts file>
-import { writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 
-import { BASE, browser, device, log, signUp } from './lib.mjs';
+import { BASE, browser, device, log, phraseSignIn, signUp } from './lib.mjs';
 import { approvePlan, daysFromNow, filePlan, signInFounders } from './event-flow.mjs';
 import * as s from './demo/steps.mjs';
 import * as c from './demo/social.mjs';
 
 const accountsFile = process.argv[3] ?? 'demo-accounts.json';
+// A second run signs in the people already in the accounts file, and skips the parts whose
+// names start with one of DEMO_SKIP's comma-separated words (what the first run made).
+const saved = existsSync(accountsFile) ? JSON.parse(readFileSync(accountsFile, 'utf8')) : [];
+const skip = (process.env.DEMO_SKIP ?? '').split(',').filter(Boolean);
 const phone = { width: 390, height: 844 };
 const failed = [];
 async function part(name, run) {
+  if (skip.some((word) => name.startsWith(word))) return log(`- ${name} (skipped)`);
   const start = Date.now();
   try {
     await run();
@@ -44,7 +49,9 @@ const accounts = [];
 for (const name of names) {
   await part(`sign up ${name}`, async () => {
     const page = await device({ viewport: phone });
-    const words = await signUp(page, name);
+    const had = saved.find((a) => a.name === name);
+    const words = had ? had.phrase.split(' ') : await signUp(page, name);
+    if (had) await phraseSignIn(page, words);
     people[name] = page;
     accounts.push({ name, phrase: words.join(' ') });
     writeFileSync(accountsFile, JSON.stringify(accounts, null, 2));

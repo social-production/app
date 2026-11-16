@@ -9,6 +9,8 @@ import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 export class BoardState {
   board = $state<Board | null>(null);
   people = $state<Record<string, Person>>({});
+  /** The viewer's key, so their row comes first and has no vote buttons. */
+  me = $state('');
   /** web's `canVolunteer`: Full standing (web's `ensure_established_voter`). */
   canVolunteer = $state(false);
   error = $state<string>();
@@ -18,6 +20,7 @@ export class BoardState {
       const board = await getBoard();
       const agents = [...board.moderators, ...board.candidates].map((m) => m.agent);
       const me = await myAgent().catch(() => '');
+      this.me = me;
       const missing = [...agents, me].filter(
         (a, i, all) => a && all.indexOf(a) === i && !this.people[a],
       );
