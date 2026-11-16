@@ -6,8 +6,8 @@
 // New message button (no receipts).
 //   node tests/e2e/messages.mjs http://localhost:4174 [screens dir]
 // It signs up two test accounts, so it may run against the live test network too.
-import assert from "node:assert/strict";
-import { mkdirSync } from "node:fs";
+import assert from 'node:assert/strict';
+import { mkdirSync } from 'node:fs';
 
 import {
   BASE,
@@ -18,9 +18,9 @@ import {
   messageFromProfile,
   signUp,
   startGroup,
-} from "./lib.mjs";
+} from './lib.mjs';
 
-const out = process.argv[3] ?? "screens";
+const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
 const phone = { width: 390, height: 844 };
 const stamp = Date.now().toString(36).slice(-5);
@@ -30,12 +30,10 @@ const answer = `Yes please, Ann ${stamp}`;
 const group = `Garden crew ${stamp}`;
 const kickoff = `Welcome to the crew ${stamp}`;
 
-const bubble = (page, text) =>
-  page.locator(".chat-log").getByText(text).first();
+const bubble = (page, text) => page.locator('.chat-log').getByText(text).first();
 const receipt = (page, text) =>
-  page.locator(".chat-message", { hasText: text }).first().locator(".receipt");
-const row = (page, name) =>
-  page.locator(".conversation-row", { hasText: name }).first();
+  page.locator('.chat-message', { hasText: text }).first().locator('.receipt');
+const row = (page, name) => page.locator('.conversation-row', { hasText: name }).first();
 const sendBadge = (page) =>
   page.locator('.mobile-bottom-nav a[aria-label="Messages"] .count-badge');
 
@@ -57,127 +55,87 @@ const bob = await device({ viewport: phone });
 await signUp(bob, bobName);
 // lib's keyOf opens Settings from the desktop rail; at phone width go there directly.
 await bob.goto(`${BASE}/settings`);
-const key = bob.locator("#settings-account .key");
+const key = bob.locator('#settings-account .key');
 await key.waitFor({ timeout: 60_000 });
 const bobKey = (await key.innerText()).trim();
-log("two accounts signed up");
+log('two accounts signed up');
 
 await ann.goto(`${BASE}/profile/${bobKey}`);
 await messageFromProfile(ann, bobName, hello, () =>
   ann.screenshot({ path: `${out}/phone390-dm-empty.png` }),
 );
 await bubble(ann, hello).waitFor({ timeout: 60_000 });
-assert.equal(
-  await ann.locator(".identity-title").innerText(),
-  bobName,
-  "the header names Bob",
-);
+assert.equal(await ann.locator('.identity-title').innerText(), bobName, 'the header names Bob');
 await receipt(ann, hello).waitFor({ timeout: 30_000 });
-assert.equal(
-  await receipt(ann, hello).getAttribute("aria-label"),
-  "Delivered",
-  "one tick: sent",
-);
+assert.equal(await receipt(ann, hello).getAttribute('aria-label'), 'Delivered', 'one tick: sent');
 await ann.screenshot({ path: `${out}/phone390-dm.png` });
-log("ann messaged bob from his profile");
+log('ann messaged bob from his profile');
 
 // The shell counts unread chat messages every 30 s (web's unreadCounts.messages).
 for (let i = 0; i < 12 && !(await sendBadge(bob).count()); i++) {
   await bob.goto(`${BASE}/`);
   await bob.waitForTimeout(10_000);
 }
-assert.equal(
-  await sendBadge(bob).innerText(),
-  "1",
-  "the send icon counts one unread message",
-);
+assert.equal(await sendBadge(bob).innerText(), '1', 'the send icon counts one unread message');
 await bob.screenshot({ path: `${out}/phone390-send-badge.png` });
-log("bob sees the count on the send icon");
+log('bob sees the count on the send icon');
 
 const annRow = await rowShows(bob, annName);
-assert.match(
-  await annRow.locator(".unread-pill").innerText(),
-  /^1$/,
-  "one unread message",
-);
+assert.match(await annRow.locator('.unread-pill').innerText(), /^1$/, 'one unread message');
 await bob.screenshot({ path: `${out}/phone390-messages-list.png` });
 await annRow.click();
 await bubble(bob, hello).waitFor({ timeout: 60_000 });
-await bob.getByRole("textbox", { name: "Write a message..." }).fill(answer);
-await bob.getByRole("button", { name: "Send", exact: true }).click();
+await bob.getByRole('textbox', { name: 'Write a message...' }).fill(answer);
+await bob.getByRole('button', { name: 'Send', exact: true }).click();
 await bubble(bob, answer).waitFor({ timeout: 30_000 });
-log("bob read it and replied");
+log('bob read it and replied');
 
-await bob.getByRole("button", { name: "Back to chats" }).click();
-await sendBadge(bob).waitFor({ state: "detached", timeout: 30_000 });
-log("reading it cleared the count");
+await bob.getByRole('button', { name: 'Back to chats' }).click();
+await sendBadge(bob).waitFor({ state: 'detached', timeout: 30_000 });
+log('reading it cleared the count');
 
 await bubble(ann, answer).waitFor({ timeout: 90_000 });
-log("ann sees the reply");
+log('ann sees the reply');
 await receipt(ann, hello)
   .and(ann.locator('[aria-label="Read"]'))
   .waitFor({ timeout: 90_000 });
-assert.equal(
-  await receipt(ann, hello).innerText(),
-  "✓✓",
-  "two ticks: Bob read it",
-);
+assert.equal(await receipt(ann, hello).innerText(), '✓✓', 'two ticks: Bob read it');
 await ann.screenshot({ path: `${out}/phone390-dm-read.png` });
 log("ann's message shows bob read it");
 
 // web's bubble menu Report in a direct chat: the reporter's yes is the one vote it needs.
-await ann
-  .locator(".chat-message", { hasText: answer })
-  .first()
-  .locator(".message-time")
-  .click();
-await ann.getByRole("menuitem", { name: "Report", exact: true }).click();
-const composer = ann.locator(".report-composer");
-await composer.getByLabel("What's wrong?").fill("Testing a report.");
-await composer.getByRole("button", { name: "Send report" }).click();
-await composer.getByRole("button", { name: "Done" }).click();
-await ann
-  .locator(".chat-log")
-  .getByText("Removed for spam")
-  .waitFor({ timeout: 60_000 });
-assert.equal(
-  await ann.locator(".chat-log").getByText(answer).count(),
-  0,
-  "the text is gone",
-);
+await ann.locator('.chat-message', { hasText: answer }).first().locator('.message-time').click();
+await ann.getByRole('menuitem', { name: 'Report', exact: true }).click();
+const composer = ann.locator('.report-composer');
+await composer.getByLabel("What's wrong?").fill('Testing a report.');
+await composer.getByRole('button', { name: 'Send report' }).click();
+await composer.getByRole('button', { name: 'Done' }).click();
+await ann.locator('.chat-log').getByText('Removed for spam').waitFor({ timeout: 60_000 });
+assert.equal(await ann.locator('.chat-log').getByText(answer).count(), 0, 'the text is gone');
 await ann.screenshot({ path: `${out}/phone390-dm-report.png` });
 await (await rowShows(bob, annName)).click();
-await bob
-  .locator(".chat-log")
-  .getByText("Removed for spam")
-  .waitFor({ timeout: 120_000 });
-await bob.getByRole("button", { name: "Back to chats" }).click();
+await bob.locator('.chat-log').getByText('Removed for spam').waitFor({ timeout: 120_000 });
+await bob.getByRole('button', { name: 'Back to chats' }).click();
 log("ann reported bob's reply: removed for both");
 
-await ann.getByRole("button", { name: "Back to chats" }).click();
-await ann.getByRole("button", { name: "New message" }).click();
-await ann.getByRole("heading", { name: "New message" }).waitFor();
-await ann
-  .locator(".new-message .person-row", { hasText: bobName })
-  .waitFor({ timeout: 120_000 });
+await ann.getByRole('button', { name: 'Back to chats' }).click();
+await ann.getByRole('button', { name: 'New message' }).click();
+await ann.getByRole('heading', { name: 'New message' }).waitFor();
+await ann.locator('.new-message .person-row', { hasText: bobName }).waitFor({ timeout: 120_000 });
 await ann.screenshot({ path: `${out}/phone390-new-message.png` });
-await ann.getByRole("button", { name: "Back", exact: true }).click();
+await ann.getByRole('button', { name: 'Back', exact: true }).click();
 await startGroup(ann, group, [bobName], kickoff, (step) =>
   ann.screenshot({ path: `${out}/phone390-new-group-${step}.png` }),
 );
 await bubble(ann, kickoff).waitFor({ timeout: 60_000 });
-assert.equal(
-  await receipt(ann, kickoff).count(),
-  0,
-  "groups have no read receipts, as on web",
-);
-log("ann started a group");
+assert.equal(await receipt(ann, kickoff).count(), 0, 'groups have no read receipts, as on web');
+log('ann started a group');
 
 await (await rowShows(bob, group)).click();
 await bubble(bob, kickoff).waitFor({ timeout: 60_000 });
 await bob.screenshot({ path: `${out}/phone390-group.png` });
-log("bob is in the group");
+log('bob is in the group');
 
-assert.deepEqual(errors, [], "no page errors");
-log("all M4c messages checks passed");
+assert.deepEqual(errors, [], 'no page errors');
+log('all M4c messages checks passed');
 await browser.close();

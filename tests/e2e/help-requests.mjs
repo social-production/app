@@ -7,254 +7,157 @@
 // Then founder one shares it with them from web's Share menu: they get the link in a direct
 // chat and web's "A help request was shared with you." notification, which opens it.
 //   node tests/e2e/help-requests.mjs http://localhost:4174 [screenshot dir]
-import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 
-import {
-  BASE,
-  browser,
-  device,
-  errors,
-  log,
-  phraseSignIn,
-  rail,
-  railShows,
-  signUp,
-  tagTestChannel,
-  TEST_CHANNEL,
-  feedChoice,
-} from "./lib.mjs";
+import { BASE, browser, device, errors, log, phraseSignIn, rail, railShows, signUp, tagTestChannel, TEST_CHANNEL, feedChoice } from './lib.mjs';
 
-const [one] = JSON.parse(
-  readFileSync(new URL("./fixtures/dev-founders.json", import.meta.url)),
-);
+const [one] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
 const title = `Lift to the station ${stamp}`;
 
 const ann = await device({ viewport: { width: 390, height: 844 } });
-await phraseSignIn(ann, one.phrase.split(" "));
+await phraseSignIn(ann, one.phrase.split(' '));
 await ann.goto(BASE);
-await ann.getByRole("button", { name: "Create", exact: true }).click();
-await ann.getByRole("menuitem", { name: /^Request/ }).click();
-const next = () => ann.getByRole("button", { name: "Continue" }).click();
+await ann.getByRole('button', { name: 'Create', exact: true }).click();
+await ann.getByRole('menuitem', { name: /^Request/ }).click();
+const next = () => ann.getByRole('button', { name: 'Continue' }).click();
 await ann.getByLabel(/^Title/).fill(title);
-await ann
-  .getByLabel("What do you need?")
-  .fill("Friday morning, with a suitcase.");
+await ann.getByLabel('What do you need?').fill('Friday morning, with a suitcase.');
 await next(); // → Location (physical)
-await ann.getByLabel("Place").fill("Allotment gate");
+await ann.getByLabel('Place').fill('Allotment gate');
 await next(); // → Timing (two hours from now, for two hours)
 await next(); // → Scope
 await tagTestChannel(ann);
 await next(); // → Roles
-await ann.getByLabel("Role title").fill("Driver");
-await ann.getByLabel("Role details").fill("A car with a big boot.");
-await ann.getByRole("button", { name: "Add a role" }).click();
-await ann.getByLabel("Role title").nth(1).fill("Company");
-await ann.getByLabel("People needed", { exact: true }).nth(1).fill("0");
+await ann.getByLabel('Role title').fill('Driver');
+await ann.getByLabel('Role details').fill('A car with a big boot.');
+await ann.getByRole('button', { name: 'Add a role' }).click();
+await ann.getByLabel('Role title').nth(1).fill('Company');
+await ann.getByLabel('People needed', { exact: true }).nth(1).fill('0');
 await next(); // → Overview
-await ann.locator(".overview-row", { hasText: "Driver, Company" }).waitFor();
-await ann.getByRole("button", { name: "Publish help request" }).click();
-await ann.getByRole("heading", { name: title }).waitFor({ timeout: 120_000 });
+await ann.locator('.overview-row', { hasText: 'Driver, Company' }).waitFor();
+await ann.getByRole('button', { name: 'Publish help request' }).click();
+await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.match(ann.url(), /\/help-requests\//);
 const url = ann.url();
-await ann
-  .locator(".role-bar", { hasText: "Driver" })
-  .waitFor({ timeout: 120_000 });
-await ann.getByText("Allotment gate").first().waitFor();
-log("founder one asked for help");
+await ann.locator('.role-bar', { hasText: 'Driver' }).waitFor({ timeout: 120_000 });
+await ann.getByText('Allotment gate').first().waitFor();
+log('founder one asked for help');
 
 const helper = await device();
 await signUp(helper, `Helper${stamp}`);
-let profile = "";
+let profile = '';
 // The feed card: when, where and sign-ups (the index reads new spaces within a minute).
 for (let i = 0; ; i++) {
   await helper.goto(BASE);
-  await feedChoice(helper, "Sort public feed by", "Most recent");
-  await helper
-    .locator(".surface")
-    .first()
-    .waitFor({ timeout: 60_000 })
-    .catch(() => {});
-  const card = helper.locator(".help-request-card", { hasText: title });
+  await feedChoice(helper, 'Sort public feed by', 'Most recent');
+  await helper.locator('.surface').first().waitFor({ timeout: 60_000 }).catch(() => {});
+  const card = helper.locator('.help-request-card', { hasText: title });
   if (await card.count()) {
-    await card.getByText("0 signed up · 1 needed").waitFor();
+    await card.getByText('0 signed up · 1 needed').waitFor();
     // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
     // the asker's profile, which lists the request.
-    await helper.goto(
-      `${BASE}${await card.locator("a.title").getAttribute("href")}`,
-    );
-    const author = helper.locator(".detail-by a").first();
+    await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
+    const author = helper.locator('.detail-by a').first();
     await author.waitFor({ timeout: 60_000 });
-    profile = await author.getAttribute("href");
+    profile = await author.getAttribute('href');
     break;
   }
-  if (i >= 40) throw new Error("the help request never reached the feed");
+  if (i >= 40) throw new Error('the help request never reached the feed');
   await helper.waitForTimeout(3000);
 }
-log("the feed shows its card");
+log('the feed shows its card');
 assert.match(profile, /^\/profile\//);
 await helper.goto(`${BASE}${profile}`);
 // Profiles show the Global row (Profiles and Comments mockups §1): no author line on it.
-const personal = helper.locator(".feed-stack .help-request-card", {
-  hasText: title,
-});
+const personal = helper.locator('.feed-stack .help-request-card', { hasText: title });
 await personal.waitFor({ timeout: 60_000 });
-await personal.getByText("0 signed up · 1 needed").waitFor();
-await personal.getByText("Allotment gate", { exact: false }).waitFor();
-assert.equal(
-  await personal.locator(".feed-context").count(),
-  0,
-  "a profile names no author",
-);
-if (process.argv[3])
-  await helper.screenshot({
-    path: `${process.argv[3]}/profile-help-request.png`,
-  });
-log("the asker's profile shows it on the feed row");
+await personal.getByText('0 signed up · 1 needed').waitFor();
+await personal.getByText('Allotment gate', { exact: false }).waitFor();
+assert.equal(await personal.locator('.feed-context').count(), 0, 'a profile names no author');
+if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/profile-help-request.png` });
+log('the asker\'s profile shows it on the feed row');
 // The helper joins the channel the request is tagged with: the rail lists it as open help.
 await helper.goto(`${BASE}/channels/${TEST_CHANNEL}`);
-await helper.getByRole("button", { name: `Join ${TEST_CHANNEL}` }).click();
-await helper
-  .getByRole("button", { name: `Leave ${TEST_CHANNEL}` })
-  .waitFor({ timeout: 120_000 });
+await helper.getByRole('button', { name: `Join ${TEST_CHANNEL}` }).click();
+await helper.getByRole('button', { name: `Leave ${TEST_CHANNEL}` }).waitFor({ timeout: 120_000 });
 const helpRow = (page, text) =>
-  rail(page)
-    .locator(".rail-section-help-requests .help-request-row", {
-      hasText: title,
-    })
-    .filter({ hasText: text });
-await railShows(
-  helper,
-  () => helpRow(helper, "0 signed up · 1 needed"),
-  "the open help request",
-  20_000,
-);
+  rail(page).locator('.rail-section-help-requests .help-request-row', { hasText: title }).filter({ hasText: text });
+await railShows(helper, () => helpRow(helper, '0 signed up · 1 needed'), 'the open help request', 20_000);
 assert.match(await helpRow(helper, title).innerText(), /help request/i);
-assert.match(
-  await helpRow(helper, title).innerText(),
-  /Friday morning, with a suitcase\./,
-);
-if (process.argv[3])
-  await helper.screenshot({ path: `${process.argv[3]}/rail-help-open.png` });
-await helpRow(helper, title).locator(".activity-open-button").click();
+assert.match(await helpRow(helper, title).innerText(), /Friday morning, with a suitcase\./);
+if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/rail-help-open.png` });
+await helpRow(helper, title).locator('.activity-open-button').click();
 await helper.waitForURL(/\/help-requests\//, { timeout: 60_000 });
 assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);
 log("the helper's rail lists it as open help in their channel");
 
 await helper.goto(url);
-const driver = helper.locator(".role-bar", { hasText: "Driver" });
+const driver = helper.locator('.role-bar', { hasText: 'Driver' });
 await driver.waitFor({ timeout: 120_000 });
-await driver.getByRole("button", { name: "Join", exact: true }).click();
-await driver
-  .getByRole("button", { name: "Leave" })
-  .waitFor({ timeout: 60_000 });
-await driver
-  .locator(".role-copy span", { hasText: /^1 needed · (?!nobody)/ })
-  .waitFor();
-log("a helper signed up as driver");
+await driver.getByRole('button', { name: 'Join', exact: true }).click();
+await driver.getByRole('button', { name: 'Leave' }).waitFor({ timeout: 60_000 });
+await driver.locator('.role-copy span', { hasText: /^1 needed · (?!nobody)/ }).waitFor();
+log('a helper signed up as driver');
 // Stay on the page until the sign-up shows (above), then the rail reads it.
-await railShows(
-  helper,
-  () => helpRow(helper, "You signed up"),
-  "the signed-up help request",
-  20_000,
-);
-assert.match(
-  await helpRow(helper, "You signed up").innerText(),
-  /1 signed up · 1 needed/,
-);
-log("the rail says the helper signed up");
+await railShows(helper, () => helpRow(helper, 'You signed up'), 'the signed-up help request', 20_000);
+assert.match(await helpRow(helper, 'You signed up').innerText(), /1 signed up · 1 needed/);
+log('the rail says the helper signed up');
 await helper.goto(url);
 await driver.waitFor({ timeout: 120_000 });
 
 for (let i = 0; ; i++) {
   await ann.goto(url);
-  const full = ann
-    .locator(".role-bar", { hasText: "Driver" })
-    .getByRole("button", { name: "Full" });
-  await ann
-    .locator(".role-bar", { hasText: "Driver" })
-    .waitFor({ timeout: 120_000 });
+  const full = ann.locator('.role-bar', { hasText: 'Driver' }).getByRole('button', { name: 'Full' });
+  await ann.locator('.role-bar', { hasText: 'Driver' }).waitFor({ timeout: 120_000 });
   if (await full.count()) break;
-  if (i >= 40) throw new Error("the driver role never showed as full");
+  if (i >= 40) throw new Error('the driver role never showed as full');
   await ann.waitForTimeout(3000);
 }
-log("the asker sees the driver role full");
-await railShows(
-  ann,
-  () => helpRow(ann, "Your request"),
-  "the asker's help request",
-  60_000,
-);
+log('the asker sees the driver role full');
+await railShows(ann, () => helpRow(ann, 'Your request'), "the asker's help request", 60_000);
 log("the asker's rail lists it as their request");
 await ann.goto(url);
 
-await driver.getByRole("button", { name: "Leave" }).click();
-await driver
-  .getByRole("button", { name: "Join", exact: true })
-  .waitFor({ timeout: 60_000 });
-log("the helper left the role");
+await driver.getByRole('button', { name: 'Leave' }).click();
+await driver.getByRole('button', { name: 'Join', exact: true }).waitFor({ timeout: 60_000 });
+log('the helper left the role');
 
 // web's Share menu: share outside the app (Copy link), then send to the helper by name.
 await ann.goto(url);
-await ann.getByRole("button", { name: "Share help request" }).click();
-await ann.getByRole("button", { name: "Copy link" }).waitFor();
-const search = ann.locator("#share-people-search");
+await ann.getByRole('button', { name: 'Share help request' }).click();
+await ann.getByRole('button', { name: 'Copy link' }).waitFor();
+const search = ann.locator('#share-people-search');
 // The directory may take a moment to list someone who just signed up.
 for (let i = 0; ; i++) {
-  await search.fill("");
+  await search.fill('');
   await search.fill(`Helper${stamp}`);
-  const row = ann
-    .locator(".contact-row", { hasText: `Helper${stamp}` })
-    .first();
-  if (
-    await row.waitFor({ timeout: 5_000 }).then(
-      () => true,
-      () => false,
-    )
-  ) {
+  const row = ann.locator('.contact-row', { hasText: `Helper${stamp}` }).first();
+  if (await row.waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
     await row.click();
     break;
   }
-  if (i >= 30) throw new Error("the helper never appeared in the share search");
+  if (i >= 30) throw new Error('the helper never appeared in the share search');
 }
-await ann.getByRole("button", { name: "Send", exact: true }).click();
-await search.waitFor({ state: "detached", timeout: 120_000 });
-log("founder one shared it with the helper");
+await ann.getByRole('button', { name: 'Send', exact: true }).click();
+await search.waitFor({ state: 'detached', timeout: 120_000 });
+log('founder one shared it with the helper');
 
-const shared = helper.locator(".notification-card", {
-  hasText: "A help request was shared with you.",
-});
+const shared = helper.locator('.notification-card', { hasText: 'A help request was shared with you.' });
 for (let i = 0; ; i++) {
   await helper.goto(`${BASE}/notifications`);
-  await helper
-    .getByRole("heading", { name: "Notifications" })
-    .waitFor({ timeout: 60_000 });
-  if (
-    await shared
-      .first()
-      .waitFor({ timeout: 9_000 })
-      .then(
-        () => true,
-        () => false,
-      )
-  )
-    break;
-  if (i >= 40) throw new Error("the share never reached the helper");
+  await helper.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
+  if (await shared.first().waitFor({ timeout: 9_000 }).then(() => true, () => false)) break;
+  if (i >= 40) throw new Error('the share never reached the helper');
 }
 await shared.first().getByText(title).waitFor();
-assert.match(
-  await shared.first().locator(".note-by").innerText(),
-  /^Help request · /,
-);
+assert.match(await shared.first().locator('.note-by').innerText(), /^Help request · /);
 await shared.first().click();
-await helper
-  .getByRole("heading", { name: title })
-  .waitFor({ timeout: 120_000 });
+await helper.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);
-log("the helper opened it from the notification");
+log('the helper opened it from the notification');
 
 assert.deepEqual(errors, []);
 await browser.close();
-log("help-requests: ok");
+log('help-requests: ok');
