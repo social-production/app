@@ -2,9 +2,9 @@
   import LinkComposer from '#lib/components/links/LinkComposer.svelte';
   import LinkRequestsSection from '#lib/components/links/LinkRequestsSection.svelte';
   import LinksSection from '#lib/components/links/LinksSection.svelte';
-  import LinkVoteHistory from '#lib/components/links/LinkVoteHistory.svelte';
+  import LinksPast from '#lib/components/links/LinksPast.svelte';
+  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
   import { LINKS_INTRO } from '#lib/domain/links.ts';
-  import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
   import { LinksState } from './linksState.svelte.ts';
@@ -12,8 +12,9 @@
   import '#lib/components/styles/links.css';
 
   /**
-   * web's DetailLinksTab for projects: the venue, active links, pending requests, historical
-   * links and past votes. Events and conversions arrive with their own screens.
+   * web's DetailLinksTab for projects (Polish Pass mockups, 2026-11-16): Propose a link at the
+   * top, the venue as a place row that opens the map, linked projects as rows, open votes as
+   * cards, and past links and votes folded away.
    */
   interface Props {
     detail: DetailState;
@@ -33,36 +34,28 @@
   const frame = $derived(links.frame);
   const venue = $derived(detail.project?.charter?.location_label.trim() ?? '');
 
-  /** web's Venue `onOpen`: a plain click opens the app's map on the place (ADR 0085). */
-  function showVenue(event: MouseEvent): void {
-    if (event.metaKey || event.ctrlKey || event.shiftKey) return;
-    event.preventDefault();
-    openPlaceOnMap(venue);
-  }
-
   async function submit(targetId: string, summary: string): Promise<void> {
     if (await links.propose(targetId, summary)) composing = false;
   }
 </script>
 
 <section class="links-tab">
-  <header class="intro">
-    <h1>Links</h1>
-    <p>{LINKS_INTRO}</p>
+  <header class="links-top">
+    <p class="links-intro">{LINKS_INTRO}</p>
+    {#if frame?.canPropose}
+      <button
+        class="propose-link-button"
+        type="button"
+        onclick={() => {
+          links.composerMessage = undefined;
+          composing = true;
+        }}>+ Propose a link</button
+      >
+    {/if}
   </header>
 
   {#if venue && venue.toLowerCase() !== 'online'}
-    <section class="external-links">
-      <a
-        class="external-link"
-        href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(venue)}`}
-        rel="noopener noreferrer"
-        onclick={showVenue}
-      >
-        <strong>Venue</strong>
-        <span>{venue}</span>
-      </a>
-    </section>
+    <div class="links-venue"><PlaceRow place={venue} /></div>
   {/if}
 
   {#if links.error}<p class="tab-loading" role="alert">{links.error}</p>{/if}
@@ -71,10 +64,8 @@
     <p class="tab-loading">Loading links…</p>
   {:else}
     <LinksSection
-      title="Active links"
-      description=""
       items={frame.active}
-      emptyMessage="No active links yet."
+      names={links.names}
       allowSever={frame.canPropose}
       pendingId={links.pendingId}
       {highlight}
@@ -84,24 +75,11 @@
     <LinkRequestsSection
       requests={frame.pending}
       names={links.names}
-      canPropose={frame.canPropose}
       pendingId={links.pendingId}
       {highlight}
-      onCompose={() => {
-        links.composerMessage = undefined;
-        composing = true;
-      }}
       onVote={(id, side, choice) => void links.vote(id, side, choice)}
     />
-    <LinksSection
-      title="Past links"
-      description=""
-      items={frame.historical}
-      emptyMessage="No historical links yet."
-      allowSever={false}
-      pendingId={null}
-    />
-    <LinkVoteHistory requests={frame.past} names={links.names} />
+    <LinksPast links={frame.historical} votes={frame.past} names={links.names} />
   {/if}
 </section>
 

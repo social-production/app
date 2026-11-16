@@ -46,6 +46,9 @@
           /></svg
         >
         <span>{where}</span>
+        <svg class="card-place-go" aria-hidden="true" viewBox="0 0 24 24"
+          ><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14" /></svg
+        >
       </a>
     {:else if where}
       <p class="card-when">{where}</p>

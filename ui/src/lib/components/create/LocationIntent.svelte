@@ -1,5 +1,6 @@
 <script lang="ts">
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
+  import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { PlaceValue } from '#lib/domain/places.ts';
   import type { LocationChoice } from '#lib/domain/projects.ts';
 
@@ -25,40 +26,31 @@
     search,
     failure,
     allowLater = true,
-    helperText = 'A physical location helps people discover this on the map. You can change it later.',
+    helperText = 'People nearby will find it on the map. You can change the place later.',
   }: Props = $props();
 
-  const choices: { value: LocationChoice; title: string; hint: string }[] = [
-    {
-      value: 'physical',
-      title: 'Physical',
-      hint: 'Discoverable on the map once coordinates are set.',
-    },
-    { value: 'online', title: 'Online', hint: 'Not shown as a map pin.' },
+  // Polish Pass mockups: three words in one segmented control, and one line that says
+  // what the choice means.
+  const choices: { value: LocationChoice; label: string; hint: string }[] = [
+    { value: 'physical', label: 'In person', hint: '' },
+    { value: 'online', label: 'Online', hint: 'It will not show on the map.' },
     {
       value: 'later',
-      title: 'Decide later',
-      hint: 'Create now, add a place later. Not map-discoverable yet.',
+      label: 'Not yet',
+      hint: 'Add a place later. Until then it is not on the map.',
     },
   ];
+  const shown = $derived(choices.filter((c) => allowLater || c.value !== 'later'));
+  const hint = $derived(choices.find((c) => c.value === intent)?.hint || helperText);
 </script>
 
 <div class="location-intent">
-  <p class="helper">{helperText}</p>
-  <div class="intent-row" role="radiogroup" aria-label="Location intent">
-    {#each choices.filter((c) => allowLater || c.value !== 'later') as choice (choice.value)}
-      <label class="intent-option">
-        <input
-          type="radio"
-          name="location-intent"
-          value={choice.value}
-          checked={intent === choice.value}
-          onchange={() => onIntent(choice.value)}
-        />
-        <span><strong>{choice.title}</strong><span class="hint">{choice.hint}</span></span>
-      </label>
-    {/each}
-  </div>
+  <SegmentedChoice
+    value={intent}
+    ariaLabel="Location intent"
+    options={shown.map((c) => ({ value: c.value, label: c.label }))}
+    onChange={onIntent}
+  />
   {#if intent === 'physical'}
     <LocationPicker
       value={place}
@@ -69,4 +61,5 @@
       {failure}
     />
   {/if}
+  <p class="helper">{hint}</p>
 </div>

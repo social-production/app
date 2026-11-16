@@ -323,10 +323,6 @@
   content: 'Reply';
 }
 
-.shell .comment-card.reply-open > .comment-self .actions-row .reply-button::after {
-  content: 'Cancel';
-}
-
 .shell .comment-card .actions-row,
 .shell .comment-card.flat .actions-row {
   display: flex;

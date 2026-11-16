@@ -1,15 +1,13 @@
 <script lang="ts">
-  import ScopeTagSelector from '#lib/components/create/ScopeTagSelector.svelte';
-  import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
-  import { scopeTag, tagScope, type ScopeKind } from '#lib/domain/scopes.ts';
+  import { scopeTag, tagScope, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
   import { listScopes } from '#lib/services/scopes.ts';
 
   /**
-   * web's create-flow scope steps (ADR 0068). Tags are `#channel` / `@community`; a primary
-   * tag leads. Each flow keeps web's own layout:
-   * - `project`: a primary channel, then (on request) more channels and communities;
-   * - `event`: channel tags, then (on request) community tags; no primary tag;
-   * - `thread` / `help`: the primary tag's type, then additional channels and communities.
+   * The create flows' channel and community step (ADR 0068; Polish Pass mockups, 2026-11-16):
+   * one search finds both, ticking a row adds it, and the chosen ones sit above as chips. Tags
+   * are `#channel` / `@community`; the first is the main one ("primary tag"), except for an
+   * event, which has none. A proposal's main tag must be a channel, so its first channel
+   * always leads.
    */
   type Variant = 'project' | 'event' | 'thread' | 'help';
 
@@ -21,126 +19,115 @@
 
   let { tags, onChange, variant = 'project' }: Props = $props();
 
-  const kindOf = (t: string) => tagScope(t)?.kind;
-  const choosePrimary = $derived(variant === 'thread' || variant === 'help');
-  let primaryKind = $state<ScopeKind>('channel');
-  const primary = $derived(
-    variant !== 'event' && tags[0] && kindOf(tags[0]) === primaryKind ? tags[0] : null,
-  );
-  const rest = $derived(tags.filter((t) => t !== primary));
-  const channels = $derived(rest.filter((t) => kindOf(t) === 'channel'));
-  const communities = $derived(rest.filter((t) => kindOf(t) === 'community'));
-  // web opens the extra fields when they already hold tags (coming back to the step).
-  // svelte-ignore state_referenced_locally
-  let showMore = $state(variant === 'event' ? communities.length > 0 : rest.length > 0);
-  const item = (tag: string) => ({ key: tag, label: tag.slice(1) });
+  let query = $state('');
+  let results = $state<Scope[]>([]);
+  let searching = $state(false);
+  let asked = 0;
 
-  const COPY = {
-    help: {
-      primaryHelp: 'Required. Help requests must be tagged like threads.',
-      channel: 'Type to add another channel',
-      community: 'Type to add another community',
-      extraHelp: 'Optional.',
-    },
-    thread: { primaryHelp: 'Required.', channel: 'Optional', community: 'Optional', extraHelp: '' },
-    project: {
-      primaryHelp: 'At least one channel tag is required.',
-      channel: 'Optional',
-      community: 'Optional',
-      extraHelp: '',
-    },
+  const kindOf = (t: string): ScopeKind | undefined => tagScope(t)?.kind;
+  const nameOf = (t: string) => t.slice(1);
+  const hasMain = $derived(variant !== 'event');
+
+  const HINTS: Record<Variant, string> = {
+    project: 'Pick at least one channel. The first channel is its main one.',
+    thread: 'Pick at least one. The first is where it mainly lives.',
+    help: 'Pick at least one. Requests are tagged like threads; the first is the main one.',
+    event: 'Pick the channels people follow, and any communities.',
   };
-  const copy = $derived(COPY[variant === 'event' ? 'project' : variant]);
 
-  const search = (kind: ScopeKind) => async (q: string) =>
-    (await listScopes(q, 8))
-      .filter((s) => s.kind === kind)
-      .map((s) => ({ key: scopeTag(kind, s.slug), label: s.handle }));
+  $effect(() => {
+    const q = query;
+    const mine = ++asked;
+    searching = true;
+    const timer = setTimeout(() => {
+      void listScopes(q, 12)
+        .then((found) => {
+          if (mine === asked) results = found;
+        })
+        .catch(() => mine === asked && (results = []))
+        .finally(() => mine === asked && (searching = false));
+    }, 250);
+    return () => clearTimeout(timer);
+  });
 
-  function add(tag: string, first = false): void {
-    if (tags.includes(tag)) return;
-    onChange(first ? [tag, ...tags] : [...tags, tag]);
+  function toggle(scope: Scope): void {
+    const tag = scopeTag(scope.kind, scope.slug);
+    if (tags.includes(tag)) return onChange(tags.filter((t) => t !== tag));
+    // A proposal's first channel leads, so its main tag is always a channel.
+    const leads =
+      variant === 'project' &&
+      scope.kind === 'channel' &&
+      !tags.some((t) => kindOf(t) === 'channel');
+    onChange(leads ? [tag, ...tags] : [...tags, tag]);
   }
+
   const remove = (tag: string) => onChange(tags.filter((t) => t !== tag));
 </script>
 
-<div class="form-stack">
-  {#if variant === 'event'}
-    <ScopeTagSelector
-      label="Channel tags"
-      placeholder="Type to add a channel tag"
-      selected={channels.map(item)}
-      search={search('channel')}
-      onAdd={(t) => add(t)}
-      onRemove={remove}
+<div class="tag-step">
+  <label class="tag-search">
+    <svg aria-hidden="true" viewBox="0 0 24 24"
+      ><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg
+    >
+    <input
+      bind:value={query}
+      aria-label="Search channels and communities"
+      placeholder="Search channels and communities"
+      autocomplete="off"
     />
-    <label class="scope-more-toggle">
-      <input bind:checked={showMore} type="checkbox" />
-      <span>Add communities</span>
-    </label>
-    {#if showMore}
-      <ScopeTagSelector
-        label="Community tags"
-        placeholder="Type to add a community tag"
-        selected={communities.map(item)}
-        search={search('community')}
-        onAdd={(t) => add(t)}
-        onRemove={remove}
-      />
-    {/if}
-  {:else}
-    {#if variant === 'thread'}
-      <p class="helper-text">Choose one primary tag so people can discover this thread.</p>
-    {/if}
-    {#if choosePrimary}
-      <label>
-        {#if variant === 'help'}
-          <RequiredLabel>Primary tag type</RequiredLabel>
-        {:else}
-          <span class="field-label">Primary tag type</span>
-        {/if}
-        <select bind:value={primaryKind}>
-          <option value="channel">Channel</option>
-          <option value="community">Community</option>
-        </select>
-      </label>
-    {/if}
-    <ScopeTagSelector
-      label={primaryKind === 'community' ? 'Primary community tag' : 'Primary channel tag'}
-      placeholder={primaryKind === 'community'
-        ? 'Type to search communities'
-        : 'Type to search channels'}
-      helperText={copy.primaryHelp}
-      selected={primary ? [item(primary)] : []}
-      search={search(primaryKind)}
-      onAdd={(t) => add(t, true)}
-      onRemove={remove}
-    />
-    {#if !choosePrimary}
-      <label class="scope-more-toggle">
-        <input bind:checked={showMore} type="checkbox" />
-        <span>Add more channels or communities</span>
-      </label>
-    {/if}
-    {#if showMore || choosePrimary}
-      <ScopeTagSelector
-        label="Additional channel tags"
-        placeholder={copy.channel}
-        helperText={copy.extraHelp}
-        selected={channels.map(item)}
-        search={search('channel')}
-        onAdd={(t) => add(t)}
-        onRemove={remove}
-      />
-      <ScopeTagSelector
-        label={choosePrimary ? 'Additional community tags' : 'Community tags'}
-        placeholder={copy.community}
-        helperText={copy.extraHelp}
-        selected={communities.map(item)}
-        search={search('community')}
-        onAdd={(t) => add(t)}
-        onRemove={remove}
-      />
-    {/if}
+  </label>
+
+  {#if tags.length > 0}
+    <ul class="tag-chips" aria-label="Chosen">
+      {#each tags as tag, i (tag)}
+        <li class="tag-chip">
+          <span>{kindOf(tag) === 'community' ? '' : '#'}{nameOf(tag)}</span>
+          {#if hasMain && i === 0}<small>main</small>{/if}
+          <button type="button" aria-label={`Remove ${nameOf(tag)}`} onclick={() => remove(tag)}
+            >×</button
+          >
+        </li>
+      {/each}
+    </ul>
   {/if}
+
+  <p class="tag-hint">{HINTS[variant]}</p>
+
+  <div
+    class="tag-results"
+    role="listbox"
+    aria-multiselectable="true"
+    aria-label="Channels and communities"
+  >
+    {#each results as scope (scope.id)}
+      {@const on = tags.includes(scopeTag(scope.kind, scope.slug))}
+      <button
+        type="button"
+        role="option"
+        aria-selected={on}
+        aria-label={scope.handle}
+        class="tag-result"
+        class:on
+        onclick={() => toggle(scope)}
+      >
+        <span class="tag-glyph" class:community={scope.kind === 'community'}
+          >{scope.kind === 'community' ? scope.handle.charAt(0).toUpperCase() : '#'}</span
+        >
+        <span class="tag-copy">
+          <strong>{scope.handle}</strong>
+          <small
+            >{scope.kind === 'community' ? 'Community' : 'Channel'} · {scope.members}
+            {scope.members === 1 ? 'member' : 'members'}</small
+          >
+        </span>
+        <span class="tag-tick" aria-hidden="true"
+          >{#if on}✓{/if}</span
+        >
+      </button>
+    {:else}
+      <p class="tag-empty">
+        {searching ? 'Searching…' : query ? `Nothing called "${query}" yet.` : ''}
+      </p>
+    {/each}
+  </div>
 </div>

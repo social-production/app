@@ -32,7 +32,7 @@ await page.getByLabel('What do you propose?').fill('Tools for the street.');
 await next(); // → Tags
 await tagTestChannel(page);
 await next(); // → Location
-await page.getByRole('radio', { name: /Physical/ }).check();
+await page.getByRole('radio', { name: 'In person' }).check();
 await page.getByRole('textbox', { name: 'Place' }).fill('Fitzroy Melbourne');
 await page.locator('.location-picker .suggestions button').first().click({ timeout: 30_000 });
 await next(); // → Overview
@@ -47,15 +47,13 @@ await setDefaultPlace(page, 'Fitzroy Melbourne');
 // The feed's Region scope, from the default place; the index lists the project once read.
 await page.goto(BASE);
 await feedScope(page, 'Region');
-const place = page.locator('.feed-page .place-search input');
-await page.waitForFunction((el) => el?.value.includes('Fitzroy'), await place.elementHandle(), {
-  timeout: 30_000,
-});
+// Region's place line ("Near Fitzroy … · 25 km") opens the sheet with the place field.
+await page.locator('.feed-page .region-near', { hasText: 'Fitzroy' }).waitFor({ timeout: 30_000 });
 const card = page.locator('.feed-page .stack .surface', { hasText: title });
 for (let i = 0; i < 45 && !(await card.count()); i++) {
   await page.waitForTimeout(8_000);
   await page.reload();
-  await page.locator('.feed-page .feed-region-row').waitFor({ timeout: 60_000 });
+  await page.locator('.feed-page .region-near').waitFor({ timeout: 60_000 });
 }
 await card.first().waitFor({ timeout: 30_000 });
 await page.screenshot({ path: `${out}/region-feed-390.png` });
@@ -74,7 +72,7 @@ log('Open as list shows Region on the map’s place');
 // The project's Venue link opens the app's map there (not OpenStreetMap).
 await page.goto(projectUrl);
 await page.getByRole('tab', { name: 'Links' }).click();
-await page.locator('.links-tab .external-link', { hasText: 'Venue' }).click();
+await page.locator('.links-tab .detail-place').click();
 await page.locator('.map-overlay .map-panel').waitFor({ timeout: 30_000 });
 await page.locator('.map-overlay .map-discovery-card', { hasText: title }).waitFor({ timeout: 60_000 });
 assert.ok(page.url().startsWith(projectUrl.split('?')[0]), 'the page stays');

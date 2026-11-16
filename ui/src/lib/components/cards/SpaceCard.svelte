@@ -10,17 +10,19 @@
   interface Props {
     card: Card;
     onSignal: (next: Stance | null) => Promise<void>;
+    /** Home's "Maya Kim proposed this" line (ADR 0107). */
+    context?: string;
   }
 
-  let { card, onSignal }: Props = $props();
+  let { card, onSignal, context = '' }: Props = $props();
 </script>
 
 {#if card.mode === 'help-request'}
-  <HelpRequestCard {card} {onSignal} />
+  <HelpRequestCard {card} {onSignal} {context} />
 {:else if card.mode === 'thread'}
-  <ThreadCard {card} {onSignal} />
+  <ThreadCard {card} {onSignal} {context} />
 {:else if card.mode === 'event'}
-  <EventCard {card} {onSignal} />
+  <EventCard {card} {onSignal} {context} />
 {:else}
-  <ProjectCard {card} {onSignal} />
+  <ProjectCard {card} {onSignal} {context} />
 {/if}

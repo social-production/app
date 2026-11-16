@@ -18,15 +18,18 @@
   interface Props {
     card: ProjectCard;
     onSignal: (next: Stance | null) => Promise<void>;
+    /** Home's \"Maya Kim proposed this\" line. */
+    context?: string;
   }
 
-  let { card, onSignal }: Props = $props();
+  let { card, onSignal, context = '' }: Props = $props();
 
   const href = $derived(resolve('/threads/[id]', { id: card.id }));
 </script>
 
 <div class="thread-card">
   <FeedSurface
+    {context}
     {href}
     accent={modeAccent(card.mode)}
     contentRestricted={card.moderation === 'hidden'}

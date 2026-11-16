@@ -31,6 +31,8 @@ export interface Person {
 export const BIO_MAX = 1000;
 export const HOME_AREA_MAX = 100;
 export const AVATAR_MAX_BYTES = 256 * 1024;
+/** `identity_integrity::COVER_MAX_BYTES` (ADR 0107). */
+export const COVER_MAX_BYTES = 512 * 1024;
 export const VOUCHES_FOR_FULL = 2;
 
 /** Short, stable tag that tells two people with the same name apart: "Johan · 7NFm". */

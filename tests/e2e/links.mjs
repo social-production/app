@@ -122,32 +122,36 @@ log('founder two approved it for project B: the link is active');
 
 await linksUntil(ann, urlA, () => ann.locator('.network-stack .link-card', { hasText: titles[1] }), 'the link in A');
 await ann.screenshot({ path: `${shots}/links-active-390.png` });
-// A string `hasText` ignores case, and "Sever link decision" contains "link decision".
-await historyCard(ann, /^Link decision/, 'approved');
+await historyCard(ann, /^Link with/, 'approved');
 log("A's History lists the approved link decision");
 await ann.getByRole('tab', { name: 'Links' }).click();
 await ann.locator('.network-stack').first().locator('.link-card .toggle-button').click();
-await ann.getByRole('button', { name: 'Start sever vote' }).click();
+await ann.getByRole('button', { name: 'End this link' }).click();
 await voteOn(ann, '.network-stack', titles[1], 'Remove link');
 await linksUntil(bob, urlB, () => bob.locator('.network-stack .link-card .side-vote-line'), 'the sever vote in B');
 // Founder two votes on B's half from History (web's DecisionHistoryCard opens the vote sheet).
-await (await historyCard(bob, 'Sever link decision', 'open')).locator('.history-toggle').click();
+await (await historyCard(bob, 'End the link with', 'open')).locator('.history-toggle').click();
 const sheet = bob.getByRole('dialog', { name: 'Sever' });
 await sheet.getByText(titles[0]).first().waitFor({ timeout: 60_000 });
 await sheet.getByRole('button', { name: 'Yes', exact: true }).click();
 await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 // Stay on the page until the vote decides it (leaving at once can drop the write).
 await bob
-  .locator('.history-shell .history-card.approved', { hasText: 'Sever link decision' })
+  .locator('.history-shell .history-card.approved', { hasText: 'End the link with' })
   .waitFor({ timeout: 180_000 });
 await bob.screenshot({ path: `${shots}/links-history-390.png`, fullPage: true });
 log('founder two voted on the sever from History');
-await linksUntil(bob, urlB, () => bob.getByText('No active links yet.'), 'the link to end');
-await bob.getByRole('button', { name: /^Show past link votes/ }).click();
+await linksUntil(bob, urlB, () => bob.getByText('Not linked to anything yet.'), 'the link to end');
+await bob.getByRole('button', { name: /^Past links/ }).click();
 log('both projects voted to sever: the link is historical');
 await ann.goto(urlA);
-await historyCard(ann, 'Sever link decision', 'approved');
+await historyCard(ann, 'End the link with', 'approved');
 log("A's History lists the approved sever decision");
+await ann.screenshot({ path: `${shots}/history-phone-390.png`, fullPage: true });
+await ann.getByRole('tab', { name: 'Links' }).click();
+await ann.getByRole('button', { name: /^Past links/ }).click();
+await ann.waitForTimeout(1500);
+await ann.screenshot({ path: `${shots}/links-past-390.png`, fullPage: true });
 
 assert.deepEqual(errors, [], 'no page errors');
 log('links ok');

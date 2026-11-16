@@ -1,0 +1,181 @@
+/* Every create flow (Polish Pass mockups, 2026-11-16): the close button at the top left, the
+   title centred with "Step 1 of 4" under it over one thin progress line, each step's question
+   as its heading, Back and Continue at the bottom, the rule as one chip. Create sheets are
+   portaled outside the shell, so these rules double a class to win over the ported styles. */
+.overlay-root.create-main .overlay-header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 10px 12px 8px;
+}
+
+.overlay-root.create-main .overlay-header-actions {
+  grid-row: 1;
+  grid-column: 1;
+}
+
+.overlay-root.create-main .overlay-header-copy {
+  grid-row: 1;
+  grid-column: 2;
+  padding-top: 0;
+  text-align: center;
+}
+
+.overlay-root.create-main .overlay-header-copy h2 {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.overlay-root.create-main .overlay-header-copy .step-count {
+  margin: 1px 0 0;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.create-main .create-close {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.overlay-root.create-main.create-main .overlay-footer.inline-close .sheet-close {
+  display: none;
+}
+
+.overlay-root.create-main .step-line {
+  height: 3px;
+  margin: 0 16px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.create-main .step-line i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand);
+  transition: width 0.2s ease;
+}
+
+.overlay-root.create-main .step-question {
+  margin: 6px 0 14px;
+  color: var(--text-main);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.overlay-root.create-main .step-intro {
+  margin: 4px 0 14px;
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.overlay-root.create-main .missing-note {
+  margin: 12px 0 0;
+  color: var(--danger);
+  font-size: 13.5px;
+}
+
+.overlay-root.create-main .overlay-footer .sheet-actions > .create-back {
+  flex: 0 0 auto;
+  padding: 0 22px;
+}
+
+.overlay-root.create-main .overlay-footer .sheet-actions > .sheet-submit {
+  flex: 1;
+}
+
+.overlay-root.create-main .overlay-footer .sheet-actions > .sheet-submit.faded {
+  opacity: 0.45;
+}
+
+/* Labels over soft fields, quiet hints under them. */
+.create-sheet.create-sheet .form-stack {
+  gap: 16px;
+}
+
+.create-sheet.create-sheet .form-stack label > span:first-child,
+.create-sheet.create-sheet .field-label {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.create-sheet.create-sheet .helper,
+.create-sheet.create-sheet .helper-text {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* The direct-use rule as one chip; "Read" opens it whole. */
+.create-sheet.create-sheet .policy-notice.policy-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: none;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.create-sheet.create-sheet .policy-chip svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.create-sheet.create-sheet .policy-chip span {
+  flex: 1;
+  min-width: 0;
+}
+
+.create-sheet.create-sheet .policy-chip button {
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.overlay-root.policy-sheet .policy-text {
+  display: grid;
+  gap: 10px;
+  padding: 0 20px;
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+
+.overlay-root.policy-sheet .policy-text p {
+  margin: 0;
+}
+
+/* Where it happens: the segmented choice, then the place field, then one line. */
+.create-sheet.create-sheet .location-intent {
+  display: grid;
+  gap: 14px;
+}

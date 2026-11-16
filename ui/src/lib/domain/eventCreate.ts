@@ -12,27 +12,30 @@ export type EventStepId =
 export interface EventStep {
   id: EventStepId;
   title: string;
+  question?: string;
 }
 
 /** web's three wizard step lists: public, private, and private organizer-controlled. */
 export function eventSteps(isPrivate: boolean, upfrontPlan: boolean): EventStep[] {
   if (!isPrivate) {
     return [
-      { id: 'basics', title: 'Basics' },
-      { id: 'audience', title: 'Audience' },
-      { id: 'scope', title: 'Tags' },
-      { id: 'location', title: 'Location' },
-      { id: 'overview', title: 'Overview' },
+      { id: 'basics', title: 'Basics', question: 'What is happening?' },
+      { id: 'audience', title: 'Audience', question: 'Who is it for?' },
+      { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
+      { id: 'location', title: 'Location', question: 'Where does it happen?' },
+      { id: 'overview', title: 'Overview', question: 'Check and publish' },
     ];
   }
   return [
-    { id: 'basics', title: 'Basics' },
-    { id: 'audience', title: 'Audience' },
-    { id: 'scope', title: 'Who' },
-    { id: 'control', title: 'Control' },
-    { id: 'location', title: 'Location' },
-    ...(upfrontPlan ? [{ id: 'plan', title: 'Plan' } as EventStep] : []),
-    { id: 'overview', title: 'Overview' },
+    { id: 'basics', title: 'Basics', question: 'What is happening?' },
+    { id: 'audience', title: 'Audience', question: 'Who can find it?' },
+    { id: 'scope', title: 'Who', question: 'Who is invited?' },
+    { id: 'control', title: 'Control', question: 'Who runs it?' },
+    { id: 'location', title: 'Location', question: 'Where does it happen?' },
+    ...(upfrontPlan
+      ? [{ id: 'plan', title: 'Plan', question: 'When is it, and what happens?' } as EventStep]
+      : []),
+    { id: 'overview', title: 'Overview', question: 'Check and publish' },
   ];
 }
 

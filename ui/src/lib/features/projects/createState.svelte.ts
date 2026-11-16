@@ -22,13 +22,13 @@ import {
 
 import type { EventStepId } from '#lib/domain/eventCreate.ts';
 
-type Step = { id: EventStepId; title: string };
+type Step = { id: EventStepId; title: string; question?: string };
 
 export const CREATE_STEPS: Step[] = [
-  { id: 'basics', title: 'Basics' },
-  { id: 'scope', title: 'Tags' },
-  { id: 'location', title: 'Location' },
-  { id: 'overview', title: 'Overview' },
+  { id: 'basics', title: 'Basics', question: 'What do you propose?' },
+  { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
+  { id: 'location', title: 'Location', question: 'Where does it happen?' },
+  { id: 'overview', title: 'Overview', question: 'Check and publish' },
 ];
 
 /** The new-proposal wizard's draft (web's CreateProjectPage state without its Type step: a

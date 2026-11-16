@@ -1,6 +1,8 @@
 <script lang="ts">
+  import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import EventAudiencePanel from '#lib/components/create/EventAudiencePanel.svelte';
+  import InviteList from '#lib/components/create/InviteList.svelte';
   import EventPlanStep from '#lib/components/create/EventPlanStep.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
@@ -115,29 +117,18 @@
       />
     </div>
   {:else if s.stepId === 'scope'}
-    <div class="form-stack">
-      <PeoplePicker
-        label="Invite people"
-        placeholder="Type to add people"
-        helperText="Invitees can join and take part once the event is underway."
-        selected={s.invitees}
-        search={(q) => s.search(q)}
-        onAdd={(c) => s.addInvitee(c)}
-        onRemove={(a) => (s.invitees = s.invitees.filter((c) => c.agent !== a))}
-      />
-      <PeoplePicker
-        label="Organizers (optional)"
-        placeholder="People with organizer authority"
-        helperText={organizerHelp}
-        selected={s.organizers}
-        search={(q) => s.search(q)}
-        onAdd={(c) => s.addOrganizer(c)}
-        onRemove={(a) => (s.organizers = s.organizers.filter((c) => c.agent !== a))}
-      />
-      {#if s.invitees.length === 0}
-        <p class="status-note">Invite at least one person for invite-only events.</p>
-      {/if}
-    </div>
+    <InviteList
+      invitees={s.invitees}
+      organizers={s.organizers}
+      search={(q) => s.search(q)}
+      onInvite={(c) => s.addInvitee(c)}
+      onRemove={(a) => {
+        s.invitees = s.invitees.filter((c) => c.agent !== a);
+        s.organizers = s.organizers.filter((c) => c.agent !== a);
+      }}
+      onOrganizer={(c, on) =>
+        on ? s.addOrganizer(c) : (s.organizers = s.organizers.filter((o) => o.agent !== c.agent))}
+    />
   {:else if s.stepId === 'location'}
     <LocationIntent
       intent={s.intent}
@@ -151,9 +142,13 @@
     <EventPlanStep bind:plan={s.plan} problems={s.planProblems} />
   {:else}
     <div class="form-stack overview">
-      <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('basics'))}>
-        <strong>Basics</strong><span>{s.title.trim() || 'Untitled event'}</span>
-      </button>
+      <CreatePreview
+        mode="event"
+        scope={s.community?.handle ?? s.tags[0]?.slice(1) ?? ''}
+        title={s.title.trim()}
+        body={s.description.trim()}
+        place={s.intent === 'physical' ? s.locationLabel : ''}
+      />
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('audience'))}>
         <strong>Audience</strong><span>{AUDIENCE_LABELS[s.audience]}</span>
       </button>

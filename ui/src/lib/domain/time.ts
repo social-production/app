@@ -46,3 +46,11 @@ export function postedAt(micros: number): string {
   const day = at.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
   return `${time} · ${day}`;
 }
+
+/** The calendar day after a local "YYYY-MM-DD" (noon, so a clock change can't skip a day). */
+export function nextDay(day: string): string {
+  const d = new Date(`${day}T12:00`);
+  d.setDate(d.getDate() + 1);
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}

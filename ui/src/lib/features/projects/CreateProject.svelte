@@ -1,4 +1,5 @@
 <script lang="ts">
+  import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
@@ -47,21 +48,29 @@
     <div class="form-stack">
       <label>
         <RequiredLabel>Title</RequiredLabel>
-        <input bind:value={s.title} maxlength="200" aria-required="true" />
+        <input
+          bind:value={s.title}
+          maxlength="200"
+          aria-required="true"
+          placeholder="Shared seed library"
+        />
       </label>
       <label>
-        <RequiredLabel>What do you propose?</RequiredLabel>
+        <RequiredLabel>Description</RequiredLabel>
+        <!-- The step asks "What do you propose?"; the field keeps that in its name. -->
         <textarea
           bind:value={s.description}
           rows="5"
           aria-required="true"
+          aria-label="What do you propose? Description"
           placeholder="The idea, and why it is worth doing."></textarea>
       </label>
       <p class="soft-note">
         <strong>No type yet</strong>It becomes a project, a service or an event when its members
         approve a plan.
       </p>
-      {#if s.allowance !== null}
+      <!-- The weekly limit shows only when it is close (Polish Pass mockups). -->
+      {#if s.allowance !== null && s.allowance <= 1}
         <p class="helper-text">
           New members can start 2 proposals a week ({s.allowance} left). Full members have no limit.
         </p>
@@ -83,15 +92,20 @@
     </div>
   {:else}
     <div class="form-stack overview">
-      <button class="overview-row" type="button" onclick={() => (s.step = 0)}>
-        <strong>Basics</strong><span>{s.title.trim() || 'Untitled proposal'}</span>
-      </button>
+      <CreatePreview
+        mode="proposal"
+        scope={s.tags[0]?.slice(1) ?? ''}
+        title={s.title.trim()}
+        body={s.description.trim()}
+        place={s.intent === 'physical' ? s.locationLabel : ''}
+      />
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
-        <strong>Tags</strong><span>{tagCounts(s.tags)}</span>
+        <strong>Channels</strong><span>{tagCounts(s.tags)}</span><em>Edit</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
-        <strong>Location</strong><span>{s.locationLabel}</span>
+        <strong>Place</strong><span>{s.locationLabel}</span><em>Edit</em>
       </button>
+      <PolicyNotice />
       {#if s.message}<p class="status-note">{s.message}</p>{/if}
     </div>
   {/if}

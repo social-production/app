@@ -121,17 +121,6 @@ export function requirementLabel(e: HistoryEntry): string {
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
 }
 
-/** web's `historyVoteSummary` (its approval share rounded; web prints the raw float). */
-export function voteSummaryLabel(e: HistoryEntry): string {
-  const total = e.yes + e.no;
-  const percent = total > 0 ? Math.round((e.yes / total) * 100) : 0;
-  const base = `${percent}% approval · ${e.yes} yes · ${e.no} no`;
-  if (e.status === 'open') return base;
-  const cast = total === 1 ? 'vote' : 'votes';
-  const quorum = e.required === 1 ? 'vote' : 'votes';
-  return `${base} · ${total} ${cast} cast out of ${e.required} quorum ${quorum}`;
-}
-
 /** web's DecisionHistoryCard `statusLabel`. */
 export function statusLabel(status: HistoryStatus): string {
   if (status === 'approved') return 'Approved';
@@ -158,4 +147,13 @@ export function stageBefore(p: Proposal, proposals: Proposal[], current: string)
     else if ('Return' in q.kind) stage = q.kind.Return.to;
   }
   return stage;
+}
+
+/** The glyph a History row leads with (Polish Pass mockups), from what the decision is. */
+export function historyIcon(kindLabel: string): string {
+  if (/link/i.test(kindLabel)) return 'link';
+  if (/plan\b/i.test(kindLabel) && !/^(advance|return)/i.test(kindLabel)) return 'layers';
+  if (/^(advance|return|close|convert)/i.test(kindLabel)) return 'trending';
+  if (/edit|update|description|title/i.test(kindLabel)) return 'pencil';
+  return 'clock';
 }

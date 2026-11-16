@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 by the owner's PC session and a cloud session; start at "START HERE (2026-11-16)", then "START HERE (2026-11-15)")
+# Status: where the P2P app stands (updated 2026-11-16 evening Melbourne by the owner's PC session and the cloud parity session; start at "START HERE (2026-11-16 afternoon)", then the cloud session's "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -87,11 +87,40 @@ The owner's list of 2026-11-15. They are references, not gospel: the built scree
 on since, and later owner answers in this file win. Read them with the Artifact tool
 (`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
 frames under `project/*.dc.html`).
-1. Polish Pass Mockups (2026-11-16, **waiting on the owner**): feed cards, feed and map
-   filters, the map bar, Region, every create step, Links, History:
-   https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
-2. Map and Region Filters (2026-11-16, first round, superseded by 1):
+0. **Profiles and Comments (2026-11-16 afternoon, approved: "all artifacts look great, i take
+   your discretion go ahead!"; building on `claude/ux-profiles`)**: Home and profile cards as
+   Global rows, the profile's cover / camera buttons / Edit profile sheet / tabs, "commented"
+   rows, one comment composer with a Replying-to bar, photos full screen:
+   https://claude.ai/artifact/9N8yzimwCoGkWXpUr3Lp4C
+   Claude's calls on its open questions: one reset (ADR 0107's records ride in #163); no
+   Photos tab; the key leaves the profile only. The page called the key "for support only",
+   which was wrong: Settings › Account's "Your key" is what others paste to vouch for you or
+   pair a device, so it stays there as it was.
+1. **Polish Pass Mockups (2026-11-16, approved: "everything is brilliant"; building on
+   `claude/ux-polish`)**: feed cards, feed and map filters, the map bar, Region, every create
+   step, Links, History: https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
+   Owner's additions: the map bar centred at the bottom (option A); hide the map credit
+   (OpenStreetMap/CARTO require it, so it collapses to MapLibre's small ⓘ); Region option A,
+   with a distance box in its sheet you can also type a custom distance into; the map's
+   result cards look like Global feed cards.
+2. Map and Region Filters (2026-11-16, first round; map A and Region A chosen, superseded by 1):
    https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
+2b. Platform and Moderators (2026-11-16, **approved, not built**):
+   https://claude.ai/artifact/VPUdEZzJZBbcMyecLCoaPU
+   Owner's picks: the globe badge ("to signal it is something different"); "N active this
+   week" under the name, not members; the Moderators button with faces as drawn, and "+N"
+   once there are more than three; sections 2 to 4 as drawn ("i trust your work"). Sections
+   1 to 3 are UI only; 4 (the "Network vote" line) ships with ADR 0095's #platform voting rule
+   (branch `claude/platform-voters` from #163, started, nothing committed yet).
+   Owner's addition the same day: channels, communities and the Platform get a picture and a
+   cover, changed by a vote like their other settings (members vote in public and
+   collaborative scopes, organizers decide at once in organizer-run ones; the Platform by a
+   network vote). A project reset, shipped with the #platform voting rule.
+2c. Channel Pictures (2026-11-16 evening, **approved, not built**; owner: the creator adds the
+   picture and cover when creating, no vote, and may leave the default; redraw the three sheets as
+   shown; no camera buttons on the scope page, only the pencil): picture + cover for
+   channels, communities and the Platform, who decides each change, and redrawn Settings,
+   Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
 4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
@@ -108,6 +137,43 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-16 afternoon, owner's PC session): #162 merged, #163 carries one more reset, two UI branches stacked on it
+- **#162 merged 2:44 pm Melbourne** (UI only, no reset).
+- **Coordination with the cloud session (agreed 2026-11-16):** ADR 0107 is ours (covers and
+  comment notes), 0108 is the cloud session's push-notification ADR (#165, #166); the next
+  free number is **0109**. The cloud session starts the privacy switches and the bot-review
+  notification once #163 has deployed (then reruns `demo-content.mjs`), and waits for
+  `claude/ux-profiles` to merge before Home's tabs, the display timezone and Russian (those
+  touch the feed, create, plan, activity and project files these branches change). Next
+  session the two sessions message each other directly (ListAgents / SendMessage): post when
+  a PR opens or merges, or when you need a file the other owns.
+- **#163 `claude/ux-plan-convert`** now also carries ADR 0107 (profile covers and comment notes:
+  `Cover` + `CommentNote` entries, `AgentToCover` / `AgentToComments` links, scenario `notes`
+  passed locally). Directory hash `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`, conversation
+  unchanged. Main merged in and pushed; merge it once CI is green (owner approved), then the
+  cloud session re-runs `tests/e2e/demo-content.mjs`. Local browser tests on #163: 17 passed
+  in one batch; `notifications`, `private-events`, `closed-communities` and `guests` failed
+  there on a seed up ~1.5 h and passed alone on a fresh one (`event-flow.mjs` is a helper,
+  not a test).
+- **`claude/ux-polish`** (Polish Pass) = #163 + the polish work; UI only. Open its PR after #163.
+- **`claude/ux-profiles`** = polish + the Profiles and Comments screens (artifact 0 above); UI
+  only. Home and profiles use the Global row (`PersonalSpaceCard` → `SpaceCard`, with
+  `FeedSurface`'s `context` line); `CommentActivityCard` rows from `services/profileNotes.ts`;
+  `ProfileHero` cover + camera buttons, `EditProfileSheet`, `ProfileFeed` tabs + filter sheet;
+  `DiscussionPanel` owns the one composer and its reply bar; `PhotoViewer` counts, swipes and
+  takes a footer. Comment notes are written in the chain's write queue and awaited: leaving
+  the page mid-write dropped them.
+- **Checked on `claude/ux-profiles` (holds all of polish), local seed with #163's hApp:**
+  browser tests `threads`, `follows`, `guests`, `help-requests` (after its overview check
+  was updated), `message-reports`, `accounts` passed. `ux-scan.mjs` at 390px light and dark:
+  feed, filter sheets, map and its sheet, every create flow, profile, thread, settings and
+  the other pages looked right after two fixes (create flows showed a second × in the footer;
+  the preview's glyph lacked its square). The scan now signs in as a dev founder (a new
+  member's 2-a-week limit stopped it); its private event stops at "Who is invited?" because
+  an invite-only event needs a guest and the founder has no named contact (covered by
+  `private-events.mjs`). Live after #162 (read-only, 390px signed out): feed, Search,
+  Feedback and About load with no page errors.
+
 ## CI is minutes on PRs while this is a prototype (owner, 2026-11-16)
 PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing), unless they touch
 `zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`, `tests/scenarios/`, `Cargo.*`,
@@ -197,22 +263,51 @@ conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
    after). Fixed on it: place rows called a store from components (layer rule); they use the
    shell's `placeOnMap` context. Local browser tests: rerunning (the first run never started:
    the seed took longer than 400 s to come up).
-3. **`claude/ux-polish`** (stacked on #163, local only until #163 merges): signed-out visitors
-   see no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`, Topbar
-   `guest`, FeedHeader `guest`; hidden only once the status is `signed-out`, not while
-   connecting); sign-up has no top bar (`authSurface` collapses it like an open chat). **Not
-   looked at in the browser yet.**
-   **Waiting on the owner (2026-11-16):** the owner found the create flows "rough and boxy and
-   confusing", Links and History not modernised, feed cards' time and place, and the filter
-   sheets wrapping. Mockups (build only after the owner answers):
+3. **`claude/ux-polish`** (stacked on #163, pushed; its PR opens once #163 merges). Built
+   from the approved Polish Pass page (Design artifacts, item 1):
+   - Signed out: no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`,
+     Topbar/FeedHeader `guest`, hidden only once the status is `signed-out`); sign-up has no
+     top bar.
+   - Map: the capsule is centred at the bottom (search and Upcoming as icons), its sheet's
+     choices are pills that wrap whole (`components/PillChoice`), the credit is MapLibre's
+     compact ⓘ top-left, closed until tapped (`maps/load.ts`), results are drawn as feed rows
+     (`MapDiscoveryCard`, `ux/mapcards.css`).
+   - Region: a "Near … · 25 km" line under the tabs; the place field, a typeable distance box
+     (`RadiusCombobox`) and the online switch are at the top of the filter sheet
+     (`RegionControls`, `ux/region.css`). Filter sheets keep their side margin
+     (`ux/pills.css`: the ported sheet body zeroed it).
+   - Feed cards: the place button gains a map mark; the date line is darker.
+   - Links: "Propose a link" at the top, the venue as a place row, linked projects as rows
+     (`LinkCard`), each open vote one card with a bar per project (`LinkVoteCard`), past links
+     and votes in one fold (`LinksPast`). "Start sever vote" reads "End this link".
+   - History: Open (vote cards with an inline Yes/No) above Decided (rows with Passed/Failed).
+     Link decisions read "Link with …" / "End the link with …".
+   - Create flows: × top left, centred title with "Step N of M", one progress line, a question
+     per step, Back + Continue (faded until complete; tapping says "To continue, add: …" and
+     focuses the field), the rule as a chip with "Read". One search for channels and
+     communities with ticked rows (`ScopeTagsStep`; tests use `TAG_SEARCH` in `lib.mjs`),
+     In person / Online / Not yet, a feed-card preview on the last step (`CreatePreview`), a
+     request's date and times as rows and roles as cards with −/+ (`HelpRolesStep`), a private
+     event's guests as rows with an Organiser pill (`InviteList`), a post as a composer with Post
+     top right (`CreateSheet composer`), a channel's # inside its field.
+   - **Not as drawn (decided while building):** request roles are edited in place on their
+     cards (a sheet over the create sheet was awkward); a private event keeps its separate
+     audience and guest steps (merging them changes the event state's per-step checks); the
+     map preview on the place step is left out.
+   - Browser tests updated for the new words (`End this link`, `Past links`, `Decided`,
+     `In person`, `Add a role`, `People needed`, `.invite-row`, `.region-near`). **Not yet run
+     on this branch, and no screens looked at yet** (the seed was busy with #163's batch).
+   **Approved 2026-11-16 and being built here:** the owner found the create flows "rough and
+   boxy and confusing", Links and History not modernised, feed cards' time and place, and the
+   filter sheets wrapping. The Polish Pass page (Design artifacts, item 1) answers all of them:
    - Polish pass (feed cards, feed and map filters, map bar at the bottom, Region, every create
      step, Links, History): https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
    - Map and Region filters (first round, superseded by the page above):
      https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
    Today's 390px screenshots of every create step come from `ONLY=create node
    tests/e2e/ux-scan.mjs` (the private event stops at step 3: the scan adds no invitees).
-   Also seen and not yet fixed: a help request's "Still needed: … is required., …" has doubled
-   full stops; the empty Search page shows bare words (platform, community, project, event).
+   (Both things seen then are fixed: the create sheet's hint now reads "To continue, add: …",
+   and Search has kind chips since #162.)
 
 ## START HERE (2026-11-15 afternoon, owner's PC session, superseded by the 2026-11-16 entry): the UX build list, three branches
 Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in

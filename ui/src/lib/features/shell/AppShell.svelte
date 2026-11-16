@@ -1,8 +1,6 @@
 <script lang="ts">
   import { untrack, type Snippet } from 'svelte';
 
-  import type { ResolvedPathname } from '$app/types';
-
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
@@ -30,6 +28,7 @@
   import { startBell } from './bellLoop.ts';
   import { MapToggle } from './mapToggle.svelte.ts';
   import { createLinks, surfaceLinks } from './createLinks.ts';
+  import { navTabs } from './navTabs.ts';
   import { refuseIfDeactivated, showDeactivatedReason } from './deactivated.ts';
   import { railLinks, startMyScopes } from './myScopesLoop.ts';
   import { provideShellContexts } from './shellContexts.ts';
@@ -69,19 +68,13 @@
   const topbarHeight = $derived(compact ? 52 : 53);
   // web's immersiveChat: on phones an open detail chat hides the top bar and bottom nav.
   const immersive = $derived(compact && chatChrome.immersive);
-  const shellTopbarHeight = $derived(immersive ? 0 : topbarHeight);
+  // Sign-up has its own logo, so the top bar goes as it does for an open chat.
+  const shellTopbarHeight = $derived(immersive || authSurface ? 0 : topbarHeight);
   const frameMaxWidth = $derived(!compact && !leftOpen && !rightOpen ? 'min(80%, 1200px)' : 'none');
   const bottomNav = $derived(compact && !immersive ? 'var(--shell-bottom-nav-height)' : '0px');
-  const tabs: { href: ResolvedPathname; label: string; icon: string; badge?: number }[] = $derived([
-    { href: resolve('/'), label: 'Home', icon: 'home' },
-    {
-      href: resolve('/notifications'),
-      label: 'Notifications',
-      icon: 'bell',
-      badge: bell.notifications.unread,
-    },
-    { href: resolve('/messages'), label: 'Messages', icon: 'send', badge: messageBadge.unread },
-  ]);
+  // Known to be signed out (not still connecting): no Notifications or Messages to offer.
+  const guest = $derived(connection.current.status === 'signed-out');
+  const tabs = $derived(navTabs(guest, bell.notifications.unread, messageBadge.unread));
 
   $effect(() => {
     const media = window.matchMedia('(max-width: 1080px)');
@@ -196,8 +189,9 @@
 >
   <Topbar
     {compact}
-    collapsed={immersive}
+    collapsed={immersive || authSurface}
     {signedIn}
+    {guest}
     viewerName={viewer.name}
     notificationCount={bell.notifications.unread}
     messageCount={messageBadge.unread}

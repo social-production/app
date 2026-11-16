@@ -1,100 +1,51 @@
 <script lang="ts">
   import type { VoteChoice } from '#lib/domain/governance.ts';
-  import {
-    sideVoteLines,
-    tallyLabel,
-    targetMetaRows,
-    type LinkRequest,
-    type LinkSide,
-  } from '#lib/domain/links.ts';
-  import { modeAccent } from '#lib/domain/projects.ts';
+  import type { LinkRequest, LinkSide } from '#lib/domain/links.ts';
 
   import { focusLinkCard } from './focusLinkCard.ts';
-  import LinkCard from './LinkCard.svelte';
-  import LinkVotePanel from './LinkVotePanel.svelte';
+  import LinkVoteCard from './LinkVoteCard.svelte';
 
   import '#lib/components/styles/links.css';
 
-  /** web's DetailLinkRequestsSection: open link votes; both projects must approve. */
+  /** web's DetailLinkRequestsSection: open link votes, each one card; both projects must
+   * approve. "Propose a link" sits at the top of the tab (Polish Pass mockups). */
   interface Props {
     requests: LinkRequest[];
     names: Record<string, string>;
-    canPropose: boolean;
     pendingId: string | null;
-    onCompose: () => void;
     onVote: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
-    /** A request a link asks to show (web's `?linkRequest=…`): expanded and scrolled to. */
+    /** A request a link asks to show (web's `?linkRequest=…`): scrolled to. */
     highlight?: string | null;
   }
 
-  let {
-    requests,
-    names,
-    canPropose,
-    pendingId,
-    onCompose,
-    onVote,
-    highlight = null,
-  }: Props = $props();
+  let { requests, names, pendingId, onVote, highlight = null }: Props = $props();
 
-  let expanded = $state<Record<string, boolean>>({});
   let shown: string | null = null;
 
   $effect(() => {
     if (!highlight || shown === highlight || !requests.some((r) => r.id === highlight)) return;
     shown = highlight;
-    expanded = { ...expanded, [highlight]: true };
     void focusLinkCard(highlight);
   });
 </script>
 
 <section class="request-stack">
-  <div class="section-heading">
-    <div class="heading-copy">
-      <h2>Votes open</h2>
-    </div>
-    {#if canPropose}
-      <button class="propose-link-button" type="button" onclick={onCompose}>
-        Propose a new link
-      </button>
-    {/if}
-  </div>
-
+  <h2 class="links-heading">
+    Votes open{#if requests.length > 0}<span class="links-count">{requests.length}</span>{/if}
+  </h2>
   {#if requests.length === 0}
-    <div class="empty-row">No pending link votes.</div>
+    <p class="links-quiet">No votes open.</p>
   {:else}
     <div class="request-list">
       {#each requests as request (request.id)}
-        {@const target = request.target}
-        {@const metaRows = targetMetaRows(target)}
-        <LinkCard
-          title={target.title}
-          metaLine={`Project · ${tallyLabel(request)} · ${names[request.proposedBy] ?? '…'}`}
-          sideVoteLines={sideVoteLines(request)}
-          accent={modeAccent(target.mode)}
-          projectId={target.id}
-          expanded={!!expanded[request.id]}
+        <LinkVoteCard
+          {request}
+          proposer={names[request.proposedBy] ?? '…'}
+          cardClass="link-card expanded"
           domId={`link-request-${request.id}`}
-          onToggle={() => (expanded = { ...expanded, [request.id]: !expanded[request.id] })}
-        >
-          <div class="target-detail">
-            <p>{target.description || request.summary}</p>
-            {#if metaRows.length > 0}
-              <div class="detail-meta">
-                {#each metaRows as row (row)}<span>{row}</span>{/each}
-              </div>
-            {/if}
-          </div>
-          <div class="vote-grid">
-            {#each [request.thisSide, request.otherSide] as side (side.projectId)}
-              <LinkVotePanel
-                {side}
-                pending={pendingId === request.id}
-                onVote={(s, choice) => onVote(request.id, s, choice)}
-              />
-            {/each}
-          </div>
-        </LinkCard>
+          pending={pendingId === request.id}
+          onVote={(side, choice) => onVote(request.id, side, choice)}
+        />
       {/each}
     </div>
   {/if}

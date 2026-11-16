@@ -1,3 +1,4 @@
+import type { CommentActivity } from './commentNotes.ts';
 import type { ProjectCard } from './projects.ts';
 import { isActivity, type RegionActivity, type RegionItem } from './regionFeed.ts';
 
@@ -12,11 +13,14 @@ export type HomeAudience = 'following' | 'popular';
 export type HomeFeedRow =
   | { key: string; source: 'public' | 'personal'; card: ProjectCard }
   /** The Region feed's project-activity items (ADR 0084). */
-  | { key: string; source: 'public'; activity: RegionActivity };
+  | { key: string; source: 'public'; activity: RegionActivity }
+  /** A comment by someone you follow (ADR 0107). */
+  | { key: string; source: 'personal'; comment: CommentActivity };
 
 /** web: public rows by last activity, personal rows by creation. */
 function rowTime(row: HomeFeedRow): number {
   if ('activity' in row) return row.activity.lastActivityAt;
+  if ('comment' in row) return row.comment.createdAt;
   return row.source === 'public'
     ? row.card.lastActivityAt || row.card.createdAt
     : row.card.createdAt;
@@ -35,12 +39,20 @@ export function mergeHomeFeed(
   publicItems: (ProjectCard | RegionItem)[],
   personalCards: ProjectCard[],
   sort: 'trending' | 'recent',
+  comments: CommentActivity[] = [],
 ): HomeFeedRow[] {
   const shown = publicRows(publicItems);
   const seen = new Set(publicItems.map((item) => item.id));
-  const personalRows: HomeFeedRow[] = personalCards
+  const cards: HomeFeedRow[] = personalCards
     .filter((card) => !seen.has(card.id))
     .map((card) => ({ key: `personal:project:${card.id}`, source: 'personal', card }));
+  const said: HomeFeedRow[] = comments.map((comment) => ({
+    key: `personal:comment:${comment.id}`,
+    source: 'personal',
+    comment,
+  }));
+  // Personal cards and comments interleave by time before they meet the public rows.
+  const personalRows = [...cards, ...said].sort((a, b) => rowTime(b) - rowTime(a));
   if (sort === 'recent') {
     return [...shown, ...personalRows].sort((a, b) => rowTime(b) - rowTime(a));
   }
@@ -52,4 +64,12 @@ export function mergeHomeFeed(
     if (own) mixed.push(own);
   }
   return mixed;
+}
+
+/** Home's line over a card made by someone you follow (Profiles and Comments mockups §1). */
+export function madeContext(name: string, mode: string): string {
+  if (mode === 'thread') return `${name} started this thread`;
+  if (mode === 'help-request') return `${name} asked for help`;
+  if (mode === 'event') return `${name} proposed this event`;
+  return `${name} proposed this`;
 }

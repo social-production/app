@@ -32,11 +32,11 @@ await tagTestChannel(ann);
 await next(); // → Roles
 await ann.getByLabel('Role title').fill('Driver');
 await ann.getByLabel('Role details').fill('A car with a big boot.');
-await ann.getByRole('button', { name: 'Add role' }).click();
+await ann.getByRole('button', { name: 'Add a role' }).click();
 await ann.getByLabel('Role title').nth(1).fill('Company');
-await ann.getByLabel('Slots needed').nth(1).fill('0');
+await ann.getByLabel('People needed', { exact: true }).nth(1).fill('0');
 await next(); // → Overview
-await ann.getByText('2 roles').waitFor();
+await ann.locator('.overview-row', { hasText: 'Driver, Company' }).waitFor();
 await ann.getByRole('button', { name: 'Publish help request' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.match(ann.url(), /\/help-requests\//);
@@ -57,7 +57,7 @@ for (let i = 0; ; i++) {
   if (await card.count()) {
     await card.getByText('0 signed up · 1 needed').waitFor();
     // Feed rows name no author (ADR 0097); the request's own page does. Its author link opens
-    // the asker's profile, which lists the request on web's PersonalHelpRequestCard.
+    // the asker's profile, which lists the request.
     await helper.goto(`${BASE}${await card.locator('a.title').getAttribute('href')}`);
     const author = helper.locator('.detail-by a').first();
     await author.waitFor({ timeout: 60_000 });
@@ -70,13 +70,14 @@ for (let i = 0; ; i++) {
 log('the feed shows its card');
 assert.match(profile, /^\/profile\//);
 await helper.goto(`${BASE}${profile}`);
-const personal = helper.locator('.feed-stack .personal-help-request-card', { hasText: title });
+// Profiles show the Global row (Profiles and Comments mockups §1): no author line on it.
+const personal = helper.locator('.feed-stack .help-request-card', { hasText: title });
 await personal.waitFor({ timeout: 60_000 });
 await personal.getByText('0 signed up · 1 needed').waitFor();
 await personal.getByText('Allotment gate', { exact: false }).waitFor();
-await personal.locator('.identity .header-name').waitFor();
+assert.equal(await personal.locator('.feed-context').count(), 0, 'a profile names no author');
 if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/profile-help-request.png` });
-log('the asker\'s profile shows it on the personal help-request card');
+log('the asker\'s profile shows it on the feed row');
 // The helper joins the channel the request is tagged with: the rail lists it as open help.
 await helper.goto(`${BASE}/channels/${TEST_CHANNEL}`);
 await helper.getByRole('button', { name: `Join ${TEST_CHANNEL}` }).click();

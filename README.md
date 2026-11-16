@@ -14,6 +14,15 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Plans, phases and feedback redrawn, Convert, profile covers and comment notes (PR #163,
+  2026-11-16 7:25 pm Melbourne, live 7:39 pm; ADRs 0106, 0107):** the Plan, Phase and
+  Feedback screens in the soft look; a phase-sheet vote converts a project into a new
+  proposal with a lineage link both ways; profiles get a cover photo, and Home and profiles
+  show "commented" rows. **Directory and project network reset**, so sign up again (test data
+  only).
+- **Telegram's New message and the Remaining Screens (PR #162, 2026-11-16 2:44 pm Melbourne):**
+  New message and New group as Telegram draws them, clearer plan and phase labels, and the
+  remaining screens in the soft look. UI only, no reset.
 - **Everything starts as a proposal (PR #160, 2026-11-16 12:21 am Melbourne, ADR 0059 stage
   A):** Create → Proposal is four steps (Basics, Tags, Location, Overview); the leading plan
   decides whether it becomes a project, a service or an event as it leaves its Plan phase, and

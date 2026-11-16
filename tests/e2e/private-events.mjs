@@ -52,7 +52,7 @@ for (let i = 0; ; i++) {
   await invite.fill("");
   await ann.waitForTimeout(3000);
 }
-await ann.locator(".selected-chip", { hasText: guestName }).waitFor();
+await ann.locator(".invite-row", { hasText: guestName }).waitFor();
 await next(); // → Control (organizer-controlled is web's preselection)
 await ann.getByText("Current selection:").waitFor();
 await next(); // → Location (decide later)

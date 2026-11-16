@@ -27,7 +27,7 @@ await page.getByLabel('What do you propose?').fill('Lend drills and ladders.');
 await next(); // → Tags
 await tagTestChannel(page);
 await next(); // → Location
-await page.getByRole('radio', { name: /Physical/ }).check();
+await page.getByRole('radio', { name: 'In person' }).check();
 
 const field = page.getByRole('textbox', { name: 'Place' });
 await field.fill('Fitzroy Melbourne');
@@ -77,7 +77,7 @@ await page.getByLabel('What do you propose?').fill('A second shed.');
 await next(); // → Tags
 await tagTestChannel(page);
 await next(); // → Location
-await page.getByRole('radio', { name: /Physical/ }).check();
+await page.getByRole('radio', { name: 'In person' }).check();
 await field.fill('Behind the hall');
 await next(); // → Overview
 await page.locator('.overview-row', { hasText: 'Behind the hall' }).waitFor();

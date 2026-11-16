@@ -2,19 +2,59 @@
    standing chip, and action buttons with words. Overrides of the ported profile.css. */
 .shell .profile-page .hero-section {
   position: relative;
-  padding: 48px var(--page-gutter) 12px;
+  padding: 72px var(--page-gutter) 12px;
   border: none;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
 }
 
-.shell .profile-page .hero-section::before {
-  content: '';
+/* The cover (ADR 0107): a 3:1 photo, or the soft band when there is none. */
+.shell .profile-page .profile-cover {
   position: absolute;
   inset: 0 0 auto;
-  height: 84px;
-  background: linear-gradient(120deg, var(--brand-soft), var(--panel-hover));
+  height: 112px;
+  background: linear-gradient(120deg, var(--brand-soft), var(--panel-hover)) center / cover;
+}
+
+.shell .profile-page .hero-identity {
+  position: relative;
+}
+
+.shell .profile-page .hero-cam {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid var(--page-bg);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  cursor: pointer;
+}
+
+.shell .profile-page .hero-cam svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .profile-page .cover-cam {
+  right: var(--page-gutter);
+  bottom: 10px;
+}
+
+.shell .profile-page .photo-cam {
+  top: 50px;
+  left: 54px;
+  width: 28px;
+  height: 28px;
 }
 
 .shell .profile-page .hero-topline,

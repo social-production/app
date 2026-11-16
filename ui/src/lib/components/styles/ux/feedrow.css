@@ -218,8 +218,18 @@
   align-items: center;
   gap: 7px;
   margin: 0;
-  color: var(--text-soft);
+  color: var(--text-main);
   font-size: 13.5px;
+}
+
+.shell .card-facts .card-when svg {
+  color: var(--text-soft);
+}
+
+.shell .card-facts .card-place .card-place-go {
+  width: 15px;
+  height: 15px;
+  opacity: 0.85;
 }
 
 .shell .card-facts svg {

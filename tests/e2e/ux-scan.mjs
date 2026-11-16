@@ -1,10 +1,10 @@
 // A scan of the controls at 390px, in light and in dark: the feed and its filter sheet, the
 // map and its filters, every step of every create flow, and each page's bottom controls
-// (post, thread, request, private event, proposal, profile, channel). One new account.
+// (post, thread, request, private event, proposal, profile, channel). As dev founder one.
 //   node tests/e2e/ux-scan.mjs http://localhost:4174 <out dir>      (ONLY=feed|create|pages)
-import { mkdirSync } from 'node:fs';
+import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, ensureTestChannel, errors, feedScope, log, signUp, tagTestChannel, TEST_CHANNEL } from './lib.mjs';
+import { BASE, browser, device, ensureTestChannel, errors, feedScope, log, phraseSignIn, tagTestChannel, TEST_CHANNEL } from './lib.mjs';
 
 const out = process.env.E2E_OUT ?? process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -41,7 +41,9 @@ const create = async (item) => {
   await page.getByRole('menuitem', { name: item }).click();
 };
 
-await signUp(page, `scan${stamp}`);
+// A founder: a new member may start only 2 projects a week, fewer than the scan creates.
+const [founder] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
+await phraseSignIn(page, founder.phrase.split(' '));
 await ensureTestChannel();
 
 if (!only || only === 'feed') {
@@ -81,7 +83,7 @@ if (!only || only === 'create') {
     await shot('create-post');
     await page.getByRole('button', { name: 'Publish post' }).click();
     await page.locator('.linked-body.detail').waitFor({ timeout: 120_000 });
-    const composer = page.getByLabel('Write a comment...');
+    const composer = page.getByLabel('Add a comment');
     await composer.fill('Cloves pointy end up.');
     await composer.press('Enter');
     await page.locator('.comment-card').first().waitFor({ timeout: 60_000 });
@@ -96,7 +98,7 @@ if (!only || only === 'create') {
     await tagTestChannel(page);
     await shot('create-thread-2');
     await page.getByRole('button', { name: 'Publish thread' }).click();
-    await page.locator('.comment-composer, [aria-label="Write a comment..."]').first().waitFor({ timeout: 120_000 });
+    await page.locator('.comment-composer, [aria-label="Add a comment"]').first().waitFor({ timeout: 120_000 });
     await shot('page-thread');
   });
   await part('create-request', async () => {

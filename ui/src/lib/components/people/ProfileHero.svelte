@@ -17,9 +17,31 @@
     /** web's standing chip is a button that opens the Trust sheet. */
     trustOpen?: boolean;
     onStanding?: () => void;
+    /** The cover photo's URL (ADR 0107). */
+    cover?: string | null;
+    /** Your own profile: the cover and the photo get camera buttons. */
+    onCoverFile?: ((file: File) => void) | undefined;
+    onPhotoFile?: ((file: File) => void) | undefined;
   }
 
-  let { person, devices = 1, actions, counts, trustOpen = false, onStanding }: Props = $props();
+  let {
+    person,
+    devices = 1,
+    actions,
+    counts,
+    trustOpen = false,
+    onStanding,
+    cover = null,
+    onCoverFile,
+    onPhotoFile,
+  }: Props = $props();
+
+  const picked = (event: Event, then?: (file: File) => void): void => {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) then?.(file);
+    input.value = '';
+  };
 
   // web's "View <name> profile photo": the picture opens full screen in the PhotoViewer.
   const avatar = $derived(person.profile?.avatar ?? null);
@@ -36,7 +58,21 @@
   import '#lib/components/styles/profile.css';
 </script>
 
-<section class="hero-section">
+{#snippet camera(label: string, onFile: (file: File) => void, cls: string)}
+  <label class="hero-cam {cls}" aria-label={label} title={label}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"
+      ><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="2" /><path
+        d="m21 16-5-5-8 8"
+      /></svg
+    >
+    <input hidden type="file" accept="image/*" onchange={(e) => picked(e, onFile)} />
+  </label>
+{/snippet}
+
+<section class="hero-section" class:has-cover={!!cover}>
+  <div class="profile-cover" style:background-image={cover ? `url(${cover})` : null}>
+    {#if onCoverFile}{@render camera('Change cover photo', onCoverFile, 'cover-cam')}{/if}
+  </div>
   <div class="hero-topline">
     <div class="hero-main">
       <div class="hero-identity">
@@ -52,6 +88,7 @@
         {:else}
           <AvatarBadge size="md" name={person.profile?.name ?? ''} avatar={null} />
         {/if}
+        {#if onPhotoFile}{@render camera('Change profile photo', onPhotoFile, 'photo-cam')}{/if}
         <div class="hero-copy">
           <div class="name-row">
             <h1>{displayName(person)}</h1>
