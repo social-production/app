@@ -82,6 +82,27 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## In flight (parity, cloud session) 2026-11-16, 1:30 pm Melbourne
+Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
+#163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this
+cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
+- **PR #164 merged** 12:50 pm Melbourne (the demo script `tests/e2e/demo-content.mjs` and the
+  parity list; no app code). Live demo content exists until #163 deploys; then run the script again
+  (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 5 sign-ups or
+  restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
+  ux-polish.
+- **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only); next: the gateway side in a `services/push` crate.
+- **Settings rows** (#162 merged 2:44 pm Melbourne; Settings is now this session's) (separate Public/Personal feeds, display timezone, Privacy's three switches):
+  start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
+  `RegionalSettings.svelte`. Settings is this session's after #162.
+- **Bot-review vote notification:** after #163 merges (both touch `identity`'s coordinator
+  `lib.rs`); coordinator only plus a card in `features/notifications/`. `notifications.mjs`
+  passes on #163 with a fresh seed (an earlier failure was a local seed slowed after ~1.5 h).
+- **Russian:** after ux-polish merges (it rewrites most create-flow, Links, History, map strings).
+- #162 and #163 showed merge conflicts with main at 12:34 pm; CI starts once main is merged in.
+- The desktop session owns: `components/styles/ux/*`, `features/projects/`, `features/shell/`,
+  `components/shell/`, the card/link/governance/plan/create/... components, messages, people,
+  search, about, invites, feedback, map, and `services/{feedback,messages,projects}.ts`.
 ## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
 The last PC session's stacked UX branches (labels → new-message → remaining-screens →
 plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
