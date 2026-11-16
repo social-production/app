@@ -118,7 +118,10 @@ frames under `project/*.dc.html`).
    network vote). A project reset, shipped with the #platform voting rule.
 2c. Channel Pictures (2026-11-16 evening, **approved, not built**; owner: the creator adds the
    picture and cover when creating, no vote, and may leave the default; redraw the three sheets as
-   shown; no camera buttons on the scope page, only the pencil): picture + cover for
+   shown; no camera buttons on the scope page, only the pencil)
+   Owner's later note: a waiting vote shows as a Vote button on a row above the floating
+   bottom bar, as on a project or event page (the detail action dock), not as the bar under
+   the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
@@ -156,6 +159,18 @@ frames under `project/*.dc.html`).
   there on a seed up ~1.5 h and passed alone on a fresh one (`event-flow.mjs` is a helper,
   not a test).
 - **`claude/ux-polish`** (Polish Pass) = #163 + the polish work; UI only. Open its PR after #163.
+- **`claude/ux-platform`** = profiles + the Platform and Moderators screens (artifact 2b, §1 to
+  §3; UI only): globe badge, "Whole network" chip, "N active last week" (the count votes are
+  sized from: the last complete week, so "last week", not "this week"), Join + a Moderators
+  pill with up to three faces and "+N"; the empty page offers "Start a platform project"
+  (`/create/project?tag=platform` preselects #platform). The sheet: a summary (or the
+  quorum-0 note), Seated / Candidates rows (`components/board/BoardRow.svelte`, wording in
+  `domain/board.ts`), your row first with "You" and no vote buttons, Volunteer / Withdraw /
+  Step down each through `BoardConfirmSheet`, and `BoardHowSheet`'s five steps. Left out
+  until ADR 0095's rest ships (they would be untrue before): the "Every Full member votes on
+  #platform projects" line, "Network vote" on cards, and "merge" in what moderators do.
+  Checked: `platform.mjs` passed (updated for the confirm step); page, sheet, confirm and
+  steps at 390px light and dark. Open its PR after `claude/ux-profiles` merges.
 - **`claude/ux-profiles`** = polish + the Profiles and Comments screens (artifact 0 above); UI
   only. Home and profiles use the Global row (`PersonalSpaceCard` → `SpaceCard`, with
   `FeedSurface`'s `context` line); `CommentActivityCard` rows from `services/profileNotes.ts`;
