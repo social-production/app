@@ -150,6 +150,13 @@ frames under `project/*.dc.html`).
   touch the feed, create, plan, activity and project files these branches change). Next
   session the two sessions message each other directly (ListAgents / SendMessage): post when
   a PR opens or merges, or when you need a file the other owns.
+- **`claude/ux-scroll-chrome` (stacked on ux-platform, owner's ask 2026-11-16 evening):** on
+  phone feeds (home, platform, profiles, channels, communities) the top bar and bottom nav slide
+  away while you scroll down and return as soon as you scroll up; the "+" drops into the nav's
+  place. Within 60px of the top they always show; opening a rail or More shows them; a route
+  change resets. `features/shell/scrollChrome.svelte.ts`, reusing web's `chrome-collapsed`
+  slides. Checked at 390px light and dark on home and profile (search keeps its bars). Its PR
+  opens after ux-platform's.
 - **Lighter CI (cloud session's #167, owner-approved, open at 5:14 pm):** once it merges,
   docs-only PRs run no CI, UI-only PRs run only the fast check, and the ~2 h scenarios run only
   when a PR touches `zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`,
