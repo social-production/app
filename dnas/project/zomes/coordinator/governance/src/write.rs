@@ -101,6 +101,11 @@ fn prepare(kind: ProposalKind, roll: &Roll) -> ExternResult<ProposalKind> {
             moves::check_return(&state, &to, &reason, roll)?;
             ProposalKind::Return { to, reason }
         }
+        ProposalKind::Convert { reason } => {
+            let state = apply::state(&mut Standing::default(), roll)?;
+            moves::check_convert(&state, &reason, roll)?;
+            ProposalKind::Convert { reason }
+        }
         ProposalKind::Software(request) => {
             software::check(&request)?;
             ProposalKind::Software(request)

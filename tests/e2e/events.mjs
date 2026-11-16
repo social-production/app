@@ -36,7 +36,7 @@ await bob.reload();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 60_000 });
 const facts = await bob.locator('.live-fact').allInnerTexts();
 assert.ok(facts.some((f) => /9:00|09:00/.test(f) && /1:00|13:00/.test(f)), `time line: ${facts}`);
-assert.ok(facts.includes('Allotment 4'), `place: ${facts}`);
+assert.ok(facts.some((f) => f.startsWith('Allotment 4')), `place: ${facts}`);
 await bob.screenshot({ path: `${shots}/event-details-390.png` });
 log(`the event shows its plan's time and place: ${facts.join(' | ')}`);
 
@@ -56,13 +56,13 @@ await feedUntil(async () => (await card.count()) > 0, 20);
 await card.waitFor();
 assert.match(await card.locator('a.title').getAttribute('href'), /\/events\//);
 log('the feed lists it as an event card');
-// web's EventCard place line: the leading plan's start, then the place (the index re-reads
-// a written space about once a minute).
-const line = card.locator('.location');
+// The card's when and where: the leading plan's start on one row, the place on its own row
+// that opens the map (the index re-reads a written space about once a minute).
+const line = card.locator('.card-when');
 await feedUntil(async () => /9:00/.test((await line.allInnerTexts()).join('')), 30);
-const placeLine = await line.innerText();
-assert.match(placeLine, /9:00.* · Allotment 4$/, `card time and place: ${placeLine}`);
-log(`the event card shows its plan's start and place: ${placeLine}`);
+const placeRow = card.locator('a.card-place');
+assert.equal((await placeRow.innerText()).trim(), 'Allotment 4', 'the place has its own row');
+log(`the event card shows its plan's start and place: ${await line.innerText()} / Allotment 4`);
 
 // web's EventActivityPhase: the plan's day is marked, and the wizard's times stay inside it.
 await bob.goto(eventUrl);

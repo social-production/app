@@ -1,11 +1,14 @@
 <script lang="ts">
+  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { IMPORTANCE_OPTIONS, type Importance, type ProjectValue } from '#lib/domain/values.ts';
 
   import DiscreteScale from './DiscreteScale.svelte';
 
   import '#lib/components/styles/values.css';
 
-  /** web's ProjectValueCard: a value, its 1–10 importance scale and the community average. */
+  /** A value as a soft card (Plan, Phase and Feedback Screens, 2): its name and a chip with
+   * your rating (or "Rate this"), ten round targets, and everyone's average as a bar. Who
+   * added it is in the card's ⋯ sheet. */
   interface Props {
     value: ProjectValue;
     authorName: string;
@@ -15,6 +18,7 @@
 
   let { value, authorName, canVote, onVote }: Props = $props();
 
+  let about = $state(false);
   // The tapped vote shows at once and holds until the reload carries it (web's `heldVote`).
   let heldVote = $state<Importance | null>(null);
   const localVote = $derived(
@@ -22,18 +26,9 @@
       ? heldVote
       : value.activeImportanceVote,
   );
-
-  const hasUserVote = $derived(localVote > 0);
-  const needsVote = $derived(canVote && !hasUserVote);
-  const averageLabel = $derived(
-    value.voteCount === 0
-      ? 'No community rating yet'
-      : `Community average: ${value.importanceScore.toFixed(1).replace(/\.0$/, '')}/10`,
-  );
-  const userVoteLabel = $derived(
-    hasUserVote ? `Your vote: ${localVote}/10` : 'Vote to rate this value',
-  );
-  const voteLabel = $derived(`${value.voteCount} vote${value.voteCount === 1 ? '' : 's'}`);
+  const needsVote = $derived(canVote && localVote === 0);
+  const average = $derived(value.importanceScore.toFixed(1).replace(/\.0$/, ''));
+  const ratings = $derived(`${value.voteCount} rating${value.voteCount === 1 ? '' : 's'}`);
 </script>
 
 <article
@@ -41,14 +36,30 @@
   class:needs-vote={needsVote}
   data-participation-action={needsVote ? 'rate-value' : undefined}
 >
-  <strong class="value-title">{value.label}</strong>
-
-  {#if needsVote}
-    <p class="value-prompt">Tap 1 if this does not matter, 10 if it is required.</p>
-  {/if}
+  <div class="value-head">
+    <strong class="value-title">{value.label}</strong>
+    {#if localVote > 0}
+      <span class="value-chip mine">You: {localVote}</span>
+    {:else if canVote}
+      <span class="value-chip need">Rate this</span>
+    {/if}
+    <button
+      class="value-more"
+      type="button"
+      aria-label={`About ${value.label}`}
+      onclick={() => (about = true)}
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24"
+        ><circle cx="12" cy="5.5" r="1.3" /><circle cx="12" cy="12" r="1.3" /><circle
+          cx="12"
+          cy="18.5"
+          r="1.3"
+        /></svg
+      >
+    </button>
+  </div>
 
   <DiscreteScale
-    averageValue={value.voteCount > 0 ? value.importanceScore : 0}
     disabled={!canVote}
     leftLabel="Unnecessary"
     onSelect={(selected) => {
@@ -60,16 +71,26 @@
     selectedValue={localVote}
   />
 
-  <div class="value-footer">
-    <span class="value-footer-start">
-      <span>{userVoteLabel}</span>
-      {#if value.voteCount > 0}
-        <span>{averageLabel}</span>
-      {/if}
-    </span>
-    <span class="value-footer-end">
-      <span>{voteLabel}</span>
-      <span>{authorName}</span>
-    </span>
+  <div
+    class="value-average"
+    aria-label={value.voteCount ? `Community average: ${average}/10` : 'No community rating yet'}
+  >
+    <span>Everyone</span>
+    <i style={`--share: ${value.voteCount ? value.importanceScore * 10 : 0}%`}></i>
+    <span
+      >{#if value.voteCount}<b>{average}</b> · {ratings}{:else}No ratings yet{/if}</span
+    >
   </div>
 </article>
+
+<OverlaySheet
+  open={about}
+  title={value.label}
+  labelledById={`value-about-${value.id}`}
+  rootClass="value-sheet"
+  onClose={() => (about = false)}
+>
+  <p class="value-about">
+    Added by <strong>{authorName}</strong> · {new Date(value.createdAt / 1000).toLocaleDateString()}
+  </p>
+</OverlaySheet>

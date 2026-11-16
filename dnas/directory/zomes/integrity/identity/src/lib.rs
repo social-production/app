@@ -6,9 +6,11 @@ mod bot_review;
 mod chain;
 mod device;
 mod feedback;
+mod feedback_comment;
 mod follow;
 mod founders;
 mod listing;
+mod notes;
 mod profile;
 mod standing;
 mod vouch;
@@ -20,7 +22,9 @@ pub use bot_review::{MARK_BOT, MARK_CLEAR, VOTE_BOT, VOTE_REAL};
 use chain::same_author;
 pub(crate) use chain::{earlier_creates, invalid, prev_action, prev_action_of, typed_entry};
 pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
+pub use feedback_comment::{FeedbackComment, FEEDBACK_COMMENT_MAX};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
+pub use notes::{CommentNote, Cover, COVER_MAX_BYTES};
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
@@ -119,6 +123,9 @@ pub enum EntryTypes {
     DeviceLink(DeviceLink),
     ProjectListing(ProjectListing),
     Feedback(Feedback),
+    FeedbackComment(FeedbackComment),
+    Cover(Cover),
+    CommentNote(CommentNote),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -149,6 +156,12 @@ pub enum LinkTypes {
     BoardVotes,
     Active,
     Deactivated,
+    // Feedback comments: item → comment; comment → the person who likes it.
+    FeedbackComments,
+    FeedbackCommentLikes,
+    // A profile's cover, and the notes listing someone's comments (notes.rs).
+    AgentToCover,
+    AgentToComments,
 }
 
 #[hdk_extern]
@@ -218,18 +231,26 @@ fn validate_create(
         EntryTypes::DeviceLink(d) => device::validate_create(d, action),
         EntryTypes::ProjectListing(l) => listing::validate_create(l, action),
         EntryTypes::Feedback(f) => feedback::validate_fields(f),
+        EntryTypes::FeedbackComment(c) => feedback_comment::validate_create(c),
+        EntryTypes::Cover(c) => notes::validate_cover(c),
+        EntryTypes::CommentNote(n) => notes::validate_note(n),
     }
 }
 
-/// Vouches and device links can be withdrawn by their author; nothing else is deletable.
+/// Vouches, device links, covers and comment notes can be withdrawn by their author.
 fn validate_delete(action: &TypedAction<DeleteData>) -> ExternResult<ValidateCallbackResult> {
     let original = must_get_valid_record(action.deletes_address.clone())?;
     let deletable = matches!(
         typed_entry(&original)?,
-        Some(EntryTypes::Vouch(_) | EntryTypes::DeviceLink(_))
+        Some(
+            EntryTypes::Vouch(_)
+                | EntryTypes::DeviceLink(_)
+                | EntryTypes::Cover(_)
+                | EntryTypes::CommentNote(_)
+        )
     );
     if !deletable {
-        return invalid("only vouches and device links can be withdrawn");
+        return invalid("only vouches, device links, covers and comment notes can be withdrawn");
     }
     same_author(
         original.action().author(),
@@ -244,12 +265,18 @@ fn validate_create_link(
     action: &TypedAction<CreateLinkData>,
 ) -> ExternResult<ValidateCallbackResult> {
     match link_type {
-        LinkTypes::AgentToProfile | LinkTypes::AgentToGrants | LinkTypes::AgentToListings => {
+        LinkTypes::AgentToProfile
+        | LinkTypes::AgentToGrants
+        | LinkTypes::AgentToListings
+        | LinkTypes::AgentToCover
+        | LinkTypes::AgentToComments => {
             let base = action.base_address.clone().into_agent_pub_key();
             if base.as_ref() == Some(action.author()) {
                 Ok(ValidateCallbackResult::Valid)
             } else {
-                invalid("agents can only link their own profile, grants and listings")
+                invalid(
+                    "agents can only link their own profile, grants, listings, cover and comments",
+                )
             }
         }
         LinkTypes::Follows
@@ -259,6 +286,8 @@ fn validate_create_link(
         | LinkTypes::RequiresFollowApproval => follow::validate_create_link(link_type, action),
         LinkTypes::AllFeedback => feedback::validate_listing_link(action),
         LinkTypes::FeedbackVotes => feedback::validate_vote_link(action),
+        LinkTypes::FeedbackComments => feedback_comment::validate_comment_link(action),
+        LinkTypes::FeedbackCommentLikes => feedback_comment::validate_like_link(action),
         LinkTypes::BotMarks | LinkTypes::BotReviewVotes | LinkTypes::ReReviews => {
             bot_review::validate_create_link(link_type, action)
         }

@@ -157,11 +157,26 @@ const card = bob.locator('.feedback-card', { hasText: `Dark tiles ${stamp}` });
 await card.getByRole('button', { name: /^Support/ }).click();
 await card.locator('.signal-percent', { hasText: '100%' }).waitFor({ timeout: 60_000 });
 await card.click();
-const detail = bob.getByRole('dialog', { name: 'Suggestion' });
-await detail.getByText('The map is bright at night.').waitFor();
+// The item opens on its own page (Plan, Phase and Feedback Screens §7); Bob comments, Ann
+// answers him, and Bob likes the answer.
+await bob.waitForURL(/\/feedback\/[^/]+$/, { timeout: 30_000 });
+await bob.getByText('The map is bright at night.').waitFor();
+const itemUrl = bob.url();
+await bob.getByRole('textbox', { name: 'Add a comment' }).fill('A dark style would help at night.');
+await bob.getByRole('button', { name: 'Post comment' }).click();
+await bob.locator('.feedback-comment', { hasText: 'A dark style would help' }).waitFor({ timeout: 60_000 });
+await ann.goto(itemUrl);
+const bobComment = ann.locator('.feedback-comment', { hasText: 'A dark style would help' });
+for (let i = 0; i < 20 && !(await bobComment.count()); i++) {
+  await ann.waitForTimeout(3000);
+  await ann.reload();
+}
+await bobComment.getByRole('button', { name: 'Reply' }).click();
+await ann.getByRole('textbox', { name: /^Reply to / }).fill('Added to the list.');
+await ann.getByRole('button', { name: 'Post comment' }).click();
+await ann.locator('.feedback-comment', { hasText: 'Added to the list.' }).getByText(/^Replying to /).waitFor({ timeout: 60_000 });
 await bob.screenshot({ path: `${out}/phone390-feedback-detail.png` });
-await bob.keyboard.press('Escape');
-log('bob supports it and opens the detail');
+log('bob supports it, opens it and comments; ann answers him');
 
 const guest = await device({ viewport: phone });
 await until(guest, `${BASE}/feedback`, () => guest.getByText(`Dark tiles ${stamp}`).isVisible(), 'guest feedback');

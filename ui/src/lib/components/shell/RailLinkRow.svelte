@@ -20,7 +20,7 @@
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- hrefs arrive resolved (ResolvedPathname) -->
 <a class="rail-link-row" class:active {href} {onclick}>
-  <ScopeGlyph {icon} {imageUrl} />
+  <span class="rail-glyph" data-icon={icon}><ScopeGlyph {icon} {imageUrl} /></span>
   <span class="label">{label}</span>
   <span class="trailing">{@render trailing?.()}</span>
 </a>
@@ -28,15 +28,38 @@
 <!-- eslint-enable svelte/no-navigation-without-resolve -->
 
 <style>
+  /* A soft square glyph (Plan, Phase and Feedback Screens, 5): # for a channel, people for
+     a community; the open row is tinted. */
+  .rail-glyph {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    background: var(--panel-hover);
+    color: var(--text-soft);
+  }
+
+  .rail-glyph[data-icon='channel'] {
+    background: color-mix(in srgb, #3f70ab 16%, transparent);
+    color: color-mix(in srgb, #3f70ab 70%, var(--text-main));
+  }
+
+  .rail-glyph[data-icon='community'] {
+    background: var(--brand-soft);
+    color: var(--brand-strong);
+  }
+
   .rail-link-row {
     display: flex;
-    gap: 8px;
+    gap: 11px;
     align-items: center;
     width: 100%;
-    padding: 8px 10px;
-    border-radius: var(--radius-sm);
+    padding: 6px 8px;
+    border-radius: 14px;
     color: var(--text-main);
-    font-size: 13px;
+    font-size: 14.5px;
     font-weight: 600;
     text-decoration: none;
     background: transparent;
@@ -46,7 +69,7 @@
   }
 
   .rail-link-row:hover {
-    background: var(--panel-strong);
+    background: var(--panel-hover);
   }
 
   .rail-link-row.active {
@@ -57,9 +80,7 @@
   .label {
     flex: 1;
     min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
 
   .trailing {

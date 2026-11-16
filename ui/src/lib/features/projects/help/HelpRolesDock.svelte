@@ -14,8 +14,9 @@
   import type { HelpState } from './helpState.svelte.ts';
 
   /**
-   * web's HelpRequestRolesSection: each role with its sign-ups and a Sign up / Leave / Full
-   * button (in the page), and the dock with the vote strip and web's Share menu (signed in).
+   * web's HelpRequestRolesSection as drawn (Invites, Help Requests and Software Screens, 2):
+   * how many roles are filled with a bar, each role as a soft card with who is in and Join /
+   * Leave / Full, and the dock with the vote strip, "Join a role" and web's Share menu.
    */
   let { help }: { help: HelpState } = $props();
 
@@ -40,17 +41,30 @@
     }
   }
 
+  const roles = $derived(help.activity?.roles ?? []);
+  const filled = $derived(roles.filter((r) => !help.hasRoom(r)).length);
+
+  function toRoles(): void {
+    document.querySelector('.help-roles-page')?.scrollIntoView({ behavior: 'smooth' });
+  }
+
   function label(role: ActivityRole): string {
     if (help.pending === role.index) return 'Working...';
     if (help.activity?.myRole === role.index) return 'Leave';
-    return help.hasRoom(role) ? 'Sign up' : 'Full';
+    return help.hasRoom(role) ? 'Join' : 'Full';
   }
 </script>
 
 <!-- ADR 0099: the roles are part of the page; the dock holds the votes and Share. -->
 {#if help.activity && help.activity.roles.length > 0}
   <div class="help-roles help-roles-page">
-    <h2 class="roles-heading">Roles</h2>
+    <div class="roles-head">
+      <h2 class="roles-heading">Roles</h2>
+      <span>{filled} of {roles.length} filled</span>
+    </div>
+    <div class="roles-meter" aria-hidden="true">
+      <i style={`width: ${roles.length ? (filled / roles.length) * 100 : 0}%`}></i>
+    </div>
     <div class="role-stack">
       {#each help.activity.roles as role (role.index)}
         {@const mine = help.activity.myRole === role.index}
@@ -59,8 +73,10 @@
             <strong>{role.label}</strong>
             {#if role.description}<p>{role.description}</p>{/if}
             <span>
-              {role.people.length} signed up
-              {#if slotsOf(role.maximum) > 0}· {slotsOf(role.maximum)} needed{/if}
+              {slotsOf(role.maximum) > 0 ? `${slotsOf(role.maximum)} needed · ` : ''}{role.people
+                .length
+                ? role.people.map((a) => help.names[a] ?? '…').join(', ')
+                : 'nobody yet'}
             </span>
           </div>
           <button
@@ -88,6 +104,9 @@
       mine={help.project.mySignal}
       onSignal={(next) => help.vote(next)}
     />
+    {#if help.activity && roles.length > 0}
+      <button class="dock-join" type="button" onclick={toRoles}>Join a role</button>
+    {/if}
     {#if signedIn}
       <ShareUserMenu
         copyLinkUrl={url}

@@ -2,6 +2,7 @@
   import type { ResolvedPathname } from '$app/types';
 
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
 
   import RailLinkRow from './RailLinkRow.svelte';
@@ -18,49 +19,63 @@
     /** Invites waiting for an answer (web's unreadCounts.invites). */
     invites?: number;
     closePanels?: () => void;
-    onDiscover?: () => void;
+    /** Opens Discover, with the words typed into the rail's field. */
+    onDiscover?: (query: string) => void;
   }
 
-  /** Ported from web/src/lib/features/left-rail/LeftRailPanel.svelte (same markup and styles). */
+  /** web's LeftRailPanel in the UX look (Plan, Phase and Feedback Screens, 5): a field that
+   * opens Discover with your words, Platform and Moderators, folding Channels and
+   * Communities with soft glyphs (the open one tinted), and Discover beside Feedback. */
   let { channels = [], communities = [], invites = 0, closePanels, onDiscover }: Props = $props();
 
-  let collectiveOpen = $state(true);
+  let find = $state('');
+  const here = (href: string): boolean =>
+    page.url.pathname + page.url.search === href || page.url.pathname === href;
   let channelsOpen = $state(true);
   let communitiesOpen = $state(true);
 </script>
 
-<section class="rail-panel">
-  <details class="rail-section" bind:open={collectiveOpen}>
-    <summary class="rail-section-summary">
-      <span class="summary-label">
-        <span class="chevron" aria-hidden="true"></span>
-        <span>Collective</span>
-      </span>
-    </summary>
-    <div class="stack-links">
-      <RailLinkRow
-        href={resolve('/platform')}
-        icon="platform"
-        label="Platform"
-        onclick={closePanels}
-      />
-      <RailLinkRow
-        href={resolve('/platform?board=1')}
-        icon="shield"
-        label="Moderators"
-        onclick={closePanels}
-      />
-    </div>
-  </details>
-</section>
+<div class="rail-ux">
+  <form
+    class="rail-find"
+    role="search"
+    onsubmit={(e) => {
+      e.preventDefault();
+      onDiscover?.(find.trim());
+      find = '';
+    }}
+  >
+    <svg aria-hidden="true" viewBox="0 0 24 24"
+      ><circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" /></svg
+    >
+    <input
+      bind:value={find}
+      type="search"
+      aria-label="Find channels and communities"
+      placeholder="Find channels and communities"
+    />
+  </form>
 
-<section class="rail-panel">
+  <div class="stack-links">
+    <RailLinkRow
+      href={resolve('/platform')}
+      icon="platform"
+      label="Platform"
+      active={here('/platform')}
+      onclick={closePanels}
+    />
+    <RailLinkRow
+      href={resolve('/platform?board=1')}
+      icon="shield"
+      label="Moderators"
+      onclick={closePanels}
+    />
+  </div>
+
   <details class="rail-section" bind:open={channelsOpen}>
     <summary class="rail-section-summary">
-      <span class="summary-label">
-        <span class="chevron" aria-hidden="true"></span>
-        <span>Channels</span>
-      </span>
+      <span>Channels</span>
+      <span class="chevron" aria-hidden="true"></span>
     </summary>
     <div class="stack-links">
       {#each channels as link (link.href)}
@@ -69,6 +84,7 @@
           icon="channel"
           imageUrl={link.imageUrl ?? null}
           label={link.label}
+          active={here(link.href)}
           onclick={closePanels}
         />
       {:else}
@@ -76,15 +92,11 @@
       {/each}
     </div>
   </details>
-</section>
 
-<section class="rail-panel">
   <details class="rail-section" bind:open={communitiesOpen}>
     <summary class="rail-section-summary">
-      <span class="summary-label">
-        <span class="chevron" aria-hidden="true"></span>
-        <span>Communities</span>
-      </span>
+      <span>Communities</span>
+      <span class="chevron" aria-hidden="true"></span>
     </summary>
     <div class="stack-links">
       {#if invites > 0}
@@ -93,6 +105,7 @@
           href={resolve('/invites')}
           icon="community"
           label="Invites"
+          active={here('/invites')}
           onclick={closePanels}
         >
           {#snippet trailing()}<span class="invite-count">{invites}</span>{/snippet}
@@ -104,6 +117,7 @@
           icon="community"
           imageUrl={link.imageUrl ?? null}
           label={link.label}
+          active={here(link.href)}
           onclick={closePanels}
         />
       {:else}
@@ -111,126 +125,109 @@
       {/each}
     </div>
   </details>
-</section>
 
-<section class="rail-panel">
   <div class="action-stack">
-    <button class="rail-action discover-button" type="button" onclick={onDiscover}>
+    <button class="rail-action discover-button" type="button" onclick={() => onDiscover?.('')}>
       <ToolbarIcon name="plus" />
       <span>Discover</span>
     </button>
-
     <a class="rail-action feedback-button" href={resolve('/feedback')} onclick={closePanels}>
       <ToolbarIcon name="pencil" />
       <span>Feedback</span>
     </a>
   </div>
-</section>
+</div>
 
 <style>
+  .rail-ux {
+    display: grid;
+    gap: 6px;
+  }
+
+  .rail-find {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 42px;
+    margin-bottom: 6px;
+    padding: 0 14px;
+    border-radius: 999px;
+    background: var(--panel-hover);
+    color: var(--text-soft);
+  }
+
+  .rail-find:focus-within {
+    box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+  }
+
+  .rail-find svg {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+  }
+
+  .rail-find input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text-main);
+    font: inherit;
+    font-size: 14.5px;
+  }
+
   .invite-count {
     min-width: 20px;
-    padding: 1px 6px;
+    height: 20px;
+    padding: 0 6px;
     border-radius: 999px;
     background: var(--brand);
     color: var(--on-brand, #fff);
-    font-size: 12px;
-    font-weight: 800;
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 20px;
     text-align: center;
-  }
-
-  .rail-panel {
-    padding: 0 0 12px;
-    border-bottom: 1px solid var(--panel-border);
   }
 
   .rail-section {
     display: grid;
   }
 
-  .rail-section[open] > .rail-section-summary {
-    margin-bottom: 8px;
-  }
-
   .rail-section-summary {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    min-height: 28px;
-    cursor: pointer;
-    list-style: none;
-    font-size: 14px;
+    padding: 12px 8px 4px;
+    color: var(--text-soft);
+    font-size: 12.5px;
     font-weight: 700;
-    color: var(--text-main);
+    list-style: none;
+    cursor: pointer;
   }
 
   .rail-section-summary::-webkit-details-marker {
     display: none;
   }
 
-  .summary-label {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    min-width: 0;
-  }
-
   .chevron {
-    width: 0;
-    height: 0;
-    border-top: 5px solid transparent;
-    border-bottom: 5px solid transparent;
-    border-left: 6px solid currentColor;
+    width: 8px;
+    height: 8px;
+    margin-right: 4px;
+    border-right: 2px solid currentColor;
+    border-bottom: 2px solid currentColor;
+    transform: rotate(-45deg);
     transition: transform 0.16s ease;
-    flex-shrink: 0;
   }
 
   details[open] > .rail-section-summary .chevron {
-    transform: rotate(90deg);
-  }
-
-  .action-stack {
-    display: grid;
-    gap: 8px;
-    width: 100%;
-    padding-top: 2px;
-  }
-
-  .rail-action {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    width: 100%;
-    min-height: 38px;
-    padding: 0 14px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    font-weight: 800;
-    text-decoration: none;
-    cursor: pointer;
-  }
-
-  .discover-button {
-    border: 1px solid color-mix(in srgb, var(--brand) 74%, transparent);
-    background: var(--brand);
-    color: var(--on-brand);
-  }
-
-  .discover-button:hover {
-    background: color-mix(in srgb, var(--brand) 86%, black);
-  }
-
-  .feedback-button {
-    border: 1px solid color-mix(in srgb, var(--panel-border) 88%, transparent);
-    background: color-mix(in srgb, var(--panel-soft) 90%, transparent);
-    color: var(--text-main);
-  }
-
-  .feedback-button:hover {
-    background: color-mix(in srgb, var(--brand) 10%, var(--panel-soft));
-    border-color: color-mix(in srgb, var(--brand) 40%, var(--panel-border));
+    transform: rotate(45deg);
   }
 
   .stack-links {
@@ -238,11 +235,40 @@
     gap: 2px;
   }
 
+  .action-stack {
+    display: flex;
+    gap: 8px;
+    padding: 12px 4px;
+  }
+
+  .rail-action {
+    display: inline-flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    height: 42px;
+    padding: 0 14px;
+    border: none;
+    border-radius: 999px;
+    background: var(--panel-hover);
+    color: var(--text-main);
+    font: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .discover-button {
+    background: var(--brand);
+    color: var(--on-brand);
+  }
+
   .empty-hint {
     margin: 0;
     padding: 4px 10px;
     color: var(--text-soft);
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: 12.5px;
   }
 </style>

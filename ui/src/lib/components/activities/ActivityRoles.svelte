@@ -1,10 +1,8 @@
 <script lang="ts">
-  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
-  import { roleButton, roleCapacity, type Activity } from '#lib/domain/activities.ts';
+  import { roleButton, roleLine, type Activity } from '#lib/domain/activities.ts';
 
-  import { resolve } from '$app/paths';
-
-  /** The Roles section of web's activity sheet: who holds each role, take/leave, suggestions. */
+  /** An opened activity's roles (Feed Headers and Activity Phase §3): one row each with who is
+   * in, a Join or Leave pill (or Full), and Suggest to put someone forward. */
   interface Props {
     activity: Activity;
     names: Record<string, string>;
@@ -50,28 +48,18 @@
   }
 </script>
 
-<section class="sheet-section">
-  <h3>Roles</h3>
+<section class="sheet-section role-group" aria-label="Roles">
   <div class="role-list">
     {#each p.activity.roles as role (role.index)}
       {@const mine = p.activity.myRole === role.index}
+      {@const label = roleButton(role, mine)}
+      {@const suggestable =
+        !p.past && !role.suggestion && p.canSuggest && p.activity.rolesOpen && !mine}
       <div class="role-bar">
         <div class="role-copy">
           <strong>{role.label}</strong>
-          <span>{roleCapacity(role)}</span>
-          {#if role.people.length > 0}
-            <div class="assignee-list">
-              {#each role.people as agent (agent)}
-                <a class="assignee-row" href={resolve('/profile/[agent]', { agent })}>
-                  <AvatarBadge size="sm" name={nameOf(agent)} />
-                  <span>{nameOf(agent)}</span>
-                </a>
-              {/each}
-            </div>
-          {/if}
-          {#if p.past}
-            <!-- web shows no suggestions on past activities -->
-          {:else if role.suggestion}
+          <span>{roleLine(role, nameOf)}</span>
+          {#if !p.past && role.suggestion}
             <span class="suggested-chip">Suggested · {nameOf(role.suggestion.person)}</span>
             {#if role.suggestion.person === p.me}
               {@const id = role.suggestion.id}
@@ -79,39 +67,44 @@
                 Decline
               </button>
             {/if}
-          {:else if p.canSuggest && p.activity.rolesOpen && !mine}
-            <button class="text-button" type="button" onclick={() => (suggesting = role.index)}>
-              Suggest someone
-            </button>
-            {#if suggesting === role.index}
-              <input
-                placeholder="Search username"
-                type="text"
-                value={query}
-                oninput={(e) => search(e.currentTarget.value)}
-              />
-              {#each results as person (person.agent)}
-                <button
-                  class="text-button"
-                  type="button"
-                  onclick={() => pick(role.index, person.agent)}
-                >
-                  {person.name}
-                </button>
-              {/each}
-            {/if}
+          {/if}
+          {#if suggestable && suggesting === role.index}
+            <input
+              placeholder="Search username"
+              type="text"
+              value={query}
+              oninput={(e) => search(e.currentTarget.value)}
+            />
+            {#each results as person (person.agent)}
+              <button
+                class="text-button"
+                type="button"
+                onclick={() => pick(role.index, person.agent)}
+              >
+                {person.name}
+              </button>
+            {/each}
           {/if}
         </div>
         {#if !p.readOnly && !p.activity.rolesOpen}
           <span class="roles-locked-copy">Locked</span>
+        {:else if label === 'Full'}
+          <span class="role-full">Full</span>
         {:else if !p.readOnly}
-          {@const label = roleButton(role, mine)}
-          <!-- One button: Take role, then the same spot becomes Leave role. -->
+          {#if suggestable}
+            <button
+              class="role-suggest"
+              type="button"
+              aria-expanded={suggesting === role.index}
+              onclick={() => (suggesting = suggesting === role.index ? null : role.index)}
+              >Suggest</button
+            >
+          {/if}
+          <!-- One button: Join, then the same spot becomes Leave. -->
           <button
             class="signup"
             class:selected={mine}
             aria-pressed={mine}
-            disabled={label === 'Role full'}
             type="button"
             onclick={() => p.onCommit(mine ? null : role.index)}>{label}</button
           >

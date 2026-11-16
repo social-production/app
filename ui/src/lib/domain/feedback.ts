@@ -16,7 +16,23 @@ export interface FeedbackItem {
   downvotes: number;
   myVote: FeedbackVote;
   lastActivity: number;
+  /** How many comments it has. */
+  comments: number;
 }
+
+/** A comment on a feedback item (flat; `replyTo` names the comment it answers). */
+export interface FeedbackComment {
+  id: string;
+  author: string;
+  body: string;
+  replyTo: string | null;
+  createdAt: number;
+  likes: number;
+  liked: boolean;
+}
+
+/** sp: identity_integrity::FEEDBACK_COMMENT_MAX. */
+export const FEEDBACK_COMMENT_MAX = 2_000;
 
 export interface FeedbackInput {
   kind: FeedbackKind;

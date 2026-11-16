@@ -77,7 +77,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.scenarios == 'true'
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # ~85 min of tests per shard plus the Nix setup; the margin keeps a slow runner from
+    # cutting off the last file.
+    timeout-minutes: 150
     strategy:
       fail-fast: false
       matrix:

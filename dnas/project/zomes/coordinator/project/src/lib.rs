@@ -2,6 +2,7 @@
 //! signals, and the project view with passed decisions applied (ADR 0033).
 
 mod charter;
+mod lineage;
 mod organizers;
 mod own;
 mod people;
@@ -10,6 +11,7 @@ mod spaces;
 mod view;
 
 use hdk::prelude::*;
+pub use lineage::{LineageInput, LineageView};
 use project_integrity::{audience, space_creator, Applied, Charter, LinkTypes, OrganizerRole};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
@@ -128,6 +130,12 @@ pub fn signal_counts(call: In<()>) -> ExternResult<SignalCounts> {
     })
 }
 
+/// Convert (ADR 0106): name the other project of a conversion on this space.
+#[hdk_extern]
+pub fn link_lineage(call: In<LineageInput>) -> ExternResult<ActionHash> {
+    lineage::link(call)
+}
+
 #[hdk_extern]
 pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
     enter(call)?;
@@ -182,6 +190,7 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         am_organizer: organizers.contains(&agent_info()?.agent_initial_pubkey),
         organizers,
         requests,
+        lineage: lineage::read(applied.converted)?,
     }))
 }
 

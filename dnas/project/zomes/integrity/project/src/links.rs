@@ -44,6 +44,7 @@ pub fn validate_create(
         LinkTypes::Recent => invalid("a recent-activity link points at a space"),
         LinkTypes::ScopeItems => crate::scope_item::validate(action),
         LinkTypes::Availability => crate::availability::validate_link(action),
+        LinkTypes::Lineage => validate_lineage(action),
     }
 }
 
@@ -81,4 +82,15 @@ pub fn membership_space(hash: &ActionHash) -> ExternResult<Option<ActionHash>> {
         }
         _ => None,
     })
+}
+
+/// A lineage link sits on a space and names the other project in its tag (ADR 0106).
+fn validate_lineage(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateCallbackResult> {
+    if !is_space(&action.base_address)? || action.base_address != action.target_address {
+        return invalid("a lineage link sits on its own space");
+    }
+    match action.tag.0.as_slice() {
+        [0 | 1, id @ ..] if !id.is_empty() && id.len() <= 200 => Ok(ValidateCallbackResult::Valid),
+        _ => invalid("a lineage link says which way and names the other project"),
+    }
 }

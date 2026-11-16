@@ -18,7 +18,8 @@
   overflow: hidden;
 }
 
-.shell .surface .content .feed-lead-glyph .surface-type-label {
+.shell .surface .content .feed-lead-glyph .surface-type-label,
+.shell .context-panel .feed-lead-glyph .surface-type-label {
   display: grid;
   place-items: center;
   width: 100%;
@@ -115,7 +116,8 @@
 
 /* Owner, 2026-11-14: a public row's title, text and actions start under the channel name,
    leaving the glyph's column empty, as a post's text sits beside its author's face. */
-.shell .surface .content .feed-card-top.feed-lead ~ * {
+.shell .surface .content .feed-card-top.feed-lead ~ *,
+.shell .context-panel .feed-card-top.feed-lead ~ * {
   margin-left: 44px;
 }
 
@@ -127,7 +129,8 @@
   border-radius: 11px;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph .surface-type-label {
   display: grid;
   place-items: center;
   width: 100%;
@@ -138,31 +141,37 @@
   color: color-mix(in srgb, var(--surface-accent, var(--brand)) 88%, var(--text-main));
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph.feed-lead-glyph svg {
   display: block;
   width: 19px;
   min-width: 19px;
   height: 19px;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .label-copy {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-glyph .label-copy,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-glyph .label-copy {
   display: none;
 }
 
 /* The channel is the bold line, without its own small icon. */
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-plain svg {
   display: none;
 }
 
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-plain,
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn {
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-plain,
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-tags .tag-overflow-btn {
   color: var(--text-main);
   font-size: 14px;
   font-weight: 700;
 }
 
 /* "Project · Plan phase · 2h": one soft grey line, the type not coloured. */
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .surface-type-label {
   padding: 0;
   background: none;
   color: var(--text-soft);
@@ -170,13 +179,17 @@
   font-weight: 500;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .surface-type-label svg {
   display: none;
 }
 
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-meta,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta,
 .shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-stage,
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-time {
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .feed-card-stage,
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta .feed-card-time,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta .feed-card-time {
   padding: 0;
   background: none;
   color: var(--text-soft);
@@ -184,8 +197,68 @@
   font-weight: 500;
 }
 
-.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label {
+.shell .surface .content .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label,
+.shell .context-panel .feed-card-top.feed-lead .feed-lead-meta.alone .surface-type-label {
   color: var(--text-main);
   font-size: 14px;
   font-weight: 700;
+}
+
+/* A feed card's when and where (owner, 2026-11-15): the date on one line, the place on its
+   own soft row that opens the map. Above the card's link layer so it takes the tap. */
+.shell .card-facts {
+  display: grid;
+  justify-items: start;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.shell .card-facts .card-when {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .card-facts svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .card-facts .card-place {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 5px 12px 5px 9px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .card-facts .card-place svg {
+  color: var(--brand-strong);
+}
+
+.shell .card-facts .card-place span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.shell .card-facts .card-place:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
 }

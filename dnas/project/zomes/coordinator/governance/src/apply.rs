@@ -108,6 +108,32 @@ fn edit(out: &mut Applied, kind: ProposalKind) {
     }
 }
 
+/// Closed by conversion, after Proposal and before closing: its work continues as a new
+/// proposal (ADR 0106). Returns the phase it is in afterwards.
+fn convert(out: &mut Applied, phase: Phase) -> Phase {
+    if matches!(phase, Phase::P1 | Phase::P7) {
+        return phase;
+    }
+    out.phase = Some(Phase::P7.id().to_string());
+    out.converted = true;
+    Phase::P7
+}
+
+/// A passed return to an earlier phase. Back in the first plan phase or before it, the
+/// subtype and a proposal's type are open again (ADR 0040, 0059).
+fn step_back(out: &mut Applied, c: &Charter, phase: Phase, to: &str) -> Phase {
+    let Some(back) = phase_return(c, out, phase, to) else {
+        return phase;
+    };
+    out.phase = Some(back.id().to_string());
+    if reopens_subtype(back) {
+        out.subtype = None;
+        out.mode = None;
+        out.requests = None;
+    }
+    back
+}
+
 /// Apply passed decisions in the order they were decided.
 fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approved]) -> Applied {
     let mut out = Applied::default();
@@ -129,9 +155,8 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     out.phase = Some(moved.to.id().to_string());
                     out.subtype = moved.subtype.or(out.subtype);
                     out.mode = moved.mode.or(out.mode);
+                    // The cited operations plan switched requests on (ADR 0059).
                     if let Some(mode) = moved.requests {
-                        // The cited operations plan switched requests on (ADR 0059); a
-                        // later `RequestSettings` vote changes them.
                         out.requests = Some(AppliedRequests {
                             enabled: true,
                             off_schedule: mode == "both",
@@ -141,19 +166,10 @@ fn fold(decisions: Vec<Decision>, charter: Option<&Charter>, approved: &[Approve
                     }
                 }
             }
+            ProposalKind::Convert { .. } => phase = convert(&mut out, phase),
             ProposalKind::Return { to, .. } => {
                 let Some(c) = charter else { continue };
-                if let Some(back) = phase_return(c, &out, phase, &to) {
-                    phase = back;
-                    out.phase = Some(back.id().to_string());
-                    if reopens_subtype(back) {
-                        // Back in the first plan phase or before it: the subtype, and a
-                        // proposal's type, are open again (ADR 0040, 0059).
-                        out.subtype = None;
-                        out.mode = None;
-                        out.requests = None;
-                    }
-                }
+                phase = step_back(&mut out, c, phase, &to);
             }
             // An approved plan changes nothing by itself; phase moves cite it. A link needs
             // both projects' approval, which the Links tab pairs (ADR 0042). Software

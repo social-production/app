@@ -67,14 +67,15 @@ await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_00
 async function assessPlan(page, yes) {
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.locator('.plan-card', { hasText: planTitle }).click();
+  await page.getByRole('button', { name: 'Review this plan' }).click();
   const sheet = page.locator('.plan-sheet');
   await sheet.locator('.criterion-row').first().waitFor();
   for (const row of await sheet.locator('.criterion-row').all()) {
     await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
     await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
   }
-  await sheet.getByRole('button', { name: 'Yes', exact: true }).click();
-  await sheet.getByText('Your vote is final once cast.').waitFor({ timeout: 30_000 });
+  await page.getByRole('button', { name: 'Yes, approve' }).click();
+  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
   await page.keyboard.press('Escape');
 }
@@ -121,11 +122,10 @@ log('ann submitted a pull request');
 /** Open the queue and the pull request's card, then its action (`Assess` or `Record merge`). */
 async function openAction(page, action, what) {
   const card = () => page.locator('.pr-card', { hasText: prTitle });
-  const button = () => card().getByRole('button', { name: action, exact: true });
+  const button = () =>
+    card().getByRole('button', typeof action === 'string' ? { name: action, exact: true } : { name: action });
   for (let i = 0; i < 40; i++) {
-    await panel(page, () => page.getByRole('button', { name: /In-progress pull requests/ }), what);
-    await page.getByRole('button', { name: /In-progress pull requests/ }).click();
-    await card().locator('.pr-card-body-shell').click();
+    await panel(page, () => card(), what);
     if (await button().waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
       await button().click();
       return;
@@ -136,7 +136,7 @@ async function openAction(page, action, what) {
 }
 
 async function voteYes(page, dialog, what) {
-  await openAction(page, 'Assess', what);
+  await openAction(page, /^(Vote|Confirm merge)$/, what);
   const sheet = page.getByRole('dialog', { name: dialog });
   await sheet.locator('.choice-bar .choice.yes').click();
   await sheet.waitFor({ state: 'hidden', timeout: 60_000 });

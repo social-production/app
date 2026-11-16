@@ -6,6 +6,7 @@
   import { planKindFor, planPhaseOf } from '#lib/domain/plans.ts';
 
   import ActivityPhase from './ActivityPhase.svelte';
+  import ClosedSummary from './ClosedSummary.svelte';
   import type { DetailState } from './detailState.svelte.ts';
   import PhaseChangeSection from './PhaseChangeSection.svelte';
   import PlanPhase from './PlanPhase.svelte';
@@ -66,6 +67,9 @@
       {:else if shown === 'phase-1' && project.charter?.mode !== 'personal-service'}
         <ValuePhase {detail} />
       {:else}
+        {#if shown === 'phase-7' && project.phase === 'phase-7'}
+          <ClosedSummary {detail} onActivity={() => (selected = 'phase-5')} />
+        {/if}
         <!-- Each of web's phase contents carries a toolbar; it gives the Phase menu its place
              in the dock. -->
         <PhaseWorkToolbar />
