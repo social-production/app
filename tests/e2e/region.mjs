@@ -72,7 +72,7 @@ log('Open as list shows Region on the map’s place');
 // The project's Venue link opens the app's map there (not OpenStreetMap).
 await page.goto(projectUrl);
 await page.getByRole('tab', { name: 'Links' }).click();
-await page.locator('.links-tab .external-link', { hasText: 'Venue' }).click();
+await page.locator('.links-tab .detail-place').click();
 await page.locator('.map-overlay .map-panel').waitFor({ timeout: 30_000 });
 await page.locator('.map-overlay .map-discovery-card', { hasText: title }).waitFor({ timeout: 60_000 });
 assert.ok(page.url().startsWith(projectUrl.split('?')[0]), 'the page stays');

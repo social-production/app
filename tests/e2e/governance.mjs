@@ -242,9 +242,9 @@ await until(bob, planStage, 'the return to the Plan phase');
 log('a return to the Plan phase passed');
 
 // web's History tab (`?tab=history`): every decision in one timeline, resolved ones under
-// Resolutions.
+// Decided.
 const historyUrl = `${bob.url().split('?')[0]}?tab=history`;
-const resolutions = bob.locator('.history-group', { hasText: 'Resolutions' });
+const resolutions = bob.locator('.history-group', { hasText: 'Decided' });
 for (const label of ['Edit decision', 'Update decision', 'Return to Plan', `Production plan · ${planTitle}`]) {
   for (let i = 0; ; i++) {
     await bob.goto(historyUrl);

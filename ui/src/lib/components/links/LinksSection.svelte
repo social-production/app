@@ -1,46 +1,28 @@
 <script lang="ts">
   import type { VoteChoice } from '#lib/domain/governance.ts';
-  import {
-    sideVoteLines,
-    tallyLabel,
-    targetMetaRows,
-    type LinkSide,
-    type ProjectLink,
-  } from '#lib/domain/links.ts';
-  import { modeAccent } from '#lib/domain/projects.ts';
+  import { targetMetaRows, type LinkSide, type ProjectLink } from '#lib/domain/links.ts';
 
   import { focusLinkCard } from './focusLinkCard.ts';
   import LinkCard from './LinkCard.svelte';
-  import LinkVotePanel from './LinkVotePanel.svelte';
+  import LinkVoteCard from './LinkVoteCard.svelte';
 
   import '#lib/components/styles/links.css';
 
-  /** web's DetailLinksSection: approved (or past) links; active ones can be put to a sever vote. */
+  /** web's DetailLinksSection for active links: one row each (Polish Pass mockups); a row opens
+   * to its details and "End this link", or to the vote that would end it. */
   interface Props {
-    title: string;
-    description: string;
     items: ProjectLink[];
-    emptyMessage: string;
+    names: Record<string, string>;
     allowSever: boolean;
     /** The link or request id an action is running for. */
     pendingId: string | null;
-    onSever?: (link: ProjectLink) => void;
-    onVote?: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
+    onSever: (link: ProjectLink) => void;
+    onVote: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
     /** A sever request a link asks to show (web's `?linkRequest=…`). */
     highlight?: string | null;
   }
 
-  let {
-    title,
-    description,
-    items,
-    emptyMessage,
-    allowSever,
-    pendingId,
-    onSever,
-    onVote,
-    highlight = null,
-  }: Props = $props();
+  let { items, names, allowSever, pendingId, onSever, onVote, highlight = null }: Props = $props();
 
   let expanded = $state<Record<string, boolean>>({});
   let shown: string | null = null;
@@ -52,21 +34,16 @@
     expanded = { ...expanded, [match.id]: true };
     void focusLinkCard(highlight);
   });
-
-  function metaLine(item: ProjectLink): string {
-    const label = item.sever ? tallyLabel(item.sever) : allowSever ? 'Linked' : 'Inactive';
-    return `Project · ${label}`;
-  }
 </script>
 
 <section class="network-stack">
-  <div class="section-heading">
-    <h2>{title}</h2>
-    {#if description}<p>{description}</p>{/if}
+  <div class="links-head">
+    <h2 class="links-heading">
+      Linked{#if items.length > 0}<span class="links-count">{items.length}</span>{/if}
+    </h2>
   </div>
-
   {#if items.length === 0}
-    <div class="empty-row">{emptyMessage}</div>
+    <p class="links-quiet">Not linked to anything yet.</p>
   {:else}
     <div class="link-list">
       {#each items as item (item.id)}
@@ -74,49 +51,32 @@
         {@const metaRows = targetMetaRows(target)}
         <LinkCard
           title={target.title}
-          metaLine={metaLine(item)}
-          sideVoteLines={item.sever ? sideVoteLines(item.sever) : []}
-          accent={modeAccent(target.mode)}
+          metaLine={['Linked', ...metaRows.slice(0, 1)].join(' · ')}
+          voteLine={item.sever ? 'A vote to end this link is open' : null}
           projectId={target.id}
           expanded={!!expanded[item.id]}
           domId={item.sever ? `link-request-${item.sever.id}` : `link-${item.id}`}
           onToggle={() => (expanded = { ...expanded, [item.id]: !expanded[item.id] })}
         >
-          <div class="target-detail">
-            <p class="detail-description">{target.description || item.create.summary}</p>
-            {#if metaRows.length > 0}
-              <div class="detail-meta">
-                {#each metaRows as row (row)}<span>{row}</span>{/each}
-              </div>
-            {/if}
-          </div>
+          <p class="detail-description">{target.description || item.create.summary}</p>
           {#if item.sever}
             {@const sever = item.sever}
-            <div class="vote-block">
-              <h3>Sever vote</h3>
-              <p class="vote-summary">{sever.summary}</p>
-              <div class="vote-grid">
-                {#each [sever.thisSide, sever.otherSide] as side (side.projectId)}
-                  <LinkVotePanel
-                    {side}
-                    yesLabel="Remove link"
-                    noLabel="Keep link"
-                    danger
-                    pending={pendingId === sever.id}
-                    onVote={onVote ? (s, choice) => onVote(sever.id, s, choice) : undefined}
-                  />
-                {/each}
-              </div>
-            </div>
-          {:else if allowSever && onSever}
-            <div class="sever-action">
-              <button
-                class="danger-button"
-                disabled={pendingId === item.id}
-                type="button"
-                onclick={() => onSever(item)}>Start sever vote</button
-              >
-            </div>
+            <LinkVoteCard
+              request={sever}
+              proposer={names[sever.proposedBy] ?? '…'}
+              yesLabel="Remove link"
+              noLabel="Keep link"
+              danger
+              pending={pendingId === sever.id}
+              onVote={(side, choice) => onVote(sever.id, side, choice)}
+            />
+          {:else if allowSever}
+            <button
+              class="danger-button end-link"
+              disabled={pendingId === item.id}
+              type="button"
+              onclick={() => onSever(item)}>End this link</button
+            >
           {/if}
         </LinkCard>
       {/each}
