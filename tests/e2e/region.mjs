@@ -47,15 +47,13 @@ await setDefaultPlace(page, 'Fitzroy Melbourne');
 // The feed's Region scope, from the default place; the index lists the project once read.
 await page.goto(BASE);
 await feedScope(page, 'Region');
-const place = page.locator('.feed-page .place-search input');
-await page.waitForFunction((el) => el?.value.includes('Fitzroy'), await place.elementHandle(), {
-  timeout: 30_000,
-});
+// Region's place line ("Near Fitzroy … · 25 km") opens the sheet with the place field.
+await page.locator('.feed-page .region-near', { hasText: 'Fitzroy' }).waitFor({ timeout: 30_000 });
 const card = page.locator('.feed-page .stack .surface', { hasText: title });
 for (let i = 0; i < 45 && !(await card.count()); i++) {
   await page.waitForTimeout(8_000);
   await page.reload();
-  await page.locator('.feed-page .feed-region-row').waitFor({ timeout: 60_000 });
+  await page.locator('.feed-page .region-near').waitFor({ timeout: 60_000 });
 }
 await card.first().waitFor({ timeout: 30_000 });
 await page.screenshot({ path: `${out}/region-feed-390.png` });

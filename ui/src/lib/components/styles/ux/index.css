@@ -16,6 +16,7 @@
 @import './activitysheet.css';
 @import './topbar.css';
 @import './mapfilters.css';
+@import './mapcards.css';
 @import './about.css';
 @import './messages.css';
 @import './newmessage.css';
@@ -39,3 +40,5 @@
 @import './sheets.css';
 @import './settingrows.css';
 @import './create.css';
+@import './pills.css';
+@import './region.css';

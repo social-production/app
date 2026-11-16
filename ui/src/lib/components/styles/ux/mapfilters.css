@@ -1,11 +1,14 @@
-/* The map's filters on phones and in fullscreen (ADR 0103): one capsule over the top of the
-   map; search opens a second bar under it only when asked. Overrides of the ported map.css. */
+/* The map's filters on phones and in fullscreen (ADR 0103; Polish Pass, 2026-11-16): one short
+   capsule centred over the bottom of the map; search opens a place bar just above it. Overrides
+   of the ported map.css. */
 .shell .map-panel .map-filter-top.filter-panel-overlay {
-  top: 10px;
-  right: 10px;
-  bottom: auto;
-  left: 10px;
-  display: grid;
+  top: auto;
+  right: 12px;
+  bottom: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: column-reverse;
+  align-items: center;
   gap: 8px;
   padding: 0;
   border: none;
@@ -16,6 +19,10 @@
   box-shadow: none;
   overflow: visible;
   pointer-events: none;
+}
+
+.shell .map-panel .map-search-bar {
+  align-self: stretch;
 }
 
 .shell .map-panel .map-filter-capsule,
@@ -35,7 +42,7 @@
 }
 
 .shell .map-panel .map-filter-capsule {
-  justify-content: space-between;
+  max-width: 100%;
 }
 
 .shell .map-panel .capsule-icon,
@@ -203,4 +210,11 @@
   background: var(--panel-hover);
   color: var(--text-main);
   font: inherit;
+}
+
+/* The map's credit (OpenStreetMap, CARTO, MapLibre) must stay, so it is MapLibre's compact
+   ⓘ in the empty top-left corner, closed until tapped (maps/load.ts). */
+.shell .map-panel .maplibregl-ctrl-attrib.maplibregl-compact {
+  min-height: 22px;
+  background: var(--float-background);
 }

@@ -7,6 +7,7 @@
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { FeedScope, HomeAudience } from '#lib/domain/homeFeed.ts';
+  import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
   import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
 
   import type { HomeFeedState } from './homeFeedState.svelte.ts';
@@ -48,11 +49,15 @@
   ];
   const windows: { value: FeedWindow; label: string }[] = [
     { value: 'today', label: 'Today' },
-    { value: 'week', label: 'This week' },
-    { value: 'month', label: 'This month' },
+    { value: 'week', label: 'Week' },
+    { value: 'month', label: 'Month' },
     { value: 'all', label: 'All time' },
   ];
 
+  const radiusLabel = $derived(
+    radiusPresetOptions.find((o) => o.value === feed.region.radius)?.label ??
+      `${feed.region.radius} km`,
+  );
   const scopeLabel = $derived(scopes.find((s) => s.value === feed.shownScope)?.label ?? 'Global');
   // The dot: something narrower than the feed's widest view is on.
   const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
@@ -85,22 +90,17 @@
     </button>
   </div>
   {#if feed.shownScope === 'region'}
-    <div class="controls-row feed-region-row"><RegionControls region={feed.region} /></div>
+    <!-- Region's place line (Polish Pass mockups): it and the filter button open one sheet. -->
+    <button type="button" class="region-near" aria-haspopup="dialog" onclick={() => (open = true)}>
+      <ToolbarIcon name="map-pin" />
+      {#if feed.region.placeQuery}
+        <span>Near <b>{feed.region.placeQuery}</b> · {radiusLabel}</span>
+      {:else}
+        <span>Choose a place to see what is near it</span>
+      {/if}
+    </button>
     {#if feed.region.message}
       <p class="inline-alert" role="alert">{feed.region.message}</p>
-    {/if}
-    {#if feed.region.suggestions.length > 0}
-      <ul class="suggestions">
-        {#each feed.region.suggestions as place, i (i)}
-          <li>
-            <button
-              type="button"
-              onmousedown={(e) => e.preventDefault()}
-              onclick={() => void feed.region.select(place)}>{place.displayLabel}</button
-            >
-          </li>
-        {/each}
-      </ul>
     {/if}
   {/if}
 </header>
@@ -113,6 +113,9 @@
   onClose={() => (open = false)}
 >
   <div class="feed-filter-groups">
+    {#if feed.shownScope === 'region'}
+      <RegionControls region={feed.region} />
+    {/if}
     {#if signedIn}
       <section>
         <h3>From</h3>

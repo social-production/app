@@ -1,0 +1,39 @@
+/* Choices as soft pills that wrap whole words (Polish Pass mockups, 2026-11-16). Unscoped:
+   the sheets that use them are portaled outside the shell. */
+.pill-choice {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-choice button {
+  min-height: 36px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.pill-choice button.on {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .pill-choice button:not(.on):hover {
+    background: color-mix(in srgb, var(--panel-hover) 70%, var(--text-main) 8%);
+  }
+}
+
+/* Filter sheets keep the page's side margin: the ported sheet body has none, and loads later
+   than the UX styles, so this needs the root's class too. */
+.overlay-root.feed-filter-sheet .overlay-body {
+  padding: 8px 20px 14px;
+}
