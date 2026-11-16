@@ -14,6 +14,15 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Loading, sign-up and Settings fixes (PRs #183 and #182, 2026-11-17 2:35 am and 3:07 am
+  Melbourne):** project, event and request chats look like Messenger; a thin loading line and
+  skeleton rows while pages load; a breathing-logo opening screen; each sign-up step fits a
+  phone screen; sheets put × and their action in one floating dock; side panels run past the
+  dock; Settings › Regional's place sheet and a new Distance row; "Show back buttons". UI only.
+- **Organisers see everyone invited to an event (PR #181, ADR 0111, 2026-11-17 1:35 am
+  Melbourne; project network reset, live 2:07 am):** sending an invite also records it on the
+  event, so the member list's Invited side (next UI PR) can list who was invited, by whom and
+  when. Test data on the project network was wiped by the reset; directory accounts kept.
 - **Chats like Telegram, full-screen search, new report sheets (PR #177, 2026-11-17 12:20 am
   Melbourne):** three-capsule chat header, bubbles with the time inside and a tail, a chat's
   person page, a search page with recent searches and channels to explore, ⋮ as a bottom
