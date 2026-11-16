@@ -145,7 +145,8 @@ try {
   await goto('/settings');
   const key = await until('the agent key', `return document.querySelector('#settings-account .key')?.innerText`);
   // ADR 0091: the app picked Railway's bootstrap from its list (the first, and it is up).
-  const server = await until('the network section', `return document.querySelector('#settings-network .server-url')?.innerText`);
+  // The "In use" row shows the bootstrap server's host (its full address is in the row's sheet).
+  const server = await until('the network section', `return document.querySelector('#settings-network .set-row-value')?.innerText`);
   if (!server.includes('railway.app')) throw new Error(`booted with ${server}, not Railway's bootstrap`);
   log(`network: ${server}`);
   await goto('/profile');
@@ -170,7 +171,8 @@ try {
 
   log('sign out, then log in with the words');
   await goto('/settings');
-  await click('Sign out');
+  await click('Sign out'); // the row, which opens its sheet
+  await click('Sign out', '[role=dialog] button');
   await signedIn('false');
   await goto('/onboarding');
   await click('Log in');
