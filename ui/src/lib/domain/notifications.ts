@@ -37,6 +37,7 @@ export type NotificationKind =
   | 'prj-removed'
   | 'bot-review'
   | 'bot-review-result'
+  | 'bot-review-vote'
   | 'svc-request'
   | 'pr-approved';
 

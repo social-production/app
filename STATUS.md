@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 afternoon Melbourne by the owner's PC session; start at "START HERE (2026-11-16 afternoon)")
+# Status: where the P2P app stands (updated 2026-11-16 evening Melbourne by the owner's PC session and the cloud parity session; start at "START HERE (2026-11-16 afternoon)", then the cloud session's "In flight")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -209,6 +209,81 @@ frames under `project/*.dc.html`).
   `private-events.mjs`). Live after #162 (read-only, 390px signed out): feed, Search,
   Feedback and About load with no page errors.
 
+## CI is minutes on PRs while this is a prototype (owner, 2026-11-16)
+PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing), unless they touch
+`zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`, `tests/scenarios/`, `Cargo.*`,
+`flake.*`, the root `package*.json` or the build/check scripts: then the ~2 h scenarios run too
+(`.github/workflows/ci.yml`). The scenarios and
+the desktop builds also run on main nightly (ci ~3 am, desktop ~3:30 am Melbourne) and on demand (Run
+workflow). Run locally the scenarios a change could break before pushing, and check the nightly
+run at the start of each session. Put the scenarios back on PRs once there is a stable release
+with real users.
+
+## In flight (parity, cloud session) 2026-11-16, 7:50 pm Melbourne
+- **A new cloud session took over at 7:35 pm** (session_01Ww2rC2Be5Zmhurdsbeum2U). It can message the
+  desktop UX session (session_01Ww2rByJuJmat7tc18ZtXjf) with the session service's
+  `send_message`, and that session's replies reach it. The owner allowed this on a trusted
+  device. Agreed PR order after #168: ux-polish → ux-profiles → ux-platform → ux-scroll-chrome
+  → ux-chat-fixes (desktop session). The desktop session's next ADR is 0109; this session takes 0110 and up.
+- **Merged 2026-11-16 evening:** #163 (ux-plan-convert, directory + project reset) 7:25 pm, live
+  7:39 pm (directory `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`); #170 (50 sign-ups per address a
+  day) and #168 (the seed listens for notice signals; Settings' push switches) 7:45 pm, both green.
+- **The ubuntu desktop smoke on main failed at 7:22 pm** (#169's commit): its live-network
+  `get_links` timed out while the seed was restarting for #169. This is deploy timing, not code;
+  check the #163 run.
+- **`claude/bot-review-vote`:** web's `bot-review-vote` card. The identity coordinator's
+  `bot_review_vote_notices(accounts)` returns review openings (not re-reviews) of the accounts
+  given, for full members only, and skips accounts whose bot mark by the caller is live; at most
+  100 accounts per call. `services/notifications.ts` passes the members of the projects and chats
+  it already reads. web also counts communities and channels; the device doesn't read those yet.
+  `bot_reviews.rs` scenario: 6 agents, with fay (a founder who never marks) asked to vote.
+  Passed locally (cloud-scenarios, 608 s). The card was checked at 390px light and dark with a
+  throwaway preview route (a real review needs 3 full members; dev-founders has 2).
+- **Demo content on live (8:00–8:45 pm Melbourne):** everything is made (project, service with a
+  request, event, proposals, threads, posts, help requests, DMs); people maya_k, tomas_b,
+  priya_r (phrases sent to the owner). `claude/demo-fixes` (PR #173) updates `tests/e2e/demo/*`
+  to #163/#171's flows and adds a resume (`DEMO_SKIP`, accounts file). The desktop session left
+  demo/* to this session; its ux-chat-fixes renames chat/report selectors (STATUS of that PR).
+- **#171 (ux-polish) merged 8:01 pm, #172 (ux-profiles) 8:20 pm.** Home's tabs, the display
+  timezone and Russian are this session's now.
+Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
+#163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this
+cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
+- **PR #164 merged** 12:50 pm Melbourne (the demo script `tests/e2e/demo-content.mjs` and the
+  parity list; no app code). Live demo content exists until #163 deploys; then run the script again
+  (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 50 sign-ups or
+  restores per IP a day, and a restart resets the count). The desktop session updates `tests/e2e/demo/*` to the new tag search in
+  ux-polish.
+- **Merged 2026-11-16:** #167 (lighter CI) 5:19 pm, #165 (ADR 0108) 5:28 pm, #166 (push
+  building blocks) 6:03 pm Melbourne, all green; the seed restarted with #166 at 6:16 pm and `GET /push/key` answers 200. `claude/push-signals` is PR #168.
+- **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only). `claude/push-gateway` (PR #166, merged): the `services/push` crate (VAPID key, RFC 8291 encryption, sender, subscriptions in `gateway.sqlite`, `Pusher::notify` with muted categories and "Show what it's about"; `cargo test -p push`, and Node decrypted its output); gateway routes `GET /push/key`, `POST /push/subscribe`, `POST /push/unsubscribe` (device secret, as `/session/cells`); `ui/static/sw.js` and `ui/src/lib/holo/push.ts` (`turnPushOn`/`turnPushOff`). Nothing sends yet. Next: the signals from the zomes (after #163, it touches the same coordinators), the gateway listening to hosted agents' signals and calling `notify`, the desktop's OS notifications, and the Settings switch (after #162). Not tested: a real push through a browser's push service.
+- **Push, the seed listens (`claude/push-signals`, PR #168):** the vendored holochain
+  patch adds a public `Conductor::app_signals(app_id)` (vendor/README.md). The gateway
+  (`services/gateway/src/notices.rs`) listens, from start and from each `/push/subscribe`, to the
+  apps of everyone with push on; a signal shaped `{ "notice": { kind, category, title, body, link
+  } }` calls `Pusher::notify`. A listener stops when the app is no longer hosted. Still to do: the
+  zomes send the signals (`recv_remote_signal` re-emits them; after #163) and desktop OS
+  notifications. Settings has "Push notifications" and "Show what it's about" under the
+  categories (`features/settings/PushSettings.svelte`, `stores/push.svelte.ts`; looked at 390px
+  light and dark against a local seed); signing out turns push off in that browser.
+- **Settings item 2 overlaps the UX branches:** the display timezone touches ~60 date calls in
+  19 files (domain/ plus components/activities, plans, create, features/projects/scopes), and
+  "Separate Public and Personal feeds" changes Home's tabs in `features/projects/`. Proposed: do
+  both after `claude/ux-profiles` merges (desktop session, 2026-11-16: it changes the Home feed files and the date callers), with Russian. The Privacy switches need
+  `identity` coordinator code (a tagged self link like `RequiresFollowApproval`; the directory
+  is public, so they hide in the app's own views, they can't make data secret, as ADR 0054):
+  after #163.
+- **Settings rows** (#162 merged 2:44 pm Melbourne; Settings is now this session's) (separate Public/Personal feeds, display timezone, Privacy's three switches):
+  start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
+  `RegionalSettings.svelte`. Settings is this session's after #162.
+- **Bot-review vote notification:** after #163 merges (both touch `identity`'s coordinator
+  `lib.rs`); coordinator only plus a card in `features/notifications/`. `notifications.mjs`
+  passes on #163 with a fresh seed (an earlier failure was a local seed slowed after ~1.5 h).
+- **Russian:** after ux-polish merges (it rewrites most create-flow, Links, History, map strings).
+- #162 and #163 showed merge conflicts with main at 12:34 pm; CI starts once main is merged in.
+- The desktop session owns: `components/styles/ux/*`, `features/projects/`, `features/shell/`,
+  `components/shell/`, the card/link/governance/plan/create/... components, messages, people,
+  search, about, invites, feedback, map, and `services/{feedback,messages,projects}.ts`.
 ## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
 The last PC session's stacked UX branches (labels → new-message → remaining-screens →
 plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
@@ -395,13 +470,33 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
 2. **PR #157 merged** 10:10 UTC Nov 15 (9:10 pm Melbourne): top bar, map capsule, About,
    sign-up helpers (UI only).
-3. **PR #159** (`claude/ux-chats-profile`, main merged in, no rebase) is open; merge when
-   green. Its sign-up keeps the floating back button (it replaces #157's "Back to feed").
-4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
-   #156's fix; merge main into it, open its PR, merge when green. **It resets the project
-   network on merge** (owner approved). After the deploy: `/readyz` shows a new project
-   hash; directory and conversation must be unchanged.
-5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+3. **PR #159 merged** 12:01 UTC Nov 15 (11:01 pm Melbourne): messages, chats, profiles,
+   sign-up, Settings rows (UI only). Its sign-up keeps the floating back button.
+4. **PR #160 merged** 13:21 UTC Nov 15 (12:21 am Nov 16 Melbourne): `claude/creation-plans`,
+   ADR 0059 stage A. **The project network was reset** (owner approved); directory and
+   conversation keep their networks. Expected project hash after the deploy:
+   `uhC0kNYqoKdcoI2u8vn7Pywpp8HOXVGDrzlzlq14qPuxRjh89iDF-` (see "After #160's deploy" below).
+   All UX branches are merged: **new UX work branches from `main`.**
+   **After #160's deploy (checked 2026-11-16 ~1:25 am Melbourne): the seed is up but hosts
+   nothing.** Railway reported the seed-node deploy a success at 13:33 UTC; `/readyz` says
+   `conductor: true`, `apps: 0`, `dnas: {}`, ~93 MB and 13 threads for 20+ minutes (after
+   earlier project resets it held ~650 MB with apps within 30 s). `/index/projects` and
+   `/index/people` are empty. The process restarted once more at ~13:53 UTC with no new
+   deploy. The bundle's hashes are right (`hc dna hash` on the built hApp: directory and
+   conversation equal the old live ones, project `uhC0kNYqoKdc…`), and #160 changed nothing in
+   the gateway's start-up, so the archivist's install (warm-up, then each 15 s index round)
+   is failing or hanging on Railway. **Needs the seed-node logs** (look for "warm-up failed",
+   "archivist round failed", "removed N apps", a panic, or "database or disk is full" on the
+   `/data` volume).
+   **Logs (owner, 2026-11-16 8:30 am Melbourne):** every round ends `archivist round failed
+   error=admin call: … ConnectionAborted`, with `lair connection recv loop ended` /
+   `incoming channel error: internal` from the keystore: the in-process lair fails each
+   request, so nothing installs. **Fix: a one-time fresh start** (owner: "I dont care about
+   wiping accounts, its all prototype"): `services/gateway/src/wipe.rs` clears `/data` once
+   (the keystore, the conductor and `gateway.sqlite`) when its `generation` file is not
+   `2026-11-16`, and logs the free space before and after. **Every account is gone after it**;
+   sign up again. Only `DATA_DIR=/data` is ever cleared. To wipe again, bump `GENERATION`.
+5. Docs PR #152 merged 2026-11-14.
    **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
    17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
    rerun passed). #156 fixed the sign-up half (`set_profile`). The rest: the profile page

@@ -37,6 +37,7 @@ export const categoryOf: Record<NotificationKind, NotificationCategory> = {
   'prj-removed': 'phase_done',
   'bot-review': 'votes_needed',
   'bot-review-result': 'votes_needed',
+  'bot-review-vote': 'votes_needed',
   'svc-request': 'roles',
   'pr-approved': 'votes_needed',
 };

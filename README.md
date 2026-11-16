@@ -8,12 +8,49 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-13)
+## Status (2026-11-16)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Push notifications, first half (PRs #166, #168, 2026-11-16 6:03 and 7:45 pm Melbourne, ADR
+  0108):** Settings → Notifications has "Push notifications on this device" and "Show what it's
+  about"; the seed keeps browsers' push subscriptions and listens for notice signals from the
+  people it hosts. The zomes don't send those signals yet, so no push arrives yet. No reset.
+- **Sign-ups (PR #170, 2026-11-16 7:45 pm Melbourne):** the seed allows 50 sign-ups or restores
+  per address a day (was 5).
+- **Demo content on live (2026-11-16 evening):** demo people (maya_k, tomas_b, priya_r) with a
+  project, a service with a request, an event, proposals, threads, posts, help requests and
+  direct messages (`tests/e2e/demo-content.mjs`, fixed for the new create flows in PR #173).
+- **Profiles and comments (PR #172, 2026-11-16 8:20 pm Melbourne):** Home and profiles show
+  Global's rows, with comment rows; your profile has a cover photo, camera buttons and an edit
+  sheet; comments show their author's photo and use one composer with a Replying-to bar; feed
+  photos open full screen with swipe and zoom. UI only, no reset.
+- **Polish pass (PR #171, 2026-11-16 8:01 pm Melbourne):** create flows ask one question per
+  step and preview the feed card before publishing; the map's filters are a bottom capsule;
+  Links and History show vote cards; signed-out visitors see no Notifications or Messages. UI
+  only, no reset.
+- **Plans, phases and feedback redrawn, Convert, profile covers and comment notes (PR #163,
+  2026-11-16 7:25 pm Melbourne, live 7:39 pm; ADRs 0106, 0107):** the Plan, Phase and
+  Feedback screens in the soft look; a phase-sheet vote converts a project into a new
+  proposal with a lineage link both ways; profiles get a cover photo, and Home and profiles
+  show "commented" rows. **Directory and project network reset**, so sign up again (test data
+  only).
+- **Telegram's New message and the Remaining Screens (PR #162, 2026-11-16 2:44 pm Melbourne):**
+  New message and New group as Telegram draws them, clearer plan and phase labels, and the
+  remaining screens in the soft look. UI only, no reset.
+- **Everything starts as a proposal (PR #160, 2026-11-16 12:21 am Melbourne, ADR 0059 stage
+  A):** Create → Proposal is four steps (Basics, Tags, Location, Overview); the leading plan
+  decides whether it becomes a project, a service or an event as it leaves its Plan phase, and
+  an operations plan can switch requests on with no settings vote. **Project network reset**,
+  and the seed node then started from empty data (its keystore had stopped answering), so
+  **every account is gone: sign up again** (test data only).
+- **Chats, profiles, sign-up and Settings in the soft look (PR #159, 2026-11-15 11:01 pm
+  Melbourne, ADRs 0104, 0105):** a Personal / Public switch in Messages, rounded bubbles,
+  word buttons on profiles, a boxless sign-up, Settings as rows that open small sheets. UI only.
+- **Top bar with search and one capsule, the map's filters as one capsule, a calmer About
+  (PR #157, 2026-11-15 9:10 pm Melbourne, ADR 0103).** UI only.
 - **Feed tabs, channel-first feed rows and a week-strip activity phase (PR #156, 2026-11-15
   3:05 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
   rows lead with the type's glyph and the channel; the Activity phase has Upcoming / Past

@@ -11,16 +11,18 @@ cd "$(dirname "$0")/.."
 shard=${1:-0}
 shards=${2:-1}
 
-# Minutes per file on CI's runners. Measured on PR #158 (2026-11-15) where a file ran there,
-# else PR #75 (2026-10-30). Update when a file's time changes a lot: a shard over CI's
-# two-hour limit is cancelled mid-file (shard 5 lost service_requests that way, 2026-11-14).
+# Minutes per file on CI's runners, measured on PR #163 (2026-11-16; `values` was cut off there,
+# so it keeps PR #158's figure plus a margin). Update when a file's time changes a lot: a shard
+# over CI's limit is cancelled mid-file (shard 4 lost `values` that way twice on #163, when
+# `bookings`, `convert` and `board` were still counted as new files).
 declare -A minutes=(
-  [private_events]=63 [scopes]=55 [reports]=43 [service_requests]=40 [governance]=31
-  [threads]=31 [activities]=30 [plans]=28 [challenges]=22 [values]=22 [collective_bookings]=22
-  [identity]=21 [health]=21 [discussion]=20 [groups]=18 [chat_reports]=17 [projects]=15
-  [events]=14 [reverts]=14 [places]=14 [follows]=12 [proposals]=12 [bot_reviews]=10
-  [links]=10 [software]=10 [help_requests]=9 [attachments]=9 [messages]=8 [calls]=5
-  [feedback]=5 [receipts]=4 [scale]=0
+  [governance]=49 [private_events]=43 [reports]=42 [service_requests]=38 [bookings]=33
+  [activities]=32 [values]=30 [scopes]=28 [discussion]=28 [collective_bookings]=24
+  [identity]=23 [projects]=22 [events]=22 [plans]=20 [help_requests]=20 [health]=18
+  [threads]=16 [proposals]=15 [challenges]=15 [links]=14 [convert]=14 [board]=14 [groups]=11
+  [places]=10 [messages]=10 [chat_reports]=10 [software]=9 [bot_reviews]=9 [attachments]=8
+  [reverts]=7 [follows]=7 [receipts]=6 [feedback]=5 [collective_requests]=5 [notes]=4
+  [feedback_comments]=3 [calls]=3 [scale]=0
 )
 NEW_FILE_MINUTES=15
 
