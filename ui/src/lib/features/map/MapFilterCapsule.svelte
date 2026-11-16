@@ -4,7 +4,7 @@
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import RadiusCombobox from '#lib/components/map/RadiusCombobox.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
+  import PillChoice from '#lib/components/PillChoice.svelte';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
 
   import { filterOptions, windowOptions, type MapPanelState } from './panelState.svelte.ts';
@@ -29,7 +29,22 @@
 
   let sheetOpen = $state(false);
   const narrowed = $derived(s.windowFilter !== 'all' || s.entityFilter !== 'all');
-  const windows = windowOptions.filter((o) => o.value !== 'custom');
+  // Pills wrap whole words, so the range's own pill sits with the rest ("Pick dates").
+  const windows = windowOptions.map((o) =>
+    o.value === 'all'
+      ? { ...o, label: 'Any time' }
+      : o.value === 'custom'
+        ? { ...o, label: 'Pick dates' }
+        : o,
+  );
+  const types = filterOptions.map((o) =>
+    o.value === 'help_requests'
+      ? { ...o, label: 'Requests' }
+      : o.value === 'all'
+        ? { ...o, label: 'Everything' }
+        : o,
+  );
+  const shown = $derived(s.listItems.length);
 </script>
 
 <div class="map-filter-top filter-panel-overlay" aria-label="Map filters">
@@ -55,13 +70,14 @@
     />
     <button
       aria-pressed={s.upcomingOnly}
+      aria-label="Upcoming only"
       title="Upcoming only"
-      class="capsule-chip"
+      class="capsule-icon"
       class:active={s.upcomingOnly}
       type="button"
       onclick={onUpcoming}
     >
-      <ToolbarIcon name={s.upcomingOnly ? 'calendar' : 'calendar-x'} /><span>Upcoming</span>
+      <ToolbarIcon name={s.upcomingOnly ? 'calendar' : 'calendar-x'} />
     </button>
     <button
       aria-haspopup="dialog"
@@ -112,7 +128,7 @@
   <div class="feed-filter-groups">
     <section>
       <h3>When</h3>
-      <SegmentedChoice
+      <PillChoice
         value={s.windowFilter}
         ariaLabel="Map time window"
         options={windows}
@@ -121,16 +137,6 @@
           onFilters();
         }}
       />
-      <button
-        class="custom-range"
-        class:on={s.showCustomDates}
-        aria-pressed={s.showCustomDates}
-        type="button"
-        onclick={() => {
-          s.windowFilter = s.showCustomDates ? 'all' : 'custom';
-          onFilters();
-        }}>Custom range</button
-      >
       {#if s.showCustomDates}
         <div class="custom-dates" role="group" aria-label="Custom date range">
           <label>
@@ -145,11 +151,11 @@
       {/if}
     </section>
     <section>
-      <h3>Type</h3>
-      <SegmentedChoice
+      <h3>Show</h3>
+      <PillChoice
         value={s.entityFilter}
         ariaLabel="Map entity filter"
-        options={filterOptions}
+        options={types}
         onChange={(v) => {
           s.entityFilter = v;
           onFilters();
@@ -160,7 +166,7 @@
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-submit" type="button" onclick={() => (sheetOpen = false)}
-        >Show results</button
+        >{shown === 1 ? 'Show 1 place' : `Show ${shown} places`}</button
       >
     </div>
   {/snippet}

@@ -11,12 +11,12 @@ import { explain } from '#lib/services/errors.ts';
 import { createHelpRequest } from '#lib/services/helpRequests.ts';
 
 export const HELP_STEPS = [
-  { id: 'basics', title: 'Basics' },
-  { id: 'location', title: 'Location' },
-  { id: 'timing', title: 'Timing' },
-  { id: 'scope', title: 'Scope' },
-  { id: 'roles', title: 'Roles' },
-  { id: 'overview', title: 'Overview' },
+  { id: 'basics', title: 'Basics', question: 'What do you need help with?' },
+  { id: 'location', title: 'Location', question: 'Where is it?' },
+  { id: 'timing', title: 'Timing', question: 'When do you need help?' },
+  { id: 'scope', title: 'Scope', question: 'Where should people find it?' },
+  { id: 'roles', title: 'Roles', question: 'Who do you need?' },
+  { id: 'overview', title: 'Overview', question: 'Check and publish' },
 ] as const;
 
 type StepId = (typeof HELP_STEPS)[number]['id'];

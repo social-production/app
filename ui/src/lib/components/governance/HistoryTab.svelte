@@ -9,8 +9,8 @@
   import '#lib/components/styles/history.css';
 
   /**
-   * web's ProjectHistoryTab / EventHistoryTab: `DecisionHistoryList` (Active Decisions, then
-   * Resolutions) of `DecisionHistoryCard`s. A card opens the decision's vote sheet (open ones
+   * web's ProjectHistoryTab / EventHistoryTab: `DecisionHistoryList` of `DecisionHistoryCard`s,
+   * as Open (vote cards) then Decided (rows; Polish Pass mockups). A card opens the decision's vote sheet (open ones
    * can still be voted, as on web); a plan opens its own sheet in its phase. A software
    * project's decisions (ADR 0086) come in `extra`.
    */
@@ -66,44 +66,31 @@
   />
 {/snippet}
 
+<!-- Polish Pass mockups: open decisions as vote cards on top, then the decided ones as rows. -->
 <section class="history-shell">
-  <div class="section-copy">
-    <h2>History</h2>
-    <p>
-      Open, approved, and rejected {noun} decisions stay here in one timeline. Open decisions can still
-      be voted from this tab.
-    </p>
-  </div>
-
   <section class="history-group">
-    <div class="group-head">
-      <h3>Active Decisions</h3>
-      <span>{active.length}</span>
-    </div>
+    <h2 class="links-heading">
+      Open{#if active.length > 0}<span class="links-count">{active.length}</span>{/if}
+    </h2>
     {#if active.length === 0}
-      <div class="empty-card"><p>No active decisions.</p></div>
+      <p class="links-quiet">Nothing to vote on right now.</p>
     {:else}
-      <div class:scrollable={active.length > 5} class="history-list">
+      <div class="history-list">
         {#each active as entry (entry.id)}{@render card(entry)}{/each}
       </div>
     {/if}
   </section>
 
   <section class="history-group">
-    <div class="group-head">
-      <h3>Resolutions</h3>
-      <span>{resolved.length}</span>
-    </div>
+    <h2 class="links-heading">
+      Decided{#if resolved.length > 0}<span class="links-count">{resolved.length}</span>{/if}
+    </h2>
     {#if resolved.length === 0}
-      <div class="empty-card">
-        <p>
-          {#if entries.length > 0}No resolutions yet.
-          {:else if loading}Loading {noun} history…
-          {:else}No {noun} decision history yet.{/if}
-        </p>
-      </div>
+      <p class="links-quiet">
+        {#if loading}Loading {noun} history…{:else}No {noun} decisions yet.{/if}
+      </p>
     {:else}
-      <div class:scrollable={resolved.length > 5} class="history-list">
+      <div class="history-list decided">
         {#each resolved as entry (entry.id)}{@render card(entry)}{/each}
       </div>
     {/if}

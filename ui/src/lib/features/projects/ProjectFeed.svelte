@@ -60,7 +60,7 @@
 </script>
 
 <section class="feed-page">
-  <FeedHeader {feed} {signedIn} bind:filter />
+  <FeedHeader {feed} {signedIn} guest={connection.current.status === 'signed-out'} bind:filter />
 
   <div class="stack">
     {#if feed.error}

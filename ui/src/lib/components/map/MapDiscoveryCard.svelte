@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { ResolvedPathname } from '$app/types';
+  import CardFacts from '#lib/components/cards/CardFacts.svelte';
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
   import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
   import {
@@ -40,7 +41,11 @@
   const scheduleTime = $derived(formatMarkerScheduleRange(item.scheduledAt, item.endsAt));
   const status = $derived(markerStatus(item));
   const location = $derived(item.displayLabel.trim());
-  const footer = $derived(markerFooter(item));
+  // web's footer is "1.2 km · 2/3 signed up": the distance goes up into the type line.
+  const footerParts = $derived(markerFooter(item).split(' · '));
+  const distance = $derived(footerParts[0] ?? '');
+  const signups = $derived(footerParts.slice(1).join(' · '));
+  const parent = $derived(item.entityType === 'activity' ? (item.parentTitle?.trim() ?? '') : '');
 
   function onclick(event: MouseEvent): void {
     onSelect(item.id);
@@ -58,25 +63,23 @@
   onmouseleave={onLeave}
 >
   <FeedSurface {href} tone="public" accent={modeAccent(mode)}>
-    <div class="header-row">
-      <SurfaceTypeLabel projectMode={mode} />
+    <!-- Drawn as a Global feed row (owner, 2026-11-16): glyph, type · status · distance. -->
+    <div class="feed-card-top feed-lead">
+      <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} feedGlyph /></span>
+      <div class="feed-lead-copy">
+        {#if parent}<div class="feed-lead-tags"><span class="map-parent">{parent}</span></div>{/if}
+        <div class="feed-lead-meta" class:alone={!parent}>
+          <SurfaceTypeLabel projectMode={mode} />
+          {#if status}<span class="feed-card-stage">{status}</span>{/if}
+          <span class="feed-card-time">{distance}</span>
+        </div>
+      </div>
     </div>
-    {#if item.entityType === 'activity' && item.parentTitle?.trim()}
-      <p class="parent-title" class:past={isPast}>{item.parentTitle}</p>
-    {/if}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
     <a class="title" class:past={isPast} data-sveltekit-preload-data="hover" {href}>{item.title}</a>
-    {#if status}
-      <p class="detail-row status" class:past={isPast}>{status}</p>
-    {/if}
-    {#if scheduleTime}
-      <p class="detail-row time" class:past={isPast}>{scheduleTime}</p>
-    {/if}
-    {#if location}
-      <p class="detail-row location" class:past={isPast}>{location}</p>
-    {/if}
-    {#if footer}
-      <p class="detail-row footer" class:past={isPast}>{footer}</p>
+    <CardFacts when={scheduleTime} place={location} />
+    {#if signups}
+      <p class="map-signups">{signups}</p>
     {/if}
   </FeedSurface>
 </div>

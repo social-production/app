@@ -162,7 +162,8 @@ export function ensureTestChannel() {
  * The index lists a new channel within a few minutes, so keep searching until it does. */
 export async function pickScopeTag(page, label, name) {
   const field = page.getByLabel(label, { exact: true });
-  const option = page.getByRole('option', { name, exact: true });
+  // A channel and a community can share a name; channels are listed first.
+  const option = page.getByRole('option', { name, exact: true }).first();
   for (let i = 0; ; i++) {
     await field.fill(name);
     // The search answers asynchronously: wait for it, not just count what is there now.
@@ -174,9 +175,11 @@ export async function pickScopeTag(page, label, name) {
   await option.click();
 }
 
-/** On a create flow's scope step: picks the test channel as the primary tag (or, with `label`,
- * in another tag field). */
-export async function tagTestChannel(page, label = 'Primary channel tag') {
+/** The create flows' one search for channels and communities (Polish Pass mockups). */
+export const TAG_SEARCH = 'Search channels and communities';
+
+/** On a create flow's scope step: ticks the test channel (the first one ticked is the main tag). */
+export async function tagTestChannel(page, label = TAG_SEARCH) {
   await ensureTestChannel();
   await pickScopeTag(page, label, TEST_CHANNEL);
 }
@@ -185,12 +188,7 @@ export async function tagTestChannel(page, label = 'Primary channel tag') {
  * (a project's or help request's primary channel, or an event's channel tags). */
 export async function continueSteps(page, n = 1) {
   for (let i = 0; i < n; i++) {
-    for (const label of ['Primary channel tag', 'Channel tags']) {
-      if (await page.getByLabel(label, { exact: true }).count()) {
-        await tagTestChannel(page, label);
-        break;
-      }
-    }
+    if (await page.getByLabel(TAG_SEARCH, { exact: true }).count()) await tagTestChannel(page);
     await page.getByRole('button', { name: 'Continue' }).click();
   }
 }

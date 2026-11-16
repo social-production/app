@@ -13,6 +13,8 @@
     /** Slid away (web's chrome-collapsed), e.g. while a chat fills the phone screen. */
     collapsed?: boolean;
     signedIn: boolean;
+    /** Known to be signed out: Notifications and Messages are left out. */
+    guest?: boolean;
     viewerName: string;
     /** Unread notifications for the bell (web's unreadCounts.notifications). */
     notificationCount?: number;
@@ -114,26 +116,28 @@
             class="nav-link nav-link-icon"
             href={resolve('/')}><ToolbarIcon name="home" /></a
           >
-          <a
-            aria-label="Notifications"
-            title="Notifications"
-            class:active-link={p.isActive('/notifications')}
-            class="nav-link nav-link-icon"
-            href={resolve('/notifications')}
-            ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
-                count={p.notificationCount ?? 0}
-              />{/if}</a
-          >
-          <a
-            aria-label="Messages"
-            title="Messages"
-            class:active-link={p.isActive('/messages')}
-            class="nav-link nav-link-icon"
-            href={resolve('/messages')}
-            ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
-                count={p.messageCount ?? 0}
-              />{/if}</a
-          >
+          {#if !p.guest}
+            <a
+              aria-label="Notifications"
+              title="Notifications"
+              class:active-link={p.isActive('/notifications')}
+              class="nav-link nav-link-icon"
+              href={resolve('/notifications')}
+              ><ToolbarIcon name="bell" />{#if (p.notificationCount ?? 0) > 0}<CountBadge
+                  count={p.notificationCount ?? 0}
+                />{/if}</a
+            >
+            <a
+              aria-label="Messages"
+              title="Messages"
+              class:active-link={p.isActive('/messages')}
+              class="nav-link nav-link-icon"
+              href={resolve('/messages')}
+              ><ToolbarIcon name="send" />{#if (p.messageCount ?? 0) > 0}<CountBadge
+                  count={p.messageCount ?? 0}
+                />{/if}</a
+            >
+          {/if}
         </nav>
       {/if}
     </div>

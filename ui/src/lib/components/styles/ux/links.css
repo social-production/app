@@ -1,169 +1,237 @@
-/* A project's Links and History tabs (Remaining Screens, 4): the soft cards from Take part,
-   a bold heading per section with its action as a pill, and one quiet line when a section
-   is empty instead of a box. */
-.shell .links-tab .section-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 4px;
+/* A project's Links and History tabs (Polish Pass mockups, 2026-11-16): a bold heading with a
+   count per section, one quiet line when a section is empty, linked projects and decided
+   decisions as rows, and each open vote as one soft card with a bar. Overrides of the ported
+   links.css and history.css. */
+.shell .links-tab,
+.shell .history-shell {
+  display: grid;
+  gap: 18px;
+  padding: 16px var(--page-gutter) 24px;
 }
 
-.shell .links-tab .section-heading h2,
-.shell .history-shell .group-head h3 {
+.shell .links-tab .links-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.shell .links-tab .links-intro {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .links-tab .propose-link-button {
+  flex: none;
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shell .links-heading {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   margin: 0;
   font-size: 16px;
   font-weight: 700;
 }
 
-.shell .links-tab .section-heading p:empty {
-  display: none;
-}
-
-.shell .links-tab .propose-link-button {
-  height: 34px;
-  padding: 0 14px;
-  border: none;
+.shell .links-count {
+  padding: 1px 8px;
   border-radius: 999px;
-  background: var(--brand);
-  color: var(--on-brand);
-  font-size: 13px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12px;
   font-weight: 700;
 }
 
-.shell .links-tab .empty-row,
-.shell .history-shell .empty-card {
-  padding: 14px 0;
-  border: none;
-  border-radius: 0;
-  background: transparent;
+.shell .links-quiet {
+  margin: 4px 0 0;
   color: var(--text-soft);
-  font-size: 13.5px;
-  text-align: center;
+  font-size: 14px;
+}
+
+.shell .links-tab .network-stack,
+.shell .links-tab .request-stack,
+.shell .links-tab .vote-archive,
+.shell .history-shell .history-group {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
 }
 
 .shell .links-tab .link-list,
-.shell .links-tab .request-list {
+.shell .links-tab .request-list,
+.shell .history-shell .history-list {
   display: grid;
   gap: 10px;
+  max-height: none;
+  overflow: visible;
 }
 
+/* A linked or past project: one row. */
 .shell .links-tab .link-card {
-  padding: 14px 16px;
+  padding: 0;
   border: none;
-  border-radius: 18px;
-  background: var(--panel-hover);
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
 }
 
-.shell .links-tab .link-card .card-header {
-  align-items: center;
+.shell .links-tab .link-list .link-card + .link-card,
+.shell .links-tab .vote-archive .link-card + .link-card {
+  border-top: 1px solid var(--panel-border);
 }
 
 .shell .links-tab .link-card .toggle-button {
-  gap: 3px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .shell .links-tab .link-card .identity {
-  display: none;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.shell .links-tab .link-row-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
 }
 
 .shell .links-tab .link-card .card-title {
-  overflow: visible;
-  overflow-wrap: anywhere;
   font-size: 15px;
-  font-weight: 700;
-  white-space: normal;
-}
-
-.shell .links-tab .link-card .header-meta {
-  gap: 2px;
-  padding-left: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .shell .links-tab .link-card .row-meta,
 .shell .links-tab .link-card .side-vote-line {
   color: var(--text-soft);
-  font-size: 13px;
+  font-size: 12.5px;
+}
+
+.shell .links-tab .link-card .side-vote-line {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.shell .links-tab .link-chevron {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  transition: transform 0.15s ease;
+}
+
+.shell .links-tab .link-card.expanded .link-chevron {
+  transform: rotate(180deg);
+}
+
+.shell .links-tab .link-card .card-body {
+  display: grid;
+  gap: 10px;
+  padding: 0 0 12px 50px;
+  border: none;
+}
+
+.shell .links-tab .detail-description {
+  margin: 0;
+  color: var(--text-main);
+  font-size: 14px;
 }
 
 .shell .links-tab .link-card .open-button {
-  height: 34px;
-  margin: 0;
-  padding: 0 14px;
+  justify-self: start;
+  color: var(--brand-strong);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .links-tab .end-link {
+  justify-self: start;
+  height: 38px;
+  padding: 0 16px;
   border: none;
   border-radius: 999px;
-  background: var(--page-bg);
-  color: var(--text-main);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.shell .links-tab .link-card .vote-panel {
-  border: none;
-  border-radius: 14px;
-  background: var(--page-bg);
-}
-
-/* History: the same soft cards, the outcome in words instead of a coloured edge. */
-.shell .history-shell .history-list {
-  gap: 10px;
-  overflow: visible;
-  border: none;
-  border-radius: 0;
-  background: transparent;
-}
-
-.shell .history-shell .history-list.scrollable {
-  overflow-y: auto;
-}
-
-.shell .history-shell .history-card,
-.shell .history-shell .history-rail-card:last-child .history-card {
-  border: none;
-  border-radius: 18px;
-  background: var(--panel-hover);
-}
-
-.shell .history-shell .history-toggle {
-  gap: 3px;
-  padding: 14px 16px;
-}
-
-.shell .history-shell .history-toggle:hover,
-.shell .history-shell .history-toggle:focus-visible {
-  background: color-mix(in srgb, var(--text-main) 5%, transparent);
-}
-
-.shell .history-shell .history-kicker {
-  color: var(--text-main);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.shell .history-shell .history-requirement {
-  color: var(--text-soft);
-  font-size: 12.5px;
+  background: color-mix(in srgb, var(--danger) 12%, transparent);
+  color: var(--danger);
   font-weight: 700;
 }
 
-.shell .history-shell .history-card.approved .history-requirement {
+/* Tags: a past link's outcome and a decided decision's. */
+.shell .links-tab .outcome-label,
+.shell .history-rail-card .history-tag {
+  flex: none;
+  padding: 2px 9px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-soft);
   color: var(--brand-strong);
+  font-size: 11.5px;
+  font-weight: 700;
 }
 
-.shell .history-shell .history-card.rejected .history-requirement {
+.shell .links-tab .outcome-label.blocked,
+.shell .history-rail-card .history-card.rejected .history-tag {
+  background: color-mix(in srgb, var(--danger) 13%, transparent);
   color: var(--danger);
 }
 
-.shell .history-shell .history-meta-row {
-  color: var(--text-soft);
-  font-size: 13px;
+.shell .links-tab .links-disclose {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
 }
 
-.shell .history-shell .group-head span {
-  color: var(--text-soft);
-  font-size: 13px;
-  font-weight: 600;
+.shell .links-tab .links-disclose svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.shell .links-tab .links-venue .detail-place {
+  margin: 0;
 }

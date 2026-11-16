@@ -69,17 +69,22 @@
   <div class="form-stack">
     <label>
       <RequiredLabel>{noun} handle</RequiredLabel>
-      <input
-        bind:value={name}
-        aria-required="true"
-        placeholder={channel ? 'e.g. local-gardening' : 'e.g. neighborhood-group'}
-      />
+      <span class="prefixed">
+        {#if channel}<span class="prefix" aria-hidden="true">#</span>{/if}
+        <input
+          bind:value={name}
+          aria-required="true"
+          placeholder={channel ? 'local-gardening' : 'neighborhood-group'}
+        />
+      </span>
     </label>
-    {#if name.trim()}
+    {#if !name.trim()}
+      <p class="helper-text">Lowercase, with dashes. This is its address.</p>
+    {:else}
       {#if !check.ok}
         <p class="status-note">{check.error}</p>
       {:else}
-        <p class="helper-text">URL: <code>{path(check.slug)}</code></p>
+        <p class="helper-text">Its address: <code>{path(check.slug)}</code></p>
       {/if}
     {/if}
     {#if !channel}

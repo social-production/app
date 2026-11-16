@@ -5,12 +5,15 @@
 
   import type { RegionFeedState } from './regionState.svelte.ts';
 
-  /** web's PublicFeed Region controls: radius, place search, device location, online list. */
+  /**
+   * web's PublicFeed Region controls (place search, device location, radius, online list), as
+   * the top of the feed's filter sheet (Polish Pass mockups, 2026-11-16). The distance box takes
+   * a typed distance as well as the presets (owner, 2026-11-16).
+   */
   let { region }: { region: RegionFeedState } = $props();
 
   let focused = $state(false);
   let blurTimer: ReturnType<typeof setTimeout> | null = null;
-  const expanded = $derived(focused || region.suggestions.length > 0);
 
   function blur(): void {
     blurTimer = setTimeout(() => {
@@ -20,51 +23,73 @@
   }
 </script>
 
-<RadiusCombobox
-  value={region.radius}
-  onChange={(v) => {
-    region.radius = v;
-    void region.reload();
-  }}
-  ariaLabel="Region radius"
-  compact
-  options={radiusPresetOptions}
-/>
+<section>
+  <h3>Place</h3>
+  <div class="region-place" class:focused>
+    <ToolbarIcon name="map-pin" />
+    <input
+      aria-label="Place"
+      value={region.placeQuery}
+      placeholder="Search a place"
+      onfocus={() => {
+        if (blurTimer) clearTimeout(blurTimer);
+        focused = true;
+      }}
+      onblur={blur}
+      oninput={(e) => region.search(e.currentTarget.value)}
+    />
+    <button
+      aria-label="Use my location"
+      title="Use my location"
+      class="region-locate"
+      type="button"
+      onclick={() => void region.useDevice()}
+    >
+      <ToolbarIcon name="locate" />
+    </button>
+  </div>
+  {#if region.suggestions.length > 0}
+    <ul class="region-suggestions">
+      {#each region.suggestions as place, i (i)}
+        <li>
+          <button
+            type="button"
+            onmousedown={(e) => e.preventDefault()}
+            onclick={() => void region.select(place)}>{place.displayLabel}</button
+          >
+        </li>
+      {/each}
+    </ul>
+  {/if}
+</section>
 
-<label class="place-search" class:expanded>
-  <input
-    aria-label="Place"
-    value={region.placeQuery}
-    placeholder="Place"
-    onfocus={() => {
-      if (blurTimer) clearTimeout(blurTimer);
-      focused = true;
+<section>
+  <h3>Distance</h3>
+  <RadiusCombobox
+    value={region.radius}
+    onChange={(v) => {
+      region.radius = v;
+      void region.reload();
     }}
-    onblur={blur}
-    oninput={(e) => region.search(e.currentTarget.value)}
+    ariaLabel="Region radius"
+    options={radiusPresetOptions}
   />
-</label>
+</section>
 
-<button
-  aria-label="Use my location"
-  class="icon-button"
-  type="button"
-  onclick={() => void region.useDevice()}
->
-  <ToolbarIcon name="locate" />
-</button>
-
-<button
-  aria-label="Include online list"
-  aria-pressed={region.includeOnline}
-  class="icon-button region-primary-only"
-  class:active={region.includeOnline}
-  title="Shows online events separately from the map"
-  type="button"
-  onclick={() => {
-    region.includeOnline = !region.includeOnline;
-    void region.reload();
-  }}
->
-  <ToolbarIcon name="wifi" />
-</button>
+<div class="region-online">
+  <span>Include online events</span>
+  <button
+    aria-checked={region.includeOnline}
+    aria-label="Include online events"
+    class="soft-switch"
+    class:on={region.includeOnline}
+    role="switch"
+    type="button"
+    onclick={() => {
+      region.includeOnline = !region.includeOnline;
+      void region.reload();
+    }}
+  >
+    <span></span>
+  </button>
+</div>

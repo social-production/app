@@ -10,8 +10,8 @@
 
   /** web's CreateThreadPage: Basics (title, opening post) → Tags (ADR 0070). */
   const steps = [
-    { id: 'basics', title: 'Basics' },
-    { id: 'scope', title: 'Tags' },
+    { id: 'basics', title: 'Basics', question: 'Start a conversation' },
+    { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
   ];
 
   let step = $state(0);

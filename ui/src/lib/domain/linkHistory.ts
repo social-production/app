@@ -56,7 +56,8 @@ export function linkRequestsById(frame: LinksFrame | undefined): Map<string, Lin
   return out;
 }
 
-/** web's "Link decision" / "Sever link decision" entries, newest first. */
+/** web's "Link decision" / "Sever link decision" entries, newest first, titled by what they
+ * decide ("Link with …", "End the link with …"; Polish Pass mockups). */
 export function linkHistory(frame: LinksFrame | undefined): HistoryEntry[] {
   const out: HistoryEntry[] = [];
   for (const r of frame ? allRequests(frame) : []) {
@@ -66,7 +67,7 @@ export function linkHistory(frame: LinksFrame | undefined): HistoryEntry[] {
       id: p.id,
       proposal: p,
       plan: null,
-      kindLabel: r.sever ? 'Sever link decision' : 'Link decision',
+      kindLabel: r.sever ? `End the link with ${r.target.title}` : `Link with ${r.target.title}`,
       author: p.author,
       createdAt: p.createdAt,
       status: statusOf(r),

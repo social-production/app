@@ -1,0 +1,186 @@
+/* A private event's create steps (Polish Pass mockups, 2026-11-16): the audience and control
+   choices as soft cards (the radio itself hidden), guests as rows with an Organiser pill, and
+   the plan step's schedule and stages in the soft style. */
+.create-sheet.create-sheet .panel {
+  padding: 0;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.create-sheet.create-sheet .panel > .description {
+  margin: 0 0 10px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.create-sheet.create-sheet .panel > h2,
+.create-sheet.create-sheet .panel > h3 {
+  display: none;
+}
+
+.create-sheet.create-sheet .control-option {
+  display: flex;
+  gap: 12px;
+  margin: 0 0 10px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  cursor: pointer;
+}
+
+.create-sheet.create-sheet .control-option:has(input:checked) {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.create-sheet.create-sheet .control-option input[type='radio'] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.create-sheet.create-sheet .control-option .hint {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.create-sheet .invite-list {
+  display: grid;
+  gap: 12px;
+}
+
+.create-sheet .invite-rows {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.create-sheet .invite-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.create-sheet .invite-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.create-sheet .invite-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.create-sheet .invite-copy strong {
+  font-size: 15px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.create-sheet .invite-copy small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.create-sheet .invite-organiser {
+  height: 30px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.create-sheet .invite-organiser.on {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 1.5px var(--brand);
+  color: var(--brand-strong);
+}
+
+.create-sheet .invite-remove {
+  width: 30px;
+  height: 30px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 18px;
+  cursor: pointer;
+}
+
+/* The plan step. */
+.create-sheet.create-sheet .schedule-fieldset {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.create-sheet.create-sheet .schedule-mode-row {
+  display: flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.create-sheet.create-sheet .schedule-mode-option {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.create-sheet.create-sheet .schedule-mode-option.active {
+  background: var(--panel);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16);
+}
+
+.create-sheet.create-sheet .schedule-mode-option input {
+  position: absolute;
+  opacity: 0;
+}
+
+.create-sheet.create-sheet .stage-card {
+  padding: 12px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.create-sheet.create-sheet .stage-card input,
+.create-sheet.create-sheet .stage-card textarea {
+  background: var(--panel);
+}
+
+.create-sheet.create-sheet .stages .secondary-button {
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-weight: 700;
+}

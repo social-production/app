@@ -1,10 +1,11 @@
 <script lang="ts">
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { proposalLabel, type Proposal, type VoteChoice } from '#lib/domain/governance.ts';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import {
+    historyIcon,
     requirementLabel,
     statusLabel,
-    voteSummaryLabel,
     type HistoryEntry,
   } from '#lib/domain/history.ts';
   import type { Charter } from '#lib/domain/projects.ts';
@@ -34,6 +35,9 @@
   let { entry, names, charter, stageOf, phaseLabel, onVote, onOpenPlan }: Props = $props();
 
   let showing = $state(false);
+  const approval = $derived(
+    entry.yes + entry.no > 0 ? Math.round((entry.yes / (entry.yes + entry.no)) * 100) : 0,
+  );
   // The sheet reads the live entry, so a vote shows in it once the page re-reads.
   const sheet = $derived(showing ? entry.proposal : null);
 
@@ -56,23 +60,37 @@
     class:approved={entry.status === 'approved'}
     class:rejected={entry.status === 'rejected'}
   >
+    <!-- Polish Pass mockups: a decided one is a row with its tag; an open one is a vote card. -->
     <button
       class="history-toggle"
       type="button"
       aria-label={`${entry.kindLabel}, ${statusLabel(entry.status)}`}
       onclick={open}
     >
-      <div class="history-status-row">
+      <span class="history-icon"><ToolbarIcon name={historyIcon(entry.kindLabel)} /></span>
+      <span class="history-copy">
         <span class="history-kicker">{entry.kindLabel}</span>
+        <span class="history-meta"
+          >{names[entry.author] ?? '…'} · {relativeTime(entry.createdAt)} · {entry.yes} yes, {entry.no}
+          no</span
+        >
+      </span>
+      {#if entry.status !== 'open'}
+        <span class="history-tag">{entry.status === 'approved' ? 'Passed' : 'Failed'}</span>
+      {/if}
+    </button>
+    {#if entry.status === 'open'}
+      <div class="history-progress">
+        <div class="history-bar"><i style={`width: ${Math.max(approval, 3)}%`}></i></div>
         <span class="history-requirement">{requirementLabel(entry)}</span>
       </div>
-      <div class="history-meta-row">
-        <span class="history-meta-left">{voteSummaryLabel(entry)}</span>
-        <span class="history-meta-right"
-          >{names[entry.author] ?? '…'} · {relativeTime(entry.createdAt)}</span
-        >
-      </div>
-    </button>
+      {#if entry.proposal}
+        {@const proposal = entry.proposal}
+        <VoteChoiceBar mine={proposal.myVote} onChoose={(c) => cast(proposal, c)} />
+      {:else if entry.plan}
+        <button class="history-review" type="button" onclick={open}>Review this plan</button>
+      {/if}
+    {/if}
   </article>
 </div>
 

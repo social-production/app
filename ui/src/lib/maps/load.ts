@@ -1,6 +1,11 @@
 /** web's map start (`maps/maplibre.ts` `mount`): Carto's Positron style, falling back to
  * MapLibre's demo style when Carto can't be reached within 4.5 s or fails to load. */
-import { Map as MapLibreMap, NavigationControl, setWorkerUrl } from 'maplibre-gl';
+import {
+  AttributionControl,
+  Map as MapLibreMap,
+  NavigationControl,
+  setWorkerUrl,
+} from 'maplibre-gl';
 import workerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import type { MapViewport } from './types.ts';
@@ -26,8 +31,14 @@ export function loadMap(
     style: DEFAULT_STYLE,
     center: [viewport.center.longitude, viewport.center.latitude],
     zoom: viewport.zoom,
+    attributionControl: false,
   });
   map.addControl(new NavigationControl({ visualizePitch: false }), 'top-right');
+  // The credit has to stay (OpenStreetMap, CARTO): a small ⓘ, closed until it is tapped.
+  map.addControl(new AttributionControl({ compact: true }), 'top-left');
+  map.once('load', () =>
+    container.querySelector('.maplibregl-ctrl-attrib')?.classList.remove('maplibregl-compact-show'),
+  );
   const ready = new Promise<void>((resolve, reject) => {
     let settled = false;
     let usedFallback = false;

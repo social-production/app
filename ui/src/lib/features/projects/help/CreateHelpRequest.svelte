@@ -1,10 +1,13 @@
 <script lang="ts">
+  import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import { searchFailure, searchPlaces } from '#lib/services/locations.ts';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import { tagCounts } from '#lib/domain/scopes.ts';
+  import { nextDay } from '#lib/domain/time.ts';
+  import HelpRolesStep from './HelpRolesStep.svelte';
   import ScopeTagsStep from '../scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
@@ -26,6 +29,23 @@
 
   function setRole(index: number, patch: Partial<(typeof s.roles)[number]>): void {
     s.roles = s.roles.map((r, i) => (i === index ? { ...r, ...patch } : r));
+  }
+
+  // The rows edit `neededAt` / `endsAt` (local "YYYY-MM-DDTHH:MM"); an end before the start
+  // is the next morning.
+  function setDay(day: string): void {
+    if (!day) return;
+    const end = s.endsAt.slice(11, 16);
+    s.setNeededAt(`${day}T${s.neededAt.slice(11, 16) || '09:00'}`);
+    if (end) setEnd(end);
+  }
+  function setStart(time: string): void {
+    if (time) s.setNeededAt(`${s.neededAt.slice(0, 10)}T${time}`);
+  }
+  function setEnd(time: string): void {
+    if (!time) return;
+    const day = s.neededAt.slice(0, 10);
+    s.endsAt = time > s.neededAt.slice(11, 16) ? `${day}T${time}` : `${nextDay(day)}T${time}`;
   }
 </script>
 
@@ -70,101 +90,78 @@
         search={searchPlaces}
         failure={searchFailure}
         allowLater={false}
-        helperText="Help requests need a physical or online location so people know where to show up."
+        helperText="Where people should come, or that it happens online."
         onIntent={(i) => (s.intent = i)}
         onPlace={(p) => s.setPlace(p)}
       />
     </div>
   {:else if s.stepId === 'timing'}
-    <div class="form-stack">
-      <div class="field-grid">
-        <label class="field">
-          <RequiredLabel>Start time</RequiredLabel>
+    <!-- Polish Pass mockups: a date and two times as rows that open the phone's own pickers. -->
+    <div class="form-stack time-rows">
+      <label class="tap-row">
+        <span>Date</span>
+        <input
+          type="date"
+          value={s.neededAt.slice(0, 10)}
+          onchange={(e) => setDay(e.currentTarget.value)}
+          aria-required="true"
+        />
+      </label>
+      <div class="tap-pair">
+        <label class="tap-row">
+          <span>Starts</span>
           <input
-            value={s.neededAt}
-            oninput={(e) => s.setNeededAt(e.currentTarget.value)}
-            aria-required="true"
-            type="datetime-local"
+            type="time"
+            aria-label="Start time"
+            value={s.neededAt.slice(11, 16)}
+            onchange={(e) => setStart(e.currentTarget.value)}
           />
         </label>
-        <label class="field">
-          <RequiredLabel>End time</RequiredLabel>
+        <label class="tap-row">
+          <span>Ends</span>
           <input
-            bind:value={s.endsAt}
-            min={s.neededAt || undefined}
-            aria-required="true"
-            type="datetime-local"
+            type="time"
+            aria-label="End time"
+            value={s.endsAt.slice(11, 16)}
+            onchange={(e) => setEnd(e.currentTarget.value)}
           />
         </label>
       </div>
-      <p class="zone-note">
-        Times are in {zone}, your display time zone. Everyone sees them in their own.
-      </p>
+      <p class="zone-note">{zone} time. Everyone sees it in their own.</p>
     </div>
   {:else if s.stepId === 'scope'}
     <div class="form-stack">
       <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} variant="help" />
     </div>
   {:else if s.stepId === 'roles'}
-    <section class="roles-block">
-      <div class="roles-header">
-        <RequiredLabel>Roles needed</RequiredLabel>
-        <button class="ghost-button" type="button" onclick={() => s.addRole()}>Add role</button>
-      </div>
-      {#each s.roles as role, index (index)}
-        <div class="role-card">
-          <label class="field">
-            <RequiredLabel>Role title</RequiredLabel>
-            <input
-              value={role.label}
-              oninput={(e) => setRole(index, { label: e.currentTarget.value })}
-              maxlength="100"
-              aria-required="true"
-              placeholder="e.g. Driver"
-            />
-          </label>
-          <label class="field">
-            <span class="field-label">Role details</span>
-            <textarea
-              value={role.description}
-              oninput={(e) => setRole(index, { description: e.currentTarget.value })}
-              rows="2"></textarea>
-          </label>
-          <label class="field">
-            <RequiredLabel>Slots needed</RequiredLabel>
-            <input
-              type="number"
-              min="0"
-              value={role.slots}
-              oninput={(e) => setRole(index, { slots: Number(e.currentTarget.value) || 0 })}
-              aria-required="true"
-            />
-          </label>
-          {#if s.roles.length > 1}
-            <button class="ghost-button danger" type="button" onclick={() => s.removeRole(index)}
-              >Remove role</button
-            >
-          {/if}
-        </div>
-      {/each}
-    </section>
+    <HelpRolesStep
+      roles={s.roles}
+      onSet={setRole}
+      onAdd={() => s.addRole()}
+      onRemove={(i) => s.removeRole(i)}
+    />
   {:else}
     <div class="form-stack overview">
-      <button class="overview-row" type="button" onclick={() => (s.step = 0)}>
-        <strong>Basics</strong><span>{s.title.trim() || 'Untitled help request'}</span>
-      </button>
+      <CreatePreview
+        mode="help-request"
+        scope={s.tags[0]?.slice(1) ?? ''}
+        title={s.title.trim()}
+        body={s.body.trim()}
+        when={s.schedule}
+        place={s.intent === 'physical' ? s.locationLabel : ''}
+      />
       <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
-        <strong>Location</strong><span>{s.locationLabel}</span>
+        <strong>Place</strong><span>{s.locationLabel}</span><em>Edit</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
-        <strong>Timing</strong><span>{s.schedule}</span>
+        <strong>When</strong><span>{s.schedule}</span><em>Edit</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 3)}>
-        <strong>Scope</strong><span>{tagCounts(s.tags)}</span>
+        <strong>Channels</strong><span>{tagCounts(s.tags)}</span><em>Edit</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 4)}>
         <strong>Roles</strong>
-        <span>{s.namedRoles.length} {s.namedRoles.length === 1 ? 'role' : 'roles'}</span>
+        <span>{s.namedRoles.map((r) => r.label).join(', ') || 'None yet'}</span><em>Edit</em>
       </button>
       {#if s.allProblems.length > 0}
         <ul class="status-message-list">

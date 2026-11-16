@@ -27,7 +27,7 @@ await ann.getByRole('menuitem', { name: /Thread/ }).click();
 await ann.getByLabel(/^Thread title/).fill(title);
 await ann.getByLabel(/^Opening post/).fill('Share what grew well last year.');
 await ann.getByRole('button', { name: 'Continue' }).click();
-await ann.getByLabel('Primary tag type').waitFor();
+await ann.getByLabel('Search channels and communities').waitFor();
 await tagTestChannel(ann);
 await ann.getByRole('button', { name: 'Publish thread' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
