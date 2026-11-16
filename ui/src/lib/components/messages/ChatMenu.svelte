@@ -2,6 +2,8 @@
   /** One entry of web's chat menu: a link or an action; `danger` ones sit below a divider. */
   export interface ChatMenuItem {
     label: string;
+    /** A ToolbarIcon name shown before the label. */
+    icon?: string;
     href?: string;
     danger?: boolean;
     onSelect?: () => void;
@@ -11,9 +13,11 @@
 <script lang="ts">
   import { tick } from 'svelte';
 
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+
   /**
    * web's chat-row-menu: opened from a list row (right-click, long press) or the chat
-   * header, at the pointer, kept on screen (196 × 220 as on web); a press outside closes it.
+   * header, at the pointer, kept on screen (220 × 300, the card's size); a press outside closes it.
    */
   interface Props {
     x: number;
@@ -24,8 +28,8 @@
 
   let { x, y, items, onClose }: Props = $props();
 
-  const left = $derived(Math.max(8, Math.min(x, window.innerWidth - 196)));
-  const top = $derived(Math.max(8, Math.min(y, window.innerHeight - 220)));
+  const left = $derived(Math.max(8, Math.min(x, window.innerWidth - 228)));
+  const top = $derived(Math.max(8, Math.min(y, window.innerHeight - 300)));
   const plain = $derived(items.filter((i) => !i.danger));
   const danger = $derived(items.filter((i) => i.danger));
 
@@ -58,13 +62,16 @@
 {#snippet entry(item: ChatMenuItem)}
   {#if item.href}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- callers resolve it -->
-    <a role="menuitem" href={item.href} onclick={onClose}>{item.label}</a>
+    <a role="menuitem" href={item.href} onclick={onClose}
+      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{item.label}</a
+    >
   {:else}
     <button
       class:menu-danger={item.danger}
       type="button"
       role="menuitem"
-      onclick={() => select(item)}>{item.label}</button
+      onclick={() => select(item)}
+      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{item.label}</button
     >
   {/if}
 {/snippet}

@@ -124,7 +124,9 @@ frames under `project/*.dc.html`).
    the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
-2d. Chats, Search and Reports (2026-11-16 evening, **waiting on the owner**): §1 shows the chat
+2d. Chats, Search and Reports (2026-11-16 evening, **approved: "all brilliant"**; v2 adds the owner's
+   one change, chats like Telegram: a three-capsule header, bubbles with the time inside and a
+   tail, a photo's time as a dark pill on it; building on `claude/ux-chat-fixes`): §1 shows the chat
    fixes already built on `claude/ux-chat-fixes` (face before name; one message capsule with no
    inner ring that always fits its text). Proposed: a ⋮ chat menu as an icon card and a
    Telegram-style person page (big photo, Call/Mute/Search/Profile, bio and key, Media, Files,

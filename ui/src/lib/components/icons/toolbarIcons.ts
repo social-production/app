@@ -57,4 +57,23 @@ export const toolbarIcons: Record<string, string> = {
     '<path d="M12 4.5a6 6 0 0 0-3.9 10.6c.9.8 1.4 1.8 1.5 2.9h4.8c.1-1.1.6-2.1 1.5-2.9A6 6 0 0 0 12 4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M9.8 20h4.4M10.4 17.9h3.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
   pencil:
     '<path d="M4 20h4L19.2 8.8a1.8 1.8 0 0 0 0-2.5l-1.5-1.5a1.8 1.8 0 0 0-2.5 0L4 16v4Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M12.8 6.2 17.8 11.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
+  pin: '<path d="M9 4h6l-1 6 3 3H7l3-3-1-6ZM12 13v8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  mute: '<path d="M7 16v-5a5 5 0 0 1 8-4M17 11v5l2 2H9M10 20a2 2 0 0 0 4 0M4 4l16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  trash:
+    '<path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13M10 11v5M14 11v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  leave:
+    '<path d="M14 4.5h4.5v15H14M10 8l-4 4 4 4M6 12h10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  info: '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /> <path d="M12 11v5M12 8h.01" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  flag: '<path d="M6 21V4M6 4h11l-2.5 4.5L17 13H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  reply:
+    '<path d="M10 8V4.5L3.5 11l6.5 6.5V14c4.5 0 7.5 1.4 10 5-.8-5.5-3.8-10.3-10-11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /> <path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  kebab:
+    '<circle cx="12" cy="5.5" r="1.6" fill="currentColor" /> <circle cx="12" cy="12" r="1.6" fill="currentColor" /> <circle cx="12" cy="18.5" r="1.6" fill="currentColor" />',
+  share:
+    '<path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  'thumb-up':
+    '<path d="M12 19V6M6.5 11.5 12 6l5.5 5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  'thumb-down':
+    '<path d="M12 5v13M6.5 12.5 12 18l5.5-5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
 };

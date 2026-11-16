@@ -7,6 +7,7 @@
   import { withReceipts } from '#lib/components/chat/chatFormat.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
   import GroupInfoSheet from '#lib/components/messages/GroupInfoSheet.svelte';
   import PinBar from '#lib/components/messages/PinBar.svelte';
@@ -137,7 +138,7 @@
   }
 </script>
 
-<header class="chat-header" class:with-call={chat.kind === 'direct'}>
+<header class="chat-header">
   <button
     class="back-button"
     type="button"
@@ -173,31 +174,46 @@
       <AvatarBadge size="md" name={title} />
     </button>
   </div>
-  {#if chat.kind === 'direct'}
+  <!-- Telegram's header: back, the face and name, then call and ⋮ in one capsule. -->
+  <div class="header-actions">
+    {#if chat.kind === 'direct'}
+      <button
+        class="call-button"
+        type="button"
+        aria-label={`Call ${title}`}
+        title={`Call ${title}`}
+        onclick={() =>
+          (callRequest.next = {
+            seed,
+            name: title,
+            peer: chat.members.find((m) => m !== inbox.me) ?? null,
+          })}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"
+          />
+        </svg>
+      </button>
+    {/if}
     <button
-      class="call-button"
+      class="menu-button"
       type="button"
-      aria-label={`Call ${title}`}
-      title={`Call ${title}`}
-      onclick={() =>
-        (callRequest.next = {
-          seed,
-          name: title,
-          peer: chat.members.find((m) => m !== inbox.me) ?? null,
-        })}
+      aria-label="Chat menu"
+      title="Chat menu"
+      onclick={(event) => {
+        const box = event.currentTarget.getBoundingClientRect();
+        onMenu(box.right - 220, box.bottom + 6);
+      }}
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"
-        />
-      </svg>
+      <ToolbarIcon name="kebab" />
     </button>
-  {/if}
+  </div>
   <PinBar {pins} canUnpin={chat.canPin} onJump={jump} onUnpin={(id) => void thread.pin(id, true)} />
 </header>
 

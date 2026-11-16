@@ -211,12 +211,18 @@
               <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
             {:else}{part.text}{/if}
           {/each}
-          {#if photos.length === 0}<span class="message-footer">{@render stamp()}</span>{/if}
+          <span class="message-footer">{@render stamp()}</span>
         </p>
       </div>
     {/if}
-    {#if photos.length > 0 || (!caption && files.length === 0 && !removed)}
-      <div class="message-footer photo-footer">{@render stamp()}</div>
+    <!-- A photo without a caption shows its time as a dark pill on the picture (Telegram). -->
+    {#if !caption && !removed && (photos.length > 0 || files.length === 0)}
+      <div
+        class="message-footer photo-footer"
+        class:on-photo={photos.length > 0 && files.length === 0}
+      >
+        {@render stamp()}
+      </div>
     {/if}
     {#if canReply && !message.own}
       <button

@@ -1,0 +1,107 @@
+/* An open chat's header as Telegram draws it (owner, 2026-11-16, Chats mockups v2): three
+   floating capsules over the messages (back; the face and name; call and ⋮), the pinned
+   message as a fourth below them, and the messages scrolling underneath. */
+.shell .messages-page .messages-shell.conversation-view {
+  grid-template-rows: minmax(0, 1fr);
+}
+
+@media (min-width: 1081px) {
+  .shell .messages-page .messages-shell.conversation-view {
+    position: relative;
+  }
+}
+
+.shell .messages-page .messages-shell.conversation-view > .chat-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 6;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: calc(8px + var(--shell-safe-top, 0px)) 10px 8px;
+  border: none;
+  background: transparent;
+  pointer-events: none;
+}
+
+.shell .messages-page .conversation-view > .chat-header > * {
+  pointer-events: auto;
+}
+
+.shell .messages-page .conversation-view .chat-header .back-button,
+.shell .messages-page .conversation-view .chat-header .identity-trigger,
+.shell .messages-page .conversation-view .chat-header .header-actions,
+.shell .messages-page .conversation-view .chat-header .pin-bar {
+  border: 1px solid var(--float-border);
+  background: var(--float-background);
+  box-shadow: var(--float-shadow);
+  -webkit-backdrop-filter: var(--float-blur);
+  backdrop-filter: var(--float-blur);
+}
+
+.shell .messages-page .conversation-view .chat-header .back-button {
+  width: 48px;
+  height: 48px;
+}
+
+.shell .messages-page .conversation-view .chat-header .chat-identity {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+
+.shell .messages-page .conversation-view .chat-header .identity-trigger {
+  width: auto;
+  max-width: 100%;
+  height: 48px;
+  padding: 0 16px 0 4px;
+  border-radius: 999px;
+}
+
+.shell .messages-page .conversation-view .chat-header .identity-trigger h2 {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.shell .messages-page .conversation-view .chat-header .header-actions {
+  display: flex;
+  flex: none;
+  align-items: center;
+  height: 48px;
+  padding: 0 4px;
+  border-radius: 999px;
+}
+
+.shell .messages-page .conversation-view .chat-header .header-actions button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-main);
+}
+
+.shell .messages-page .conversation-view .chat-header .header-actions svg {
+  width: 20px;
+  height: 20px;
+}
+
+.shell .messages-page .conversation-view .chat-header .pin-bar {
+  flex: 1 0 100%;
+  border-radius: 18px;
+}
+
+/* Room for the floating header above the first messages. */
+.shell .messages-page .conversation-view .chat-log {
+  padding-top: calc(72px + var(--shell-safe-top, 0px));
+}
+
+.shell .messages-page .conversation-view:has(.pin-bar) .chat-log {
+  padding-top: calc(132px + var(--shell-safe-top, 0px));
+}
