@@ -127,7 +127,8 @@ frames under `project/*.dc.html`).
 2e. Detail Pages Cleanup (2026-11-16 night, **approved, not built**: "designs are great"). Owner's
    choices: sign-up option A, but signed out the Sign up button sits permanently on the bottom dock
    (a card in the corner would cover the left/right panels and the map); one layout for all types;
-   threads and posts take the shared header. Owner's notes for the build: a request drops the
+   threads take the shared header. Posts keep the author's face and name on top (no type or
+   channel), and the comment sections stay as they are. Owner's notes for the build: a request drops the
    dock's big "Join a role" button (each role already has its own Join); analyse the dock once
    you've joined, as it gets crowded (the member-list button can go, since Details shows the
    count; check whether the member list itself was modernised); show Share before joining too.
