@@ -2,6 +2,7 @@
 //! signals, and the project view with passed decisions applied (ADR 0033).
 
 mod charter;
+mod invites;
 mod lineage;
 mod organizers;
 mod own;
