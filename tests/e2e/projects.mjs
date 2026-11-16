@@ -30,12 +30,13 @@ async function createProject(page, name, tag) {
   await page.getByLabel('Title').fill(name);
   await page.getByLabel('What do you propose?').fill('Share seeds between gardens.\n\nMore detail later.');
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByRole('radio', { name: /Online/ }).check();
-  await page.getByRole('button', { name: 'Continue' }).click();
   // The scope step: the project's own channel first (its main tag), then the shared test
   // channel as a second one (so the card shows web's "+1" on phones).
   await pickScopeTag(page, 'Search channels and communities', tag);
   await tagTestChannel(page);
+  await page.getByRole('button', { name: 'Continue' }).click();
+  // Then the place (c8a6735 moved it after the channels).
+  await page.getByRole('radio', { name: /Online/ }).check();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Publish proposal' }).click();
 }
@@ -94,9 +95,10 @@ for (let i = 0; i < 20 && !(await ann.getByRole('button', { name: '2 members' })
   await ann.reload();
 }
 await ann.getByRole('button', { name: '2 members' }).click();
-await ann.locator('.people-sheet .person-row', { hasText: `bob_${stamp}` }).waitFor();
-await ann.getByRole('button', { name: 'Close' }).last().click();
-log('Ann sees Bob in the members sheet');
+const people = ann.getByRole('dialog', { name: 'People' });
+await people.locator('.member-row', { hasText: `bob_${stamp}` }).waitFor();
+await people.getByRole('button', { name: 'Back' }).click();
+log('Ann sees Bob on the People page');
 
 // web's "Share +" on the project page: send to Bob (a direct-chat message plus web's
 // `prj-share` notification), and "Create post" starts a post with the link.
