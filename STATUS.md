@@ -124,8 +124,8 @@ Two sessions work side by side: the owner's desktop session does UX (#162 `claud
 cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
 - **PR #164 merged** 12:50 pm Melbourne (the demo script `tests/e2e/demo-content.mjs` and the
   parity list; no app code). Live demo content exists until #163 deploys; then run the script again
-  (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 5 sign-ups or
-  restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
+  (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 50 sign-ups or
+  restores per IP a day, and a restart resets the count). The desktop session updates `tests/e2e/demo/*` to the new tag search in
   ux-polish.
 - **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only). `claude/push-gateway` (PR #166): the `services/push` crate (VAPID key, RFC 8291 encryption, sender, subscriptions in `gateway.sqlite`, `Pusher::notify` with muted categories and "Show what it's about"; `cargo test -p push`, and Node decrypted its output); gateway routes `GET /push/key`, `POST /push/subscribe`, `POST /push/unsubscribe` (device secret, as `/session/cells`); `ui/static/sw.js` and `ui/src/lib/holo/push.ts` (`turnPushOn`/`turnPushOff`). Nothing sends yet. Next: the signals from the zomes (after #163, it touches the same coordinators), the gateway listening to hosted agents' signals and calling `notify`, the desktop's OS notifications, and the Settings switch (after #162). Not tested: a real push through a browser's push service.
 - **Push, next steps found (2026-11-16):** the gateway must hear hosted apps' signals. In
