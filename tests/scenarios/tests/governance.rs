@@ -215,7 +215,7 @@ async fn leaving_proposal_needs_demand_then_a_vote() {
     let view = project(&net, 0).await;
     assert_eq!(
         (view.phase.as_str(), view.stage.as_str()),
-        ("phase-2", "Production Plan")
+        ("phase-2", "Plan")
     );
     net.shut_down().await;
 }

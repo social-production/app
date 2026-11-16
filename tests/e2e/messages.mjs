@@ -9,7 +9,16 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
+import {
+  BASE,
+  browser,
+  device,
+  errors,
+  log,
+  messageFromProfile,
+  signUp,
+  startGroup,
+} from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -52,11 +61,9 @@ const bobKey = (await key.innerText()).trim();
 log('two accounts signed up');
 
 await ann.goto(`${BASE}/profile/${bobKey}`);
-await ann.getByRole('button', { name: `Message ${bobName}` }).click({ timeout: 120_000 });
-await ann.getByRole('dialog').getByText(bobName).waitFor();
-await ann.getByPlaceholder('Write a message…').fill(hello);
-await ann.getByRole('dialog').getByRole('button', { name: 'Send' }).click();
-await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
+await messageFromProfile(ann, bobName, hello, () =>
+  ann.screenshot({ path: `${out}/phone390-dm-empty.png` }),
+);
 await bubble(ann, hello).waitFor({ timeout: 60_000 });
 assert.equal(await ann.locator('.identity-title').innerText(), bobName, 'the header names Bob');
 await receipt(ann, hello).waitFor({ timeout: 30_000 });
@@ -112,16 +119,13 @@ log("ann reported bob's reply: removed for both");
 
 await ann.getByRole('button', { name: 'Back to chats' }).click();
 await ann.getByRole('button', { name: 'New message' }).click();
-const sheet = ann.getByRole('dialog');
-await sheet.getByRole('tab', { name: 'Group' }).click();
-await sheet.getByPlaceholder('Group name').fill(group);
-await sheet.getByPlaceholder('Add members').fill(bobName);
-await sheet.getByRole('option', { name: bobName }).click({ timeout: 60_000 });
-await sheet.getByPlaceholder('Write a message…').fill(kickoff);
-await ann.screenshot({ path: `${out}/phone390-compose-group.png` });
-await sheet.getByRole('button', { name: 'Send' }).click();
-await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
-await ann.locator('.identity-title', { hasText: group }).waitFor({ timeout: 60_000 });
+await ann.getByRole('heading', { name: 'New message' }).waitFor();
+await ann.locator('.new-message .person-row', { hasText: bobName }).waitFor({ timeout: 120_000 });
+await ann.screenshot({ path: `${out}/phone390-new-message.png` });
+await ann.getByRole('button', { name: 'Back', exact: true }).click();
+await startGroup(ann, group, [bobName], kickoff, (step) =>
+  ann.screenshot({ path: `${out}/phone390-new-group-${step}.png` }),
+);
 await bubble(ann, kickoff).waitFor({ timeout: 60_000 });
 assert.equal(await receipt(ann, kickoff).count(), 0, 'groups have no read receipts, as on web');
 log('ann started a group');

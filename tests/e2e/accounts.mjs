@@ -75,6 +75,7 @@ log('saved a passkey and signed in with it');
 const c = await device({ passkeys: false });
 await signUp(c, 'AnnLaptop');
 await open(c, 'Settings');
+await c.getByRole('button', { name: 'Pair with my main account' }).click();
 await c.getByPlaceholder('uhCAk…').fill(annKey);
 await c.getByRole('button', { name: 'Send pairing request' }).click();
 await c.getByText('Request sent').waitFor({ timeout: 60_000 });

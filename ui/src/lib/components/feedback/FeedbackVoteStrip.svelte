@@ -22,7 +22,8 @@
     onVote,
   }: Props = $props();
 
-  const percent = $derived(`${Math.round(approval)}%`);
+  // No votes yet reads as a dash, not 0%.
+  const percent = $derived(upvotes + downvotes > 0 ? `${Math.round(approval)}%` : '—');
   const tooltip = $derived(`${upvotes} support · ${downvotes} oppose · ${percent}`);
 
   function vote(value: 'up' | 'down', event: MouseEvent): void {

@@ -22,12 +22,31 @@
     class={`surface-icon ${className}`.trim()}
     style={`width: ${dimension}; height: ${dimension};`}
   >
-    {#if icon === 'post'}
+    {#if icon === 'post' || icon === 'bubble'}
       <path
         d="M6 5.5h12a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 18 16.5H10l-4 3v-3H6A1.5 1.5 0 0 1 4.5 12V7A1.5 1.5 0 0 1 6 5.5Z"
         fill="none"
         stroke="currentColor"
         stroke-width="1.8"
+        stroke-linejoin="round"
+      />
+    {:else if icon === 'cube'}
+      <!-- Feed Headers mockup: a project's cube in a feed row. -->
+      <path
+        d="M12 3.5l7.5 4v9L12 20.5l-7.5-4v-9zM4.500 7.5L12 11.5l7.5-4M12 11.5v9"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linejoin="round"
+      />
+    {:else if icon === 'bulb'}
+      <!-- Feed Headers mockup: a proposal's lightbulb in a feed row. -->
+      <path
+        d="M9 17h6M10 20.5h4M8 14a6 6 0 1 1 8 0c-.7.7-1 1.5-1 3H9c0-1.5-.3-2.3-1-3z"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
         stroke-linejoin="round"
       />
     {:else if icon === 'thread'}

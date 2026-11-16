@@ -26,7 +26,7 @@
     /** web's header-actions slot (e.g. the event members sheet's Invite +). */
     headerActions?: Snippet | undefined;
     toolbar?: Snippet;
-    footer?: Snippet;
+    footer?: Snippet | undefined;
     children: Snippet;
   }
 

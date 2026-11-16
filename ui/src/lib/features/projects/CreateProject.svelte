@@ -31,7 +31,6 @@
   title="New proposal"
   description="A proposal is shared work people can find, join and shape. Its plan decides what it becomes."
   {steps}
-  progress
   stepIndex={s.step}
   missing={s.missing}
   submitLabel="Publish proposal"

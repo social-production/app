@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 12:30 am Melbourne by a cloud session; start at "START HERE (2026-11-15)")
+# Status: where the P2P app stands (updated 2026-11-16 by the owner's PC session and a cloud session; start at "START HERE (2026-11-16)", then "START HERE (2026-11-15)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -92,7 +92,7 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
   restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
   ux-polish.
 - **Push notifications:** ADR 0107 accepted by the owner (PR #165, docs only); next: the gateway side in a `services/push` crate.
-- **Settings rows** (separate Public/Personal feeds, display timezone, Privacy's three switches):
+- **Settings rows** (#162 merged 2:44 pm Melbourne; Settings is now this session's) (separate Public/Personal feeds, display timezone, Privacy's three switches):
   start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
   `RegionalSettings.svelte`. Settings is this session's after #162.
 - **Bot-review vote notification:** after #163 merges (both touch `identity`'s coordinator
@@ -103,6 +103,77 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
 - The desktop session owns: `components/styles/ux/*`, `features/projects/`, `features/shell/`,
   `components/shell/`, the card/link/governance/plan/create/... components, messages, people,
   search, about, invites, feedback, map, and `services/{feedback,messages,projects}.ts`.
+## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
+The last PC session's stacked UX branches (labels → new-message → remaining-screens →
+plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
+conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
+`claude/ux-plan-screens`.
+1. **PR #162 `claude/ux-screens`** = main + labels + Telegram's New message + the Remaining
+   Screens. UI only: `hc dna hash` equals main's build (directory `uhC0kiObR4…`, project
+   `uhC0kNYqoKd…`, conversation `uhC0k1AJBcn…`). Local browser tests passed: `accounts` (on
+   the second run; the first sign-up after a seed start times out), `messages`, `shell`,
+   `search`, `follows`, `regional`, `governance`, `events`, `mentions`, `group-options`,
+   `attachments`, `calls`, `platform`, `map`, `region`, `links`, `scope-settings`,
+   `public-chats`, `message-reports`, `chat`, `ux-review`. **The desktop smoke failed for a
+   real reason**: Settings' network line and Sign out now sit behind rows that open sheets;
+   `tests/desktop/smoke.mjs` reads the row and signs out through the sheet (fixed, rerunning).
+   Merge when green.
+2. **PR #163 `claude/ux-plan-convert`** = #162 + plan-screens (Plan, Phase and Feedback
+   Screens, Convert, feedback comments). **Resets the directory (`uhC0koVynnrz…`) and the
+   project network (`uhC0kQTrPUR3…`)**; conversation unchanged. **Owner, 2026-11-16: merge
+   once CI is green, after #162; then re-run `tests/e2e/demo-content.mjs` on live** (the
+   owner's other work runs in tandem, so the demo content is seeded before and re-seeded
+   after). Fixed on it: place rows called a store from components (layer rule); they use the
+   shell's `placeOnMap` context. Local browser tests: rerunning (the first run never started:
+   the seed took longer than 400 s to come up).
+3. **`claude/ux-polish`** (stacked on #163, local only until #163 merges): signed-out visitors
+   see no Notifications, Messages or Home feed tab (`features/shell/navTabs.ts`, Topbar
+   `guest`, FeedHeader `guest`; hidden only once the status is `signed-out`, not while
+   connecting); sign-up has no top bar (`authSurface` collapses it like an open chat). **Not
+   looked at in the browser yet.**
+   **Waiting on the owner (2026-11-16):** the owner found the create flows "rough and boxy and
+   confusing", Links and History not modernised, feed cards' time and place, and the filter
+   sheets wrapping. Mockups (build only after the owner answers):
+   - Polish pass (feed cards, feed and map filters, map bar at the bottom, Region, every create
+     step, Links, History): https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
+   - Map and Region filters (first round, superseded by the page above):
+     https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
+   Today's 390px screenshots of every create step come from `ONLY=create node
+   tests/e2e/ux-scan.mjs` (the private event stops at step 3: the scan adds no invitees).
+   Also seen and not yet fixed: a help request's "Still needed: … is required., …" has doubled
+   full stops; the empty Search page shows bare words (platform, community, project, event).
+
+## START HERE (2026-11-15 afternoon, owner's PC session): the UX build list, three branches
+Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
+this order, once creation-plans is on main; merge main in first):
+1. **`claude/ux-labels`** (the owner's answers): every type's first plan phase reads just
+   "Plan" (`sp_governance::phases::stage_label`); "Project" not "Productive", "Service" not
+   "Collective service"; feed rows use the mockups' glyphs (cube, speech bubble, lightbulb
+   for a proposal: `SurfaceTypeLabel`'s `feedGlyph`). **No DNA hash moves**: directory and
+   conversation equal live `/readyz`, project equals creation-plans' build. Browser tests
+   `accounts`, `governance`, `events` passed; scenarios `governance.rs`/`events.rs` updated
+   but not run.
+2. **`claude/ux-new-message`** (Telegram's New message): `features/messages/NewMessagePage`
+   (`?new=message`, `?new=group`), `NewGroupName`, `DraftChatView` (`?to=<agent>`: an empty
+   chat; the first message creates it). The profile's Message is a link to `?to=`.
+   `ComposeMessageSheet` is gone. `tests/e2e/lib.mjs` has `messageFromProfile` and
+   `startGroup`. `messages` passed and its screens were looked at; **not run:** `mentions`,
+   `group-options`, `attachments`, `calls`.
+3. **`claude/ux-remaining-screens`**: Settings' other sections as rows
+   (`components/settings/SettingSwitch`, `SettingPanel`; `lib.mjs` `setDefaultPlace`, sign
+   out confirms in a sheet), People rows, Search (pill field, type chips, feed-style rows),
+   the channel/community/Platform header (`scopes/ScopeHeader.svelte`), the Feedback list
+   (Plan, Phase and Feedback Screens §7: segmented kinds, word tabs, % pill, floating Add
+   feedback), Links and History as soft cards, every multi-step create flow with "Step N of
+   M" and a progress line. `tests/e2e/ux-review.mjs` shoots these at 390px light and dark
+   (`ONLY=create` for the create flows and a proposal's tabs). Passed: `shell`, `follows`,
+   `search`, `regional`. **Not run:** `accounts`, `platform`, `map`, `region`, `links`.
+   Looked at in light and dark: Settings, People, Search, channel header, Feedback, New
+   message, New group.
+**Still to do:** the Feedback item page with comments (new data in the directory DNA =
+a reset: ask the owner); Plan, Phase and Feedback Screens §1 to §6 plus Convert on the
+phase sheet (needs an ADR); README Status. The create menu and the Take part phase line were
+compared with their mockups and already match (menu items follow Creating Through Plans).
 
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
 **Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the

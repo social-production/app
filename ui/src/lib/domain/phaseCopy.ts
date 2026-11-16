@@ -18,7 +18,7 @@ const DEFAULT: Record<string, string> = {
 
 const OVERRIDES: Partial<Record<CharterMode, Record<string, string>>> = {
   'collective-service': {
-    'phase-2': 'Define how the collective service will operate day to day.',
+    'phase-2': 'Define how the service will operate day to day.',
     'phase-3': 'Decide who can access the service and under what conditions.',
   },
   'personal-service': {

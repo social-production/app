@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, signUp, continueSteps } from './lib.mjs';
+import { BASE, browser, device, errors, log, signUp, continueSteps, startGroup } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -124,15 +124,7 @@ await bob.goto(`${BASE}/notifications`);
 await card(bob, 'You were mentioned.').waitFor({ timeout: 60_000 });
 assert.equal(await card(bob, 'You were mentioned.').locator('.unread-dot').count(), 0);
 await ann.goto(`${BASE}/messages`);
-await ann.getByRole('button', { name: 'New message' }).click();
-const sheet = ann.getByRole('dialog');
-await sheet.getByRole('tab', { name: 'Group' }).click();
-await sheet.getByPlaceholder('Group name').fill(group);
-await sheet.getByPlaceholder('Add members').fill(bobName);
-await sheet.getByRole('option', { name: bobName }).click({ timeout: 60_000 });
-await sheet.getByPlaceholder('Write a message…').fill(kickoff);
-await sheet.getByRole('button', { name: 'Send' }).click();
-await ann.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
+await startGroup(ann, group, [bobName], kickoff);
 await bubble(ann, kickoff).waitFor({ timeout: 60_000 });
 const groupBox = ann.getByRole('textbox', { name: 'Write a message...' });
 await groupBox.pressSequentially(`@${bobName.slice(0, 4)}`, { delay: 30 });

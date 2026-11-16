@@ -1,0 +1,172 @@
+/* Search (Remaining Screens, 5): a rounded field, the type filter as chips, results as
+   feed-style rows. */
+.shell .search-page .page-header {
+  gap: 12px;
+  padding-bottom: 4px;
+  border-bottom: none;
+}
+
+.shell .search-page .search-form {
+  display: block;
+  margin-top: 0;
+}
+
+.shell .search-page .search-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 48px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.shell .search-page .search-input-wrap:focus-within {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+.shell .search-page .search-glyph {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.shell .search-page .search-input-wrap .search-input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.shell .search-page .type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shell .search-page .type-chip {
+  padding: 6px 13px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shell .search-page .type-chip:hover {
+  color: var(--text-main);
+}
+
+.shell .search-page .type-chip.on {
+  background: var(--text-main);
+  color: var(--page-bg);
+}
+
+.shell .search-page .search-lede {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.shell .search-page .stack {
+  gap: 0;
+}
+
+.shell .search-page .result-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  border-bottom: none;
+}
+
+.shell .search-page .result-card .avatar-badge {
+  flex: none;
+}
+
+.shell .search-page .result-copy {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.shell .search-page .result-card .topline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.shell .search-page .result-card .topline > * + *::before {
+  content: '· ';
+}
+
+.shell .search-page .result-card .kind-chip {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--brand-strong);
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .search-page .result-card .kind-thread,
+.shell .search-page .result-card .kind-post,
+.shell .search-page .result-card .kind-profile {
+  color: var(--text-soft);
+}
+
+.shell .search-page .result-card h2 {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+
+.shell .search-page .result-card p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .search-page a.result-card:hover h2 {
+  color: var(--brand-strong);
+}
+
+.shell .search-page .result-card.none {
+  display: grid;
+  gap: 2px;
+  padding: 18px 0;
+  text-align: center;
+}
+
+/* The field says what the page is; the heading stays for screen readers. */
+.shell .search-page .page-header h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
