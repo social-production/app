@@ -85,3 +85,27 @@
 .overlay-root.overlay-root .overlay-footer > :not(p) {
   grid-row: 2;
 }
+
+/* An actions group holding only a line of text (the board's "Full members can volunteer.")
+   is text, not a dock capsule: it sits above the dock, so it never covers "× Close". */
+.overlay-root.overlay-root .overlay-footer .sheet-actions:not(:has(button, a)) {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  margin-bottom: 8px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  box-shadow: none;
+}
+
+.overlay-root.overlay-root .overlay-footer .sheet-actions:not(:has(button, a)) > p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  text-align: center;
+}
