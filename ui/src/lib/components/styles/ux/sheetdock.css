@@ -70,3 +70,18 @@
 .overlay-root.overlay-root .overlay-footer .sheet-actions > .sheet-cancel {
   background: transparent;
 }
+
+/* A line of text in a footer ("Full members can volunteer.") is not part of the dock: it sits
+   across the sheet above it, and the dock keeps the row below. */
+.overlay-root.overlay-root .overlay-footer > p {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin: 0 0 8px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.overlay-root.overlay-root .overlay-footer > :not(p) {
+  grid-row: 2;
+}
