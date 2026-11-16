@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { untrack } from 'svelte';
+
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { Person } from '#lib/domain/people.ts';
   import { placeAndStanding } from '#lib/domain/personLine.ts';
@@ -66,9 +68,10 @@
     const missing = [...organizers, ...waiting.flatMap((i) => [i.agent, i.by])].filter(
       (a) => !known[a],
     );
-    people = { ...people, ...known };
+    // `people` is written here, so it is read untracked (or the effect re-runs itself).
+    people = { ...untrack(() => people), ...known };
     for (const agent of new Set(missing)) {
-      void cachedPerson(agent).then((p) => (people = { ...people, [agent]: p }));
+      void cachedPerson(agent).then((p) => (people = { ...untrack(() => people), [agent]: p }));
     }
   });
 
