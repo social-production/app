@@ -8,12 +8,18 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-16)
+## Status (2026-11-17)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Chats like Telegram, full-screen search, new report sheets (PR #177, 2026-11-17 12:20 am
+  Melbourne):** three-capsule chat header, bubbles with the time inside and a tail, a chat's
+  person page, a search page with recent searches and channels to explore, ⋮ as a bottom
+  sheet, and a two-reason report form with a confirmation. UI only, no reset.
+- **Phone feeds hide the bars on scroll (PR #176, 2026-11-17 12:18 am Melbourne):** the top bar
+  and bottom nav slide away while you scroll down and come back when you scroll up. UI only.
 - **Push notifications, first half (PRs #166, #168, 2026-11-16 6:03 and 7:45 pm Melbourne, ADR
   0108):** Settings → Notifications has "Push notifications on this device" and "Show what it's
   about"; the seed keeps browsers' push subscriptions and listens for notice signals from the

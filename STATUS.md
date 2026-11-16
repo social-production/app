@@ -182,7 +182,16 @@ They message each other (ListAgents / SendMessage) when a PR opens or merges, be
 a branch the other might touch, and before starting an ADR. ADR numbers: **0109 goes to the
 parity session** (below); the UX session takes 0111 and up if it needs one; parity continues 0110+.
 
-### Where things stand (12:15 am Melbourne, 2026-11-17)
+### Where things stand (12:30 am Melbourne, 2026-11-17)
+- **UX session (cloud):** #176 merged 12:18 am and #177 12:20 am; live smoked read-only at
+  390px light and dark (signed-out Home, scroll-away bars, the search page): no page errors.
+- The UX session could not message the parity session (the send needs a trusted device), so
+  coordinate through this file and PR descriptions until the owner relays.
+- **Owner, 12:25 am: the Invited list gets its reset now (ADR 0111, `claude/event-invites`).**
+  Invites are encrypted sender → invitee, so organisers could read only their own. A new
+  `Invite` record (project DNA) lists who was invited, by whom and when. Project network reset;
+  directory hash checked unchanged (`uhC0kfM8SR1…`). **Parity session: your ADR 0109 reset
+  also changes project integrity; merge main in after `claude/event-invites` lands (or ride with it).**
 - Merged and live: #171 polish, #172 profiles, #174 platform screens, #175 bot-review vote.
 - **#176 `claude/ux-scroll-chrome`** (main merged in, fast checks clean locally): phone feeds
   slide the top and bottom bars away on scroll. Merge when green.
