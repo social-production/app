@@ -111,3 +111,32 @@
 .overlay-root.edit-profile-sheet .edit-hint.error {
   color: var(--danger);
 }
+
+/* The Area field's locate button sits inside the box at its right (Profiles mockups §2). */
+.overlay-root.edit-profile-sheet .edit-field > .edit-area {
+  position: relative;
+  display: block;
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.overlay-root.edit-profile-sheet .edit-area input {
+  width: 100%;
+  padding-right: 48px;
+}
+
+.overlay-root.edit-profile-sheet .edit-locate {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--brand-strong);
+  transform: translateY(-50%);
+}

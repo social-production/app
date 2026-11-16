@@ -202,3 +202,64 @@
     display: none;
   }
 }
+
+/* Profiles and Comments mockups §2 (owner, 17 Nov: "copy the mockups"): Edit profile is an
+   outlined pill at the right of the photo, just under the cover; the place has its own line
+   with a pin; the counts are followers and following only. */
+.shell .profile-page .hero-aside {
+  position: absolute;
+  top: 54px;
+  right: 0;
+}
+
+.shell .profile-page .edit-profile {
+  height: 36px;
+  padding: 0 16px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--page-bg);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.shell .profile-page .profile-bio {
+  margin: 0;
+  padding-left: 0;
+  border-left: none;
+  color: var(--text-main);
+  font-size: 14.5px;
+  font-weight: 400;
+}
+
+/* The identity block spans the column, so the aside reaches the right edge. (The ported
+   hero-main keeps justify-content: flex-start, which shrinks a grid's one column to its
+   content.) */
+.shell .profile-page .hero-main {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.shell .profile-page .profile-area {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .profile-page .profile-area svg {
+  flex: none;
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .profile-page .hero-copy {
+  gap: 4px;
+}

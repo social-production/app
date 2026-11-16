@@ -10,8 +10,11 @@
   /** The header of web's ProfilePage (classes styled by styles/profile.css). */
   interface Props {
     person: Person;
+    /** Unused since the count row shows followers only (Profiles mockups §2). */
     devices?: number;
     actions?: Snippet;
+    /** Beside the photo, at the right (your own profile's Edit profile, Profiles mockup §2). */
+    aside?: Snippet;
     /** Leading items of the count row (web's follower / following buttons). */
     counts?: Snippet;
     /** web's standing chip is a button that opens the Trust sheet. */
@@ -26,8 +29,8 @@
 
   let {
     person,
-    devices = 1,
     actions,
+    aside,
     counts,
     trustOpen = false,
     onStanding,
@@ -89,6 +92,7 @@
           <AvatarBadge size="md" name={person.profile?.name ?? ''} avatar={null} />
         {/if}
         {#if onPhotoFile}{@render camera('Change profile photo', onPhotoFile, 'photo-cam')}{/if}
+        {#if aside}<div class="hero-aside">{@render aside()}</div>{/if}
         <div class="hero-copy">
           <div class="name-row">
             <h1>{displayName(person)}</h1>
@@ -113,13 +117,20 @@
           {#if person.profile?.bio}
             <p class="profile-bio">{person.profile.bio}</p>
           {/if}
+          {#if person.profile?.home_area}
+            <p class="profile-area">
+              <svg aria-hidden="true" viewBox="0 0 24 24"
+                ><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle
+                  cx="12"
+                  cy="10"
+                  r="2.5"
+                /></svg
+              >{person.profile.home_area}
+            </p>
+          {/if}
+          <!-- Followers and following only, as drawn; standing and vouches live in the chip's sheet. -->
           <div class="count-row">
             {@render counts?.()}
-            {#if person.profile?.home_area}<span>{person.profile.home_area}</span>{/if}
-            {#if devices > 1}<span><strong>{devices}</strong> devices</span>{/if}
-            {#if person.standing.level === 'New'}
-              <span><strong>{person.standing.vouchers.length}</strong>/2 vouches</span>
-            {/if}
           </div>
         </div>
       </div>
