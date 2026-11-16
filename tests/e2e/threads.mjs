@@ -92,7 +92,7 @@ await bob.getByLabel(/What's on your mind/).fill(`${body}\nAs discussed in ${url
 // ADR 0101: a post carries photos, picked in the create form.
 await bob.getByLabel('Photos for this post').setInputFiles({ name: 'beds.png', mimeType: 'image/png', buffer: PHOTO });
 await bob.locator('.post-photo-pick img').waitFor({ timeout: 30_000 });
-await bob.getByRole('button', { name: 'Publish post' }).click();
+await bob.getByRole('button', { name: 'Publish post' }).last().click(); // header Post shares the name
 await bob.locator('.linked-body.detail', { hasText: body }).waitFor({ timeout: 120_000 });
 const shown = async (img) => (await img.evaluate((el) => el.naturalWidth)) > 0;
 const pagePhoto = bob.locator('.item-head .post-photos[data-count="1"] img');

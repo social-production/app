@@ -24,7 +24,7 @@ export async function comment(page, url, text, { upvote = true } = {}) {
     const up = page.locator('.overview-shell').getByRole('button', { name: 'Vote up' });
     if (await up.count()) await up.click();
   }
-  const box = page.getByLabel('Write a comment...');
+  const box = page.getByRole('textbox', { name: 'Add a comment' });
   await box.fill(text);
   await box.press('Enter');
   await page.locator('.comment-card', { hasText: text }).first().waitFor({ timeout: 60_000 });
@@ -38,7 +38,7 @@ export async function reply(page, url, to, text) {
     await page.waitForTimeout(3000);
   }
   await card.getByRole('button', { name: 'Reply' }).first().click();
-  const box = page.getByLabel('Write a reply...');
+  const box = page.getByRole('textbox', { name: /^Reply to / });
   await box.fill(text);
   await box.press('Enter');
   await page.locator('.comment-card', { hasText: text }).first().waitFor({ timeout: 60_000 });
@@ -114,7 +114,8 @@ export async function post(page, { text, photo }) {
       .setInputFiles({ name: 'garden.png', mimeType: 'image/png', buffer: photo });
     await page.locator('.post-photo-pick img').waitFor({ timeout: 30_000 });
   }
-  await page.getByRole('button', { name: 'Publish post' }).click();
+  // The composer's header Post and its dock button share the name; either publishes.
+  await page.getByRole('button', { name: 'Publish post' }).last().click();
   await page.locator('.linked-body.detail').first().waitFor({ timeout: 120_000 });
 }
 

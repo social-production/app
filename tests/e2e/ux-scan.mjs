@@ -81,7 +81,7 @@ if (!only || only === 'create') {
     await create(/Post/);
     await page.getByLabel(/What's on your mind/).fill(`Planting garlic this weekend ${stamp}`);
     await shot('create-post');
-    await page.getByRole('button', { name: 'Publish post' }).click();
+    await page.getByRole('button', { name: 'Publish post' }).last().click();
     await page.locator('.linked-body.detail').waitFor({ timeout: 120_000 });
     const composer = page.getByLabel('Add a comment');
     await composer.fill('Cloves pointy end up.');
