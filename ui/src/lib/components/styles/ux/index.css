@@ -5,6 +5,7 @@
    notifications list, a post or thread page) lose the type stripe too. */
 @import './feed.css';
 @import './feedrow.css';
+@import './commentrow.css';
 @import './menus.css';
 @import './rail.css';
 @import './detail.css';

@@ -1,24 +1,25 @@
 <script lang="ts">
   import type { ProjectCard, Stance } from '#lib/domain/projects.ts';
 
-  import PersonalActivityCard from './PersonalActivityCard.svelte';
-  import PersonalHelpRequestCard from './PersonalHelpRequestCard.svelte';
   import PersonalPostCard from './PersonalPostCard.svelte';
+  import SpaceCard from './SpaceCard.svelte';
 
-  /** web's PersonalFeedCard: the personal-feed card for a space's mode. */
+  /**
+   * A personal-feed item (Home's people you follow, a profile): posts keep their author row;
+   * everything else is the Global row (Profiles and Comments mockups §1), with Home's
+   * "Maya Kim proposed this" line when `context` is given.
+   */
   interface Props {
     card: ProjectCard;
     onSignal: (next: Stance | null) => Promise<void>;
+    context?: string;
   }
 
-  let { card, onSignal }: Props = $props();
-  const authorName = $derived(card.creatorName || 'Unnamed');
+  let { card, onSignal, context = '' }: Props = $props();
 </script>
 
-{#if card.mode === 'help-request'}
-  <PersonalHelpRequestCard {card} {authorName} {onSignal} />
-{:else if card.mode === 'post'}
-  <PersonalPostCard {card} {authorName} {onSignal} />
+{#if card.mode === 'post'}
+  <PersonalPostCard {card} authorName={card.creatorName || 'Unnamed'} {onSignal} />
 {:else}
-  <PersonalActivityCard {card} {authorName} {onSignal} />
+  <SpaceCard {card} {onSignal} {context} />
 {/if}

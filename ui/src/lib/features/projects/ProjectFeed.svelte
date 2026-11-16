@@ -4,10 +4,13 @@
   import { page } from '$app/state';
   import { resolve } from '$app/paths';
   import type { ResolvedPathname } from '$app/types';
+  import CommentActivityCard from '#lib/components/cards/CommentActivityCard.svelte';
   import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
   import ProjectActivityCard from '#lib/components/cards/ProjectActivityCard.svelte';
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
+  import { madeContext } from '#lib/domain/homeFeed.ts';
+  import type { ProjectCard } from '#lib/domain/projects.ts';
   import { regionLink, type RegionActivity } from '#lib/domain/regionFeed.ts';
 
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -54,6 +57,12 @@
     });
   });
 
+  /** "Maya Kim proposed this" over a card by someone you follow (ADR 0107). */
+  const contextOf = (card: ProjectCard): string =>
+    feed.following.includes(card.creator)
+      ? madeContext(card.creatorName || 'Unnamed', card.mode)
+      : '';
+
   /** An activity's project page, with web's `?activity=`. */
   const activityHref = (a: RegionActivity): ResolvedPathname =>
     `${resolve('/projects/[id]', { id: a.parentId })}?activity=${a.id}` as ResolvedPathname;
@@ -81,8 +90,14 @@
       {#each feed.rows as row (row.key)}
         {#if 'activity' in row}
           <ProjectActivityCard item={row.activity} href={activityHref(row.activity)} />
+        {:else if 'comment' in row}
+          <CommentActivityCard comment={row.comment} />
         {:else if row.source === 'personal'}
-          <PersonalSpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
+          <PersonalSpaceCard
+            card={row.card}
+            context={contextOf(row.card)}
+            onSignal={(next) => feed.signal(row.card, next)}
+          />
         {:else}
           <SpaceCard card={row.card} onSignal={(next) => feed.signal(row.card, next)} />
         {/if}

@@ -6,6 +6,7 @@ import { addComment, listComments, voteComment } from '#lib/services/discussions
 import { explain } from '#lib/services/errors.ts';
 import { getPerson } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
+import { noteComment } from '#lib/services/profileNotes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 import { ModerationLoader } from '../moderationState.svelte.ts';
 
@@ -18,6 +19,16 @@ function mapTree(
   return list.map((c) =>
     c.id === id ? change(c) : { ...c, replies: mapTree(c.replies, id, change) },
   );
+}
+
+/** The author of comment `id` anywhere in the tree. */
+function authorOf(list: DiscussionComment[], id: string): string | null {
+  for (const c of list) {
+    if (c.id === id) return c.author;
+    const found = authorOf(c.replies, id);
+    if (found) return found;
+  }
+  return null;
 }
 
 function authors(list: DiscussionComment[]): string[] {
@@ -100,7 +111,9 @@ export class DiscussionState {
     if (!requireViewer('Sign in to comment.') || !body.trim()) return false;
     this.message = '';
     try {
-      await addComment(this.id, body, parent);
+      const id = await addComment(this.id, body, parent);
+      // ADR 0107: the note lists it on your profile and followers' Home.
+      void noteComment(this.id, id, body, parent ? authorOf(this.comments, parent) : null);
       await this.fetch();
       return true;
     } catch (e) {
