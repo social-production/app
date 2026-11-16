@@ -139,6 +139,16 @@ frames under `project/*.dc.html`).
   `DiscussionPanel` owns the one composer and its reply bar; `PhotoViewer` counts, swipes and
   takes a footer. Comment notes are written in the chain's write queue and awaited: leaving
   the page mid-write dropped them.
+- **Checked on `claude/ux-profiles` (holds all of polish), local seed with #163's hApp:**
+  browser tests `threads`, `follows`, `guests`, `help-requests` (after its overview check
+  was updated), `message-reports`, `accounts` passed. `ux-scan.mjs` at 390px light and dark:
+  feed, filter sheets, map and its sheet, every create flow, profile, thread, settings and
+  the other pages looked right after two fixes (create flows showed a second × in the footer;
+  the preview's glyph lacked its square). The scan now signs in as a dev founder (a new
+  member's 2-a-week limit stopped it); its private event stops at "Who is invited?" because
+  an invite-only event needs a guest and the founder has no named contact (covered by
+  `private-events.mjs`). Live after #162 (read-only, 390px signed out): feed, Search,
+  Feedback and About load with no page errors.
 
 ## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
 The last PC session's stacked UX branches (labels → new-message → remaining-screens →
