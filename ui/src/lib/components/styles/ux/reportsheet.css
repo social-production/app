@@ -1,0 +1,151 @@
+/* Reporting (Chats, Search and Reports mockups §4). The ⋮ menu is a short action sheet from
+   the bottom on phones (it was a full-screen "Options" page); the report form asks why with
+   two cards; once sent, the sheet confirms. Portaled outside `.shell`: rules double a class. */
+@media (max-width: 760px) {
+  .report-ui .report-menu-backdrop.report-menu-backdrop {
+    place-items: end stretch;
+  }
+
+  .report-ui .report-menu.report-menu {
+    height: auto;
+    max-height: 85dvh;
+    padding-top: 6px;
+    border-radius: 24px 24px 0 0;
+    animation: report-sheet-up 0.2s ease;
+  }
+}
+
+@keyframes report-sheet-up {
+  from {
+    transform: translateY(40%);
+    opacity: 0;
+  }
+}
+
+.report-ui .report-menu.action-sheet .menu-body {
+  gap: 0;
+  padding: 6px 16px 4px;
+}
+
+.report-ui .report-menu.action-sheet .menu-item {
+  justify-content: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 54px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 0;
+  background: none;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.report-ui .report-menu.action-sheet .menu-item + .menu-item {
+  border-top: 1px solid var(--panel-border);
+}
+
+.report-ui .report-menu .menu-item.menu-danger {
+  color: var(--danger);
+}
+
+.report-ui .report-menu.action-sheet .menu-item svg {
+  width: 20px;
+  height: 20px;
+}
+
+.report-ui .report-menu.action-sheet .menu-actions {
+  border-top: none;
+}
+
+/* The report form: the two reasons as cards. */
+.report-composer .report-reasons {
+  display: grid;
+  gap: 8px;
+}
+
+.report-composer .report-question {
+  margin: 0 0 2px;
+  font-weight: 600;
+}
+
+.report-composer .report-reason {
+  display: flex;
+  gap: 12px;
+  padding: 12px 14px;
+  border: 1.5px solid transparent;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  cursor: pointer;
+}
+
+.report-composer .report-reason.on {
+  border-color: var(--brand);
+  background: var(--brand-soft);
+}
+
+.report-composer .report-reason input {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin: 1px 0 0;
+  padding: 0;
+  accent-color: var(--brand);
+}
+
+.report-composer .report-reason > span {
+  display: grid;
+  gap: 2px;
+}
+
+.report-composer .report-reason b {
+  font-size: 15px;
+}
+
+.report-composer .report-reason > span > span {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.report-composer textarea {
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+/* Sent. */
+.report-composer .report-sent {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  padding: 4px 20px 8px;
+  text-align: center;
+}
+
+.report-composer .report-sent-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.report-composer .report-sent-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.report-composer .report-sent h3 {
+  margin: 4px 0 0;
+  font-size: 19px;
+}
+
+.report-composer .report-sent p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}

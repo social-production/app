@@ -169,7 +169,7 @@
 .shell .chat-panel .message-copy p > .message-footer {
   position: absolute;
   right: 10px;
-  bottom: 5px;
+  bottom: 8px;
   display: inline-flex;
   width: auto;
   margin: 0;

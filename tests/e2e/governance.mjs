@@ -2,57 +2,95 @@
 // dev hApp makes the two identities in fixtures/dev-founders.json founders (Full standing).
 // One proposes an edit, an update and a phase move; the other votes them through.
 //   node tests/e2e/governance.mjs http://localhost:4174
-import assert from 'node:assert/strict';
-import { mkdirSync, readFileSync } from 'node:fs';
+import assert from "node:assert/strict";
+import { mkdirSync, readFileSync } from "node:fs";
 
-import { BASE, addPlan, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps, feedChoice } from './lib.mjs';
+import {
+  BASE,
+  addPlan,
+  browser,
+  device,
+  errors,
+  log,
+  phraseSignIn,
+  rail,
+  railShows,
+  continueSteps,
+  feedChoice,
+} from "./lib.mjs";
 
-const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
+const [one, two] = JSON.parse(
+  readFileSync(new URL("./fixtures/dev-founders.json", import.meta.url)),
+);
 const stamp = Date.now().toString(36).slice(-4);
 const title = `Bike kitchen ${stamp}`;
 
 // Founder one is a phone (390px, web's first check); screenshots of the Take part tab go to E2E_OUT.
 const ann = await device({ viewport: { width: 390, height: 844 } });
-const shots = process.env.E2E_OUT ?? 'screens';
+const shots = process.env.E2E_OUT ?? "screens";
 mkdirSync(shots, { recursive: true });
-await phraseSignIn(ann, one.phrase.split(' '));
+await phraseSignIn(ann, one.phrase.split(" "));
 await ann.goto(`${BASE}/create/project`);
-await ann.getByLabel('Title').fill(title);
-await ann.getByLabel('What do you propose?').fill('Fix bikes together on Saturdays.');
+await ann.getByLabel("Title").fill(title);
+await ann
+  .getByLabel("What do you propose?")
+  .fill("Fix bikes together on Saturdays.");
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish proposal' }).click();
-await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+await ann.getByRole("button", { name: "Publish proposal" }).click();
+await ann.getByRole("heading", { name: title }).waitFor({ timeout: 120_000 });
 const projectUrl = ann.url();
-await ann.getByRole('button', { name: /^Support/ }).click();
+await ann.getByRole("button", { name: /^Support/ }).click();
 // ADR 0099: the dock takes the nav's place; with a stance, Support and Oppose fold into a
 // chip in the capsule, and tapping it opens them again.
-const chip = ann.locator('.dock-capsule .dock-chip');
+const chip = ann.locator(".dock-capsule .dock-chip");
 await chip.waitFor({ timeout: 60_000 });
-assert.match((await chip.getAttribute('aria-label')) ?? '', /^You support this, 100% support/);
-assert.equal(await ann.getByRole('button', { name: /^Oppose/ }).count(), 0, 'the strip folded away');
-assert.equal(await ann.locator('.mobile-bottom-nav').isVisible(), false, 'the dock replaces the nav');
+assert.match(
+  (await chip.getAttribute("aria-label")) ?? "",
+  /^You support this, 100% support/,
+);
+assert.equal(
+  await ann.getByRole("button", { name: /^Oppose/ }).count(),
+  0,
+  "the strip folded away",
+);
+assert.equal(
+  await ann.locator(".mobile-bottom-nav").isVisible(),
+  false,
+  "the dock replaces the nav",
+);
 await chip.click();
-await ann.getByRole('button', { name: /^Oppose/ }).waitFor();
+await ann.getByRole("button", { name: /^Oppose/ }).waitFor();
 await chip.click();
-await ann.getByRole('button', { name: /^Oppose/ }).waitFor({ state: 'hidden' });
+await ann.getByRole("button", { name: /^Oppose/ }).waitFor({ state: "hidden" });
 // ADR 0059: a new proposal has no type until a plan leads it out of its Plan phase.
-assert.equal(await ann.locator('.context-panel .feed-lead-meta .surface-type-label').innerText(), 'Proposal');
-log('founder one created the proposal and supports it; the stance folds into a chip');
+assert.equal(
+  await ann
+    .locator(".context-panel .feed-lead-meta .surface-type-label")
+    .innerText(),
+  "Proposal",
+);
+log(
+  "founder one created the proposal and supports it; the stance folds into a chip",
+);
 
 const bob = await device();
-await phraseSignIn(bob, two.phrase.split(' '));
+await phraseSignIn(bob, two.phrase.split(" "));
 await bob.goto(projectUrl);
-await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-await bob.getByRole('button', { name: 'Join project' }).click();
-await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 });
-await bob.getByRole('button', { name: /^Support/ }).click();
-log('founder two joined and supports it');
+await bob.getByRole("heading", { name: title }).waitFor({ timeout: 120_000 });
+await bob.getByRole("button", { name: "Join project" }).click();
+await bob
+  .getByRole("button", { name: "2 members" })
+  .waitFor({ timeout: 60_000 });
+await bob.getByRole("button", { name: /^Support/ }).click();
+log("founder two joined and supports it");
 
 /** Reload until the loaded project page shows `locator` (gossip between the two agents). */
 async function until(page, locator, what) {
   for (let i = 0; i < 40; i++) {
     // Attached, not visible: the title sits in the Details tab, which may be hidden.
-    await page.locator('.project-detail h1').waitFor({ state: 'attached', timeout: 60_000 });
+    await page
+      .locator(".project-detail h1")
+      .waitFor({ state: "attached", timeout: 60_000 });
     if (await locator().count()) return;
     await page.waitForTimeout(3000);
     await page.reload();
@@ -63,222 +101,331 @@ async function until(page, locator, what) {
 /** Vote Yes on the open proposal. Edits and updates are voted on in the Details tab's dock,
  * phase moves in the Take part tab's (as on web). */
 async function voteYes(page, tab) {
-  const vote = () => page.getByRole('button', { name: 'Vote', exact: true });
-  await page.keyboard.press('Escape'); // a plan sheet left open would cover the tabs
+  const vote = () => page.getByRole("button", { name: "Vote", exact: true });
+  await page.keyboard.press("Escape"); // a plan sheet left open would cover the tabs
   for (let i = 0; ; i++) {
-    await page.locator('.project-detail h1').waitFor({ state: 'attached', timeout: 60_000 });
-    if (tab) await page.getByRole('tab', { name: tab }).click();
+    await page
+      .locator(".project-detail h1")
+      .waitFor({ state: "attached", timeout: 60_000 });
+    if (tab) await page.getByRole("tab", { name: tab }).click();
     if (await vote().count()) break;
-    if (i >= 40) throw new Error('timed out waiting for an open proposal');
+    if (i >= 40) throw new Error("timed out waiting for an open proposal");
     await page.waitForTimeout(3000);
     await page.reload();
   }
   await vote().click();
-  await page.locator('.choice-bar .choice.yes').click();
+  await page.locator(".choice-bar .choice.yes").click();
 }
 
 /** web's Phase ▾ menu: choose "Advance to …", then say why in its sheet. */
 async function advance(page) {
-  await page.getByRole('button', { name: 'Phase', exact: true }).click();
-  const sheet = page.getByRole('dialog', { name: 'Where should this go next?' });
-  await sheet.getByRole('radio', { name: /^Advance to / }).click();
-  await sheet.getByPlaceholder('State why this phase change should happen now.').fill('We are ready.');
-  await sheet.getByRole('button', { name: 'Start the vote' }).click();
-  await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
+  await page.getByRole("button", { name: "Phase", exact: true }).click();
+  const sheet = page.getByRole("dialog", {
+    name: "Where should this go next?",
+  });
+  await sheet.getByRole("radio", { name: /^Advance to / }).click();
+  await sheet
+    .getByPlaceholder("State why this phase change should happen now.")
+    .fill("We are ready.");
+  await sheet.getByRole("button", { name: "Start the vote" }).click();
+  await sheet.waitFor({ state: "hidden", timeout: 60_000 });
 }
 
 await ann.reload();
-await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
-await ann.getByRole('button', { name: 'Edit', exact: true }).click();
-await ann.locator('.edit-sheet').getByLabel('Title').fill(`${title} co-op`);
-await ann.getByRole('button', { name: 'Propose edit' }).click();
+await until(
+  ann,
+  () => ann.getByRole("button", { name: "2 members" }),
+  "the second member",
+);
+await ann.getByRole("button", { name: "Edit", exact: true }).click();
+await ann.locator(".edit-sheet").getByLabel("Title").fill(`${title} co-op`);
+await ann.getByRole("button", { name: "Propose edit" }).click();
 await voteYes(bob);
-await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'the edit to apply');
-log('an edit passed with both founders and applied');
+await until(
+  bob,
+  () => bob.getByRole("heading", { name: `${title} co-op` }),
+  "the edit to apply",
+);
+log("an edit passed with both founders and applied");
 
 await ann.reload();
-await ann.getByRole('button', { name: 'Update', exact: true }).click();
-await ann.locator('.update-sheet textarea').fill('First repair night went well.');
-await ann.getByRole('button', { name: 'Post update' }).click();
+await ann.getByRole("button", { name: "Update", exact: true }).click();
+await ann
+  .locator(".update-sheet textarea")
+  .fill("First repair night went well.");
+await ann.getByRole("button", { name: "Post update" }).click();
 await voteYes(bob);
 // The Details tab shows only the newest update, in its own block (Plan, Phase and Feedback
 // Screens, 1).
-const updateLine = () => bob.locator('.overview-update', { hasText: 'First repair night' });
-await until(bob, updateLine, 'the update');
-assert.match((await updateLine().innerText()).trim(), /^Latest update · .+\nFirst repair night went well\.$/);
-assert.equal(await bob.locator('.update-card').count(), 0, 'no separate updates list (web)');
-await bob.locator('.context-panel').screenshot({ path: `${shots}/update-line-390.png` });
-log('an update passed and shows in the header');
+const updateLine = () =>
+  bob.locator(".overview-update", { hasText: "First repair night" });
+await until(bob, updateLine, "the update");
+assert.match(
+  (await updateLine().innerText()).trim(),
+  /^Latest update · .+\nFirst repair night went well\.$/,
+);
+assert.equal(
+  await bob.locator(".update-card").count(),
+  0,
+  "no separate updates list (web)",
+);
+await bob
+  .locator(".context-panel")
+  .screenshot({ path: `${shots}/update-line-390.png` });
+log("an update passed and shows in the header");
 // web's feed card shows the newest update ("Latest: …") once the index refreshes.
-const latest = bob.locator('.project-card', { hasText: title }).getByText('Latest: First repair night went well.');
+const latest = bob
+  .locator(".project-card", { hasText: title })
+  .getByText("Latest: First repair night went well.");
 for (let i = 0; i < 45 && !(await latest.count()); i++) {
   await bob.goto(BASE);
-  await feedChoice(bob, 'Sort public feed by', 'Most recent');
-  await bob.locator('.project-card').first().waitFor({ timeout: 60_000 });
+  await feedChoice(bob, "Sort public feed by", "Most recent");
+  await bob.locator(".project-card").first().waitFor({ timeout: 60_000 });
   if (await latest.count()) break;
   await bob.waitForTimeout(3000);
 }
 await latest.waitFor();
 await bob.goto(projectUrl);
-log('the feed card shows the update as Latest');
+log("the feed card shows the update as Latest");
 
 await ann.reload();
-await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByRole("tab", { name: "Participation" }).click();
 await ann.screenshot({ path: `${shots}/take-part-proposal-390.png` });
-assert.deepEqual(await ann.locator('[role=tab][aria-selected=true]').allInnerTexts(), ['Take part']);
+assert.deepEqual(
+  await ann.locator("[role=tab][aria-selected=true]").allInnerTexts(),
+  ["Take part"],
+);
 
 // M3d: web's "Add value"; both founders rate it 8/10, so plans are judged against it.
 const valueLabel = `Quiet at night ${stamp}`;
-await ann.getByRole('button', { name: 'Add value' }).click();
-const valueSheet = ann.getByRole('dialog', { name: 'Add value' });
+await ann.getByRole("button", { name: "Add value" }).click();
+const valueSheet = ann.getByRole("dialog", { name: "Add value" });
 await valueSheet.getByPlaceholder(/^Add a value/).fill(valueLabel);
-await valueSheet.getByRole('button', { name: 'Importance 8 of 10' }).click();
-await valueSheet.getByRole('button', { name: 'Add value' }).click();
-await valueSheet.waitFor({ state: 'hidden', timeout: 60_000 });
+await valueSheet.getByRole("button", { name: "Importance 8 of 10" }).click();
+await valueSheet.getByRole("button", { name: "Add value" }).click();
+await valueSheet.waitFor({ state: "hidden", timeout: 60_000 });
 /** Rate the value 8/10 and wait until the reload carries the vote. */
 async function rateValue(page) {
-  const card = page.locator('.value-card', { hasText: valueLabel });
-  await card.getByRole('button', { name: 'Importance 8 of 10' }).click();
-  await card.getByText('You: 8').waitFor({ timeout: 60_000 });
+  const card = page.locator(".value-card", { hasText: valueLabel });
+  await card.getByRole("button", { name: "Importance 8 of 10" }).click();
+  await card.getByText("You: 8").waitFor({ timeout: 60_000 });
 }
 await rateValue(ann);
-await until(bob, () => bob.locator('.value-card', { hasText: valueLabel }), 'the value');
-await bob.getByRole('tab', { name: 'Participation' }).click();
+await until(
+  bob,
+  () => bob.locator(".value-card", { hasText: valueLabel }),
+  "the value",
+);
+await bob.getByRole("tab", { name: "Participation" }).click();
 await rateValue(bob);
-await bob.locator('.value-card .value-average[aria-label="Community average: 8/10"]').waitFor({ timeout: 120_000 });
+await bob
+  .locator('.value-card .value-average[aria-label="Community average: 8/10"]')
+  .waitFor({ timeout: 120_000 });
 await ann.screenshot({ path: `${shots}/take-part-values-390.png` });
-log('a value was added and both founders rated it');
+log("a value was added and both founders rated it");
 
 await advance(ann);
-await voteYes(bob, 'Participation');
-const planStage = () => bob.locator('.feed-card-stage', { hasText: /^\s*Plan\s*$/ });
-await until(bob, planStage, 'the phase move');
-log('the proposal moved to its Plan phase');
+await voteYes(bob, "Participation");
+const planStage = () =>
+  bob.locator(".feed-card-stage", { hasText: /^\s*Plan\s*$/ });
+await until(bob, planStage, "the phase move");
+log("the proposal moved to its Plan phase");
 
 // M3b: a production plan, rated and approved by both, lets the proposal leave its Plan phase
 // as a productive project.
 const planTitle = `Saturday workshop ${stamp}`;
 await ann.reload();
-await ann.getByRole('tab', { name: 'Participation' }).click();
-await addPlan(ann, 'Production plan');
-const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
-await wizard.getByPlaceholder('Plan title').fill(planTitle);
-await wizard.getByPlaceholder('Describe the plan').fill('Open the workshop every Saturday morning.');
-await wizard.getByRole('button', { name: 'Next' }).click(); // overview → plan type
-await wizard.getByRole('button', { name: 'Next' }).click(); // → location
-await wizard.getByRole('textbox', { name: 'Place' }).fill('Community hall');
-await wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both supporters can come.');
-await wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Stage title').fill('Set up benches');
-await wizard.getByPlaceholder('What happens in this stage?').fill('Borrow tools and benches.');
-await wizard.getByRole('button', { name: 'Next' }).click(); // → review
-await wizard.getByRole('button', { name: 'Submit Production Plan' }).click();
-await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
+await ann.getByRole("tab", { name: "Participation" }).click();
+await addPlan(ann, "Production plan");
+const wizard = ann.getByRole("dialog", { name: "Create Production Plan" });
+await wizard.getByPlaceholder("Plan title").fill(planTitle);
+await wizard
+  .getByPlaceholder("Describe the plan")
+  .fill("Open the workshop every Saturday morning.");
+await wizard.getByRole("button", { name: "Next" }).click(); // overview → plan type
+await wizard.getByRole("button", { name: "Next" }).click(); // → location
+await wizard.getByRole("textbox", { name: "Place" }).fill("Community hall");
+await wizard.getByRole("button", { name: "Next" }).click();
+await wizard
+  .getByPlaceholder("Explain how this plan responds to support")
+  .fill("Both supporters can come.");
+await wizard.getByRole("button", { name: "Next" }).click();
+await wizard.getByPlaceholder("Stage title").fill("Set up benches");
+await wizard
+  .getByPlaceholder("What happens in this stage?")
+  .fill("Borrow tools and benches.");
+await wizard.getByRole("button", { name: "Next" }).click(); // → review
+await wizard.getByRole("button", { name: "Submit Production Plan" }).click();
+await ann
+  .locator(".plan-card", { hasText: planTitle })
+  .waitFor({ timeout: 60_000 });
 // ADR 0099: the phase strip is a progress line named underneath; a plan's approval is a bar.
 // A proposal shows the shortest path every type has (sp_governance visible_phases).
-assert.equal(await ann.locator('.phase-context .position').innerText(), 'Phase 2 of 4');
-assert.equal(await ann.locator('.phase-context h2').innerText(), 'Plan');
-assert.equal(await ann.locator('.plan-card', { hasText: planTitle }).locator('.plan-meter').count(), 1);
-log('founder one filed a production plan');
+assert.equal(
+  await ann.locator(".phase-context .position").innerText(),
+  "Phase 2 of 4",
+);
+assert.equal(await ann.locator(".phase-context h2").innerText(), "Plan");
+assert.equal(
+  await ann
+    .locator(".plan-card", { hasText: planTitle })
+    .locator(".plan-meter")
+    .count(),
+  1,
+);
+log("founder one filed a production plan");
 
 /** Open the plan, rate every criterion "Support", vote Yes, and wait until the tally shows
  * `yes` votes (writes run one at a time; leaving the page earlier would cancel them). */
 async function assess(page, yes, fromRail = false) {
   if (fromRail) {
     // web's rail: "Assess and approve this plan" opens the plan's own sheet.
-    const row = () => rail(page).locator('.vote-row', { hasText: planTitle });
-    await railShows(page, row, 'the plan vote');
+    const row = () => rail(page).locator(".vote-row", { hasText: planTitle });
+    await railShows(page, row, "the plan vote");
     assert.match(await row().innerText(), /Assess and approve this plan/);
-    await row().getByRole('button', { name: 'Assess', exact: true }).click();
-    await page.getByRole('dialog', { name: planTitle }).waitFor({ timeout: 120_000 });
+    await row().getByRole("button", { name: "Assess", exact: true }).click();
+    await page
+      .getByRole("dialog", { name: planTitle })
+      .waitFor({ timeout: 120_000 });
   } else {
-    await page.getByRole('tab', { name: 'Participation' }).click();
-    await page.locator('.plan-card', { hasText: planTitle }).click();
+    await page.getByRole("tab", { name: "Participation" }).click();
+    await page.locator(".plan-card", { hasText: planTitle }).click();
   }
-  await page.getByRole('button', { name: 'Review this plan' }).click();
-  const sheet = page.locator('.plan-sheet');
-  await sheet.locator('.criterion-row', { hasText: valueLabel }).getByText('Shared value').waitFor();
-  for (const row of await sheet.locator('.criterion-row').all()) {
-    await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
-    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
+  await page.getByRole("button", { name: "Review this plan" }).click();
+  const sheet = page.locator(".plan-sheet");
+  await sheet
+    .locator(".criterion-row", { hasText: valueLabel })
+    .getByText("Shared value")
+    .waitFor();
+  for (const row of await sheet.locator(".criterion-row").all()) {
+    await row.getByRole("button", { name: /^4(\s*Support)?$/ }).click();
+    await row.getByText("Your rating: Support").waitFor({ timeout: 30_000 });
   }
-  await page.getByRole('button', { name: 'Yes, approve' }).click();
-  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
-  await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
+  await page.getByRole("button", { name: "Yes, approve" }).click();
+  await page
+    .getByText("You voted yes.", { exact: false })
+    .waitFor({ timeout: 30_000 });
+  await page
+    .locator(".plan-card", { hasText: `${yes} yes` })
+    .waitFor({ timeout: 120_000 });
 }
 
 await assess(ann, 1);
-await until(bob, () => bob.locator('.plan-card', { hasText: planTitle }), 'the plan');
+await until(
+  bob,
+  () => bob.locator(".plan-card", { hasText: planTitle }),
+  "the plan",
+);
 await assess(bob, 2, true);
-log('bob opened the plan from his rail');
-await until(bob, () => bob.locator('.plan-card.leading', { hasText: planTitle }), 'the plan to lead');
-log('both rated and approved the plan; it leads');
+log("bob opened the plan from his rail");
+await until(
+  bob,
+  () => bob.locator(".plan-card.leading", { hasText: planTitle }),
+  "the plan to lead",
+);
+log("both rated and approved the plan; it leads");
 
 await ann.reload();
-await ann.getByRole('tab', { name: 'Participation' }).click();
+await ann.getByRole("tab", { name: "Participation" }).click();
 await ann.screenshot({ path: `${shots}/take-part-plan-390.png` });
 await advance(ann);
-await voteYes(bob, 'Participation');
-const pastPlan = () => bob.locator('.feed-card-stage').filter({ hasNotText: /^\s*(Plan|Proposal)\s*$/ });
-await until(bob, pastPlan, 'the move past the plan');
-assert.equal(await bob.locator('.context-panel .feed-lead-meta .surface-type-label').innerText(), 'Project');
-log('the approved production plan made it a productive project as it left the Plan phase');
+await voteYes(bob, "Participation");
+const pastPlan = () =>
+  bob
+    .locator(".feed-card-stage")
+    .filter({ hasNotText: /^\s*(Plan|Proposal)\s*$/ });
+await until(bob, pastPlan, "the move past the plan");
+assert.equal(
+  await bob
+    .locator(".context-panel .feed-lead-meta .surface-type-label")
+    .innerText(),
+  "Project",
+);
+log(
+  "the approved production plan made it a productive project as it left the Plan phase",
+);
 
 // M3c: web's Phase menu → Return to an earlier phase; the other founder's vote sends it back.
 await ann.reload();
-await ann.getByRole('tab', { name: 'Participation' }).click();
-await ann.getByRole('button', { name: 'Phase', exact: true }).click();
-const returning = ann.getByRole('dialog', { name: 'Where should this go next?' });
-await returning.getByRole('radio', { name: /^Return to Plan/ }).click();
-await returning.getByPlaceholder('State why this phase change should happen now.').fill('The plan needs another look.');
-await returning.getByRole('button', { name: 'Start the vote' }).click();
-await returning.waitFor({ state: 'hidden', timeout: 60_000 });
+await ann.getByRole("tab", { name: "Participation" }).click();
+await ann.getByRole("button", { name: "Phase", exact: true }).click();
+const returning = ann.getByRole("dialog", {
+  name: "Where should this go next?",
+});
+await returning.getByRole("radio", { name: /^Return to Plan/ }).click();
+await returning
+  .getByPlaceholder("State why this phase change should happen now.")
+  .fill("The plan needs another look.");
+await returning.getByRole("button", { name: "Start the vote" }).click();
+await returning.waitFor({ state: "hidden", timeout: 60_000 });
 // Proposing a return is not a Yes (as on web), so both founders vote.
-await voteYes(bob, 'Participation');
-await voteYes(ann, 'Participation');
+await voteYes(bob, "Participation");
+await voteYes(ann, "Participation");
 // A return to the Plan phase reopens the type (ADR 0059).
-await until(bob, planStage, 'the return to the Plan phase');
-log('a return to the Plan phase passed');
+await until(bob, planStage, "the return to the Plan phase");
+log("a return to the Plan phase passed");
 
 // web's History tab (`?tab=history`): every decision in one timeline, resolved ones under
 // Decided.
-const historyUrl = `${bob.url().split('?')[0]}?tab=history`;
-const resolutions = bob.locator('.history-group', { hasText: 'Decided' });
-for (const label of ['Edit decision', 'Update decision', 'Return to Plan', `Production plan · ${planTitle}`]) {
+const historyUrl = `${bob.url().split("?")[0]}?tab=history`;
+const resolutions = bob.locator(".history-group", { hasText: "Decided" });
+for (const label of [
+  "Edit decision",
+  "Update decision",
+  "Return to Plan",
+  `Production plan · ${planTitle}`,
+]) {
   for (let i = 0; ; i++) {
     await bob.goto(historyUrl);
-    const card = resolutions.getByRole('button', { name: `${label}, Approved` }).first();
-    if (await card.waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
+    const card = resolutions
+      .getByRole("button", { name: `${label}, Approved` })
+      .first();
+    if (
+      await card.waitFor({ timeout: 15_000 }).then(
+        () => true,
+        () => false,
+      )
+    )
+      break;
     if (i >= 10) throw new Error(`History never listed ${label}`);
   }
 }
-await resolutions.getByRole('button', { name: 'Return to Plan, Approved' }).click();
-const decided = bob.getByRole('dialog', { name: 'Return to Plan' });
-await decided.getByText('The plan needs another look.').waitFor();
+await resolutions
+  .getByRole("button", { name: "Return to Plan, Approved" })
+  .click();
+const decided = bob.getByRole("dialog", { name: "Return to Plan" });
+await decided.getByText("The plan needs another look.").waitFor();
 // A decided return moved from the stage it left, not from today's stage.
-const outcome = await decided.locator('.outcome').innerText();
+const outcome = await decided.locator(".outcome").innerText();
 // The return reopened the type (ADR 0059), so the stage it went back to reads "Plan".
 assert.match(outcome, /to Plan\.$/);
 assert.doesNotMatch(outcome, /from Plan to/, outcome);
-assert.equal(await decided.getByRole('button', { name: 'Yes', exact: true }).count(), 0, 'decided: no vote');
+assert.equal(
+  await decided.getByRole("button", { name: "Yes", exact: true }).count(),
+  0,
+  "decided: no vote",
+);
 await bob.screenshot({ path: `${shots}/history-390.png` });
-await decided.getByRole('button', { name: 'Close' }).click();
-log('the History tab lists the resolved edit, update, plan and return');
+await decided.getByRole("button", { name: "Close" }).click();
+log("the History tab lists the resolved edit, update, plan and return");
 
 // web's "Plan became leading" (off by default): once founder one switches it on in Settings,
 // their notifications say the plan they filed took the lead (ADR 0072).
 await ann.goto(`${BASE}/settings`);
-const leading = ann.getByRole('switch', { name: 'Plan became leading' });
-assert.equal(await leading.getAttribute('aria-checked'), 'false', 'off by default, as on web');
+const leading = ann.getByRole("switch", { name: "Plan became leading" });
+assert.equal(
+  await leading.getAttribute("aria-checked"),
+  "false",
+  "off by default, as on web",
+);
 await leading.click();
 await ann.goto(`${BASE}/notifications`);
 await ann
-  .getByText('A vote passed and your plan is now leading.')
+  .getByText("A vote passed and your plan is now leading.")
   .first() // a long-lived network keeps earlier runs' cards
   .waitFor({ timeout: 120_000 });
-log('with the switch on, founder one is told their plan became leading');
+log("with the switch on, founder one is told their plan became leading");
 
-assert.deepEqual(errors, [], 'no page errors');
-log('all M3a + M3b + M3c + M3d governance checks passed');
+assert.deepEqual(errors, [], "no page errors");
+log("all M3a + M3b + M3c + M3d governance checks passed");
 await browser.close();

@@ -5,12 +5,21 @@
 // his Home feed with web's personal card; signed out, the feed stays Global.
 //   node tests/e2e/follows.mjs http://localhost:4174 [screens dir]
 // It signs up three test accounts, so it may run against the live test network too.
-import assert from 'node:assert/strict';
-import { mkdirSync } from 'node:fs';
+import assert from "node:assert/strict";
+import { mkdirSync } from "node:fs";
 
-import { BASE, browser, device, errors, log, signUp, continueSteps, feedScope } from './lib.mjs';
+import {
+  BASE,
+  browser,
+  device,
+  errors,
+  log,
+  signUp,
+  continueSteps,
+  feedScope,
+} from "./lib.mjs";
 
-const out = process.argv[3] ?? 'screens';
+const out = process.argv[3] ?? "screens";
 mkdirSync(out, { recursive: true });
 const phone = { width: 390, height: 844 };
 const stamp = Date.now().toString(36).slice(-5);
@@ -25,14 +34,15 @@ async function until(page, url, check, what) {
       if (await check().catch(() => false)) return;
       await page.waitForTimeout(2000);
     }
-    if (Date.now() - t0 > 180_000) throw new Error(`timed out waiting for ${what}`);
+    if (Date.now() - t0 > 180_000)
+      throw new Error(`timed out waiting for ${what}`);
   }
 }
 
 /** The agent key from Settings (on a phone the Settings link sits in the More sheet). */
 async function keyOf(page) {
   await page.goto(`${BASE}/settings`);
-  const key = page.locator('#settings-account .key');
+  const key = page.locator("#settings-account .key");
   await key.waitFor({ timeout: 60_000 });
   return (await key.innerText()).trim();
 }
@@ -44,149 +54,237 @@ const annProfile = `${BASE}/profile/${annKey}`;
 
 const bob = await device({ viewport: phone });
 await signUp(bob, `bob${stamp}`);
-await until(bob, annProfile, () => bob.getByRole('heading', { name: `ann${stamp}` }).isVisible(), 'ann');
-await bob.getByRole('button', { name: `Follow ann${stamp}` }).click();
-await bob.getByRole('button', { name: `Unfollow ann${stamp}` }).waitFor({ timeout: 60_000 });
+await until(
+  bob,
+  annProfile,
+  () => bob.getByRole("heading", { name: `ann${stamp}` }).isVisible(),
+  "ann",
+);
+await bob.getByRole("button", { name: `Follow ann${stamp}` }).click();
+await bob
+  .getByRole("button", { name: `Unfollow ann${stamp}` })
+  .waitFor({ timeout: 60_000 });
 await bob.screenshot({ path: `${out}/phone390-following.png` });
-log('bob follows ann at once (no approval)');
+log("bob follows ann at once (no approval)");
 
 await until(
   ann,
   annProfile,
-  async () => (await ann.locator('.count-row button').first().innerText()).startsWith('1'),
-  'one follower',
+  async () =>
+    (await ann.locator(".count-row button").first().innerText()).startsWith(
+      "1",
+    ),
+  "one follower",
 );
-await ann.locator('.count-row button').first().click();
-await ann.getByRole('dialog', { name: 'Followers' }).getByText(`bob${stamp}`).waitFor();
-await ann.keyboard.press('Escape');
-log('ann sees bob in her followers');
+await ann.locator(".count-row button").first().click();
+await ann
+  .getByRole("dialog", { name: "Followers" })
+  .getByText(`bob${stamp}`)
+  .waitFor();
+await ann.keyboard.press("Escape");
+log("ann sees bob in her followers");
 
 // Approval on: Cat's follow becomes a request until Ann accepts it.
 await ann.goto(`${BASE}/settings`);
-const approval = ann.getByRole('switch', { name: 'Require approval to follow you' });
+const approval = ann.getByRole("switch", {
+  name: "Require approval to follow you",
+});
 await approval.click();
 await ann.waitForFunction(
-  () => document.querySelector('#settings-privacy .switch')?.getAttribute('aria-checked') === 'true',
+  () =>
+    document
+      .querySelector("#settings-privacy .switch")
+      ?.getAttribute("aria-checked") === "true",
 );
 const cat = await device({ viewport: phone });
 await signUp(cat, `cat${stamp}`);
-await until(cat, annProfile, () => cat.getByRole('heading', { name: `ann${stamp}` }).isVisible(), 'ann');
-await cat.getByRole('button', { name: `Follow ann${stamp}` }).click();
-await cat.getByRole('button', { name: /Cancel follow request/ }).waitFor({ timeout: 60_000 });
-assert.equal(await cat.locator('.action.primary .action-text').innerText(), 'Requested');
-log('with approval on, cat\'s follow is a request');
+await until(
+  cat,
+  annProfile,
+  () => cat.getByRole("heading", { name: `ann${stamp}` }).isVisible(),
+  "ann",
+);
+await cat.getByRole("button", { name: `Follow ann${stamp}` }).click();
+await cat
+  .getByRole("button", { name: /Cancel follow request/ })
+  .waitFor({ timeout: 60_000 });
+assert.equal(
+  await cat.locator(".action.primary .action-text").innerText(),
+  "Requested",
+);
+log("with approval on, cat's follow is a request");
 
 await until(
   ann,
   `${BASE}/settings`,
-  () => ann.locator('#settings-follow-requests').getByText(`@cat${stamp}`).isVisible(),
-  'the request in Settings',
+  () =>
+    ann
+      .locator("#settings-follow-requests")
+      .getByText(`@cat${stamp}`)
+      .isVisible(),
+  "the request in Settings",
 );
 await ann.screenshot({ path: `${out}/phone390-follow-requests.png` });
-await ann.locator('#settings-follow-requests').getByRole('button', { name: 'Accept' }).click();
-await ann.locator('#settings-follow-requests').waitFor({ state: 'detached', timeout: 60_000 });
+await ann
+  .locator("#settings-follow-requests")
+  .getByRole("button", { name: "Accept" })
+  .click();
+await ann
+  .locator("#settings-follow-requests")
+  .waitFor({ state: "detached", timeout: 60_000 });
 await until(
   cat,
   annProfile,
-  () => cat.getByRole('button', { name: `Unfollow ann${stamp}` }).isVisible(),
-  'the accepted follow',
+  () => cat.getByRole("button", { name: `Unfollow ann${stamp}` }).isVisible(),
+  "the accepted follow",
 );
-log('ann accepts; cat is following');
+log("ann accepts; cat is following");
 
 // Mentions: Ann follows Cat, so "@<stamp>" in her project chat offers Cat before Bob (a
 // follower), although Bob's name sorts first.
-await until(ann, `${BASE}/profile/${await keyOf(cat)}`, () =>
-  ann.getByRole('button', { name: `Follow cat${stamp}` }).isVisible(), 'cat');
-await ann.getByRole('button', { name: `Follow cat${stamp}` }).click();
-await ann.getByRole('button', { name: `Unfollow cat${stamp}` }).waitFor({ timeout: 60_000 });
+await until(
+  ann,
+  `${BASE}/profile/${await keyOf(cat)}`,
+  () => ann.getByRole("button", { name: `Follow cat${stamp}` }).isVisible(),
+  "cat",
+);
+await ann.getByRole("button", { name: `Follow cat${stamp}` }).click();
+await ann
+  .getByRole("button", { name: `Unfollow cat${stamp}` })
+  .waitFor({ timeout: 60_000 });
 await ann.goto(`${BASE}/create/project`);
-await ann.getByLabel('Title').fill(`Seed swap ${stamp}`);
-await ann.getByLabel('What do you propose?').fill('Swap seeds in spring.');
+await ann.getByLabel("Title").fill(`Seed swap ${stamp}`);
+await ann.getByLabel("What do you propose?").fill("Swap seeds in spring.");
 await continueSteps(ann, 3);
-await ann.getByRole('button', { name: 'Publish proposal' }).click();
-await ann.getByRole('heading', { name: `Seed swap ${stamp}` }).waitFor({ timeout: 120_000 });
+await ann.getByRole("button", { name: "Publish proposal" }).click();
+await ann
+  .getByRole("heading", { name: `Seed swap ${stamp}` })
+  .waitFor({ timeout: 120_000 });
 const chatUrl = `${ann.url()}?tab=chat`;
-const options = ann.getByRole('option');
+const options = ann.getByRole("option");
 const offered = async () => {
-  const box = ann.getByRole('textbox', { name: 'Message the project...' });
-  await box.fill('');
+  const box = ann.getByRole("textbox", { name: "Message the project..." });
+  await box.fill("");
   await box.pressSequentially(`@${stamp}`, { delay: 30 });
   await options.first().waitFor({ timeout: 10_000 });
   return (await options.count()) >= 2;
 };
-await until(ann, chatUrl, offered, 'both people in the mention menu');
+await until(ann, chatUrl, offered, "both people in the mention menu");
 assert.deepEqual(
   (await options.allInnerTexts()).map((t) => t.trim().split(/\s/)[0]),
   [`cat${stamp}`, `bob${stamp}`],
 );
-log('ann\'s mention menu offers cat (followed) before bob (a follower)');
+log("ann's mention menu offers cat (followed) before bob (a follower)");
 
 // Home: Bob follows Ann, so her project is on his Home feed, as the Global row with a line
 // naming her (Profiles and Comments mockups §1).
 const seedSwap = `Seed swap ${stamp}`;
 await bob.goto(`${BASE}/`);
-await feedScope(bob, 'Home');
+await feedScope(bob, "Home");
 await until(
   bob,
   `${BASE}/`,
-  () => bob.locator('.project-card', { hasText: seedSwap }).isVisible(),
-  'ann\'s project on Home',
+  () => bob.locator(".project-card", { hasText: seedSwap }).isVisible(),
+  "ann's project on Home",
 );
-const homeCard = bob.locator('.project-card', { hasText: seedSwap });
-assert.equal((await homeCard.locator('.feed-context').innerText()).trim(), `ann${stamp} proposed this`);
-assert.equal(await bob.locator('.project-card').count(), 1, 'bob joined no channel or community, so Home has no public rows');
+const homeCard = bob.locator(".project-card", { hasText: seedSwap });
+assert.equal(
+  (await homeCard.locator(".feed-context").innerText()).trim(),
+  `ann${stamp} proposed this`,
+);
+assert.equal(
+  await bob.locator(".project-card").count(),
+  1,
+  "bob joined no channel or community, so Home has no public rows",
+);
 await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
-await feedScope(bob, 'Global');
-await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
-assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).count(), 1);
-assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context').count(), 0);
-log('bob\'s Home shows ann\'s project with her name over it; Global shows it once, as a public card');
+await feedScope(bob, "Global");
+await bob
+  .locator(".project-card", { hasText: seedSwap })
+  .waitFor({ timeout: 60_000 });
+assert.equal(
+  await bob.locator(".project-card", { hasText: seedSwap }).count(),
+  1,
+);
+assert.equal(
+  await bob
+    .locator(".project-card", { hasText: seedSwap })
+    .locator(".feed-context")
+    .count(),
+  0,
+);
+log(
+  "bob's Home shows ann's project with her name over it; Global shows it once, as a public card",
+);
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);
-await ann.getByRole('button', { name: 'Add feedback' }).click();
-const compose = ann.getByRole('dialog', { name: 'Add feedback' });
-await compose.getByRole('radio', { name: 'Suggestion' }).click();
-await compose.getByLabel('Title').fill(`Dark tiles ${stamp}`);
-await compose.getByLabel('Description').fill('The map is bright at night.');
-await compose.getByRole('button', { name: 'Submit feedback' }).click();
-await compose.waitFor({ state: 'detached', timeout: 60_000 });
+await ann.getByRole("button", { name: "Add feedback" }).click();
+const compose = ann.getByRole("dialog", { name: "Add feedback" });
+await compose.getByRole("radio", { name: "Suggestion" }).click();
+await compose.getByLabel("Title").fill(`Dark tiles ${stamp}`);
+await compose.getByLabel("Description").fill("The map is bright at night.");
+await compose.getByRole("button", { name: "Submit feedback" }).click();
+await compose.waitFor({ state: "detached", timeout: 60_000 });
 await ann.getByText(`Dark tiles ${stamp}`).waitFor();
-log('ann adds feedback');
+log("ann adds feedback");
 
-await until(bob, `${BASE}/feedback`, () => bob.getByText(`Dark tiles ${stamp}`).isVisible(), 'feedback');
-const card = bob.locator('.feedback-card', { hasText: `Dark tiles ${stamp}` });
-await card.getByRole('button', { name: /^Support/ }).click();
-await card.locator('.signal-percent', { hasText: '100%' }).waitFor({ timeout: 60_000 });
+await until(
+  bob,
+  `${BASE}/feedback`,
+  () => bob.getByText(`Dark tiles ${stamp}`).isVisible(),
+  "feedback",
+);
+const card = bob.locator(".feedback-card", { hasText: `Dark tiles ${stamp}` });
+await card.getByRole("button", { name: /^Support/ }).click();
+await card
+  .locator(".signal-percent", { hasText: "100%" })
+  .waitFor({ timeout: 60_000 });
 await card.click();
 // The item opens on its own page (Plan, Phase and Feedback Screens §7); Bob comments, Ann
 // answers him, and Bob likes the answer.
 await bob.waitForURL(/\/feedback\/[^/]+$/, { timeout: 30_000 });
-await bob.getByText('The map is bright at night.').waitFor();
+await bob.getByText("The map is bright at night.").waitFor();
 const itemUrl = bob.url();
-await bob.getByRole('textbox', { name: 'Add a comment' }).fill('A dark style would help at night.');
-await bob.getByRole('button', { name: 'Post comment' }).click();
-await bob.locator('.feedback-comment', { hasText: 'A dark style would help' }).waitFor({ timeout: 60_000 });
+await bob
+  .getByRole("textbox", { name: "Add a comment" })
+  .fill("A dark style would help at night.");
+await bob.getByRole("button", { name: "Post comment" }).click();
+await bob
+  .locator(".feedback-comment", { hasText: "A dark style would help" })
+  .waitFor({ timeout: 60_000 });
 await ann.goto(itemUrl);
-const bobComment = ann.locator('.feedback-comment', { hasText: 'A dark style would help' });
+const bobComment = ann.locator(".feedback-comment", {
+  hasText: "A dark style would help",
+});
 for (let i = 0; i < 20 && !(await bobComment.count()); i++) {
   await ann.waitForTimeout(3000);
   await ann.reload();
 }
-await bobComment.getByRole('button', { name: 'Reply' }).click();
-await ann.getByRole('textbox', { name: /^Reply to / }).fill('Added to the list.');
-await ann.getByRole('button', { name: 'Post comment' }).click();
-await ann.locator('.feedback-comment', { hasText: 'Added to the list.' }).getByText(/^Replying to /).waitFor({ timeout: 60_000 });
+await bobComment.getByRole("button", { name: "Reply" }).click();
+await ann
+  .getByRole("textbox", { name: /^Reply to / })
+  .fill("Added to the list.");
+await ann.getByRole("button", { name: "Post comment" }).click();
+await ann
+  .locator(".feedback-comment", { hasText: "Added to the list." })
+  .getByText(/^Replying to /)
+  .waitFor({ timeout: 60_000 });
 await bob.screenshot({ path: `${out}/phone390-feedback-detail.png` });
-log('bob supports it, opens it and comments; ann answers him');
+log("bob supports it, opens it and comments; ann answers him");
 
 const guest = await device({ viewport: phone });
-await until(guest, `${BASE}/feedback`, () => guest.getByText(`Dark tiles ${stamp}`).isVisible(), 'guest feedback');
+await until(
+  guest,
+  `${BASE}/feedback`,
+  () => guest.getByText(`Dark tiles ${stamp}`).isVisible(),
+  "guest feedback",
+);
 await guest.screenshot({ path: `${out}/phone390-feedback-guest.png` });
-await guest.getByRole('button', { name: 'Add feedback' }).click();
-await guest.getByText('Sign in to share feedback.').waitFor();
-log('guests read feedback; adding asks them to sign in');
+await guest.getByRole("button", { name: "Add feedback" }).click();
+await guest.getByText("Sign in to share feedback.").waitFor();
+log("guests read feedback; adding asks them to sign in");
 
-assert.deepEqual(errors, [], 'no page errors');
-log('all follows and feedback checks passed');
+assert.deepEqual(errors, [], "no page errors");
+log("all follows and feedback checks passed");
 await browser.close();
