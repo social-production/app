@@ -1,0 +1,256 @@
+/* The Moderators sheet and its steps and confirm sheets (Platform and Moderators mockups §2,
+   §3). Portaled outside `.shell`: rules double a class to win over the shared sheet styles. */
+.overlay-root.platform-board .board-how-link {
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.overlay-root.platform-board .board-body {
+  display: grid;
+  gap: 4px;
+  padding: 0 18px 12px;
+}
+
+.overlay-root.platform-board .board-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.platform-board .board-summary span {
+  display: grid;
+}
+
+.overlay-root.platform-board .board-summary b {
+  color: var(--text-main);
+  font-size: 15px;
+}
+
+.overlay-root.platform-board .board-summary.board-note {
+  display: block;
+  color: var(--text-main);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.overlay-root.platform-board .board-head {
+  margin: 10px 0 2px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.overlay-root.platform-board .board-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.overlay-root.platform-board .board-row.you {
+  margin: 0 -8px;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+}
+
+.overlay-root.platform-board .board-face {
+  flex: none;
+}
+
+.overlay-root.platform-board .board-copy {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  min-width: 0;
+}
+
+.overlay-root.platform-board .board-name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.overlay-root.platform-board .board-name a {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.overlay-root.platform-board .board-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.overlay-root.platform-board .board-row.you .board-chip {
+  background: var(--panel);
+}
+
+.overlay-root.platform-board .board-row.you .board-chip.you-chip {
+  color: var(--text-soft);
+}
+
+.overlay-root.platform-board .board-chip.warn {
+  background: color-mix(in srgb, var(--warning, #c98a00) 20%, var(--panel));
+  color: color-mix(in srgb, var(--warning, #c98a00) 70%, var(--text-main));
+}
+
+.overlay-root.platform-board .board-bar {
+  display: block;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.platform-board .board-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.overlay-root.platform-board .board-line {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.platform-board .board-vote {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.overlay-root.platform-board .board-vote button {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.overlay-root.platform-board .board-vote button.mine {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.overlay-root.platform-board .board-vote svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.overlay-root.platform-board .board-empty,
+.overlay-root.platform-board .board-hint {
+  margin: 8px 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.overlay-root.platform-board .board-hint {
+  flex: 1;
+}
+
+.overlay-root.platform-board .board-notice,
+.overlay-root.platform-board .board-problem {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.overlay-root.platform-board .board-problem {
+  background: color-mix(in srgb, var(--danger, #c0392b) 12%, var(--panel));
+  color: var(--danger, #c0392b);
+}
+
+.overlay-root.platform-board .board-steps {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0 18px 12px;
+  list-style: none;
+}
+
+.overlay-root.platform-board .board-steps li {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 10px;
+}
+
+.overlay-root.platform-board .board-steps b {
+  font-size: 14.5px;
+}
+
+.overlay-root.platform-board .board-steps p {
+  margin: 2px 0 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.overlay-root.platform-board .board-step-num {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.overlay-root.platform-board .board-confirm {
+  display: grid;
+  gap: 10px;
+  padding: 0 18px 8px;
+}
+
+.overlay-root.platform-board .board-confirm p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.overlay-root.platform-board .board-confirm p.soft {
+  color: var(--text-soft);
+}

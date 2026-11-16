@@ -5,6 +5,7 @@
     tallyLine,
     type Proposal,
   } from '#lib/domain/governance.ts';
+  import { isNetworkVote } from '#lib/domain/board.ts';
   import type { Charter } from '#lib/domain/projects.ts';
   import { settingsSummary } from '#lib/domain/serviceRequests.ts';
 
@@ -25,6 +26,9 @@
 <div class="vote-sheet">
   <p class="outcome">{outcomeSentence(kind, stage, phaseLabel)}</p>
   <p class="proposer">Proposed by {authorName}</p>
+  {#if isNetworkVote(charter.tags)}
+    <p class="network-vote-line">Network vote: any Full member can vote</p>
+  {/if}
 
   {#if 'Update' in kind}
     <section class="change-card">

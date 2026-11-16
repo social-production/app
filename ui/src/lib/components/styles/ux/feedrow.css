@@ -272,3 +272,9 @@
   background: var(--brand-soft);
   color: var(--brand-strong);
 }
+
+/* A #platform project's row says "Network vote" in its stage's place (ADR 0095). */
+.shell .feed-card-top .feed-card-stage.network-vote.network-vote.network-vote.network-vote {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
