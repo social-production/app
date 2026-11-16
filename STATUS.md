@@ -108,6 +108,52 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## CI is minutes on PRs while this is a prototype (owner, 2026-11-16)
+PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing), unless they touch
+`zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`, `tests/scenarios/`, `Cargo.*`,
+`flake.*`, the root `package*.json` or the build/check scripts: then the ~2 h scenarios run too
+(`.github/workflows/ci.yml`). The scenarios and
+the desktop builds also run on main nightly (ci ~3 am, desktop ~3:30 am Melbourne) and on demand (Run
+workflow). Run locally the scenarios a change could break before pushing, and check the nightly
+run at the start of each session. Put the scenarios back on PRs once there is a stable release
+with real users.
+
+## In flight (parity, cloud session) 2026-11-16, 1:30 pm Melbourne
+Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
+#163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this
+cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
+- **PR #164 merged** 12:50 pm Melbourne (the demo script `tests/e2e/demo-content.mjs` and the
+  parity list; no app code). Live demo content exists until #163 deploys; then run the script again
+  (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 5 sign-ups or
+  restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
+  ux-polish.
+- **Push notifications:** ADR 0108 accepted by the owner (PR #165, docs only). `claude/push-gateway` (PR #166): the `services/push` crate (VAPID key, RFC 8291 encryption, sender, subscriptions in `gateway.sqlite`, `Pusher::notify` with muted categories and "Show what it's about"; `cargo test -p push`, and Node decrypted its output); gateway routes `GET /push/key`, `POST /push/subscribe`, `POST /push/unsubscribe` (device secret, as `/session/cells`); `ui/static/sw.js` and `ui/src/lib/holo/push.ts` (`turnPushOn`/`turnPushOff`). Nothing sends yet. Next: the signals from the zomes (after #163, it touches the same coordinators), the gateway listening to hosted agents' signals and calling `notify`, the desktop's OS notifications, and the Settings switch (after #162). Not tested: a real push through a browser's push service.
+- **Push, next steps found (2026-11-16):** the gateway must hear hosted apps' signals. In
+  Holochain 0.7 `Conductor::subscribe_to_app_signals(app_id)` (a `broadcast::Receiver<Signal>`)
+  exists only under `test_utils` (`vendor/holochain/src/conductor/conductor.rs` ~4110); add it
+  to the vendored patch outside the feature (ADR 0053: re-apply the patch, note it in
+  vendor/README.md), subscribe per hosted app at start and after each install, and call
+  `Pusher::notify(agent, notice)` for signals shaped `{ "notice": { kind, category, title, body,
+  link } }`. The alternative (an app-websocket client per hosted app) costs a socket and a token
+  per account.
+- **Settings item 2 overlaps the UX branches:** the display timezone touches ~60 date calls in
+  19 files (domain/ plus components/activities, plans, create, features/projects/scopes), and
+  "Separate Public and Personal feeds" changes Home's tabs in `features/projects/`. Proposed: do
+  both after `claude/ux-profiles` merges (desktop session, 2026-11-16: it changes the Home feed files and the date callers), with Russian. The Privacy switches need
+  `identity` coordinator code (a tagged self link like `RequiresFollowApproval`; the directory
+  is public, so they hide in the app's own views, they can't make data secret, as ADR 0054):
+  after #163.
+- **Settings rows** (#162 merged 2:44 pm Melbourne; Settings is now this session's) (separate Public/Personal feeds, display timezone, Privacy's three switches):
+  start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
+  `RegionalSettings.svelte`. Settings is this session's after #162.
+- **Bot-review vote notification:** after #163 merges (both touch `identity`'s coordinator
+  `lib.rs`); coordinator only plus a card in `features/notifications/`. `notifications.mjs`
+  passes on #163 with a fresh seed (an earlier failure was a local seed slowed after ~1.5 h).
+- **Russian:** after ux-polish merges (it rewrites most create-flow, Links, History, map strings).
+- #162 and #163 showed merge conflicts with main at 12:34 pm; CI starts once main is merged in.
+- The desktop session owns: `components/styles/ux/*`, `features/projects/`, `features/shell/`,
+  `components/shell/`, the card/link/governance/plan/create/... components, messages, people,
+  search, about, invites, feedback, map, and `services/{feedback,messages,projects}.ts`.
 ## START HERE (2026-11-16, owner's PC session): two UX PRs, and a polish branch waiting on mockups
 The last PC session's stacked UX branches (labels → new-message → remaining-screens →
 plan-screens, all pushed, no PRs) were moved onto main as two branches (merges, no rebase, no
