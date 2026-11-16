@@ -5,8 +5,10 @@ mod auth;
 mod config;
 mod hex;
 mod node;
+mod notices;
 mod routes;
 mod store;
+mod wipe;
 
 use std::future::Future;
 use std::net::SocketAddr;
@@ -21,10 +23,21 @@ pub async fn serve(
     on_bound: impl FnOnce(SocketAddr),
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
+    // Only the Railway volume: local and test data dirs are never cleared (wipe.rs).
+    if config.data_dir == std::path::Path::new("/data") {
+        wipe::fresh_start_once(&config.data_dir)?;
+    }
     let node = Box::pin(node::Node::start(&config, passphrase)).await?;
     tokio::spawn(background(node.clone(), config.happ_path.clone()));
+    let store = store::Store::open(&config.data_dir).await?;
+    // The UI's origin names this gateway to the push services (ADR 0108).
+    let pusher = Arc::new(push::Pusher::open(store.pool().clone(), &config.rp_origin).await?);
+    let listeners = notices::Listeners::default();
+    listeners.start_all(&node, &pusher).await;
     let state = routes::AppState {
-        store: store::Store::open(&config.data_dir).await?,
+        store,
+        pusher,
+        listeners,
         passkeys: Arc::new(auth::passkeys::Passkeys::new(
             &config.rp_id,
             &config.rp_origin,
