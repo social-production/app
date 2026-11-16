@@ -14,7 +14,7 @@ in the order the cloud session builds it:
    timezone selects in service bookings), Privacy's three "hide … from non-followers /
    personal feeds" switches.
 3. **Push notifications** (new: web has none). ADR [0107](../decisions/0107-push-notifications.md)
-   (proposed): remote signals from the writer, Web Push from the seed, OS notifications on desktop.
+   (accepted): remote signals from the writer, Web Push from the seed, OS notifications on desktop.
 4. **One language besides English: Russian** (owner's priority). Needs an ADR (string
    catalogue, how the language is chosen). It touches nearly every screen, so it goes after
    the UX branches of the moment have merged, to avoid conflicts.

@@ -91,7 +91,7 @@ cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agre
   (`node tests/e2e/demo-content.mjs <ui url> <accounts file>`; the seed allows 5 sign-ups or
   restores per IP a day). The desktop session updates `tests/e2e/demo/*` to the new tag search in
   ux-polish.
-- **Push notifications:** ADR 0107 (proposed) on `claude/push-adr`; docs only.
+- **Push notifications:** ADR 0107 accepted by the owner (PR #165, docs only); next: the gateway side in a `services/push` crate.
 - **Settings rows** (separate Public/Personal feeds, display timezone, Privacy's three switches):
   start after #162 merges (it restyles all of Settings). Use `SettingRow`, `SettingSwitch`,
   `RegionalSettings.svelte`. Settings is this session's after #162.

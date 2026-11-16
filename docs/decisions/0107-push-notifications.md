@@ -1,6 +1,6 @@
 # 0107. Push notifications: a signal from the writer, Web Push from the seed, the OS on desktop
 
-Status: **proposed** (2026-11-16; the owner's parity list: "Web doesn't have notifications push
+Status: **accepted** (2026-11-16, owner; from the owner's parity list: "Web doesn't have notifications push
 either, that needs to be built"). Builds on [0046](./0046-notifications-derived-on-device.md).
 
 ## Context
