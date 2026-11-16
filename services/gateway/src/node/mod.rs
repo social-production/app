@@ -14,6 +14,7 @@ mod region;
 mod release;
 mod restore;
 mod seeds;
+mod signals;
 mod spaces;
 
 use std::collections::BTreeMap;

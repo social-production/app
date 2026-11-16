@@ -48,6 +48,12 @@ impl Store {
         Ok(Self { pool })
     }
 
+    /// The database, for the push subscriptions kept beside it (ADR 0108).
+    #[must_use]
+    pub fn pool(&self) -> &SqlitePool {
+        &self.pool
+    }
+
     pub async fn person_exists(&self, agent: &str) -> anyhow::Result<bool> {
         let row = sqlx::query("select 1 from persons where agent = ?")
             .bind(agent)
