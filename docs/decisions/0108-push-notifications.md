@@ -47,6 +47,25 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
   opened to read it. Items tagged only to a closed community are never pushed with their text.
 - **Read state:** a push doesn't mark anything read; opening its link does, as a card tap does.
 
+## Built (2026-11-17): how the signal travels
+- **One `notices` coordinator zome, in the directory DNA only** (`dnas/directory/zomes/coordinator/notices`).
+  Everyone shares the directory, so each person needs one grant, whatever project or chat the
+  card is about. No integrity zome: notices are never stored. The three DNA hashes are unchanged.
+- `enable_notices` makes the unrestricted grant for `recv_remote_signal` (tag `notices`) once;
+  the app calls it when the bell starts. `send_notice { to, notice }` leaves the writer out,
+  caps the list at 100 and refuses a notice whose link is not an in-app path or whose text is
+  too long; `recv_remote_signal` checks the same again (a peer's app may not be ours) and
+  re-emits `{ notice }` to the person's own app, which the seed's push listener already reads.
+- **The writer's app words the notice, not its coordinator.** The UI already has each card's
+  wording, link and category (`domain/notifications.ts`), so it calls `send_notice` right after
+  the write; the zomes stay as they are. An app that skips it only costs its readers a nudge,
+  and the grant is open to anyone either way, so a coordinator sender would guard nothing more.
+- `recv_remote_signal` takes the sent value itself (`Envelope`), not `ExternIO`: the call's
+  payload is the encoded value, and an `ExternIO` parameter never decodes (found by
+  `tests/scenarios/tests/notices.rs`).
+- In the app, a notice arriving refreshes the bell at once. First sender: a reply to your
+  comment in a project chat. The rest of the card kinds follow, one PR at a time.
+
 ## Consequences
 - Every notifying write gains one `send_remote_signal` call. The recipients are the people a card
   goes to anyway, so the cost is one small message each.

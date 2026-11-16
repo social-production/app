@@ -35,6 +35,7 @@ let pending: Promise<AppWebsocket | undefined> | undefined;
 let state: ConnectionState = { status: 'connecting' };
 const listeners = new Set<(state: ConnectionState) => void>();
 const directListeners = new Set<(signal: DirectSignalIn) => void>();
+const noticeListeners = new Set<(notice: unknown) => void>();
 
 /** A direct signal another person's node sent to one of this person's cells (holo/signals.ts). */
 export interface DirectSignalIn {
@@ -49,8 +50,19 @@ export function onDirectSignal(listener: (signal: DirectSignalIn) => void): () =
   return () => directListeners.delete(listener);
 }
 
+/** Listen for the notices other people's apps send this person (ADR 0108, holo/notices.ts). */
+export function onNoticeSignal(listener: (notice: unknown) => void): () => void {
+  noticeListeners.add(listener);
+  return () => noticeListeners.delete(listener);
+}
+
 function relaySignals(ws: AppWebsocket): void {
   ws.on('signal', (signal: Signal) => {
+    if (signal.type === SignalType.App && signal.value.zome_name === 'notices') {
+      const { payload } = signal.value;
+      for (const listener of noticeListeners) listener(payload);
+      return;
+    }
     if (signal.type !== SignalType.AppDirect) return;
     const { cell_id, from_agent, signal: data } = signal.value;
     const message = {

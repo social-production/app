@@ -33,7 +33,7 @@ pub use availability::{AvailabilityRule, Booking};
 pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use history::{ActivityCompletion, ActivityRating};
 pub use link::{LinkRequest, ProjectRef};
-pub use organizer::{audience, organized, Organizer, OrganizerRole};
+pub use organizer::{audience, organized, Invite, Organizer, OrganizerRole};
 pub use place::Place;
 pub use plan::{check as check_plan, Plan, PlanStage, Rating};
 pub use scope_item::SEED_MAX as SCOPE_ITEM_SEED_MAX;
@@ -190,6 +190,7 @@ pub enum EntryTypes {
     ActivityCompletion(ActivityCompletion),
     Organizer(Organizer),
     AvailabilityRule(AvailabilityRule),
+    Invite(Invite),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -234,6 +235,8 @@ pub enum LinkTypes {
     /// Space → itself; tag `[0]` (continues from) or `[1]` (continued by) + the other
     /// project's id (Convert, ADR 0106).
     Lineage,
+    /// Space → an `Invite` record (ADR 0111).
+    Invites,
 }
 
 #[hdk_extern]
@@ -262,6 +265,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             EntryTypes::ActivityCompletion(c) => history::validate_completion(&c, &action),
             EntryTypes::Organizer(o) => organizer::validate(&o, &action),
             EntryTypes::AvailabilityRule(r) => availability::validate_rule(&r, &action),
+            EntryTypes::Invite(i) => organizer::validate_invite(&i, &action),
         },
         // Charters change through proposals; votes are final; outcomes are history.
         FlatOp::CreateEntry(OpEntry::UpdateEntry { .. })
