@@ -1,0 +1,263 @@
+/* A chat's page (Chats, Search and Reports mockups §2): it slides in over the chat, with
+   the round back and ⋮ floating at the top, the big face, four quick actions, the person's
+   bio and key, and tabs of what was shared. */
+.shell .messages-page .chat-about {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  animation: chat-about-in 0.22s ease;
+}
+
+@keyframes chat-about-in {
+  from {
+    transform: translateX(28%);
+    opacity: 0;
+  }
+}
+
+.shell .messages-page .chat-about .about-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  padding: calc(8px + var(--shell-safe-top, 0px)) 10px 0;
+  pointer-events: none;
+}
+
+.shell .messages-page .chat-about .about-round {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 1px solid var(--float-border);
+  border-radius: 50%;
+  background: var(--float-background);
+  box-shadow: var(--float-shadow);
+  color: var(--text-main);
+  pointer-events: auto;
+}
+
+.shell .messages-page .chat-about .about-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: calc(28px + var(--shell-safe-top, 0px)) 0 32px;
+}
+
+.shell .messages-page .chat-about .about-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 0 16px 14px;
+  text-align: center;
+}
+
+.shell .messages-page .chat-about .about-face .avatar-badge {
+  width: 96px;
+  height: 96px;
+  font-size: 30px;
+}
+
+.shell .messages-page .chat-about h2 {
+  margin: 8px 0 0;
+  font-size: 22px;
+  overflow-wrap: anywhere;
+}
+
+.shell .messages-page .chat-about .about-sub {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .messages-page .chat-about .about-tiles {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+  margin-top: 12px;
+}
+
+.shell .messages-page .chat-about .about-tile {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  padding: 10px 0 8px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--brand-strong);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .messages-page .chat-about .about-info {
+  display: grid;
+  width: 100%;
+  margin-top: 10px;
+  padding: 2px 14px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  text-align: left;
+}
+
+.shell .messages-page .chat-about .about-info > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 8px;
+  padding: 9px 0;
+}
+
+.shell .messages-page .chat-about .about-info > div + div {
+  border-top: 1px solid var(--panel-border);
+}
+
+.shell .messages-page .chat-about .about-info span {
+  grid-column: 1 / -1;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.shell .messages-page .chat-about .about-info p {
+  margin: 0;
+  font-size: 14.5px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.shell .messages-page .chat-about .about-info button {
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .messages-page .chat-about .about-tabs {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  gap: 18px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--panel-border);
+  background: var(--panel);
+}
+
+.shell .messages-page .chat-about .about-tabs button {
+  height: 46px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.shell .messages-page .chat-about .about-tabs button.on {
+  color: var(--text-main);
+  box-shadow: inset 0 -3px 0 var(--brand);
+}
+
+.shell .messages-page .chat-about .about-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.shell .messages-page .chat-about .about-grid button {
+  padding: 0;
+  border: none;
+  background: var(--panel-hover);
+  aspect-ratio: 1;
+}
+
+.shell .messages-page .chat-about .about-grid img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.shell .messages-page .chat-about .about-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: none;
+  color: var(--text-main);
+  text-align: left;
+  text-decoration: none;
+}
+
+.shell .messages-page .chat-about .about-row-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.shell .messages-page .chat-about .about-row-copy b {
+  overflow: hidden;
+  font-size: 14.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell .messages-page .chat-about .about-row-copy span {
+  overflow: hidden;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell .messages-page .chat-about .about-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .messages-page .chat-about .about-date {
+  flex: none;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.shell .messages-page .chat-about .about-chip {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.shell .messages-page .chat-about .about-empty {
+  margin: 24px 16px;
+  color: var(--text-soft);
+  text-align: center;
+}

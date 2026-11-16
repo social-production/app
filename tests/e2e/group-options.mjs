@@ -6,7 +6,15 @@
 import assert from "node:assert/strict";
 import { mkdirSync } from "node:fs";
 
-import { BASE, browser, device, errors, log, signUp, startGroup } from "./lib.mjs";
+import {
+  BASE,
+  browser,
+  device,
+  errors,
+  log,
+  signUp,
+  startGroup,
+} from "./lib.mjs";
 
 const out = process.argv[3] ?? "screens";
 mkdirSync(out, { recursive: true });
@@ -56,7 +64,7 @@ await bubble(ann, typo).waitFor({ timeout: 60_000 });
 log("ann started the group");
 
 // Chat info from the header menu: rename, then add Cat.
-await ann.getByRole("button", { name: "Chat options" }).click();
+await ann.getByRole("button", { name: "Chat menu" }).click();
 await ann.getByRole("menuitem", { name: "Chat info" }).click();
 const info = ann.getByRole("dialog");
 await info.getByPlaceholder("Rename group chat").fill(renamed);
@@ -105,7 +113,7 @@ await bob.locator(".pin-bar", { hasText: fixed }).waitFor({ timeout: 90_000 });
 log("bob muted the group and sees the pin");
 
 // Ann leaves; Bob takes over.
-await ann.getByRole("button", { name: "Chat options" }).click();
+await ann.getByRole("button", { name: "Chat menu" }).click();
 await ann.getByRole("menuitem", { name: "Leave group" }).click();
 await ann
   .getByRole("alertdialog")
@@ -117,7 +125,7 @@ assert.equal(await row(ann, renamed).count(), 0, "the group left her list");
 log("ann left the group");
 
 await bob.getByText(`${annName} left the group.`).waitFor({ timeout: 120_000 });
-await bob.getByRole("button", { name: "Chat options" }).click();
+await bob.getByRole("button", { name: "Chat menu" }).click();
 await bob.getByRole("menuitem", { name: "Chat info" }).click();
 await bob
   .getByRole("dialog")
