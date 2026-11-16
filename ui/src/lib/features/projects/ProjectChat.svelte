@@ -9,6 +9,7 @@
   import { mentionPool } from '#lib/services/messages.ts';
   import { getMessageModeration, reportMessage, voteOnReport } from '#lib/services/moderation.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
+  import { noteComment, unnoteComment } from '#lib/services/profileNotes.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
   import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -49,9 +50,17 @@
   const chat = new ChatState(
     {
       list: () => listMessages(projectId),
-      post: (body, replyTo, files) => postMessage(projectId, body, replyTo, files),
+      post: async (body, replyTo, files) => {
+        const id = await postMessage(projectId, body, replyTo, files);
+        const answered = replyTo ? chat.messages.find((m) => m.id === replyTo)?.author : null;
+        await noteComment(projectId, id, body, answered ?? null);
+        return id;
+      },
       file: (attachment) => projectAttachmentBlob(projectId, attachment),
-      remove: (id) => deleteMessage(projectId, id),
+      remove: async (id) => {
+        await deleteMessage(projectId, id);
+        await unnoteComment(id);
+      },
       viewer,
       names: namesOf,
       explain,

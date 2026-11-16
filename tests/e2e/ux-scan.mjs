@@ -83,7 +83,7 @@ if (!only || only === 'create') {
     await shot('create-post');
     await page.getByRole('button', { name: 'Publish post' }).click();
     await page.locator('.linked-body.detail').waitFor({ timeout: 120_000 });
-    const composer = page.getByLabel('Write a comment...');
+    const composer = page.getByLabel('Add a comment');
     await composer.fill('Cloves pointy end up.');
     await composer.press('Enter');
     await page.locator('.comment-card').first().waitFor({ timeout: 60_000 });
@@ -98,7 +98,7 @@ if (!only || only === 'create') {
     await tagTestChannel(page);
     await shot('create-thread-2');
     await page.getByRole('button', { name: 'Publish thread' }).click();
-    await page.locator('.comment-composer, [aria-label="Write a comment..."]').first().waitFor({ timeout: 120_000 });
+    await page.locator('.comment-composer, [aria-label="Add a comment"]').first().waitFor({ timeout: 120_000 });
     await shot('page-thread');
   });
   await part('create-request', async () => {

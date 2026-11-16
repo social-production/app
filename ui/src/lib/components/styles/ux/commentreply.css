@@ -1,0 +1,114 @@
+/* Comments with their author's photo, one composer that a bar points at a comment, the
+   comment being answered outlined, and "Sending…" (Profiles and Comments mockups §4).
+   Overrides of the ported discussion.css; every rule starts with `.shell`. */
+
+/* Thread comments get the avatar column too; the name sits right on the comment. */
+.shell .comment-card:not(.flat) > .comment-self {
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: 2px 10px;
+}
+
+.shell .comment-card:not(.flat) > .comment-self > .comment-avatar {
+  grid-row: 1 / span 2;
+  grid-column: 1;
+}
+
+.shell .comment-card:not(.flat) > .comment-self > .topline,
+.shell .comment-card:not(.flat) > .comment-self > .comment-body-block {
+  grid-column: 2;
+}
+
+.shell .comment-card:not(.flat) .comment-avatar .avatar-badge {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.shell .comment-card:not(.flat) .comment-body-block {
+  gap: 4px;
+}
+
+/* The fold button fills the rest of the name row; it must not make the row tall. */
+.shell .comment-card:not(.flat) .collapse-hit {
+  height: 22px;
+  min-height: 0;
+}
+
+.shell .comment-card:not(.flat) .author-link {
+  color: var(--text-main);
+  font-weight: 700;
+}
+
+.shell .comment-card .actions-row {
+  gap: 4px;
+}
+
+/* Reply says what it does. */
+.shell .comment-card .reply-button {
+  gap: 5px;
+  width: auto;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .comment-card .reply-button svg {
+  width: 15px;
+  height: 15px;
+}
+
+/* The comment the composer answers. */
+.shell .comment-card .comment-self.reply-target {
+  margin: 0 -8px;
+  padding-right: 8px;
+  padding-left: 8px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.shell .comment-card .comment-sending {
+  color: var(--brand-strong);
+  font-size: 12.5px;
+  font-weight: 600;
+}
+
+.shell .comment-card.sending .body {
+  color: var(--text-soft);
+}
+
+/* The bar over the composer: whom you answer, and × to go back to a top-level comment. */
+.shell .discussion-shell .composer-card .reply-bar {
+  display: flex;
+  flex: 0 0 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 6px 6px 14px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  pointer-events: auto;
+}
+
+.shell .discussion-shell .composer-card .reply-bar button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  font-size: 18px;
+}
+
+@media (max-width: 760px) {
+  .shell .discussion-shell .composer-card.replying {
+    flex-wrap: wrap;
+  }
+}

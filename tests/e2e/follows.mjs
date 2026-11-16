@@ -121,24 +121,26 @@ assert.deepEqual(
 );
 log('ann\'s mention menu offers cat (followed) before bob (a follower)');
 
-// Home: Bob follows Ann, so her project is on his Home feed as a personal card.
+// Home: Bob follows Ann, so her project is on his Home feed, as the Global row with a line
+// naming her (Profiles and Comments mockups §1).
 const seedSwap = `Seed swap ${stamp}`;
 await bob.goto(`${BASE}/`);
 await feedScope(bob, 'Home');
 await until(
   bob,
   `${BASE}/`,
-  () => bob.locator('.personal-activity-card', { hasText: seedSwap }).isVisible(),
+  () => bob.locator('.project-card', { hasText: seedSwap }).isVisible(),
   'ann\'s project on Home',
 );
-const homeCard = bob.locator('.personal-activity-card', { hasText: seedSwap });
-assert.equal((await homeCard.locator('.identity .header-name').innerText()).trim(), `ann${stamp}`);
-assert.equal(await bob.locator('.project-card').count(), 0, 'bob joined no channel or community, so Home has no public rows');
+const homeCard = bob.locator('.project-card', { hasText: seedSwap });
+assert.equal((await homeCard.locator('.feed-context').innerText()).trim(), `ann${stamp} proposed this`);
+assert.equal(await bob.locator('.project-card').count(), 1, 'bob joined no channel or community, so Home has no public rows');
 await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
 await feedScope(bob, 'Global');
 await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
-assert.equal(await bob.locator('.personal-activity-card', { hasText: seedSwap }).count(), 0);
-log('bob\'s Home shows ann\'s project as a personal card; Global shows it once, as a public card');
+assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).count(), 1);
+assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context').count(), 0);
+log('bob\'s Home shows ann\'s project with her name over it; Global shows it once, as a public card');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);

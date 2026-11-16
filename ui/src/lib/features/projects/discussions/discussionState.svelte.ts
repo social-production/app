@@ -4,8 +4,9 @@ import type { Project, Stance } from '#lib/domain/projects.ts';
 import { queued } from '#lib/services/chat.ts';
 import { addComment, listComments, voteComment } from '#lib/services/discussions.ts';
 import { explain } from '#lib/services/errors.ts';
-import { getPerson } from '#lib/services/people.ts';
+import { getPerson, myAgent } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
+import { noteComment } from '#lib/services/profileNotes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 import { ModerationLoader } from '../moderationState.svelte.ts';
 
@@ -18,6 +19,16 @@ function mapTree(
   return list.map((c) =>
     c.id === id ? change(c) : { ...c, replies: mapTree(c.replies, id, change) },
   );
+}
+
+/** The author of comment `id` anywhere in the tree. */
+function authorOf(list: DiscussionComment[], id: string): string | null {
+  for (const c of list) {
+    if (c.id === id) return c.author;
+    const found = authorOf(c.replies, id);
+    if (found) return found;
+  }
+  return null;
 }
 
 function authors(list: DiscussionComment[]): string[] {
@@ -95,17 +106,44 @@ export class DiscussionState {
     this.comments = mapTree(this.comments, comment, (c) => ({ ...c, moderation: next }));
   }
 
+  /** A comment shown at once, marked "Sending…", until the page reads it back. */
+  private async pending(parent: string | null, body: string): Promise<void> {
+    const author = await myAgent().catch(() => '');
+    const draft: DiscussionComment = {
+      id: `sending-${Date.now()}`,
+      author,
+      body: body.trim(),
+      createdAt: Date.now() * 1000,
+      voteCount: 0,
+      activeVote: 0,
+      replies: [],
+      sending: true,
+    };
+    this.comments = parent
+      ? mapTree(this.comments, parent, (c) => ({ ...c, replies: [...c.replies, draft] }))
+      : [...this.comments, draft];
+  }
+
   /** web's addComment: true once written (the composer then clears). */
   async comment(parent: string | null, body: string): Promise<boolean> {
     if (!requireViewer('Sign in to comment.') || !body.trim()) return false;
     this.message = '';
+    const shown = this.pending(parent, body);
     try {
-      await addComment(this.id, body, parent);
+      const id = await addComment(this.id, body, parent);
+      // ADR 0107: the note lists it on your profile and followers' Home.
+      await noteComment(this.id, id, body, parent ? authorOf(this.comments, parent) : null);
       await this.fetch();
       return true;
     } catch (e) {
+      await shown;
+      this.comments = dropSending(this.comments);
       this.message = explain(e);
       return false;
     }
   }
+}
+
+function dropSending(list: DiscussionComment[]): DiscussionComment[] {
+  return list.filter((c) => !c.sending).map((c) => ({ ...c, replies: dropSending(c.replies) }));
 }

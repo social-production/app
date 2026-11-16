@@ -33,7 +33,7 @@ await ann.getByRole('button', { name: 'Publish thread' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.match(ann.url(), /\/threads\//);
 const url = ann.url();
-const composer = ann.getByLabel('Write a comment...');
+const composer = ann.getByLabel('Add a comment');
 await composer.fill('Tomatoes did best for me.');
 await composer.press('Enter');
 const annComment = ann.locator('.comment-card', { hasText: 'Tomatoes did best' });
@@ -68,7 +68,7 @@ await comment.waitFor({ timeout: 60_000 });
 await comment.getByRole('button', { name: 'Vote up' }).first().click();
 await comment.locator('.vote-count').first().filter({ hasText: '1' }).waitFor();
 await comment.getByRole('button', { name: 'Reply' }).first().click();
-const reply = bob.getByLabel('Write a reply...');
+const reply = bob.getByLabel(/^Reply to /);
 await reply.fill('Which kind of tomato?');
 await reply.press('Enter');
 await comment
@@ -106,7 +106,7 @@ assert.match(bob.url(), /\/posts\//);
 // web's LinkedPostBody: the thread's URL in the body is a link.
 const subject = bob.locator('.linked-body.detail a.linked-subject');
 assert.equal(await subject.getAttribute('href'), url);
-const postComposer = bob.getByLabel('Write a comment...');
+const postComposer = bob.getByLabel('Add a comment');
 await postComposer.fill('Cloves pointy end up.');
 await postComposer.press('Enter');
 const postComment = bob.locator('.comment-card.flat', { hasText: 'pointy end up' }).first();
@@ -117,7 +117,7 @@ const actions = bob.locator('.item-head .item-actions');
 await actions.getByLabel('1 comment').waitFor();
 await bob.locator('.item-head .comments-head .icon-menu-trigger', { hasText: 'Oldest first' }).waitFor();
 await postComment.getByRole('button', { name: 'Reply' }).first().click();
-const postReply = bob.getByLabel('Write a reply...');
+const postReply = bob.getByLabel(/^Reply to /);
 await postReply.fill('About a hand apart.');
 await postReply.press('Enter');
 const flatReply = bob.locator('.comment-card.flat', { hasText: 'a hand apart' }).last();
@@ -187,7 +187,7 @@ log('founder one sees the nested reply and the comment vote');
 
 // web's @mention menu in the comment composer: the reader is offered by name, and the posted
 // comment links the mention to their profile.
-const mentionComposer = ann.getByLabel('Write a comment...');
+const mentionComposer = ann.getByLabel('Add a comment');
 await mentionComposer.fill('');
 await mentionComposer.pressSequentially('Thanks @Read', { delay: 40 });
 const option = ann.locator('.composer-field .mention-item', { hasText: `Reader${stamp}` }).first();

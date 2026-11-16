@@ -63,8 +63,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
    The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
    page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
-   web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088
-   (owner 2026-11-10: in the directory), not built yet (a directory reset).
+   web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088,
+   built 2026-11-12/13 (a `Deactivated` link, then the chain closes).
    web's Change password doesn't apply (passkeys and the recovery phrase).
    The seven create flows were compared with web's source 2026-11-12 (see "Create flows").
 
@@ -290,7 +290,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   project-activity cards (done 2026-11-08 with phase 5b, ADR 0078–0085).
 - [x] Software project governance (pull requests / merge flow) in the Activity phase
   (2026-11-08, ADR 0086; rail rows, history cards and `pr-approved`: 2026-11-09, ADR 0087).
-- [x] **The Platform channel** (found 2026-11-12; shipped in PR #151, ADR 0095): web's `/platform` is the `platform`
+- [x] **The Platform channel** (found 2026-11-12; built 2026-11-13, ADR 0095, PR #151): web's `/platform` is the `platform`
   channel's scope page (`DirectoryFeedLayout`: description "The channel for the whole
   network…", Follow, its projects and events; web-backend `services/platform.py` creates the
   channel on demand). Projects tagged `#platform` take the whole network as their vote
@@ -298,7 +298,8 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   personal service can't use the tag. The app reserves the slug (`domain/scopes.ts`), shows a
   stub at `/platform`, and links `#platform` tags there. Needs an ADR (who may create the
   channel record; the population rule is a governance change).
-- [x] **Moderators** (shipped in PR #151, ADR 0095; owner, 2026-11-12: "we also don't have moderators"; this overrides the
+- [x] **Moderators** (built 2026-11-13 with the channel, ADR 0095; still open: platform-tagged
+  projects voted on by any Full member, moderators' merge capability, weekly-count populations) (owner, 2026-11-12: "we also don't have moderators"; this overrides the
   2026-10-31 note that filed the platform board under asset management): web's moderator board
   on the Platform page (`features/platform/board/*`: moderators and candidates, volunteer,
   `castModeratorVote`, "How moderator roles work": moderators execute approved platform

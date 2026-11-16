@@ -4,12 +4,14 @@ import {
   type HomeAudience,
   type HomeFeedRow,
 } from '#lib/domain/homeFeed.ts';
+import type { CommentActivity } from '#lib/domain/commentNotes.ts';
 import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/projects.ts';
 import type { RegionLink } from '#lib/domain/regionFeed.ts';
 import { scopeTag } from '#lib/domain/scopes.ts';
 import { communityEventCards } from '#lib/services/closedCommunities.ts';
 import { followCircles } from '#lib/services/follows.ts';
 import { myAgent } from '#lib/services/people.ts';
+import { commentsOf } from '#lib/services/profileNotes.ts';
 import { myScopes } from '#lib/services/scopes.ts';
 
 import { FeedState } from './feedState.svelte.ts';
@@ -32,6 +34,14 @@ function keep(key: string, value: string): void {
   } catch {
     // Private windows may refuse storage; the choice then lasts for this page only.
   }
+}
+
+const DAY_MICROS = 86_400_000_000;
+
+/** The oldest comment a feed window shows, in microseconds. */
+function windowStart(window: FeedWindow): number {
+  const days = { today: 1, week: 7, month: 31 }[window as string] ?? 0;
+  return days ? Date.now() * 1000 - days * DAY_MICROS : 0;
 }
 
 /** Your private communities' events matching the search (the index never sees them). */
@@ -59,6 +69,10 @@ export class HomeFeedState {
   private signedIn = $state(false);
   /** Home: events listed on your private communities (ADR 0069), read from their networks. */
   private communityEvents = $state<ProjectCard[]>([]);
+  /** Comments by the people you follow (ADR 0107), within the feed's time window. */
+  private comments = $state<CommentActivity[]>([]);
+  /** Who you follow: their cards get a "Maya Kim proposed this" line. */
+  following = $state<string[]>([]);
 
   constructor(private readonly search: () => string) {}
 
@@ -86,7 +100,7 @@ export class HomeFeedState {
           : this.public.items;
     if (!this.signedIn) return mergeHomeFeed(shown, [], 'trending');
     const sort = this.public.sort === 'recent' ? 'recent' : 'trending';
-    return mergeHomeFeed(shown, this.personal.items, sort);
+    return mergeHomeFeed(shown, this.personal.items, sort, this.comments);
   });
 
   private readonly regional = $derived(this.shownScope === 'region');
@@ -188,11 +202,19 @@ export class HomeFeedState {
       this.personal.items = [];
       this.personal.total = 0;
       this.personal.loading = false;
+      this.comments = [];
       return;
     }
     const [{ following }, me] = await Promise.all([followCircles(), myAgent()]);
+    this.following = following;
     this.personal.creator = following.join(',');
     this.personal.personal = { me, popular: this.audience === 'popular' };
-    return this.personal.reload();
+    await Promise.all([this.personal.reload(), this.loadComments(following)]);
+  }
+
+  private async loadComments(following: string[]): Promise<void> {
+    const since = windowStart(this.window);
+    const found = following.length ? await commentsOf(following).catch(() => []) : [];
+    this.comments = found.filter((c) => c.createdAt >= since);
   }
 }

@@ -29,6 +29,8 @@ export interface DiscussionComment {
   /** Its report, when someone reported it (ADR 0071 part b). */
   moderation?: Moderation;
   replies: DiscussionComment[];
+  /** Shown at once while it is written (Profiles and Comments mockups §4). */
+  sending?: boolean;
 }
 
 /**
@@ -77,7 +79,7 @@ export function sortComments(list: DiscussionComment[], mode: CommentSort): Disc
 
 /** Every comment in the tree, replies included. */
 export function countComments(list: DiscussionComment[]): number {
-  return list.reduce((n, c) => n + 1 + countComments(c.replies), 0);
+  return list.reduce((n, c) => n + (c.sending ? 0 : 1) + countComments(c.replies), 0);
 }
 
 /** A post's charter title (posts show none): its first line, cut to 80 characters. */

@@ -18,9 +18,11 @@
   interface Props {
     card: ProjectCard;
     onSignal: (next: Stance | null) => Promise<void>;
+    /** Home's \"Maya Kim proposed this\" line. */
+    context?: string;
   }
 
-  let { card, onSignal }: Props = $props();
+  let { card, onSignal, context = '' }: Props = $props();
 
   const href = $derived(resolve('/help-requests/[id]', { id: card.id }));
   const when = $derived(localDateTime(card.help?.neededAt ?? null));
@@ -33,6 +35,7 @@
 
 <div class="help-request-card">
   <FeedSurface
+    {context}
     {href}
     accent={modeAccent(card.mode)}
     contentRestricted={card.moderation === 'hidden'}

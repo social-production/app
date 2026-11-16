@@ -31,7 +31,7 @@ await bob.getByRole('button', { name: 'Publish post' }).click();
 await bob.locator('.linked-body.detail').waitFor({ timeout: 120_000 });
 const postUrl = bob.url();
 assert.match(postUrl, /\/posts\//);
-const box = bob.getByLabel('Write a comment...');
+const box = bob.getByLabel('Add a comment');
 await box.fill(spam);
 await box.press('Enter');
 await bob.locator('.comment-card', { hasText: spam }).waitFor({ timeout: 60_000 });
