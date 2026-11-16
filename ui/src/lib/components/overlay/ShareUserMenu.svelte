@@ -16,6 +16,8 @@
     menuTitle: string;
     /** Icon only, for tight action strips; the label stays as the accessible name. */
     compact?: boolean;
+    /** The button's word (Detail Pages Cleanup §6: "Invite people" on the People page). */
+    buttonLabel?: string;
     copyLinkUrl?: string | null;
     /** Title for the device share sheet and share links; defaults to the page title. */
     shareTitle?: string | null;
@@ -35,6 +37,7 @@
   let {
     menuTitle,
     compact = false,
+    buttonLabel = 'Share',
     copyLinkUrl = null,
     shareTitle = null,
     placeholder = 'Type a username',
@@ -143,7 +146,7 @@
           stroke-linejoin="round"
         /></svg
       >
-      {#if !compact}<span class="share-button-label">Share</span>{/if}
+      {#if !compact}<span class="share-button-label">{buttonLabel}</span>{/if}
     </button>
   </div>
 </span>

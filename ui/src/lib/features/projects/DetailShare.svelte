@@ -19,7 +19,7 @@
    * Share is always on the dock (members send; others copy or share the link). Private
    * events: organizers only, as "Invite to event" (an invite to accept, no Create post).
    */
-  let { detail }: { detail: DetailState } = $props();
+  let { detail, label = 'Share' }: { detail: DetailState; label?: string } = $props();
 
   const project = $derived(detail.project);
   const event = $derived(isEvent(project?.charter?.mode));
@@ -68,6 +68,7 @@
     recipientHint={isPrivate
       ? "It's a private event, so they get an invite to accept under Invites."
       : 'They get it as a message and a notification.'}
+    buttonLabel={label}
     copyLinkUrl={url}
     shareTitle={title}
     searchContacts={search}

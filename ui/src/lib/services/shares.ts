@@ -26,3 +26,14 @@ export async function shareSpace(
 export function sharePrefill(title: string, url: string): string {
   return `Check this out: ${title}\n${url}`;
 }
+
+/** Detail Pages Cleanup §5, "Share profile": a link to someone's profile instead of their key,
+ * sent into your direct chat with the recipient. */
+export async function shareProfile(to: Contact, name: string, url: string): Promise<void> {
+  await sendNewChat({
+    kind: 'direct',
+    members: [to],
+    title: '',
+    body: `${name}'s profile: ${url}`,
+  });
+}

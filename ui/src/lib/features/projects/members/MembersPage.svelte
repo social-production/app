@@ -159,5 +159,5 @@
     {/if}
   </div>
 
-  <div class="members-invite"><DetailShare {detail} /></div>
+  <div class="members-invite"><DetailShare {detail} label="Invite people" /></div>
 </div>
