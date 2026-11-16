@@ -202,6 +202,15 @@ with real users.
   100 accounts per call. `services/notifications.ts` passes the members of the projects and chats
   it already reads. web also counts communities and channels; the device doesn't read those yet.
   `bot_reviews.rs` scenario: 6 agents, with fay (a founder who never marks) asked to vote.
+  Passed locally (cloud-scenarios, 608 s). The card was checked at 390px light and dark with a
+  throwaway preview route (a real review needs 3 full members; dev-founders has 2).
+- **Demo content on live (8:00–8:45 pm Melbourne):** everything is made (project, service with a
+  request, event, proposals, threads, posts, help requests, DMs); people maya_k, tomas_b,
+  priya_r (phrases sent to the owner). `claude/demo-fixes` (PR #173) updates `tests/e2e/demo/*`
+  to #163/#171's flows and adds a resume (`DEMO_SKIP`, accounts file). The desktop session left
+  demo/* to this session; its ux-chat-fixes renames chat/report selectors (STATUS of that PR).
+- **#171 (ux-polish) merged 8:01 pm, #172 (ux-profiles) 8:20 pm.** Home's tabs, the display
+  timezone and Russian are this session's now.
 Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
 #163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this
 cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
