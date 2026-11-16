@@ -43,7 +43,7 @@ impl Config {
             rp_id: env_or("RP_ID", "localhost"),
             rp_origin: env_or("RP_ORIGIN", "http://localhost:5173"),
             pow_bits: env_num("POW_BITS", 20),
-            signups_per_ip_per_day: env_num("SIGNUPS_PER_IP_PER_DAY", 5),
+            signups_per_ip_per_day: env_num("SIGNUPS_PER_IP_PER_DAY", 50),
             db_max_readers: env_num("DB_MAX_READERS", 16),
             restart_after_upgrade: env_or("RESTART_AFTER_UPGRADE", "1") != "0",
         }
