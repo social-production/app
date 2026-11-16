@@ -31,3 +31,51 @@ export interface Board {
 /** web's `_meets_standing_threshold` at 66% (sp_board::APPROVAL_PERCENT). */
 export const qualifies = (yes: number, no: number, quorum: number): boolean =>
   yes + no >= quorum && (yes + no === 0 || yes * 100 >= 66 * (yes + no));
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const percent = (m: BoardMember) => (m.ratio === null ? null : Math.round(m.ratio * 100));
+const votesOf = (m: BoardMember) => m.yes + m.no;
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+
+/** A row's state chip (Platform and Moderators mockups §2): Seated, Grace · N days, Candidate. */
+export function boardChip(m: BoardMember, now = Date.now()): string {
+  if (m.standing === 'active') return 'Seated';
+  if (m.standing === 'grace') {
+    const days =
+      m.graceEndsAt === null ? 7 : Math.max(1, Math.ceil((m.graceEndsAt - now) / DAY_MS));
+    return `Grace · ${plural(days, 'day')}`;
+  }
+  return m.standing === 'qualifying' ? 'Ready' : 'Candidate';
+}
+
+/** A row's one line: how the person stands against this week's quorum. */
+export function boardLine(m: BoardMember, quorum: number): string {
+  const votes = votesOf(m);
+  const pct = percent(m);
+  if (m.standing === 'active') {
+    if (votes === 0) return quorum === 0 ? 'Seated straight away' : 'No votes yet';
+    return `${pct}% yes from ${plural(votes, 'vote')}`;
+  }
+  if (m.standing === 'grace') {
+    return `${pct ?? 0}% yes, but ${votes} of ${quorum} votes this week`;
+  }
+  if (m.standing === 'qualifying') return 'Has the votes; seated at the next count';
+  return votes ? `${votes} of ${quorum} votes · ${pct}% yes` : `0 of ${quorum} votes`;
+}
+
+/** How far a candidate is towards the votes a seat needs, 0 to 100. */
+export const boardProgress = (m: BoardMember, quorum: number): number =>
+  quorum === 0 ? 100 : Math.min(100, Math.round((100 * votesOf(m)) / quorum));
+
+/** The viewer first, then by name. */
+export function boardOrder(
+  list: BoardMember[],
+  me: string,
+  name: (m: BoardMember) => string,
+): BoardMember[] {
+  return [...list].sort(
+    (a, b) =>
+      Number(b.agent === me) - Number(a.agent === me) ||
+      name(a).localeCompare(name(b), undefined, { sensitivity: 'base' }),
+  );
+}

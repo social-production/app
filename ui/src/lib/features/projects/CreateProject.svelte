@@ -17,6 +17,8 @@
   /** web's CreateProjectPage without its Type step (ADR 0059), in the Creating Through Plans
    * mockup's order: basics → tags → location → overview. */
   const s = new CreateState();
+  // The Platform page's "Start a platform project" (Platform and Moderators mockups §1).
+  if (page.url.searchParams.get('tag') === 'platform') s.tags = ['#platform'];
   const steps = CREATE_STEPS;
 
   $effect(() => {

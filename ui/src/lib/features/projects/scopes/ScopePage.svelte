@@ -3,6 +3,7 @@
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import PlatformBoardPanel from '#lib/components/board/PlatformBoardPanel.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
 
   import { BoardState } from './boardState.svelte.ts';
@@ -55,7 +56,8 @@
   });
 
   $effect(() => {
-    if (s.platform && boardOpen && !boardState.board) void boardState.load();
+    // The header shows the moderators' faces and the weekly count, so the board loads at once.
+    if (s.platform && !boardState.board) void boardState.load();
   });
 
   async function redeem(): Promise<void> {
@@ -95,6 +97,8 @@
       bind:inviteOpen
       bind:settingsOpen
       bind:boardOpen
+      board={boardState.board}
+      people={boardState.people}
       onVotes={() => (votesOpen = true)}
     />
 
@@ -104,7 +108,15 @@
       {:else if s.feed.items.length === 0}
         <section class="info-card">
           {#if s.platform}
-            <p>No platform activity yet.</p>
+            <div class="platform-empty">
+              <ToolbarIcon name="globe" />
+              <b>Nothing for the whole network yet</b>
+              <p>Projects and events tagged #platform show here.</p>
+              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
+              <a class="scope-pill primary" href={`${resolve('/create/project')}?tag=platform`}
+                >Start a platform project</a
+              >
+            </div>
           {:else}
             <p>
               No tagged posts, help, or events in this {noun} yet. Tag content with this {noun} to show
@@ -136,6 +148,7 @@
         open={boardOpen}
         board={boardState.board}
         people={boardState.people}
+        me={boardState.me}
         canVolunteer={boardState.canVolunteer}
         onVolunteer={boardState.volunteer}
         onVote={boardState.vote}

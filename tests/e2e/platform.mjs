@@ -39,36 +39,35 @@ await leave.waitFor({ timeout: 120_000 });
 log("founder two follows the Platform channel");
 
 await ann.getByRole("button", { name: "Moderators" }).click();
-const sheet = ann
-  .locator(".platform-board .overlay-sheet, .platform-board")
-  .first();
-await ann.getByRole("heading", { name: "Moderators" }).waitFor();
-const volunteer = ann.getByRole("button", { name: "Volunteer as moderator" });
-const stepDown = ann.getByRole("button", { name: "Step down as moderator" });
+const sheet = ann.getByRole("dialog", { name: "Moderators" });
+await sheet.getByRole("heading", { name: "Moderators" }).waitFor();
+const volunteer = sheet.getByRole("button", { name: "Volunteer as moderator" });
+const stepDown = sheet.getByRole("button", { name: "Step down", exact: true });
+const confirm = async (title, button) => {
+  const ask = ann.getByRole("dialog", { name: title });
+  await ask.getByRole("button", { name: button, exact: true }).click();
+  await ask.waitFor({ state: "detached", timeout: 60_000 });
+};
 await volunteer.or(stepDown).waitFor({ timeout: 60_000 });
 if (await stepDown.count()) {
   // A rerun against the same node: start from off the board.
   await stepDown.click();
-  await ann.getByRole("button", { name: "Confirm step down" }).click();
+  await confirm("Step down as moderator?", "Step down");
   await volunteer.waitFor({ timeout: 60_000 });
 }
 await volunteer.click();
-await ann
-  .getByText("You are now seeking a moderator role.")
-  .waitFor({ timeout: 60_000 });
-await sheet.getByText("Active moderators").waitFor({ timeout: 60_000 });
+await confirm("Volunteer as moderator?", "Volunteer");
+// Nobody was active last week on a fresh node, so the quorum is 0 and they are seated.
+await sheet.getByText("You're seated.").waitFor({ timeout: 60_000 });
+await sheet.getByText(/^Seated · \d+/).waitFor({ timeout: 60_000 });
 // Dev founders have no profile on a local node, so the row shows their key's tag.
-await sheet
-  .locator(".member-section .person-row", { hasText: "BGTu" })
-  .waitFor();
+await sheet.locator(".board-row.you", { hasText: "BGTu" }).waitFor();
 if (shots) await ann.screenshot({ path: `${shots}/moderators.png` });
 log("volunteering seats them while the quorum is 0");
 
 await stepDown.click();
-await ann.getByRole("button", { name: "Confirm step down" }).click();
-await ann
-  .getByText("You have stepped down as moderator.")
-  .waitFor({ timeout: 60_000 });
+await confirm("Step down as moderator?", "Step down");
+await sheet.getByText("You stepped down.").waitFor({ timeout: 60_000 });
 await volunteer.waitFor({ timeout: 60_000 });
 log("stepping down leaves the board");
 
@@ -80,7 +79,7 @@ await bob
   .getByRole("heading", { name: "Moderators" })
   .waitFor({ timeout: 60_000 });
 await bob
-  .getByText(/No moderators listed yet|Seeking position|Active moderators/)
+  .getByText(/Nobody has volunteered yet|Seated · |Candidates · /)
   .first()
   .waitFor({
     timeout: 60_000,
