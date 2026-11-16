@@ -28,8 +28,12 @@ pub async fn serve(
     }
     let node = Box::pin(node::Node::start(&config, passphrase)).await?;
     tokio::spawn(background(node.clone(), config.happ_path.clone()));
+    let store = store::Store::open(&config.data_dir).await?;
+    // The UI's origin names this gateway to the push services (ADR 0107).
+    let pusher = Arc::new(push::Pusher::open(store.pool().clone(), &config.rp_origin).await?);
     let state = routes::AppState {
-        store: store::Store::open(&config.data_dir).await?,
+        store,
+        pusher,
         passkeys: Arc::new(auth::passkeys::Passkeys::new(
             &config.rp_id,
             &config.rp_origin,

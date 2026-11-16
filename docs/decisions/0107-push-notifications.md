@@ -28,11 +28,11 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
 - **Browsers: Web Push from the seed.** The gateway listens to the app signals of the agents it
   hosts. Settings → Notifications gets "Push notifications on this device": switching it on asks
   the browser for permission, registers a small service worker (`ui/static/sw.js`) and sends the
-  browser's push subscription to `POST /push/subscribe` (signed like `/session/resume`), with the
+  browser's push subscription to `POST /push/subscribe` (with the device secret, as `/session/cells` takes it), with the
   categories switched off on that device. The gateway keeps subscriptions in `gateway.sqlite`
   (agent, endpoint, keys, muted categories) and, for each signal to a hosted agent, sends an
   encrypted Web Push (VAPID, RFC 8291) to each of that agent's subscriptions whose category is on.
-  Tapping the notification opens its link. `DELETE /push/subscribe` and signing out remove it; a
+  Tapping the notification opens its link. `POST /push/unsubscribe` and signing out remove it; a
   410 from the push service removes it too. The VAPID key pair is made on first start and kept in
   `gateway.sqlite`.
 - **Desktop: the OS's own notifications.** The desktop app gets the same signals from its own
