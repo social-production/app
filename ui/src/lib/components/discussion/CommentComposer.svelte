@@ -21,17 +21,20 @@
     onSubmit: () => void;
     /** People whose name matches the "@…" being typed (web's searchPeopleSuggestions). */
     mentionSearch?: ((query: string) => Promise<Mentionable[]>) | null | undefined;
+    /** Changes when the field should take focus (Reply points the composer at a comment). */
+    focus?: number;
   }
 
   let {
     value = $bindable(''),
-    placeholder = 'Write a comment...',
+    placeholder = 'Add a comment',
     submitLabel = 'Post comment',
     signInMessage = 'Sign in to comment.',
     signedIn,
     onSignIn,
     onSubmit,
     mentionSearch = null,
+    focus = 0,
   }: Props = $props();
 
   const MAX_HEIGHT = 240;
@@ -118,6 +121,10 @@
   $effect(() => {
     void value;
     resize();
+  });
+
+  $effect(() => {
+    if (focus > 0) field?.focus();
   });
 </script>
 

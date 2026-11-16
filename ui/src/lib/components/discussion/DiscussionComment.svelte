@@ -12,13 +12,13 @@
   import { resolve } from '$app/paths';
 
   import type { CommentMentions } from './commentMentions.ts';
-  import CommentComposer from './CommentComposer.svelte';
   import Self from './DiscussionComment.svelte';
 
   /**
    * web's DiscussionComment: author and time (the row folds the comment and its replies), the
    * body (or web's "Removed for …" and serious-harm reveal, ADR 0071 part b), a vote strip,
-   * Reply and the ⋮ report menu, a reply composer, then the replies.
+   * Reply and the ⋮ report menu, then the replies. Reply hands the page's one composer to this
+   * comment, which is outlined while it is answered (Profiles and Comments mockups §4).
    */
   interface Props {
     comment: Comment;
@@ -31,11 +31,11 @@
     flat?: boolean;
     /** Flat replies name whose comment they answer. */
     replyingTo?: string | null;
-    signedIn: boolean;
-    onSignIn: (message: string) => void;
     onVote: (id: string, direction: VoteDirection) => Promise<void>;
-    /** Resolves true once the reply is written (the draft then clears). */
-    onReply: (parent: string, body: string) => Promise<boolean>;
+    /** The comment the composer answers now (outlined). */
+    replyTarget?: string | null;
+    /** Reply: the composer answers this comment. */
+    onReply: (parent: string, name: string) => void;
     /** A report or vote changed this comment's state. */
     onModeration: (id: string, next: Moderation) => void;
     mentions?: CommentMentions | null;
@@ -49,16 +49,13 @@
     embedded = false,
     flat = false,
     replyingTo = null,
-    signedIn,
-    onSignIn,
+    replyTarget = null,
     onVote,
     onReply,
     onModeration,
     mentions = null,
   }: Props = $props();
 
-  let draft = $state('');
-  let replyOpen = $state(false);
   let collapsed = $state(false);
   let revealed = $state(false);
   const moderation = $derived(comment.moderation ?? VISIBLE);
@@ -77,13 +74,6 @@
   $effect(() => {
     if (isHighlighted) self?.scrollIntoView({ block: 'center' });
   });
-
-  async function reply(): Promise<void> {
-    if (await onReply(comment.id, draft)) {
-      draft = '';
-      replyOpen = false;
-    }
-  }
 </script>
 
 <article
@@ -91,17 +81,24 @@
   class:embedded
   class:flat
   class:has-replies={comment.replies.length > 0}
-  class:reply-open={replyOpen}
+  class:reply-open={replyTarget === comment.id}
+  class:sending={comment.sending}
   class="comment-card"
 >
-  <div bind:this={self} class:highlighted={isHighlighted} class="comment-self">
-    {#if flat}<span class="comment-avatar"><AvatarBadge size="sm" {name} /></span>{/if}
+  <div
+    bind:this={self}
+    class:highlighted={isHighlighted}
+    class:reply-target={replyTarget === comment.id}
+    class="comment-self"
+  >
+    <span class="comment-avatar"><AvatarBadge size="sm" {name} /></span>
     <div class="topline">
       <a class="author-link" href={resolve('/profile/[agent]', { agent: comment.author })}>
         {name}
       </a>
       <PausedBadge agent={comment.author} />
       <span class="comment-time">{relativeCompact(comment.createdAt)}</span>
+      {#if comment.sending}<span class="comment-sending">Sending…</span>{/if}
       <button
         aria-expanded={!collapsed}
         aria-label={collapsed
@@ -151,24 +148,22 @@
         </p>
       {/if}
 
-      <div class="actions-row">
-        <VoteStrip
-          bare
-          support={comment.voteCount}
-          oppose={0}
-          mine={stance}
-          onSignal={(next) =>
-            onVote(comment.id, next === 'Demand' ? 1 : next === 'Oppose' ? -1 : 0)}
-        />
-        <button
-          class="reply-button"
-          type="button"
-          aria-label={replyOpen ? 'Cancel reply' : 'Reply'}
-          onclick={() => (replyOpen = !replyOpen)}
-        >
-          {#if replyOpen}
-            <span aria-hidden="true">×</span>
-          {:else}
+      {#if !comment.sending}
+        <div class="actions-row">
+          <VoteStrip
+            bare
+            support={comment.voteCount}
+            oppose={0}
+            mine={stance}
+            onSignal={(next) =>
+              onVote(comment.id, next === 'Demand' ? 1 : next === 'Oppose' ? -1 : 0)}
+          />
+          <button
+            class="reply-button"
+            type="button"
+            aria-label="Reply"
+            onclick={() => onReply(comment.id, name)}
+          >
             <svg aria-hidden="true" viewBox="0 0 24 24">
               <path
                 d="M9 10 4 15l5 5"
@@ -186,28 +181,15 @@
                 stroke-linecap="round"
               />
             </svg>
-          {/if}
-        </button>
-        <ReportControl
-          id={space}
-          message={comment.id}
-          itemLabel="comment"
-          {moderation}
-          owner={comment.author}
-          onChange={(next) => onModeration(comment.id, next)}
-        />
-      </div>
-
-      {#if replyOpen}
-        <div class="composer-card">
-          <CommentComposer
-            bind:value={draft}
-            placeholder="Write a reply..."
-            submitLabel="Post reply"
-            {signedIn}
-            {onSignIn}
-            mentionSearch={mentions?.search}
-            onSubmit={() => void reply()}
+            <span>Reply</span>
+          </button>
+          <ReportControl
+            id={space}
+            message={comment.id}
+            itemLabel="comment"
+            {moderation}
+            owner={comment.author}
+            onChange={(next) => onModeration(comment.id, next)}
           />
         </div>
       {/if}
@@ -225,8 +207,7 @@
           {embedded}
           {flat}
           replyingTo={flat ? name : null}
-          {signedIn}
-          {onSignIn}
+          {replyTarget}
           {onVote}
           {onReply}
           {onModeration}

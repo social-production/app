@@ -4,7 +4,7 @@ import type { Project, Stance } from '#lib/domain/projects.ts';
 import { queued } from '#lib/services/chat.ts';
 import { addComment, listComments, voteComment } from '#lib/services/discussions.ts';
 import { explain } from '#lib/services/errors.ts';
-import { getPerson } from '#lib/services/people.ts';
+import { getPerson, myAgent } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
 import { noteComment } from '#lib/services/profileNotes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
@@ -106,10 +106,29 @@ export class DiscussionState {
     this.comments = mapTree(this.comments, comment, (c) => ({ ...c, moderation: next }));
   }
 
+  /** A comment shown at once, marked "Sending…", until the page reads it back. */
+  private async pending(parent: string | null, body: string): Promise<void> {
+    const author = await myAgent().catch(() => '');
+    const draft: DiscussionComment = {
+      id: `sending-${Date.now()}`,
+      author,
+      body: body.trim(),
+      createdAt: Date.now() * 1000,
+      voteCount: 0,
+      activeVote: 0,
+      replies: [],
+      sending: true,
+    };
+    this.comments = parent
+      ? mapTree(this.comments, parent, (c) => ({ ...c, replies: [...c.replies, draft] }))
+      : [...this.comments, draft];
+  }
+
   /** web's addComment: true once written (the composer then clears). */
   async comment(parent: string | null, body: string): Promise<boolean> {
     if (!requireViewer('Sign in to comment.') || !body.trim()) return false;
     this.message = '';
+    const shown = this.pending(parent, body);
     try {
       const id = await addComment(this.id, body, parent);
       // ADR 0107: the note lists it on your profile and followers' Home.
@@ -117,8 +136,14 @@ export class DiscussionState {
       await this.fetch();
       return true;
     } catch (e) {
+      await shown;
+      this.comments = dropSending(this.comments);
       this.message = explain(e);
       return false;
     }
   }
+}
+
+function dropSending(list: DiscussionComment[]): DiscussionComment[] {
+  return list.filter((c) => !c.sending).map((c) => ({ ...c, replies: dropSending(c.replies) }));
 }

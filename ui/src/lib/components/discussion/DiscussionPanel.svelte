@@ -18,7 +18,9 @@
   /**
    * web's DiscussionPanel: the comment composer and the comments, top-level ones in the chosen
    * order (ADR 0070). On phones the composer is a floating bar with a back button in the
-   * nav's place (ADR 0100).
+   * nav's place (ADR 0100). It is the page's only composer: Reply points it at a comment, and
+   * a bar above it says whom you answer until you send or press × (Profiles and Comments
+   * mockups §4).
    */
   interface Props {
     comments: Comment[];
@@ -56,18 +58,39 @@
   }: Props = $props();
 
   let draft = $state('');
+  let replying = $state<{ id: string; name: string } | null>(null);
+  let focus = $state(0);
   const sorted = $derived(sortComments(comments, sortMode));
 
+  function startReply(id: string, name: string): void {
+    if (!signedIn) return onSignIn('Sign in to reply.');
+    replying = { id, name };
+    focus++;
+  }
+
   async function submit(): Promise<void> {
-    if (await onComment(null, draft)) draft = '';
+    const parent = replying?.id ?? null;
+    const body = draft;
+    draft = '';
+    replying = null;
+    if (!(await onComment(parent, body))) draft = body;
   }
 </script>
 
 <section class:embedded class="discussion-shell" id="comments">
-  <div class="composer-card">
+  <div class="composer-card" class:replying={!!replying}>
+    {#if replying}
+      <div class="reply-bar">
+        <span>Replying to <b>{replying.name}</b></span>
+        <button type="button" aria-label="Cancel reply" onclick={() => (replying = null)}>×</button>
+      </div>
+    {/if}
     <BackButton />
     <CommentComposer
       bind:value={draft}
+      placeholder={replying ? `Reply to ${replying.name}` : 'Add a comment'}
+      submitLabel={replying ? 'Post reply' : 'Post comment'}
+      {focus}
       {signedIn}
       {onSignIn}
       mentionSearch={mentions?.search}
@@ -84,10 +107,9 @@
         {highlighted}
         {embedded}
         {flat}
-        {signedIn}
-        {onSignIn}
+        replyTarget={replying?.id ?? null}
         {onVote}
-        onReply={(parent, body) => onComment(parent, body)}
+        onReply={startReply}
         {onModeration}
         {mentions}
       />
