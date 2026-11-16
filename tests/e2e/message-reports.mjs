@@ -27,7 +27,7 @@ await bob.goto(BASE);
 await bob.getByRole('button', { name: 'Create', exact: true }).click();
 await bob.getByRole('menuitem', { name: /Post/ }).click();
 await bob.getByLabel(/What's on your mind/).fill(`A quiet post ${stamp}`);
-await bob.getByRole('button', { name: 'Publish post' }).click();
+await bob.getByRole('button', { name: 'Publish post' }).last().click();
 await bob.locator('.linked-body.detail').waitFor({ timeout: 120_000 });
 const postUrl = bob.url();
 assert.match(postUrl, /\/posts\//);
