@@ -6,13 +6,15 @@
 .shell .history-shell {
   display: grid;
   gap: 18px;
-  padding: 16px var(--page-gutter) 24px;
+  /* Flush with the Details tab at the page's 16px (owner, 17 Nov: the tab sat inside the
+     page's gutter and its own, at 32px). */
+  padding: 16px 0 24px;
 }
 
 .shell .links-tab .links-top {
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 
