@@ -118,7 +118,24 @@ workflow). Run locally the scenarios a change could break before pushing, and ch
 run at the start of each session. Put the scenarios back on PRs once there is a stable release
 with real users.
 
-## In flight (parity, cloud session) 2026-11-16, 1:30 pm Melbourne
+## In flight (parity, cloud session) 2026-11-16, 7:50 pm Melbourne
+- **A new cloud session took over at 7:35 pm** (session_01Ww2rC2Be5Zmhurdsbeum2U). It can message the
+  desktop UX session (session_01Ww2rByJuJmat7tc18ZtXjf) with the session service's
+  `send_message`, and that session's replies reach it. The owner allowed this on a trusted
+  device. Agreed PR order after #168: ux-polish → ux-profiles → ux-platform → ux-scroll-chrome
+  → ux-chat-fixes (desktop session). The desktop session's next ADR is 0109; this session takes 0110 and up.
+- **Merged 2026-11-16 evening:** #163 (ux-plan-convert, directory + project reset) 7:25 pm, live
+  7:39 pm (directory `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`); #170 (50 sign-ups per address a
+  day) and #168 (the seed listens for notice signals; Settings' push switches) 7:45 pm, both green.
+- **The ubuntu desktop smoke on main failed at 7:22 pm** (#169's commit): its live-network
+  `get_links` timed out while the seed was restarting for #169. This is deploy timing, not code;
+  check the #163 run.
+- **`claude/bot-review-vote`:** web's `bot-review-vote` card. The identity coordinator's
+  `bot_review_vote_notices(accounts)` returns review openings (not re-reviews) of the accounts
+  given, for full members only, and skips accounts whose bot mark by the caller is live; at most
+  100 accounts per call. `services/notifications.ts` passes the members of the projects and chats
+  it already reads. web also counts communities and channels; the device doesn't read those yet.
+  `bot_reviews.rs` scenario: 6 agents, with fay (a founder who never marks) asked to vote.
 Two sessions work side by side: the owner's desktop session does UX (#162 `claude/ux-screens`,
 #163 `claude/ux-plan-convert`, which resets directory + project, then `claude/ux-polish`); this
 cloud session does the parity list in `docs/plans/PARITY.md` (top section). Agreed order:
