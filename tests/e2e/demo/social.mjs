@@ -1,5 +1,5 @@
 // Threads, comments, help requests and direct messages for tests/e2e/demo-content.mjs.
-import { BASE, pickScopeTag } from '../lib.mjs';
+import { BASE, TAG_SEARCH, pickScopeTag } from '../lib.mjs';
 
 /** A thread in `tag`'s channel; returns its URL. */
 export async function thread(page, { title, text, tag }) {
@@ -9,8 +9,8 @@ export async function thread(page, { title, text, tag }) {
   await page.getByLabel(/^Thread title/).fill(title);
   await page.getByLabel(/^Opening post/).fill(text);
   await page.getByRole('button', { name: 'Continue' }).click();
-  await page.getByLabel('Primary tag type').waitFor();
-  await pickScopeTag(page, 'Primary channel tag', tag);
+  await page.getByLabel(TAG_SEARCH, { exact: true }).waitFor();
+  await pickScopeTag(page, TAG_SEARCH, tag);
   await page.getByRole('button', { name: 'Publish thread' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];
@@ -56,10 +56,10 @@ export async function helpRequest(page, { title, text, place, tag, roles }) {
   await page.getByLabel('Place').fill(place);
   await next(); // → Timing
   await next(); // → Scope
-  await pickScopeTag(page, 'Primary channel tag', tag);
+  await pickScopeTag(page, TAG_SEARCH, tag);
   await next(); // → Roles
   for (const [i, [role, details]] of roles.entries()) {
-    if (i > 0) await page.getByRole('button', { name: 'Add role' }).click();
+    if (i > 0) await page.getByRole('button', { name: 'Add a role' }).click();
     await page.getByLabel('Role title').nth(i).fill(role);
     await page.getByLabel('Role details').nth(i).fill(details);
   }
@@ -72,9 +72,10 @@ export async function helpRequest(page, { title, text, place, tag, roles }) {
 /** `page` sends a direct message to the person with key `key` from their profile. */
 export async function message(page, key, text) {
   await page.goto(`${BASE}/profile/${key}`);
-  await page.getByRole('button', { name: /^Message / }).click({ timeout: 120_000 });
-  await page.getByPlaceholder('Write a message…').fill(text);
-  await page.getByRole('dialog').getByRole('button', { name: 'Send' }).click();
+  await page.getByRole('link', { name: /^Message / }).click({ timeout: 120_000 });
+  await page.waitForURL(/\/messages\?to=/, { timeout: 60_000 });
+  await page.getByRole('textbox', { name: 'Write a message...' }).fill(text);
+  await page.getByRole('button', { name: 'Send', exact: true }).click();
   await page.waitForURL(/\/messages\?conversation=/, { timeout: 120_000 });
   await page.locator('.chat-log').getByText(text).first().waitFor({ timeout: 60_000 });
 }
