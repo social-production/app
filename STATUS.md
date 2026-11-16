@@ -115,7 +115,10 @@ frames under `project/*.dc.html`).
    Owner's addition the same day: channels, communities and the Platform get a picture and a
    cover, changed by a vote like their other settings (members vote in public and
    collaborative scopes, organizers decide at once in organizer-run ones; the Platform by a
-   network vote). Mockups next; a project reset, shipped with the #platform voting rule.
+   network vote). A project reset, shipped with the #platform voting rule.
+2c. Channel Pictures (2026-11-16 evening, **waiting for the owner**): picture + cover for
+   channels, communities and the Platform, who decides each change, and redrawn Settings,
+   Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
 4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
