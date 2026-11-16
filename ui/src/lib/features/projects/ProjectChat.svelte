@@ -8,7 +8,7 @@
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
   import { getMessageModeration, reportMessage, voteOnReport } from '#lib/services/moderation.ts';
-  import { notify } from '#lib/services/notices.ts';
+  import { notify, notifyMentions } from '#lib/services/notices.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { noteComment, unnoteComment } from '#lib/services/profileNotes.ts';
   import { markProjectChatRead } from '#lib/services/publicChats.ts';
@@ -56,13 +56,9 @@
         const answered = replyTo ? chat.messages.find((m) => m.id === replyTo)?.author : null;
         await noteComment(projectId, id, body, answered ?? null);
         // web's reply card goes to the replied-to author; tell them at once (ADR 0108).
-        void notify(
-          [answered],
-          'reply',
-          (me) => `${me} replied to your comment`,
-          body,
-          `${location.pathname}?tab=chat&comment=${encodeURIComponent(id)}`,
-        );
+        const link = `${location.pathname}?tab=chat&comment=${encodeURIComponent(id)}`;
+        void notify([answered], 'reply', (me) => `${me} replied to your comment`, body, link);
+        notifyMentions(mentions.mentioned(body), 'in a project chat', body, link);
         return id;
       },
       file: (attachment) => projectAttachmentBlob(projectId, attachment),

@@ -1,3 +1,4 @@
+import { mentionsOf } from '#lib/domain/chat.ts';
 import {
   mentionTarget,
   rankMentions,
@@ -55,6 +56,14 @@ export class MentionSource {
   };
 
   agentOf = (name: string): string | null => mentionTarget(name, this.everyone(), this.circles());
+
+  /** The people a message mentions, as its links would name them (for their notices). */
+  async mentioned(body: string): Promise<string[]> {
+    const names = mentionsOf(body);
+    if (!names.length) return [];
+    await this.ensure();
+    return names.map(this.agentOf).filter((a): a is string => a !== null);
+  }
 
   private everyone(): Mentionable[] {
     const known = Object.entries(this.here().names).map(([agent, name]) => ({ agent, name }));
