@@ -6,15 +6,7 @@
 import assert from "node:assert/strict";
 import { mkdirSync } from "node:fs";
 
-import {
-  BASE,
-  browser,
-  device,
-  errors,
-  log,
-  signUp,
-  startGroup,
-} from "./lib.mjs";
+import { BASE, browser, device, errors, log, signUp, startGroup } from "./lib.mjs";
 
 const out = process.argv[3] ?? "screens";
 mkdirSync(out, { recursive: true });
