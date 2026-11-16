@@ -23,7 +23,8 @@
   margin-top: 8px;
 }
 
-.shell .settings-scope .settings-section h2 {
+.shell .settings-scope .settings-section h2,
+.shell .settings-scope .settings-section .settings-subhead {
   margin: 6px 4px 0;
   color: var(--text-soft);
   font-size: 12px;
@@ -192,4 +193,13 @@
 .shell .settings-scope .profile-copy input,
 .shell .settings-scope .profile-copy textarea {
   width: 100%;
+}
+
+/* Push notifications on this device (ADR 0108), under the notification categories. */
+.shell .settings-scope .settings-section .settings-subhead {
+  margin-top: 14px;
+}
+
+.shell .settings-scope .push-problem {
+  color: var(--danger);
 }

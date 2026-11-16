@@ -22,7 +22,7 @@ import type { CharterMode } from '#lib/domain/projects.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { listActivities } from './activities.ts';
-import { myBotNotices } from './botReview.ts';
+import { myBotNotices, voteAskNotices } from './botReview.ts';
 import { pendingInvites } from './events.ts';
 import { listMessages } from './chat.ts';
 import { getModeration } from './moderation.ts';
@@ -39,6 +39,7 @@ interface GlanceWire {
   creator: AgentPubKey;
   charter: { title: string; mode: CharterMode; subtype: string } | null;
   am_member: boolean;
+  members: AgentPubKey[];
   phases: { id: string; label: string }[];
 }
 
@@ -57,16 +58,34 @@ export async function myNotifications(
     myProjectSeeds(),
     myChats(),
   ]);
-  const settled = await Promise.allSettled([
+  const spaces = [
     ...seeds.map((seed) => fromProject(seed, me, name, { planLeads, prs })),
     ...chats.map((c) => fromChat(c.seed, c.at, me, name)),
+  ];
+  const settled = await Promise.allSettled([
+    ...spaces.map((s) => s.then((found) => found.items)),
     followView(me).then(followNotifications),
     pendingInvites().then(inviteNotifications),
-    fromBotReviews(me, off),
+    fromBotReviews(me, off, sharedPeople(spaces)),
     myServiceRequests().then((r) => requestNotifications(r, me)),
   ]);
   const all = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value : []));
   return { items: withReadMarks(all, marksOf(me)) };
+}
+
+/** A project's or chat's cards, and its members (for `bot-review-vote`). */
+interface Space {
+  items: Unread[];
+  people: string[];
+}
+
+type Unread = Omit<NotificationItem, 'isUnread'>;
+
+/** Everyone in the projects and chats read for cards, once each. */
+async function sharedPeople(spaces: Promise<Space>[]): Promise<string[]> {
+  const settled = await Promise.allSettled(spaces);
+  const people = settled.flatMap((r) => (r.status === 'fulfilled' ? r.value.people : []));
+  return [...new Set(people)];
 }
 
 /** Reads a switched-off category would only drop: plan leads, approved pull requests. */
@@ -75,7 +94,7 @@ interface Reads {
   prs: boolean;
 }
 
-async function fromProject(seed: string, me: string, myName: string, reads: Reads) {
+async function fromProject(seed: string, me: string, myName: string, reads: Reads): Promise<Space> {
   const cell = await projectCell(seed, 'Project');
   const [project, proposals, messages, activities, leads, moderation] = await Promise.all([
     callCell<GlanceWire | null>(cell, 'project', 'get_project'),
@@ -85,7 +104,7 @@ async function fromProject(seed: string, me: string, myName: string, reads: Read
     reads.planLeads ? planLeadChanges({ seed }).catch(() => []) : [],
     getModeration({ seed }).catch(() => VISIBLE),
   ]);
-  if (!project?.charter) return [];
+  if (!project?.charter) return { items: [], people: [] };
   const software =
     reads.prs && isSoftwareProject(project.charter)
       ? await loadSoftware({ seed }).catch(() => null)
@@ -108,19 +127,25 @@ async function fromProject(seed: string, me: string, myName: string, reads: Read
   const names = takers.length ? await namesOf([...new Set(takers)]) : {};
   const holdsRole = activities.some((a) => a.roles.some((r) => r.people.includes(me)));
   const involved = project.am_member || holdsRole;
-  return [
+  const items = [
     ...removedNotifications({ ...glance, involved }, moderation),
     ...projectNotifications(glance, me, myName),
     ...activityNotifications(glance, activities, me, names),
     ...planLeadNotifications(glance, leads, me),
     ...(software ? prApprovedNotifications(glance, software, me) : []),
   ];
+  return { items, people: project.am_member ? project.members.map(hashToString) : [] };
 }
 
-/** web's bot review cards (ADR 0074). */
-async function fromBotReviews(me: string, off: NotificationCategory[]) {
+/** web's bot review cards (ADR 0074), with `bot-review-vote` for the people you share a project
+ * or chat with (web also counts communities and channels; the device reads only these). */
+async function fromBotReviews(me: string, off: NotificationCategory[], shared: Promise<string[]>) {
   if (off.includes('votes_needed')) return [];
-  const notices = await myBotNotices();
+  const [own, asks] = await Promise.all([
+    myBotNotices(),
+    shared.then(voteAskNotices).catch(() => []),
+  ]);
+  const notices = [...own, ...asks];
   if (notices.length === 0) return [];
   const names = await namesOf([...new Set(notices.map((n) => n.account))]);
   return botReviewNotifications(notices, me, names);
@@ -128,21 +153,23 @@ async function fromBotReviews(me: string, off: NotificationCategory[]) {
 
 /** Mentions in a direct or group chat you're still in (web notifies only its members), and
  * spaces shared with you in a direct one. */
-async function fromChat(seed: string, at: number, me: string, myName: string) {
+async function fromChat(seed: string, at: number, me: string, myName: string): Promise<Space> {
   const [summary, messages] = await Promise.all([chatSummary(seed, at), listChatMessages(seed)]);
-  if (!summary.member) return [];
+  if (!summary.member) return { items: [], people: [] };
+  const people = summary.members;
   const shares = summary.kind === 'direct' ? shareNotifications(seed, messages, me) : [];
   const found = chatMentionNotifications(
     { seed, title: summary.title, messages, names: {} },
     me,
     myName,
   );
-  if (found.length === 0) return shares;
+  if (found.length === 0) return { items: shares, people };
   const names = await namesOf([...new Set(found.map((n) => n.actor))]);
-  return [
+  const items = [
     ...shares,
     ...chatMentionNotifications({ seed, title: summary.title, messages, names }, me, myName),
   ];
+  return { items, people };
 }
 
 /** Read one card (web's "Mark read"). */

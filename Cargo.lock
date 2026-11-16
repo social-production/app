@@ -2710,6 +2710,7 @@ dependencies = [
  "lair_keystore_api",
  "mr_bundle",
  "nix",
+ "push",
  "rand 0.8.8",
  "rmpv",
  "rustls",
@@ -7353,6 +7354,21 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 3.0.9",
+]
+
+[[package]]
+name = "push"
+version = "0.0.1"
+dependencies = [
+ "anyhow",
+ "base64 0.22.1",
+ "reqwest 0.12.28",
+ "ring",
+ "serde",
+ "serde_json",
+ "sqlx",
+ "tokio",
+ "tracing",
 ]
 
 [[package]]

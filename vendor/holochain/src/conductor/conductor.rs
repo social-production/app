@@ -4094,6 +4094,18 @@ impl Conductor {
     }
 }
 
+/// Social Production patch (ADR 0108): the seed node hears its hosted people's signals in
+/// process, to send them push notifications, without an app websocket per person.
+impl Conductor {
+    /// Signals emitted by the cells of `installed_app_id` (it need not be installed yet).
+    pub fn app_signals(
+        &self,
+        installed_app_id: InstalledAppId,
+    ) -> tokio::sync::broadcast::Receiver<Signal> {
+        self.app_broadcast.subscribe(installed_app_id)
+    }
+}
+
 /// Methods only available with feature "test_utils"
 #[cfg(any(test, feature = "test_utils"))]
 #[allow(missing_docs)]

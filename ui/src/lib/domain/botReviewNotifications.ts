@@ -7,14 +7,16 @@ type Unread = Omit<NotificationItem, 'isUnread'>;
  * Times are Holochain micros. */
 export interface BotNotice {
   account: string;
-  kind: 'opened' | 'upheld' | 'cleared';
+  /** `vote`: a review of someone you share a space with opened (identity
+   * `bot_review_vote_notices`). */
+  kind: 'opened' | 'upheld' | 'cleared' | 'vote';
   isAppeal: boolean;
   at: number;
   reReviewFrom: number | null;
 }
 
-/** web-backend `bot_reviews.py`'s `bot-review` (to the account) and `bot-review-result` (to
- * whoever marked or voted) cards: "Account", no actor, opening the account's profile. */
+/** web-backend `bot_reviews.py`'s `bot-review` (to the account), `bot-review-result` (to
+ * whoever marked or voted) and `bot-review-vote` (to full members sharing a space) cards: "Account", no actor, opening the account's profile. */
 export function botReviewNotifications(
   notices: BotNotice[],
   me: string,
@@ -26,7 +28,7 @@ export function botReviewNotifications(
     const [title, body] = own ? ownCopy(n) : theirCopy(n, name);
     return {
       id: `bot-review:${n.account}:${n.kind}:${n.at}`,
-      kind: own ? 'bot-review' : 'bot-review-result',
+      kind: n.kind === 'vote' ? 'bot-review-vote' : own ? 'bot-review' : 'bot-review-result',
       subject: 'account',
       seed: '',
       // web's account cards take the project accent (`mapSubjectKind` falls back to it).
@@ -62,6 +64,12 @@ function ownCopy(n: BotNotice): [string, string] {
 }
 
 function theirCopy(n: BotNotice, name: string): [string, string] {
+  if (n.kind === 'vote') {
+    return [
+      `Is ${name} a real person?`,
+      `${name} is in a bot review, and you share a space with them. If you know them, vote Real person or Bot on their profile.`,
+    ];
+  }
   if (n.kind === 'opened') {
     return [
       `A bot review of ${name} is open`,
