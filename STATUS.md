@@ -116,7 +116,9 @@ frames under `project/*.dc.html`).
    cover, changed by a vote like their other settings (members vote in public and
    collaborative scopes, organizers decide at once in organizer-run ones; the Platform by a
    network vote). A project reset, shipped with the #platform voting rule.
-2c. Channel Pictures (2026-11-16 evening, **waiting for the owner**): picture + cover for
+2c. Channel Pictures (2026-11-16 evening, **approved, not built**; owner: the creator adds the
+   picture and cover when creating, no vote, and may leave the default; redraw the three sheets as
+   shown; no camera buttons on the scope page, only the pencil): picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
