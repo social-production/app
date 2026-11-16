@@ -112,3 +112,43 @@
   font-size: 15px;
   font-weight: 700;
 }
+
+/* Every create flow (Remaining Screens, 1): soft filled fields with no border, as drawn.
+   Create sheets are portaled outside the shell, so these rules scope to the sheet. */
+.create-sheet.create-sheet input:not([type]),
+.create-sheet.create-sheet input[type='text'],
+.create-sheet.create-sheet input[type='search'],
+.create-sheet.create-sheet input[type='url'],
+.create-sheet.create-sheet input[type='number'],
+.create-sheet.create-sheet input[type='date'],
+.create-sheet.create-sheet input[type='time'],
+.create-sheet.create-sheet input[type='datetime-local'],
+.create-sheet.create-sheet select,
+.create-sheet.create-sheet textarea {
+  min-height: 50px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  box-shadow: none;
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.create-sheet.create-sheet textarea {
+  min-height: 110px;
+  padding-block: 14px;
+}
+
+.create-sheet.create-sheet input:focus-visible,
+.create-sheet.create-sheet select:focus-visible,
+.create-sheet.create-sheet textarea:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+/* The direct-use note: a soft block like "No type yet", not a bordered box. */
+.create-sheet.create-sheet .policy-notice {
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}

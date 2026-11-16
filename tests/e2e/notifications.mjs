@@ -101,7 +101,7 @@ log('bob got the reply and marked it read');
 
 // Reload until both supports have reached Ann (the gate unlocks "Advance to …").
 const advance = () =>
-  ann.getByRole('dialog', { name: 'Change phase' }).getByRole('button', { name: /^Advance to / });
+  ann.getByRole('dialog', { name: 'Where should this go next?' }).getByRole('radio', { name: /^Advance to / });
 for (let i = 0; ; i++) {
   await ann.goto(projectUrl);
   await ann.getByRole('tab', { name: 'Participation' }).click();
@@ -111,9 +111,9 @@ for (let i = 0; ; i++) {
   await ann.waitForTimeout(3000);
 }
 await advance().click();
-const sheet = ann.getByRole('dialog', { name: /^Advance to / });
+const sheet = ann.getByRole('dialog', { name: 'Where should this go next?' });
 await sheet.getByPlaceholder('State why this phase change should happen now.').fill('Ready to plan.');
-await sheet.getByRole('button', { name: /^Advance to / }).click();
+await sheet.getByRole('button', { name: 'Start the vote' }).click();
 await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 log('ann proposed a phase move');
 

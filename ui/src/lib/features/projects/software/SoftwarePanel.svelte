@@ -1,7 +1,7 @@
 <script lang="ts">
   import { resolve } from '$app/paths';
 
-  import CountBadge from '#lib/components/icons/CountBadge.svelte';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import {
     canVote,
     compactVoteStatus,
@@ -19,13 +19,13 @@
   import '#lib/components/styles/software.css';
 
   /**
-   * web's ProjectSoftwareGovernancePanel (ADR 0086): the repository and who may merge, the
-   * in-progress pull requests (three stage dots; Assess or Record merge when expanded) and the
+   * web's ProjectSoftwareGovernancePanel (ADR 0086) as drawn (Invites, Help Requests and
+   * Software Screens, 3): the repository and who may merge as one soft group, the pull
+   * requests in progress as cards with a three-step line and their action, and the
    * repository replacement history. The wizard opens from here and from the dock.
    */
   let { sw }: { sw: SoftwareState } = $props();
 
-  let queueOpen = $state(false);
   let expanded = $state('');
 
   const g = $derived(sw.governance);
@@ -37,7 +37,6 @@
 
   $effect(() => {
     if (sw.activeId) {
-      queueOpen = true;
       expanded = sw.activeId;
     }
   });
@@ -50,178 +49,121 @@
     sw.open(pr.stage === 'awaiting-merge' ? 'record-merge' : 'vote-pr', pr);
   }
 
-  function toggle(id: string): void {
-    expanded = expanded === id ? '' : id;
+  const STAGE_NAMES = ['Approval', 'Merge', 'Confirmation'];
+
+  /** The card's action: vote while approving, record the merge, then confirm it. */
+  function actionLabel(pr: SoftwarePullRequest): string {
+    if (pr.stage === 'awaiting-merge') return 'Record merge';
+    return pr.stage === 'confirmation' ? 'Confirm merge' : 'Vote';
   }
 
-  function onKey(event: KeyboardEvent, id: string): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      toggle(id);
-    }
+  function toggle(id: string): void {
+    expanded = expanded === id ? '' : id;
   }
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- the repository's links are off the app -->
 {#if g}
-  <section id="software-governance-panel" class="software-panel">
-    <div class="repo-card">
+  <section id="software-governance-panel" class="software-panel software-ux">
+    <div class="repo-group">
+      <a
+        class="repo-cell repo-link-row"
+        href={externalUrl(g.repositoryUrl)}
+        rel="noreferrer"
+        target="_blank"
+      >
+        <span class="repo-glyph" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M8 7 3 12l5 5M16 7l5 5-5 5M13.5 4.5l-3 15" /></svg>
+        </span>
+        <span class="repo-copy">
+          <small class="repo-title">Repository</small>
+          <b class="repo-value">{g.repositoryUrl.replace(/^https?:\/\//, '')}</b>
+        </span>
+        <svg class="chev" aria-hidden="true" viewBox="0 0 24 24"
+          ><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg
+        >
+      </a>
       <div class="repo-cell">
-        <span class="repo-title">Repository</span>
-        <a class="repo-value" href={externalUrl(g.repositoryUrl)} rel="noreferrer" target="_blank">
-          {g.repositoryUrl.replace(/^https?:\/\//, '')}
-        </a>
-      </div>
-      <div class="repo-cell">
-        <span class="repo-title">Mergers</span>
         {#if g.mergers.length > 0}
-          <span class="merger-names">
-            {#each g.mergers as member, index (member.agent)}
-              <a
-                class="repo-value"
-                href={resolve('/profile/[agent]', { agent: member.agent })}
-                title={`Open ${name(member.agent)}'s profile`}>{name(member.agent)}</a
-              >{#if index < g.mergers.length - 1}<span class="repo-comma">, </span>{/if}
+          <span class="repo-faces" aria-hidden="true">
+            {#each g.mergers.slice(0, 3) as member (member.agent)}
+              <AvatarBadge size="sm" name={name(member.agent)} />
             {/each}
           </span>
-        {:else}
-          <span class="merger-empty">No one yet</span>
         {/if}
+        <span class="repo-copy">
+          <small class="repo-title">Mergers</small>
+          {#if g.mergers.length > 0}
+            <b class="merger-names">
+              {#each g.mergers as member, index (member.agent)}
+                <a href={resolve('/profile/[agent]', { agent: member.agent })}
+                  >{name(member.agent)}</a
+                >{#if index < g.mergers.length - 1}<span class="repo-comma">, </span>{/if}
+              {/each}
+            </b>
+          {:else}
+            <b class="merger-empty">No one yet</b>
+          {/if}
+        </span>
       </div>
     </div>
 
-    {#if open.length > 0}
-      <div class="detail-card pr-queue-card">
-        <button
-          class="pr-queue-toggle"
-          type="button"
-          aria-expanded={queueOpen}
-          onclick={() => (queueOpen = !queueOpen)}
+    <div class="pr-head">
+      <h3>Pull requests</h3>
+      <span>{open.length} in progress</span>
+    </div>
+    {#each open as pr (pr.id)}
+      {@const isOpen = expanded === pr.id}
+      {@const filled = stageFilled(pr.stage)}
+      <article class="pr-card" class:expanded={isOpen} id={`software-pr-card-${pr.id}`}>
+        <div class="pr-card-top">
+          <button
+            class="pr-card-body-shell"
+            type="button"
+            aria-expanded={isOpen}
+            onclick={() => toggle(pr.id)}><strong class="pr-card-title">{pr.title}</strong></button
+          >
+          {#if canAct(pr)}
+            <button
+              class="pr-action"
+              class:merge={pr.stage !== 'approval'}
+              type="button"
+              onclick={() => act(pr)}>{actionLabel(pr)}</button
+            >
+          {/if}
+        </div>
+        <span class="pr-meta">
+          <a href={externalUrl(pr.pullRequestUrl)} rel="noreferrer" target="_blank"
+            >{pr.pullRequestId}</a
+          >
+          · by {name(pr.author)} · {relativeTime(pr.createdAt)}
+        </span>
+        <span class="pr-steps" aria-label={stageTooltip(pr.stage)}>
+          {#each [1, 2, 3] as step (step)}
+            <i class:done={step < filled} class:now={step === filled}></i>
+          {/each}
+        </span>
+        <span class="pr-meta"
+          >Step {filled} of 3 · {STAGE_NAMES[filled - 1]} · {compactVoteStatus(pr.tally)}</span
         >
-          <span class="pr-queue-toggle-copy">
-            <span class="pr-queue-title">In-progress pull requests</span>
-            <CountBadge count={open.length} />
-          </span>
-          <span class="pr-queue-chevron" class:open={queueOpen} aria-hidden="true">▾</span>
-        </button>
-
-        {#if queueOpen}
-          <div class="pr-card-list" class:scrollable={open.length > 5}>
-            {#each open as pr (pr.id)}
-              {@const isOpen = expanded === pr.id}
-              {@const filled = stageFilled(pr.stage)}
-              <article class="pr-card" class:expanded={isOpen} id={`software-pr-card-${pr.id}`}>
-                <div
-                  class="pr-card-body-shell"
-                  role="button"
-                  tabindex="0"
-                  aria-expanded={isOpen}
-                  aria-label={isOpen ? `Collapse ${pr.title}` : `Expand ${pr.title}`}
-                  onclick={() => toggle(pr.id)}
-                  onkeydown={(event) => onKey(event, pr.id)}
+        {#if isOpen}
+          <div class="pr-card-body">
+            <span class="stage-copy">{stageHelperCopy(pr.stage)}</span>
+            {#if pr.summary}<span class="summary-copy">{pr.summary}</span>{/if}
+            {#if pr.merge}
+              <span class="merge-row">
+                Merge
+                <a href={externalUrl(pr.merge.mergeUrl)} rel="noreferrer" target="_blank"
+                  >{pr.merge.mergeId}</a
                 >
-                  <div class="pr-card-toggle">
-                    <span class="pr-card-top">
-                      <span class="pr-card-title-group">
-                        <strong class="pr-card-title">{pr.title}</strong>
-                      </span>
-                      <span
-                        class="stage-dots"
-                        title={stageTooltip(pr.stage)}
-                        aria-label={stageTooltip(pr.stage)}
-                      >
-                        {#each [1, 2, 3] as step (step)}
-                          <span class="stage-dot" class:filled={step <= filled}></span>
-                        {/each}
-                      </span>
-                    </span>
-                  </div>
-
-                  <div class="pr-card-link-row">
-                    <a
-                      class="repo-link"
-                      href={externalUrl(pr.pullRequestUrl)}
-                      rel="noreferrer"
-                      target="_blank"
-                      onclick={(event) => event.stopPropagation()}>{pr.pullRequestId}</a
-                    >
-                  </div>
-
-                  {#if isOpen}
-                    <div class="pr-card-body">
-                      <span class="stage-copy">{stageHelperCopy(pr.stage)}</span>
-                      {#if pr.summary}
-                        <span class="summary-copy">{pr.summary}</span>
-                      {/if}
-                      <div class="pr-card-meta">
-                        <a
-                          class="repo-link"
-                          href={externalUrl(pr.pullRequestUrl)}
-                          rel="noreferrer"
-                          target="_blank"
-                          onclick={(event) => event.stopPropagation()}>{pr.pullRequestUrl}</a
-                        >
-                        {#if pr.merge}
-                          <span class="merge-row">
-                            <span>Merge ID:</span>
-                            <a
-                              class="repo-link"
-                              href={externalUrl(pr.merge.mergeUrl)}
-                              rel="noreferrer"
-                              target="_blank"
-                              onclick={(event) => event.stopPropagation()}>{pr.merge.mergeId}</a
-                            >
-                          </span>
-                          <a
-                            class="repo-link"
-                            href={externalUrl(pr.merge.mergeUrl)}
-                            rel="noreferrer"
-                            target="_blank"
-                            onclick={(event) => event.stopPropagation()}>{pr.merge.mergeUrl}</a
-                          >
-                        {/if}
-                        <small>{compactVoteStatus(pr.tally)}</small>
-                      </div>
-                    </div>
-                  {/if}
-
-                  <div class="pr-card-footer">
-                    {#if isOpen && canAct(pr)}
-                      <div class="pr-card-actions">
-                        <button
-                          class="detail-action-button primary-action"
-                          type="button"
-                          onclick={(event) => {
-                            event.stopPropagation();
-                            act(pr);
-                          }}
-                        >
-                          {pr.stage === 'awaiting-merge' ? 'Record merge' : 'Assess'}
-                        </button>
-                      </div>
-                    {:else}
-                      <span></span>
-                    {/if}
-                    <div class="pr-card-meta-corner">
-                      <span class="expand-chevrons" class:open={isOpen} aria-hidden="true">
-                        {#each [1, 2, 3] as step (step)}
-                          <span
-                            class="expand-chevron"
-                            class:filled={step <= filled}
-                            class:pulse={step === filled && !isOpen}>▾</span
-                          >
-                        {/each}
-                      </span>
-                      <span>{name(pr.author)} · {relativeTime(pr.createdAt)}</span>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            {/each}
+              </span>
+            {/if}
           </div>
         {/if}
-      </div>
-    {/if}
+      </article>
+    {:else}
+      <p class="pr-empty">No pull requests in progress.</p>
+    {/each}
 
     {#if history.length > 0}
       <div class="detail-card">

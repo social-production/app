@@ -1,0 +1,426 @@
+/* An opened plan (Plan, Phase and Feedback Screens, 3), portaled outside the shell: it
+   reads like a page, the review's questions get large targets, and the result or the final
+   Yes / No stays in the footer. */
+.overlay-root.plan-scope .plan-sheet {
+  display: grid;
+  gap: 14px;
+  padding-bottom: 8px;
+}
+
+.overlay-root.plan-scope .sheet-author {
+  margin: 2px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overlay-root.plan-scope .sheet-chip {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.overlay-root.plan-scope .sheet-chip.leading {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.overlay-root.plan-scope .sheet-back {
+  height: 34px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.overlay-root.plan-scope .plan-read {
+  display: grid;
+  gap: 12px;
+}
+
+.overlay-root.plan-scope .plan-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.overlay-root.plan-scope .fact-line {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 14.5px;
+}
+
+.overlay-root.plan-scope .fact-line svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--text-soft);
+}
+
+.overlay-root.plan-scope .plan-place {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: inherit;
+  text-decoration: none;
+}
+
+.overlay-root.plan-scope .plan-place .fact-line {
+  flex: 1;
+}
+
+.overlay-root.plan-scope .plan-place strong {
+  display: grid;
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.overlay-root.plan-scope .plan-place small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.overlay-root.plan-scope .plan-place > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.overlay-root.plan-scope .stage-list {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.overlay-root.plan-scope .stage-item {
+  display: flex;
+  gap: 12px;
+  border: none;
+  padding: 0;
+}
+
+.overlay-root.plan-scope .stage-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.overlay-root.plan-scope .stage-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+  font-size: 14.5px;
+}
+
+.overlay-root.plan-scope .stage-copy p,
+.overlay-root.plan-scope .stage-meta {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overlay-root.plan-scope .plan-note {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  font-size: 14px;
+}
+
+.overlay-root.plan-scope .plan-note small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.overlay-root.plan-scope .plan-facts {
+  display: grid;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.plan-scope .plan-facts .fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border: none;
+}
+
+.overlay-root.plan-scope .plan-facts .fact + .fact {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-main) 8%, transparent);
+}
+
+.overlay-root.plan-scope .plan-facts dt {
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.overlay-root.plan-scope .plan-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-size: 14px;
+  text-align: right;
+}
+
+.overlay-root.plan-scope .assess-panel {
+  border: none;
+  padding: 0;
+  background: transparent;
+}
+
+.overlay-root.plan-scope .criterion-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.overlay-root.plan-scope .criterion-row {
+  display: grid;
+  gap: 9px;
+  padding: 13px 14px;
+  border: none;
+  border-radius: 20px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.plan-scope .criterion-row > strong {
+  font-size: 14.5px;
+  line-height: 1.3;
+}
+
+.overlay-root.plan-scope .criterion-kind,
+.overlay-root.plan-scope .criterion-meta {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.plan-scope .fives {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.overlay-root.plan-scope .fives .rating-chip {
+  height: 40px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text-soft);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.overlay-root.plan-scope .fives .rating-chip.selected {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.overlay-root.plan-scope .criterion-row .ends {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.overlay-root.plan-scope .plan-sheet-foot {
+  display: grid;
+  flex: 1;
+  gap: 10px;
+  min-width: 0;
+}
+
+.overlay-root.plan-scope .plan-final {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overlay-root.plan-scope .plan-final strong {
+  display: block;
+  color: var(--text-main);
+}
+
+.overlay-root.plan-scope .plan-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.plan-scope .plan-result strong {
+  color: var(--text-main);
+}
+
+.overlay-root.plan-scope .plan-result i {
+  position: relative;
+  flex: 1;
+  height: 5px;
+  overflow: hidden;
+  border-radius: 5px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.plan-scope .plan-result i::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--share, 0%);
+  border-radius: 5px;
+  background: var(--brand);
+}
+
+.overlay-root.plan-scope .plan-review-button,
+.overlay-root.plan-scope .plan-yes-no button {
+  height: 50px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font: inherit;
+  font-size: 15.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.overlay-root.plan-scope .plan-yes-no {
+  display: grid;
+  grid-template-columns: 1fr 1.6fr;
+  gap: 8px;
+}
+
+.overlay-root.plan-scope .plan-yes-no button:not(.yes) {
+  background: var(--panel-hover);
+  color: var(--text-main);
+}
+
+.overlay-root.plan-scope .plan-yes-no button:disabled:not(.selected) {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Every phase move on one sheet (Plan, Phase and Feedback Screens, 4). */
+.overlay-root.phase-move-sheet .phase-moves {
+  display: grid;
+  gap: 8px;
+}
+
+.overlay-root.phase-move-sheet .phase-move {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 13px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.overlay-root.phase-move-sheet .phase-move.on {
+  background: var(--brand-soft);
+  box-shadow: inset 0 0 0 2px var(--brand);
+}
+
+.overlay-root.phase-move-sheet .phase-move:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.overlay-root.phase-move-sheet .phase-move .radio {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--text-soft);
+  border-radius: 50%;
+}
+
+.overlay-root.phase-move-sheet .phase-move.on .radio {
+  border-color: var(--brand);
+  background: radial-gradient(var(--brand) 45%, transparent 50%);
+}
+
+.overlay-root.phase-move-sheet .phase-move-copy {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+}
+
+.overlay-root.phase-move-sheet .phase-move-copy strong {
+  font-size: 15px;
+}
+
+.overlay-root.phase-move-sheet .phase-move.danger strong {
+  color: var(--danger);
+}
+
+.overlay-root.phase-move-sheet .phase-move-copy small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.overlay-root.phase-move-sheet .phase-move-reason {
+  display: grid;
+  gap: 6px;
+  margin-top: 14px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.overlay-root.phase-move-sheet .phase-move-reason textarea {
+  min-height: 80px;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.overlay-root.phase-move-sheet .phase-move-alert {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-size: 13.5px;
+}
+
+.overlay-root.phase-move-sheet .overlay-body {
+  padding-inline: 18px;
+}

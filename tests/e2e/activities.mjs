@@ -83,9 +83,9 @@ for (let i = 0; ; i++) {
 }
 await row(bob).click();
 const sheet = bob.getByRole('dialog', { name: activity });
-await sheet.getByRole('button', { name: 'Take role' }).click();
-await sheet.getByRole('button', { name: 'Leave role' }).waitFor({ timeout: 60_000 });
-await sheet.getByText('1 of 1 filled').waitFor();
+await sheet.getByRole('button', { name: 'Join', exact: true }).click();
+await sheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
+await sheet.getByText(/ · 1 of 1$/).waitFor();
 await bob.screenshot({ path: `${out}/phone390-activity-sheet.png` });
 await bob.keyboard.press('Escape');
 assert.equal(await row(bob).locator('.agenda-chip').innerText(), 'Full');
@@ -94,8 +94,8 @@ await notified(ann, `took the "Helper" role in ${activity}`);
 log('ann is told bob took the role');
 
 await row(bob).click();
-await sheet.getByRole('button', { name: 'Leave role' }).click();
-await sheet.getByRole('button', { name: 'Take role' }).waitFor({ timeout: 60_000 });
+await sheet.getByRole('button', { name: 'Leave', exact: true }).click();
+await sheet.getByRole('button', { name: 'Join', exact: true }).waitFor({ timeout: 60_000 });
 await bob.keyboard.press('Escape');
 log('bob left the role');
 
@@ -103,7 +103,7 @@ log('bob left the role');
 await takePart(ann);
 await row(ann).click();
 const annSheet = ann.getByRole('dialog', { name: activity });
-await annSheet.getByRole('button', { name: 'Suggest someone' }).click();
+await annSheet.getByRole('button', { name: 'Suggest', exact: true }).click();
 await annSheet.getByPlaceholder('Search username').fill(`bob${stamp}`);
 await annSheet.getByRole('button', { name: `bob${stamp}` }).click();
 await annSheet.getByText(`Suggested · bob${stamp}`).waitFor({ timeout: 60_000 });
@@ -185,8 +185,8 @@ for (let i = 0; ; i++) {
 }
 await quickRow(bob).click();
 const quickSheet = bob.getByRole('dialog', { name: quick });
-await quickSheet.getByRole('button', { name: 'Take role' }).click();
-await quickSheet.getByRole('button', { name: 'Leave role' }).waitFor({ timeout: 60_000 });
+await quickSheet.getByRole('button', { name: 'Join', exact: true }).click();
+await quickSheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
 await bob.keyboard.press('Escape');
 log('bob took a role in a two-minute activity');
 await bob.waitForTimeout(Math.max(0, end.getTime() - Date.now()) + 5_000);

@@ -3,7 +3,7 @@
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import AddValueSheet from '#lib/components/values/AddValueSheet.svelte';
   import ValueCard from '#lib/components/values/ValueCard.svelte';
-  import { sortValuesForRating } from '#lib/domain/values.ts';
+  import { sortValuesForRating, type Importance } from '#lib/domain/values.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
 
@@ -25,8 +25,12 @@
   const canAddValue = $derived(inValuePhase && !!project?.amMember);
   const canVoteValues = $derived(inValuePhase && !!project?.amMember);
 
-  async function submit(label: string): Promise<void> {
-    if (await detail.addValue(label)) composing = false;
+  /** Add the value, then rate it with the author's own rating from the same sheet. */
+  async function submit(label: string, importance: Importance): Promise<void> {
+    if (!(await detail.addValue(label))) return;
+    composing = false;
+    const added = detail.values.find((v) => v.label === label && v.activeImportanceVote === 0);
+    if (added) await detail.rateValue(added.id, importance);
   }
 </script>
 
@@ -67,7 +71,7 @@
         open={composing}
         pending={detail.saving}
         message={detail.sheetMessage}
-        onSubmit={(label) => void submit(label)}
+        onSubmit={(label, importance) => void submit(label, importance)}
         onClose={() => (composing = false)}
       />
     {/if}

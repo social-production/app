@@ -88,12 +88,31 @@ pub fn check_return(state: &State, to: &str, reason: &str, roll: &Roll) -> Exter
     Ok(())
 }
 
-/// Whether a move or return is still being decided.
+/// Convert closes the project and continues its work as a new proposal (ADR 0106): any phase
+/// after Proposal, not once closed, a reason, and no other phase vote open.
+pub fn check_convert(state: &State, reason: &str, roll: &Roll) -> ExternResult<()> {
+    if matches!(state.phase(), Phase::P1 | Phase::P7) {
+        return Err(guest(
+            "A project converts after its Proposal phase and before it closes.",
+        ));
+    }
+    if reason.trim().is_empty() {
+        return Err(guest("Add a reason before submitting this conversion."));
+    }
+    if phase_vote_open(roll)? {
+        return Err(guest(
+            "A vote is already open — approve or reject it first.",
+        ));
+    }
+    Ok(())
+}
+
+/// Whether a move, return or conversion is still being decided.
 fn phase_vote_open(roll: &Roll) -> ExternResult<bool> {
     for p in reads::proposals()? {
         let phase_change = matches!(
             p.entry.kind,
-            ProposalKind::Phase { .. } | ProposalKind::Return { .. }
+            ProposalKind::Phase { .. } | ProposalKind::Return { .. } | ProposalKind::Convert { .. }
         );
         if phase_change && count(&p, roll)?.decided.is_none() {
             return Ok(true);

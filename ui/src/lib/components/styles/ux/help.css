@@ -1,0 +1,119 @@
+/* A request's page as drawn (Invites, Help Requests and Software Screens, 2): the same
+   header and facts as a project's Details, then the roles as soft cards. */
+.shell .help-overview .context-panel {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: auto;
+  min-height: 0;
+}
+
+.shell .help-roles-page {
+  display: grid;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.shell .help-roles-page .roles-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.shell .help-roles-page .roles-heading {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.shell .help-roles-page .roles-head span {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .help-roles-page .roles-meter {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: var(--panel-hover);
+}
+
+.shell .help-roles-page .roles-meter i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--brand);
+}
+
+.shell .help-roles-page .role-stack {
+  display: grid;
+  gap: 8px;
+}
+
+.shell .help-roles-page .role-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.shell .help-roles-page .role-copy {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.shell .help-roles-page .role-copy strong {
+  font-size: 15px;
+}
+
+.shell .help-roles-page .role-copy p,
+.shell .help-roles-page .role-copy span {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .help-roles-page .signup {
+  flex: none;
+  height: 36px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font: inherit;
+  font-size: 13.5px;
+  font-weight: 700;
+}
+
+.shell .help-roles-page .signup.selected {
+  background: var(--page-bg);
+  color: var(--text-main);
+}
+
+.shell .help-roles-page .signup:disabled:not(.selected) {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  opacity: 1;
+}
+
+.shell .dock-join {
+  flex: 1.4;
+  height: 100%;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  white-space: nowrap;
+}

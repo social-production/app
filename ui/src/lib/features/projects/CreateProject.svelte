@@ -9,6 +9,7 @@
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
+  import { page } from '$app/state';
 
   import { CREATE_STEPS, CreateState } from './createState.svelte.ts';
 
@@ -19,6 +20,9 @@
 
   $effect(() => {
     void s.checkAllowance();
+    // Convert (ADR 0106): `?continues=<id>` starts from the converted project.
+    const continues = page.url.searchParams.get('continues');
+    if (continues) void s.continueFrom(continues);
   });
 
   async function publish(): Promise<void> {

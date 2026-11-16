@@ -53,6 +53,9 @@ pub struct Applied {
     /// The request settings the newest passed `RequestSettings` proposal set (ADR 0076).
     #[serde(default)]
     pub requests: Option<AppliedRequests>,
+    /// Closed by a passed `Convert` proposal: its work continues as a new proposal (ADR 0106).
+    #[serde(default)]
+    pub converted: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]

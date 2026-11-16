@@ -31,11 +31,17 @@
       <h3>Proposed update</h3>
       <p class="proposed-copy">{kind.Update.body}</p>
     </section>
-  {:else if 'Return' in kind || 'Phase' in kind}
+  {:else if 'Return' in kind || 'Phase' in kind || 'Convert' in kind}
     <!-- web shows a phase change's reason as "Why". -->
     <section class="change-card">
       <h3>Why</h3>
-      <p>{'Return' in kind ? kind.Return.reason : kind.Phase.reason}</p>
+      <p>
+        {'Return' in kind
+          ? kind.Return.reason
+          : 'Convert' in kind
+            ? kind.Convert.reason
+            : kind.Phase.reason}
+      </p>
     </section>
   {:else if 'Software' in kind}
     <!-- web's generic decision: the change's card, then why (software votes, ADR 0086). -->

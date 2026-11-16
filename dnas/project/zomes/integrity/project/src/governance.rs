@@ -122,6 +122,11 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             }
             Ok(())
         }
+        ProposalKind::Convert { reason }
+            if reason.trim().is_empty() || reason.chars().count() > LONG_TEXT_MAX =>
+        {
+            Err("a conversion needs a reason".into())
+        }
         ProposalKind::Plan(plan) => crate::plan::check(plan),
         ProposalKind::Software(request) => crate::software::check(request),
         ProposalKind::Return { to, reason } => {
@@ -138,7 +143,8 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
         // Request settings need the space's mode too (whether a reason is needed).
         ProposalKind::Link(_)
         | ProposalKind::RemoveMember { .. }
-        | ProposalKind::RequestSettings { .. } => Ok(()),
+        | ProposalKind::RequestSettings { .. }
+        | ProposalKind::Convert { .. } => Ok(()),
     }
 }
 
@@ -266,6 +272,9 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
             requests,
             reason,
         ),
+        ProposalKind::Convert { .. } if scope => {
+            Err("channels and communities don't convert".into())
+        }
         ProposalKind::Software(_)
             if !sp_software::takes_software(crate::applied::typed_as(mode, "productive")) =>
         {

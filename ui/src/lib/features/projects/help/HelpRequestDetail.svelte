@@ -1,6 +1,8 @@
 <script lang="ts">
   import FactLine from '#lib/components/cards/FactLine.svelte';
-  import ContentMetaRow from '#lib/components/cards/ContentMetaRow.svelte';
+  import FoldedText from '#lib/components/cards/FoldedText.svelte';
+  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
   import RestrictionNotice from '#lib/components/moderation/RestrictionNotice.svelte';
@@ -35,6 +37,15 @@
   let compact = $state(false);
   let chatOpened = $state(false);
   const chatFull = $derived(tab === 'chat' && compact);
+  const author = $derived(help.names[help.project?.creator ?? ''] ?? '…');
+  const started = $derived(
+    help.project
+      ? new Date(help.project.createdAt / 1000).toLocaleDateString(undefined, {
+          day: 'numeric',
+          month: 'short',
+        })
+      : '',
+  );
 
   $effect(() => {
     void help.open();
@@ -82,7 +93,12 @@
         {#if tab === 'context'}
           <div class="context-tab help-overview">
             <div class="context-panel">
-              <FeedCardTop mode="help-request" tags={charter.tags} stage="">
+              <FeedCardTop
+                mode="help-request"
+                tags={charter.tags}
+                stage=""
+                createdAt={project.createdAt}
+              >
                 <ReportControl
                   id={help.id}
                   itemLabel="help request"
@@ -93,26 +109,24 @@
                 />
               </FeedCardTop>
               <div class="heading overview-heading">
-                <div class="identity-copy">
-                  <RestrictionNotice active={isHidden(help.moderation.value)}>
-                    <h1>{charter.title}</h1>
-                  </RestrictionNotice>
-                  {#if help.activity}
-                    <FactLine icon="when">{localDateTime(help.activity.startsAt)}</FactLine>
-                  {/if}
-                  {#if charter.location_label}
-                    <FactLine icon="where">{charter.location_label}</FactLine>
-                  {/if}
-                  <p class="overview-copy">{charter.description}</p>
-                </div>
-              </div>
-              <div class="context-meta">
-                <ContentMetaRow
-                  fullName
-                  authorName={help.names[project.creator] ?? '…'}
-                  authorHref={resolve('/profile/[agent]', { agent: project.creator })}
-                  createdAt={project.createdAt}
-                />
+                <RestrictionNotice active={isHidden(help.moderation.value)}>
+                  <h1>{charter.title}</h1>
+                </RestrictionNotice>
+                <p class="detail-by">
+                  <AvatarBadge size="sm" name={author} />
+                  <span>
+                    Asked by
+                    <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>
+                    · {started}
+                  </span>
+                </p>
+                {#if help.activity}
+                  <FactLine icon="when">{localDateTime(help.activity.startsAt)}</FactLine>
+                {/if}
+                <PlaceRow place={charter.location_label} />
+                {#if charter.description.trim()}
+                  <FoldedText text={charter.description} className="overview-copy" />
+                {/if}
               </div>
             </div>
             <HelpRolesDock {help} />

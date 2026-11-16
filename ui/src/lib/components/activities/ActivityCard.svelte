@@ -177,10 +177,7 @@
         </p>
       {/if}
       {#if a.note.trim()}
-        <section class="sheet-section">
-          <h3>Description</h3>
-          <p class="activity-note">{a.note.trim()}</p>
-        </section>
+        <p class="activity-note">{a.note.trim()}</p>
       {/if}
       {#if a.roles.length > 0}
         <ActivityRoles

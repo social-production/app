@@ -48,7 +48,7 @@
   let leftOpen = $state(false);
   let rightOpen = $state(false);
   let moreOpen = $state(false);
-  let discoverOpen = $state(false);
+  let discover = $state({ open: false, query: '' });
   // web's map panel over the content, or the `/map` page (mapToggle.ts, ADR 0085).
   const mapPage = $derived(page.url.pathname === '/map');
   const map = new MapToggle(
@@ -110,7 +110,6 @@
     void connect();
   });
 
-  // The bell's and the send icon's counts (bellLoop.ts).
   $effect(() => {
     if (signedIn) return untrack(() => startBell(() => page.url.pathname.startsWith('/messages')));
   });
@@ -236,7 +235,7 @@
           communities={railLinks(myScopes.communities)}
           invites={bell.notifications.invites}
           closePanels={closeCompact}
-          onDiscover={() => (discoverOpen = true)}
+          onDiscover={(query) => (discover = { open: true, query })}
         />
       {/if}
     </aside>
@@ -292,8 +291,9 @@
     />
   {/if}
   <ScopeDiscoverSheet
-    open={discoverOpen}
-    onClose={() => (discoverOpen = false)}
+    open={discover.open}
+    initialQuery={discover.query}
+    onClose={() => (discover.open = false)}
     onNavigate={closeCompact}
   />
   <AuthActionNotice />

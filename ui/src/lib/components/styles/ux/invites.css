@@ -1,0 +1,139 @@
+/* Invites as drawn (Invites, Help Requests and Software Screens, 1): soft cards with a type
+   glyph, the date with its icon, and Decline / Accept pills. */
+.shell .invites.invites-ux {
+  display: grid;
+  gap: 10px;
+  max-width: none;
+  padding: 14px var(--page-gutter) 96px;
+}
+
+.shell .invites-ux .invites-head {
+  display: grid;
+  gap: 2px;
+}
+
+.shell .invites-ux .invites-head h1 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.shell .invites-ux .invites-head span,
+.shell .invites-ux .muted {
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .invites-ux > .muted {
+  margin: 6px 0 0;
+  text-align: center;
+}
+
+.shell .invites-ux ul {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.shell .invites-ux li {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: none;
+  border-radius: 20px;
+  background: var(--panel-hover);
+}
+
+.shell .invites-ux .invite-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shell .invites-ux .invite-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .invites-ux .invite-glyph[data-kind='event'] {
+  background: color-mix(in srgb, #7b50b2 16%, transparent);
+  color: color-mix(in srgb, #7b50b2 70%, var(--text-main));
+}
+
+.shell .invites-ux .invite-who {
+  display: grid;
+  min-width: 0;
+  line-height: 1.25;
+}
+
+.shell .invites-ux .invite-who strong {
+  overflow-wrap: anywhere;
+  font-size: 15.5px;
+}
+
+.shell .invites-ux .kind {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .invites-ux .description {
+  margin: 0;
+  font-size: 14.5px;
+}
+
+.shell .invites-ux .when {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .invites-ux .when svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.shell .invites-ux .actions {
+  display: flex;
+  gap: 8px;
+}
+
+.shell .invites-ux .actions button {
+  height: 42px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shell .invites-ux .actions .decline {
+  flex: 1;
+  background: var(--page-bg);
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.shell .invites-ux .actions .accept {
+  flex: 1.6;
+  background: var(--brand);
+  color: var(--on-brand);
+}

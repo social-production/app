@@ -13,7 +13,12 @@ import {
 } from '#lib/domain/places.ts';
 import { tagScope } from '#lib/domain/scopes.ts';
 import { explain } from '#lib/services/errors.ts';
-import { createProject, projectAllowance } from '#lib/services/projects.ts';
+import {
+  createProject,
+  getProject,
+  linkLineage,
+  projectAllowance,
+} from '#lib/services/projects.ts';
 
 import type { EventStepId } from '#lib/domain/eventCreate.ts';
 
@@ -39,6 +44,8 @@ export class CreateState {
   /** The Location step's picker (web's `locationValue`). */
   placeValue = $state<PlaceValue>(emptyPlaceValue());
   tags = $state<string[]>([]);
+  /** Convert (ADR 0106): the converted project this proposal continues. */
+  continues = $state<string | null>(null);
   submitting = $state(false);
   message = $state<string>();
   /** Projects left this week for a New member; `null`: no limit. */
@@ -117,12 +124,32 @@ export class CreateState {
     };
   }
 
+  /** Convert (ADR 0106): start from the converted project's title, description and tags. */
+  async continueFrom(id: string): Promise<void> {
+    this.continues = id;
+    try {
+      const charter = (await getProject(id)).charter;
+      if (!charter) return;
+      this.title = charter.title;
+      this.description = charter.description;
+      this.tags = [...charter.tags];
+      if (charter.location_label.trim().toLowerCase() === 'online') this.intent = 'online';
+    } catch (e) {
+      this.message = explain(e);
+    }
+  }
+
   /** The new project's id, or undefined with `message` set. */
   async submit(): Promise<string | undefined> {
     this.submitting = true;
     this.message = undefined;
     try {
       const id = await createProject(this.charter());
+      if (this.continues) {
+        // Each names the other; a failure here leaves the new proposal standing.
+        await linkLineage(id, this.continues, false).catch(() => undefined);
+        await linkLineage(this.continues, id, true).catch(() => undefined);
+      }
       return id;
     } catch (e) {
       this.message = explain(e);

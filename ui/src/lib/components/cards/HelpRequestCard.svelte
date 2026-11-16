@@ -5,6 +5,7 @@
 
   import { resolve } from '$app/paths';
 
+  import CardFacts from './CardFacts.svelte';
   import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
@@ -45,9 +46,7 @@
     >
     <a class="title" href={resolve('/help-requests/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>
-    {#if when || card.locationLabel}
-      <p class="location">{[when, card.locationLabel].filter(Boolean).join(' · ')}</p>
-    {/if}
+    <CardFacts {when} place={card.locationLabel} />
     {#if signups}<p class="signup-summary">{signups}</p>{/if}
     <FeedActions
       commentHref={`${href}?tab=chat`}

@@ -21,6 +21,8 @@
     labelledById?: string;
     label?: string;
     sheetTitle?: string;
+    /** Opens the caller's own sheet instead of this list (the one-sheet phase move). */
+    onOpen?: () => void;
   }
 
   let {
@@ -29,6 +31,7 @@
     labelledById = 'phase-menu-title',
     label = 'Phase',
     sheetTitle = 'Change phase',
+    onOpen,
   }: Props = $props();
 
   let open = $state(false);
@@ -52,7 +55,7 @@
       aria-haspopup="dialog"
       aria-expanded={open}
       title={sheetTitle}
-      onclick={() => (open = true)}
+      onclick={() => (onOpen ? onOpen() : (open = true))}
     >
       <span class="label">{label}</span>
       <span class="caret" aria-hidden="true">▾</span>

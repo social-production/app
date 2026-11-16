@@ -30,6 +30,7 @@ pub struct FeedbackView {
     pub my_vote: Option<VoteDirection>,
     /// The newest of the item's creation and any vote (web's trending clock).
     pub last_activity: Timestamp,
+    pub comments: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -73,6 +74,7 @@ pub fn get(id: ActionHash) -> ExternResult<Option<FeedbackView>> {
     let count =
         |dir| u32::try_from(votes.values().filter(|(d, _)| *d == dir).count()).unwrap_or(u32::MAX);
     let created_at = record.action().timestamp();
+    let comments = crate::feedback_comments::count(id.clone())?;
     Ok(Some(FeedbackView {
         id,
         kind: item.kind,
@@ -84,6 +86,7 @@ pub fn get(id: ActionHash) -> ExternResult<Option<FeedbackView>> {
         downvotes: count(VoteDirection::Down),
         my_vote: votes.get(&me).map(|(d, _)| *d),
         last_activity: votes.values().map(|(_, at)| *at).fold(created_at, Ord::max),
+        comments,
     }))
 }
 

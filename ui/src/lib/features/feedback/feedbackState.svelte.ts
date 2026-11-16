@@ -1,11 +1,11 @@
 import type { FeedbackInput, FeedbackItem, FeedbackVote } from '#lib/domain/feedback.ts';
 import { withVote } from '#lib/domain/feedback.ts';
 import { explain } from '#lib/services/errors.ts';
-import { createFeedback, getFeedback, listFeedback, voteFeedback } from '#lib/services/feedback.ts';
+import { createFeedback, listFeedback, voteFeedback } from '#lib/services/feedback.ts';
 import { namesOf } from '#lib/services/people.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
-/** web's FeedbackPage state: the list, the compose and detail sheets, and votes shown at once
+/** web's FeedbackPage state: the list, the compose sheet, and votes shown at once
  *  (rolled back if the write fails). */
 export class FeedbackState {
   items = $state<FeedbackItem[]>([]);
@@ -15,10 +15,7 @@ export class FeedbackState {
   composeOpen = $state(false);
   composePending = $state(false);
   composeMessage = $state('');
-  detailId = $state<string | null>(null);
   voting = $state<string[]>([]);
-
-  readonly detail = $derived(this.items.find((i) => i.id === this.detailId) ?? null);
 
   async load(): Promise<void> {
     try {
@@ -51,12 +48,6 @@ export class FeedbackState {
     } finally {
       this.composePending = false;
     }
-  }
-
-  async open(id: string): Promise<void> {
-    this.detailId = id;
-    const fresh = await getFeedback(id).catch(() => null);
-    if (fresh) this.merge(fresh);
   }
 
   async vote(id: string, vote: FeedbackVote): Promise<void> {

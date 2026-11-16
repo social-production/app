@@ -1,0 +1,316 @@
+/* A software project's Take part as drawn (Invites, Help Requests and Software Screens, 3):
+   the repository and mergers as one soft group, pull requests as soft cards with a
+   three-step line and their action as a chip. */
+.shell .software-ux {
+  display: grid;
+  gap: 10px;
+  margin: 8px 0 12px;
+}
+
+.shell .software-ux .repo-group {
+  display: grid;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.shell .software-ux .repo-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.shell .software-ux .repo-cell + .repo-cell {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-main) 8%, transparent);
+}
+
+.shell .software-ux .repo-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 11px;
+  background: var(--page-bg);
+  color: var(--text-soft);
+}
+
+.shell .software-ux svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .software-ux .chev {
+  flex: none;
+  color: var(--text-soft);
+}
+
+.shell .software-ux .repo-copy {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.shell .software-ux .repo-title {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.shell .software-ux .repo-value {
+  overflow-wrap: anywhere;
+  color: var(--brand-strong);
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.shell .software-ux .merger-names,
+.shell .software-ux .merger-empty {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.shell .software-ux .merger-names a {
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.shell .software-ux .repo-faces {
+  display: flex;
+  flex: none;
+}
+
+.shell .software-ux .repo-faces .avatar-badge {
+  width: 28px;
+  height: 28px;
+  margin-left: -8px;
+  border: 2px solid var(--panel-hover);
+  font-size: 10px;
+}
+
+.shell .software-ux .repo-faces .avatar-badge:first-child {
+  margin-left: 0;
+}
+
+.shell .software-ux .pr-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 4px;
+}
+
+.shell .software-ux .pr-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.shell .software-ux .pr-head span,
+.shell .software-ux .pr-empty {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.shell .software-ux .pr-empty {
+  margin: 0;
+  padding: 10px 0;
+  text-align: center;
+}
+
+.shell .software-ux .pr-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.shell .software-ux .pr-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shell .software-ux .pr-card-body-shell {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shell .software-ux .pr-card-title {
+  overflow-wrap: anywhere;
+  font-size: 15px;
+}
+
+.shell .software-ux .pr-action {
+  flex: none;
+  padding: 4px 12px;
+  border: none;
+  border-radius: 999px;
+  background: color-mix(in srgb, #f0b429 24%, transparent);
+  color: color-mix(in srgb, #9a6a00 70%, var(--text-main));
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.shell .software-ux .pr-action.merge {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .software-ux .pr-meta {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .software-ux .pr-meta a {
+  color: var(--brand-strong);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .software-ux .pr-steps {
+  display: flex;
+  gap: 5px;
+}
+
+.shell .software-ux .pr-steps i {
+  flex: 1;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--page-bg);
+}
+
+.shell .software-ux .pr-steps i.done {
+  background: var(--brand);
+}
+
+.shell .software-ux .pr-steps i.now {
+  background: color-mix(in srgb, var(--brand) 45%, var(--page-bg));
+}
+
+.shell .software-ux .pr-card-body {
+  display: grid;
+  gap: 4px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.shell .software-ux .pr-card-body a {
+  color: var(--brand-strong);
+}
+
+/* A pull request opened (Invites, Help Requests and Software Screens, 4). The wizard can
+   be portaled, so these rules scope to the wizard. */
+.software-wizard .pr-review-steps {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+}
+
+.software-wizard .pr-review-steps i {
+  flex: 1;
+  height: 5px;
+  border-radius: 5px;
+  background: var(--panel-hover);
+}
+
+.software-wizard .pr-review-steps i.done {
+  background: var(--brand);
+}
+
+.software-wizard .pr-review-steps i.now {
+  background: color-mix(in srgb, var(--brand) 45%, var(--panel-hover));
+}
+
+.software-wizard .pr-review-step {
+  margin: 0 0 10px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.software-wizard .pr-review-step b {
+  color: var(--brand-strong);
+}
+
+.software-wizard .metadata-card.metadata-card {
+  display: grid;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.software-wizard .metadata-card .meta-row {
+  display: grid;
+  gap: 1px;
+  padding: 12px 14px;
+  border: none;
+}
+
+.software-wizard .metadata-card .meta-row + .meta-row {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-main) 8%, transparent);
+}
+
+.software-wizard .metadata-card .meta-label {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.software-wizard .metadata-card .meta-value {
+  overflow-wrap: anywhere;
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.software-wizard .metadata-card .meta-link {
+  color: var(--brand-strong);
+}
+
+.software-wizard .metadata-card .stage-pill {
+  justify-self: start;
+  margin: 0 14px 12px;
+  padding: 3px 10px;
+  border: none;
+  border-radius: 999px;
+  background: var(--page-bg);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.software-wizard .vote-card.vote-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px 0 0;
+  border: none;
+  background: transparent;
+}

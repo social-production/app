@@ -86,8 +86,10 @@ impl Shape<'_> {
 pub fn stage_label(shape: Shape<'_>, phase: Phase) -> &'static str {
     let phase = phase.effective();
     match shape.mode {
+        // A converted proposal closes without ever taking a type (ADR 0106).
         PROPOSAL => match phase {
             Phase::P1 => "Proposal",
+            Phase::P7 => "Closed",
             _ => "Plan",
         },
         EVENT => match phase {
@@ -196,6 +198,12 @@ mod tests {
         include_access: false,
     };
 
+    const PROPOSAL_SHAPE: Shape<'static> = Shape {
+        mode: PROPOSAL,
+        subtype: "standard",
+        include_access: false,
+    };
+
     const EVENT_SHAPE: Shape<'static> = Shape {
         mode: EVENT,
         subtype: "standard",
@@ -221,6 +229,7 @@ mod tests {
         assert_eq!(stage_label(COLLECTIVE, P6), "Activity");
         assert_eq!(stage_label(PERSONAL, P1), "Activity");
         assert_eq!(stage_label(PERSONAL, P2), "Closed");
+        assert_eq!(stage_label(PROPOSAL_SHAPE, P7), "Closed");
     }
 
     #[test]

@@ -1,0 +1,313 @@
+/* A project's or event's Details tab (Plan, Phase and Feedback Screens, 1). */
+
+.shell .project-overview .context-panel {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  height: auto;
+  min-height: 0;
+}
+
+.shell .context-panel .overview-heading {
+  display: grid;
+  align-content: start;
+  align-items: start;
+  gap: 12px;
+}
+
+.shell .context-panel .overview-heading h1 {
+  margin: 4px 0 0;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.shell .context-panel .detail-by {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .context-panel .detail-by .avatar-badge {
+  width: 24px;
+  height: 24px;
+  font-size: 10px;
+}
+
+.shell .context-panel .detail-by a {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shell .context-panel .detail-place {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 -4px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: inherit;
+  text-decoration: none;
+}
+
+.shell .context-panel .detail-place .fact-line {
+  flex: 1;
+  margin: 0;
+}
+
+.shell .context-panel .detail-place strong {
+  display: grid;
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.shell .context-panel .detail-place small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+
+.shell .context-panel .detail-place > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .context-panel .folded-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.shell .context-panel .folded-text.folded {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 6;
+  line-clamp: 6;
+}
+
+.shell .context-panel .fold-toggle {
+  justify-self: start;
+  margin-top: -6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shell .context-panel .detail-tags {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.shell .context-panel .detail-tags a {
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .context-panel .overview-update {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.shell .context-panel .overview-update small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.shell .context-panel .detail-going {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.shell .context-panel .detail-going strong {
+  color: var(--text-main);
+}
+
+.shell .context-panel .detail-faces {
+  display: flex;
+}
+
+.shell .context-panel .detail-faces .avatar-badge {
+  width: 24px;
+  height: 24px;
+  margin-left: -7px;
+  border: 2px solid var(--page-bg);
+  font-size: 9px;
+}
+
+.shell .context-panel .detail-faces .avatar-badge:first-child {
+  margin-left: 0;
+}
+
+/* Links and History lead with their sections, as drawn; the tab already says what it is. */
+.shell .links-tab > .intro,
+.shell .history-shell > .section-copy {
+  display: none;
+}
+
+/* A closed project's Take part (Plan, Phase and Feedback Screens, 4). */
+.shell .closed-summary {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.shell .closed-summary .closed-banner {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  background: var(--panel-hover);
+}
+
+.shell .closed-summary .closed-chip {
+  justify-self: start;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--page-bg);
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 700;
+}
+
+.shell .closed-summary .closed-banner strong {
+  font-size: 17px;
+}
+
+.shell .closed-summary .closed-banner p {
+  margin: 0;
+  font-size: 14.5px;
+}
+
+.shell .closed-summary .closed-vote {
+  color: var(--text-soft);
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.shell .closed-summary .closed-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.shell .closed-summary .closed-stats div {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .closed-summary .closed-stats b {
+  color: var(--text-main);
+  font-size: 20px;
+}
+
+.shell .closed-summary .closed-rows {
+  display: grid;
+  overflow: hidden;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.shell .closed-summary .closed-rows > * {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14.5px;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.shell .closed-summary .closed-rows > * + * {
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--text-main) 8%, transparent);
+}
+
+.shell .closed-summary .closed-rows span {
+  display: grid;
+  flex: 1;
+}
+
+.shell .closed-summary .closed-rows small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .closed-summary .closed-rows svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.shell .context-panel .lineage-copy {
+  display: grid;
+  flex: 1;
+}
+
+.shell .context-panel .lineage-copy small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .context-panel .lineage-copy strong {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.shell .closed-summary .closed-rows .closed-start span {
+  color: var(--brand-strong);
+  font-weight: 700;
+}

@@ -225,3 +225,207 @@ body[data-theme='light'] .shell .feedback-page {
   box-shadow: var(--float-shadow);
   cursor: pointer;
 }
+
+/* A feedback item's own page (Plan, Phase and Feedback Screens §7), built like a post. */
+.shell .feedback-item-page {
+  --feedback-amber: #f0c463;
+  --feedback-amber-soft: #3b3017;
+  padding-bottom: 96px;
+}
+
+html[data-theme='light'] .shell .feedback-item-page,
+body[data-theme='light'] .shell .feedback-item-page {
+  --feedback-amber: #9a6a00;
+  --feedback-amber-soft: #fbefd2;
+}
+
+.shell .feedback-item {
+  display: grid;
+  gap: 10px;
+  padding: 16px var(--page-gutter);
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
+
+.shell .feedback-item-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.shell .feedback-item .kind {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell .feedback-item .kind.bug {
+  background: var(--feedback-amber-soft);
+  color: var(--feedback-amber);
+}
+
+.shell .feedback-item-who {
+  display: grid;
+  line-height: 1.25;
+}
+
+.shell .feedback-item-who small {
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.shell .feedback-item-who a,
+.shell .feedback-comment-head a {
+  color: var(--text-main);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.shell .feedback-item h1 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.shell .feedback-item-body {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  white-space: pre-line;
+}
+
+.shell .feedback-item-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.shell .feedback-item-pills .vote-strip,
+.shell .feedback-item-pills .feedback-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.shell .feedback-item-pills .vote-strip {
+  padding: 0 4px;
+}
+
+.shell .feedback-item-pills .vote-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 11px;
+}
+
+.shell .feedback-item-pills .vote-button.active-support {
+  color: var(--brand-strong);
+}
+
+.shell .feedback-item-pills .vote-button.active-oppose {
+  color: var(--danger);
+}
+
+.shell .feedback-item-pills svg,
+.shell .feedback-comment-actions svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.shell .feedback-comments .replying-note {
+  margin: 8px var(--page-gutter) 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .feedback-comments .replying-note button {
+  margin-left: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-weight: 600;
+}
+
+.shell .feedback-comment {
+  display: flex;
+  gap: 10px;
+  padding: 12px var(--page-gutter);
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 70%, transparent);
+}
+
+.shell .feedback-comment-copy {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+  font-size: 14.5px;
+  line-height: 1.45;
+}
+
+.shell .feedback-comment-copy p {
+  margin: 0;
+}
+
+.shell .feedback-comment-head,
+.shell .feedback-comment .replying-to {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .feedback-comment-body {
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+.shell .feedback-comment-actions {
+  display: flex;
+  gap: 22px;
+  margin-top: 6px;
+}
+
+.shell .feedback-comment-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shell .feedback-comment-actions button.liked {
+  color: #d6336c;
+}
+
+.shell .feedback-comment-actions button.liked svg {
+  fill: currentColor;
+}

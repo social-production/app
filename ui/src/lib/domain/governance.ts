@@ -21,6 +21,8 @@ export type ProposalKind =
   | { Phase: { to: string; plan: string | null; reason: string } }
   /** web's revert request: back to an earlier planning phase, with a reason (ADR 0040). */
   | { Return: { to: string; reason: string } }
+  /** Close this and continue its work as a new proposal (ADR 0106). */
+  | { Convert: { reason: string } }
   /** A channel's or community's member vote to remove someone (ADR 0068). */
   | { RemoveMember: { agent: string } }
   /** A service's request settings (ADR 0076): voted in a collective service, saved at once
@@ -106,6 +108,7 @@ export function proposalLabel(kind: ProposalKind, phaseLabel: (id: string) => st
   if ('Software' in kind) return kind.Software.label;
   // web's phaseChangeDecisionTitle('return', …).
   if ('Return' in kind) return `Return to ${phaseLabel(kind.Return.to)}`;
+  if ('Convert' in kind) return 'Convert to a new proposal';
   return `Move to ${phaseLabel(kind.Phase.to)}`;
 }
 
@@ -121,6 +124,8 @@ export function outcomeSentence(
   if ('Software' in kind) return 'If this passes, this change is applied.';
   if ('Phase' in kind) return `If this passes, this moves from ${from} to ${to(kind.Phase.to)}.`;
   if ('Return' in kind) return `If this passes, this moves from ${from} to ${to(kind.Return.to)}.`;
+  if ('Convert' in kind)
+    return 'If this passes, this closes and its work continues as a new proposal.';
   const e = kind.Edit;
   const names = [
     e.title !== null && 'title',

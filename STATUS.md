@@ -82,9 +82,38 @@ Every Railway URL returned "Application not found". Cause: the owner's Railway u
 raised it and all three services came back by 07:36 UTC (seed node restarted, 533 MB at 41 s).
 If every URL 404s again, ask the owner to check Railway usage/billing first.
 
+## Design artifacts (owner's mockups, newest first; add every new one here)
+The owner's list of 2026-11-15. They are references, not gospel: the built screens have moved
+on since, and later owner answers in this file win. Read them with the Artifact tool
+(`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
+frames under `project/*.dc.html`).
+1. Polish Pass Mockups (2026-11-16, **waiting on the owner**): feed cards, feed and map
+   filters, the map bar, Region, every create step, Links, History:
+   https://claude.ai/artifact/6nBddoWckyGwDhdFmo6zJv
+2. Map and Region Filters (2026-11-16, first round, superseded by 1):
+   https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
+3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
+   https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
+4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
+   https://claude.ai/artifact/QKBwCRmbKwcTPzgFWhex6t
+5. Top Bar and Map Redesign (approved but the map filters; `claude/ux-topbar-map`):
+   https://claude.ai/artifact/P5n4eg23ikHPXH8W1BH1Vp
+6. Feed Headers and Activity Phase (all picks, PR #156): https://claude.ai/artifact/2qLuYLhBCfvducCwtwGhGp
+7. Creating Through Plans (approved; "Proposal"): https://claude.ai/artifact/GekVi8swuWXaMr9eKeZ5Mv
+8. Remaining Screens (approved, built on `claude/ux-remaining-screens`):
+   https://claude.ai/artifact/CxWVNQtVsXgGijjQNvJRBH
+9. Chats, Profile, Onboarding (approved, `claude/ux-chats-profile`):
+   https://claude.ai/artifact/RT6knfQXdtDeFzDDLj2hMu
+10. https://claude.ai/artifact/VRsK1VYCpRrb97Dfeodo4a (in the owner's list; not yet described here)
+11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
+12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
+13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
 ## CI is minutes on PRs while this is a prototype (owner, 2026-11-16)
-PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing). The ~2 h scenarios and
-the desktop builds run on main nightly (ci ~3 am, desktop ~3:30 am Melbourne) and on demand (Run
+PRs run only `scripts/check-fast.sh` (~6 min; docs-only PRs run nothing), unless they touch
+`zomes/`, `dnas/`, `crates/`, `services/`, `happ/`, `vendor/`, `tests/scenarios/`, `Cargo.*`,
+`flake.*`, the root `package*.json` or the build/check scripts: then the ~2 h scenarios run too
+(`.github/workflows/ci.yml`). The scenarios and
+the desktop builds also run on main nightly (ci ~3 am, desktop ~3:30 am Melbourne) and on demand (Run
 workflow). Run locally the scenarios a change could break before pushing, and check the nightly
 run at the start of each session. Put the scenarios back on PRs once there is a stable release
 with real users.
@@ -168,7 +197,7 @@ conflicts). Its one unsaved file, `tests/e2e/ux-scan.mjs`, was committed on
    Also seen and not yet fixed: a help request's "Still needed: … is required., …" has doubled
    full stops; the empty Search page shows bare words (platform, community, project, event).
 
-## START HERE (2026-11-15 afternoon, owner's PC session): the UX build list, three branches
+## START HERE (2026-11-15 afternoon, owner's PC session, superseded by the 2026-11-16 entry): the UX build list, three branches
 Stacked on `origin/claude/creation-plans`, all pushed, **no PRs yet** (open one per branch, in
 this order, once creation-plans is on main; merge main in first):
 1. **`claude/ux-labels`** (the owner's answers): every type's first plan phase reads just
@@ -195,10 +224,76 @@ this order, once creation-plans is on main; merge main in first):
    `search`, `regional`. **Not run:** `accounts`, `platform`, `map`, `region`, `links`.
    Looked at in light and dark: Settings, People, Search, channel header, Feedback, New
    message, New group.
-**Still to do:** the Feedback item page with comments (new data in the directory DNA =
-a reset: ask the owner); Plan, Phase and Feedback Screens §1 to §6 plus Convert on the
-phase sheet (needs an ADR); README Status. The create menu and the Take part phase line were
-compared with their mockups and already match (menu items follow Creating Through Plans).
+4. **`claude/ux-plan-screens`** (Plan, Phase and Feedback Screens §1 to §6, UI only):
+   - §1 Details (`ContextPanel`): the channel header, "Started by" under the title, the place
+     as a row that opens the map, the description folded after six lines
+     (`components/cards/FoldedText`), tags as chips, the latest update in its own block, an
+     event's faces of who is going.
+   - §2 values: round 1–10 targets, a "You: 8" / "Rate this" chip, the average as a bar,
+     the author in the ⋯ sheet; Add value asks your rating in the same sheet.
+   - §3 the plan sheet (`components/plans/PlanSheet`): reads like a page with the result and
+     "Review this plan" at the bottom; the review shows "Question N of M" with five large
+     targets and keeps "Yes, approve" / "No" in view.
+   - §4 every phase move on one sheet (`governance/PhaseMoveSheet`; AdvanceSheet and
+     ReturnSheet deleted), "Start the vote"; a closed project's Take part leads with the
+     closing reason and vote (`ClosedSummary`; it counts people, decisions and updates, not
+     activities and ratings, which the page doesn't load).
+   - §5 the left rail: a field that opens Discover with your words, soft glyph rows, the open
+     one tinted, Discover beside Feedback. §6 Discover: a segmented filter, Join pills that
+     join in place, "Start … yourself".
+   - Also fixed for every create flow: soft fields and the photo button (create sheets are
+     portaled outside `.shell`, so their rules scope to `.create-sheet`).
+   - **Convert: ADR 0106, proposed, not built** (a project network reset; three questions
+     for the owner in it).
+   - Browser tests: `governance` passed with §1 to §3; **not yet run after §4 to §6:**
+     `governance`, `service-requests`, `event-flow`, `notifications`, `discover`, then
+     `collective-requests`, `software`, `events`, `activities`.
+   **Later on the same branch (owner, 2026-11-15 afternoon):**
+   - **Directory reset approved by the owner.** Feedback items open on their own page
+     (`/feedback/<id>`, `features/feedback/FeedbackItemPage`): flat comments with "Replying
+     to …", likes, the post page's floating comment bar. Directory integrity gains
+     `FeedbackComment` and links `FeedbackComments`, `FeedbackCommentLikes` (ADR 0054's
+     feedback); coordinator `feedback_comments.rs`. **New directory hash
+     `uhC0koVynnrz_2MHJg-B1OXJ8-Nwtk-2f4fMinVtTrehMuvBV42yB`** (project and conversation
+     unchanged). Scenarios `feedback` and `feedback_comments` passed.
+   - Feed cards: the date on its own line, the place on its own soft row that opens the map
+     (`components/cards/CardFacts`; events, projects, services, help requests).
+   - "Service" everywhere a person reads it (About too); `collective-service` stays the
+     internal mode id (renaming it would be a reset for nothing visible).
+   - Notifications rebuilt as drawn (Remaining Screens §2): round type icon, one bold line,
+     time, a green dot that marks it read.
+   - Invites, a help request (Asked by, place row, roles "N of M filled" with Join), software
+     Take part and a pull request: built as drawn (https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV,
+     approved). A proposal's Details copies the request's header (`ux/feedrow.css`).
+   - **Convert built (ADR 0106, accepted; project network reset, owner OK'd).** A "Convert to
+     a new proposal" move on the phase sheet (not events, not in Proposal or Closed; a reason
+     is required). Passing closes the project (`Applied.converted`) and its Take part offers
+     "Start the new proposal" (`/create?continues=<id>`); the new proposal and the old one
+     link each other (`LinkTypes::Lineage`, extern `link_lineage`, `ProjectView.lineage`):
+     "Continues the work of" on Details, "Where the work continues" on the closed page.
+     Members join the new one themselves; the old chat stays. **New project hash
+     `uhC0kQTrPUR3ws7xm6TdriTNccbjgmKVnxdjhGyr_jpvreXjIaYly`** (directory as above,
+     conversation unchanged). Scenarios `convert`, `feedback_comments`, `reverts` passed.
+   - An opened activity drawn as approved (Feed Headers and Activity Phase §3): no section
+     headings, one row per role ("Mika, Jo · 2 of 2"), Join / Leave / Full / Suggest pills
+     (`domain/activities.ts` `roleButton`, `roleLine`). The agenda, week strip, faces and
+     Past tab already matched. About already follows Feedback's type and segmented control.
+   - A closed proposal's phase reads "Closed" (`stage_label`; no DNA hash moved, checked).
+     Notifications gets an empty state.
+   - New browser test `tests/e2e/convert.mjs` (one founder: support, advance, convert, start
+     the new proposal, both links).
+   - **Browser tests on the new hApp, all passed:** `accounts`, `governance`, `help-requests`,
+     `software`, `guests`, `activities`, `collective-requests`, `convert`, `notifications`,
+     `events`, `discover`, `private-events`, `closed-communities` (fixed: "Join with invite"
+     is now in the header and the panel), `platform`, `map`, `region`, `links`, `mentions`,
+     `group-options`, `attachments`, `calls`, `ux-review` (screens looked at in light and
+     dark: closed page, phase sheet with Convert, About, Invites, Notifications, Feedback,
+     activity sheet). The first sign-up after a seed restart can take over 120 s, so the
+     warm-up `accounts` run may time out once; rerun it.
+**Still to do:** open the PRs in order
+(labels, new-message, remaining-screens, plan-screens) once creation-plans is on main. The
+create menu and the Take part phase line already match their mockups. README Status
+changes when these merge (it lists what is live).
 
 ## START HERE (2026-11-15, cloud session): what is merged, what is waiting, what is next
 **Owner, 2026-11-15:** this session got everything ready for UX work; the next session (the
