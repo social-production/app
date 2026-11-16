@@ -172,6 +172,10 @@
             <img class="message-photo" alt={photo.name} use:photoSrc={photo} />
           </button>
         {/each}
+        <!-- No caption: the time is a dark pill on the picture (Telegram). -->
+        {#if !caption && files.length === 0}
+          <div class="message-footer photo-footer on-photo">{@render stamp()}</div>
+        {/if}
       </div>
     {/if}
     {#if files.length > 0}
@@ -215,14 +219,8 @@
         </p>
       </div>
     {/if}
-    <!-- A photo without a caption shows its time as a dark pill on the picture (Telegram). -->
-    {#if !caption && !removed && (photos.length > 0 || files.length === 0)}
-      <div
-        class="message-footer photo-footer"
-        class:on-photo={photos.length > 0 && files.length === 0}
-      >
-        {@render stamp()}
-      </div>
+    {#if !caption && !removed && ((photos.length > 0 && files.length > 0) || (photos.length === 0 && files.length === 0))}
+      <div class="message-footer photo-footer">{@render stamp()}</div>
     {/if}
     {#if canReply && !message.own}
       <button

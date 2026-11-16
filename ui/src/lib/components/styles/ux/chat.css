@@ -65,6 +65,8 @@
 }
 
 .shell .chat-panel .message-copy .message-photo {
+  /* A fixed cap: the ported min(240px, 100%) left the photo's button wider than the photo. */
+  max-width: 240px;
   border-radius: 18px;
 }
 
@@ -236,8 +238,9 @@
 }
 
 /* A photo without a caption: its time is a dark pill on the picture. */
-.shell .chat-panel .message-copy.photo-stack {
+.shell .chat-panel .message-copy .photo-row {
   position: relative;
+  width: fit-content;
 }
 
 .shell .chat-panel .message-copy .message-footer.on-photo {
