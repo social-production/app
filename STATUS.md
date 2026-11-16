@@ -161,6 +161,31 @@ frames under `project/*.dc.html`).
   touch the feed, create, plan, activity and project files these branches change). Next
   session the two sessions message each other directly (ListAgents / SendMessage): post when
   a PR opens or merges, or when you need a file the other owns.
+- **`claude/ux-chat-fixes` (stacked on ux-scroll-chrome; the approved Chats, Search and
+  Reports page, design artifact 2d, with the owner's Telegram change):**
+  - **Chats:** the header is three floating capsules (back; face and name, which open the chat's
+    page; call and ⋮), and the pinned message is a capsule under them (`ChatHeader.svelte`,
+    `ux/chathead.css`). Bubbles keep the time in the corner, on the last line when it fits; an
+    invisible spacer reserves that room. The last bubble of a run (by side) gets a tail, and a
+    captionless photo shows its time as a dark pill on the picture. The ⋮ and message menus
+    are icon cards (`ux/chatmenus.css`, icons in `toolbarIcons.ts`). The message bar has no
+    inner ring.
+  - **Chat page** (`ChatAboutPage.svelte`, `?conversation=…&about=1`, so back returns to the
+    chat): the photo, Call/Mute/Pin/Profile, bio and key, then Media/Files/Links/Groups; a group
+    shows Members first, with Edit/Info opening the old group sheet. "Search in chat" is left out
+    until there is a chat search (Pin took its tile).
+  - **Search** (`features/search/SearchOverlay.svelte`, mounted in `routes/+layout.svelte`):
+    the top bar's field (read-only) and the results page's field open it. Recent searches are
+    kept in localStorage only (`recentSearches.ts`), channels to explore come from
+    `listScopes`, and suggestions are grouped by kind. On desktop it's a panel at the top. The
+    result filters are one sideways-scrolling row.
+  - **Reports:** ⋮ is a bottom action sheet (Copy link, Share where `navigator.share` exists,
+    Report in red), and your own items show no Report row. The form has two reason cards in a
+    "Reason" radio group, then "Send report", then the "Thanks, it's under review" confirmation
+    with Done.
+  - **Tests:** reports, message-reports, messages, chat and group-options pass locally (their
+    selectors changed: "Chat menu", the radio, "Send report", Done). Everything was checked at
+    390px light and dark against the local seed.
 - **`claude/ux-scroll-chrome` (stacked on ux-platform, owner's ask 2026-11-16 evening):** on
   phone feeds (home, platform, profiles, channels, communities) the top bar and bottom nav slide
   away while you scroll down and return as soon as you scroll up; the "+" drops into the nav's
