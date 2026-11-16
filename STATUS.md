@@ -123,6 +123,14 @@ frames under `project/*.dc.html`).
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
 ## START HERE (2026-11-16 afternoon, owner's PC session): #162 merged, #163 carries one more reset, two UI branches stacked on it
 - **#162 merged 2:44 pm Melbourne** (UI only, no reset).
+- **Coordination with the cloud session (agreed 2026-11-16):** ADR 0107 is ours (covers and
+  comment notes), 0108 is the cloud session's push-notification ADR (#165, #166); the next
+  free number is **0109**. The cloud session starts the privacy switches and the bot-review
+  notification once #163 has deployed (then reruns `demo-content.mjs`), and waits for
+  `claude/ux-profiles` to merge before Home's tabs, the display timezone and Russian (those
+  touch the feed, create, plan, activity and project files these branches change). Next
+  session the two sessions message each other directly (ListAgents / SendMessage): post when
+  a PR opens or merges, or when you need a file the other owns.
 - **#163 `claude/ux-plan-convert`** now also carries ADR 0107 (profile covers and comment notes:
   `Cover` + `CommentNote` entries, `AgentToCover` / `AgentToComments` links, scenario `notes`
   passed locally). Directory hash `uhC0kfM8SR1…`, project `uhC0kQTrPUR3…`, conversation
