@@ -7,6 +7,7 @@ mod hex;
 mod node;
 mod routes;
 mod store;
+mod wipe;
 
 use std::future::Future;
 use std::net::SocketAddr;
@@ -21,6 +22,10 @@ pub async fn serve(
     on_bound: impl FnOnce(SocketAddr),
     shutdown: impl Future<Output = ()> + Send + 'static,
 ) -> anyhow::Result<()> {
+    // Only the Railway volume: local and test data dirs are never cleared (wipe.rs).
+    if config.data_dir == std::path::Path::new("/data") {
+        wipe::fresh_start_once(&config.data_dir)?;
+    }
     let node = Box::pin(node::Node::start(&config, passphrase)).await?;
     tokio::spawn(background(node.clone(), config.happ_path.clone()));
     let state = routes::AppState {

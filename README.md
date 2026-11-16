@@ -8,12 +8,23 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-13)
+## Status (2026-11-16)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Everything starts as a proposal (PR #160, 2026-11-16 12:21 am Melbourne, ADR 0059 stage
+  A):** Create → Proposal is four steps (Basics, Tags, Location, Overview); the leading plan
+  decides whether it becomes a project, a service or an event as it leaves its Plan phase, and
+  an operations plan can switch requests on with no settings vote. **Project network reset**,
+  and the seed node then started from empty data (its keystore had stopped answering), so
+  **every account is gone: sign up again** (test data only).
+- **Chats, profiles, sign-up and Settings in the soft look (PR #159, 2026-11-15 11:01 pm
+  Melbourne, ADRs 0104, 0105):** a Personal / Public switch in Messages, rounded bubbles,
+  word buttons on profiles, a boxless sign-up, Settings as rows that open small sheets. UI only.
+- **Top bar with search and one capsule, the map's filters as one capsule, a calmer About
+  (PR #157, 2026-11-15 9:10 pm Melbourne, ADR 0103).** UI only.
 - **Feed tabs, channel-first feed rows and a week-strip activity phase (PR #156, 2026-11-15
   3:05 am Melbourne, ADR 0102):** Home / Global / Region tabs with one Feed filters sheet;
   rows lead with the type's glyph and the channel; the Activity phase has Upcoming / Past

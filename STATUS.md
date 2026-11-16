@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 late morning Melbourne by the owner's PC session; start at "START HERE (2026-11-16)")
+# Status: where the P2P app stands (updated 2026-11-16 by the owner's PC session and a cloud session; start at "START HERE (2026-11-16)", then "START HERE (2026-11-15)")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -265,13 +265,33 @@ owner's PC) continues the UX build list. Answers to the open questions (apply th
    smoke's red was a real sign-up fault, fixed in it: see "Done 2026-11-15" on main.
 2. **PR #157 merged** 10:10 UTC Nov 15 (9:10 pm Melbourne): top bar, map capsule, About,
    sign-up helpers (UI only).
-3. **PR #159** (`claude/ux-chats-profile`, main merged in, no rebase) is open; merge when
-   green. Its sign-up keeps the floating back button (it replaces #157's "Back to feed").
-4. **Then `claude/creation-plans` (this branch):** it already contains `ux-chats-profile` and
-   #156's fix; merge main into it, open its PR, merge when green. **It resets the project
-   network on merge** (owner approved). After the deploy: `/readyz` shows a new project
-   hash; directory and conversation must be unchanged.
-5. Docs PR #152 (`claude/social-production-handoff-dsam61`) is waiting on CI.
+3. **PR #159 merged** 12:01 UTC Nov 15 (11:01 pm Melbourne): messages, chats, profiles,
+   sign-up, Settings rows (UI only). Its sign-up keeps the floating back button.
+4. **PR #160 merged** 13:21 UTC Nov 15 (12:21 am Nov 16 Melbourne): `claude/creation-plans`,
+   ADR 0059 stage A. **The project network was reset** (owner approved); directory and
+   conversation keep their networks. Expected project hash after the deploy:
+   `uhC0kNYqoKdcoI2u8vn7Pywpp8HOXVGDrzlzlq14qPuxRjh89iDF-` (see "After #160's deploy" below).
+   All UX branches are merged: **new UX work branches from `main`.**
+   **After #160's deploy (checked 2026-11-16 ~1:25 am Melbourne): the seed is up but hosts
+   nothing.** Railway reported the seed-node deploy a success at 13:33 UTC; `/readyz` says
+   `conductor: true`, `apps: 0`, `dnas: {}`, ~93 MB and 13 threads for 20+ minutes (after
+   earlier project resets it held ~650 MB with apps within 30 s). `/index/projects` and
+   `/index/people` are empty. The process restarted once more at ~13:53 UTC with no new
+   deploy. The bundle's hashes are right (`hc dna hash` on the built hApp: directory and
+   conversation equal the old live ones, project `uhC0kNYqoKdc…`), and #160 changed nothing in
+   the gateway's start-up, so the archivist's install (warm-up, then each 15 s index round)
+   is failing or hanging on Railway. **Needs the seed-node logs** (look for "warm-up failed",
+   "archivist round failed", "removed N apps", a panic, or "database or disk is full" on the
+   `/data` volume).
+   **Logs (owner, 2026-11-16 8:30 am Melbourne):** every round ends `archivist round failed
+   error=admin call: … ConnectionAborted`, with `lair connection recv loop ended` /
+   `incoming channel error: internal` from the keystore: the in-process lair fails each
+   request, so nothing installs. **Fix: a one-time fresh start** (owner: "I dont care about
+   wiping accounts, its all prototype"): `services/gateway/src/wipe.rs` clears `/data` once
+   (the keystore, the conductor and `gateway.sqlite`) when its `generation` file is not
+   `2026-11-16`, and logs the free space before and after. **Every account is gone after it**;
+   sign up again. Only `DATA_DIR=/data` is ever cleared. To wipe again, bump `GENERATION`.
+5. Docs PR #152 merged 2026-11-14.
    **The Linux desktop smoke still flakes against the live seed** (PR #157's first run,
    17:16 UTC 2026-11-14: every network read from the desktop timed out over the relay; the
    rerun passed). #156 fixed the sign-up half (`set_profile`). The rest: the profile page
