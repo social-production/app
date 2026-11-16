@@ -46,7 +46,7 @@
   cursor: pointer;
 }
 
-.overlay-root.create-main .overlay-footer .sheet-close {
+.overlay-root.create-main.create-main .overlay-footer.inline-close .sheet-close {
   display: none;
 }
 
