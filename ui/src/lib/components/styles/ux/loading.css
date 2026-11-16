@@ -1,0 +1,209 @@
+/* Owner's fixes 3b and 3c (2026-11-17, mockup approved): a thin line under the top bar while
+   a page loads, grey skeletons in the shape of what is coming, and the opening screen. */
+
+.loading-line {
+  position: fixed;
+  top: var(--topbar-height, 0px);
+  right: 0;
+  left: 0;
+  z-index: calc(var(--z-topbar, 50) + 1);
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.loading-line::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 40%;
+  border-radius: 0 3px 3px 0;
+  background: linear-gradient(90deg, transparent, var(--brand) 30%, var(--brand) 70%, transparent);
+  animation: loading-line 1.3s ease-in-out infinite;
+  content: '';
+}
+
+@keyframes loading-line {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(260%);
+  }
+}
+
+.sk {
+  display: block;
+  height: 11px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-main) 9%, transparent);
+  animation: sk-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes sk-pulse {
+  50% {
+    opacity: 0.55;
+  }
+}
+
+.sk-line {
+  width: 100%;
+}
+
+.sk-title {
+  height: 16px;
+}
+
+.sk-title.big {
+  height: 22px;
+}
+
+.sk-face {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.sk-face.big {
+  width: 48px;
+  height: 48px;
+}
+
+.sk-icon {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.skeleton-list {
+  display: grid;
+  gap: 12px;
+}
+
+.skeleton-list.rows {
+  gap: 4px;
+}
+
+.skeleton-card,
+.skeleton-facts {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border-radius: 16px;
+  background: var(--panel);
+}
+
+.skeleton-head,
+.skeleton-row,
+.skeleton-fact {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.skeleton-row {
+  padding: 10px 4px;
+}
+
+.skeleton-row > div,
+.skeleton-fact > div {
+  display: grid;
+  flex: 1;
+  gap: 8px;
+}
+
+.skeleton-detail {
+  display: grid;
+  gap: 12px;
+  padding: 16px 0;
+}
+
+.skeleton-facts {
+  margin-top: 8px;
+  gap: 16px;
+}
+
+/* The opening screen. */
+.opening-screen {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: calc(100dvh - var(--topbar-height, 0px) - var(--shell-bottom-nav-offset, 0px));
+  padding: 24px;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.opening-logo {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 6px;
+  border-radius: 22px;
+  background: var(--brand);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--brand) 35%, transparent);
+  animation: opening-breathe 2.4s ease-in-out infinite;
+}
+
+.opening-logo img {
+  width: 54px;
+  height: 54px;
+}
+
+@keyframes opening-breathe {
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 14px 40px color-mix(in srgb, var(--brand) 50%, transparent);
+  }
+}
+
+.opening-screen strong {
+  font-size: 19px;
+  font-weight: 700;
+}
+
+.opening-screen p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14.5px;
+}
+
+.opening-dots {
+  display: inline-flex;
+  gap: 3px;
+  margin-left: 4px;
+}
+
+.opening-dots i {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: sk-pulse 1.2s ease-in-out infinite;
+}
+
+.opening-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.opening-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+.opening-screen .opening-slow {
+  max-width: 260px;
+  margin-top: 8px;
+  font-size: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loading-line::before,
+  .sk,
+  .opening-logo,
+  .opening-dots i {
+    animation: none;
+  }
+}

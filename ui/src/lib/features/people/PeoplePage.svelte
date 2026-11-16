@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import PersonChip from '#lib/components/PersonChip.svelte';
   import { explain } from '#lib/services/errors.ts';
   import { getPerson, listPeople, pairingOf } from '#lib/services/people.ts';
@@ -42,7 +44,7 @@
     </header>
     {#if error}<p class="warning-card">{error}</p>{/if}
     {#if !loaded}
-      <p class="end-copy">Loading people…</p>
+      <LoadingLine /><SkeletonRows kind="row" count={6} />
     {:else}
       <div class="people-list people">
         {#each rows as row (row.person.agent)}
