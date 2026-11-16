@@ -105,10 +105,17 @@ frames under `project/*.dc.html`).
    result cards look like Global feed cards.
 2. Map and Region Filters (2026-11-16, first round; map A and Region A chosen, superseded by 1):
    https://claude.ai/artifact/N3uUWkAzWFSQTmaN8LFEPP
-2b. Platform and Moderators (2026-11-16, **waiting for the owner**): the Platform page and the
-   Moderators sheet were ported straight from web on 2026-11-13; redesign proposed, plus the
-   "Network vote" line for #platform projects (ADR 0095's rest, branch `claude/platform-voters`
-   from #163, started, nothing committed): https://claude.ai/artifact/VPUdEZzJZBbcMyecLCoaPU
+2b. Platform and Moderators (2026-11-16, **approved, not built**):
+   https://claude.ai/artifact/VPUdEZzJZBbcMyecLCoaPU
+   Owner's picks: the globe badge ("to signal it is something different"); "N active this
+   week" under the name, not members; the Moderators button with faces as drawn, and "+N"
+   once there are more than three; sections 2 to 4 as drawn ("i trust your work"). Sections
+   1 to 3 are UI only; 4 (the "Network vote" line) ships with ADR 0095's #platform voting rule
+   (branch `claude/platform-voters` from #163, started, nothing committed yet).
+   Owner's addition the same day: channels, communities and the Platform get a picture and a
+   cover, changed by a vote like their other settings (members vote in public and
+   collaborative scopes, organizers decide at once in organizer-run ones; the Platform by a
+   network vote). Mockups next; a project reset, shipped with the #platform voting rule.
 3. Invites, Help Requests and Software (Design canvas, 2026-11-15, **approved, built**):
    https://claude.ai/artifact/6y2hxVLuFBm5nUWerZxpMV
 4. Plan, Phase and Feedback Screens (approved, built on `claude/ux-plan-screens`):
