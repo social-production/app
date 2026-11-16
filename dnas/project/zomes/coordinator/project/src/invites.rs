@@ -63,11 +63,20 @@ fn list() -> ExternResult<Vec<InviteView>> {
             continue;
         };
         let at = record.action().timestamp();
-        if invite.grant.as_ref().and_then(|g| ended.get(g)).is_some_and(|end| *end <= at) {
+        if invite
+            .grant
+            .as_ref()
+            .and_then(|g| ended.get(g))
+            .is_some_and(|end| *end <= at)
+        {
             continue;
         }
         out.retain(|i| i.agent != invite.agent);
-        out.push(InviteView { agent: invite.agent, by: record.action().author().clone(), at });
+        out.push(InviteView {
+            agent: invite.agent,
+            by: record.action().author().clone(),
+            at,
+        });
     }
     Ok(out)
 }

@@ -29,8 +29,13 @@ async fn organizers_see_every_invite_to_a_private_event() {
     let _: ActionHash = net.call(0, "project", "add_organizer", key(1)).await;
     net.settle().await;
 
-    let refused = net.try_call::<_, ()>(2, "project", "record_invite", key(3)).await;
-    assert!(refused.is_err(), "only organizers invite to a private event");
+    let refused = net
+        .try_call::<_, ()>(2, "project", "record_invite", key(3))
+        .await;
+    assert!(
+        refused.is_err(),
+        "only organizers invite to a private event"
+    );
     let _: () = net.call(1, "project", "record_invite", key(3)).await;
     let _: () = net.call(1, "project", "record_invite", key(3)).await;
     let _: () = net.call(0, "project", "record_invite", key(2)).await;
@@ -52,7 +57,9 @@ async fn a_removed_organizers_later_invites_are_left_out() {
     net.settle().await;
     let _: () = net.call(0, "project", "remove_organizer", key(1)).await;
     net.settle().await;
-    let late = net.try_call::<_, ()>(1, "project", "record_invite", key(2)).await;
+    let late = net
+        .try_call::<_, ()>(1, "project", "record_invite", key(2))
+        .await;
     assert!(late.is_err(), "a removed organizer can't record invites");
     assert!(invites(&net, 0).await.is_empty());
     net.shut_down().await;
