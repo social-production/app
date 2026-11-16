@@ -1,0 +1,113 @@
+/* Edit profile, over the profile (Profiles and Comments mockups §2). Portaled: doubled class. */
+.overlay-root.edit-profile-sheet .edit-profile {
+  display: grid;
+  gap: 12px;
+  padding: 0 20px 8px;
+}
+
+.overlay-root.edit-profile-sheet .edit-cover {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 104px;
+  border-radius: 16px;
+  background: linear-gradient(120deg, var(--brand-soft), var(--panel-hover)) center / cover;
+}
+
+.overlay-root.edit-profile-sheet .edit-cam,
+.overlay-root.edit-profile-sheet .edit-cover-remove {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 0;
+  padding: 7px 12px;
+  border: none;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 0.55);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.overlay-root.edit-profile-sheet .edit-cover-remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 5px 10px;
+  font-size: 12px;
+}
+
+.overlay-root.edit-profile-sheet .edit-cam svg,
+.overlay-root.edit-profile-sheet .hero-cam svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.overlay-root.edit-profile-sheet .edit-avatar {
+  position: relative;
+  width: 72px;
+  min-height: 0;
+  margin: -46px 0 0 14px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.overlay-root.edit-profile-sheet .edit-avatar .avatar-badge {
+  width: 72px;
+  height: 72px;
+  border: 4px solid var(--panel);
+}
+
+.overlay-root.edit-profile-sheet .edit-avatar .hero-cam {
+  position: absolute;
+  right: -2px;
+  bottom: 0;
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.6);
+  color: #fff;
+}
+
+.overlay-root.edit-profile-sheet .edit-field {
+  display: grid;
+  gap: 6px;
+}
+
+.overlay-root.edit-profile-sheet .edit-field > span {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.overlay-root.edit-profile-sheet .edit-field input,
+.overlay-root.edit-profile-sheet .edit-field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+}
+
+.overlay-root.edit-profile-sheet .edit-hint {
+  margin: -6px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overlay-root.edit-profile-sheet .edit-hint.error {
+  color: var(--danger);
+}

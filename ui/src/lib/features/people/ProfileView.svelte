@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import CopyKey from '#lib/components/CopyKey.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
@@ -11,14 +10,14 @@
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
-  import { resolve } from '$app/paths';
-
   import BotButton from './BotButton.svelte';
   import BotReviewCard from './BotReviewCard.svelte';
+  import EditProfileSheet from './EditProfileSheet.svelte';
   import FollowButton from './FollowButton.svelte';
   import FollowRequests from './FollowRequests.svelte';
   import { ProfileFollows } from './followState.svelte.ts';
   import MessageButton from './MessageButton.svelte';
+  import { ProfileEditor } from './profileEdit.svelte.ts';
   import TrustSheets from './TrustSheets.svelte';
   import { ProfileTrust } from './trustState.svelte.ts';
   import VouchButton from './VouchButton.svelte';
@@ -44,6 +43,7 @@
   );
 
   const follows = $derived(new ProfileFollows(agent, own));
+  const editor = $derived(new ProfileEditor(agent, load));
   const trust = $derived(new ProfileTrust(agent, load));
   // web: accounts found to be bots can't message, vouch or mark.
   const viewerPaused = $derived(me?.standing.level === 'Paused');
@@ -92,6 +92,9 @@
   $effect(() => {
     void follows.load();
   });
+  $effect(() => {
+    void editor.loadCover();
+  });
 </script>
 
 <div class="profile-page">
@@ -102,6 +105,9 @@
         person={shown}
         {devices}
         trustOpen={trust.open}
+        cover={editor.cover}
+        onCoverFile={own ? (file) => void editor.pickCover(file) : undefined}
+        onPhotoFile={own ? (file) => void editor.pickPhoto(shown, file) : undefined}
         onStanding={() => {
           trust.open = !trust.open;
           if (trust.open) follows.list = null;
@@ -165,15 +171,19 @@
               {/if}
             </div>
           {:else if own}
-            <!-- Owner, 2026-11-14: an Edit profile button on your own profile is fine. -->
+            <!-- Edit profile opens over the profile (Profiles and Comments mockups §2). -->
             <div class="action-row">
-              <a class="action" href={resolve('/settings')}>
+              <button class="action" type="button" onclick={() => (editor.open = true)}>
                 <ToolbarIcon name="pencil" /><span class="action-text">Edit profile</span>
-              </a>
+              </button>
             </div>
           {/if}
         {/snippet}
       </ProfileHero>
+      {#if own}<EditProfileSheet {editor} person={shown} />{/if}
+      {#if editor.error && !editor.open}
+        <p class="warning-card" role="alert">{editor.error}</p>
+      {/if}
       {#if follows.error}<p class="warning-card" role="alert">{follows.error}</p>{/if}
       {#if trust.stanceMessage}<p class="warning-card" role="alert">{trust.stanceMessage}</p>{/if}
       {#if trust.review && trust.review.status !== 'none'}
@@ -204,7 +214,7 @@
       />
       <TrustSheets {trust} person={shown} />
 
-      {#if own}
+      {#if own && (person.standing.level === 'New' || canClaim)}
         <section class="empty-card own-card">
           {#if person.standing.level === 'New'}
             <p>
@@ -225,7 +235,6 @@
               </button>
             </div>
           {/if}
-          <CopyKey value={agent} />
         </section>
       {/if}
     {:else if !error}
