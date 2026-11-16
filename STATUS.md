@@ -124,7 +124,14 @@ frames under `project/*.dc.html`).
    the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
-2e. Detail Pages Cleanup (2026-11-16 night, **waiting on the owner**): the sign-up banner (A: a
+2e. Detail Pages Cleanup (2026-11-16 night, **approved, not built**: "designs are great"). Owner's
+   choices: sign-up option A, but signed out the Sign up button sits permanently on the bottom dock
+   (a card in the corner would cover the left/right panels and the map); one layout for all types;
+   threads and posts take the shared header. Owner's notes for the build: a request drops the
+   dock's big "Join a role" button (each role already has its own Join); analyse the dock once
+   you've joined, as it gets crowded (the member-list button can go, since Details shows the
+   count; check whether the member list itself was modernised); show Share before joining too.
+   Mockup again before building the dock changes. Originally: the sign-up banner (A: a
    Sign up pill plus a floating join card, recommended; B: the pill only), and an analysis of the
    detail pages measured on live. Proposals, projects, events and requests indent their header
    body to x=61 (the feed row's icon column) while tabs and sections sit at 16, giving four left
