@@ -1,11 +1,18 @@
 <script lang="ts">
-  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
+  import DistanceChoice from '#lib/components/settings/DistanceChoice.svelte';
+  import PlaceSearchField from '#lib/components/settings/PlaceSearchField.svelte';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
+  import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
   import { emptyPlaceValue, type PlaceValue } from '#lib/domain/places.ts';
   import { devicePlace, ipHintFailure, ipPlaceHint, placeSearch } from '#lib/services/locations.ts';
   import { readDefaultLocation, writeDefaultLocation } from '#lib/stores/defaultLocation.svelte.ts';
+  import {
+    DEFAULT_REGION_RADIUS,
+    readRegionRadius,
+    writeRegionRadius,
+  } from '#lib/stores/regionRadius.svelte.ts';
 
   /**
    * web's Regional settings: the default location (Region feed and map), the device-location
@@ -19,6 +26,20 @@
   let device = $state(saved?.deviceGeolocation ?? false);
   let message = $state('');
   let networkOpen = $state(false);
+  // Owner's fix 3d: the place and the distance each open a small sheet with a Save button.
+  let placeOpen = $state(false);
+  let picked = $state<PlaceValue | null>(null);
+  let distanceOpen = $state(false);
+  let radius = $state(readRegionRadius());
+  let draftRadius = $state(DEFAULT_REGION_RADIUS);
+  const radiusLabel = (v: string): string =>
+    radiusPresetOptions.find((o) => o.value === v)?.label ?? `${v} km`;
+  $effect(() => {
+    if (placeOpen) picked = null;
+  });
+  $effect(() => {
+    if (distanceOpen) draftRadius = radius;
+  });
 
   function save(next: PlaceValue): void {
     message = '';
@@ -43,6 +64,12 @@
     }
   }
 
+  async function locateOnce(): Promise<void> {
+    const result = await devicePlace();
+    if (result.ok) picked = result.place;
+    else message = devicePositionMessage(result.error);
+  }
+
   async function toggleDevice(): Promise<void> {
     message = '';
     device = !device;
@@ -65,14 +92,56 @@
     <SettingPanel
       label="Default location"
       value={place.displayLabel.trim() || 'Add'}
-      hint="Used for regional feed and map discovery."
+      hint="Used for the Region feed and the map."
+      bind:open={placeOpen}
     >
-      <LocationPicker
-        value={place}
-        modes={['physical']}
-        onChange={save}
-        search={placeSearch.search}
-        failure={placeSearch.failure}
+      {#snippet footer()}
+        <div class="sheet-actions">
+          <button
+            class="sheet-submit"
+            type="button"
+            disabled={!picked}
+            onclick={() => {
+              if (picked) save(picked);
+              placeOpen = false;
+            }}>{picked ? `Use ${picked.displayLabel.split(',')[0]}` : 'Pick a place'}</button
+          >
+        </div>
+      {/snippet}
+      {#if placeOpen}
+        <PlaceSearchField
+          initial={place.displayLabel}
+          {picked}
+          onPick={(p) => (picked = p)}
+          onLocate={() => void locateOnce()}
+          search={placeSearch.search}
+          failure={placeSearch.failure}
+        />
+      {/if}
+    </SettingPanel>
+    <SettingPanel
+      label="Distance"
+      value={radiusLabel(radius)}
+      hint="How far the Region feed looks from your place."
+      bind:open={distanceOpen}
+    >
+      {#snippet footer()}
+        <div class="sheet-actions">
+          <button
+            class="sheet-submit"
+            type="button"
+            onclick={() => {
+              radius = draftRadius;
+              writeRegionRadius(radius);
+              distanceOpen = false;
+            }}>Save</button
+          >
+        </div>
+      {/snippet}
+      <DistanceChoice
+        value={draftRadius}
+        presets={radiusPresetOptions}
+        onChange={(v) => (draftRadius = v)}
       />
     </SettingPanel>
     <SettingSwitch

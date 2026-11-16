@@ -220,21 +220,22 @@ export async function feedChoice(page, group, option) {
   await sheet.waitFor({ state: 'hidden' });
 }
 
-/** Settings → Regional → Default location: search for `query` in the row's sheet, take the
- * first suggestion and close the sheet. Returns the suggestion's label. */
+/** Settings → Regional → Default location: search for `query` in the row's sheet, pick the
+ * first match and save it with the sheet's "Use …" button. Returns the row's new value. */
 export async function setDefaultPlace(page, query) {
   const regional = page.locator('#settings-regional');
   await regional.getByRole('heading', { name: 'Regional' }).waitFor({ timeout: 60_000 });
-  await regional.getByRole('button', { name: /^Default location/ }).click();
+  const row = regional.getByRole('button', { name: /^Default location/ });
+  await row.click();
   const sheet = page.getByRole('dialog', { name: 'Default location' });
-  await sheet.getByRole('textbox', { name: 'Place' }).fill(query);
-  const suggestion = sheet.locator('.suggestions button').first();
-  await suggestion.waitFor({ timeout: 30_000 });
-  const label = (await suggestion.innerText()).trim();
-  await suggestion.click();
-  await sheet.getByRole('button', { name: 'Close' }).click();
+  await sheet.getByRole('textbox', { name: 'Search a place' }).fill(query);
+  // The first row is "Use my location"; the matches follow it.
+  const match = sheet.locator('.place-search-list li:nth-child(2) button');
+  await match.waitFor({ timeout: 30_000 });
+  await match.click();
+  await sheet.locator('.sheet-submit').click();
   await sheet.waitFor({ state: 'hidden' });
-  return label;
+  return (await row.locator('.set-row-value').innerText()).trim();
 }
 
 /** A profile's Message button opens the chat with that person (empty until the first
