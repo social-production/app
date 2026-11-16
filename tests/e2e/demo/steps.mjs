@@ -1,6 +1,6 @@
 // Steps for tests/e2e/demo-content.mjs: proposals carried through their votes, plans of each
 // kind, channels and a community, written with realistic words for looking at the screens.
-import { BASE, addPlan, pickScopeTag } from '../lib.mjs';
+import { BASE, TAG_SEARCH, addPlan, pickScopeTag } from '../lib.mjs';
 import { advance, until, voteYes } from '../event-flow.mjs';
 
 /** Founder one makes a channel (a taken handle means an earlier run made it). */
@@ -41,7 +41,7 @@ export async function propose(page, { title, text, tag, place }) {
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('What do you propose?').fill(text);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Tags
-  await pickScopeTag(page, 'Primary channel tag', tag);
+  await pickScopeTag(page, TAG_SEARCH, tag);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Location
   if (place) {
     const field = page.getByRole('textbox', { name: 'Place' });
