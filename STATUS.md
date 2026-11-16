@@ -392,7 +392,18 @@ workflow). Run locally the scenarios a change could break before pushing, and ch
 run at the start of each session. Put the scenarios back on PRs once there is a stable release
 with real users.
 
-## In flight (parity, cloud session) 2026-11-16, 7:50 pm Melbourne
+## In flight (parity, cloud session) 2026-11-17, 2:15 am Melbourne
+- **Overnight 17 Nov (owner asleep; UX cloud session session_01Ww2rC26k9Wbs5Pjv9zPgFV merged
+  #176/#177).** #175 merged 9:13 pm; the seed restarted ~9:26 pm with directory `uhC0kfM8SR1…`,
+  project `uhC0kQTrPUR3…`, conversation `uhC0k1AJBcn3…` unchanged. #177's chat selectors still
+  match `tests/e2e/demo/*`.
+- **`claude/notice-signals` (ADR 0108 "Built"):** a `notices` coordinator zome in the directory
+  only (`enable_notices`, `send_notice`, `recv_remote_signal`), all three DNA hashes unchanged.
+  The UI words each notice (`services/notices.ts` `notify`); the bell enables notices and
+  refreshes when one arrives. First sender: a reply to your comment in a project chat.
+  Scenario `notices.rs` passed locally (323 s). Next senders, one PR each: mentions, "Replied
+  to your project", phase votes and results, follows, invites and shares, roles, requests, bot
+  reviews, plan leading; then the desktop's OS notifications (Tauri plugin).
 - **A new cloud session took over at 7:35 pm** (session_01Ww2rC2Be5Zmhurdsbeum2U). It can message the
   desktop UX session (session_01Ww2rByJuJmat7tc18ZtXjf) with the session service's
   `send_message`, and that session's replies reach it. The owner allowed this on a trusted
