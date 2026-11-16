@@ -1,5 +1,6 @@
 <script lang="ts">
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import { isEvent } from '#lib/domain/projects.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { resolve } from '$app/paths';
@@ -16,6 +17,8 @@
 
   const guest = $derived(connection.current.status === 'signed-out');
   const title = $derived(detail.project?.charter?.title ?? '');
+  const mode = $derived(detail.project?.charter?.mode);
+  const noun = $derived(mode && isEvent(mode) ? 'event' : 'project');
 </script>
 
 {#if guest}
@@ -25,6 +28,7 @@
   <button
     id="participation-join"
     type="button"
+    aria-label={`Join ${noun}`}
     class="dock-labelled primary"
     disabled={detail.joining}
     onclick={() => detail.requestToggleJoin()}

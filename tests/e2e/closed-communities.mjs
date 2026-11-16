@@ -143,7 +143,7 @@ await b.screenshot({ path: `${out}/phone390-community-event-card.png` });
 await eventCard.getByRole('link', { name: title }).first().click();
 await b.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await b.getByRole('button', { name: 'Join event' }).click();
-await b.getByRole('button', { name: 'Leave event' }).waitFor({ timeout: 120_000 });
+await b.getByRole('button', { name: 'More actions' }).waitFor({ timeout: 120_000 }); // joined: the ⋯ dock
 log('two joined the community event');
 
 // Home lists it too: web-backend's home feed includes your private communities' events.
