@@ -124,6 +124,13 @@ frames under `project/*.dc.html`).
    the header drawn in §3.: picture + cover for
    channels, communities and the Platform, who decides each change, and redrawn Settings,
    Decisions and Vote sheets (also straight web ports): https://claude.ai/artifact/3t4YWuh5PsGw2AorUfrY8f
+2e. Detail Pages Cleanup (2026-11-16 night, **waiting on the owner**): the sign-up banner (A: a
+   Sign up pill plus a floating join card, recommended; B: the pill only), and an analysis of the
+   detail pages measured on live. Proposals, projects, events and requests indent their header
+   body to x=61 (the feed row's icon column) while tabs and sections sit at 16, giving four left
+   edges on an event. Proposed: one layout for all types, flush at 16, with a shared icon, channel
+   and kind header, facts as one grouped card, sentence-case sections and no page border:
+   https://claude.ai/artifact/UJEVvZ1b93rpoJoKMrWaMp
 2d. Chats, Search and Reports (2026-11-16 evening, **approved: "all brilliant"**; v2 adds the owner's
    one change, chats like Telegram: a three-capsule header, bubbles with the time inside and a
    tail, a photo's time as a dark pill on it; building on `claude/ux-chat-fixes`): §1 shows the chat
