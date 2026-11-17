@@ -13,6 +13,7 @@
   import { deleteMessage, listMessages, postMessage } from '#lib/services/chat.ts';
   import { explain } from '#lib/services/errors.ts';
   import { mentionPool } from '#lib/services/messages.ts';
+  import { notifyMentions } from '#lib/services/notices.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead, projectChatMembers } from '#lib/services/publicChats.ts';
 
@@ -37,7 +38,12 @@
   const talk = new ChatState(
     {
       list: () => listMessages(project),
-      post: (body, replyTo, files) => inTurn(() => postMessage(project, body, replyTo, files)),
+      post: async (body, replyTo, files) => {
+        const sent = await inTurn(() => postMessage(project, body, replyTo, files));
+        const link = `${location.pathname}${location.search}`;
+        notifyMentions(mentions.mentioned(body), 'in a project chat', body, link);
+        return sent;
+      },
       file: (attachment) => projectAttachmentBlob(project, attachment),
       remove: (messageId) => inTurn(() => deleteMessage(project, messageId)),
       viewer,
