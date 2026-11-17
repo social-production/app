@@ -204,6 +204,17 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (6:15 pm Melbourne, 2026-11-17, UX session)
+- **ADR 0109 is live.** PR #190 merged 4:49 pm; directory and project networks reset, live by
+  ~5:02 pm (directory `uhC0kiXZib9v…`, project `uhC0kgtXO683…`, conversation unchanged
+  `uhC0k1AJBcn3…`). Everyone signs up again; demo content needs re-running.
+- **PR #191 (merged 6:10 pm, gateway only, no reset):** #190 had left the gateway half out, so
+  index cards carried no `picture`/`cover`: rows, the rail, Discover and tag sheets showed plain
+  icons. `cards.rs` now reads them from the charter; `ProjectCard` sends them as base64 hashes.
+  Checked on a local seed: feed-row tags and the "+N" tag sheet show the pictures, light and dark.
+- **Next:** demo content on live; ADR 0095's moderator merge on #platform software projects;
+  audits (Platform/Moderators, reporting, profile photos); parity's notification senders.
+
 ### Where things stand (3 pm Melbourne, 2026-11-17, UX session; now also parity's work)
 - **Owner, 17 Nov: "parity is not working today so that is your responsibility also."** This
   session owns the parity queue too (Settings, notifications, gateway, `tests/e2e/demo/*`).

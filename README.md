@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Pictures for channels and communities, and open #platform votes (PRs #190 and #191, ADR
+  0109, 2026-11-17; directory and project networks reset, live ~5:02 pm Melbourne):** a channel
+  or community takes a picture and a cover when created, and changes them by its own vote (or
+  its organizers); the pictures show on its page, feed-row tags, tag sheets, the rail and
+  Discover. Any Full member may vote on a #platform project, members or not.
 - **Loading, sign-up and Settings fixes (PRs #183 and #182, 2026-11-17 2:35 am and 3:07 am
   Melbourne):** project, event and request chats look like Messenger; a thin loading line and
   skeleton rows while pages load; a breathing-logo opening screen; each sign-up step fits a
