@@ -38,8 +38,10 @@ owner handed it to the UX session that day.
    `None` allowed only there. Integrity can't read standing in another DNA, so the recount
    (ADR 0040, `decide.rs`) keeps only voters with Full standing before the proposal, as it
    already does for members, and sizes the population from the directory's weekly active
-   count at the proposal's time (ADR 0095), never smaller than the member snapshot. The
-   Outcome check in integrity stays a member-snapshot tally; readers trust the recount.
+   count at the proposal's time (ADR 0095), never smaller than the member snapshot. Integrity
+   can't read that count either, so on a #platform project it checks only that an Outcome
+   cites one earlier vote per voter; readers trust the recount, as they already do for
+   standing.
 5. Everything else stays: records are never updated or deleted (images too), the handle is
    fixed, a personal service can't carry `#platform`.
 
