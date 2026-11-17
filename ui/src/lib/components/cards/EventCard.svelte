@@ -50,7 +50,7 @@
     {#if card.latestUpdate}
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
-    <CardFacts {when} place={card.locationLabel} />
+    <CardFacts {when} place={card.locationLabel} target={href} />
     <FeedActions
       commentHref={`${href}?tab=chat`}
       commentCount={card.commentCount}

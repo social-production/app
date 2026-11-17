@@ -4,7 +4,6 @@
   import LinkRequestsSection from '#lib/components/links/LinkRequestsSection.svelte';
   import LinksSection from '#lib/components/links/LinksSection.svelte';
   import LinksPast from '#lib/components/links/LinksPast.svelte';
-  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
 
   import type { DetailState } from './detailState.svelte.ts';
   import { LinksState } from './linksState.svelte.ts';
@@ -13,7 +12,7 @@
 
   /**
    * web's DetailLinksTab for projects (Polish Pass mockups, 2026-11-16): Propose a link at the
-   * top, the venue as a place row that opens the map, linked projects as rows, open votes as
+   * top (the place is on Details, owner 2026-11-18), linked projects as rows, open votes as
    * cards, and past links and votes folded away.
    */
   interface Props {
@@ -32,7 +31,6 @@
   });
 
   const frame = $derived(links.frame);
-  const venue = $derived(detail.project?.charter?.location_label.trim() ?? '');
 
   async function submit(targetId: string, summary: string): Promise<void> {
     if (await links.propose(targetId, summary)) composing = false;
@@ -52,10 +50,6 @@
 {/snippet}
 
 <section class="links-tab">
-  {#if venue && venue.toLowerCase() !== 'online'}
-    <div class="links-venue"><PlaceRow place={venue} /></div>
-  {/if}
-
   {#if links.error}<p class="tab-loading" role="alert">{links.error}</p>{/if}
 
   {#if !frame}

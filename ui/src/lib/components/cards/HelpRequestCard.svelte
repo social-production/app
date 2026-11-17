@@ -49,7 +49,7 @@
     >
     <a class="title" href={resolve('/help-requests/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>
-    <CardFacts {when} place={card.locationLabel} />
+    <CardFacts {when} place={card.locationLabel} target={href} />
     {#if signups}<p class="signup-summary">{signups}</p>{/if}
     <FeedActions
       commentHref={`${href}?tab=chat`}

@@ -121,6 +121,9 @@
     view.scheduleResize(start ? 120 : 50);
   }
 
+  // web shows an error toast; the app has no toast host, so the map's own toast says it.
+  const missing = (label: string): void => s.showToast(`Could not find ${label} on the map`);
+
   async function start(): Promise<void> {
     const prefs = readMapPreferences(s.me);
     if (prefs) {
@@ -129,16 +132,9 @@
       s.entityFilter = prefs.entityFilter || 'all';
       s.upcomingOnly = prefs.upcomingOnly;
     }
-    await loader.initialCenter();
-    await tick();
-    const { centerLat: lat, centerLon: lon } = s;
-    if (lat != null && lon != null) {
-      await view.mountIfNeeded(mapContainer, { lat, lon });
-      await view.syncRadiusToCenter();
-      view.currentRadiusKm = effectiveRadiusKm(s.radiusKm);
-      view.syncRadiusOverlay();
-      await loader.loadBroadening({ lat, lon });
-    } else await view.mountIfNeeded(mapContainer);
+    const pending = mapFocus.request;
+    clearMapFocusRequest();
+    await loader.boot(pending, missing);
     s.updateStageHeight();
     await tick();
     view.adapter?.resize?.();
@@ -189,8 +185,7 @@
     if (!initialLoadDone || !request) return;
     untrack(() => {
       clearMapFocusRequest();
-      // web shows an error toast; the app has no toast host, so the map's own toast says it.
-      void loader.focus(request, (label) => s.showToast(`Could not find ${label} on the map`));
+      void loader.focus(request, missing);
     });
   });
 </script>
