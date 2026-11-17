@@ -4,10 +4,33 @@ use sp_core::project::{check_fields, CharterFields, MODES, SUBTYPES, SUMMARY_MAX
 use sp_governance::projects::{check_new_member_project_cap, NEW_PROJECT_WINDOW_US};
 
 use crate::vouch::not_full;
-use crate::{invalid, typed_entry, EntryTypes, ProjectListing, UnitEntryTypes};
+use crate::{invalid, typed_entry, EntryTypes, StandingProof, UnitEntryTypes};
 
 /// `<creator key>.<nonce>` (see `project_integrity::creator_in_seed`).
 const NETWORK_SEED_MAX: usize = 128;
+
+/// A project in the directory (docs/plans/M2-projects.md). The project itself lives in its
+/// own clone of the project DNA, joined with `network_seed` and the author as creator.
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct ProjectListing {
+    pub network_seed: String,
+    pub title: String,
+    pub summary: String,
+    pub mode: String,
+    pub subtype: String,
+    pub location_label: String,
+    pub phase: String,
+    pub tags: Vec<String>,
+    /// Full members cite their standing and skip the New-member limit.
+    pub creator_standing: Option<StandingProof>,
+    /// A channel's or community's picture and cover (`ScopeImage` records, ADR 0109): the
+    /// creator mirrors its scope's passed charter here, so rows need no read of the clone.
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
+}
 
 /// Valid fields, and either a Full-standing proof or room under the New-member limit.
 pub fn validate_create(
@@ -62,6 +85,10 @@ fn check(l: &ProjectListing) -> Result<(), String> {
     }
     if l.summary.chars().count() > SUMMARY_MAX {
         return Err(format!("summary must be at most {SUMMARY_MAX} characters"));
+    }
+    let scope = l.mode == "channel" || l.mode == "community";
+    if !scope && (l.picture.is_some() || l.cover.is_some()) {
+        return Err("only a channel or community has a picture and cover".into());
     }
     // Other kinds (ADR 0057: events, later help requests, communities, channels) get shape
     // checks only; their clone's own DNA holds the rules, so new kinds need no directory reset.

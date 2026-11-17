@@ -1,6 +1,7 @@
 //! The membership roll: every `Members` link with when it was made and, if its member left,
 //! when it was deleted. Challenges are checked against it (ADR 0040).
 
+use std::cell::RefCell;
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
@@ -20,7 +21,12 @@ impl Span {
     }
 }
 
-pub struct Roll(Vec<Span>);
+pub struct Roll {
+    spans: Vec<Span>,
+    /// A #platform project: its population is the weekly active count (ADR 0109).
+    platform: bool,
+    weekly: RefCell<BTreeMap<i64, u32>>,
+}
 
 impl Roll {
     pub fn load() -> ExternResult<Self> {
@@ -39,12 +45,21 @@ impl Roll {
                 left: deletes.iter().map(|d| d.action().timestamp()).min(),
             })
             .collect();
-        Ok(Self(spans))
+        let platform = crate::calls::base_charter()?.is_some_and(|c| {
+            c.tags
+                .iter()
+                .any(|t| t.eq_ignore_ascii_case(sp_scope::PLATFORM))
+        });
+        Ok(Self {
+            spans,
+            platform,
+            weekly: RefCell::default(),
+        })
     }
 
     /// Who made the membership link `hash`; asks the network when the roll hasn't seen it.
     pub fn agent(&self, hash: &ActionHash) -> ExternResult<Option<AgentPubKey>> {
-        if let Some(span) = self.0.iter().find(|s| &s.hash == hash) {
+        if let Some(span) = self.spans.iter().find(|s| &s.hash == hash) {
             return Ok(Some(span.agent.clone()));
         }
         Ok(get(hash.clone(), GetOptions::default())?.map(|r| r.action().author().clone()))
@@ -52,7 +67,7 @@ impl Roll {
 
     /// The member of link `hash`, if it was a live membership at `at`.
     pub fn member_at(&self, hash: &ActionHash, at: Timestamp) -> Option<&AgentPubKey> {
-        self.0
+        self.spans
             .iter()
             .find(|s| &s.hash == hash && s.member_at(at))
             .map(|s| &s.agent)
@@ -61,7 +76,7 @@ impl Roll {
     /// Everyone who was a member at `at`, each with their earliest membership link then.
     pub fn members_at(&self, at: Timestamp) -> BTreeMap<AgentPubKey, ActionHash> {
         let mut earliest: BTreeMap<AgentPubKey, &Span> = BTreeMap::new();
-        for span in self.0.iter().filter(|s| s.member_at(at)) {
+        for span in self.spans.iter().filter(|s| s.member_at(at)) {
             let entry = earliest.entry(span.agent.clone()).or_insert(span);
             if span.at < entry.at {
                 *entry = span;
@@ -71,5 +86,20 @@ impl Roll {
             .into_iter()
             .map(|(agent, span)| (agent, span.hash.clone()))
             .collect()
+    }
+
+    /// The population a proposal made at `at` is counted against: the member snapshot, or on
+    /// a #platform project the directory's weekly active count then, if larger (ADR 0109).
+    pub fn population(&self, members: u32, at: Timestamp) -> ExternResult<u32> {
+        if !self.platform {
+            return Ok(members);
+        }
+        let key = at.as_micros();
+        if let Some(n) = self.weekly.borrow().get(&key) {
+            return Ok(members.max(*n));
+        }
+        let n = crate::calls::weekly_active(at)?;
+        self.weekly.borrow_mut().insert(key, n);
+        Ok(members.max(n))
     }
 }

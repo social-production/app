@@ -23,6 +23,11 @@ pub struct ListingInput {
     pub location_label: String,
     pub phase: String,
     pub tags: Vec<String>,
+    /// A scope's picture and cover (`ScopeImage` hashes, ADR 0109).
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -162,5 +167,7 @@ fn to_listing(
         phase: input.phase,
         tags: input.tags,
         creator_standing,
+        picture: input.picture,
+        cover: input.cover,
     }
 }

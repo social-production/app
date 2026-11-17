@@ -14,6 +14,7 @@ mod challenge;
 mod charter;
 mod governance;
 mod history;
+mod kinds;
 mod link;
 mod links;
 mod organizer;
@@ -32,6 +33,7 @@ pub use applied::{Applied, AppliedRequests, AppliedUpdate};
 pub use availability::{AvailabilityRule, Booking};
 pub use governance::{check_scope_kind, SNAPSHOT_MAX};
 pub use history::{ActivityCompletion, ActivityRating};
+pub use kinds::{ImageChange, ProposalKind};
 pub use link::{LinkRequest, ProjectRef};
 pub use organizer::{audience, organized, Invite, Organizer, OrganizerRole};
 pub use place::Place;
@@ -58,57 +60,11 @@ pub struct Charter {
     /// The phase the project was created in; later phases come from passed proposals.
     pub phase: String,
     pub tags: Vec<String>,
-}
-
-/// What a proposal decides. An edit stores only what changes (as web does).
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-#[allow(clippy::large_enum_variant)] // boxing the plan would change every caller
-pub enum ProposalKind {
-    Edit {
-        title: Option<String>,
-        description: Option<String>,
-        location: Option<String>,
-        /// With `location`: its place (ADR 0078); `None` there leaves the label without one.
-        #[serde(default)]
-        place: Option<Box<Place>>,
-    },
-    Update {
-        body: String,
-    },
-    /// Leaving a plan phase cites the approved plan it goes ahead with (ADR 0039). web asks
-    /// for a reason for every phase change (ADR 0040).
-    Phase {
-        to: String,
-        plan: Option<ActionHash>,
-        reason: String,
-    },
-    /// A production, distribution, operations or access plan; its approval is the vote.
-    Plan(Plan),
-    /// Back to an earlier planning phase, with web's required reason (ADR 0040). Whether `to`
-    /// is earlier depends on the phase reached, so the fold checks it when applying.
-    Return {
-        to: String,
-        reason: String,
-    },
-    /// One project's half of a link to another project (ADR 0042).
-    Link(LinkRequest),
-    /// Remove a member from a channel or community (web's `remove_member`, ADR 0068).
-    RemoveMember {
-        agent: AgentPubKey,
-    },
-    /// Request settings (ADR 0076): voted in a collective service, saved by a personal one's.
-    RequestSettings {
-        enabled: bool,
-        mode: String,
-        off_schedule: bool,
-        reason: String,
-    },
-    /// A software project's pull request, merge, merge capability or repository (ADR 0086).
-    Software(SoftwareRequest),
-    /// Close this and continue the work as a new proposal (ADR 0106).
-    Convert {
-        reason: String,
-    },
+    /// A channel's or community's picture and cover: directory `ScopeImage` hashes (ADR 0109).
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
 }
 
 #[hdk_entry_helper]
@@ -140,7 +96,9 @@ pub enum VoteChoice {
 #[derive(Clone, PartialEq)]
 pub struct Vote {
     pub proposal: ActionHash,
-    pub membership: ActionHash,
+    /// The voter's `Members` link; `None` only on a #platform project, where any Full member
+    /// may vote and the recount keeps only Full standing (ADR 0109).
+    pub membership: Option<ActionHash>,
     pub choice: VoteChoice,
 }
 

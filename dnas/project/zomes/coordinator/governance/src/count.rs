@@ -91,7 +91,7 @@ pub fn count(p: &Found<Proposal>, roll: &Roll) -> ExternResult<Count> {
         .collect();
     let to_u32 = |n: usize| u32::try_from(n).unwrap_or(u32::MAX);
     Ok(Count {
-        population: to_u32(p.entry.members.len() + added.len()),
+        population: roll.population(to_u32(p.entry.members.len() + added.len()), p.at)?,
         added: to_u32(added.len()),
         challenges: counted.into_iter().collect(),
         decided,

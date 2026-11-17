@@ -20,6 +20,16 @@ pub struct Cover {
     pub bytes: Vec<u8>,
 }
 
+/// A channel's or community's picture or cover (ADR 0109), named by its charter and listing.
+/// Content-addressed: the same image is one record.
+#[hdk_entry_helper]
+#[derive(Clone, PartialEq)]
+pub struct ScopeImage {
+    pub mime: String,
+    #[serde(with = "serde_bytes")]
+    pub bytes: Vec<u8>,
+}
+
 /// "I commented in this space": the space's listing, the message in its clone, who it answers
 /// (a reply), and the opening words, so a feed row needs no read of the space itself.
 #[hdk_entry_helper]
@@ -37,6 +47,16 @@ pub fn validate_cover(c: &Cover) -> ExternResult<ValidateCallbackResult> {
     }
     if !AVATAR_MIME_TYPES.contains(&c.mime.as_str()) {
         return invalid("a cover photo must be JPEG, PNG or WebP");
+    }
+    Ok(ValidateCallbackResult::Valid)
+}
+
+pub fn validate_scope_image(i: &ScopeImage) -> ExternResult<ValidateCallbackResult> {
+    if i.bytes.is_empty() || i.bytes.len() > COVER_MAX_BYTES {
+        return invalid("a picture or cover must be at most 512 KB");
+    }
+    if !AVATAR_MIME_TYPES.contains(&i.mime.as_str()) {
+        return invalid("a picture or cover must be JPEG, PNG or WebP");
     }
     Ok(ValidateCallbackResult::Valid)
 }
@@ -73,6 +93,25 @@ mod tests {
             bytes: vec![1; 10],
         };
         assert!(!valid(validate_cover(&gif)));
+    }
+
+    #[test]
+    fn scope_images_are_small_images() {
+        let ok = ScopeImage {
+            mime: "image/webp".into(),
+            bytes: vec![1; 1000],
+        };
+        assert!(valid(validate_scope_image(&ok)));
+        let empty = ScopeImage {
+            mime: "image/png".into(),
+            bytes: vec![],
+        };
+        assert!(!valid(validate_scope_image(&empty)));
+        let big = ScopeImage {
+            mime: "image/jpeg".into(),
+            bytes: vec![1; COVER_MAX_BYTES + 1],
+        };
+        assert!(!valid(validate_scope_image(&big)));
     }
 
     #[test]

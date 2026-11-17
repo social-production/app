@@ -33,6 +33,11 @@ pub struct Applied {
     /// The place the edit that set `location` gave it, if any (ADR 0078).
     #[serde(default)]
     pub place: Option<crate::Place>,
+    /// A scope's newest passed picture and cover change (ADR 0109).
+    #[serde(default)]
+    pub picture: Option<crate::ImageChange>,
+    #[serde(default)]
+    pub cover: Option<crate::ImageChange>,
     /// The phase reached through passed `Phase` proposals, if any.
     pub phase: Option<String>,
     /// The subtype chosen by the production or operations plan (ADR 0039), if any.

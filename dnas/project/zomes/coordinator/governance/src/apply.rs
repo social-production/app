@@ -97,10 +97,14 @@ fn edit(out: &mut Applied, kind: ProposalKind) {
         description,
         location,
         place,
+        picture,
+        cover,
     } = kind
     {
         out.title = title.or(out.title.take());
         out.description = description.or(out.description.take());
+        out.picture = picture.or(out.picture.take());
+        out.cover = cover.or(out.cover.take());
         if location.is_some() {
             out.location = location;
             out.place = place.map(|p| *p);
