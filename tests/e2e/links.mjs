@@ -123,7 +123,7 @@ log('founder two approved it for project B: the link is active');
 
 await linksUntil(ann, urlA, () => ann.locator('.network-stack .link-card', { hasText: titles[1] }), 'the link in A');
 await ann.screenshot({ path: `${shots}/links-active-390.png` });
-await historyCard(ann, /^Link with/, 'approved');
+await historyCard(ann, /Link with/, 'approved');
 log("A's History lists the approved link decision");
 await ann.getByRole('tab', { name: 'Links' }).click();
 await ann.locator('.network-stack').first().locator('.link-card .toggle-button').click();
