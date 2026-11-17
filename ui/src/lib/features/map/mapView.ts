@@ -77,6 +77,12 @@ export class MapView {
     this.lastViewportKey = '';
   }
 
+  /** A tapped pin opens its card (Map Redesign); a tap on the map closes it. */
+  select(markerId: string | null): void {
+    this.s.selectedId = markerId;
+    this.highlight(markerId);
+  }
+
   highlight(markerId: string | null, center = false): void {
     this.s.highlightedId = markerId;
     this.adapter?.setHighlightedMarker?.(markerId);
@@ -173,6 +179,7 @@ export class MapView {
     this.adapter = createMapAdapter(this.navigate);
     this.adapter.setErrorHandler?.((message) => (this.s.mapTileError = explain(message)));
     this.adapter.onViewportChange?.((v) => this.onViewport(v));
+    this.adapter.onMarkerSelect?.((id) => this.select(id));
     try {
       await this.adapter.mount(container, { center, zoom: centered ? LOCAL_ZOOM : WORLD_ZOOM });
       this.mounted = true;

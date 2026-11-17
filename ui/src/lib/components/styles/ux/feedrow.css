@@ -282,3 +282,12 @@
   color: var(--brand-strong);
   font-weight: 600;
 }
+
+/* A feed row's kind icon is the map pin's: a white symbol on the kind's solid colour
+   (Map Redesign, owner 2026-11-17: "bolder colours and these symbols"). */
+.shell .surface .content .feed-lead-glyph .surface-type-label.kind-tile,
+.shell .context-panel .feed-lead-glyph .surface-type-label.kind-tile,
+.feed-lead-glyph .surface-type-label.kind-tile {
+  background: var(--surface-accent);
+  color: var(--kind-on);
+}

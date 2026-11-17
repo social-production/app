@@ -1,6 +1,10 @@
-/** web's pin element (`maps/maplibre.ts` `buildMarkerElement`). Links go through `navigate`
- * (the app's router) instead of a page load, which would reconnect to Holochain. */
-import { buildTooltipHtml, resolveMarkerColor, truncate } from './markerLook.ts';
+/** A map pin (Map Redesign, owner 2026-11-17): a round head in its kind's colour with the
+ * kind's symbol (the same set as the feed cards' icons), a white ring and a short tail.
+ * Proposals and activities are a size smaller, past events are faded, and the selected pin
+ * grows and names itself. A tap selects the pin (the map opens its card); it never leaves
+ * the map by itself. */
+import { KIND_GLYPHS, kindOfMarker } from '#lib/domain/kindGlyphs.ts';
+import { buildTooltipHtml, truncate } from './markerLook.ts';
 import type { MapMarker } from './types.ts';
 
 export interface Tooltip {
@@ -12,128 +16,70 @@ export interface Tooltip {
 export interface PinContext {
   tooltip: Tooltip;
   navigate: (href: string) => void;
+  /** A tapped pin: the map selects it and shows its card. */
+  select: (markerId: string) => void;
 }
 
-const fromChild = (event: Event): boolean =>
-  Boolean((event.target as HTMLElement | null)?.closest?.('.sp-map-marker__child'));
-
-/** One activity row inside a parent's pin. */
-function childRowElement(
-  child: MapMarker,
-  parent: MapMarker,
-  childList: HTMLElement,
-  highlightedChildId: string | null,
-  parentTooltipHtml: string,
-  ctx: PinContext,
-): HTMLElement {
-  const row = document.createElement('span');
-  row.className = [
-    'sp-map-marker__child',
-    child.id === highlightedChildId ? 'sp-map-marker__child--highlighted' : '',
-  ]
-    .filter(Boolean)
-    .join(' ');
-  row.dataset.markerId = child.id;
-  row.style.setProperty('--sp-map-marker-child-color', resolveMarkerColor(child));
-  row.setAttribute('role', 'link');
-  row.tabIndex = 0;
-  row.textContent = truncate(child.label, 28);
-  const html = buildTooltipHtml({ ...child, parentTitle: parent.label });
-  row.addEventListener('mouseenter', (event) => {
-    event.stopPropagation();
-    for (const other of childList.querySelectorAll<HTMLElement>('.sp-map-marker__child')) {
-      other.classList.toggle(
-        'sp-map-marker__child--highlighted',
-        other === row || other.dataset.markerId === highlightedChildId,
-      );
-    }
-    ctx.tooltip.show(html, event.clientX, event.clientY);
-  });
-  row.addEventListener('mousemove', (event) => {
-    event.stopPropagation();
-    ctx.tooltip.move(event.clientX, event.clientY);
-  });
-  row.addEventListener('mouseleave', (event) => {
-    event.stopPropagation();
-    if (child.id !== highlightedChildId) row.classList.remove('sp-map-marker__child--highlighted');
-    ctx.tooltip.show(parentTooltipHtml, event.clientX, event.clientY);
-  });
-  row.addEventListener('click', (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    if (child.href) ctx.navigate(child.href);
-  });
-  return row;
-}
-
-/** The title, status and activity rows of an expanded pin. */
-function fillExpanded(
-  element: HTMLElement,
-  item: MapMarker,
-  highlightedChildId: string | null,
-  tooltipHtml: string,
-  ctx: PinContext,
-): void {
-  const title = document.createElement('span');
-  title.className = 'sp-map-marker__title sp-map-marker__title--solo';
-  title.textContent = truncate(item.label, 32);
-  element.appendChild(title);
-  if (item.statusText?.trim()) {
-    const status = document.createElement('span');
-    status.className = 'sp-map-marker__status';
-    status.textContent = truncate(item.statusText, 28);
-    element.appendChild(status);
-  }
-  const children = item.children ?? [];
-  if (children.length === 0) return;
-  const list = document.createElement('span');
-  list.className = 'sp-map-marker__children';
-  for (const child of children) {
-    list.appendChild(childRowElement(child, item, list, highlightedChildId, tooltipHtml, ctx));
-  }
-  element.appendChild(list);
+export function isPastMarker(item: MapMarker, now = Date.now()): boolean {
+  const end = Date.parse(item.endsAt ?? item.scheduledAt ?? '');
+  return Number.isFinite(end) && end < now;
 }
 
 export function buildMarkerElement(
   item: MapMarker,
-  compact: boolean,
   highlighted: boolean,
-  highlightedChildId: string | null,
   ctx: PinContext,
 ): HTMLButtonElement {
-  const entityType = item.entityType ?? 'event';
-  const hasChildren = (item.children ?? []).length > 0;
-  const showExpanded = highlighted || !compact || hasChildren;
+  const kind = kindOfMarker(item);
+  const small = kind === 'proposal' || item.entityType === 'activity';
   const element = document.createElement('button');
   element.type = 'button';
   element.className = [
-    'sp-map-marker',
-    showExpanded ? '' : 'sp-map-marker--dot',
-    highlighted ? 'sp-map-marker--highlighted' : '',
-    hasChildren ? 'sp-map-marker--grouped' : '',
-    `sp-map-marker--${entityType}`,
+    'sp-pin',
+    `sp-pin--${kind}`,
+    small && !highlighted ? 'sp-pin--small' : '',
+    highlighted ? 'sp-pin--selected' : '',
+    isPastMarker(item) ? 'sp-pin--past' : '',
   ]
     .filter(Boolean)
     .join(' ');
   element.setAttribute('aria-label', item.label);
   element.dataset.markerId = item.id;
-  element.style.setProperty('--sp-map-marker-color', resolveMarkerColor(item));
+  element.style.setProperty('--pin', `var(--kind-${kind})`);
+  const children = item.children?.length ?? 0;
+  element.innerHTML =
+    (highlighted ? `<span class="sp-pin__name"></span>` : '') +
+    `<span class="sp-pin__head"><svg viewBox="0 0 24 24" aria-hidden="true">${KIND_GLYPHS[kind]}</svg>` +
+    (children > 0 ? `<span class="sp-pin__count">${children + 1}</span>` : '') +
+    `</span><span class="sp-pin__tail"></span>`;
+  const name = element.querySelector('.sp-pin__name');
+  if (name) name.textContent = truncate(item.label, 32);
   const tooltipHtml = buildTooltipHtml(item);
-  if (showExpanded) fillExpanded(element, item, highlightedChildId, tooltipHtml, ctx);
   element.addEventListener('mouseenter', (event) => {
-    if (!fromChild(event)) ctx.tooltip.show(tooltipHtml, event.clientX, event.clientY);
+    if (!highlighted) ctx.tooltip.show(tooltipHtml, event.clientX, event.clientY);
   });
-  element.addEventListener('mousemove', (event) => {
-    if (!fromChild(event)) ctx.tooltip.move(event.clientX, event.clientY);
-  });
+  element.addEventListener('mousemove', (event) => ctx.tooltip.move(event.clientX, event.clientY));
   element.addEventListener('mouseleave', () => ctx.tooltip.hide());
-  if (item.href) {
-    const href = item.href;
-    element.addEventListener('click', (event) => {
-      if (fromChild(event)) return;
-      event.preventDefault();
-      ctx.navigate(href);
-    });
-  }
+  element.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    ctx.tooltip.hide();
+    ctx.select(item.id);
+  });
+  return element;
+}
+
+/** Pins too close to tell apart, as one round count; a tap zooms in on them. */
+export function buildClusterElement(count: number, onTap: () => void): HTMLButtonElement {
+  const element = document.createElement('button');
+  element.type = 'button';
+  element.className = 'sp-cluster';
+  element.setAttribute('aria-label', `${count} places here. Zoom in`);
+  element.textContent = String(count);
+  element.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    onTap();
+  });
   return element;
 }

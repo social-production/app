@@ -1,19 +1,56 @@
-/** web's pin layer (`maps/maplibre.ts` `renderMarkers`, `scheduleCompactRefresh`): stacked,
- * crowded pins shrink to dots, the highlighted one stays expanded. */
+/** The pin layer (Map Redesign, owner 2026-11-17): one round pin per thing; pins closer than
+ * a pin's width merge into a count that zooms in when tapped (they used to shrink to dots);
+ * the selected pin stays out of any count. web's same-spot stacking still applies first. */
 import { Marker, type Map as MapLibreMap } from 'maplibre-gl';
-import { buildMarkerElement, type PinContext } from './markerElement.ts';
-import { detectCrowdedMarkerIds, stackOverlappingCoordinates } from './stacking.ts';
+import { buildClusterElement, buildMarkerElement, type PinContext } from './markerElement.ts';
+import { stackOverlappingCoordinates } from './stacking.ts';
 import type { MapMarker } from './types.ts';
+
+const CLUSTER_PX = 42;
+
+interface Cluster {
+  members: MapMarker[];
+  x: number;
+  y: number;
+}
+
+/** Greedy screen-space clusters: each pin joins the first cluster within CLUSTER_PX. */
+function clusterOf(map: MapLibreMap, markers: MapMarker[], keep: string | null): Cluster[] {
+  const clusters: Cluster[] = [];
+  for (const item of markers) {
+    const p = map.project([item.longitude, item.latitude]);
+    const near =
+      item.id === keep
+        ? undefined
+        : clusters.find(
+            (c) =>
+              !c.members.some((m) => m.id === keep) &&
+              (c.x - p.x) ** 2 + (c.y - p.y) ** 2 <= CLUSTER_PX ** 2,
+          );
+    if (near) near.members.push(item);
+    else clusters.push({ members: [item], x: p.x, y: p.y });
+  }
+  return clusters;
+}
+
+const signature = (clusters: Cluster[]): string =>
+  clusters
+    .map((c) =>
+      c.members
+        .map((m) => m.id)
+        .sort()
+        .join('+'),
+    )
+    .sort()
+    .join(',');
 
 export class Pins {
   pending: MapMarker[] = [];
   private placed: Marker[] = [];
-  private rendering = false;
-  private lastCrowdedKey = '';
-  private compactDebounce: ReturnType<typeof setTimeout> | null = null;
+  private lastKey = '';
+  private refresh: ReturnType<typeof setTimeout> | null = null;
   private highlightedId: string | null = null;
-  private byId = new Map<string, { marker: Marker; item: MapMarker }>();
-  private forceExpanded = new Set<string>();
+  private byId = new Map<string, MapMarker>();
   private childToParent = new Map<string, string>();
 
   constructor(
@@ -21,15 +58,10 @@ export class Pins {
     private readonly ctx: PinContext,
   ) {}
 
-  private highlightTarget(): { parentId: string | null; childId: string | null } {
+  /** The pin a highlighted id shows on (an activity shows on its parent's pin). */
+  private selectedPin(): string | null {
     const id = this.highlightedId;
-    if (!id) return { parentId: null, childId: null };
-    const parentId = this.childToParent.get(id);
-    return parentId ? { parentId, childId: id } : { parentId: id, childId: null };
-  }
-
-  private crowded(map: MapLibreMap, markers: MapMarker[]): Set<string> {
-    return detectCrowdedMarkerIds((p) => map.project(p), markers, this.forceExpanded);
+    return id ? (this.childToParent.get(id) ?? id) : null;
   }
 
   clear(): void {
@@ -40,63 +72,69 @@ export class Pins {
 
   render(next: MapMarker[]): void {
     const map = this.map();
+    this.pending = next;
     if (!map) return;
-    if (this.rendering) {
-      this.pending = next;
-      queueMicrotask(() => {
-        if (this.pending === next) this.render(this.pending);
-      });
-      return;
-    }
-    this.rendering = true;
-    try {
-      this.place(map, next);
-    } finally {
-      this.rendering = false;
-    }
-  }
-
-  private place(map: MapLibreMap, next: MapMarker[]): void {
     this.clear();
     const stacked = stackOverlappingCoordinates(next);
-    this.forceExpanded = stacked.forceExpandedIds;
     this.childToParent = stacked.childToParentId;
-    const crowded = this.crowded(map, stacked.markers);
-    this.lastCrowdedKey = [...crowded].sort().join(',');
-    const highlight = this.highlightTarget();
-    stacked.markers.forEach((item, stackIndex) => {
-      const highlighted = item.id === highlight.parentId;
-      const forced = this.forceExpanded.has(item.id);
-      const compact = crowded.has(item.id) && !highlighted && !forced;
-      const element = buildMarkerElement(
-        item,
-        compact,
-        highlighted,
-        highlighted ? highlight.childId : null,
-        this.ctx,
-      );
-      if (forced || highlighted) element.style.zIndex = String(40 + stackIndex);
-      const marker = new Marker({ element, anchor: compact && !highlighted ? 'center' : 'bottom' })
-        .setLngLat([item.longitude, item.latitude])
-        .addTo(map);
-      this.placed.push(marker);
-      this.byId.set(item.id, { marker, item });
-      for (const child of item.children ?? []) this.byId.set(child.id, { marker, item });
-    });
+    const selected = this.selectedPin();
+    const clusters = clusterOf(map, stacked.markers, selected);
+    this.lastKey = signature(clusters);
+    for (const item of stacked.markers) {
+      this.byId.set(item.id, item);
+      for (const child of item.children ?? []) this.byId.set(child.id, item);
+    }
+    for (const cluster of clusters) {
+      const [only] = cluster.members;
+      if (cluster.members.length === 1 && only) this.placePin(map, only, selected);
+      else this.placeCluster(map, cluster.members);
+    }
   }
 
-  /** After a zoom, re-render only when which pins are crowded changed. */
+  private placePin(map: MapLibreMap, item: MapMarker, selected: string | null): void {
+    const highlighted = item.id === selected;
+    const element = buildMarkerElement(item, highlighted, this.ctx);
+    if (highlighted) element.style.zIndex = '50';
+    const marker = new Marker({ element, anchor: 'bottom' })
+      .setLngLat([item.longitude, item.latitude])
+      .addTo(map);
+    this.placed.push(marker);
+  }
+
+  private placeCluster(map: MapLibreMap, members: MapMarker[]): void {
+    const lng = members.reduce((sum, m) => sum + m.longitude, 0) / members.length;
+    const lat = members.reduce((sum, m) => sum + m.latitude, 0) / members.length;
+    const element = buildClusterElement(members.length, () => {
+      const lngs = members.map((m) => m.longitude);
+      const lats = members.map((m) => m.latitude);
+      const span = Math.max(
+        Math.max(...lngs) - Math.min(...lngs),
+        Math.max(...lats) - Math.min(...lats),
+      );
+      if (span < 0.0005) map.easeTo({ center: [lng, lat], zoom: Math.min(map.getZoom() + 3, 18) });
+      else
+        map.fitBounds(
+          [
+            [Math.min(...lngs), Math.min(...lats)],
+            [Math.max(...lngs), Math.max(...lats)],
+          ],
+          { padding: 80, maxZoom: 18 },
+        );
+    });
+    const marker = new Marker({ element, anchor: 'center' }).setLngLat([lng, lat]).addTo(map);
+    this.placed.push(marker);
+  }
+
+  /** After a zoom, re-render only when the clusters changed. */
   scheduleCompactRefresh(): void {
-    if (this.compactDebounce) clearTimeout(this.compactDebounce);
-    this.compactDebounce = setTimeout(() => {
+    if (this.refresh) clearTimeout(this.refresh);
+    this.refresh = setTimeout(() => {
       const map = this.map();
-      if (!map || this.pending.length === 0 || this.rendering) return;
+      if (!map || this.pending.length === 0) return;
       const stacked = stackOverlappingCoordinates(this.pending);
-      this.forceExpanded = stacked.forceExpandedIds;
-      this.childToParent = stacked.childToParentId;
-      const key = [...this.crowded(map, stacked.markers)].sort().join(',');
-      if (key !== this.lastCrowdedKey) this.render(this.pending);
-    }, 400);
+      const key = signature(clusterOf(map, stacked.markers, this.selectedPin()));
+      if (key !== this.lastKey) this.render(this.pending);
+    }, 250);
   }
 
   highlight(markerId: string | null): void {
@@ -105,12 +143,12 @@ export class Pins {
   }
 
   position(markerId: string): { latitude: number; longitude: number } | null {
-    const entry = this.byId.get(markerId);
-    return entry ? { latitude: entry.item.latitude, longitude: entry.item.longitude } : null;
+    const item = this.byId.get(markerId);
+    return item ? { latitude: item.latitude, longitude: item.longitude } : null;
   }
 
   destroy(): void {
-    if (this.compactDebounce) clearTimeout(this.compactDebounce);
+    if (this.refresh) clearTimeout(this.refresh);
     this.clear();
     this.pending = [];
   }

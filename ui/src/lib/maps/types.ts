@@ -57,6 +57,8 @@ export interface MapAdapter {
   /** Pan to a marker without changing zoom. */
   centerOnMarker?(markerId: string): void;
   onViewportChange?(handler: ((change: MapViewportChange) => void) | null): void;
+  /** A tapped pin, or `null` for a tap on the map itself. */
+  onMarkerSelect?(handler: ((markerId: string | null) => void) | null): void;
   /** Recompute map dimensions after the container becomes visible or resizes. */
   resize?(): void;
   /** Optional hook for tile/style load failures. */
