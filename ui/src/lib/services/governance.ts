@@ -10,6 +10,7 @@ import {
 } from '#lib/holo/index.ts';
 
 import { cellFor, type ProjectRef } from './projects.ts';
+import { artIn, artOut } from './scopeImages.ts';
 
 type KindWire =
   | Exclude<ProposalKind, { Phase: unknown } | { RemoveMember: unknown }>
@@ -40,6 +41,10 @@ const governance = async <T>(project: ProjectRef, fn: string, payload?: unknown)
   callCell<T>(await cellFor(project), 'governance', fn, payload);
 
 function kindOf(kind: KindWire): ProposalKind {
+  if ('Edit' in kind) {
+    const { picture, cover, ...rest } = kind.Edit;
+    return { Edit: { ...rest, picture: artIn(picture), cover: artIn(cover) } };
+  }
   if ('RemoveMember' in kind)
     return { RemoveMember: { agent: hashToString(kind.RemoveMember.agent) } };
   if (!('Phase' in kind)) return kind;
@@ -80,7 +85,18 @@ export async function propose(projectId: string, kind: ProposalKind): Promise<vo
       : 'RemoveMember' in kind
         ? { RemoveMember: { agent: stringToHash(kind.RemoveMember.agent) } }
         : kind;
-  await governance<ActionHash>(projectId, 'propose', wire);
+  // A scope's picture and cover travel as raw hashes (ADR 0109).
+  const sent =
+    'Edit' in kind
+      ? {
+          Edit: {
+            ...kind.Edit,
+            picture: artOut(kind.Edit.picture),
+            cover: artOut(kind.Edit.cover),
+          },
+        }
+      : wire;
+  await governance<ActionHash>(projectId, 'propose', sent);
 }
 
 /** Votes are final (ADR 0033). */

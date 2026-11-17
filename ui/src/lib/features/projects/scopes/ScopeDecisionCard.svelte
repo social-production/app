@@ -1,6 +1,7 @@
 <script lang="ts">
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
 
+  import { imageUrl, type ScopeArt } from './scopeArt.svelte.ts';
   import { describeDecision, type ScopeDecision } from './scopeGovernance.svelte.ts';
 
   /**
@@ -16,9 +17,31 @@
     busy?: boolean;
     /** The choice just made, kept marked while the sheet moves on. */
     chosen?: VoteChoice | null;
+    /** The scope's current picture and cover, shown as "Now" beside a proposed one. */
+    art?: ScopeArt | undefined;
   }
 
-  let { item, memberName, onVote, busy = false, chosen = null }: Props = $props();
+  let { item, memberName, onVote, busy = false, chosen = null, art }: Props = $props();
+
+  // A picture or cover change shows Now and Proposed side by side (Channel Pictures §3).
+  const change = $derived.by(() => {
+    if (!('Edit' in item.kind)) return null;
+    const { picture, cover } = item.kind.Edit;
+    const pick = cover ?? picture;
+    if (!pick) return null;
+    return {
+      slot: cover ? ('cover' as const) : ('picture' as const),
+      hash: pick === 'Remove' ? null : pick.Set,
+    };
+  });
+  let proposedUrl = $state<string | null>(null);
+  $effect(() => {
+    const hash = change?.hash ?? null;
+    void imageUrl(hash).then((u) => (proposedUrl = u));
+  });
+  const nowUrl = $derived(
+    change ? (change.slot === 'cover' ? art?.coverUrl : art?.pictureUrl) : null,
+  );
 
   const open = $derived(item.status === 'Open');
   const share = $derived(
@@ -44,6 +67,21 @@
     <span class="decision-tag">{tag}</span>
   </div>
   {#if text}<p class="decision-text">"{text}"</p>{/if}
+  {#if change}
+    <div class="decision-art" class:square={change.slot === 'picture'}>
+      {#if open}
+        <figure>
+          <span style={nowUrl ? `background-image: url(${nowUrl})` : undefined}></span>
+          <figcaption>Now</figcaption>
+        </figure>
+        <span class="decision-art-arrow" aria-hidden="true">›</span>
+      {/if}
+      <figure>
+        <span style={proposedUrl ? `background-image: url(${proposedUrl})` : undefined}></span>
+        <figcaption>{change.hash ? 'Proposed' : 'Removed'}</figcaption>
+      </figure>
+    </div>
+  {/if}
   <div class="decision-bar" aria-hidden="true"><i style={`width: ${Math.max(fill, 3)}%`}></i></div>
   <p class="decision-line">
     {item.yes} yes · {item.no} no · {item.required} votes needed, {APPROVAL_PERCENT}% yes · by {item.proposer}

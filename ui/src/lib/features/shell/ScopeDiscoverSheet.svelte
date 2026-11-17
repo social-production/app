@@ -12,7 +12,7 @@
   import { resolve } from '$app/paths';
   import type { Scope, ScopeKind } from '#lib/domain/scopes.ts';
 
-  import { scopeHref } from './myScopesLoop.ts';
+  import { scopeHref, withPictures } from './myScopesLoop.ts';
 
   import '#lib/components/styles/scopes.css';
 
@@ -67,7 +67,7 @@
     if (scopes.length === 0) loading = true;
     loadError = '';
     try {
-      const found = await listScopes(needle, 200);
+      const found = await withPictures(await listScopes(needle, 200));
       if (current === requestId) scopes = found;
     } catch {
       if (current === requestId) loadError = 'Could not load channels and communities.';
@@ -166,7 +166,14 @@
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- scopeHref resolves -->
           <a class="scope-row-link" href={scopeHref(scope)} onclick={choose}>
             <span class="scope-icon" data-kind={scope.kind}>
-              {#if scope.kind === 'channel'}#{:else}<SurfaceIcon icon="community" size="sm" />{/if}
+              {#if scope.pictureUrl}<img
+                  class="discover-picture"
+                  src={scope.pictureUrl}
+                  alt=""
+                />{:else if scope.kind === 'channel'}#{:else}<SurfaceIcon
+                  icon="community"
+                  size="sm"
+                />{/if}
             </span>
             <span class="scope-copy">
               <strong>{scope.handle}</strong>

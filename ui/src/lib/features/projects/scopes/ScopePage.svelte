@@ -10,6 +10,7 @@
   import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
 
   import { BoardState } from './boardState.svelte.ts';
+  import { ScopeArt } from './scopeArt.svelte.ts';
 
   import CommunityInvitePanel from './CommunityInvitePanel.svelte';
   import ScopeHeader from './ScopeHeader.svelte';
@@ -51,6 +52,11 @@
     if (board) boardOpen = true;
   });
   const boardState = new BoardState();
+  // The picture and cover the charter names now (ADR 0109).
+  const art = new ScopeArt();
+  $effect(() => {
+    void art.show(s.project?.charter?.picture, s.project?.charter?.cover);
+  });
   const waiting = $derived(s.gov?.votable.length ?? 0);
   const noun = $derived(kind === 'channel' ? 'channel' : 'community');
 
@@ -93,6 +99,7 @@
     {@const scope = s.scope}
     <ScopeHeader
       {s}
+      {art}
       {kind}
       {waiting}
       {invitePanel}
@@ -167,6 +174,7 @@
         isMember={!!s.project?.amMember}
         gov={s.gov}
         memberName={s.memberName}
+        {art}
         isPrivate={!!scope.isPrivate}
         organized={s.project?.governance === 'organizer_controlled'}
         amOrganizer={!!s.project?.amOrganizer}
@@ -176,6 +184,7 @@
         onClose={() => (settingsOpen = false)}
       />
       <ScopeVoteSheet
+        {art}
         open={votesOpen}
         gov={s.gov}
         memberName={s.memberName}

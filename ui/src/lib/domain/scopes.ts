@@ -17,6 +17,11 @@ export interface Scope {
   /** A closed (private) community: its own network, found from your memberships, never
    * listed; its id is its seed (ADR 0068 decision 1). */
   isPrivate?: boolean;
+  /** Its picture and cover: `ScopeImage` hashes (ADR 0109). */
+  picture?: string | null;
+  cover?: string | null;
+  /** The picture as a loaded image URL, once fetched. */
+  pictureUrl?: string | null;
 }
 
 /** web's canonicalizeHandle. */

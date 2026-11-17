@@ -10,6 +10,7 @@
   import type { Person } from '#lib/domain/people.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
+  import type { ScopeArt } from './scopeArt.svelte.ts';
   import type { ScopeState } from './scopeState.svelte.ts';
 
   /**
@@ -20,6 +21,8 @@
    */
   interface Props {
     s: ScopeState;
+    /** Its picture and cover (ADR 0109); the band and mark show until there are some. */
+    art: ScopeArt;
     kind: ScopeKind;
     /** Decisions waiting for this viewer's vote. */
     waiting: number;
@@ -36,6 +39,7 @@
 
   let {
     s,
+    art,
     kind,
     waiting,
     invitePanel,
@@ -72,10 +76,14 @@
 
 {#if scope}
   <section class="scope-header scope-hero">
-    <div class="scope-cover" aria-hidden="true"></div>
+    <div
+      class="scope-cover"
+      aria-hidden="true"
+      style={art.coverUrl ? `background-image: url(${art.coverUrl})` : undefined}
+    ></div>
     <div class="scope-hero-body">
       <span class="scope-avatar" aria-hidden="true">
-        {#if s.platform}<ToolbarIcon
+        {#if art.pictureUrl}<img src={art.pictureUrl} alt="" />{:else if s.platform}<ToolbarIcon
             name="globe"
           />{:else if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}
       </span>

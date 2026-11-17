@@ -26,6 +26,7 @@ import {
 } from '#lib/holo/index.ts';
 
 import { myAgent } from './people.ts';
+import { charterIn, charterOut, type CharterWire } from './scopeImages.ts';
 
 interface ListingWire {
   id: ActionHash;
@@ -35,7 +36,7 @@ interface ListingWire {
 
 interface ProjectWire {
   creator: AgentPubKey;
-  charter: Charter | null;
+  charter: CharterWire | null;
   members: AgentPubKey[];
   demand: number;
   opposition: number;
@@ -105,7 +106,7 @@ export async function createProject(charter: Charter): Promise<string> {
     await commonsCell(),
     'project',
     'create_charter',
-    charter,
+    charterOut(charter),
   );
   const seed = spaceSeed(await myAgent(), space);
   const id = await directory<ActionHash>('create_listing', listingOf(seed, charter));
@@ -175,7 +176,7 @@ export async function getProject(id: string): Promise<Project> {
     id,
     networkSeed: seed,
     creator: hashToString(p.creator),
-    charter: p.charter,
+    charter: charterIn(p.charter),
     members: p.members.map(hashToString),
     demand: p.demand,
     opposition: p.opposition,
@@ -194,7 +195,7 @@ export async function getProject(id: string): Promise<Project> {
       body: u.body,
       at: u.at,
     })),
-    audience: audienceOf(p.audience, p.charter),
+    audience: audienceOf(p.audience, charterIn(p.charter)),
     governance: p.governance,
     organizers: p.organizers.map(hashToString),
     amOrganizer: p.am_organizer,
@@ -236,5 +237,7 @@ function listingOf(seed: string, c: Charter) {
     location_label: c.location_label,
     phase: c.phase,
     tags: c.tags,
+    picture: c.picture ? stringToHash(c.picture) : null,
+    cover: c.cover ? stringToHash(c.cover) : null,
   };
 }

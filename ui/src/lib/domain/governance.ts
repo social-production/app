@@ -3,6 +3,7 @@
 import type { Place } from './places.ts';
 
 export type VoteChoice = 'Yes' | 'No' | 'Neutral';
+export type ImageChange = { Set: string } | 'Remove';
 export type ProposalStatus = 'Open' | 'Passed' | 'Rejected';
 
 export type ProposalKind =
@@ -13,6 +14,9 @@ export type ProposalKind =
         location: string | null;
         /** With `location`: its place (ADR 0078); none leaves the label without one. */
         place?: Place | null;
+        /** A scope's new picture or cover (a `ScopeImage` hash), or its removal (ADR 0109). */
+        picture?: ImageChange | null;
+        cover?: ImageChange | null;
       };
     }
   | { Update: { body: string } }

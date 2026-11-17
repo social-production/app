@@ -26,6 +26,8 @@ const toScope = (c: ProjectCard): Scope => ({
   creator: c.creator,
   createdAt: c.createdAt,
   networkSeed: c.networkSeed,
+  picture: c.picture ?? null,
+  cover: c.cover ?? null,
 });
 
 /** Channels and communities whose handle or description matches, first handle first. */
