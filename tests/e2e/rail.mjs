@@ -30,8 +30,10 @@ async function create(page, title, personal) {
 }
 
 const ann = await device({ viewport: phone });
-// Signed out, Your activity shows its three tabs and Coming up's empty state.
+// Signed out there is no rail (Detail Pages Cleanup); a new member's Your activity shows its
+// three tabs and Coming up's empty state.
 await ann.goto(BASE);
+await signUp(ann, `ann${stamp}`);
 await railButton(ann).click();
 await rail(ann).getByText('No activity yet').waitFor({ timeout: 60_000 });
 assert.deepEqual(
@@ -39,9 +41,8 @@ assert.deepEqual(
   ['Coming up', 'Votes', 'Requests'],
 );
 await ann.waitForTimeout(1000);
-await ann.screenshot({ path: `${out}/phone390-rail-signed-out.png` });
+await ann.screenshot({ path: `${out}/phone390-rail-empty.png` });
 await railButton(ann).click();
-await signUp(ann, `ann${stamp}`);
 const serviceUrl = await create(ann, service, true);
 await ann.getByRole('tab', { name: 'Participation' }).click();
 // web's personal service lists one-off availability: an "Available" activity, one Service
