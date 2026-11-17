@@ -127,3 +127,8 @@ export const platformPlaceholder = (): Scope => ({
   createdAt: 0,
   networkSeed: '',
 });
+
+/** The context key for a scope's picture by slug (ADR 0109): the shell provides it, tag glyphs
+ * read it; `null` while unknown or when the scope has none. */
+export const SCOPE_PICTURES = Symbol('scope-pictures');
+export type ScopePictureOf = (slug: string) => string | null;
