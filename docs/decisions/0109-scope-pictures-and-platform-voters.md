@@ -28,11 +28,11 @@ owner handed it to the UX session that day.
    and `cover` (`Option<ImageChange>`: `Set(hash)` or `Remove`), again only for scopes. The
    current picture is the charter's, replaced by each passed edit in order, as the
    description already is. The Platform keeps its globe (it takes no proposals, ADR 0095).
-3. **The listing mirrors them.** `ProjectListing` gains `picture` and `cover`. Only its
-   creator may update a listing (unchanged), so the creator's app brings it in step when it
-   opens the scope and finds the passed charter differs. Until then rows, the rail, Discover
-   and Search show the older picture; the scope's own page reads the clone and is always
-   current.
+3. **Rows show the current ones.** `ProjectListing` gains `picture` and `cover` as created. The
+   seed's index reads each public scope's current charter (it already does, for titles and
+   summaries), so its cards (feed rows, the left rail, Discover, Search) carry the picture and
+   cover with passed edits applied; the UI fetches the image by hash and caches it. A closed
+   community is never indexed; its members read its clone.
 4. **`#platform` votes are open.** In a project whose charter is tagged `platform`, a vote may
    come from someone who isn't a member: `Vote.membership` becomes `Option<ActionHash>`,
    `None` allowed only there. Integrity can't read standing in another DNA, so the recount
@@ -48,9 +48,8 @@ owner handed it to the UX session that day.
 ## Consequences
 - **Directory and project network resets**, together (new entry types and fields). The
   conversation DNA is unchanged. Test data only; everyone signs up again.
-- A listing can lag its scope's picture until the creator's app next opens the scope; a scope
-  whose creator never returns keeps its first picture in rows (its page shows the current
-  one). A later ADR can let any member mirror a passed decision if this matters.
+- The listing keeps the picture it was created with (only its creator may update it); readers
+  use the index's card or the clone's charter, both current.
 - An image nobody points to costs storage on the holders of its DHT arc; covers have the same
   property (ADR 0107).
 - The moderators' merge capability on #platform software projects (ADR 0095 "Powers") stays
