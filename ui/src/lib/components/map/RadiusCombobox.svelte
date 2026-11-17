@@ -62,7 +62,7 @@
 >
   <div class="feed-filter-groups">
     <section>
-      <RadiusChips {value} {options} {ariaLabel} {onChange} />
+      <RadiusChips {value} {options} ariaLabel="Distance" {onChange} />
     </section>
   </div>
   {#snippet footer()}
