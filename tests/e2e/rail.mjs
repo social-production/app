@@ -1,70 +1,88 @@
-// web's right rail (the top bar's activity button) at phone width. Ann offers a personal
-// service with one availability slot: it shows under Project Activity & Events with its signups and
-// the button's badge; clearing it moves it to Cleared until restored, and opening it goes to
-// the activity's sheet. Bob joins Ann's productive project; her edit shows under Votes to
-// cast on his rail, Assess opens its vote, and once he votes it moves to History.
+// Your activity (the top bar's activity button, Screen Review §1) at phone width. A new member
+// sees its three tabs and Coming up's empty state. The dev founders move Ann's event to its
+// Activity phase and she adds an activity with one Helper place: it shows under Coming up with
+// its signups and the button's badge; clearing it moves it to Cleared until restored, and
+// opening it goes to the activity's sheet. Bob joins Ann's project; her edit shows under Votes
+// on his rail, Assess opens its vote, and once he votes it moves to History.
 //   node tests/e2e/rail.mjs http://localhost:4174 [screens dir]
-// It signs up two test accounts, so it may run against the live test network too.
+// It needs the dev founders, so it runs only against a local seed node.
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
 import { BASE, browser, device, errors, log, rail, railButton, railShows, railTab, railTabs, signUp, continueSteps } from './lib.mjs';
+import { advanceTo, approvePlan, createEvent, daysFromNow, filePlan, signInFounders } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
 const phone = { width: 390, height: 844 };
 const stamp = Date.now().toString(36).slice(-5);
-const service = `Bike fixing ${stamp}`;
-const activity = 'Available';
+const title = `Bike fixing ${stamp}`;
+const activity = `Saturday repairs ${stamp}`;
 const coop = `Tool library ${stamp}`;
 
-async function create(page, title, personal) {
+async function create(page, name) {
   await page.goto(`${BASE}/create/project`);
-  if (personal) await page.getByRole('radio', { name: /Personal service/ }).click();
-  await page.getByLabel('Title').fill(title);
+  await page.getByLabel('Title').fill(name);
   await page.getByLabel('What do you propose?').fill('Made by the rail test.');
   await continueSteps(page, 3);
   await page.getByRole('button', { name: 'Publish proposal' }).click();
-  await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+  await page.getByRole('heading', { name }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];
 }
 
-const ann = await device({ viewport: phone });
-// Signed out there is no rail (Detail Pages Cleanup); a new member's Your activity shows its
-// three tabs and Coming up's empty state.
-await ann.goto(BASE);
-await signUp(ann, `ann${stamp}`);
-await railButton(ann).click();
-await rail(ann).getByText('No activity yet').waitFor({ timeout: 60_000 });
+// A new member's Your activity shows its three tabs and Coming up's empty state.
+const bob = await device({ viewport: phone });
+await bob.goto(BASE);
+await signUp(bob, `bob${stamp}`);
+await railButton(bob).click();
+await rail(bob).getByText('No activity yet').waitFor({ timeout: 60_000 });
 assert.deepEqual(
-  (await railTabs(ann).allInnerTexts()).map((t) => t.trim()),
+  (await railTabs(bob).allInnerTexts()).map((t) => t.trim().replace(/\s*\d+$/, '')),
   ['Coming up', 'Votes', 'Requests'],
 );
-await ann.waitForTimeout(1000);
-await ann.screenshot({ path: `${out}/phone390-rail-empty.png` });
-await railButton(ann).click();
-const serviceUrl = await create(ann, service, true);
+await bob.waitForTimeout(1000);
+await bob.screenshot({ path: `${out}/phone390-rail-empty.png` });
+await railButton(bob).click();
+log('a new member sees the three tabs and the empty state');
+
+const { ann, bob: voter } = await signInFounders(phone);
+const eventUrl = await createEvent(ann, voter, title);
+await advanceTo(ann, voter, 'Plan');
+const planTitle = `Repair fortnight ${stamp}`;
+await filePlan(ann, { title: planTitle, range: [daysFromNow(0), daysFromNow(14)], start: '00:00', finish: '23:59', place: 'The shed' });
+await approvePlan(ann, voter, planTitle);
+await advanceTo(ann, voter, 'Activity');
+await voter.context().close();
+await ann.goto(eventUrl);
+await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await ann.getByRole('tab', { name: 'Participation' }).click();
-// web's personal service lists one-off availability: an "Available" activity, one Service
-// lead needed, at the service's place (online here).
-await ann.getByRole('button', { name: 'Add availability', exact: true }).waitFor({ timeout: 60_000 });
-await ann.getByRole('button', { name: 'Add availability', exact: true }).click();
-await ann.getByRole('dialog').getByRole('button', { name: 'Add availability', exact: true }).click();
+await ann.getByRole('button', { name: 'Add activity' }).click();
+const next = () => ann.getByRole('button', { name: 'Next', exact: true }).click();
+await ann.getByPlaceholder('Activity title').fill(activity);
+await next();
+await next();
+await ann.getByPlaceholder('Search a place').fill('The shed');
+await next();
+await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
+await ann.getByPlaceholder('No cap').fill('1');
+await next();
+await ann.getByPlaceholder('What should happen in this activity?').fill('Fix brakes and chains.');
+await next();
+await ann.getByRole('button', { name: 'Create activity' }).click();
 await ann.locator('.agenda-row', { hasText: activity }).waitFor({ timeout: 60_000 });
 log('ann added an activity');
 
 const row = () => rail(ann).locator('.activity-row', { hasText: activity });
 await railShows(ann, row, 'the activity');
-assert.match(await row().innerText(), /Online/);
+assert.match(await row().innerText(), /The shed/);
 assert.match(await row().innerText(), /0 signed up · 1 needed/);
-assert.match(await row().innerText(), /Project activity/i);
 await ann.locator('.panel-toggle-right .count-badge').waitFor();
 await ann.waitForTimeout(1000); // the rail slides in
 await ann.screenshot({ path: `${out}/phone390-rail-activity.png` });
 log('the rail lists it with its signups, and the button has a badge');
 
 await row().getByRole('button', { name: 'Dismiss activity card' }).click();
-await rail(ann).getByText('No activity yet').waitFor({ state: 'attached' });
+await row().waitFor({ state: 'hidden' });
 await rail(ann).getByText('Cleared').click();
 await rail(ann).locator('.cleared-row', { hasText: activity }).waitFor();
 await rail(ann).getByRole('button', { name: 'Restore all' }).click();
@@ -74,14 +92,12 @@ log('clearing moves it to Cleared; Restore all brings it back');
 
 await row().locator('.activity-open-button').click();
 await ann.getByRole('dialog', { name: activity }).waitFor({ timeout: 120_000 });
-assert.equal(ann.url().split('?')[0], serviceUrl);
+assert.equal(ann.url().split('?')[0], eventUrl);
 await ann.keyboard.press('Escape');
 assert.equal(await ann.locator('.panel-toggle-right .count-badge').count(), 0);
 log('opening it shows the activity sheet and clears the badge');
 
-const coopUrl = await create(ann, coop, false);
-const bob = await device({ viewport: phone });
-await signUp(bob, `bob${stamp}`);
+const coopUrl = await create(ann, coop);
 await bob.goto(coopUrl);
 await bob.getByRole('heading', { name: coop }).waitFor({ timeout: 120_000 });
 await bob.getByRole('button', { name: 'Join project' }).click();
