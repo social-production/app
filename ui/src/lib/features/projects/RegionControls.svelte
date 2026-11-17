@@ -1,6 +1,6 @@
 <script lang="ts">
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import RadiusCombobox from '#lib/components/map/RadiusCombobox.svelte';
+  import RadiusChips from '#lib/components/map/RadiusChips.svelte';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
 
   import type { RegionFeedState } from './regionState.svelte.ts';
@@ -8,7 +8,8 @@
   /**
    * web's PublicFeed Region controls (place search, device location, radius, online list), as
    * the top of the feed's filter sheet (Polish Pass mockups, 2026-11-16). The distance box takes
-   * a typed distance as well as the presets (owner, 2026-11-16).
+   * a typed distance as well as the presets (owner, 2026-11-16); they are chips, so picking one
+   * never opens the keyboard (owner, 2026-11-17).
    */
   let { region }: { region: RegionFeedState } = $props();
 
@@ -37,7 +38,29 @@
       }}
       onblur={blur}
       oninput={(e) => region.search(e.currentTarget.value)}
+      onkeydown={(e) => {
+        const first = region.suggestions[0];
+        if (e.key === 'Enter' && first) {
+          e.preventDefault();
+          void region.select(first);
+        }
+      }}
+      autocomplete="off"
+      enterkeyhint="search"
     />
+    {#if region.searching}
+      <span class="region-spinner" aria-label="Searching"></span>
+    {:else if focused && region.placeQuery}
+      <button
+        aria-label="Clear place"
+        class="region-clear"
+        type="button"
+        onmousedown={(e) => e.preventDefault()}
+        onclick={() => region.search('')}
+      >
+        <ToolbarIcon name="x" />
+      </button>
+    {/if}
     <button
       aria-label="Use my location"
       title="Use my location"
@@ -48,6 +71,11 @@
       <ToolbarIcon name="locate" />
     </button>
   </div>
+  {#if region.message}
+    <p class="region-note" role="alert">
+      <ToolbarIcon name="locate" /><span>{region.message}</span>
+    </p>
+  {/if}
   {#if region.suggestions.length > 0}
     <ul class="region-suggestions">
       {#each region.suggestions as place, i (i)}
@@ -65,7 +93,7 @@
 
 <section>
   <h3>Distance</h3>
-  <RadiusCombobox
+  <RadiusChips
     value={region.radius}
     onChange={(v) => {
       region.radius = v;

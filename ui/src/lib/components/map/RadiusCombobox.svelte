@@ -3,8 +3,10 @@
   import { portal } from '#lib/components/actions/portal.ts';
   import '#lib/components/styles/map.css';
 
-  /** web's `components/shared/RadiusCombobox.svelte`: a typed or picked radius ("25 km",
-   * "Global"); the menu is fixed-positioned, flipping above near the bottom edge. */
+  /** web's `components/shared/RadiusCombobox.svelte`: a picked or typed radius ("25 km",
+   * "Global"); the menu is fixed-positioned, flipping above near the bottom edge. Tapping the
+   * box only opens the list (no keyboard on phones); typing lives in the list's last row
+   * (owner, 2026-11-17: "always wants me to type"). */
   interface Props {
     value: string;
     onChange: (value: string) => void;
@@ -27,7 +29,7 @@
 
   let open = $state(false);
   let shell = $state<HTMLDivElement>();
-  let input = $state<HTMLInputElement>();
+  let trigger = $state<HTMLButtonElement>();
   let menu = $state<HTMLDivElement>();
   let menuStyle = $state('');
   let draft = $state('');
@@ -37,29 +39,28 @@
     const parsed = Number(value);
     return Number.isFinite(parsed) ? `${Math.round(parsed)} km` : value;
   });
+  const custom = $derived(!options.some((o) => o.value === value));
 
   async function positionMenu(): Promise<void> {
     await tick();
-    if (!input || !menu) return;
-    const trigger = input.getBoundingClientRect();
-    const box = menu.getBoundingClientRect();
+    if (!trigger || !menu) return;
+    const box = trigger.getBoundingClientRect();
+    const size = menu.getBoundingClientRect();
     const gap = 4;
     const pad = 8;
-    let top = preferAbove ? trigger.top - box.height - gap : trigger.bottom + gap;
-    if (!preferAbove && top + box.height > window.innerHeight - pad) {
-      top = trigger.top - box.height - gap;
+    let top = preferAbove ? box.top - size.height - gap : box.bottom + gap;
+    if (!preferAbove && top + size.height > window.innerHeight - pad) {
+      top = box.top - size.height - gap;
     }
-    const left = Math.max(pad, Math.min(trigger.left, window.innerWidth - box.width - pad));
-    top = Math.max(pad, Math.min(top, window.innerHeight - box.height - pad));
-    menuStyle = `top: ${top}px; left: ${left}px; width: ${Math.max(trigger.width, 168)}px;`;
+    const left = Math.max(pad, Math.min(box.left, window.innerWidth - size.width - pad));
+    top = Math.max(pad, Math.min(top, window.innerHeight - size.height - pad));
+    menuStyle = `top: ${top}px; left: ${left}px; width: ${Math.max(box.width, 180)}px;`;
   }
 
-  async function openMenu(): Promise<void> {
-    if (open) return;
-    open = true;
-    draft = value === 'global' ? '' : value;
-    await positionMenu();
-    input?.select();
+  function toggle(): void {
+    open = !open;
+    draft = custom && value !== 'global' ? value : '';
+    if (open) void positionMenu();
   }
 
   function select(next: string): void {
@@ -67,39 +68,31 @@
     if (next.trim() && next !== value) onChange(next);
   }
 
-  /** web's `commitDraft`: "global", or a whole number of km (at least 1). */
+  /** web's `commitDraft`: a whole number of km (at least 1). */
   function commit(): void {
-    const typed = draft.trim().toLowerCase();
-    if (!typed) return void (open = false);
-    if (typed === 'global') return select('global');
-    const parsed = Number(typed.replace(/[^\d.]/g, ''));
-    if (!Number.isFinite(parsed)) return void (open = false);
+    const parsed = Number(draft.replace(/[^\d.]/g, ''));
+    if (!draft.trim() || !Number.isFinite(parsed)) return;
     select(String(Math.max(1, Math.round(parsed))));
   }
 
-  function onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter') {
-      event.preventDefault();
-      commit();
-    } else if (event.key === 'Escape') {
-      event.preventDefault();
-      open = false;
-    }
-  }
-
   $effect(() => {
-    const outside = (event: MouseEvent): void => {
+    const outside = (event: PointerEvent): void => {
       const target = event.target as Node;
       if (open && !shell?.contains(target) && !menu?.contains(target)) open = false;
     };
     const reposition = (): void => {
       if (open) void positionMenu();
     };
-    document.addEventListener('click', outside);
+    const escape = (event: KeyboardEvent): void => {
+      if (open && event.key === 'Escape') open = false;
+    };
+    document.addEventListener('pointerdown', outside);
+    document.addEventListener('keydown', escape);
     window.addEventListener('resize', reposition);
     window.addEventListener('scroll', reposition, true);
     return () => {
-      document.removeEventListener('click', outside);
+      document.removeEventListener('pointerdown', outside);
+      document.removeEventListener('keydown', escape);
       window.removeEventListener('resize', reposition);
       window.removeEventListener('scroll', reposition, true);
     };
@@ -115,7 +108,6 @@
         aria-selected={option.value === value}
         class="radius-option"
         class:selected={option.value === value}
-        onmousedown={(e) => e.preventDefault()}
         onclick={() => select(option.value)}
       >
         <span>{option.label}</span>
@@ -124,40 +116,43 @@
         {/if}
       </button>
     {/each}
+    <form
+      class="radius-custom"
+      class:selected={custom}
+      onsubmit={(e) => {
+        e.preventDefault();
+        commit();
+      }}
+    >
+      <input
+        type="text"
+        inputmode="numeric"
+        enterkeyhint="done"
+        aria-label="Custom distance in km"
+        placeholder="Custom"
+        bind:value={draft}
+      />
+      <span>km</span>
+      <button type="submit" disabled={!draft.trim()}>Set</button>
+    </form>
   </div>
 {/snippet}
 
 <div bind:this={shell} class="radius-combobox" class:compact>
   <div class="input-shell" class:open>
-    <input
-      bind:this={input}
-      class="radius-input"
-      type="text"
-      inputmode="numeric"
+    <button
+      bind:this={trigger}
+      class="radius-input radius-trigger"
+      type="button"
       aria-label={ariaLabel}
       aria-haspopup="listbox"
-      value={open ? draft : display}
-      onfocus={() => void openMenu()}
-      oninput={(event) => {
-        open = true;
-        draft = event.currentTarget.value;
-        void positionMenu();
-      }}
-      onkeydown={onKeydown}
-      onblur={() => window.setTimeout(() => open && commit(), 120)}
-    />
-    <button
-      class="toggle-button"
-      type="button"
-      aria-label="Open radius options"
-      onmousedown={(e) => e.preventDefault()}
-      onclick={(e) => {
-        e.stopPropagation();
-        if (open) open = false;
-        else void openMenu();
-      }}
+      aria-expanded={open}
+      onclick={toggle}
     >
-      ▾
+      <span>{display}</span>
+      <svg class="chevron" aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
+        <path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" />
+      </svg>
     </button>
   </div>
 

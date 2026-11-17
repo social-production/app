@@ -65,18 +65,18 @@ export function serializeDefaultLocation(place: PlaceValue, deviceGeolocation: b
 
 export type DevicePositionError = 'disabled' | 'unsupported' | 'denied' | 'timeout' | 'unavailable';
 
-/** web's `devicePositionErrorMessage`. */
+/** web's `devicePositionErrorMessage`, in plainer words: what happened and what to do. */
 export function devicePositionMessage(error: DevicePositionError): string {
   switch (error) {
     case 'denied':
-      return 'Location permission denied. Search for a place instead.';
+      return "Your browser is blocking location for this site. Allow it in the browser's site settings, or search for a place.";
     case 'timeout':
-      return 'Location request timed out. Try again or search for a place.';
+      return 'Finding your location took too long. Try again, or search for a place.';
     case 'unsupported':
-      return 'This browser does not support device location.';
+      return "This browser can't share your location. Search for a place instead.";
     case 'disabled':
-      return 'Device location is off. Enable it in settings or search for a place.';
+      return 'Location is turned off on this device. Turn it on in settings, or search for a place.';
     default:
-      return 'Could not determine your location. Search for a place instead.';
+      return "We couldn't find your location. Search for a place instead.";
   }
 }

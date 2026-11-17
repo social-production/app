@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte';
+  import { tick, type Snippet } from 'svelte';
 
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import RadiusCombobox from '#lib/components/map/RadiusCombobox.svelte';
@@ -45,6 +45,15 @@
         : o,
   );
   const shown = $derived(s.listItems.length);
+  let searchBar = $state<HTMLDivElement>();
+
+  // Opening search puts the cursor in the place field, so you can type straight away.
+  async function toggleSearch(): Promise<void> {
+    s.fullscreenSearchOpen = !s.fullscreenSearchOpen;
+    if (!s.fullscreenSearchOpen) return;
+    await tick();
+    searchBar?.querySelector('input')?.select();
+  }
 </script>
 
 <div class="map-filter-top filter-panel-overlay" aria-label="Map filters">
@@ -56,7 +65,7 @@
       class="capsule-icon"
       class:active={s.fullscreenSearchOpen}
       type="button"
-      onclick={() => (s.fullscreenSearchOpen = !s.fullscreenSearchOpen)}
+      onclick={() => void toggleSearch()}
     >
       <ToolbarIcon name="search" />
     </button>
@@ -67,6 +76,7 @@
       options={radiusPresetOptions}
       compact
       portaled
+      preferAbove
     />
     <button
       aria-pressed={s.upcomingOnly}
@@ -103,7 +113,7 @@
     {/if}
   </div>
   {#if s.fullscreenSearchOpen}
-    <div class="map-search-bar">
+    <div bind:this={searchBar} class="map-search-bar">
       <div class="map-search-field">{@render picker()}</div>
       <button
         aria-label="Use my location"

@@ -1,0 +1,27 @@
+/* Fullscreen is the whole screen (owner, 2026-11-17): the map covers the top bar and the
+   bottom nav, edge to edge with no frame, and the browser goes fullscreen where it can. */
+.shell .map-panel.map-panel-fullscreen {
+  position: fixed;
+  inset: 0;
+  z-index: 75;
+  padding: 0;
+  background: var(--page-bg);
+}
+
+.shell .map-overlay:has(.map-panel-fullscreen) {
+  z-index: 75;
+}
+
+.shell .map-panel.map-panel-fullscreen .map-stage {
+  border: none;
+  border-radius: 0;
+}
+
+.shell .map-panel.map-panel-fullscreen .map-filter-top.filter-panel-overlay {
+  bottom: calc(12px + env(safe-area-inset-bottom));
+}
+
+/* Lists opened from the map's own controls stay above it. */
+.location-picker.location-portal {
+  z-index: var(--z-menu);
+}
