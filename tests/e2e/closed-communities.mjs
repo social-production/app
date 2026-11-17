@@ -85,7 +85,9 @@ await a.getByRole('button', { name: 'Settings', exact: true }).click();
 const settings = a.locator('.scope-settings');
 await settings.getByText('Organizers decide: saved at once').waitFor();
 await settings.getByPlaceholder('Username to remove').fill(two.name);
-await settings.getByRole('option', { name: two.name }).first().click();
+// An exact name picks the member at once (the list then hides); otherwise pick from the list.
+const pick = settings.getByRole('option', { name: two.name }).first();
+if (await pick.isVisible()) await pick.click();
 await a.screenshot({ path: `${out}/phone390-community-who-decides.png` });
 await settings.getByRole('button', { name: 'Remove', exact: true }).click();
 await a.getByRole('alertdialog').getByRole('button', { name: 'Remove' }).click();
