@@ -147,8 +147,19 @@ fn accepts(mode: &str, kind: &ProposalKind) -> ExternResult<()> {
 }
 
 pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash> {
-    let membership = calls::my_membership()?.ok_or_else(|| guest("Join the project to vote."))?;
     let me = agent_info()?.agent_initial_pubkey;
+    let membership = calls::my_membership()?;
+    if membership.is_none() {
+        // A #platform project takes any Full member's vote (ADR 0109).
+        let platform = calls::base_charter()?
+            .is_some_and(|c| c.tags.iter().any(|t| sp_scope::is_platform_tag(t)));
+        if !platform {
+            return Err(guest("Join the project to vote."));
+        }
+        if !calls::full_before(&me, sys_time()?)? {
+            return Err(guest("Only Full members vote on #platform projects."));
+        }
+    }
     if reads::votes(&proposal)?.iter().any(|v| v.author == me) || voted_locally(&proposal)? {
         return Err(guest("You've already voted on this."));
     }

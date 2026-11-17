@@ -31,6 +31,15 @@ pub fn check_platform(description: &str, join_policy: &str, tags: &[String]) -> 
 /// A community's join policy (web: `open` or `closed`); channels are always open.
 pub const JOIN_POLICIES: [&str; 2] = ["open", "closed"];
 
+/// A tag that puts a project on the Platform (`#platform`, any case): any Full member may vote
+/// on it (ADR 0095, 0109).
+#[must_use]
+pub fn is_platform_tag(tag: &str) -> bool {
+    tag.trim()
+        .trim_start_matches('#')
+        .eq_ignore_ascii_case(PLATFORM)
+}
+
 #[must_use]
 pub fn is_scope(mode: &str) -> bool {
     mode == CHANNEL || mode == COMMUNITY
@@ -125,6 +134,8 @@ mod tests {
         assert!(check_scope("event", "Food", "open").is_err());
         assert!(may_be_organizer_run(COMMUNITY, "closed"));
         assert!(is_platform(CHANNEL, "platform"));
+        assert!(is_platform_tag("#platform") && is_platform_tag("Platform"));
+        assert!(!is_platform_tag("#platforms"));
         assert!(!is_platform(CHANNEL, "Platform") && !is_platform(COMMUNITY, "platform"));
         assert!(check_platform(PLATFORM_DESCRIPTION, "open", &[]).is_ok());
         assert!(check_platform("Mine now", "open", &[]).is_err());

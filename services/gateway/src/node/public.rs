@@ -23,6 +23,8 @@ const DIRECTORY: &[(&str, &[&str])] = &[(
         "follow_view",
         "list_feedback",
         "get_feedback",
+        // A channel's or community's picture and cover (ADR 0109).
+        "scope_image",
     ],
 )];
 const PROJECT: &[(&str, &[&str])] = &[

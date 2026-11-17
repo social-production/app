@@ -3060,6 +3060,7 @@ dependencies = [
  "sp_discussion",
  "sp_governance",
  "sp_help",
+ "sp_scope",
  "sp_software",
  "space_scope",
 ]

@@ -52,9 +52,22 @@ export class ScopeGovernance {
     }
   }
 
-  /** web's "Propose change": a description edit (the name is the handle and stays). */
-  proposeDescription(description: string): Promise<boolean> {
-    return this.run(() => propose(this.id, { Edit: { title: null, description, location: null } }));
+  /** web's "Propose change": a new description, picture or cover (the name is the handle and
+   * stays; ADR 0109). `null` leaves a field as it is. */
+  proposeEdit(change: {
+    description: string | null;
+    picture: string | null;
+    cover: string | null;
+  }): Promise<boolean> {
+    const set = (hash: string | null) => (hash ? { Set: hash } : null);
+    const edit = {
+      title: null,
+      description: change.description,
+      location: null,
+      picture: set(change.picture),
+      cover: set(change.cover),
+    };
+    return this.run(() => propose(this.id, { Edit: edit }));
   }
 
   /** web's "Username to remove": a member vote, or at once in an organizer-run community. */
@@ -92,7 +105,11 @@ export class ScopeGovernance {
 export function describeDecision(p: Proposal, memberName: (agent: string) => string): string {
   if ('RemoveMember' in p.kind) return `Remove ${memberName(p.kind.RemoveMember.agent)}`;
   if ('Edit' in p.kind) {
-    return p.kind.Edit.description !== null ? 'New description' : 'New settings';
+    const e = p.kind.Edit;
+    if (e.description !== null) return 'New description';
+    if (e.cover && !e.picture) return 'New cover';
+    if (e.picture && !e.cover) return 'New picture';
+    return e.picture ? 'New picture and cover' : 'New settings';
   }
   return 'New settings';
 }

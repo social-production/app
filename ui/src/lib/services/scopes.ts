@@ -26,6 +26,8 @@ const toScope = (c: ProjectCard): Scope => ({
   creator: c.creator,
   createdAt: c.createdAt,
   networkSeed: c.networkSeed,
+  picture: c.picture ?? null,
+  cover: c.cover ?? null,
 });
 
 /** Channels and communities whose handle or description matches, first handle first. */
@@ -66,14 +68,15 @@ export async function createScope(
   handle: string,
   description: string,
   closed?: { organized: boolean },
+  art: { picture: string | null; cover: string | null } = { picture: null, cover: null },
 ): Promise<string> {
   const slug = slugOf(handle);
   if (await findScope(slug))
     throw new Error('That handle is already used by a channel or community');
   if (kind === 'community' && closed) {
-    return (await createClosedCommunity(handle, description, closed.organized)).slug;
+    return (await createClosedCommunity(handle, description, closed.organized, art)).slug;
   }
-  await found(kind, handle.trim(), description.trim());
+  await found(kind, handle.trim(), description.trim(), art);
   return slug;
 }
 
@@ -86,7 +89,12 @@ export async function foundPlatform(): Promise<Scope> {
   );
 }
 
-async function found(kind: ScopeKind, handle: string, description: string): Promise<Scope> {
+async function found(
+  kind: ScopeKind,
+  handle: string,
+  description: string,
+  art: { picture: string | null; cover: string | null } = { picture: null, cover: null },
+): Promise<Scope> {
   const slug = slugOf(handle);
   const id = await createProject({
     title: handle,
@@ -96,6 +104,7 @@ async function found(kind: ScopeKind, handle: string, description: string): Prom
     location_label: '',
     phase: '',
     tags: [],
+    ...art,
   });
   const scope: Scope = {
     id,

@@ -17,6 +17,11 @@ export interface Scope {
   /** A closed (private) community: its own network, found from your memberships, never
    * listed; its id is its seed (ADR 0068 decision 1). */
   isPrivate?: boolean;
+  /** Its picture and cover: `ScopeImage` hashes (ADR 0109). */
+  picture?: string | null;
+  cover?: string | null;
+  /** The picture as a loaded image URL, once fetched. */
+  pictureUrl?: string | null;
 }
 
 /** web's canonicalizeHandle. */
@@ -122,3 +127,8 @@ export const platformPlaceholder = (): Scope => ({
   createdAt: 0,
   networkSeed: '',
 });
+
+/** The context key for a scope's picture by slug (ADR 0109): the shell provides it, tag glyphs
+ * read it; `null` while unknown or when the scope has none. */
+export const SCOPE_PICTURES = Symbol('scope-pictures');
+export type ScopePictureOf = (slug: string) => string | null;

@@ -2,6 +2,7 @@
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { VoteChoice } from '#lib/domain/governance.ts';
 
+  import type { ScopeArt } from './scopeArt.svelte.ts';
   import ScopeDecisionCard from './ScopeDecisionCard.svelte';
   import type { ScopeDecision, ScopeGovernance } from './scopeGovernance.svelte.ts';
 
@@ -16,10 +17,11 @@
     open: boolean;
     gov: ScopeGovernance;
     memberName: (agent: string) => string;
+    art?: ScopeArt | undefined;
     onClose: () => void;
   }
 
-  let { open, gov, memberName, onClose }: Props = $props();
+  let { open, gov, memberName, art, onClose }: Props = $props();
 
   let index = $state(0);
   let voted = $state<VoteChoice | null>(null);
@@ -63,6 +65,7 @@
       <ScopeDecisionCard
         item={current}
         {memberName}
+        {art}
         busy={gov.busy}
         chosen={voted}
         onVote={(choice) => current && void cast(current, choice)}

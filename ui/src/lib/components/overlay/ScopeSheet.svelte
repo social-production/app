@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
+  import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
   import { tagHref, tagIcon, tagKindLabel } from '#lib/components/cards/tagLinks.ts';
   import ScopeGlyph from '#lib/components/icons/ScopeGlyph.svelte';
   import type { TagRef } from '#lib/domain/scopes.ts';
@@ -27,6 +30,8 @@
       .sort((a, b) => a.label.localeCompare(b.label, undefined, { sensitivity: 'base' }))
       .filter((tag) => !needle || tag.label.toLowerCase().includes(needle)),
   );
+
+  const pictureOf = getContext<ScopePictureOf | undefined>(SCOPE_PICTURES);
 </script>
 
 <OverlaySheet {open} title="Channels & communities" rootClass="scope-sheet" {onClose}>
@@ -50,7 +55,7 @@
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- tagHref resolves -->
         <a class="scope-row" href={tagHref(tag)} onclick={onClose}>
           <span class="scope-icon">
-            {#if icon}<ScopeGlyph {icon} size="md" />{/if}
+            {#if icon}<ScopeGlyph {icon} size="md" imageUrl={pictureOf?.(tag.slug) ?? null} />{/if}
           </span>
           <span class="scope-copy">
             <strong>{tag.label}</strong>

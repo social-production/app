@@ -32,6 +32,9 @@ export interface Charter {
   place?: Place | null;
   phase: string;
   tags: string[];
+  /** A channel's or community's picture and cover: base64 `ScopeImage` hashes (ADR 0109). */
+  picture?: string | null;
+  cover?: string | null;
 }
 
 /** One feed card (gateway `ProjectCard`). */
@@ -68,6 +71,9 @@ export interface ProjectCard {
   scheduledAt?: number;
   /** web's moderationState while a report is open: `under_review` or `hidden` (ADR 0071). */
   moderation?: string;
+  /** A channel's or community's picture and cover hashes (ADR 0109). */
+  picture?: string;
+  cover?: string;
 }
 
 export interface Project {

@@ -16,6 +16,7 @@ mod listings;
 mod notes;
 mod profile;
 mod records;
+mod scope_images;
 mod standing;
 
 use hdk::prelude::*;

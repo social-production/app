@@ -49,6 +49,8 @@ export const toolbarIcons: Record<string, string> = {
     '<rect x="5" y="6" width="14" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M5 10h14M8 4v3M16 4v3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" /> <path d="M8 14h8M8 17h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
   search:
     '<path d="M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Zm6.8 2.2-4.2-4.2" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" />',
+  image:
+    '<rect x="3.5" y="5" width="17" height="14" rx="2.5" fill="none" stroke="currentColor" stroke-width="1.8" /> <circle cx="9" cy="10" r="1.6" fill="none" stroke="currentColor" stroke-width="1.6" /> <path d="m20.5 16-5-5-8 8" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   link: '<path d="M9.5 14.5 8 16a3.5 3.5 0 0 1-5-5l2.5-2.5a3.5 3.5 0 0 1 5 0M14.5 9.5 16 8a3.5 3.5 0 0 1 5 5l-2.5 2.5a3.5 3.5 0 0 1-5 0M9 15l6-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   loudspeaker:
     '<path d="M4.5 9.5h3.2L12 6.2v11.6L7.7 14.5H4.5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M15.2 9.2a3.2 3.2 0 0 1 0 5.6M17.8 7a5.8 5.8 0 0 1 0 10" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',

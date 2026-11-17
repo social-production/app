@@ -1,12 +1,13 @@
 <script lang="ts">
-  import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { APPROVAL_PERCENT } from '#lib/domain/governance.ts';
   import type { Contact } from '#lib/domain/messages.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
+  import type { ScopeArt } from './scopeArt.svelte.ts';
   import ScopeDecisionCard from './ScopeDecisionCard.svelte';
+  import ScopeSheetArt from './ScopeSheetArt.svelte';
   import type { ScopeGovernance } from './scopeGovernance.svelte.ts';
   import ScopeWhoDecides from './ScopeWhoDecides.svelte';
 
@@ -17,7 +18,7 @@
    * the cover band and mark on top, Name (fixed: tags use it, ADR 0068) and Description, one
    * line saying who decides, and the action in the sheet's dock. Decisions lists open and past
    * votes as cards. A private community adds web's "Who decides"; an organizer-run one's
-   * organizers edit directly. The picture and cover themselves wait for ADR 0109.
+   * organizers edit directly. The picture and cover go the same way (ADR 0109).
    */
   interface Props {
     open: boolean;
@@ -27,6 +28,8 @@
     isMember: boolean;
     gov: ScopeGovernance;
     memberName: (agent: string) => string;
+    /** Its picture and cover, and the new ones staged here (ADR 0109). */
+    art: ScopeArt;
     /** A private community's governance (ADR 0068 part d). */
     isPrivate?: boolean;
     organized?: boolean;
@@ -46,6 +49,7 @@
     isMember,
     gov,
     memberName,
+    art,
     isPrivate = false,
     organized = false,
     amOrganizer = false,
@@ -68,10 +72,12 @@
     draft = description;
     notice = '';
     how = false;
+    art.clearStaged();
     void gov.load();
   });
 
-  const changed = $derived(draft.trim() !== description.trim());
+  const described = $derived(draft.trim() !== description.trim());
+  const changed = $derived(described || !!art.newPicture || !!art.newCover);
 
   let how = $state(false);
   const rule = $derived(
@@ -83,7 +89,13 @@
   );
 
   async function save(): Promise<void> {
-    if (await gov.proposeDescription(draft.trim())) {
+    const change = {
+      description: described ? draft.trim() : null,
+      picture: art.newPicture?.hash ?? null,
+      cover: art.newCover?.hash ?? null,
+    };
+    if (await gov.proposeEdit(change)) {
+      art.clearStaged();
       notice = direct ? 'Saved' : 'Vote started';
       if (direct) onChanged();
       else tab = 'decisions';
@@ -135,6 +147,7 @@
             <ScopeDecisionCard
               {item}
               {memberName}
+              {art}
               busy={gov.busy}
               onVote={isMember && item.myVote === null
                 ? (choice) => void gov.vote(item.id, choice)
@@ -145,16 +158,11 @@
         {/if}
         {#if gov.past.length > 0}
           <h3 class="decisions-head">Past</h3>
-          {#each gov.past as item (item.id)}<ScopeDecisionCard {item} {memberName} />{/each}
+          {#each gov.past as item (item.id)}<ScopeDecisionCard {item} {memberName} {art} />{/each}
         {/if}
       </section>
     {:else}
-      <section class="scope-sheet-art" aria-hidden="true">
-        <div class="scope-cover"></div>
-        <span class="scope-avatar"
-          >{#if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}</span
-        >
-      </section>
+      <ScopeSheetArt {kind} {art} {canEdit} />
 
       <label class="field">
         <span>Name</span>

@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { getContext } from 'svelte';
+
+  import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
   import type { Snippet } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
@@ -59,6 +62,8 @@
   }
 
   import '#lib/components/styles/cards.css';
+
+  const pictureOf = getContext<ScopePictureOf | undefined>(SCOPE_PICTURES);
 </script>
 
 {#snippet tagList()}
@@ -68,7 +73,9 @@
       {#if index > 0}<span class="tag-sep" aria-hidden="true">,</span>{/if}
       <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- tagHref resolves -->
       <a class="tag-plain" href={tagHref(tag)}
-        >{#if icon}<ScopeGlyph {icon} />{/if}<span>{tag.label}</span></a
+        >{#if icon}<ScopeGlyph {icon} imageUrl={pictureOf?.(tag.slug) ?? null} />{/if}<span
+          >{tag.label}</span
+        ></a
       >
     {/each}
     {#if hidden > 0}

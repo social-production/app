@@ -94,8 +94,11 @@ fn check_kind(kind: &ProposalKind) -> Result<(), String> {
             description,
             location,
             place,
+            picture,
+            cover,
         } => {
-            if title.is_none() && description.is_none() && location.is_none() {
+            let art = picture.is_some() || cover.is_some();
+            if title.is_none() && description.is_none() && location.is_none() && !art {
                 return Err("an edit must change something".into());
             }
             let title_ok =
@@ -159,17 +162,12 @@ fn check_space(p: &Proposal, author: &AgentPubKey) -> ExternResult<Result<(), St
     if let Err(reason) = check_scope_kind(&charter.mode, &p.kind) {
         return Ok(Err(reason));
     }
-    if personal_settings(&charter.mode, &p.kind) && author != &founder {
+    if crate::space::personal_settings(&charter.mode, &p.kind) && author != &founder {
         return Ok(Err(
             "only a personal service's creator changes its request settings".into(),
         ));
     }
     Ok(Ok(()))
-}
-
-/// A personal service's creator saves its request settings without a vote (ADR 0076).
-fn personal_settings(mode: &str, kind: &ProposalKind) -> bool {
-    mode == "personal-service" && matches!(kind, ProposalKind::RequestSettings { .. })
 }
 
 pub fn validate_vote(
@@ -182,10 +180,14 @@ pub fn validate_vote(
         return invalid("a vote must be on a proposal");
     };
     let at = Some(action.timestamp());
-    if !is_membership(&v.membership, action.author(), at, Some(&proposal.space))? {
-        return invalid("only members can vote");
+    let member = match &v.membership {
+        Some(m) => is_membership(m, action.author(), at, Some(&proposal.space))?,
+        None => false,
+    };
+    if member || (v.membership.is_none() && crate::space::platform_tagged(&proposal.space)?) {
+        return Ok(ValidateCallbackResult::Valid);
     }
-    Ok(ValidateCallbackResult::Valid)
+    invalid("only members can vote")
 }
 
 /// The claimed result must be what the cited votes (one per voter, neutrals not counted) give
@@ -213,7 +215,7 @@ pub fn validate_outcome(
         };
         let by_founder =
             proposal_record.action().author() == &founder && action.author() == &founder;
-        if personal_settings(&charter.mode, &proposal.kind) && by_founder {
+        if crate::space::personal_settings(&charter.mode, &proposal.kind) && by_founder {
             return Ok(ValidateCallbackResult::Valid);
         }
     }
@@ -238,6 +240,10 @@ pub fn validate_outcome(
         Ok(added) => added,
         Err(reason) => return invalid(reason),
     };
+    // #platform: the weekly active count sizes it, which only readers can read (ADR 0109).
+    if crate::space::platform_tagged(&proposal.space)? {
+        return Ok(ValidateCallbackResult::Valid);
+    }
     let population = u32::try_from(proposal.members.len() + added).unwrap_or(u32::MAX);
     let verdict = tally(&choices, population, Threshold::DEFAULT).verdict();
     let claimed = if o.passed {
@@ -262,6 +268,11 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
         }
         ProposalKind::Edit { title: Some(_), .. } if scope => {
             Err("a channel's or community's name is its handle and stays".into())
+        }
+        ProposalKind::Edit { picture, cover, .. }
+            if !scope && (picture.is_some() || cover.is_some()) =>
+        {
+            Err("only a channel or community has a picture and cover".into())
         }
         ProposalKind::RequestSettings {
             mode: requests,

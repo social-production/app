@@ -5,6 +5,9 @@
   import { explain } from '#lib/services/errors.ts';
   import { createScope } from '#lib/services/scopes.ts';
 
+  import { ScopeArt } from './scopeArt.svelte.ts';
+  import ScopeSheetArt from './ScopeSheetArt.svelte';
+
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
 
@@ -23,6 +26,8 @@
   let governance = $state<'collaborative' | 'organizer'>('collaborative');
   let message = $state('');
   let submitting = $state(false);
+  // The creator may add a picture and cover now, with no vote (ADR 0109), or leave the default.
+  const art = new ScopeArt();
   const check = $derived(checkHandle(name, `${noun} name`, kind));
   const path = (slug: string) =>
     channel ? resolve('/channels/[slug]', { slug }) : resolve('/communities/[slug]', { slug });
@@ -41,7 +46,10 @@
         !channel && openness === 'invite_only'
           ? { organized: governance === 'organizer' }
           : undefined;
-      const slug = await createScope(kind, name, description, closed);
+      const slug = await createScope(kind, name, description, closed, {
+        picture: art.newPicture?.hash ?? null,
+        cover: art.newCover?.hash ?? null,
+      });
       // eslint-disable-next-line svelte/no-navigation-without-resolve -- path() resolves it
       await goto(path(slug));
     } catch (e) {
@@ -67,6 +75,7 @@
   onClose={() => void goto(resolve('/'))}
 >
   <div class="form-stack">
+    <ScopeSheetArt {kind} {art} canEdit />
     <label>
       <RequiredLabel>{noun} handle</RequiredLabel>
       <span class="prefixed">
@@ -104,10 +113,10 @@
             <option value="organizer">Organizer controlled: you and organizers you choose</option>
           </select>
           <span class="helper-text">
-            <!-- web's copy, less what isn't ported (renames, pictures, switching; ADR 0068). -->
+            <!-- web's copy, less what isn't ported (renames, switching; ADR 0068). -->
             {governance === 'organizer'
               ? 'Organizers edit settings and remove members directly. This stays as it is.'
-              : 'Members vote on the description and on removing members. This stays as it is.'}
+              : 'Members vote on the description, picture and cover, and on removing members. This stays as it is.'}
           </span>
         </label>
       {/if}

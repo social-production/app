@@ -13,7 +13,9 @@ mod view;
 
 use hdk::prelude::*;
 pub use lineage::{LineageInput, LineageView};
-use project_integrity::{audience, space_creator, Applied, Charter, LinkTypes, OrganizerRole};
+use project_integrity::{
+    audience, space_creator, Applied, Charter, ImageChange, LinkTypes, OrganizerRole,
+};
 use sp_governance::phases::{next_phase, stage_label, visible_phases, Phase, Shape};
 use sp_governance::returns::returnable;
 use space_scope::{enter, In};
@@ -258,6 +260,14 @@ fn merge(mut c: Charter, a: &Applied) -> Charter {
     if let Some(l) = &a.location {
         c.location_label.clone_from(l);
         c.place.clone_from(&a.place);
+    }
+    // A scope's picture and cover (ADR 0109).
+    for (slot, change) in [(&mut c.picture, &a.picture), (&mut c.cover, &a.cover)] {
+        match change {
+            Some(ImageChange::Set(hash)) => *slot = Some(hash.clone()),
+            Some(ImageChange::Remove) => *slot = None,
+            None => {}
+        }
     }
     // The production or operations plan chooses the subtype (ADR 0039).
     if let Some(s) = &a.subtype {

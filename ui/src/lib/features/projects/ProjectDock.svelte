@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { canVoteOn } from '#lib/domain/board.ts';
   import SignalStrip from '#lib/components/cards/SignalStrip.svelte';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
@@ -85,7 +86,7 @@
           />
         </div>
       {/if}
-      {#if project.amMember}
+      {#if canVoteOn(project)}
         <VoteDock
           proposals={detail.openProposals.filter((p) => !isPhaseChange(p.kind))}
           names={detail.names}

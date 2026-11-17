@@ -24,7 +24,8 @@ pub(crate) use chain::{earlier_creates, invalid, prev_action, prev_action_of, ty
 pub use feedback::{FEEDBACK_DESCRIPTION_MAX, VOTE_DOWN, VOTE_UP};
 pub use feedback_comment::{FeedbackComment, FEEDBACK_COMMENT_MAX};
 pub use founders::{founder_agents, DirectoryProperties, Founder};
-pub use notes::{CommentNote, Cover, COVER_MAX_BYTES};
+pub use listing::ProjectListing;
+pub use notes::{CommentNote, Cover, ScopeImage, COVER_MAX_BYTES};
 
 #[hdk_entry_helper]
 #[derive(Clone, PartialEq)]
@@ -79,23 +80,6 @@ pub struct DeviceLink {
     pub device: AgentPubKey,
 }
 
-/// A project in the directory (docs/plans/M2-projects.md). The project itself lives in its
-/// own clone of the project DNA, joined with `network_seed` and the author as creator.
-#[hdk_entry_helper]
-#[derive(Clone, PartialEq)]
-pub struct ProjectListing {
-    pub network_seed: String,
-    pub title: String,
-    pub summary: String,
-    pub mode: String,
-    pub subtype: String,
-    pub location_label: String,
-    pub phase: String,
-    pub tags: Vec<String>,
-    /// Full members cite their standing and skip the New-member limit.
-    pub creator_standing: Option<StandingProof>,
-}
-
 #[derive(Serialize, Deserialize, Clone, Copy, Debug, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum FeedbackKind {
@@ -126,6 +110,7 @@ pub enum EntryTypes {
     FeedbackComment(FeedbackComment),
     Cover(Cover),
     CommentNote(CommentNote),
+    ScopeImage(ScopeImage),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -234,6 +219,7 @@ fn validate_create(
         EntryTypes::FeedbackComment(c) => feedback_comment::validate_create(c),
         EntryTypes::Cover(c) => notes::validate_cover(c),
         EntryTypes::CommentNote(n) => notes::validate_note(n),
+        EntryTypes::ScopeImage(i) => notes::validate_scope_image(i),
     }
 }
 

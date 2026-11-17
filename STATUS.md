@@ -204,7 +204,28 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
-### Where things stand (2 pm Melbourne, 2026-11-17, UX session)
+### Where things stand (3 pm Melbourne, 2026-11-17, UX session; now also parity's work)
+- **Owner, 17 Nov: "parity is not working today so that is your responsibility also."** This
+  session owns the parity queue too (Settings, notifications, gateway, `tests/e2e/demo/*`).
+- **#188 (Links/History) and #189 (Channel Pictures layout) merged and live** (smoke: Home,
+  /platform, no page errors).
+- **ADR 0109 on `claude/scope-pictures-ui` (backend + UI; `claude/scope-pictures` is the
+  backend alone).** Owner chose the directory reset ("Directory reset", asked 17 Nov):
+  - Directory: `ScopeImage` records (`put_scope_image`, `scope_image`), listing picture/cover.
+  - Project: `Charter.picture/cover`, `Edit { picture, cover: ImageChange }` (scopes only);
+    `Vote.membership: Option` — on a `#platform` project any Full member votes; the recount
+    keeps Full voters and sizes the population as max(members, weekly active); integrity skips
+    the verdict check there. `sp_scope::is_platform_tag`.
+  - Gateway index cards carry the charter's current picture/cover.
+  - UI: scope page cover/picture, Settings Change cover / camera / New badge, Vote and
+    Decisions Now › Proposed, create flow picker, left rail and Discover pictures; VoteDock
+    for non-members on #platform projects (`canVoteOn`).
+  - Hashes: directory `uhC0kiXZib9v…`, project `uhC0kgtXO683…`, conversation unchanged
+    `uhC0k1AJBcn3…`. Scenario `scope_pictures` (2 tests) passes; `governance`, `scopes`
+    running. Not yet: feed-row tag pictures (FeedCardTop needs a picture lookup threaded in),
+    browser test of the picker, the moderators' merge capability (no reset needed).
+
+
 - **#184 and #187 merged and live** (smoke: Home at 390px, no page errors).
 - **`claude/ux-links-history`:** Links and History compared frame by frame with Polish Pass §6–7
   in light and dark (`tests/e2e/links.mjs` passes; it was stale on the Propose button). Propose

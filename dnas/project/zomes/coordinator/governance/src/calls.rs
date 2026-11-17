@@ -99,3 +99,21 @@ pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
     )?;
     decode(response, "identity/full_standing_before")
 }
+
+#[derive(Deserialize, Debug)]
+struct WeeklyActive {
+    count: u32,
+}
+
+/// Full members active in the last complete week before `at`, from the caller's directory
+/// cell (ADR 0095): a #platform project's population (ADR 0109).
+pub fn weekly_active(at: Timestamp) -> ExternResult<u32> {
+    let response = call(
+        CallTargetCell::OtherRole("directory".into()),
+        ZomeName::from("identity"),
+        "weekly_active".into(),
+        None,
+        Some(at),
+    )?;
+    decode::<WeeklyActive>(response, "identity/weekly_active").map(|w| w.count)
+}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { canVoteOn } from '#lib/domain/board.ts';
   import PlanCard from '#lib/components/plans/PlanCard.svelte';
   import PlanWizard from '#lib/components/plans/PlanWizard.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
@@ -134,7 +135,7 @@
               {plan}
               authorName={detail.names[plan.author] ?? '…'}
               makes={typeless ? planMakesLine(plan.plan.kind) : null}
-              canVote={project.amMember}
+              canVote={canVoteOn(project)}
               reveal={revealPlan === plan.id}
               {onRevealDone}
               onRate={(criterion, rating) => void detail.ratePlan(plan.id, criterion, rating)}

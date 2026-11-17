@@ -35,6 +35,12 @@ pub fn validate_anchor(
 }
 
 fn check_charter(c: &Charter) -> Result<(), String> {
+    // ADR 0109: only channels and communities have a picture and cover; the Platform keeps its
+    // globe.
+    let art = c.picture.is_some() || c.cover.is_some();
+    if art && (!sp_scope::is_scope(&c.mode) || sp_scope::is_platform(&c.mode, &c.title)) {
+        return Err("only a channel or community has a picture and cover".into());
+    }
     if c.description.trim().is_empty() || c.description.chars().count() > DESCRIPTION_MAX {
         return Err(format!(
             "description must be 1–{DESCRIPTION_MAX} characters"
