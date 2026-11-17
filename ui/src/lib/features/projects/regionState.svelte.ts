@@ -20,6 +20,7 @@ export class RegionFeedState {
   radius = $state('25');
   includeOnline = $state(false);
   suggestions = $state<PlaceValue[]>([]);
+  searching = $state(false);
   message = $state('');
   items = $state<RegionItem[]>([]);
   total = $state(0);
@@ -27,6 +28,7 @@ export class RegionFeedState {
   error = $state<string>();
   me: string | null = null;
   private searchTimer: ReturnType<typeof setTimeout> | null = null;
+  private asked = 0;
 
   readonly hasCenter = $derived(this.lat != null && this.lon != null);
   readonly hasMore = $derived(this.items.length < this.total);
@@ -88,21 +90,40 @@ export class RegionFeedState {
     }
   }
 
-  /** web's debounced place search under the toolbar. */
+  /** web's debounced place search under the toolbar. The last list stays up while you type
+   * (no flicker), and an answer to an older query never replaces a newer one. */
   search(query: string): void {
     this.placeQuery = query;
+    this.message = '';
     if (this.searchTimer) clearTimeout(this.searchTimer);
-    this.searchTimer = setTimeout(() => {
-      if (!query.trim()) return void (this.suggestions = []);
-      void searchPlaces(query, 5)
-        .then((found) => (this.suggestions = found.filter((p) => p.latitude != null)))
-        .catch(() => (this.suggestions = []));
-    }, 250);
+    const trimmed = query.trim();
+    if (trimmed.length < 2) {
+      this.asked++;
+      this.searching = false;
+      this.suggestions = [];
+      return;
+    }
+    this.searchTimer = setTimeout(() => void this.lookup(trimmed), 220);
+  }
+
+  private async lookup(query: string): Promise<void> {
+    const ticket = ++this.asked;
+    this.searching = true;
+    const found = await searchPlaces(query, 5).catch(() => [] as PlaceValue[]);
+    if (ticket !== this.asked) return;
+    // The geocoder can name one place twice; show each name once.
+    this.suggestions = found.filter(
+      (p, i) =>
+        p.latitude != null && found.findIndex((q) => q.displayLabel === p.displayLabel) === i,
+    );
+    this.searching = false;
   }
 
   /** web's `selectPlace`: the place becomes the centre and your default location. */
   select(place: PlaceValue): Promise<void> {
     if (place.latitude == null || place.longitude == null) return Promise.resolve();
+    this.asked++;
+    this.searching = false;
     this.setCenter(place.latitude, place.longitude, place.displayLabel);
     this.suggestions = [];
     writeDefaultLocation(this.me, place, false);
@@ -111,7 +132,9 @@ export class RegionFeedState {
 
   /** web's `useDeviceCenter`. */
   async useDevice(): Promise<void> {
-    const result = await devicePlace();
+    this.message = '';
+    this.searching = true;
+    const result = await devicePlace().finally(() => (this.searching = false));
     if (!result.ok) return void (this.message = devicePositionMessage(result.error));
     this.message = '';
     const place = result.place;

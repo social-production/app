@@ -84,9 +84,6 @@
         <span>Choose a place to see what is near it</span>
       {/if}
     </button>
-    {#if feed.region.message}
-      <p class="inline-alert" role="alert">{feed.region.message}</p>
-    {/if}
   {/if}
 </header>
 

@@ -69,8 +69,28 @@
     void goto(`${resolve('/')}${query}`).then(onClose);
   }
 
-  async function toggleFullscreen(): Promise<void> {
+  /** The browser's own fullscreen too, where it has one (not iPhone Safari: there the map
+   * still covers the whole page). Leaving it with Esc or a swipe leaves the map's as well. */
+  function browserFullscreen(on: boolean): void {
+    const root = document.documentElement;
+    if (on && !document.fullscreenElement) void root.requestFullscreen?.().catch(() => {});
+    if (!on && document.fullscreenElement) void document.exitFullscreen?.().catch(() => {});
+  }
+
+  onMount(() => {
+    const left = (): void => {
+      if (!document.fullscreenElement && s.mapFullscreen) void toggleFullscreen(false);
+    };
+    document.addEventListener('fullscreenchange', left);
+    return () => {
+      document.removeEventListener('fullscreenchange', left);
+      if (s.mapFullscreen) browserFullscreen(false);
+    };
+  });
+
+  async function toggleFullscreen(browser = true): Promise<void> {
     s.mapFullscreen = !s.mapFullscreen;
+    if (browser) browserFullscreen(s.mapFullscreen);
     customDateOpen = false;
     s.fullscreenSearchOpen = false;
     view.pauseViewportLoads(900);

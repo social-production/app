@@ -88,7 +88,7 @@
       searching = false;
       return;
     }
-    timer = setTimeout(() => void lookup(trimmed), 300);
+    timer = setTimeout(() => void lookup(trimmed), 220);
   }
 
   async function lookup(trimmed: string) {
@@ -144,7 +144,8 @@
 
   function oninput() {
     editing = true;
-    listOpen = false;
+    // The last list stays up while you type, so it doesn't blink on every key.
+    if (query.trim().length < 2) listOpen = false;
     runSearch(query);
     const trimmed = query.trim();
     if (value.mode === 'physical' && trimmed && !preserveCoordsWhileEditing) {
