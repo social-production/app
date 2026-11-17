@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -124,10 +125,11 @@
 
     <div class="stack">
       {#if query.trim() && loaded && results.length === 0}
-        <section class="result-card none">
-          <h2>No results</h2>
-          <p>Try a channel name, community name, project title, or username.</p>
-        </section>
+        <EmptyState
+          icon="search"
+          title={`No results for "${query.trim()}"`}
+          text="Try a channel name, community name, project title or username."
+        />
       {:else if query.trim()}
         {#each results as result (result.id)}
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the app's own paths -->

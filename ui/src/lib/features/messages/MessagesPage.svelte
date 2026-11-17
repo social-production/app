@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -192,11 +193,20 @@
           {:else if (openId || toAgent) && !inbox.loaded}
             <SkeletonRows kind="row" count={5} />
           {:else if inbox.error && inbox.chats.length === 0}
-            <div class="empty-state">{inbox.error}</div>
+            <EmptyState icon="info" title="Your chats didn't load" text={inbox.error} />
           {:else if inbox.chats.length === 0}
-            <div class="empty-state">
-              {inbox.loaded ? 'No personal messages yet.' : 'Loading chats…'}
-            </div>
+            {#if inbox.loaded}
+              <EmptyState
+                icon="send"
+                title="No messages yet"
+                text="Start a chat with someone you work with."
+              >
+                <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
+                <a class="empty-action" href={`${resolve('/messages')}?new=message`}>New message</a>
+              </EmptyState>
+            {:else}
+              <SkeletonRows kind="row" count={5} />
+            {/if}
           {:else}
             {#each inbox.chats as chat (chat.id)}
               <ChatRow

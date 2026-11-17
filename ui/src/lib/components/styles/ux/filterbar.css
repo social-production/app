@@ -1,0 +1,19 @@
+/* A channel's, community's or the Platform's feed bar (Scope Filters mockups §1a): the
+   current choice at the left, the filter button at the right, between two hairlines. */
+.shell .feed-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-top: 1px solid var(--panel-border);
+  border-bottom: 1px solid var(--panel-border);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.shell .feed-filter-bar .feed-tune {
+  margin-right: -10px;
+}

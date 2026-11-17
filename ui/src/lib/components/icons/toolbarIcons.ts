@@ -1,5 +1,9 @@
 /** SVG bodies of web's FeedToolbarIcon, keyed by name (ported verbatim). */
 export const toolbarIcons: Record<string, string> = {
+  check:
+    '<path d="m5.5 12.5 4.5 4.5 8.5-9.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" />',
+  hash: '<path d="M10 4.5 8 19.5M16 4.5l-2 15M5 9.5h14.5M4.5 14.5H19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
+  doc: '<path d="M7 3.5h7l4 4v13H7z M14 3.5v4h4 M10 12h5M10 16h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round" />',
   home: '<path d="M5.5 10.2V18a1 1 0 0 0 1 1H9v-5h6v5h2.5a1 1 0 0 0 1-1v-7.8L12 5.5 5.5 10.2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />',
   globe:
     '<circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M4.5 12h15M12 3.5a14.5 14.5 0 0 1 0 17M12 3.5a14.5 14.5 0 0 0 0 17" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
