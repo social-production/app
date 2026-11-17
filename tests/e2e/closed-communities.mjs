@@ -39,7 +39,7 @@ await a.getByLabel('Who decides').selectOption('organizer');
 await a.getByLabel(/Description/).fill('Made by the closed-communities test.');
 await a.getByRole('button', { name: 'Create community' }).click();
 await a.getByRole('heading', { name: handle }).waitFor({ timeout: 120_000 });
-await a.getByLabel('Private', { exact: true }).waitFor();
+await a.locator('.scope-kind-chip', { hasText: 'Private' }).waitFor();
 const url = a.url();
 log('one made the private community');
 
@@ -83,9 +83,11 @@ await retry('two never showed as a member', async () => {
 });
 await a.getByRole('button', { name: 'Settings', exact: true }).click();
 const settings = a.locator('.scope-settings');
-await settings.getByText("You're an organizer, so changes apply straight away.").waitFor();
+await settings.getByText('Organizers decide: saved at once').waitFor();
 await settings.getByPlaceholder('Username to remove').fill(two.name);
-await settings.getByRole('option', { name: two.name }).first().click();
+// An exact name picks the member at once (the list then hides); otherwise pick from the list.
+const pick = settings.getByRole('option', { name: two.name }).first();
+if (await pick.isVisible()) await pick.click();
 await a.screenshot({ path: `${out}/phone390-community-who-decides.png` });
 await settings.getByRole('button', { name: 'Remove', exact: true }).click();
 await a.getByRole('alertdialog').getByRole('button', { name: 'Remove' }).click();

@@ -92,7 +92,7 @@ export class ScopeGovernance {
 export function describeDecision(p: Proposal, memberName: (agent: string) => string): string {
   if ('RemoveMember' in p.kind) return `Remove ${memberName(p.kind.RemoveMember.agent)}`;
   if ('Edit' in p.kind) {
-    return `Change: ${p.kind.Edit.description !== null ? 'new description' : 'settings'}`;
+    return p.kind.Edit.description !== null ? 'New description' : 'New settings';
   }
-  return 'Change: settings';
+  return 'New settings';
 }

@@ -48,7 +48,7 @@ await settings.getByLabel('Description').fill(after);
 await b.screenshot({ path: `${out}/phone390-scope-settings.png` });
 await settings.getByRole('button', { name: 'Propose change' }).click();
 await settings.getByText('Vote started').waitFor({ timeout: 60_000 });
-const open = settings.locator('.decision-card.open', { hasText: 'Change: new description' });
+const open = settings.locator('.decision-card.open', { hasText: 'New description' });
 await open.waitFor({ timeout: 60_000 });
 await b.screenshot({ path: `${out}/phone390-scope-decisions.png` });
 await settings.locator('.sheet-close').click();
@@ -62,9 +62,10 @@ for (let i = 0; ; i++) {
   if (await fab.waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
   if (i >= 20) throw new Error('the Vote button never showed');
 }
+await a.screenshot({ path: `${out}/phone390-scope-page.png` });
 await fab.click();
 const vote = a.locator('.scope-vote');
-await vote.getByText('Change: new description').waitFor();
+await vote.getByText('New description').waitFor();
 await vote.getByText(after).waitFor();
 await a.screenshot({ path: `${out}/phone390-scope-vote.png` });
 await vote.getByRole('button', { name: 'Yes', exact: true }).click();
@@ -81,7 +82,7 @@ for (let i = 0; ; i++) {
 await a.getByRole('button', { name: 'Settings', exact: true }).click();
 await a.locator('.scope-settings').getByRole('tab', { name: /Decisions/ }).click();
 await a
-  .locator('.scope-settings .decision-card.approved', { hasText: 'Change: new description' })
+  .locator('.scope-settings .decision-card.approved', { hasText: 'New description' })
   .waitFor({ timeout: 60_000 });
 log('the description changed and the decision passed');
 
