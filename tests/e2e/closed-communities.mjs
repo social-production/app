@@ -39,7 +39,7 @@ await a.getByLabel('Who decides').selectOption('organizer');
 await a.getByLabel(/Description/).fill('Made by the closed-communities test.');
 await a.getByRole('button', { name: 'Create community' }).click();
 await a.getByRole('heading', { name: handle }).waitFor({ timeout: 120_000 });
-await a.getByLabel('Private', { exact: true }).waitFor();
+await a.locator('.scope-kind-chip', { hasText: 'Private' }).waitFor();
 const url = a.url();
 log('one made the private community');
 
