@@ -180,3 +180,29 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/* The suggested searches before you type, as the app's pills (they showed as bare words). */
+.shell .chip-row:has(.query-chip) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.shell .chip-row .query-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .chip-row .query-chip:hover {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
