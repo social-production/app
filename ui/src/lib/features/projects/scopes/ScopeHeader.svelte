@@ -13,9 +13,10 @@
   import type { ScopeState } from './scopeState.svelte.ts';
 
   /**
-   * A channel's, community's or the Platform's header (Remaining Screens, 3), the same shape
-   * as a profile: a soft band, the mark (a rounded square), the name large, "Channel · N
-   * members", the description, then pill buttons with words and a round settings button.
+   * A channel's, community's or the Platform's header (Remaining Screens, 3; Channel Pictures
+   * mockups §1), the same shape as a profile: a soft band, the mark (a rounded square), the
+   * name large with a chip (Channel, Community or Private), "N members" and who decides in an
+   * organizer-run community, the description, then pill buttons with words and the pencil.
    */
   interface Props {
     s: ScopeState;
@@ -52,10 +53,14 @@
   const count = $derived(s.project?.members.length ?? scope?.members ?? 0);
   const pending = $derived(s.joining || (!s.project && !!scope?.id));
   const typeName = $derived(kind === 'channel' ? 'Channel' : 'Community');
+  const organized = $derived(s.project?.governance === 'organizer_controlled');
   // The Platform counts people active last week (what its votes are sized from), not members
   // (Platform and Moderators mockups §1).
   const sub = $derived.by(() => {
-    if (!s.platform) return `${typeName} · ${count} ${count === 1 ? 'member' : 'members'}`;
+    if (!s.platform) {
+      const members = `${count} ${count === 1 ? 'member' : 'members'}`;
+      return organized ? `${members} · organizers decide` : members;
+    }
     const n = board?.weeklyActive;
     if (n === undefined) return 'The whole network';
     return n === 0 ? 'Nobody active last week' : `${n.toLocaleString()} active last week`;
@@ -78,19 +83,9 @@
         <h1>
           {s.platform ? 'Platform' : scope.handle}
           {#if s.platform}<span class="scope-kind-chip">Whole network</span>{/if}
-          {#if scope.isPrivate}
-            <span class="private-mark" title="Private: members only" aria-label="Private">
-              <svg aria-hidden="true" viewBox="0 0 24 24" width="14" height="14">
-                <path
-                  d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </span>
-          {/if}
+          {#if !s.platform}<span class="scope-kind-chip"
+              >{scope.isPrivate ? 'Private' : typeName}</span
+            >{/if}
         </h1>
         <p class="scope-hero-sub">{sub}</p>
       </div>
@@ -181,12 +176,7 @@
             type="button"
             onclick={() => (settingsOpen = true)}
           >
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
-              <path
-                d="M10.3 2h3.4l.5 2.4c.5.2 1 .4 1.5.6l2.1-1.2 2.4 2.4-1.2 2.1c.2.5.4 1 .6 1.5L22 10.3v3.4l-2.4.5c-.2.5-.4 1-.6 1.5l1.2 2.1-2.4 2.4-2.1-1.2c-.5.2-1 .4-1.5.6L13.7 22h-3.4l-.5-2.4c-.5-.2-1-.4-1.5-.6l-2.1 1.2-2.4-2.4 1.2-2.1c-.2-.5-.4-1-.6-1.5L2 13.7v-3.4l2.4-.5c.2-.5.4-1 .6-1.5L3.8 6.2l2.4-2.4 2.1 1.2c.5-.2 1-.4 1.5-.6L10.3 2Zm1.7 6.2A3.8 3.8 0 1 0 12 15.8 3.8 3.8 0 0 0 12 8.2Z"
-                fill="currentColor"
-              ></path>
-            </svg>
+            <ToolbarIcon name="pencil" />
           </button>
         {/if}
       </div>
@@ -206,6 +196,9 @@
         aria-label={`Vote: ${waiting} waiting for your vote`}
         onclick={onVotes}
       >
+        <svg class="vote-fab-arrow" aria-hidden="true" viewBox="0 0 24 24"
+          ><path d="M12 19V5M6 11l6-6 6 6" /></svg
+        >
         Vote
         <span class="vote-fab-count">{waiting}</span>
       </button>

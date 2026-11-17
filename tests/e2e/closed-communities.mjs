@@ -83,7 +83,7 @@ await retry('two never showed as a member', async () => {
 });
 await a.getByRole('button', { name: 'Settings', exact: true }).click();
 const settings = a.locator('.scope-settings');
-await settings.getByText("You're an organizer, so changes apply straight away.").waitFor();
+await settings.getByText('Organizers decide: saved at once').waitFor();
 await settings.getByPlaceholder('Username to remove').fill(two.name);
 await settings.getByRole('option', { name: two.name }).first().click();
 await a.screenshot({ path: `${out}/phone390-community-who-decides.png` });
