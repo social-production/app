@@ -2,6 +2,7 @@
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import FeedbackCard from '#lib/components/feedback/FeedbackCard.svelte';
   import FeedbackComposeSheet from '#lib/components/feedback/FeedbackComposeSheet.svelte';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import {
     emptyFeedbackCopy,
@@ -71,7 +72,8 @@
   {:else if fb.loading}
     <SkeletonRows count={3} />
   {:else if items.length === 0}
-    <p class="feedback-note">{emptyFeedbackCopy(filter)}</p>
+    {@const empty = emptyFeedbackCopy(filter)}
+    <EmptyState icon="message" title={empty.title} text={empty.text} />
   {:else}
     <div class="feedback-list">
       {#each items as item (item.id)}

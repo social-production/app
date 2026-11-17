@@ -4,8 +4,9 @@
   import { standingLabel } from '#lib/components/people/standing.ts';
   import type { Person } from '#lib/domain/people.ts';
 
-  /** One person in the People list (Remaining Screens, 6): a plain row with a larger face,
-   * the name, one quiet line and "View". The key suffix stays on the profile. */
+  /** One person in the People list (Screen Review §2, owner 2026-11-18): the whole row opens
+   * them; the second line is place and standing as in member lists, with the vouch count only
+   * part-way there; a chevron instead of a "View" box. The key suffix stays on the profile. */
   interface Props {
     person: Person;
     /** Devices this person uses; shown when more than one. */
@@ -16,10 +17,12 @@
 
   const facts = $derived(
     [
-      standingLabel(person),
-      person.standing.level === 'New' ? `${person.standing.vouchers.length} of 2 vouches` : '',
-      devices > 1 ? `${devices} devices` : '',
       person.profile?.home_area ?? '',
+      standingLabel(person),
+      person.standing.level === 'New' && person.standing.vouchers.length > 0
+        ? `${person.standing.vouchers.length} of 2 vouches`
+        : '',
+      devices > 1 ? `${devices} devices` : '',
     ].filter(Boolean),
   );
 </script>
@@ -39,5 +42,6 @@
     <strong>{person.profile?.name ?? 'Unnamed'}</strong>
     <small>{facts.join(' · ')}</small>
   </span>
-  <span class="people-view">View</span>
+  <svg class="people-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m10 7 5 5-5 5" /></svg
+  >
 </a>

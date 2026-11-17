@@ -2,10 +2,10 @@
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import RailCleared from '#lib/components/rail/RailCleared.svelte';
   import RailHistory from '#lib/components/rail/RailHistory.svelte';
   import RailRow from '#lib/components/rail/RailRow.svelte';
-  import RailSection from '#lib/components/rail/RailSection.svelte';
   import { railTime, type RailItem } from '#lib/domain/activityRail.ts';
   import { isHelpKind } from '#lib/domain/helpRail.ts';
   import { projectPageOf } from '#lib/services/notifications.ts';
@@ -21,9 +21,11 @@
   import { spaceHref } from '#lib/components/cards/spaceHref.ts';
 
   /**
-   * web's RightRailPanel: Project Activity & Events, Help Requests, Requests, Votes to cast,
-   * History and Cleared. Help Requests lists yours, your sign-ups and open ones in your
-   * channels and communities; Requests, open service requests to services you run (ADR 0076).
+   * Your activity (Screen Review §1, owner 2026-11-18): three tabs with counts instead of web's
+   * four disclosure lists. Coming up is what you're in (web's Project Activity & Events); Votes
+   * is web's Votes to cast; Requests merges help requests (yours, your sign-ups, open ones in
+   * your channels and communities) and service requests you can answer (ADR 0076). History and
+   * Cleared stay below.
    */
   let { onClose }: { onClose: () => void } = $props();
 
@@ -36,6 +38,23 @@
   const requests = $derived(visible.filter((i) => i.kind === 'request'));
   const help = $derived(visible.filter((i) => isHelpKind(i.kind)));
   const unseen = (item: RailItem): boolean => !activityRail.seen.includes(item.id);
+  type Tab = 'coming' | 'votes' | 'requests';
+  let tab = $state<Tab>('coming');
+  const tabs = $derived([
+    {
+      id: 'coming' as Tab,
+      label: 'Coming up',
+      count: activities.length,
+      hot: activities.some(unseen),
+    },
+    { id: 'votes' as Tab, label: 'Votes', count: votes.length, hot: votes.length > 0 },
+    {
+      id: 'requests' as Tab,
+      label: 'Requests',
+      count: help.length + requests.length,
+      hot: help.some(unseen) || requests.some(unseen),
+    },
+  ]);
 
   /** web's handleOpenItem; a link into the page already open reloads it, so it opens there. */
   async function openItem(item: RailItem): Promise<void> {
@@ -53,101 +72,111 @@
   }
 </script>
 
-<section class="rail-panel">
-  <RailSection
-    title="Project Activity & Events"
-    count={activities.length}
-    hot={activities.some(unseen)}
-    emptyTitle="No activity yet"
-    emptyText="Nothing scheduled in your memberships right now."
-  >
-    {#each activities as item (item.id)}
-      <RailRow
-        {item}
-        unseen={unseen(item)}
-        rowClass=""
-        dismissLabel="Dismiss activity card"
-        time={railTime(item.createdAt)}
-        onOpen={() => openItem(item)}
-        onDismiss={() => dismissRailItem(item.id)}
-      />
-    {/each}
-  </RailSection>
-
-  <RailSection
-    title="Help Requests"
-    count={help.length}
-    hot={help.some(unseen)}
-    extraClass="rail-section-help-requests"
-    emptyTitle="No help requests yet"
-    emptyText="Open help in your memberships will show here."
-  >
-    {#each help as item (item.id)}
-      <RailRow
-        {item}
-        unseen={unseen(item)}
-        rowClass="help-request-row"
-        dismissLabel="Dismiss help request card"
-        time={railTime(item.createdAt)}
-        onOpen={() => openItem(item)}
-        onDismiss={() => dismissRailItem(item.id)}
-      />
-    {/each}
-  </RailSection>
-
-  <RailSection
-    title="Requests"
-    count={requests.length}
-    hot={requests.some(unseen)}
-    extraClass="rail-section-requests"
-    emptyTitle="No open requests"
-    emptyText="Service requests you can review will appear here and open the matching project card."
-  >
-    {#each requests as item (item.id)}
-      <RailRow
-        {item}
-        unseen={unseen(item)}
-        rowClass=""
-        dismissLabel="Dismiss request card"
-        time={railTime(item.createdAt)}
-        onOpen={() => openItem(item)}
-        onDismiss={() => dismissRailItem(item.id)}
-      />
-    {/each}
-  </RailSection>
-
-  <RailSection
-    title="Votes to cast"
-    count={votes.length}
-    hot={votes.length > 0}
-    extraClass="rail-section-votes"
-    emptyTitle="No votes waiting"
-    emptyText="Open decisions you still need to cast appear here. Votes you already cast stay in History until they close."
-  >
-    {#each votes as item (item.id)}
-      <RailRow
-        {item}
-        unseen={false}
-        rowClass="vote-row"
-        dismissLabel="Dismiss vote card"
-        time={railTime(item.createdAt)}
-        onOpen={() => openItem(item)}
-        onDismiss={() => dismissRailItem(item.id)}
+<section class="rail-panel rail-tabs-panel">
+  <h2 class="rail-title">Your activity</h2>
+  <div class="rail-tabs" role="tablist" aria-label="Your activity">
+    {#each tabs as t (t.id)}
+      <button
+        type="button"
+        role="tab"
+        aria-selected={tab === t.id}
+        class:on={tab === t.id}
+        onclick={() => (tab = t.id)}
+        >{t.label}{#if t.count > 0}<span class="rail-tab-count" class:hot={t.hot}>{t.count}</span
+          >{/if}</button
       >
-        {#snippet actions()}
-          <div class="vote-row-actions">
-            <button
-              class="vote-action-button assess-button"
-              type="button"
-              onclick={() => openItem(item)}
-            >
-              {item.voteKindLabel === 'pull_request_merge' ? 'Record merge' : 'Assess'}
-            </button>
-          </div>
-        {/snippet}
-      </RailRow>
     {/each}
-  </RailSection>
+  </div>
+
+  {#if tab === 'coming'}
+    <div class="rail-tab-panel" role="tabpanel">
+      {#each activities as item (item.id)}
+        <RailRow
+          {item}
+          unseen={unseen(item)}
+          rowClass=""
+          dismissLabel="Dismiss activity card"
+          time={railTime(item.createdAt)}
+          onOpen={() => openItem(item)}
+          onDismiss={() => dismissRailItem(item.id)}
+        />
+      {:else}
+        <EmptyState
+          icon="calendar"
+          title="No activity yet"
+          text="Activities and events you join show up here."
+        />
+      {/each}
+    </div>
+  {:else if tab === 'votes'}
+    <div class="rail-tab-panel rail-section-votes" role="tabpanel">
+      {#each votes as item (item.id)}
+        <RailRow
+          {item}
+          unseen={false}
+          rowClass="vote-row"
+          dismissLabel="Dismiss vote card"
+          time={railTime(item.createdAt)}
+          onOpen={() => openItem(item)}
+          onDismiss={() => dismissRailItem(item.id)}
+        >
+          {#snippet actions()}
+            <div class="vote-row-actions">
+              <button
+                class="vote-action-button assess-button"
+                type="button"
+                onclick={() => openItem(item)}
+              >
+                {item.voteKindLabel === 'pull_request_merge' ? 'Record merge' : 'Assess'}
+              </button>
+            </div>
+          {/snippet}
+        </RailRow>
+      {:else}
+        <EmptyState
+          icon="check"
+          title="No votes waiting"
+          text="Decisions that need your vote show up here. Once you vote, they move to History."
+        />
+      {/each}
+    </div>
+  {:else}
+    <div class="rail-tab-panel" role="tabpanel">
+      <div class="rail-section-help-requests">
+        {#each help as item (item.id)}
+          <RailRow
+            {item}
+            unseen={unseen(item)}
+            rowClass="help-request-row"
+            dismissLabel="Dismiss help request card"
+            time={railTime(item.createdAt)}
+            onOpen={() => openItem(item)}
+            onDismiss={() => dismissRailItem(item.id)}
+          />
+        {/each}
+      </div>
+      <div class="rail-section-requests">
+        {#each requests as item (item.id)}
+          <RailRow
+            {item}
+            unseen={unseen(item)}
+            rowClass=""
+            dismissLabel="Dismiss request card"
+            time={railTime(item.createdAt)}
+            onOpen={() => openItem(item)}
+            onDismiss={() => dismissRailItem(item.id)}
+          />
+        {/each}
+      </div>
+      {#if help.length + requests.length === 0}
+        <EmptyState
+          icon="message"
+          title="No requests to answer"
+          text="Help and service requests in your projects and channels show up here."
+        />
+      {/if}
+    </div>
+  {/if}
 
   {#if activityRail.history.length > 0}
     <RailHistory items={activityRail.history} onOpen={openItem} />

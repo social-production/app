@@ -126,7 +126,7 @@ await guest.getByRole("heading", { name: title }).waitFor({ timeout: 120_000 });
 assert.match(guest.url(), /\.organized\./);
 await guest.locator(".feed-card-top .private-mark").waitFor();
 await guest.goto(`${BASE}/invites`);
-await guest.getByText("No invites waiting.").waitFor({ timeout: 60_000 });
+await guest.getByText("No invites waiting").waitFor({ timeout: 60_000 });
 assert.equal(await rows().count(), 0, "no Invites row once answered");
 log("the invitee accepted and joined");
 

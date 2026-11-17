@@ -13,6 +13,14 @@
   let rows = $state<PersonRow[]>([]);
   let loaded = $state(false);
   let error = $state<string>();
+  let query = $state('');
+  const shown = $derived(
+    query.trim()
+      ? rows.filter((r) =>
+          (r.person.profile?.name ?? '').toLowerCase().includes(query.trim().toLowerCase()),
+        )
+      : rows,
+  );
 
   async function load(): Promise<void> {
     try {
@@ -41,16 +49,26 @@
     <header class="people-head">
       <h1>People</h1>
       <p>Open someone's profile to vouch for them.</p>
+      <input
+        id="people-search"
+        class="people-search"
+        type="search"
+        placeholder="Search people"
+        aria-label="Search people"
+        bind:value={query}
+      />
     </header>
     {#if error}<p class="warning-card">{error}</p>{/if}
     {#if !loaded}
       <LoadingLine /><SkeletonRows kind="row" count={6} />
     {:else}
       <div class="people-list people">
-        {#each rows as row (row.person.agent)}
+        {#each shown as row (row.person.agent)}
           <PersonChip person={row.person} devices={row.devices} />
         {:else}
-          <p class="end-copy">Nobody has set up a profile yet.</p>
+          <p class="end-copy">
+            {query.trim() ? `Nobody called "${query.trim()}".` : 'Nobody has set up a profile yet.'}
+          </p>
         {/each}
       </div>
     {/if}

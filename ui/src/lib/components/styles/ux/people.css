@@ -83,3 +83,29 @@
 .shell .profile-page .people-row:hover .people-view {
   background: color-mix(in srgb, var(--text-main) 12%, transparent);
 }
+
+/* Screen Review §2 (owner, 2026-11-18): a search box, rows that open the person, a chevron. */
+.shell .people-head .people-search {
+  width: 100%;
+  height: 42px;
+  margin-top: 10px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+}
+
+.shell .people-list .people-row .people-chevron {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  margin-left: auto;
+  fill: none;
+  stroke: var(--text-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
