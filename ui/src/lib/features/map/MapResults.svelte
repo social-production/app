@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { ResolvedPathname } from '$app/types';
   import { resolve } from '$app/paths';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import MapDiscoveryCard from '#lib/components/map/MapDiscoveryCard.svelte';
   import { markerRoute, type MapMarkerItem } from '#lib/domain/mapMarkers.ts';
@@ -32,6 +33,22 @@
     return `${path}${route.query}` as ResolvedPathname;
   }
 
+  const WHEN: Record<string, string> = {
+    today: ' today',
+    week: ' this week',
+    month: ' this month',
+    custom: ' in those dates',
+  };
+  // The empty map says what was searched and what to change (Scope Filters' empty states).
+  const nothingText = $derived.by(() => {
+    const where = s.radiusKm === 'global' ? 'anywhere' : `within ${s.radiusKm} km`;
+    const when = WHEN[s.windowFilter] ?? '';
+    const wider = s.radiusKm === 'global' ? '' : 'a wider distance';
+    const longer = when ? 'a longer time' : '';
+    const tryThis = [wider, longer].filter(Boolean).join(' or ');
+    return `Nothing on the map ${where}${when}.${tryThis ? ` Try ${tryThis}.` : ''}`;
+  });
+
   const isPast = (iso: string | null): boolean => !!iso && new Date(iso).getTime() < Date.now();
 </script>
 
@@ -39,13 +56,15 @@
   {#if s.loading && s.listItems.length === 0}
     <p class="empty-state">Loading markers…</p>
   {:else if s.errorMessage}
-    <p class="empty-state" role="alert">{s.errorMessage}</p>
+    <EmptyState icon="map-pin" title="The map couldn't load" text={s.errorMessage} />
   {:else if !s.hasCenter}
-    <p class="empty-state">
-      Search a place, use device location, or set a default in Settings to load map pins.
-    </p>
+    <EmptyState
+      icon="map-pin"
+      title="Choose a place"
+      text="Search a place or use your location to see what's near it."
+    />
   {:else if s.listItems.length === 0}
-    <p class="empty-state">No physical map-eligible items in this radius for the selected time.</p>
+    <EmptyState icon="map-pin" title="Nothing here yet" text={nothingText} />
   {:else}
     {#if s.overlayFilters}
       <header class="results-head">
