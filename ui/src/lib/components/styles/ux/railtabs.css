@@ -1,6 +1,7 @@
 /* Your activity (Screen Review §1, owner 2026-11-18): a title, three tabs with counts, and rows
    with the kind's tile; web's disclosure lists and boxed cards are gone. */
 .right-rail .rail-panel.rail-tabs-panel {
+  border-bottom: none;
   display: grid;
   gap: 12px;
   align-content: start;
@@ -63,6 +64,7 @@
 
 .right-rail .rail-tabs-panel .rail-tab-panel {
   display: grid;
+  border: none;
 }
 
 .right-rail .rail-tabs-panel .rail-tab-panel .empty-block {
@@ -139,19 +141,27 @@
 .right-rail .rail-tabs-panel .rail-item .card-meta,
 .right-rail .rail-tabs-panel .rail-item .card-detail,
 .right-rail .rail-tabs-panel .rail-item .card-body-preview {
+  margin: 0;
+  padding: 0;
+  border: none;
   color: var(--text-soft);
   font-size: 12.5px;
 }
 
-.right-rail .rail-tabs-panel .rail-item.activity-row-unseen strong::after {
+.right-rail .rail-tabs-panel .rail-item .rail-tile {
+  position: relative;
+}
+
+.right-rail .rail-tabs-panel .rail-item.activity-row-unseen .rail-tile::after {
   content: '';
-  display: inline-block;
-  width: 7px;
-  height: 7px;
-  margin-left: 6px;
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--panel);
   border-radius: 50%;
   background: var(--brand);
-  vertical-align: 2px;
 }
 
 .right-rail .rail-tabs-panel .rail-item .dismiss-card {
