@@ -151,7 +151,9 @@
     {:else}
       <section class="scope-sheet-art" aria-hidden="true">
         <div class="scope-cover"></div>
-        <span class="scope-avatar"><SurfaceIcon icon={kind} size="md" /></span>
+        <span class="scope-avatar"
+          >{#if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}</span
+        >
       </section>
 
       <label class="field">
