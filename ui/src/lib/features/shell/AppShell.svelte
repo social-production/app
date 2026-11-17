@@ -17,6 +17,7 @@
   import { applyBackButtons } from '#lib/stores/backButtons.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
+  import { settleBootSplash } from './bootSplash.ts';
   import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
   import { myScopes } from '#lib/stores/myScopes.svelte.ts';
   import { openSearch } from '#lib/stores/searchOverlay.svelte.ts';
@@ -131,6 +132,7 @@
     }
   });
 
+  $effect(() => settleBootSplash(connection.current.status));
   $effect(showDeactivatedReason);
   $effect(() => {
     const current = connection.current;

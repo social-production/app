@@ -5,7 +5,8 @@
 
   /** web's `components/shared/RadiusCombobox.svelte` as a button that opens a Distance sheet:
    * the same one-tap chips and "Other distance" box as the Region filter (owner, 2026-11-17:
-   * the drop-down list didn't look like the rest of the app's filters). */
+   * the drop-down list didn't look like the rest of the app's filters). The map stays in view
+   * behind it and follows each tap; Done closes it. */
   interface Props {
     value: string;
     onChange: (value: string) => void;
@@ -61,15 +62,7 @@
 >
   <div class="feed-filter-groups">
     <section>
-      <RadiusChips
-        {value}
-        {options}
-        {ariaLabel}
-        onChange={(v) => {
-          open = false;
-          onChange(v);
-        }}
-      />
+      <RadiusChips {value} {options} {ariaLabel} {onChange} />
     </section>
   </div>
   {#snippet footer()}
