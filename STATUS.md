@@ -204,6 +204,15 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (11:05 pm Melbourne, 2026-11-17, UX session)
+- **Live since ~11 pm: PR #200** (owner): every sheet whose footer is the × and its actions
+  docks them in one capsule (`ux/sheetdock.css`; the create flow and footers with a text
+  line keep their own layout); the map's distance opens a Distance sheet of chips
+  (`RadiusCombobox` is now a button + `RadiusChips` sheet; the drop-down is gone); the map's
+  empty, no-place and error states use `EmptyState` and say what was searched. `map.mjs`,
+  `region.mjs` pass locally; live smoke at 390px light/dark clean, 0 page errors.
+- Next: ADR 0095's moderator merge on #platform software projects, then the audits.
+
 ### Where things stand (9:20 pm Melbourne, 2026-11-17, UX session)
 - **Live since ~9:15 pm:** PR #196 (guests' "Sign in" in chat bars is a pill that fits the
   bar, owner) and PR #197 (@mention notices are sent from project, direct and group chats;
