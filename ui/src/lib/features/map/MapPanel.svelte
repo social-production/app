@@ -11,7 +11,9 @@
   import { clearMapFocusRequest, mapFocus } from '#lib/stores/mapFocus.svelte.ts';
   import { readMapPreferences } from '#lib/stores/mapPreferences.svelte.ts';
   import MapFilters from './MapFilters.svelte';
+  import MapPeek from './MapPeek.svelte';
   import MapResults from './MapResults.svelte';
+  import { markerHref } from './markerHref.ts';
   import { MarkerLoader } from './markerLoader.ts';
   import { MapPanelState } from './panelState.svelte.ts';
   import { MapView } from './mapView.ts';
@@ -31,6 +33,7 @@
   // eslint-disable-next-line svelte/no-navigation-without-resolve -- hrefs come from the index's own routes
   const navigate = (href: string): void => void goto(href).then(onClose);
   const view = new MapView(s, navigate, (coords) => loader.schedule(coords));
+  const selected = $derived(s.listItems.find((i) => i.id === s.selectedId) ?? null);
   const loader = new MarkerLoader(s, view, () => mapContainer);
 
   const stageStyle = $derived(
@@ -221,6 +224,14 @@
         </button>
         {#if s.overlayFilters}
           {@render filters(true)}
+        {/if}
+        {#if selected}
+          <MapPeek
+            item={selected}
+            href={markerHref(selected)}
+            onClose={() => view.select(null)}
+            onOpen={() => (view.select(null), onClose())}
+          />
         {/if}
       </div>
       {#if !s.mapFullscreen && !s.isCompactMap}

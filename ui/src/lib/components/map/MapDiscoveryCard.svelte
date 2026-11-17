@@ -39,7 +39,9 @@
 
   const mode = $derived(markerMode(item));
   const scheduleTime = $derived(formatMarkerScheduleRange(item.scheduledAt, item.endsAt));
-  const status = $derived(markerStatus(item));
+  // A proposal's status is "Proposal", which its type already says (Map Redesign: "Kind · distance").
+  const rawStatus = $derived(markerStatus(item));
+  const status = $derived(rawStatus.toLowerCase() === mode ? '' : rawStatus);
   const location = $derived(item.displayLabel.trim());
   // web's footer is "1.2 km · 2/3 signed up": the distance goes up into the type line.
   const footerParts = $derived(markerFooter(item).split(' · '));

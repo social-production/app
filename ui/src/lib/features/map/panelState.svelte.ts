@@ -42,6 +42,8 @@ export class MapPanelState {
   markers: MapMarker[] = [];
   listItems = $state<MapMarkerItem[]>([]);
   highlightedId = $state<string | null>(null);
+  /** The pin whose card is open (Map Redesign). */
+  selectedId = $state<string | null>(null);
   mapFullscreen = $state(false);
   isMobile = $state(false);
   isCompactMap = $state(false);

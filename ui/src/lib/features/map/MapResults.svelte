@@ -1,11 +1,9 @@
 <script lang="ts">
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
-  import type { ResolvedPathname } from '$app/types';
-  import { resolve } from '$app/paths';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import MapDiscoveryCard from '#lib/components/map/MapDiscoveryCard.svelte';
-  import { markerRoute, type MapMarkerItem } from '#lib/domain/mapMarkers.ts';
+  import { markerHref } from './markerHref.ts';
   import type { MapPanelState } from './panelState.svelte.ts';
 
   /** web's MapPanel results list beside (or under) the map. */
@@ -20,19 +18,6 @@
   }
 
   let { s, onHover, onLeave, onSelect, onClose, onList }: Props = $props();
-
-  /** The item's page, with web's `?activity=` (the path is resolved; the query rides along). */
-  function hrefOf(item: MapMarkerItem): ResolvedPathname {
-    const route = markerRoute(item.href);
-    if (!route) return resolve('/');
-    const path =
-      route.path === 'events'
-        ? resolve('/events/[id]', { id: route.id })
-        : route.path === 'help-requests'
-          ? resolve('/help-requests/[id]', { id: route.id })
-          : resolve('/projects/[id]', { id: route.id });
-    return `${path}${route.query}` as ResolvedPathname;
-  }
 
   const WHEN: Record<string, string> = {
     today: ' today',
@@ -79,7 +64,7 @@
       {#each s.listItems as item (item.id)}
         <MapDiscoveryCard
           {item}
-          href={hrefOf(item)}
+          href={markerHref(item)}
           isPast={!s.upcomingOnly && isPast(item.scheduledAt)}
           highlighted={s.highlightedId === item.id}
           {onHover}

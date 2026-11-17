@@ -23,8 +23,19 @@ export class MapLibreAdapter implements MapAdapter {
   private centerMarker: Marker | null = null;
   private radiusReady = false;
 
+  private onSelect: ((markerId: string | null) => void) | null = null;
+
   constructor(navigate: (href: string) => void) {
-    this.pins = new Pins(() => this.map, { tooltip: this.tooltip, navigate });
+    this.pins = new Pins(() => this.map, {
+      tooltip: this.tooltip,
+      navigate,
+      select: (id) => this.onSelect?.(id),
+    });
+  }
+
+  /** A tapped pin, or `null` for a tap on the map itself (which closes a pin's card). */
+  onMarkerSelect(handler: ((markerId: string | null) => void) | null): void {
+    this.onSelect = handler;
   }
 
   async mount(container: HTMLElement, viewport: MapViewport): Promise<void> {
@@ -91,6 +102,7 @@ export class MapLibreAdapter implements MapAdapter {
     map.on('movestart', mark);
     map.on('zoomstart', mark);
     map.on('moveend', () => this.scheduleViewportChange());
+    map.on('click', () => this.onSelect?.(null));
     map.on('zoomend', () => {
       this.scheduleViewportChange();
       this.pins.scheduleCompactRefresh();
@@ -190,7 +202,7 @@ export class MapLibreAdapter implements MapAdapter {
     const element = document.createElement('div');
     element.className = 'sp-map-center-marker';
     element.setAttribute('aria-hidden', 'true');
-    this.centerMarker = new Marker({ element, anchor: 'bottom' })
+    this.centerMarker = new Marker({ element, anchor: 'center' })
       .setLngLat([center.longitude, center.latitude])
       .addTo(this.map);
   }

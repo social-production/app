@@ -65,6 +65,15 @@
   --type-accent-community: #be4646;
   --type-accent-platform: #5489c6;
   --type-accent-neutral: #676b73;
+  /* One colour per kind, shared by map pins and feed card icons (Map Redesign, 2026-11-17). */
+  --kind-project: #3fae6e;
+  --kind-service: #d99a1c;
+  --kind-event: #8a70ec;
+  --kind-request: #ec7f5d;
+  --kind-proposal: #5ea6b6;
+  --kind-thread: #5b8fd4;
+  --kind-post: #a8754f;
+  --kind-on: #ffffff;
   --surface-thread: #25282d;
   --surface-thread-border: #353942;
   --toolbar-background: #1b1d21;
@@ -192,6 +201,14 @@ body[data-theme='light'] {
   --type-accent-community: #ca5050;
   --type-accent-platform: #5e91d0;
   --type-accent-neutral: #a1a1aa;
+  --kind-project: #2f8a57;
+  --kind-service: #c28407;
+  --kind-event: #6d4fd8;
+  --kind-request: #e0704f;
+  --kind-proposal: #4f8f9e;
+  --kind-thread: #3f72b8;
+  --kind-post: #8a5a3a;
+  --kind-on: #ffffff;
   --surface-thread: #ffffff;
   --surface-thread-border: #e4e4e7;
   --toolbar-background: #ffffff;
