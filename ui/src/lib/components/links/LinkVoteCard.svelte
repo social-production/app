@@ -1,12 +1,6 @@
 <script lang="ts">
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
-  import {
-    resultNote,
-    voteRequirement,
-    type LinkHalf,
-    type LinkRequest,
-    type LinkSide,
-  } from '#lib/domain/links.ts';
+  import { resultNote, type LinkHalf, type LinkRequest, type LinkSide } from '#lib/domain/links.ts';
 
   import '#lib/components/styles/links.css';
 
@@ -70,10 +64,8 @@
       <div class="link-vote-bar" class:done={half?.status === 'Approved'}>
         <i style={`width: ${Math.max(percent(half), 3)}%`}></i>
       </div>
-      {#if !open || half?.status !== 'Open'}
-        <span class="link-vote-note"
-          >{half?.status === 'Open' ? voteRequirement(half) : resultNote(half)}</span
-        >
+      {#if !open}
+        <span class="link-vote-note">{resultNote(half)}</span>
       {/if}
     </div>
   {/each}

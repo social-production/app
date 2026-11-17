@@ -31,9 +31,9 @@
   gap: 5px;
   height: 34px;
   padding: 0 14px;
-  border: none;
+  border: 1px solid var(--panel-border);
   border-radius: 999px;
-  background: var(--brand-soft);
+  background: transparent;
   color: var(--brand-strong);
   font: inherit;
   font-size: 13.5px;
