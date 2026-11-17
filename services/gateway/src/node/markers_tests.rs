@@ -18,6 +18,8 @@ fn card(id: &str, mode: &str, place: Option<(f64, f64)>) -> ProjectCard {
         location_label: "Somewhere".into(),
         phase: String::new(),
         tags: Vec::new(),
+        picture: None,
+        cover: None,
         members: 1,
         demand: 0,
         opposition: 0,

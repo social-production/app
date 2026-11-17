@@ -16,6 +16,8 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         location_label: String::new(),
         phase: String::new(),
         tags: vec!["food".into()],
+        picture: None,
+        cover: None,
         members: 1,
         demand,
         opposition: 0,

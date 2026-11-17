@@ -1,7 +1,7 @@
 //! What the archivist reads to make a feed card (mirrors of the zomes' views) and the card it
 //! makes. A help request's card also carries its time and sign-ups (ADR 0067).
 
-use holo_hash::{ActionHashB64, AgentPubKeyB64};
+use holo_hash::{ActionHashB64, AgentPubKeyB64, EntryHashB64};
 use holochain::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -26,6 +26,11 @@ pub struct Listing {
     pub location_label: String,
     pub phase: String,
     pub tags: Vec<String>,
+    /// A scope's picture and cover as created (ADR 0109); the charter has the current ones.
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
 }
 
 /// Mirrors the project zome's `ProjectView` (the fields the index needs).
@@ -77,6 +82,11 @@ pub struct Charter {
     /// ADR 0078; older charters have none.
     #[serde(default)]
     pub place: Option<super::markers::PlaceMirror>,
+    /// A channel's or community's picture and cover, passed edits applied (ADR 0109).
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
 }
 
 impl ProjectView {
@@ -178,6 +188,8 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
             if !c.subtype.is_empty() {
                 l.subtype.clone_from(&c.subtype);
             }
+            l.picture.clone_from(&c.picture);
+            l.cover.clone_from(&c.cover);
         }
         l.phase.clone_from(&p.stage);
     }
@@ -193,6 +205,8 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         location_label: l.location_label,
         phase: l.phase,
         tags: l.tags,
+        picture: l.picture.map(|h| EntryHashB64::from(h).to_string()),
+        cover: l.cover.map(|h| EntryHashB64::from(h).to_string()),
         members: project
             .as_ref()
             .map_or(1, |p| u32::try_from(p.members.len()).unwrap_or(u32::MAX)),

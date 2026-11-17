@@ -24,6 +24,11 @@ pub struct ProjectCard {
     pub location_label: String,
     pub phase: String,
     pub tags: Vec<String>,
+    /// A channel's or community's picture and cover: base64 `ScopeImage` hashes (ADR 0109).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub picture: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cover: Option<String>,
     pub members: u32,
     pub demand: u32,
     pub opposition: u32,
