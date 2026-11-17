@@ -5,6 +5,7 @@
   import { KIND_LABELS, kindColor, kindOfMarker } from '#lib/domain/kindGlyphs.ts';
   import type { MapMarkerItem } from '#lib/domain/mapMarkers.ts';
   import { formatMarkerScheduleRange } from '#lib/domain/markerTime.ts';
+  import DirectionsSheet from './DirectionsSheet.svelte';
 
   /** A tapped pin's card (Map Redesign, owner 2026-11-17): what it is, when and how far, with
    * Directions and Open; the map stays where it is until you choose. */
@@ -26,9 +27,12 @@
       : `${item.distanceKm.toFixed(1)} km away`,
   );
   const line = $derived([KIND_LABELS[kind], when, distance].filter(Boolean).join(' · '));
-  const directions = $derived(
-    `https://www.openstreetmap.org/directions?to=${item.latitude}%2C${item.longitude}`,
-  );
+  let directionsOpen = $state(false);
+  const to = $derived({
+    latitude: item.latitude,
+    longitude: item.longitude,
+    label: item.displayLabel.trim() || item.title,
+  });
 </script>
 
 <div class="map-peek" role="dialog" aria-label={item.title} style={`--pin: ${kindColor(kind)}`}>
@@ -43,11 +47,12 @@
     </button>
   </div>
   <div class="map-peek-actions">
-    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- an outside site -->
-    <a class="map-peek-secondary" href={directions} target="_blank" rel="noopener noreferrer"
-      >Directions</a
+    <button class="map-peek-secondary" type="button" onclick={() => (directionsOpen = true)}
+      >Directions</button
     >
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
     <a class="map-peek-primary" {href} onclick={onOpen}>Open</a>
   </div>
 </div>
+
+<DirectionsSheet open={directionsOpen} {to} onClose={() => (directionsOpen = false)} />

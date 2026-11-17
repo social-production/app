@@ -69,12 +69,13 @@ assert.match(page.url(), /lat=-37\.\d+&lon=144\.\d+/);
 await card.first().waitFor({ timeout: 60_000 });
 log('Open as list shows Region on the map’s place');
 
-// The project's Venue link opens the app's map there (not OpenStreetMap).
+// The project's place on Details opens the app's map there (not OpenStreetMap), with its
+// own pin's card open.
 await page.goto(projectUrl);
-await page.getByRole('tab', { name: 'Links' }).click();
-await page.locator('.links-tab .detail-place').click();
+await page.getByText('Show on the map').first().click();
 await page.locator('.map-overlay .map-panel').waitFor({ timeout: 30_000 });
 await page.locator('.map-overlay .map-discovery-card', { hasText: title }).waitFor({ timeout: 60_000 });
+await page.locator('.map-overlay .map-peek', { hasText: title }).waitFor({ timeout: 30_000 });
 assert.ok(page.url().startsWith(projectUrl.split('?')[0]), 'the page stays');
 await page.screenshot({ path: `${out}/region-venue-map-390.png` });
 log('the Venue link opens the map on the place');

@@ -8,7 +8,16 @@
    * place on a separate soft row that opens the app's map on it. "Online" is not a place.
    * The place is shortened to its name and suburb (owner, 2026-11-17).
    */
-  let { when = '', place = '' }: { when?: string; place?: string | null } = $props();
+  let {
+    when = '',
+    place = '',
+    target,
+  }: {
+    when?: string;
+    place?: string | null;
+    /** The card's own page: the map opens with its pin selected. */
+    target?: string;
+  } = $props();
   const map = placeOnMap();
 
   const where = $derived(implementedLabel(place));
@@ -20,7 +29,7 @@
     if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
     e.stopPropagation();
-    map.show(where);
+    map.show(where, target);
   }
 </script>
 

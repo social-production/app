@@ -122,15 +122,43 @@ export class MarkerLoader {
   }
 
   /** Centre on a place another page asked for, without changing the saved home area. */
-  async focus(request: MapFocusRequest, onMissing: (label: string) => void): Promise<void> {
+  async focus(request: MapFocusRequest, onMissing: (label: string) => void): Promise<boolean> {
     const place: PlaceValue | null =
       request.latitude != null && request.longitude != null
         ? { ...emptyPlaceValue(), latitude: request.latitude, longitude: request.longitude }
         : ((await searchPlaces(request.label, 1).catch(() => []))[0] ?? null);
-    if (place?.latitude == null || place.longitude == null) return onMissing(request.label);
+    if (place?.latitude == null || place.longitude == null) {
+      onMissing(request.label);
+      return false;
+    }
     // A global radius would leave the camera on the whole world; look around the place.
     if (this.s.radiusKm === GLOBAL_RADIUS_VALUE) this.s.radiusKm = '10';
     await this.applyAnchor({ ...place, displayLabel: request.label }, { persist: false });
+    // Opened from a card or page: that thing's own pin opens selected, card and all.
+    const select = request.select;
+    const match = select
+      ? this.s.listItems.find(
+          (i) => i.entityType !== 'activity' && select.endsWith(i.href.split('?')[0] ?? i.href),
+        )
+      : undefined;
+    if (match) this.view.select(match.id);
+    return true;
+  }
+
+  /** The first centre and markers. A place another page asked for goes first: it used to
+   * wait behind the first load (IP hint, then widening), and on a slow connection the map
+   * stayed on the IP's city (owner, 2026-11-18). */
+  async boot(pending: MapFocusRequest | null, onMissing: (label: string) => void): Promise<void> {
+    if (pending && (await this.focus(pending, onMissing))) return;
+    await this.initialCenter();
+    await tick();
+    const { centerLat: lat, centerLon: lon } = this.s;
+    if (lat == null || lon == null) return this.view.mountIfNeeded(this.container());
+    await this.view.mountIfNeeded(this.container(), { lat, lon });
+    await this.view.syncRadiusToCenter();
+    this.view.currentRadiusKm = effectiveRadiusKm(this.s.radiusKm);
+    this.view.syncRadiusOverlay();
+    await this.loadBroadening({ lat, lon });
   }
 
   async useDevice(): Promise<void> {

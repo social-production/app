@@ -1,10 +1,7 @@
 <script lang="ts">
-  import {
-    APPROVAL_PERCENT,
-    outcomeSentence,
-    tallyLine,
-    type Proposal,
-  } from '#lib/domain/governance.ts';
+  import { resultSentence } from '#lib/domain/decided.ts';
+  import { APPROVAL_PERCENT, type Proposal } from '#lib/domain/governance.ts';
+  import { relativeTime } from '#lib/domain/time.ts';
   import { isNetworkVote } from '#lib/domain/board.ts';
   import type { Charter } from '#lib/domain/projects.ts';
   import { settingsSummary } from '#lib/domain/serviceRequests.ts';
@@ -21,11 +18,26 @@
   let { proposal, authorName, charter, stage, phaseLabel }: Props = $props();
 
   const kind = $derived(proposal.kind);
+  const total = $derived(proposal.yes + proposal.no);
+  const percent = $derived(total > 0 ? Math.round((proposal.yes / total) * 100) : 0);
+  const turnout = $derived(
+    `${total} of ${proposal.population} ${proposal.population === 1 ? 'member' : 'members'} voted · at least ${proposal.required} needed`,
+  );
+  const state = $derived(
+    proposal.status === 'Open' ? 'open' : proposal.status === 'Passed' ? 'passed' : 'failed',
+  );
 </script>
 
 <div class="vote-sheet">
-  <p class="outcome">{outcomeSentence(kind, stage, phaseLabel)}</p>
-  <p class="proposer">Proposed by {authorName}</p>
+  <!-- History's sheets (owner, 2026-11-18), drawn as the Channel Pictures vote: the result as a
+       chip, what it does or did, then one bar towards the 66% mark. -->
+  <div class="vote-status-row">
+    <span class={`vote-status ${state}`}
+      >{state === 'open' ? 'Open' : state === 'passed' ? 'Passed' : "Didn't pass"}</span
+    >
+    <span class="proposer">{authorName} · {relativeTime(proposal.createdAt)}</span>
+  </div>
+  <p class="outcome">{resultSentence(proposal, stage, phaseLabel)}</p>
   {#if isNetworkVote(charter.tags)}
     <p class="network-vote-line">Network vote: any Full member can vote</p>
   {/if}
@@ -105,11 +117,15 @@
   {/if}
 
   <section class="tally">
-    <p>{tallyLine(proposal)}</p>
-    <p class="tally-note">
-      Needs {APPROVAL_PERCENT}% yes to pass, from at least {proposal.required} of {proposal.population}
-      members.
-    </p>
+    <div class="tally-line">
+      <b>{total === 0 ? 'No votes yet' : `${proposal.yes} yes · ${proposal.no} no`}</b>
+      <span>{total > 0 ? `${percent}% yes · ` : ''}needs {APPROVAL_PERCENT}%</span>
+    </div>
+    <div class="tally-bar" class:failed={state === 'failed'}>
+      <i style={`width: ${percent}%`}></i>
+      <span class="tally-mark" style={`left: ${APPROVAL_PERCENT}%`}></span>
+    </div>
+    <p class="tally-note">{turnout}</p>
     <!-- App-only (ADR 0040): challenged counts and members still left out. -->
     {#if proposal.added > 0}
       <p class="tally-note">

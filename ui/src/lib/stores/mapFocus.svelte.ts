@@ -8,6 +8,8 @@ export interface MapFocusRequest {
   /** The place's coordinates when the page has them (web looks its location row up). */
   latitude: number | null;
   longitude: number | null;
+  /** The page whose pin to select once the map is there (`/projects/<id>`, …). */
+  select: string | null;
   token: number;
 }
 
@@ -19,6 +21,7 @@ export const mapFocus = $state<{ request: MapFocusRequest | null; open: boolean 
 export function openPlaceOnMap(
   label: string,
   coords: { latitude: number; longitude: number } | null = null,
+  select: string | null = null,
 ): void {
   const trimmed = label.trim();
   if (!trimmed) return;
@@ -26,6 +29,7 @@ export function openPlaceOnMap(
     label: trimmed,
     latitude: coords?.latitude ?? null,
     longitude: coords?.longitude ?? null,
+    select,
     token: Date.now(),
   };
 }

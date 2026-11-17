@@ -5,7 +5,8 @@ import { getContext, setContext } from 'svelte';
  * place (ADR 0085). Components stay presentational (CODE_RULES): the shell provides it.
  */
 export interface PlaceOnMap {
-  show: (label: string) => void;
+  /** `select` is the page of the thing at the place: its pin opens selected. */
+  show: (label: string, select?: string) => void;
 }
 
 const KEY = Symbol('place-on-map');

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { page } from '$app/state';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
 
   import FactRow from './FactRow.svelte';
@@ -14,7 +15,7 @@
   function show(e: MouseEvent): void {
     if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
     e.preventDefault();
-    map.show(where);
+    map.show(where, page.url.pathname);
   }
 </script>
 

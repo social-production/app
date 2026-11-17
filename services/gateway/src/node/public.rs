@@ -25,6 +25,10 @@ const DIRECTORY: &[(&str, &[&str])] = &[(
         "get_feedback",
         // A channel's or community's picture and cover (ADR 0109).
         "scope_image",
+        // A profile's cover and comments (ADR 0107): comments in unlisted (private) spaces
+        // are dropped by the reader, which needs `get_listing` for each one.
+        "get_cover",
+        "comments_of",
     ],
 )];
 const PROJECT: &[(&str, &[&str])] = &[
@@ -148,6 +152,7 @@ mod tests {
         assert!(allowed(PROJECT, "activities", "list_activities"));
         assert!(!allowed(PROJECT, "activities", "take_role"));
         assert!(allowed(DIRECTORY, "identity", "get_profile"));
+        assert!(allowed(DIRECTORY, "identity", "comments_of"));
         assert!(!allowed(PROJECT, "project", "join"));
         assert!(!allowed(PROJECT, "identity", "get_profile"));
         assert!(!allowed(DIRECTORY, "identity", "get_devices"));

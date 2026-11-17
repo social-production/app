@@ -246,10 +246,6 @@
   stroke-width: 1.8;
 }
 
-.shell .links-tab .links-venue .detail-place {
-  margin: 0;
-}
-
 /* An open link vote keeps its soft card (the row rule above would flatten it). */
 .shell .links-tab .request-list .link-vote.link-card {
   padding: 14px;

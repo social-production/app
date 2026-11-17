@@ -10,6 +10,6 @@ import { provideReports } from './reportActionsProvider.ts';
 export function provideShellContexts(): void {
   provideReports();
   providePaused();
-  providePlaceOnMap({ show: (label) => openPlaceOnMap(label) });
+  providePlaceOnMap({ show: (label, select) => openPlaceOnMap(label, null, select ?? null) });
   providePostPhotoSource({ list: postPhotos, url: postPhotoUrl });
 }

@@ -164,6 +164,7 @@
 .overlay-root.plan-scope .plan-facts {
   display: grid;
   margin: 0;
+  border: none;
   overflow: hidden;
   border-radius: 18px;
   background: var(--panel-hover);
@@ -184,6 +185,9 @@
 .overlay-root.plan-scope .plan-facts dt {
   color: var(--text-soft);
   font-size: 13.5px;
+  font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
 }
 
 .overlay-root.plan-scope .plan-facts dd {
@@ -423,4 +427,12 @@
 
 .overlay-root.phase-move-sheet .overlay-body {
   padding-inline: 18px;
+}
+
+/* The result line and Review sit across the sheet above the dock, so "× Close" never covers
+   them (owner, 2026-11-18: History's plan sheet). */
+.overlay-root.overlay-root.plan-scope .overlay-footer > .plan-sheet-foot {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  margin-bottom: 10px;
 }
