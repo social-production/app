@@ -238,7 +238,7 @@ nav and Topbar, and removes `SignedOutIntro`.
     screen, every sheet's dock;
   - Settings, People, Search, Feedback, Links, History, channel and community pages, create
     flows, Invites;
-  - map pins, the tap card and feed icons (PR #203).
+  - map pins, the tap card and feed icons (PR #203, live).
 - **Map Redesign, the approved items not built yet:**
   - controls (zoom hidden on phones, fullscreen alone at top right, My location above the
     capsule, the capsule reading "Place · distance" + Filters + List);
@@ -269,7 +269,8 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Melbourne demo content on live** (`tests/e2e/demo-melbourne.mjs`, places picked from the
   geocoder so they have pins): 9 proposals, 3 help requests, an event (Edinburgh Gardens) and
   a project (Abbotsford Convent). `DEMO_SKIP` skips parts already made.
-- **PR #203 `claude/map-pins`** (in CI, 1:30 am 18 Nov): pins by kind with the feed's
+- **PR #203 `claude/map-pins` merged 1:39 am 18 Nov, live, smoked at 390px light/dark (8 pins
+  near Fitzroy, tap card works, 0 page errors):** pins by kind with the feed's
   symbols (`domain/kindGlyphs.ts`, `--kind-*` tokens), counted clusters, same-spot pins share
   one counted pin (`maps/stacking.ts` no longer nudges them apart), a tap opens `MapPeek`,
   feed icons are the bold kind tile, the searched place is a small dot under the pins.

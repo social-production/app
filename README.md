@@ -8,12 +8,18 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-17)
+## Status (2026-11-18)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Map pins by kind and a calmer opening (PRs #202 and #203, 2026-11-18 1:39 am Melbourne):**
+  map pins are round, coloured by kind with the feed's symbols; crowded pins merge into a
+  count, things at one spot share a counted pin, and a tapped pin opens a card with Directions
+  and Open. Feed card icons use the same bold colours. The opening screen shows from the first
+  paint, sign-in buttons go straight to sign-up, feed filters survive a refresh, cards show a
+  short place, and loading text became skeletons. Melbourne demo content is on the map.
 - **Mentions notify, and tidier map and region controls (PRs #196–#198, 2026-11-17 evening
   Melbourne):** @mentioning someone in a chat sends them a notice; guests' chat "Sign in" fits
   the message bar; the Region distance is one tap, location errors say what to do, place search
