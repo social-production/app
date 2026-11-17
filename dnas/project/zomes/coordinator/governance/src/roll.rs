@@ -48,7 +48,7 @@ impl Roll {
         let platform = crate::calls::base_charter()?.is_some_and(|c| {
             c.tags
                 .iter()
-                .any(|t| t.eq_ignore_ascii_case(sp_scope::PLATFORM))
+                .any(|t| sp_scope::is_platform_tag(t))
         });
         Ok(Self {
             spans,

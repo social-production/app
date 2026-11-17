@@ -154,7 +154,7 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
         let platform = calls::base_charter()?.is_some_and(|c| {
             c.tags
                 .iter()
-                .any(|t| t.eq_ignore_ascii_case(sp_scope::PLATFORM))
+                .any(|t| sp_scope::is_platform_tag(t))
         });
         if !platform {
             return Err(guest("Join the project to vote."));

@@ -62,9 +62,8 @@ pub fn is_space(base: &AnyLinkableHash) -> ExternResult<bool> {
 
 /// A #platform project (ADR 0095, 0109): any Full member may vote on it, members or not.
 pub(crate) fn platform_tagged(space: &ActionHash) -> ExternResult<bool> {
-    let tag = sp_scope::PLATFORM;
     Ok(crate::charter_at(space)?
-        .is_some_and(|(charter, _)| charter.tags.iter().any(|t| t.eq_ignore_ascii_case(tag))))
+        .is_some_and(|(charter, _)| charter.tags.iter().any(|t| sp_scope::is_platform_tag(t))))
 }
 
 /// A personal service's creator saves its request settings without a vote (ADR 0076).
