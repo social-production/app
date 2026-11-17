@@ -209,11 +209,12 @@ nav and Topbar, and removes `SignedOutIntro`.
   bar, owner) and PR #197 (@mention notices are sent from project, direct and group chats;
   ADR 0109 wording). Live smoke: /, /platform, /search, a project's chat as a guest, 0 page
   errors. `mentions.mjs` and `chat.mjs` passed locally before merging.
-- **In flight: PR #198 `claude/region-map-polish`** (owner, 9 pm): Region sheet distance as
+- **Live since ~9:35 pm: PR #198 `claude/region-map-polish`** (owner, 9 pm): Region sheet distance as
   chips plus "Other distance"; map `RadiusCombobox` is one button (no keyboard) with a Custom
   row; plainer location errors (in the sheet, not behind it); steady place search (no blink,
   stale answers dropped, duplicates removed); map fullscreen covers the whole screen and uses
-  the browser's fullscreen. `map.mjs` and `region.mjs` pass locally. Merge when green.
+  the browser's fullscreen. `map.mjs` and `region.mjs` pass locally; live smoke of the Region
+  sheet, the map's distance list and fullscreen at 390px was clean.
 - Next: ADR 0095's moderator merge on #platform software projects, then the audits.
 
 ### Where things stand (8:30 pm Melbourne, 2026-11-17, UX session)
