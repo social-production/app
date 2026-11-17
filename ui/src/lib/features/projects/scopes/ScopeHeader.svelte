@@ -79,6 +79,7 @@
     <div
       class="scope-cover"
       aria-hidden="true"
+      data-cover={s.project?.charter?.cover ?? ''}
       style={art.coverUrl ? `background-image: url(${art.coverUrl})` : undefined}
     ></div>
     <div class="scope-hero-body">
