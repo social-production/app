@@ -1,6 +1,9 @@
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
+  import { shortDate } from '#lib/domain/botReview.ts';
   import type { VoteChoice } from '#lib/domain/governance.ts';
-  import { targetMetaRows, type LinkSide, type ProjectLink } from '#lib/domain/links.ts';
+  import type { LinkSide, ProjectLink } from '#lib/domain/links.ts';
 
   import { focusLinkCard } from './focusLinkCard.ts';
   import LinkCard from './LinkCard.svelte';
@@ -20,9 +23,20 @@
     onVote: (requestId: string, side: LinkSide, choice: VoteChoice) => void;
     /** A sever request a link asks to show (web's `?linkRequest=…`). */
     highlight?: string | null;
+    /** "Propose a link", at the right of the heading (Polish Pass mockups §6). */
+    action?: Snippet | undefined;
   }
 
-  let { items, names, allowSever, pendingId, onSever, onVote, highlight = null }: Props = $props();
+  let {
+    items,
+    names,
+    allowSever,
+    pendingId,
+    onSever,
+    onVote,
+    highlight = null,
+    action,
+  }: Props = $props();
 
   let expanded = $state<Record<string, boolean>>({});
   let shown: string | null = null;
@@ -41,6 +55,7 @@
     <h2 class="links-heading">
       Linked{#if items.length > 0}<span class="links-count">{items.length}</span>{/if}
     </h2>
+    {@render action?.()}
   </div>
   {#if items.length === 0}
     <p class="links-quiet">Not linked to anything yet.</p>
@@ -48,10 +63,10 @@
     <div class="link-list">
       {#each items as item (item.id)}
         {@const target = item.create.target}
-        {@const metaRows = targetMetaRows(target)}
         <LinkCard
           title={target.title}
-          metaLine={['Linked', ...metaRows.slice(0, 1)].join(' · ')}
+          metaLine={`${target.mode === 'event' ? 'Event' : 'Project'} · linked ${shortDate(item.create.createdAt / 1000)}`}
+          icon={target.mode === 'event' ? 'event' : 'cube'}
           voteLine={item.sever ? 'A vote to end this link is open' : null}
           projectId={target.id}
           expanded={!!expanded[item.id]}

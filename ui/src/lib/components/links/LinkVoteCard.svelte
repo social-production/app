@@ -1,12 +1,6 @@
 <script lang="ts">
-  import type { VoteChoice } from '#lib/domain/governance.ts';
-  import {
-    resultNote,
-    voteRequirement,
-    type LinkHalf,
-    type LinkRequest,
-    type LinkSide,
-  } from '#lib/domain/links.ts';
+  import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
+  import { resultNote, type LinkHalf, type LinkRequest, type LinkSide } from '#lib/domain/links.ts';
 
   import '#lib/components/styles/links.css';
 
@@ -47,47 +41,55 @@
   );
   const percent = (h: LinkHalf | null): number =>
     h && h.yes + h.no > 0 ? Math.round((h.yes / (h.yes + h.no)) * 100) : 0;
-  const voters = (h: LinkHalf | null): string =>
-    h ? `${h.yes + h.no} of ${h.population} voted · ${percent(h)}% yes` : 'Not received yet';
+  // The mockup's "1 of 1 · 100%": who has voted of the members, and the share saying yes.
+  const tally = (h: LinkHalf | null): string =>
+    h ? `${h.yes + h.no} of ${h.population} · ${percent(h)}%` : 'Not received yet';
+  // One Approve / Oppose pair for the side the viewer belongs to (Polish Pass mockups §6).
+  const mine = $derived(
+    [request.thisSide, request.otherSide].find((s) => s.canVote || s.half?.myVote),
+  );
+  const open = $derived(request.status === 'Open');
 </script>
 
 <article id={domId} class={`link-vote ${cardClass}`}>
   <strong class="link-vote-title">{title}</strong>
   <span class="link-vote-meta">Proposed by {proposer}</span>
-  {#if request.summary}<p class="link-vote-summary">{request.summary}</p>{/if}
   {#each [request.thisSide, request.otherSide] as side (side.projectId)}
     {@const half = side.half}
-    {@const voted = half?.myVote ?? null}
     <div class="link-vote-side">
       <div class="link-vote-line">
         <b>{side === request.thisSide ? 'This project' : side.projectTitle}</b>
-        <span>{voters(half)}</span>
+        <span>{tally(half)}</span>
       </div>
       <div class="link-vote-bar" class:done={half?.status === 'Approved'}>
         <i style={`width: ${Math.max(percent(half), 3)}%`}></i>
       </div>
-      <span class="link-vote-note">
-        {half?.status === 'Open' ? voteRequirement(half) : resultNote(half)}
-      </span>
-      {#if onVote && (side.canVote || voted)}
-        <div class="vote-buttons">
-          <button
-            class:active={voted === 'Yes'}
-            class:danger
-            class="vote-button yes"
-            disabled={pending || !side.canVote}
-            type="button"
-            onclick={() => onVote(side, 'Yes')}>{yesLabel}</button
-          >
-          <button
-            class:active={voted === 'No'}
-            class="vote-button"
-            disabled={pending || !side.canVote}
-            type="button"
-            onclick={() => onVote(side, 'No')}>{noLabel}</button
-          >
-        </div>
+      {#if !open}
+        <span class="link-vote-note">{resultNote(half)}</span>
       {/if}
     </div>
   {/each}
+  {#if open}<span class="link-vote-note">Each side needs {APPROVAL_PERCENT}% of its members.</span
+    >{/if}
+  {#if onVote && mine}
+    {@const side = mine}
+    {@const voted = side.half?.myVote ?? null}
+    <div class="vote-buttons">
+      <button
+        class:active={voted === 'Yes'}
+        class:danger
+        class="vote-button yes"
+        disabled={pending || !side.canVote}
+        type="button"
+        onclick={() => onVote(side, 'Yes')}>{yesLabel}</button
+      >
+      <button
+        class:active={voted === 'No'}
+        class="vote-button"
+        disabled={pending || !side.canVote}
+        type="button"
+        onclick={() => onVote(side, 'No')}>{noLabel}</button
+      >
+    </div>
+  {/if}
 </article>
