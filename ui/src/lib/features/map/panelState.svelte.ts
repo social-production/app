@@ -35,7 +35,8 @@ export class MapPanelState {
   entityFilter = $state('all');
   dateFrom = $state('');
   dateTo = $state('');
-  loading = $state(false);
+  // The map opens loading, so the list shows skeletons rather than "Nothing here" at first.
+  loading = $state(true);
   errorMessage = $state('');
   locationToast = $state('');
   mapTileError = $state('');

@@ -1,23 +1,22 @@
 <script lang="ts">
-  import { tick, type Snippet } from 'svelte';
-
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import RadiusCombobox from '#lib/components/map/RadiusCombobox.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import PillChoice from '#lib/components/PillChoice.svelte';
-  import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
+  import type { PlaceValue } from '#lib/domain/places.ts';
+  import { shortPlace } from '#lib/domain/shortPlace.ts';
 
   import { filterOptions, windowOptions, type MapPanelState } from './panelState.svelte.ts';
+  import PlaceSheet from './PlaceSheet.svelte';
 
   /**
-   * The map's filters on phones and in fullscreen (ADR 0103): one capsule over the top of the
-   * map with a search button, the distance, Upcoming and Filters. Search opens a second bar
-   * (place field and "my location") only when asked, so the map stays visible; Filters opens
-   * a sheet with the time window and the type.
+   * The map's filters on phones and in fullscreen (Map Redesign §1–2, owner 2026-11-17): one
+   * capsule at the bottom with "Place · distance" (one sheet for both), Filters (a dot when
+   * anything is narrowed; Upcoming or Include past lives there now) and the list. "My
+   * location" floats just above it on the right.
    */
   interface Props {
     s: MapPanelState;
-    picker: Snippet;
+    onPlace: (place: PlaceValue) => void;
     onLocate: () => void;
     onRadius: (value: string) => void;
     onFilters: () => void;
@@ -25,10 +24,25 @@
     onList: () => void;
   }
 
-  let { s, picker, onLocate, onRadius, onFilters, onUpcoming, onList }: Props = $props();
+  let { s, onPlace, onLocate, onRadius, onFilters, onUpcoming, onList }: Props = $props();
 
   let sheetOpen = $state(false);
-  const narrowed = $derived(s.windowFilter !== 'all' || s.entityFilter !== 'all');
+  let placeOpen = $state(false);
+  const narrowed = $derived(
+    s.windowFilter !== 'all' || s.entityFilter !== 'all' || !s.upcomingOnly,
+  );
+  const distance = $derived(
+    s.radiusKm === 'global'
+      ? 'Global'
+      : Number.isFinite(Number(s.radiusKm))
+        ? `${Math.round(Number(s.radiusKm))} km`
+        : s.radiusKm,
+  );
+  const where = $derived(shortPlace(s.place.displayLabel.trim()).split(',')[0] || 'Pick a place');
+  const events = [
+    { value: 'upcoming', label: 'Upcoming' },
+    { value: 'past', label: 'Include past' },
+  ];
   // Pills wrap whole words, so the range's own pill sits with the rest ("Pick dates").
   const windows = windowOptions.map((o) =>
     o.value === 'all'
@@ -45,49 +59,28 @@
         : o,
   );
   const shown = $derived(s.listItems.length);
-  let searchBar = $state<HTMLDivElement>();
-
-  // Opening search puts the cursor in the place field, so you can type straight away.
-  async function toggleSearch(): Promise<void> {
-    s.fullscreenSearchOpen = !s.fullscreenSearchOpen;
-    if (!s.fullscreenSearchOpen) return;
-    await tick();
-    searchBar?.querySelector('input')?.select();
-  }
 </script>
 
 <div class="map-filter-top filter-panel-overlay" aria-label="Map filters">
+  <button
+    aria-label="Use my location"
+    title="Use my location"
+    class="map-locate-button"
+    type="button"
+    onclick={onLocate}
+  >
+    <ToolbarIcon name="locate" />
+  </button>
   <div class="map-filter-capsule">
     <button
-      aria-expanded={s.fullscreenSearchOpen}
-      aria-label="Search place"
-      title="Search place"
-      class="capsule-icon"
-      class:active={s.fullscreenSearchOpen}
+      aria-haspopup="dialog"
+      aria-expanded={placeOpen}
+      aria-label={`Search place. ${where}, ${distance}`}
+      class="capsule-place"
       type="button"
-      onclick={() => void toggleSearch()}
+      onclick={() => (placeOpen = true)}
     >
-      <ToolbarIcon name="search" />
-    </button>
-    <RadiusCombobox
-      value={s.radiusKm}
-      onChange={onRadius}
-      ariaLabel="Snap map to radius"
-      options={radiusPresetOptions}
-      compact
-      portaled
-      preferAbove
-    />
-    <button
-      aria-pressed={s.upcomingOnly}
-      aria-label="Upcoming only"
-      title="Upcoming only"
-      class="capsule-icon"
-      class:active={s.upcomingOnly}
-      type="button"
-      onclick={onUpcoming}
-    >
-      <ToolbarIcon name={s.upcomingOnly ? 'calendar' : 'calendar-x'} />
+      <ToolbarIcon name="search" /><span>{where} · {distance}</span>
     </button>
     <button
       aria-haspopup="dialog"
@@ -99,34 +92,28 @@
     >
       <ToolbarIcon name="filter" /><span>Filters</span>
     </button>
-    {#if s.mapFullscreen}
-      <button
-        aria-label="Open as list"
-        title="Open as list"
-        class="capsule-icon"
-        disabled={!s.hasCenter}
-        type="button"
-        onclick={onList}
-      >
-        <ToolbarIcon name="list" />
-      </button>
-    {/if}
+    <button
+      aria-label="Open as list"
+      title="Open as list"
+      class="capsule-icon"
+      disabled={!s.hasCenter}
+      type="button"
+      onclick={onList}
+    >
+      <ToolbarIcon name="list" />
+    </button>
   </div>
-  {#if s.fullscreenSearchOpen}
-    <div bind:this={searchBar} class="map-search-bar">
-      <div class="map-search-field">{@render picker()}</div>
-      <button
-        aria-label="Use my location"
-        title="Use my location"
-        class="capsule-icon locate"
-        type="button"
-        onclick={onLocate}
-      >
-        <ToolbarIcon name="locate" />
-      </button>
-    </div>
-  {/if}
 </div>
+
+<PlaceSheet
+  open={placeOpen}
+  place={s.place}
+  radius={s.radiusKm}
+  onPlace={(p) => (onPlace(p), (placeOpen = false))}
+  onLocate={() => (onLocate(), (placeOpen = false))}
+  {onRadius}
+  onClose={() => (placeOpen = false)}
+/>
 
 <OverlaySheet
   open={sheetOpen}
@@ -136,6 +123,17 @@
   onClose={() => (sheetOpen = false)}
 >
   <div class="feed-filter-groups">
+    <section>
+      <h3>Events</h3>
+      <PillChoice
+        value={s.upcomingOnly ? 'upcoming' : 'past'}
+        ariaLabel="Map events"
+        options={events}
+        onChange={(v) => {
+          if ((v === 'upcoming') !== s.upcomingOnly) onUpcoming();
+        }}
+      />
+    </section>
     <section>
       <h3>When</h3>
       <PillChoice
