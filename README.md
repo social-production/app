@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Your activity, People and empty pages (PR #208, 2026-11-18 10:16 am Melbourne):** the right
+  rail is "Your activity" with Coming up, Votes and Requests tabs and counts; People rows open
+  the person with place and standing and a search box; empty Invites and Feedback use the app's
+  empty state.
 - **Directions, places that open their pin, and the map bar (PRs #205 and #206, 2026-11-18
   9:37 am Melbourne):** Directions offers Google Maps, Apple Maps, Waze, the phone's own map
   app or OpenStreetMap; a place on a card or page opens the map with that pin's card showing;

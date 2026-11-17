@@ -213,10 +213,14 @@ nav and Topbar, and removes `SignedOutIntro`.
   `get_cover`, checked live) and **#206** (phone map bar `MapFilterCapsule` + `PlaceSheet`,
   Upcoming in Filters, `MapLoading`, `ux/mapcapsule.css`, search page pills, profile grammar).
   `region.mjs` now opens the map from the Details place and waits for `.map-peek`.
-- **Screen review for the owner:** https://claude.ai/artifact/F8BUdASoNbVRSE3wt7p5QS. Every
-  screen's status, plus mockups waiting for an OK: the right rail as a "Your activity" drawer
-  (Coming up / Votes / Requests tabs), People rows, empty Invites and Feedback. Not captured:
-  Notifications with cards, service booking calendars.
+- **Screen review approved and built (#208, live 10:16 am):** `RightRailPanel` is tabs (Coming
+  up / Votes / Requests) with `RailRow` kind tiles (`ux/railtabs.css`); `railShows` in
+  `tests/e2e/lib.mjs` looks through the tabs. People (`PersonChip`, search box), empty Invites and
+  Feedback (`EmptyState`). Review page: https://claude.ai/artifact/F8BUdASoNbVRSE3wt7p5QS.
+  **Known broken test:** `rail.mjs` creates a "Personal service" (removed by ADR 0059) and fails
+  on main too; rewrite it around a proposal with an activity.
+- **Open question to the owner:** Invites is reachable only when one waits (left rail row under
+  Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
 ### Before the FastAPI site can shut down, and screens still to modernise (owner asked, 18 Nov 1:30 am)
 **Must do before parity (shutting down Railway's FastAPI site):**
