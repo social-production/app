@@ -29,6 +29,8 @@ export function buildMarkerElement(
   item: MapMarker,
   highlighted: boolean,
   ctx: PinContext,
+  /** Other things at this exact spot, counted on the pin's badge. */
+  sameSpot = 0,
 ): HTMLButtonElement {
   const kind = kindOfMarker(item);
   const small = kind === 'proposal' || item.entityType === 'activity';
@@ -46,7 +48,7 @@ export function buildMarkerElement(
   element.setAttribute('aria-label', item.label);
   element.dataset.markerId = item.id;
   element.style.setProperty('--pin', `var(--kind-${kind})`);
-  const children = item.children?.length ?? 0;
+  const children = (item.children?.length ?? 0) + sameSpot;
   element.innerHTML =
     (highlighted ? `<span class="sp-pin__name"></span>` : '') +
     `<span class="sp-pin__head"><svg viewBox="0 0 24 24" aria-hidden="true">${KIND_GLYPHS[kind]}</svg>` +

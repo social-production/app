@@ -226,3 +226,20 @@
   background: var(--brand);
   color: var(--on-brand, var(--page-bg));
 }
+
+/* The searched place: a small ring under the pins, not web's blue teardrop over them. */
+.map-panel .sp-map-center-marker.sp-map-center-marker {
+  z-index: 0;
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--page-bg);
+  border-radius: 50%;
+  background: var(--text-main);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--text-main) 18%, transparent);
+  pointer-events: none;
+}
+
+.map-panel .sp-pin,
+.map-panel .sp-cluster {
+  z-index: 1;
+}

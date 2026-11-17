@@ -1,12 +1,20 @@
 /** The pin layer (Map Redesign, owner 2026-11-17): one round pin per thing; pins closer than
  * a pin's width merge into a count that zooms in when tapped (they used to shrink to dots);
- * the selected pin stays out of any count. web's same-spot stacking still applies first. */
+ * the selected pin stays out of any count. Things at one spot share one pin with a count. */
 import { Marker, type Map as MapLibreMap } from 'maplibre-gl';
 import { buildClusterElement, buildMarkerElement, type PinContext } from './markerElement.ts';
 import { stackOverlappingCoordinates } from './stacking.ts';
 import type { MapMarker } from './types.ts';
 
 const CLUSTER_PX = 42;
+/** Degrees: closer than this is one spot (about 10 m). */
+const SAME_SPOT = 0.0001;
+
+function spanOf(members: MapMarker[]): number {
+  const lngs = members.map((m) => m.longitude);
+  const lats = members.map((m) => m.latitude);
+  return Math.max(Math.max(...lngs) - Math.min(...lngs), Math.max(...lats) - Math.min(...lats));
+}
 
 interface Cluster {
   members: MapMarker[];
@@ -85,15 +93,17 @@ export class Pins {
       for (const child of item.children ?? []) this.byId.set(child.id, item);
     }
     for (const cluster of clusters) {
-      const [only] = cluster.members;
-      if (cluster.members.length === 1 && only) this.placePin(map, only, selected);
+      const [first] = cluster.members;
+      // Zooming can't part things at one spot: they share one pin with a count.
+      if (first && (cluster.members.length === 1 || spanOf(cluster.members) < SAME_SPOT))
+        this.placePin(map, first, selected, cluster.members.length - 1);
       else this.placeCluster(map, cluster.members);
     }
   }
 
-  private placePin(map: MapLibreMap, item: MapMarker, selected: string | null): void {
+  private placePin(map: MapLibreMap, item: MapMarker, selected: string | null, sameSpot = 0): void {
     const highlighted = item.id === selected;
-    const element = buildMarkerElement(item, highlighted, this.ctx);
+    const element = buildMarkerElement(item, highlighted, this.ctx, sameSpot);
     if (highlighted) element.style.zIndex = '50';
     const marker = new Marker({ element, anchor: 'bottom' })
       .setLngLat([item.longitude, item.latitude])
@@ -107,19 +117,13 @@ export class Pins {
     const element = buildClusterElement(members.length, () => {
       const lngs = members.map((m) => m.longitude);
       const lats = members.map((m) => m.latitude);
-      const span = Math.max(
-        Math.max(...lngs) - Math.min(...lngs),
-        Math.max(...lats) - Math.min(...lats),
+      map.fitBounds(
+        [
+          [Math.min(...lngs), Math.min(...lats)],
+          [Math.max(...lngs), Math.max(...lats)],
+        ],
+        { padding: 80, maxZoom: 18 },
       );
-      if (span < 0.0005) map.easeTo({ center: [lng, lat], zoom: Math.min(map.getZoom() + 3, 18) });
-      else
-        map.fitBounds(
-          [
-            [Math.min(...lngs), Math.min(...lats)],
-            [Math.max(...lngs), Math.max(...lats)],
-          ],
-          { padding: 80, maxZoom: 18 },
-        );
     });
     const marker = new Marker({ element, anchor: 'center' }).setLngLat([lng, lat]).addTo(map);
     this.placed.push(marker);

@@ -202,7 +202,7 @@ export class MapLibreAdapter implements MapAdapter {
     const element = document.createElement('div');
     element.className = 'sp-map-center-marker';
     element.setAttribute('aria-hidden', 'true');
-    this.centerMarker = new Marker({ element, anchor: 'bottom' })
+    this.centerMarker = new Marker({ element, anchor: 'center' })
       .setLngLat([center.longitude, center.latitude])
       .addTo(this.map);
   }

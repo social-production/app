@@ -1,5 +1,5 @@
-/** web's pin stacking (`maps/maplibre.ts`): a parent and its activities at one spot share a
- * pin; other items there stack; pins closer than 40 px shrink to dots. */
+/** web's pin grouping (`maps/maplibre.ts`): a parent and its activities at one spot share a
+ * pin; other things at that spot keep their place and share a counted pin (pins.ts). */
 import type { MapMarker } from './types.ts';
 
 const OVERLAP_PIXEL_THRESHOLD = 40;
@@ -30,7 +30,6 @@ interface Stacked {
   childToParentId: Map<string, string>;
 }
 
-const STACK_LAT_STEP = 0.00038;
 const bySchedule = (a: MapMarker, b: MapMarker): number =>
   scheduleSortKey(a) - scheduleSortKey(b) || a.id.localeCompare(b.id);
 
@@ -53,9 +52,9 @@ function stackGroup(group: MapMarker[], out: Stacked): void {
     entries.push(item);
     out.forceExpandedIds.add(item.id);
   }
-  entries.forEach((item, index) => {
-    out.markers.push({ ...item, latitude: item.latitude - STACK_LAT_STEP * index });
-  });
+  // Map Redesign (2026-11-17): they stay at their real spot and share one pin with a count
+  // (pins.ts); web nudged each one about 40 m south.
+  out.markers.push(...entries);
 }
 
 export function stackOverlappingCoordinates(nextMarkers: MapMarker[]): Stacked {
