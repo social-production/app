@@ -132,7 +132,7 @@ for (let i = 0; ; i++) {
   if (await shared.first().waitFor({ timeout: 9_000 }).then(() => true, () => false)) break;
   if (i >= 40) throw new Error('the share never reached Bob');
 }
-await shared.first().getByText('Project', { exact: true }).waitFor();
+await shared.first().getByText(/^Project · /).waitFor();
 await shared.first().click();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(bob.url()).pathname, new URL(projectUrl).pathname);
