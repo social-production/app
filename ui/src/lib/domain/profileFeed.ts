@@ -1,5 +1,5 @@
 import type { CommentActivity } from './commentNotes.ts';
-import type { FeedSort, ProjectCard } from './projects.ts';
+import { isPrivateSeed, type FeedSort, type ProjectCard } from './projects.ts';
 
 /** A profile's tabs (Profiles and Comments mockups §2). */
 export type ProfileTab = 'all' | 'posts' | 'comments' | 'projects';
@@ -36,4 +36,15 @@ export function profileRows(
   if (sort === 'top') return [...cardRows, ...commentRows];
   const rows = [...cardRows, ...commentRows].sort((a, b) => timeOf(b) - timeOf(a));
   return sort === 'oldest' ? rows.reverse() : rows;
+}
+
+/** Who can see: "public" leaves out private events and comments in their chats, so your own
+ * profile shows what everyone else sees (web's All / Public; Profiles mockups §2). */
+export type ProfileAudience = 'all' | 'public';
+
+export function forAudience(rows: ProfileRow[], audience: ProfileAudience): ProfileRow[] {
+  if (audience === 'all') return rows;
+  return rows.filter((row) =>
+    'comment' in row ? !isPrivateSeed(row.comment.space.id) : !isPrivateSeed(row.card.id),
+  );
 }

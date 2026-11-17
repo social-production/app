@@ -38,6 +38,16 @@
       : `${space}?comment=${encodeURIComponent(comment.message)}`) as ResolvedPathname,
   );
   const scope = $derived(comment.space.tag ? tagRef(comment.space.tag).label : '');
+  let copied = $state(false);
+
+  /** Share copies the comment's link (it opens the comment where it was written). */
+  async function share(event: MouseEvent): Promise<void> {
+    event.preventDefault();
+    event.stopPropagation();
+    await navigator.clipboard?.writeText(`${location.origin}${href}`).catch(() => {});
+    copied = true;
+    setTimeout(() => (copied = false), 1500);
+  }
 </script>
 
 <div class="comment-activity-card">
@@ -70,6 +80,24 @@
             <strong>{comment.space.title}</strong>
           </span>
         </a>
+        <!-- Reply and Share, plain, as drawn (Profiles mockups §3). Reply opens the comment
+             where it was written; a comment row carries no votes to show. -->
+        <div class="comment-activity-actions">
+          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href is built from spaceHref, which resolves -->
+          <a class="comment-activity-action" {href}
+            ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z" /></svg
+            >Reply</a
+          >
+          <button
+            class="comment-activity-action"
+            type="button"
+            aria-label="Copy link to this comment"
+            onclick={(e) => void share(e)}
+            ><svg aria-hidden="true" viewBox="0 0 24 24"
+              ><path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" /></svg
+            >{copied ? 'Copied' : ''}</button
+          >
+        </div>
       </div>
     </div>
   </FeedSurface>

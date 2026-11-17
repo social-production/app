@@ -9,8 +9,14 @@
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { CommentActivity } from '#lib/domain/commentNotes.ts';
-  import { profileRows, type ProfileTab } from '#lib/domain/profileFeed.ts';
+  import {
+    forAudience,
+    profileRows,
+    type ProfileAudience,
+    type ProfileTab,
+  } from '#lib/domain/profileFeed.ts';
   import type { FeedSort } from '#lib/domain/projects.ts';
+  import { cachedPerson } from '#lib/services/people.ts';
   import { commentsOf } from '#lib/services/profileNotes.ts';
 
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -33,6 +39,15 @@
   let comments = $state<CommentActivity[]>([]);
   let tab = $state<ProfileTab>('all');
   let open = $state(false);
+  let audience = $state<ProfileAudience>('all');
+  let name = $state('');
+  const audiences: { value: ProfileAudience; label: string }[] = [
+    { value: 'all', label: 'Everything' },
+    { value: 'public', label: 'Public only' },
+  ];
+  // svelte-ignore state_referenced_locally
+  const own = agent === undefined; // re-created per person, as `who` above
+  const sheetTitle = $derived(name ? `Show on ${name}'s profile` : 'Show on this profile');
 
   const tabs: { value: ProfileTab; label: string }[] = [
     { value: 'all', label: 'All' },
@@ -45,12 +60,18 @@
     { value: 'top', label: 'Top' },
     { value: 'oldest', label: 'Oldest' },
   ];
-  const rows = $derived(profileRows(feed.items, comments, tab, feed.sort));
+  const rows = $derived(
+    forAudience(profileRows(feed.items, comments, tab, feed.sort), own ? audience : 'all'),
+  );
 
   $effect(() => {
     untrack(() => {
       feed.sort = 'recent';
       void feed.reload();
+      void cachedPerson(who).then(
+        (p) => (name = p.profile?.name ?? ''),
+        () => undefined,
+      );
       void commentsOf([who]).then(
         (found) => (comments = found),
         () => undefined,
@@ -112,14 +133,14 @@
 
 <OverlaySheet
   {open}
-  title="Show on this profile"
+  title={sheetTitle}
   labelledById="profile-filter-title"
   rootClass="shell feed-filter-sheet"
   onClose={() => (open = false)}
 >
   <div class="feed-filter-groups">
     <section>
-      <h3>Order</h3>
+      <h3>Sort</h3>
       <SegmentedChoice
         value={feed.sort}
         ariaLabel="Sort profile feed"
@@ -127,6 +148,17 @@
         onChange={(v) => ((feed.sort = v), void feed.reload())}
       />
     </section>
+    {#if own}
+      <section>
+        <h3>Who can see</h3>
+        <SegmentedChoice
+          value={audience}
+          ariaLabel="Who can see"
+          options={audiences}
+          onChange={(v) => (audience = v)}
+        />
+      </section>
+    {/if}
   </div>
   {#snippet footer()}
     <div class="sheet-actions">

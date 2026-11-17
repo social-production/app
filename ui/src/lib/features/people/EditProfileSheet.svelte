@@ -2,7 +2,10 @@
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
   import { BIO_MAX, HOME_AREA_MAX, type Person } from '#lib/domain/people.ts';
+  import { devicePlace } from '#lib/services/locations.ts';
 
   import type { ProfileEditor } from './profileEdit.svelte.ts';
 
@@ -15,6 +18,28 @@
   let name = $state('');
   let bio = $state('');
   let area = $state('');
+  let locating = $state(false);
+  let areaNote = $state('');
+
+  /** The Area field's locate button (Profiles mockups §2): this device's place, once. */
+  async function locate(): Promise<void> {
+    locating = true;
+    areaNote = '';
+    const result = await devicePlace();
+    locating = false;
+    if (!result.ok) {
+      areaNote = devicePositionMessage(result.error);
+      return;
+    }
+    // "76, Greeves Street, Fitzroy, Melbourne, Victoria, 3065, Australia" → "Fitzroy, Melbourne":
+    // no numbers, no state or country, the two smallest places left.
+    const parts = result.place.displayLabel
+      .split(',')
+      .map((p) => p.trim())
+      .filter((p) => p && !/^\d/.test(p));
+    const local = parts.length > 3 ? parts.slice(0, -2) : parts;
+    area = local.slice(-2).join(', ') || result.place.displayLabel;
+  }
   let coverInput = $state<HTMLInputElement>();
   let photoInput = $state<HTMLInputElement>();
   const problem = $derived(handleProblem(name));
@@ -109,8 +134,19 @@
     </label>
     <label class="edit-field">
       <span>Area</span>
-      <input bind:value={area} maxlength={HOME_AREA_MAX} placeholder="e.g. Fitzroy, Melbourne" />
+      <span class="edit-area">
+        <input bind:value={area} maxlength={HOME_AREA_MAX} placeholder="e.g. Fitzroy, Melbourne" />
+        <button
+          class="edit-locate"
+          type="button"
+          aria-label="Use my location"
+          title="Use my location"
+          disabled={locating}
+          onclick={() => void locate()}><ToolbarIcon name="locate" /></button
+        >
+      </span>
     </label>
+    {#if areaNote}<p class="edit-hint">{areaNote}</p>{/if}
     {#if editor.error}<p class="edit-hint error" role="alert">{editor.error}</p>{/if}
   </div>
   {#snippet footer()}

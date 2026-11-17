@@ -1,7 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
 
-  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
   import { acceptedCount, shownRows } from '#lib/domain/follows.ts';
@@ -172,13 +171,14 @@
                 />
               {/if}
             </div>
-          {:else if own}
-            <!-- Edit profile opens over the profile (Profiles and Comments mockups §2). -->
-            <div class="action-row">
-              <button class="action" type="button" onclick={() => (editor.open = true)}>
-                <ToolbarIcon name="pencil" /><span class="action-text">Edit profile</span>
-              </button>
-            </div>
+          {/if}
+        {/snippet}
+        {#snippet aside()}
+          <!-- Edit profile opens over the profile, beside the photo (Profiles mockups §2). -->
+          {#if own}
+            <button class="edit-profile" type="button" onclick={() => (editor.open = true)}
+              >Edit profile</button
+            >
           {/if}
         {/snippet}
       </ProfileHero>
@@ -216,15 +216,8 @@
       />
       <TrustSheets {trust} person={shown} />
 
-      {#if own && (person.standing.level === 'New' || canClaim)}
+      {#if own && canClaim}
         <section class="empty-card own-card">
-          {#if person.standing.level === 'New'}
-            <p>
-              New members can join projects, talk and help. To vote and vouch, ask
-              {VOUCHES_FOR_FULL} full members to vouch for you ({person.standing.vouchers.length} so far),
-              or stay active for 30 days.
-            </p>
-          {/if}
           {#if canClaim}
             <div class="button-row">
               <button
@@ -251,8 +244,5 @@
   .own-card {
     display: grid;
     gap: 10px;
-  }
-  .own-card p {
-    margin: 0;
   }
 </style>

@@ -139,7 +139,7 @@
 
   // web's isFeedDiscoveryPath: the "+" sits on feeds, never on onboarding or over the map.
   const feed = $derived(!authSurface && !map.open && isFeedSurface(page.url.pathname));
-  const showCreateFab = $derived(feed);
+  const showCreateFab = $derived(feed && !page.url.pathname.startsWith('/profile')); // not on profiles (mockups §2)
   // Phone feeds slide the bars away while you scroll down (scrollChrome.svelte.ts).
   const scroll = new ScrollChrome(() => ({
     on: compact && feed && !immersive,
