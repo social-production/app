@@ -83,9 +83,9 @@ const urlB = await create(bob, titles[1]);
 log('each founder created a project');
 
 // Founder one proposes the link; the search finds B through the node's index.
-await linksUntil(ann, urlA, () => ann.getByRole('button', { name: 'Propose a new link' }), 'the Links tab');
+await linksUntil(ann, urlA, () => ann.getByRole('button', { name: /Propose a link/ }), 'the Links tab');
 await ann.screenshot({ path: `${shots}/links-empty-390.png` });
-await ann.getByRole('button', { name: 'Propose a new link' }).click();
+await ann.getByRole('button', { name: /Propose a link/ }).click();
 const composer = ann.getByRole('dialog', { name: 'Propose a new link' });
 for (let i = 0; ; i++) {
   await composer.getByLabel('Search by name').fill(titles[1]);
