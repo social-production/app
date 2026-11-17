@@ -168,3 +168,17 @@
   min-height: 44px;
   padding: 0 26px;
 }
+
+/* A sheet rooted in `.shell` (for the shell's styles) must not take the shell's page colour:
+   the page stays visible, dimmed, behind it (owner, 2026-11-17: the map vanished while the
+   Distance sheet was open). */
+.overlay-root.overlay-root.shell {
+  background: transparent;
+}
+
+/* The Distance sheet keeps the map in view: a lighter scrim, so the circle can be watched
+   changing as you tap distances. */
+.overlay-root.radius-sheet .overlay-scrim,
+.overlay-root.radius-sheet button.overlay-scrim.overlay-scrim:hover {
+  background: color-mix(in srgb, var(--text-main) 12%, transparent);
+}

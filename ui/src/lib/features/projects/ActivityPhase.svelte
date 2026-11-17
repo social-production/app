@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import ActivityAgenda from '#lib/components/activities/ActivityAgenda.svelte';
   import ActivityCalendar from '#lib/components/activities/ActivityCalendar.svelte';
   import ActivityHistory from '#lib/components/activities/ActivityHistory.svelte';
@@ -155,7 +156,7 @@
             <p class="validation-copy" role="alert">{state.error}</p>
           {/if}
           {#if !state.loaded}
-            <div class="empty-card">Loading activities…</div>
+            <SkeletonRows count={2} />
           {:else if state.live.length === 0}
             <div class="empty-card">
               {planDays.length > 0

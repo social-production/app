@@ -43,10 +43,107 @@
         } catch (e) {}
       })();
     </script>
+    <!-- The opening screen before the app's code arrives (owner's fix 3c): the breathing logo,
+         the name and one line; the app removes it once the first connection settles. -->
+    <style>
+      #boot-splash {
+        position: fixed;
+        inset: 0;
+        z-index: 2000;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 10px;
+        background: #ffffff;
+        color: #18181b;
+        font:
+          15px/1.4 Inter,
+          system-ui,
+          -apple-system,
+          sans-serif;
+        text-align: center;
+        transition: opacity 0.25s ease;
+      }
+      #boot-splash.gone {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #boot-splash .logo {
+        display: grid;
+        place-items: center;
+        width: 76px;
+        height: 76px;
+        margin-bottom: 6px;
+        border-radius: 22px;
+        background: #2f8a57;
+        box-shadow: 0 10px 30px rgb(47 138 87 / 0.35);
+        animation: boot-breathe 2.4s ease-in-out infinite;
+      }
+      #boot-splash .logo i {
+        width: 72px;
+        height: 72px;
+        background: #ffffff;
+        -webkit-mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain
+          no-repeat;
+        mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain no-repeat;
+      }
+      #boot-splash strong {
+        font-size: 19px;
+      }
+      #boot-splash p {
+        margin: 0;
+        color: #71717a;
+        font-size: 14.5px;
+      }
+      #boot-splash p span {
+        animation: boot-dot 1.2s ease-in-out infinite;
+      }
+      #boot-splash p span:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      #boot-splash p span:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      [data-theme='dark'] #boot-splash {
+        background: #181a1b;
+        color: #f3f4f6;
+      }
+      [data-theme='dark'] #boot-splash .logo {
+        background: #5dd691;
+        box-shadow: 0 10px 30px rgb(93 214 145 / 0.3);
+      }
+      [data-theme='dark'] #boot-splash .logo i {
+        background: #102017;
+      }
+      [data-theme='dark'] #boot-splash p {
+        color: #bbc0c9;
+      }
+      @keyframes boot-breathe {
+        50% {
+          transform: scale(1.06);
+        }
+      }
+      @keyframes boot-dot {
+        50% {
+          opacity: 0.25;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-splash .logo,
+        #boot-splash p span {
+          animation: none;
+        }
+      }
+    </style>
     <title>Social Production</title>
     %sveltekit.head%
   </head>
   <body data-sveltekit-preload-data="hover">
+    <div id="boot-splash" role="status">
+      <span class="logo"><i></i></span>
+      <strong>Social Production</strong>
+      <p>Connecting to the network<span>.</span><span>.</span><span>.</span></p>
+    </div>
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

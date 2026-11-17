@@ -19,6 +19,7 @@
 
   import EmptyFeedEnd from '#lib/components/empty/FeedEnd.svelte';
   import { keepRow, type FeedType } from '#lib/domain/feedTypes.ts';
+  import { keepFeedFilters, readFeedFilters } from '#lib/stores/feedFilters.ts';
 
   import FeedHeader from './FeedHeader.svelte';
   import HomeFeedEmpty from './HomeFeedEmpty.svelte';
@@ -34,7 +35,12 @@
 
   const feed = new HomeFeedState(() => search);
   const signedIn = $derived(connection.current.status === 'connected');
-  let filter = $state<FeedType>('all');
+  // The filters last across reloads, on this device.
+  const saved = readFeedFilters('home', { type: 'all', sort: 'trending', window: 'all' });
+  feed.public.sort = saved.sort;
+  feed.public.window = saved.window;
+  let filter = $state<FeedType>(saved.type);
+  $effect(() => keepFeedFilters('home', { type: filter, sort: feed.sort, window: feed.window }));
   let sheetOpen = $state(false);
   const rows = $derived(feed.rows.filter((row) => keepRow(row, filter)));
   const narrowed = $derived(filter !== 'all' || feed.window !== 'all');

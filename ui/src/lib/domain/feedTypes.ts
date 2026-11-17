@@ -2,13 +2,17 @@ import type { HomeFeedRow } from './homeFeed.ts';
 import type { CharterMode, FeedSort, FeedWindow, ProjectCard } from './projects.ts';
 
 /** The feed filter's Type (Scope Filters mockups §1): one choice for Home, scopes and profiles. */
-export type FeedType = 'all' | 'projects' | 'events' | 'threads';
+export type FeedType = 'all' | 'projects' | 'events' | 'requests' | 'threads' | 'posts';
 
+/** Every kind a feed holds has its own Type (owner, 2026-11-17: "type doesn't have all content
+ * types, like request or post"). */
 export const FEED_TYPES: { value: FeedType; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'projects', label: 'Projects' },
   { value: 'events', label: 'Events' },
+  { value: 'requests', label: 'Requests' },
   { value: 'threads', label: 'Threads' },
+  { value: 'posts', label: 'Posts' },
 ];
 
 export const FEED_SORTS: { value: FeedSort; label: string }[] = [
@@ -23,11 +27,13 @@ export const FEED_WINDOWS: { value: FeedWindow; label: string }[] = [
   { value: 'all', label: 'All time' },
 ];
 
-/** Which Type a card's mode falls under: threads and posts are Threads, events Events, and
- * everything else (projects, services, proposals, help requests) Projects. */
+/** Which Type a card's mode falls under: events, help requests, threads and posts each
+ * their own, and everything else (projects, services, proposals) Projects. */
 export function typeOfMode(mode: CharterMode | string): Exclude<FeedType, 'all'> {
   if (mode === 'event') return 'events';
-  if (mode === 'thread' || mode === 'post') return 'threads';
+  if (mode === 'help-request') return 'requests';
+  if (mode === 'thread') return 'threads';
+  if (mode === 'post') return 'posts';
   return 'projects';
 }
 

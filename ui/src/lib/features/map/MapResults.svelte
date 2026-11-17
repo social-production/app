@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import type { ResolvedPathname } from '$app/types';
   import { resolve } from '$app/paths';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
@@ -54,7 +55,7 @@
 
 <section class="list-panel" aria-label="Map results list">
   {#if s.loading && s.listItems.length === 0}
-    <p class="empty-state">Loading markers…</p>
+    <SkeletonRows count={3} kind="row" />
   {:else if s.errorMessage}
     <EmptyState icon="map-pin" title="The map couldn't load" text={s.errorMessage} />
   {:else if !s.hasCenter}

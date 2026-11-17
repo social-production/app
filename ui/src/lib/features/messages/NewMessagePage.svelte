@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -119,7 +120,7 @@
           People could not be loaded. <button type="button" onclick={load}>Try again</button>
         </p>
       {:else if everyone === null}
-        <p class="new-message-note">Loading people…</p>
+        <SkeletonRows count={4} kind="row" />
       {:else if shown.length === 0}
         <p class="new-message-note">{query.trim() ? 'No matches.' : 'Nobody else is here yet.'}</p>
       {:else}

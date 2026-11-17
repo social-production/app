@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SettingRow from '#lib/components/settings/SettingRow.svelte';
@@ -66,7 +67,7 @@
 
 <section class="settings-section" id="settings-profile">
   {#if !loaded}
-    <div class="card"><p class="section-intro">Loading…</p></div>
+    <SkeletonRows count={3} kind="row" />
   {:else}
     <!-- As drawn: who you are on top, then one row per field; a row opens a small sheet. -->
     <div class="profile-head">

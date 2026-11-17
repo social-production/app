@@ -63,24 +63,22 @@ await guest.getByText('Swap seeds every spring.').first().waitFor();
 await guest.screenshot({ path: `${out}/phone390-guest-details.png` });
 log('the guest opened the project page signed out');
 
-// web's requireViewer: Join shows "Sign in to join this project." with a Sign in link.
-await guest.getByRole('button', { name: 'Join project' }).first().click();
-const notice = guest.locator('.auth-action-notice');
-await notice.getByText('Sign in to join this project.').waitFor();
-assert.equal(await notice.getByRole('link', { name: 'Sign in' }).getAttribute('href'), '/onboarding');
-await guest.screenshot({ path: `${out}/phone390-guest-notice.png` });
-await notice.getByRole('button', { name: 'Dismiss' }).click();
-await notice.waitFor({ state: 'detached' });
+// "Sign up to join" takes a guest straight to the sign-up page (owner, 2026-11-17: no pop-up).
+await guest.getByRole('link', { name: 'Sign up to join' }).or(guest.getByRole('button', { name: 'Sign up to join' })).first().click();
+await guest.waitForURL('**/onboarding');
+await guest.screenshot({ path: `${out}/phone390-guest-signup.png` });
+await guest.goBack();
+await guest.waitForURL(projectUrl.split('?')[0] + '**');
 
 await guest.getByRole('tab', { name: /Take part|Participation/ }).click();
 await guest.locator('.participation-tab').getByText(/Proposal/).first().waitFor();
 
 await guest.getByRole('tab', { name: 'Chat' }).click();
 await guest.locator('.chat-log').getByText(hello).waitFor({ timeout: 60_000 });
-await guest.getByRole('button', { name: 'Sign in', exact: true }).click();
-await notice.getByText('Sign in to send a message.').waitFor();
 await guest.screenshot({ path: `${out}/phone390-guest-chat.png` });
-log('the guest read the chat; sending asks them to sign in');
+await guest.getByRole('button', { name: 'Sign in', exact: true }).click();
+await guest.waitForURL('**/onboarding');
+log('the guest read the chat; Sign in opens the sign-up page');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all guest checks passed');

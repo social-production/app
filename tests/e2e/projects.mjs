@@ -85,8 +85,8 @@ const guestCard = guest.locator('.project-card', { hasText: title });
 // Feed rows name no author (ADR 0097): the type label leads the row instead.
 await guestCard.locator('.feed-lead-meta .surface-type-label').waitFor();
 await guestCard.getByRole('button', { name: /^Support/ }).click();
-// web's requireViewer: a notice with a Sign in link (not a redirect).
-await guest.locator('.auth-action-notice').getByText('Sign in to support this project.').waitFor();
+// Support takes a guest straight to the sign-up page (owner, 2026-11-17: no pop-up).
+await guest.waitForURL('**/onboarding');
 log('a guest sees the feed with names, and Support asks them to sign in');
 
 await ann.reload();

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
   import DiscussionPanel from '#lib/components/discussion/DiscussionPanel.svelte';
@@ -63,7 +65,7 @@
     {:else if state.moderation.value.state === 'removed'}
       <p class="tab-loading">{removedLabel(state.moderation.value.report?.reason)}</p>
     {:else if !state.project?.charter}
-      <p class="tab-loading">Loading {kind}…</p>
+      <LoadingLine /><SkeletonDetail />
     {:else}
       <FeedSurface
         tone={kind === 'post' ? 'personal' : 'public'}

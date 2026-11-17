@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import type { Snippet } from 'svelte';
 
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
@@ -233,7 +234,7 @@
         </section>
       {/if}
     {:else if !error}
-      <p class="end-copy">Loading…</p>
+      <SkeletonRows count={2} />
     {/if}
     {#if error}<p class="warning-card">{error}</p>{/if}
     {@render children?.()}

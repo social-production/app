@@ -275,10 +275,10 @@
     <SkeletonRows kind="row" count={5} />
   {:else if publicChats.error && publicChats.chats.length === 0}
     <div class="empty-state">{publicChats.error}</div>
+  {:else if !publicChats.loaded}
+    <SkeletonRows count={4} kind="row" />
   {:else if publicChats.chats.length === 0}
-    <div class="empty-state">
-      {publicChats.loaded ? 'No public chats yet.' : 'Loading chats…'}
-    </div>
+    <div class="empty-state">No public chats yet.</div>
   {:else}
     {#each publicChats.chats as chat (chat.id)}
       <ChatRow

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import ServiceRequestCard from '#lib/components/requests/ServiceRequestCard.svelte';
   import { isPending, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
@@ -35,7 +36,7 @@
   <section class="service-ui card-rail-section">
     {#if state.error}<p class="validation-copy" role="alert">{state.error}</p>{/if}
     {#if !state.loaded}
-      <div class="empty-card">Loading requests…</div>
+      <SkeletonRows count={3} kind="row" />
     {:else if requests.length === 0}
       <div class="empty-card">
         {#if requestsOff}

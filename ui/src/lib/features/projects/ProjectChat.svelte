@@ -141,7 +141,7 @@
     title={copy.title}
     placeholder={copy.placeholder}
     submitLabel="Send"
-    emptyCopy={chat.loaded ? copy.empty : 'Loading chat…'}
+    emptyCopy={chat.loaded ? copy.empty : ''}
     {embedded}
     fitViewport={embedded}
     showHeader={false}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { boardOrder, type Board, type BoardMember } from '#lib/domain/board.ts';
   import { displayName, type Person } from '#lib/domain/people.ts';
@@ -133,7 +134,7 @@
       {@render section('Seated', seated)}
       {@render section('Candidates', candidates)}
     {:else}
-      <p class="board-empty">Loading moderators…</p>
+      <SkeletonRows count={3} kind="row" />
     {/if}
     {#if notice}<p class="board-notice" role="status">{notice}</p>{/if}
     {#if problem}<p class="board-problem" role="alert">{problem}</p>{/if}
