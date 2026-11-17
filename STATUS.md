@@ -204,6 +204,20 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (9:40 am Melbourne, 2026-11-18, UX session)
+- **Live: #205** (Directions sheet `features/map/DirectionsSheet.svelte` + `domain/directions.ts`;
+  a place opens the map with its pin selected: `openPlaceOnMap(label, coords, select)` and
+  `MarkerLoader.boot/focus`, which now run before the IP-hint load so the map no longer stays on
+  the IP's city; Links tab without its place row; decision sheets `VoteDecisionBody` +
+  `domain/decided.ts` + `ux/decisionsheet.css`; the gateway lets guests read `comments_of` and
+  `get_cover`, checked live) and **#206** (phone map bar `MapFilterCapsule` + `PlaceSheet`,
+  Upcoming in Filters, `MapLoading`, `ux/mapcapsule.css`, search page pills, profile grammar).
+  `region.mjs` now opens the map from the Details place and waits for `.map-peek`.
+- **Screen review for the owner:** https://claude.ai/artifact/F8BUdASoNbVRSE3wt7p5QS. Every
+  screen's status, plus mockups waiting for an OK: the right rail as a "Your activity" drawer
+  (Coming up / Votes / Requests tabs), People rows, empty Invites and Feedback. Not captured:
+  Notifications with cards, service booking calendars.
+
 ### Before the FastAPI site can shut down, and screens still to modernise (owner asked, 18 Nov 1:30 am)
 **Must do before parity (shutting down Railway's FastAPI site):**
 1. **Settings rows (PARITY.md list item 2):** separate Public and Personal feeds, a display
