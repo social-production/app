@@ -204,6 +204,25 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (1:30 am Melbourne, 2026-11-18, UX session)
+- **PR `claude/map-sheet-splash`** (owner's notes, 17 Nov evening): the opening screen is a
+  static splash in `app.html` that `features/shell/bootSplash.ts` fades once the first
+  connection settles; sheets rooted in `.shell` no longer paint the page colour (the page
+  shows dimmed behind every sheet); the Distance sheet keeps the map in view and follows each
+  tap; guests' "Sign in" goes straight to /onboarding (`requireViewer` bumps
+  `authNotice.signIn`, no pop-up); feed filters are kept per device (`stores/feedFilters.ts`:
+  home, scope, profile); cards show `shortPlace()` (name and suburb); "Loading …" lines are
+  skeletons (`ChatEmpty` for chats); the feed Type has Requests and Posts (pills).
+  `guests`, `projects`, `map`, `region`, `chat`, `accounts` pass locally (`guests.mjs` and
+  `projects.mjs` now expect the sign-up page).
+- **Melbourne demo content on live** (`tests/e2e/demo-melbourne.mjs`, places picked from the
+  geocoder so they have pins): 9 proposals, 3 help requests, an event (Edinburgh Gardens) and
+  a project (Abbotsford Convent). `DEMO_SKIP` skips parts already made.
+- **Map Redesign mockup approved** (https://claude.ai/artifact/3yaqAngXMWWStXdDLFEiDN, owner
+  "love the map redesign"): next build it all (pins by kind with symbols, clusters, tap card,
+  controls, "Upcoming / Include past" in Filters, loading, list cards), and make feed card
+  icons use the same bolder kind colours and symbols.
+
 ### Where things stand (11:05 pm Melbourne, 2026-11-17, UX session)
 - **Live since ~11 pm: PR #200** (owner): every sheet whose footer is the × and its actions
   docks them in one capsule (`ux/sheetdock.css`; the create flow and footers with a text
