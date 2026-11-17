@@ -53,17 +53,27 @@
     {#if before}{@render before()}{/if}
     <section>
       <h3>Type</h3>
-      <SegmentedChoice value={type} ariaLabel="Show only" options={FEED_TYPES} onChange={onType} />
+      <SegmentedChoice
+        value={type}
+        ariaLabel="Filter public feed"
+        options={FEED_TYPES}
+        onChange={onType}
+      />
     </section>
     <section>
       <h3>Order</h3>
-      <SegmentedChoice value={sort} ariaLabel="Sort by" options={sorts} onChange={onSort} />
+      <SegmentedChoice
+        value={sort}
+        ariaLabel="Sort public feed by"
+        options={sorts}
+        onChange={onSort}
+      />
     </section>
     <section>
       <h3>When</h3>
       <SegmentedChoice
         value={window}
-        ariaLabel="Time window"
+        ariaLabel="Public feed time window"
         options={FEED_WINDOWS}
         onChange={onWindow}
       />
