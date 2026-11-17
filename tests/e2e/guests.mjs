@@ -63,8 +63,8 @@ await guest.getByText('Swap seeds every spring.').first().waitFor();
 await guest.screenshot({ path: `${out}/phone390-guest-details.png` });
 log('the guest opened the project page signed out');
 
-// Join takes a guest straight to the sign-up page (owner, 2026-11-17: no pop-up).
-await guest.getByRole('button', { name: 'Join project' }).first().click();
+// "Sign up to join" takes a guest straight to the sign-up page (owner, 2026-11-17: no pop-up).
+await guest.getByRole('link', { name: 'Sign up to join' }).or(guest.getByRole('button', { name: 'Sign up to join' })).first().click();
 await guest.waitForURL('**/onboarding');
 await guest.screenshot({ path: `${out}/phone390-guest-signup.png` });
 await guest.goBack();

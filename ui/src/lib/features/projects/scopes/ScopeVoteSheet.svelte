@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { VoteChoice } from '#lib/domain/governance.ts';
@@ -78,7 +79,7 @@
         >
       {/if}
     {:else if !gov.loaded}
-      <p class="meta">Loading…</p>
+      <SkeletonRows count={2} kind="row" />
     {:else}
       <EmptyState
         icon="check"

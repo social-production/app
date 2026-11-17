@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import LinkComposer from '#lib/components/links/LinkComposer.svelte';
   import LinkRequestsSection from '#lib/components/links/LinkRequestsSection.svelte';
   import LinksSection from '#lib/components/links/LinksSection.svelte';
@@ -58,7 +59,7 @@
   {#if links.error}<p class="tab-loading" role="alert">{links.error}</p>{/if}
 
   {#if !frame}
-    <p class="tab-loading">Loading links…</p>
+    <SkeletonRows count={2} kind="row" />
   {:else}
     <LinksSection
       action={frame.canPropose ? propose : undefined}

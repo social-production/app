@@ -2,6 +2,7 @@
   import type { Snippet } from 'svelte';
 
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
+  import PillChoice from '#lib/components/PillChoice.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import { FEED_SORTS, FEED_TYPES, FEED_WINDOWS, type FeedType } from '#lib/domain/feedTypes.ts';
   import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
@@ -53,7 +54,7 @@
     {#if before}{@render before()}{/if}
     <section>
       <h3>Type</h3>
-      <SegmentedChoice
+      <PillChoice
         value={type}
         ariaLabel="Filter public feed"
         options={FEED_TYPES}

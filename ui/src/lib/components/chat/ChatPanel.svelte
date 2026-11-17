@@ -1,6 +1,5 @@
 <script lang="ts">
   import { tick } from 'svelte';
-
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
   import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
@@ -9,6 +8,7 @@
   import BubbleMenu from './BubbleMenu.svelte';
   import ChatBubble from './ChatBubble.svelte';
   import ChatComposer from './ChatComposer.svelte';
+  import ChatEmpty from './ChatEmpty.svelte';
   import ChatNote from './ChatNote.svelte';
   import ChatReportComposer from './ChatReportComposer.svelte';
   import type { ChatReports } from './chatReports.ts';
@@ -208,7 +208,7 @@
   <div bind:this={log} class="chat-log">
     <div class="chat-log-stack">
       {#if p.lines.length === 0}
-        <div class="empty-state">{p.emptyCopy}</div>
+        <ChatEmpty copy={p.emptyCopy} />
       {:else}
         {#each p.lines as message, i (message.id)}
           {@const previous = i > 0 ? p.lines[i - 1] : undefined}

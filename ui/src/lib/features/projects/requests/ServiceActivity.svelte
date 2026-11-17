@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import ActivityAgenda from '#lib/components/activities/ActivityAgenda.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
   import { ruleLine, type AvailabilityRule } from '#lib/domain/availability.ts';
@@ -53,7 +54,7 @@
   {/if}
 
   {#if !p.activities.loaded}
-    <div class="empty-card">Loading activities…</div>
+    <SkeletonRows count={2} />
   {:else if p.rows.length === 0}
     {#if !p.usesCalendar}
       <div class="empty-card">This service is currently running without listed activity slots.</div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
+  import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import BackButton from '#lib/components/BackButton.svelte';
   import CommentComposer from '#lib/components/discussion/CommentComposer.svelte';
   import FeedbackVoteStrip from '#lib/components/feedback/FeedbackVoteStrip.svelte';
@@ -151,7 +153,11 @@
       {/each}
     </section>
   {:else}
-    <p class="feedback-note">{fb.loaded ? fb.error : 'Loading feedback…'}</p>
+    {#if fb.loaded}
+      <p class="feedback-note">{fb.error}</p>
+    {:else}
+      <LoadingLine /><SkeletonDetail />
+    {/if}
   {/if}
   {#if fb.item && fb.error}<p class="feedback-note warning" role="alert">{fb.error}</p>{/if}
 </div>

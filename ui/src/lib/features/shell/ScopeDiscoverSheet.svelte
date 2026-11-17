@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import { untrack } from 'svelte';
 
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
@@ -153,7 +154,7 @@
 
   <div class="scope-list">
     {#if loading}
-      <p class="empty-row">Loading…</p>
+      <SkeletonRows count={4} kind="row" />
     {:else if loadError}
       <p class="empty-row">{loadError}</p>
     {:else if filtered.length === 0}

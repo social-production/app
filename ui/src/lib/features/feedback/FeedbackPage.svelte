@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import FeedbackCard from '#lib/components/feedback/FeedbackCard.svelte';
   import FeedbackComposeSheet from '#lib/components/feedback/FeedbackComposeSheet.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -68,7 +69,7 @@
   {#if fb.error}
     <p class="feedback-note warning">{fb.error}</p>
   {:else if fb.loading}
-    <p class="feedback-note">Loading feedback…</p>
+    <SkeletonRows count={3} />
   {:else if items.length === 0}
     <p class="feedback-note">{emptyFeedbackCopy(filter)}</p>
   {:else}

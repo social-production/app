@@ -156,7 +156,7 @@
   title={chat.title}
   placeholder="Message the project..."
   submitLabel="Send"
-  emptyCopy={talk.loaded ? 'No project chat yet.' : 'Loading messages...'}
+  emptyCopy={talk.loaded ? 'No project chat yet.' : ''}
   embedded={true}
   fitViewport={false}
   showHeader={false}

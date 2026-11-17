@@ -1,4 +1,5 @@
 <script lang="ts">
+  import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { APPROVAL_PERCENT } from '#lib/domain/governance.ts';
@@ -137,7 +138,7 @@
     {#if tab === 'decisions'}
       <section class="decisions" aria-label="Decisions">
         {#if !gov.loaded}
-          <p class="empty-card">Loading…</p>
+          <SkeletonRows count={2} kind="row" />
         {:else if gov.open.length === 0 && gov.past.length === 0}
           <p class="empty-card">No decisions yet.</p>
         {/if}

@@ -194,7 +194,7 @@
   {title}
   placeholder="Write a message..."
   submitLabel="Send"
-  emptyCopy={thread.loaded ? 'No messages yet.' : 'Loading messages...'}
+  emptyCopy={thread.loaded ? 'No messages yet.' : ''}
   embedded={true}
   fitViewport={false}
   showHeader={false}
