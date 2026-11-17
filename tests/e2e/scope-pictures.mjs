@@ -114,6 +114,9 @@ await vote.locator('.decision-art figcaption', { hasText: 'Proposed' }).waitFor(
 await a.waitForTimeout(1500);
 await a.screenshot({ path: `${out}/phone390-scope-art-vote.png` });
 await vote.getByRole('button', { name: 'Yes', exact: true }).click();
+// Stay until the vote is written (leaving at once can drop it).
+await vote.getByText(/You voted Yes/).waitFor({ timeout: 60_000 });
+await vote.waitFor({ state: 'detached', timeout: 30_000 });
 log('one voted');
 
 for (let i = 0; ; i++) {
