@@ -14,6 +14,12 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Directions, places that open their pin, and the map bar (PRs #205 and #206, 2026-11-18
+  9:37 am Melbourne):** Directions offers Google Maps, Apple Maps, Waze, the phone's own map
+  app or OpenStreetMap; a place on a card or page opens the map with that pin's card showing;
+  the phone map bar reads "Place · distance" with Filters (now holding Upcoming / Include past)
+  and the list; loading shows a green line, pulsing pins and a short count. History's sheets say
+  what was decided with a bar to the 66% mark; signed-out visitors see a profile's comments.
 - **Map pins by kind and a calmer opening (PRs #202 and #203, 2026-11-18 1:39 am Melbourne):**
   map pins are round, coloured by kind with the feed's symbols; crowded pins merge into a
   count, things at one spot share a counted pin, and a tapped pin opens a card with Directions
