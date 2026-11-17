@@ -7,6 +7,7 @@
   import { scheduleLine } from '#lib/domain/eventSchedule.ts';
   import { slugOf } from '#lib/domain/scopes.ts';
   import { explain } from '#lib/services/errors.ts';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { answerInvite, pendingInvites, type PendingInvite } from '#lib/services/events.ts';
   import { notifications } from '#lib/stores/notifications.svelte.ts';
 
@@ -60,10 +61,11 @@
   {#if loading}
     <LoadingLine /><SkeletonRows kind="row" count={3} />
   {:else if invites.length === 0}
-    <p class="muted">
-      No invites waiting. When someone invites you to a private community or event, it shows up
-      here.
-    </p>
+    <EmptyState
+      icon="people"
+      title="No invites waiting"
+      text="When someone invites you to a private community or event, it shows up here."
+    />
   {:else}
     <ul>
       {#each invites as invite (invite.seed)}

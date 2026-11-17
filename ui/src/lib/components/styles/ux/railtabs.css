@@ -1,0 +1,202 @@
+/* Your activity (Screen Review §1, owner 2026-11-18): a title, three tabs with counts, and rows
+   with the kind's tile; web's disclosure lists and boxed cards are gone. */
+.right-rail .rail-panel.rail-tabs-panel {
+  border-bottom: none;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 14px;
+}
+
+.right-rail .rail-tabs-panel .rail-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.right-rail .rail-tabs-panel .rail-tabs {
+  display: flex;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+}
+
+.right-rail .rail-tabs-panel .rail-tabs button {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-height: 34px;
+  padding: 0 6px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.right-rail .rail-tabs-panel .rail-tabs button.on {
+  background: var(--panel);
+  color: var(--text-main);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+}
+
+.right-rail .rail-tabs-panel .rail-tab-count {
+  min-width: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--text-soft) 18%, transparent);
+  color: var(--text-soft);
+  font-size: 11.5px;
+  font-weight: 700;
+  line-height: 18px;
+}
+
+.right-rail .rail-tabs-panel .rail-tab-count.hot {
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+}
+
+.right-rail .rail-tabs-panel .rail-tab-panel {
+  display: grid;
+  border: none;
+}
+
+.right-rail .rail-tabs-panel .rail-tab-panel .empty-block {
+  padding-block: 28px;
+}
+
+.right-rail .rail-tabs-panel .snapshot-row.rail-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  margin: 0;
+  padding: 10px 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.right-rail .rail-tabs-panel .snapshot-row.rail-item + .snapshot-row.rail-item,
+.right-rail
+  .rail-tabs-panel
+  .rail-section-help-requests:not(:empty)
+  + .rail-section-requests
+  .rail-item:first-child {
+  border-top: 1px solid var(--panel-border);
+}
+
+.right-rail .rail-tabs-panel .rail-item .activity-open-button {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.right-rail .rail-tabs-panel .rail-item .rail-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: var(--tile);
+  color: var(--kind-on);
+}
+
+.right-rail .rail-tabs-panel .rail-item .rail-copy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.right-rail .rail-tabs-panel .rail-item .card-kicker {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-transform: none;
+}
+
+.right-rail .rail-tabs-panel .rail-item strong {
+  font-size: 14.5px;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+}
+
+.right-rail .rail-tabs-panel .rail-item .card-meta,
+.right-rail .rail-tabs-panel .rail-item .card-detail,
+.right-rail .rail-tabs-panel .rail-item .card-body-preview {
+  margin: 0;
+  padding: 0;
+  border: none;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.right-rail .rail-tabs-panel .rail-item .rail-tile {
+  position: relative;
+}
+
+.right-rail .rail-tabs-panel .rail-item.activity-row-unseen .rail-tile::after {
+  content: '';
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  border: 2px solid var(--panel);
+  border-radius: 50%;
+  background: var(--brand);
+}
+
+.right-rail .rail-tabs-panel .rail-item .dismiss-card {
+  position: static;
+  align-self: start;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.right-rail .rail-tabs-panel .rail-item .dismiss-card:hover {
+  background: var(--panel-hover);
+}
+
+.right-rail .rail-tabs-panel .rail-item .vote-row-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  padding-left: 46px;
+}
+
+.right-rail .rail-tabs-panel .rail-item .vote-action-button {
+  height: 32px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}

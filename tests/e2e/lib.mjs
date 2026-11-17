@@ -114,6 +114,8 @@ export async function keyOf(page) {
 
 /** web's right rail (the top bar's activity button). */
 export const rail = (page) => page.locator('.right-rail .rail-panel');
+export const railTabs = (page) => page.locator('.right-rail [role="tab"]');
+export const railTab = (page, name) => railTabs(page).filter({ hasText: name }).click();
 export const railButton = (page) => page.getByRole('button', { name: 'Open activity' });
 
 /** Open the rail (it reloads on open) until `locator` shows in it; `wait` per opening (a
@@ -121,7 +123,15 @@ export const railButton = (page) => page.getByRole('button', { name: 'Open activ
 export async function railShows(page, locator, what, wait = 10_000) {
   for (let i = 0; i < 20; i++) {
     if (!(await rail(page).count())) await railButton(page).click();
-    if (await locator().waitFor({ timeout: wait }).then(() => true, () => false)) return;
+    // Your activity has tabs (Coming up, Votes, Requests): look in each until it shows.
+    const until = Date.now() + wait;
+    while (Date.now() < until) {
+      for (const tab of await railTabs(page).all()) {
+        await tab.click();
+        if (await locator().isVisible()) return;
+      }
+      await page.waitForTimeout(500);
+    }
     await railButton(page).click(); // close, then reopen to reload it
   }
   throw new Error(`timed out waiting for ${what} in the rail`);

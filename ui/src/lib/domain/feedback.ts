@@ -80,8 +80,10 @@ export function withVote(item: FeedbackItem, vote: FeedbackVote): FeedbackItem {
   return { ...item, upvotes: up, downvotes: down, myVote: vote };
 }
 
-export function emptyFeedbackCopy(filter: FeedbackFilter): string {
-  if (filter === 'bugs') return 'No bugs have been submitted yet.';
-  if (filter === 'suggestions') return 'No suggestions have been submitted yet.';
-  return 'No feedback has been submitted yet.';
+/** An empty list's title and line (Screen Review §3, owner 2026-11-18). */
+export function emptyFeedbackCopy(filter: FeedbackFilter): { title: string; text: string } {
+  const text = 'Spotted a bug or have an idea? Add it here for everyone to vote on.';
+  if (filter === 'bugs') return { title: 'No bugs reported yet', text };
+  if (filter === 'suggestions') return { title: 'No suggestions yet', text };
+  return { title: 'No feedback yet', text };
 }
