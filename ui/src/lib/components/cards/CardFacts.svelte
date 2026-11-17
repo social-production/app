@@ -1,16 +1,20 @@
 <script lang="ts">
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import { implementedLabel } from '#lib/domain/eventSchedule.ts';
+  import { shortPlace } from '#lib/domain/shortPlace.ts';
 
   /**
    * A feed card's when and where (owner, 2026-11-15): the date on its own line, then the
    * place on a separate soft row that opens the app's map on it. "Online" is not a place.
+   * The place is shortened to its name and suburb (owner, 2026-11-17).
    */
   let { when = '', place = '' }: { when?: string; place?: string | null } = $props();
   const map = placeOnMap();
 
   const where = $derived(implementedLabel(place));
   const mappable = $derived(!!where && where.toLowerCase() !== 'online');
+  // The card shows a short place; the full address stays in the link and its title.
+  const short = $derived(shortPlace(where));
 
   function show(e: MouseEvent): void {
     if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
@@ -35,7 +39,7 @@
         class="card-place"
         href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(where)}`}
         rel="noopener noreferrer"
-        title="Show on the map"
+        title={`${where} · Show on the map`}
         onclick={show}
       >
         <svg aria-hidden="true" viewBox="0 0 24 24"
@@ -45,7 +49,7 @@
             r="2.3"
           /></svg
         >
-        <span>{where}</span>
+        <span>{short}</span>
         <svg class="card-place-go" aria-hidden="true" viewBox="0 0 24 24"
           ><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14" /></svg
         >

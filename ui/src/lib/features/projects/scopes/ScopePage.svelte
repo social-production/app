@@ -9,6 +9,7 @@
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import FeedEnd from '#lib/components/empty/FeedEnd.svelte';
   import { keepCard, type FeedType } from '#lib/domain/feedTypes.ts';
+  import { keepFeedFilters, readFeedFilters } from '#lib/stores/feedFilters.ts';
   import { parseInvite, scopeTag, type ScopeKind } from '#lib/domain/scopes.ts';
 
   import FeedFilterBar from '../FeedFilterBar.svelte';
@@ -64,7 +65,12 @@
   const waiting = $derived(s.gov?.votable.length ?? 0);
   const noun = $derived(kind === 'channel' ? 'channel' : 'community');
   // The feed bar's Type (Scope Filters mockups §1), applied to the loaded cards.
-  let type = $state<FeedType>('all');
+  // The filters last across reloads, on this device (one set for every channel and community).
+  const saved = readFeedFilters('scope', { type: 'all', sort: 'trending', window: 'all' });
+  s.feed.sort = saved.sort;
+  s.feed.window = saved.window;
+  let type = $state<FeedType>(saved.type);
+  $effect(() => keepFeedFilters('scope', { type, sort: s.feed.sort, window: s.feed.window }));
   const items = $derived(s.feed.items.filter((card) => keepCard(card, type)));
   const narrowed = $derived(type !== 'all' || s.feed.window !== 'all');
   const title = $derived(s.platform ? 'Platform' : (s.scope?.handle ?? slug));

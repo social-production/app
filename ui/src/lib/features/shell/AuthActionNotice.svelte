@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
@@ -6,8 +7,17 @@
 
   import '#lib/components/styles/notice.css';
 
-  /** web's AuthActionNotice: shown when a guest tries something that needs an account. */
+  /** web's AuthActionNotice, now only for why an account was signed out; a guest who tries
+   * something that needs an account goes straight to the sign-up page. */
   let lastPath = '';
+
+  // A guest who tries something that needs an account goes to the sign-up page.
+  let asked = 0;
+  $effect(() => {
+    if (authNotice.signIn === asked) return;
+    asked = authNotice.signIn;
+    void goto(resolve('/onboarding'));
+  });
 
   $effect(() => {
     const path = page.url.pathname;

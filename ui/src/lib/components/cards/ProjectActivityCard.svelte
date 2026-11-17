@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { shortPlace } from '#lib/domain/shortPlace.ts';
   import type { ResolvedPathname } from '$app/types';
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
   import { isoOfMicros } from '#lib/domain/mapMarkers.ts';
@@ -14,7 +15,7 @@
   const schedule = $derived(
     formatMarkerScheduleRange(isoOfMicros(item.scheduledAt), isoOfMicros(item.endsAt)),
   );
-  const location = $derived(item.locationLabel.trim());
+  const location = $derived(shortPlace(item.locationLabel));
 </script>
 
 <div class="project-activity-card">

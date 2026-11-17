@@ -24,6 +24,7 @@
 
   import { connection } from '#lib/stores/connection.svelte.ts';
 
+  import { keepFeedFilters, readFeedFilters } from '#lib/stores/feedFilters.ts';
   import { FeedState } from './feedState.svelte.ts';
 
   /**
@@ -39,6 +40,10 @@
   // svelte-ignore state_referenced_locally
   const who = agent ?? me;
   const feed = new FeedState(() => '', who);
+  // The filters last across reloads, on this device; a profile starts on Most recent.
+  const saved = readFeedFilters('profile', { type: 'all', sort: 'recent', window: 'all' });
+  feed.window = saved.window;
+  $effect(() => keepFeedFilters('profile', { type: 'all', sort: feed.sort, window: feed.window }));
   let comments = $state<CommentActivity[]>([]);
   let tab = $state<ProfileTab>('all');
   let open = $state(false);
@@ -86,7 +91,7 @@
 
   $effect(() => {
     untrack(() => {
-      feed.sort = 'recent';
+      feed.sort = saved.sort;
       void feed.reload();
       void cachedPerson(who).then(
         (p) => (name = p.profile?.name ?? ''),
