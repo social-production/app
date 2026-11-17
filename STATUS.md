@@ -204,6 +204,19 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (1 pm Melbourne, 2026-11-17, UX session)
+- **#184 (Detail Pages Cleanup) merged 12:58 pm.** Centred dock, fact rows, People page, tags
+  only in the header, facts above the description, plain thread tag and comment rows.
+- **#187 (Profiles §2/§3) open**, main merged in; merge when the fast check is green. Post
+  comments now sit flat (no reply line or dividers), as drawn.
+- **Still to do (owner: "slow down and properly analyse these pages"):** compare side by side
+  with the mockup frames (`scratchpad/mockshots.cjs`-style renders) before claiming a match.
+  Left: Polish Pass Links/History populated states, Platform/Moderators, §4 reporting visual
+  check, Profiles §5 photos, someone else's profile (buttons crowd; ask owner for a frame),
+  Settings › Account (parity's area; asked on #187). Re-run the demo threads and photo post
+  on live (#185 fixed the selectors). Channel Pictures and Platform §4 wait on parity's ADR
+  0109 reset. Optional: an always-visible send button in the comment box (mockup has one).
+
 ### Where things stand (8 am Melbourne, 2026-11-17, UX session)
 - **#181 (ADR 0111, project reset) merged 1:35 am**, live 2:07 am (seed `/readyz` lists project
   `uhC0ky4AsBp4o9sQ…`; directory unchanged). Local `invites.rs` 3/3 and `private_events.rs` 3/3
