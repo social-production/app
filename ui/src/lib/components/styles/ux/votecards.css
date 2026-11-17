@@ -111,7 +111,13 @@
   opacity: 0.45;
 }
 
-/* History rows. */
+/* History rows: plain rows with a line between, no box round the list (Polish Pass §7). */
+.shell .history-shell .history-list {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+}
+
 .shell .history-shell .history-list.decided {
   gap: 0;
 }

@@ -204,6 +204,15 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (2 pm Melbourne, 2026-11-17, UX session)
+- **#184 and #187 merged and live** (smoke: Home at 390px, no page errors).
+- **`claude/ux-links-history`:** Links and History compared frame by frame with Polish Pass §6–7
+  in light and dark (`tests/e2e/links.mjs` passes; it was stale on the Propose button). Propose
+  beside the Linked heading, dated rows with the kind's icon, one card per open vote, past
+  links once each with why they ended, History without the box. Next: Channel Pictures'
+  layout half (pencil, who-decides line, Settings/Vote/Decisions sheets, Vote on the dock
+  row); the picture and cover wait for parity's ADR 0109.
+
 ### Where things stand (1 pm Melbourne, 2026-11-17, UX session)
 - **#184 (Detail Pages Cleanup) merged 12:58 pm.** Centred dock, fact rows, People page, tags
   only in the header, facts above the description, plain thread tag and comment rows.

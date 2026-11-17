@@ -38,20 +38,19 @@
   }
 </script>
 
-<section class="links-tab">
-  {#if frame?.canPropose}
-    <header class="links-top">
-      <button
-        class="propose-link-button"
-        type="button"
-        onclick={() => {
-          links.composerMessage = undefined;
-          composing = true;
-        }}>+ Propose a link</button
-      >
-    </header>
-  {/if}
+{#snippet propose()}
+  <button
+    class="propose-link-button"
+    type="button"
+    onclick={() => {
+      links.composerMessage = undefined;
+      composing = true;
+    }}
+    ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>Propose a link</button
+  >
+{/snippet}
 
+<section class="links-tab">
   {#if venue && venue.toLowerCase() !== 'online'}
     <div class="links-venue"><PlaceRow place={venue} /></div>
   {/if}
@@ -62,6 +61,7 @@
     <p class="tab-loading">Loading links…</p>
   {:else}
     <LinksSection
+      action={frame.canPropose ? propose : undefined}
       items={frame.active}
       names={links.names}
       allowSever={frame.canPropose}

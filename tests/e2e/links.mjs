@@ -54,6 +54,7 @@ async function historyCard(page, kind, state) {
   const card = page.locator(`.history-shell .history-card.${state}`, { hasText: kind }).first();
   await card.waitFor({ timeout: 180_000 }).catch(async (e) => {
     log(await page.locator('.history-shell').innerText().catch(() => 'no history tab'));
+    await page.screenshot({ path: `${shots}/history-timeout.png`, fullPage: true });
     throw e;
   });
   return card;
@@ -83,9 +84,9 @@ const urlB = await create(bob, titles[1]);
 log('each founder created a project');
 
 // Founder one proposes the link; the search finds B through the node's index.
-await linksUntil(ann, urlA, () => ann.getByRole('button', { name: 'Propose a new link' }), 'the Links tab');
+await linksUntil(ann, urlA, () => ann.getByRole('button', { name: /Propose a link/ }), 'the Links tab');
 await ann.screenshot({ path: `${shots}/links-empty-390.png` });
-await ann.getByRole('button', { name: 'Propose a new link' }).click();
+await ann.getByRole('button', { name: /Propose a link/ }).click();
 const composer = ann.getByRole('dialog', { name: 'Propose a new link' });
 for (let i = 0; ; i++) {
   await composer.getByLabel('Search by name').fill(titles[1]);
@@ -122,7 +123,7 @@ log('founder two approved it for project B: the link is active');
 
 await linksUntil(ann, urlA, () => ann.locator('.network-stack .link-card', { hasText: titles[1] }), 'the link in A');
 await ann.screenshot({ path: `${shots}/links-active-390.png` });
-await historyCard(ann, /^Link with/, 'approved');
+await historyCard(ann, /Link with/, 'approved');
 log("A's History lists the approved link decision");
 await ann.getByRole('tab', { name: 'Links' }).click();
 await ann.locator('.network-stack').first().locator('.link-card .toggle-button').click();
