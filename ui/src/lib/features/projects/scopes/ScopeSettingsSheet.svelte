@@ -1,21 +1,23 @@
 <script lang="ts">
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { APPROVAL_PERCENT } from '#lib/domain/governance.ts';
-  import { relativeCompact } from '#lib/domain/time.ts';
   import type { Contact } from '#lib/domain/messages.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
-  import { describeDecision, type ScopeGovernance } from './scopeGovernance.svelte.ts';
+  import ScopeDecisionCard from './ScopeDecisionCard.svelte';
+  import type { ScopeGovernance } from './scopeGovernance.svelte.ts';
   import ScopeWhoDecides from './ScopeWhoDecides.svelte';
 
   import '#lib/components/styles/scopes.css';
 
   /**
-   * web's ScopeSettingsSheet (the gear): Settings (name, description) and Decisions (open and
-   * past votes). Public scopes are collaborative, so a change goes to a member vote. The name
-   * is the handle tags use, so it stays (ADR 0068); scopes have no picture yet. A private
-   * community adds web's "Who decides"; an organizer-run one's organizers edit directly.
+   * A scope's Settings (the pencil), redrawn like Edit profile (Channel Pictures mockups §2):
+   * the cover band and mark on top, Name (fixed: tags use it, ADR 0068) and Description, one
+   * line saying who decides, and the action in the sheet's dock. Decisions lists open and past
+   * votes as cards. A private community adds web's "Who decides"; an organizer-run one's
+   * organizers edit directly. The picture and cover themselves wait for ADR 0109.
    */
   interface Props {
     open: boolean;
@@ -65,19 +67,20 @@
     if (!open) return;
     draft = description;
     notice = '';
+    how = false;
     void gov.load();
   });
 
   const changed = $derived(draft.trim() !== description.trim());
 
-  const dateOf = (micros: number | null): string =>
-    micros
-      ? new Date(micros / 1000).toLocaleDateString(undefined, {
-          day: 'numeric',
-          month: 'short',
-          year: 'numeric',
-        })
-      : '';
+  let how = $state(false);
+  const rule = $derived(
+    direct
+      ? 'Organizers decide: saved at once'
+      : organized
+        ? 'Organizers decide: read only for you'
+        : `Members vote: ${APPROVAL_PERCENT}% yes`,
+  );
 
   async function save(): Promise<void> {
     if (await gov.proposeDescription(draft.trim())) {
@@ -121,86 +124,36 @@
     {#if notice}<p class="how">{notice}</p>{/if}
     {#if tab === 'decisions'}
       <section class="decisions" aria-label="Decisions">
-        <div class="group-head">
-          <h3>Open decisions</h3>
-          <span>{gov.open.length}</span>
-        </div>
         {#if !gov.loaded}
           <p class="empty-card">Loading…</p>
-        {:else if gov.open.length === 0}
-          <p class="empty-card">No open decisions.</p>
-        {:else}
-          <div class="decision-list">
-            {#each gov.open as item (item.id)}
-              <article class="decision-card open">
-                <div class="decision-row">
-                  <strong>{describeDecision(item, memberName)}</strong>
-                  <span>{item.required} yes needed · {APPROVAL_PERCENT}%</span>
-                </div>
-                <div class="decision-row">
-                  <span>
-                    {[`${item.yes} yes · ${item.no} no`, item.myVote && `you voted ${item.myVote}`]
-                      .filter(Boolean)
-                      .join(' · ')}
-                  </span>
-                  <span>{item.proposer} · {relativeCompact(item.createdAt)}</span>
-                </div>
-                {#if isMember && item.myVote === null}
-                  <div class="vote-row">
-                    <button
-                      type="button"
-                      disabled={gov.busy}
-                      onclick={() => void gov.vote(item.id, 'Yes')}>Yes</button
-                    >
-                    <button
-                      type="button"
-                      disabled={gov.busy}
-                      onclick={() => void gov.vote(item.id, 'No')}>No</button
-                    >
-                  </div>
-                {:else if !isMember}
-                  <p class="vote-note">Members vote on this. Join to take part.</p>
-                {/if}
-              </article>
-            {/each}
-          </div>
+        {:else if gov.open.length === 0 && gov.past.length === 0}
+          <p class="empty-card">No decisions yet.</p>
         {/if}
-
-        <div class="group-head">
-          <h3>Past decisions</h3>
-          <span>{gov.past.length}</span>
-        </div>
-        {#if gov.past.length === 0}
-          <p class="empty-card">No past decisions yet.</p>
-        {:else}
-          <div class="decision-list">
-            {#each gov.past as item (item.id)}
-              <article
-                class="decision-card"
-                class:approved={item.status === 'Passed'}
-                class:rejected={item.status !== 'Passed'}
-              >
-                <div class="decision-row">
-                  <strong>{describeDecision(item, memberName)}</strong>
-                  <span>{item.status === 'Passed' ? 'Passed' : 'Rejected'}</span>
-                </div>
-                <div class="decision-row">
-                  <span>{item.yes} yes · {item.no} no</span>
-                  <span>{[item.proposer, dateOf(item.closedAt)].filter(Boolean).join(' · ')}</span>
-                </div>
-              </article>
-            {/each}
-          </div>
+        {#if gov.open.length > 0}
+          <h3 class="decisions-head">Open</h3>
+          {#each gov.open as item (item.id)}
+            <ScopeDecisionCard
+              {item}
+              {memberName}
+              busy={gov.busy}
+              onVote={isMember && item.myVote === null
+                ? (choice) => void gov.vote(item.id, choice)
+                : undefined}
+            />
+          {/each}
+          {#if !isMember}<p class="vote-note">Members vote on these. Join to take part.</p>{/if}
+        {/if}
+        {#if gov.past.length > 0}
+          <h3 class="decisions-head">Past</h3>
+          {#each gov.past as item (item.id)}<ScopeDecisionCard {item} {memberName} />{/each}
         {/if}
       </section>
     {:else}
-      <section class="picture-row">
-        <span class="scope-avatar" style="--avatar-size: 64px" aria-hidden="true">
-          <SurfaceIcon icon={kind} size="md" />
-        </span>
-        <div class="picture-copy">
-          <span>Shown on cards and at the top of the page.</span>
-        </div>
+      <section class="scope-sheet-art" aria-hidden="true">
+        <div class="scope-cover"></div>
+        <span class="scope-avatar"
+          >{#if kind === 'channel'}#{:else}<SurfaceIcon icon={kind} size="md" />{/if}</span
+        >
       </section>
 
       <label class="field">
@@ -210,24 +163,25 @@
       </label>
       <label class="field">
         <span>Description</span>
-        <textarea bind:value={draft} rows="4" maxlength="2000" disabled={!canEdit}></textarea>
+        <textarea bind:value={draft} rows="3" maxlength="2000" disabled={!canEdit}></textarea>
       </label>
 
-      <p class="how">
-        {#if direct}
-          You're an organizer, so changes apply straight away.
-        {:else if organized}
-          Read only. Organizers ({organizerNames.join(', ')}) look after these settings.
-        {:else}
-          Collaborative: changes go to a member vote ({APPROVAL_PERCENT}% yes, with quorum based on
-          members).
-        {/if}
-      </p>
-
-      {#if canEdit}
-        <button class="primary" type="button" disabled={gov.busy || !changed} onclick={save}>
-          {direct ? 'Save' : 'Propose change'}
-        </button>
+      <div class="scope-rule-strip">
+        <ToolbarIcon name="people" />
+        <span>{rule}</span>
+        <button type="button" aria-expanded={how} onclick={() => (how = !how)}>How</button>
+      </div>
+      {#if how}
+        <p class="how">
+          {#if direct}
+            You're an organizer, so changes apply straight away.
+          {:else if organized}
+            Organizers ({organizerNames.join(', ')}) look after these settings.
+          {:else}
+            Collaborative: changes go to a member vote ({APPROVAL_PERCENT}% yes, with quorum based
+            on members).
+          {/if}
+        </p>
       {/if}
 
       {#if isPrivate}
@@ -247,4 +201,13 @@
       {/if}
     {/if}
   </div>
+  {#snippet footer()}
+    {#if canEdit && tab === 'settings'}
+      <div class="sheet-actions">
+        <button class="sheet-submit" type="button" disabled={gov.busy || !changed} onclick={save}>
+          {direct ? 'Save' : 'Propose change'}
+        </button>
+      </div>
+    {/if}
+  {/snippet}
 </OverlaySheet>

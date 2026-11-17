@@ -1,0 +1,219 @@
+/* A channel's or community's Settings, Decisions and Vote sheets (Channel Pictures mockups
+   §2–3): the cover band and mark on top as in Edit profile, one soft line saying who decides,
+   and each decision as a card with a bar. Sheets are portaled, so rules use the doubled root
+   class. Overrides of the ported scopes.css. */
+.overlay-root.overlay-root.scope-settings .settings-body {
+  gap: 14px;
+}
+
+.overlay-root.overlay-root.scope-settings .scope-sheet-art {
+  position: relative;
+  height: 128px;
+}
+
+.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-cover {
+  height: 92px;
+  border-radius: 16px;
+  background: linear-gradient(
+    120deg,
+    var(--brand-soft),
+    color-mix(in srgb, var(--text-main) 10%, transparent)
+  );
+}
+
+.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-avatar {
+  position: absolute;
+  bottom: 0;
+  left: 16px;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border: 4px solid var(--panel);
+  border-radius: 20px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.overlay-root.overlay-root.scope-settings .field input,
+.overlay-root.overlay-root.scope-settings .field textarea {
+  border: none;
+  border-radius: 14px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.overlay-root.scope-settings .scope-rule-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.overlay-root.overlay-root.scope-settings .scope-rule-strip span {
+  flex: 1;
+}
+
+.overlay-root.overlay-root.scope-settings .scope-rule-strip .toolbar-icon {
+  flex: none;
+  width: 18px;
+  height: 18px;
+}
+
+.overlay-root.overlay-root.scope-settings .scope-rule-strip button {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.overlay-root.overlay-root.scope-settings .decisions {
+  gap: 12px;
+}
+
+.overlay-root.overlay-root.scope-settings .decisions-head {
+  margin: 4px 0 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* A decision: a soft-bordered card with its tag, the new text, a bar and one line. */
+.overlay-root.overlay-root .decision-card {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border: 1px solid var(--panel-border);
+  border-radius: 18px;
+  background: var(--panel);
+}
+
+.overlay-root.overlay-root .decision-card .decision-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.overlay-root.overlay-root .decision-card .decision-top strong {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.overlay-root.overlay-root .decision-card .decision-tag {
+  flex: none;
+  padding: 2px 9px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.overlay-root.overlay-root .decision-card.open .decision-tag {
+  background: color-mix(in srgb, #e6b325 22%, transparent);
+  color: color-mix(in srgb, #8a5a00 80%, var(--text-main));
+}
+
+.overlay-root.overlay-root .decision-card.rejected .decision-tag {
+  background: color-mix(in srgb, var(--danger) 13%, transparent);
+  color: var(--danger);
+}
+
+.overlay-root.overlay-root .decision-card .decision-text,
+.overlay-root.overlay-root .decision-card .decision-line {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.overlay-root.overlay-root .decision-card .decision-text {
+  color: var(--text-main);
+  font-size: 14px;
+}
+
+.overlay-root.overlay-root .decision-card .decision-bar {
+  height: 6px;
+  overflow: hidden;
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--text-soft) 22%, transparent);
+}
+
+.overlay-root.overlay-root .decision-card .decision-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 6px;
+  background: var(--brand);
+}
+
+.overlay-root.overlay-root .decision-card .decision-choices {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.overlay-root.overlay-root .decision-card .decision-choices button {
+  height: 44px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.overlay-root.overlay-root .decision-card .decision-choices .yes {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.overlay-root.overlay-root .decision-card .decision-choices button.chosen {
+  box-shadow: inset 0 0 0 2px var(--text-main);
+}
+
+.overlay-root.overlay-root .decision-card .decision-choices button:disabled:not(.chosen) {
+  opacity: 0.45;
+}
+
+.overlay-root.overlay-root.scope-vote .vote-body {
+  position: relative;
+  padding-top: 4px;
+}
+
+/* "1 of 1" at the right, just above the card. */
+.overlay-root.overlay-root.scope-vote .vote-count {
+  justify-self: end;
+  margin: -4px 0 -4px;
+  color: var(--text-soft);
+  font-size: 15px;
+}
+
+.overlay-root.overlay-root.scope-vote .voted {
+  margin: 0;
+  color: var(--brand-strong);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+/* The page: the Vote pill's arrow. */
+.shell .scope-header .vote-fab-arrow {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
