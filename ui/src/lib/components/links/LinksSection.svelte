@@ -65,7 +65,8 @@
         {@const target = item.create.target}
         <LinkCard
           title={target.title}
-          metaLine={`${target.mode === 'event' ? 'Event' : 'Project'} · linked ${shortDate(item.create.createdAt)}`}
+          metaLine={`${target.mode === 'event' ? 'Event' : 'Project'} · linked ${shortDate(item.create.createdAt / 1000)}`}
+          icon={target.mode === 'event' ? 'event' : 'cube'}
           voteLine={item.sever ? 'A vote to end this link is open' : null}
           projectId={target.id}
           expanded={!!expanded[item.id]}

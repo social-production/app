@@ -260,3 +260,7 @@
 .shell .links-tab .request-list .link-vote .vote-button:not(.yes) {
   background: var(--panel);
 }
+
+.shell .links-tab .link-card .identity.round {
+  border-radius: 50%;
+}

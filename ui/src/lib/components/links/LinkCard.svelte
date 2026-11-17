@@ -4,6 +4,8 @@
   import { resolve } from '$app/paths';
 
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
 
   import '#lib/components/styles/links.css';
 
@@ -21,6 +23,8 @@
     outcomeTone?: 'approved' | 'blocked' | 'pending' | null;
     /** The counterpart's project page. */
     projectId: string;
+    /** The row's glyph: the project's kind, or a round link for a past one (Polish Pass §6). */
+    icon?: SurfaceIconId | 'link';
     expanded: boolean;
     domId: string;
     onToggle: () => void;
@@ -34,6 +38,7 @@
     outcomeLabel = null,
     outcomeTone = null,
     projectId,
+    icon = 'cube',
     expanded,
     domId,
     onToggle,
@@ -51,7 +56,9 @@
     aria-controls={detailsId}
     onclick={onToggle}
   >
-    <span class="identity" aria-hidden="true"><SurfaceIcon icon="project" size="sm" /></span>
+    <span class="identity" class:round={icon === 'link'} aria-hidden="true">
+      {#if icon === 'link'}<ToolbarIcon name="link" />{:else}<SurfaceIcon {icon} size="sm" />{/if}
+    </span>
     <span class="link-row-copy">
       <strong class="card-title">{title}</strong>
       <span class="row-meta">{metaLine}</span>
