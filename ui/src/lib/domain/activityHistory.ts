@@ -1,3 +1,4 @@
+import { inZone } from './zone.ts';
 import { committedOf, minimumOf, type Activity } from './activities.ts';
 
 /**
@@ -119,5 +120,5 @@ export function endedAgo(micros: number, now = Date.now()): string {
   if (hours < 24) return `${hours}h ago`;
   const days = Math.round(hours / 24);
   if (days < 7) return `${days}d ago`;
-  return new Date(micros / 1000).toLocaleDateString();
+  return new Date(micros / 1000).toLocaleDateString(undefined, inZone({}));
 }

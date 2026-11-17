@@ -1,3 +1,4 @@
+import { displayZone, wallMicros } from '#lib/domain/zone.ts';
 import { minutesOf, type AvailabilityRule } from '#lib/domain/availability.ts';
 import { preferredTime } from '#lib/domain/serviceRequests.ts';
 import {
@@ -8,10 +9,10 @@ import {
 } from '#lib/services/activities.ts';
 import { explain } from '#lib/services/errors.ts';
 
-const micros = (local: string): number => Date.parse(local) * 1000;
+const micros = (local: string): number => wallMicros(local);
 
 /** The browser's IANA zone (web's `getDisplayTimezone` until the app has that setting). */
-export const browserZone = (): string => Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+export const browserZone = (): string => displayZone();
 
 /**
  * A personal service's listed availability (web's "Add availability" sheet, ADR 0077): one-off

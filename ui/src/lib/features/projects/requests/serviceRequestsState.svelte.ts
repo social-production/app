@@ -1,3 +1,4 @@
+import { wallMicros } from '#lib/domain/zone.ts';
 import { fitsOpenSlot, type Slot } from '#lib/domain/availability.ts';
 import { toLocalInput } from '#lib/domain/helpRequests.ts';
 import type { RequestMode, RequestSettings } from '#lib/domain/projects.ts';
@@ -36,7 +37,7 @@ const emptyForm = (): RequestForm => ({
 
 const local = (micros: number): string => toLocalInput(new Date(micros / 1000));
 
-const micros = (local: string): number | null => (local ? Date.parse(local) * 1000 : null);
+const micros = (local: string): number | null => (local ? wallMicros(local) : null);
 
 /**
  * A personal service's requests (ADR 0076): the creator reviews every request sent to it;

@@ -10,6 +10,7 @@ import {
   type PlaceQuickPick,
   type PlaceValue,
 } from './places.ts';
+import { wall, wallMicros } from './zone.ts';
 import type { PlanView } from './plans.ts';
 
 export interface RoleDraft {
@@ -160,8 +161,8 @@ export function activityQuickPicks(
 /** web's `activityScheduleValidationMessage`. */
 export function scheduleProblem(form: ActivityForm, now = Date.now()): string | null {
   if (!form.scheduledAt.trim() || !form.endsAt.trim()) return null;
-  const start = new Date(form.scheduledAt).getTime();
-  const end = new Date(form.endsAt).getTime();
+  const start = wallMicros(form.scheduledAt) / 1000;
+  const end = wallMicros(form.endsAt) / 1000;
   if (Number.isNaN(start) || Number.isNaN(end)) return 'Choose valid start and finish times.';
   if (end <= start) return 'Finish must be after the start time.';
   if (start < now) return 'Start time must be in the future.';
@@ -189,7 +190,7 @@ export function stepReady(type: ActivityStepType, form: ActivityForm): boolean {
 }
 
 /** web's `localDateTimeValue`: now, as a `datetime-local` minimum. */
-export function localNow(date = new Date()): string {
+export function localNow(date = wall(Date.now())): string {
   const pad = (n: number): string => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }

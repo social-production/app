@@ -1,3 +1,4 @@
+import { fromWall, wall } from './zone.ts';
 import { toLocalInput } from './helpRequests.ts';
 import type { RequestSettings } from './projects.ts';
 
@@ -37,14 +38,14 @@ export const STATUS_LABELS: Record<RequestStatus, string> = {
 
 export const isPending = (status: RequestStatus): boolean => status === 'open';
 
-/** web's `addPreferredTime`: tomorrow 18:00–19:00 in the browser's zone. */
+/** web's `addPreferredTime`: tomorrow 18:00–19:00 in the Display timezone. */
 export function preferredTime(now = new Date()): { scheduledAt: string; endsAt: string } {
-  const start = new Date(now);
+  const start = wall(now.getTime());
   start.setDate(start.getDate() + 1);
   start.setHours(18, 0, 0, 0);
   const end = new Date(start);
   end.setHours(19);
-  return { scheduledAt: toLocalInput(start), endsAt: toLocalInput(end) };
+  return { scheduledAt: toLocalInput(fromWall(start)), endsAt: toLocalInput(fromWall(end)) };
 }
 
 /** web's `_ensure_requests_enabled`: why these settings refuse a request with or without a

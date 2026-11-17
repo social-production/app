@@ -14,6 +14,7 @@
     type ToneOf,
   } from '#lib/domain/activityCalendar.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
+  import { wall } from '#lib/domain/zone.ts';
 
   import '#lib/components/styles/activities.css';
 
@@ -65,7 +66,7 @@
   const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const label = $derived(month.toLocaleDateString([], { month: 'long', year: 'numeric' }));
   const zone = zoneOf(new Date());
-  const today = isoOf(new Date());
+  const today = isoOf(wall(Date.now()));
   const agendaDay = $derived(
     p.selectedDay ||
       (days.some((d) => d.iso === today) ? today : '') ||

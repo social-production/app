@@ -1,10 +1,13 @@
 import { signupTone, type Activity } from './activities.ts';
 import { localNow } from './activityForm.ts';
+import { wall } from './zone.ts';
+
+const w = (micros: number): number => wall(micros / 1000).getTime();
 
 /**
  * web's ProjectActivityCalendarCard month grid: 6 weeks from Monday, each day with its
- * activities as bars on a 24-hour track, overlapping ones side by side. Browser time (web uses
- * its Display timezone setting, which the app doesn't have yet).
+ * activities as bars on a 24-hour track, overlapping ones side by side. Dates here are wall
+ * clocks in the Display timezone (`zone.ts` `wall`); `w` moves an activity's instant there.
  */
 export interface DayBar {
   id: string;
@@ -41,10 +44,10 @@ function bars(iso: string, activities: Activity[], now: number, toneOf?: ToneOf)
   const dayEnd = new Date(dayStart);
   dayEnd.setDate(dayEnd.getDate() + 1);
   const ranged = activities
-    .filter((a) => a.startsAt / 1000 < dayEnd.getTime() && a.endsAt / 1000 > dayStart.getTime())
+    .filter((a) => w(a.startsAt) < dayEnd.getTime() && w(a.endsAt) > dayStart.getTime())
     .map((a) => {
-      const from = new Date(Math.max(a.startsAt / 1000, dayStart.getTime()));
-      const to = new Date(Math.min(a.endsAt / 1000, dayEnd.getTime()));
+      const from = new Date(Math.max(w(a.startsAt), dayStart.getTime()));
+      const to = new Date(Math.min(w(a.endsAt), dayEnd.getTime()));
       const start = (from.getTime() - dayStart.getTime()) / 60_000;
       const end = Math.max((to.getTime() - dayStart.getTime()) / 60_000, start + 30);
       const ended = !a.rolesOpen || a.endsAt / 1000 <= now;
@@ -103,9 +106,10 @@ export const monthStart = (date: Date): Date => new Date(date.getFullYear(), dat
  * else the next upcoming activity's, else the first's. */
 export function defaultMonth(activities: Activity[], now = Date.now(), day?: string): Date {
   if (day) return monthStart(new Date(`${day}T12:00`));
-  const starts = activities.map((a) => a.startsAt / 1000).sort((x, y) => x - y);
-  const next = starts.find((t) => t >= now) ?? starts[0];
-  return monthStart(next === undefined ? new Date(now) : new Date(next));
+  const starts = activities.map((a) => w(a.startsAt)).sort((x, y) => x - y);
+  const today = wall(now).getTime();
+  const next = starts.find((t) => t >= today) ?? starts[0];
+  return monthStart(new Date(next ?? today));
 }
 
 /** The week strip's first day (ADR 0102): the picked or first plan day (`day`), else the next
@@ -113,10 +117,10 @@ export function defaultMonth(activities: Activity[], now = Date.now(), day?: str
 export function defaultDay(activities: Activity[], now = Date.now(), day?: string): Date {
   if (day) return new Date(`${day}T12:00`);
   const next = activities
-    .map((a) => a.startsAt / 1000)
+    .map((a) => w(a.startsAt))
     .sort((x, y) => x - y)
-    .find((t) => t >= now);
-  return new Date(next ?? now);
+    .find((t) => t >= wall(now).getTime());
+  return new Date(next ?? wall(now).getTime());
 }
 
 /** The seven days (Monday first) of `days` that hold `iso`. */
@@ -134,7 +138,7 @@ export function weekOf(days: CalendarDay[], iso: string): CalendarDay[] {
 export function defaultTimes(
   iso: string | null,
   activities: Activity[],
-  now = new Date(),
+  now = wall(Date.now()),
 ): { scheduledAt: string; endsAt: string } {
   const nextHour = (): { scheduledAt: string; endsAt: string } => {
     const s = new Date(now);
@@ -144,12 +148,12 @@ export function defaultTimes(
   };
   if (!iso) return nextHour();
   const first = activities
-    .filter((a) => isoOf(new Date(a.startsAt / 1000)) === iso)
+    .filter((a) => isoOf(new Date(w(a.startsAt))) === iso)
     .sort((x, y) => x.startsAt - y.startsAt)[0];
   if (first) {
     return {
-      scheduledAt: localNow(new Date(first.startsAt / 1000)),
-      endsAt: localNow(new Date(first.endsAt / 1000)),
+      scheduledAt: localNow(new Date(w(first.startsAt))),
+      endsAt: localNow(new Date(w(first.endsAt))),
     };
   }
   if (new Date(`${iso}T18:00`).getTime() < now.getTime()) return nextHour();
