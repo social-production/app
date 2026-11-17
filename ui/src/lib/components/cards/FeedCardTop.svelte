@@ -63,6 +63,7 @@
 
   import '#lib/components/styles/cards.css';
 
+  // Feed rows keep the bold channel name alone; other tag lists show its picture (owner).
   const pictureOf = getContext<ScopePictureOf | undefined>(SCOPE_PICTURES);
 </script>
 
@@ -73,9 +74,10 @@
       {#if index > 0}<span class="tag-sep" aria-hidden="true">,</span>{/if}
       <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- tagHref resolves -->
       <a class="tag-plain" href={tagHref(tag)}
-        >{#if icon}<ScopeGlyph {icon} imageUrl={pictureOf?.(tag.slug) ?? null} />{/if}<span
-          >{tag.label}</span
-        ></a
+        >{#if icon}<ScopeGlyph
+            {icon}
+            imageUrl={lead ? null : (pictureOf?.(tag.slug) ?? null)}
+          />{/if}<span>{tag.label}</span></a
       >
     {/each}
     {#if hidden > 0}
