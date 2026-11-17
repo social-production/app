@@ -204,6 +204,18 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (9:20 pm Melbourne, 2026-11-17, UX session)
+- **Live since ~9:15 pm:** PR #196 (guests' "Sign in" in chat bars is a pill that fits the
+  bar, owner) and PR #197 (@mention notices are sent from project, direct and group chats;
+  ADR 0109 wording). Live smoke: /, /platform, /search, a project's chat as a guest, 0 page
+  errors. `mentions.mjs` and `chat.mjs` passed locally before merging.
+- **In flight: PR #198 `claude/region-map-polish`** (owner, 9 pm): Region sheet distance as
+  chips plus "Other distance"; map `RadiusCombobox` is one button (no keyboard) with a Custom
+  row; plainer location errors (in the sheet, not behind it); steady place search (no blink,
+  stale answers dropped, duplicates removed); map fullscreen covers the whole screen and uses
+  the browser's fullscreen. `map.mjs` and `region.mjs` pass locally. Merge when green.
+- Next: ADR 0095's moderator merge on #platform software projects, then the audits.
+
 ### Where things stand (8:30 pm Melbourne, 2026-11-17, UX session)
 - **Live since 8:28 pm:** PR #193 (feed rows show the channel name without its picture, owner's
   call) and PR #194 (Scope Filters and Empty States mockups, https://claude.ai/artifact/6HSJrceovwUMCY7r6NyWBv,
@@ -215,8 +227,7 @@ nav and Topbar, and removes `SignedOutIntro`.
   since 1d2cc78) and `platform.mjs` (Moderators rows without a profile read "Unnamed").
 - **Not merged anywhere yet:** `claude/notice-mentions` (parity, 16 Nov: @mention notices; the
   app shows mention notices but nothing sends them) and the ADR 0109 wording on
-  `claude/scope-pictures` (rows read the charter, not a listing mirror). Next: those, then ADR
-  0095's moderator merge and the audits.
+  `claude/scope-pictures` (rows read the charter, not a listing mirror). Both merged in #197.
 
 ### Where things stand (6:15 pm Melbourne, 2026-11-17, UX session)
 - **ADR 0109 is live.** PR #190 merged 4:49 pm; directory and project networks reset, live by
