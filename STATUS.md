@@ -204,6 +204,57 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Before the FastAPI site can shut down, and screens still to modernise (owner asked, 18 Nov 1:30 am)
+**Must do before parity (shutting down Railway's FastAPI site):**
+1. **Settings rows (PARITY.md list item 2):** separate Public and Personal feeds, a display
+   timezone (also web's timezone selects in service bookings), and Privacy's three "hide …
+   from non-followers / personal feeds" switches.
+2. **Push notifications, the rest (ADR 0108):** notices exist for chat replies and
+   @mentions. Still to add: "Replied to your project", phase votes and results, follows,
+   invites and shares, roles, requests, bot reviews and plan leading. Then desktop OS
+   notifications (the Tauri plugin), and a real Web Push test on a phone.
+3. **Russian (PARITY.md item 4):** needs an ADR first (string catalogue, how the language is
+   chosen). It touches every screen, so do it once the UX branches have merged.
+4. **Compare the signed-in screens not compared yet** with web's source (PARITY.md "Not
+   compared yet").
+5. **ADR 0095's remainder:** moderators' merge capability on #platform software projects.
+   #platform voting by any Full member shipped with ADR 0109.
+6. **Audits:**
+   - Platform / Moderators, reporting and profile photos, end to end on live.
+   - Whether plan rating and vote errors reach the user.
+7. **Owner-only:** roll the Railway environment variables, then switch off the FastAPI
+   services. Nobody needs migrating: the FastAPI site is a prototype and gets wiped.
+- Not parity, but the plan after it:
+  - M7 cutover: seedless (docs/plans/SEEDLESS.md), and Android/iOS builds;
+  - files in project chats;
+  - code health (UX.md):
+    - one "kind profile" per type;
+    - split the files near 300 lines;
+    - one resolved-link helper.
+
+**Screens still to modernise.** "Done" means restyled since the 13 Nov screen audit:
+- **Done:**
+  - feed rows and filters, chats (Messenger), detail pages, profile, sign-up and the opening
+    screen, every sheet's dock;
+  - Settings, People, Search, Feedback, Links, History, channel and community pages, create
+    flows, Invites;
+  - map pins, the tap card and feed icons (PR #203).
+- **Map Redesign, the approved items not built yet:**
+  - controls (zoom hidden on phones, fullscreen alone at top right, My location above the
+    capsule, the capsule reading "Place · distance" + Filters + List);
+  - "Upcoming / Include past" moved into Filters (the calendar button goes);
+  - the loading state (a loading line, pulsing ghost pins, skeleton list);
+  - the "N places" count pill.
+- **No mockup yet (mockup first):**
+  - the right rail (owner: "later");
+  - the Notifications page;
+  - About;
+  - the Platform page and its Moderators board;
+  - the project phase screens: the Activity phase agenda, the software pull-request flow,
+    service availability/booking calendars;
+  - the plan and vote wizards (the plan editor and phase moves);
+  - Settings > Devices and Account.
+
 ### Where things stand (1:30 am Melbourne, 2026-11-18, UX session)
 - **PR `claude/map-sheet-splash`** (owner's notes, 17 Nov evening): the opening screen is a
   static splash in `app.html` that `features/shell/bootSplash.ts` fades once the first
@@ -218,8 +269,13 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Melbourne demo content on live** (`tests/e2e/demo-melbourne.mjs`, places picked from the
   geocoder so they have pins): 9 proposals, 3 help requests, an event (Edinburgh Gardens) and
   a project (Abbotsford Convent). `DEMO_SKIP` skips parts already made.
+- **PR #203 `claude/map-pins`** (in CI, 1:30 am 18 Nov): pins by kind with the feed's
+  symbols (`domain/kindGlyphs.ts`, `--kind-*` tokens), counted clusters, same-spot pins share
+  one counted pin (`maps/stacking.ts` no longer nudges them apart), a tap opens `MapPeek`,
+  feed icons are the bold kind tile, the searched place is a small dot under the pins.
+  `map.mjs`, `region.mjs` pass locally.
 - **Map Redesign mockup approved** (https://claude.ai/artifact/3yaqAngXMWWStXdDLFEiDN, owner
-  "love the map redesign"): next build it all (pins by kind with symbols, clusters, tap card,
+  "love the map redesign"): the rest still to build (pins by kind with symbols, clusters, tap card,
   controls, "Upcoming / Include past" in Filters, loading, list cards), and make feed card
   icons use the same bolder kind colours and symbols.
 
