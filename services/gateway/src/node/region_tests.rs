@@ -50,6 +50,8 @@ fn card(id: &str, mode: &str, place: Option<CardPlace>) -> ProjectCard {
         place,
         activities: Vec::new(),
         online: false,
+        picture: None,
+        cover: None,
     }
 }
 

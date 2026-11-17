@@ -35,6 +35,8 @@ fn card(id: &str, mode: &str, place: Option<(f64, f64)>) -> ProjectCard {
         }),
         activities: Vec::new(),
         online: false,
+        picture: None,
+        cover: None,
     }
 }
 

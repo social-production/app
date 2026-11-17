@@ -29,6 +29,8 @@ fn card(title: &str, demand: u32, at: i64) -> ProjectCard {
         place: None,
         activities: Vec::new(),
         online: false,
+        picture: None,
+        cover: None,
     }
 }
 

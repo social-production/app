@@ -1,7 +1,7 @@
 //! What the archivist reads to make a feed card (mirrors of the zomes' views) and the card it
 //! makes. A help request's card also carries its time and sign-ups (ADR 0067).
 
-use holo_hash::{ActionHashB64, AgentPubKeyB64};
+use holo_hash::{ActionHashB64, AgentPubKeyB64, EntryHashB64};
 use holochain::prelude::*;
 use serde::{Deserialize, Serialize};
 
@@ -77,6 +77,11 @@ pub struct Charter {
     /// ADR 0078; older charters have none.
     #[serde(default)]
     pub place: Option<super::markers::PlaceMirror>,
+    /// ADR 0109; only channels and communities have them.
+    #[serde(default)]
+    pub picture: Option<EntryHash>,
+    #[serde(default)]
+    pub cover: Option<EntryHash>,
 }
 
 impl ProjectView {
@@ -166,6 +171,10 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         .and_then(|c| c.place.as_ref());
     let place = mirror.and_then(super::markers::PlaceMirror::physical);
     let online = mirror.is_some_and(|m| m.online);
+    let charter = project.as_ref().and_then(|p| p.charter.as_ref());
+    let art = |h: Option<&EntryHash>| h.map(|h| EntryHashB64::from(h.clone()).to_string());
+    let picture = art(charter.and_then(|c| c.picture.as_ref()));
+    let cover = art(charter.and_then(|c| c.cover.as_ref()));
     // The project's own network is the source of truth once decisions change it (ADR 0033).
     if let Some(p) = &project {
         if let Some(c) = &p.charter {
@@ -213,5 +222,7 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         place,
         activities: Vec::new(),
         online,
+        picture,
+        cover,
     }
 }
