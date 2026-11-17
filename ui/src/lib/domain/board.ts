@@ -82,3 +82,9 @@ export function boardOrder(
 
 /** A project tagged #platform takes a network vote: any Full member can vote (ADR 0095). */
 export const isNetworkVote = (tags: readonly string[]): boolean => tags.includes('#platform');
+
+/** Who may vote on a space's proposals: its members, and on a #platform project any Full
+ * member (ADR 0109; the zome refuses anyone else's vote with its reason). */
+export const canVoteOn = (
+  p: { amMember: boolean; charter: { tags: string[] } | null } | undefined,
+): boolean => !!p?.amMember || isNetworkVote(p?.charter?.tags ?? []);

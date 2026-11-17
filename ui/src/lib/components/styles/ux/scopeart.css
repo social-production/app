@@ -1,29 +1,29 @@
 /* ADR 0109: the cover and picture themselves, and the controls that change them. */
 .shell .scope-hero .scope-cover,
-.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-cover {
+.overlay-root.overlay-root .scope-sheet-art .scope-cover {
   background-position: center;
   background-size: cover;
 }
 
 .shell .scope-hero .scope-avatar,
-.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-avatar {
+.overlay-root.overlay-root .scope-sheet-art .scope-avatar {
   overflow: hidden;
 }
 
 .shell .scope-hero .scope-avatar img,
-.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-avatar img {
+.overlay-root.overlay-root .scope-sheet-art .scope-avatar img {
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.overlay-root.overlay-root.scope-settings .scope-sheet-art .scope-cover {
+.overlay-root.overlay-root .scope-sheet-art .scope-cover {
   position: relative;
   display: grid;
   place-items: center;
 }
 
-.overlay-root.overlay-root.scope-settings .art-change {
+.overlay-root.overlay-root .art-change {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -39,13 +39,13 @@
   cursor: pointer;
 }
 
-.overlay-root.overlay-root.scope-settings .art-change .toolbar-icon,
-.overlay-root.overlay-root.scope-settings .art-camera .toolbar-icon {
+.overlay-root.overlay-root .art-change .toolbar-icon,
+.overlay-root.overlay-root .art-camera .toolbar-icon {
   width: 16px;
   height: 16px;
 }
 
-.overlay-root.overlay-root.scope-settings .art-camera {
+.overlay-root.overlay-root .art-camera {
   position: absolute;
   bottom: 0;
   left: 62px;
@@ -61,7 +61,7 @@
   cursor: pointer;
 }
 
-.overlay-root.overlay-root.scope-settings .art-new {
+.overlay-root.overlay-root .art-new {
   position: absolute;
   top: 8px;
   left: 8px;
@@ -73,7 +73,7 @@
   font-weight: 700;
 }
 
-.overlay-root.overlay-root.scope-settings .scope-avatar .art-new {
+.overlay-root.overlay-root .scope-avatar .art-new {
   top: auto;
   bottom: 2px;
   left: 50%;
@@ -82,7 +82,7 @@
   font-size: 10px;
 }
 
-.overlay-root.overlay-root.scope-settings .art-file {
+.overlay-root.overlay-root .art-file {
   display: none;
 }
 

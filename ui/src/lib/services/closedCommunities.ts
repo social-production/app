@@ -33,6 +33,7 @@ export async function createClosedCommunity(
   handle: string,
   description: string,
   organized: boolean,
+  art: { picture: string | null; cover: string | null } = { picture: null, cover: null },
 ): Promise<Scope> {
   const me = await myAgent();
   const seed = newPrivateEventSeed(me, organized);
@@ -45,6 +46,8 @@ export async function createClosedCommunity(
     location_label: '',
     phase: '',
     tags: [],
+    picture: art.picture ? stringToHash(art.picture) : null,
+    cover: art.cover ? stringToHash(art.cover) : null,
   });
   // Your other devices learn it from your inbox, as private events do (ADR 0061).
   await sendEventInvite(me, seed).catch(() => {});

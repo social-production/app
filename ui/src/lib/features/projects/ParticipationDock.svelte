@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { canVoteOn } from '#lib/domain/board.ts';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
@@ -34,7 +35,7 @@
   {@const charter = detail.project.charter}
   <DetailActionDock {active}>
     {#snippet vote()}
-      {#if project.amMember}
+      {#if canVoteOn(project)}
         <VoteDock
           proposals={votes}
           names={{ ...detail.names, ...detail.software.names }}
