@@ -192,12 +192,10 @@
   padding-top: 4px;
 }
 
-/* "1 of 1" at the right of the sheet's title row. */
+/* "1 of 1" at the right, just above the card. */
 .overlay-root.overlay-root.scope-vote .vote-count {
-  position: absolute;
-  top: -40px;
-  right: 20px;
-  margin: 0;
+  justify-self: end;
+  margin: -4px 0 -4px;
   color: var(--text-soft);
   font-size: 15px;
 }
