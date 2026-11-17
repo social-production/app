@@ -2,7 +2,9 @@
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
-  import { keyTag } from '#lib/domain/people.ts';
+  import PlaceStanding from '#lib/components/people/PlaceStanding.svelte';
+  import { clashingNames, pickerName } from '#lib/domain/personLine.ts';
+  import { cachedPerson } from '#lib/services/people.ts';
 
   /** New group's last step, as Telegram's: name the group, see who is in it, create it. */
   interface Props {
@@ -78,8 +80,8 @@
       <div class="person-row">
         <span class="person-face"><AvatarBadge size="md" name={person.name} /></span>
         <span class="person-copy">
-          <strong>{person.name}</strong>
-          <small>{keyTag(person.agent)}</small>
+          <strong>{pickerName(person, clashingNames(members))}</strong>
+          <small><PlaceStanding agent={person.agent} load={cachedPerson} /></small>
         </span>
       </div>
     {/each}

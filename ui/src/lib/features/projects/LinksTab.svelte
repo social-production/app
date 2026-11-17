@@ -4,7 +4,6 @@
   import LinksSection from '#lib/components/links/LinksSection.svelte';
   import LinksPast from '#lib/components/links/LinksPast.svelte';
   import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
-  import { LINKS_INTRO } from '#lib/domain/links.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
   import { LinksState } from './linksState.svelte.ts';
@@ -40,9 +39,8 @@
 </script>
 
 <section class="links-tab">
-  <header class="links-top">
-    <p class="links-intro">{LINKS_INTRO}</p>
-    {#if frame?.canPropose}
+  {#if frame?.canPropose}
+    <header class="links-top">
       <button
         class="propose-link-button"
         type="button"
@@ -51,8 +49,8 @@
           composing = true;
         }}>+ Propose a link</button
       >
-    {/if}
-  </header>
+    </header>
+  {/if}
 
   {#if venue && venue.toLowerCase() !== 'online'}
     <div class="links-venue"><PlaceRow place={venue} /></div>

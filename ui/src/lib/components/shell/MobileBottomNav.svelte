@@ -14,6 +14,8 @@
     tabs: Tab[];
     moreActive?: boolean;
     collapsed?: boolean;
+    /** Signed out: a Sign up pill in the middle of the bar (Detail Pages Cleanup §4). */
+    signUpHref?: ResolvedPathname | null;
     isActive: (href: string) => boolean;
     onMore: () => void;
     onNavigate?: () => void;
@@ -23,6 +25,7 @@
     tabs,
     moreActive = false,
     collapsed = false,
+    signUpHref = null,
     isActive,
     onMore,
     onNavigate,
@@ -55,6 +58,10 @@
     </a>
     <!-- eslint-enable svelte/no-navigation-without-resolve -->
   {/each}
+  {#if signUpHref}
+    <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the shell -->
+    <a class="bottom-nav-signup" href={signUpHref} onclick={onNavigate}>Sign up</a>
+  {/if}
 
   <button
     aria-label="More"
@@ -141,6 +148,19 @@
     padding: 0 16px;
   }
 
+  .bottom-nav-signup {
+    flex: 1.4 1 0;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--brand);
+    color: var(--on-brand, var(--page-bg));
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .bottom-nav-signup:active,
   .bottom-nav-item:active {
     transform: scale(0.94);
   }

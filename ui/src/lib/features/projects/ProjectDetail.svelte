@@ -4,10 +4,10 @@
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
-  import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
   import { removedLabel } from '#lib/domain/moderation.ts';
   import { isEvent, isPrivateSeed, type DetailTabId, type Project } from '#lib/domain/projects.ts';
+  import { eventInvites, type EventInvite } from '#lib/services/eventInvites.ts';
   import { placeSearch } from '#lib/services/locations.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
 
@@ -17,8 +17,8 @@
 
   import ContextPanel from './ContextPanel.svelte';
   import { DetailState } from './detailState.svelte.ts';
-  import EventMembersSheet from './EventMembersSheet.svelte';
   import LinksTab from './LinksTab.svelte';
+  import MembersPage from './members/MembersPage.svelte';
   import { ModerationLoader } from './moderationState.svelte.ts';
   import ParticipationDock from './ParticipationDock.svelte';
   import ParticipationPanel from './ParticipationPanel.svelte';
@@ -81,6 +81,16 @@
 
   $effect(() => {
     void detail.open();
+  });
+
+  // An event's Invited side (ADR 0111), read when the member list opens.
+  let invites = $state<EventInvite[]>([]);
+  $effect(() => {
+    if (sheet !== 'members' || !isEvent(detail.project?.charter?.mode)) return;
+    void eventInvites(id).then(
+      (found) => (invites = found),
+      () => undefined,
+    );
   });
 
   $effect(() => {
@@ -181,6 +191,7 @@
             moderation={moderation.value}
             onModeration={(next) => moderation.set(next)}
             onMembers={() => (sheet = 'members')}
+            onPhase={() => (tab = 'participation')}
           />
         </div>
         <div
@@ -192,8 +203,6 @@
           <ParticipationDock
             {detail}
             active={tab === 'participation'}
-            membersOpen={sheet === 'members'}
-            onOpenMembers={() => (sheet = 'members')}
             revealVote={detailsVote || planVote ? null : voteLink}
             onRevealDone={clearVoteLink}
           />
@@ -241,7 +250,6 @@
         {#if tab === 'context'}
           <ProjectDock
             {detail}
-            membersOpen={sheet === 'members'}
             onOpenMembers={() => (sheet = 'members')}
             onEdit={() => (sheet = 'edit')}
             onUpdate={() => (sheet = 'update')}
@@ -251,17 +259,8 @@
         {/if}
       </section>
 
-      {#if event}
-        <EventMembersSheet {detail} open={sheet === 'members'} onClose={() => (sheet = null)} />
-      {:else}
-        <PeopleSheet
-          open={sheet === 'members'}
-          title="Project members"
-          description="Members coordinate planning, updates, and activity together."
-          emptyCopy="No members listed yet."
-          people={detail.members}
-          onClose={() => (sheet = null)}
-        />
+      {#if sheet === 'members'}
+        <MembersPage {detail} invites={event ? invites : null} onClose={() => (sheet = null)} />
       {/if}
       <EditSheet
         open={sheet === 'edit'}

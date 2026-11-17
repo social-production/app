@@ -6,7 +6,7 @@
   import { standingLabel } from '#lib/components/people/standing.ts';
   import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
   import type { ChatSummary, ListPrefs } from '#lib/domain/messages.ts';
-  import { keyTag, type Person } from '#lib/domain/people.ts';
+  import type { Person } from '#lib/domain/people.ts';
   import { getPerson } from '#lib/services/people.ts';
 
   /**
@@ -95,15 +95,6 @@
     link.download = a.name;
     link.click();
   }
-
-  let copied = $state(false);
-  function copyKey(): void {
-    if (!partner) return;
-    void navigator.clipboard?.writeText(partner).then(
-      () => (copied = true),
-      () => undefined,
-    );
-  }
 </script>
 
 {#snippet tile(icon: string, label: string, run: () => void)}
@@ -165,18 +156,12 @@
           >
         {/if}
       </div>
-      {#if partner}
+      {#if partner && person?.profile?.bio}
+        <!-- Detail Pages Cleanup §5: no key row; the full key stays in Settings › Account. -->
         <div class="about-info">
-          {#if person?.profile?.bio}<div>
-              <span>Bio</span>
-              <p>{person.profile.bio}</p>
-            </div>{/if}
           <div>
-            <span>Profile key</span>
-            <p class="about-key">{keyTag(partner)}</p>
-            <button type="button" aria-label="Copy profile key" onclick={copyKey}
-              >{#if copied}Copied{:else}<ToolbarIcon name="copy" />{/if}</button
-            >
+            <span>Bio</span>
+            <p>{person.profile.bio}</p>
           </div>
         </div>
       {/if}

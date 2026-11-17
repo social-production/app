@@ -62,7 +62,7 @@ await createChannel(ann, channel);
 log('created a channel');
 await createProject(ann, title, channel);
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
-await ann.getByRole('button', { name: 'Leave project' }).waitFor();
+await ann.getByRole('button', { name: 'More actions' }).waitFor(); // joined: the ⋯ dock
 assert.equal((await ann.getByRole('button', { name: '1 members' }).count()), 1, 'creator is the first member');
 log('created; the creator is a member');
 const projectUrl = ann.url();
@@ -95,9 +95,10 @@ for (let i = 0; i < 20 && !(await ann.getByRole('button', { name: '2 members' })
   await ann.reload();
 }
 await ann.getByRole('button', { name: '2 members' }).click();
-await ann.locator('.people-sheet .person-row', { hasText: `bob_${stamp}` }).waitFor();
-await ann.getByRole('button', { name: 'Close' }).last().click();
-log('Ann sees Bob in the members sheet');
+const people = ann.getByRole('dialog', { name: 'People' });
+await people.locator('.member-row', { hasText: `bob_${stamp}` }).waitFor();
+await people.getByRole('button', { name: 'Back' }).click();
+log('Ann sees Bob on the People page');
 
 // web's "Share +" on the project page: send to Bob (a direct-chat message plus web's
 // `prj-share` notification), and "Create post" starts a post with the link.

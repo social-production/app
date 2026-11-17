@@ -1,7 +1,7 @@
 // M5c private events end to end (ADR 0061). A new person signs up; founder one creates an
 // invite-only, organizer-controlled event inviting them, with its plan up front, so the event
 // opens in Activity. The invitee finds it under Invites (left rail and notification), accepts
-// and lands on the event; founder one then promotes them in the members sheet.
+// and lands on the event; founder one then makes them an organiser on the People page.
 //   node tests/e2e/private-events.mjs http://localhost:4174
 import assert from "node:assert/strict";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -130,41 +130,33 @@ await guest.getByText("No invites waiting.").waitFor({ timeout: 60_000 });
 assert.equal(await rows().count(), 0, "no Invites row once answered");
 log("the invitee accepted and joined");
 
-// web's EventMembersPanel: founder one promotes the invitee from Members to Organizers.
+// The People page (Detail Pages Cleanup §6): founder one makes the invitee an organiser from
+// the row's ⋯, then removes them again.
 await ann.reload();
 await ann.getByRole("heading", { name: title }).waitFor({ timeout: 120_000 });
-const sheet = ann.locator(".people-sheet");
+const sheet = ann.getByRole("dialog", { name: "People" });
+const row = sheet.locator(".member-row", { hasText: guestName });
+const menu = async () => {
+  await row.getByRole("button", { name: `More for ${guestName}` }).click();
+  return row.getByRole("menu");
+};
 for (let i = 0; ; i++) {
+  await ann.getByRole("tab", { name: "Details" }).click(); // the people row lives there
   await ann.getByRole("button", { name: /^\d+ members$/ }).click();
-  await sheet.getByRole("heading", { name: "Organizers" }).waitFor();
-  if (await sheet.getByRole("button", { name: "Promote to organizer" }).count())
-    break;
+  await sheet.getByRole("heading", { name: /^Organisers/ }).waitFor();
+  if (await row.count()) break;
   if (i >= 20) throw new Error(`${guestName} never appeared under Members`);
-  await sheet.getByRole("button", { name: "Close" }).click();
+  await sheet.getByRole("button", { name: "Back" }).click();
   await ann.waitForTimeout(3000);
   await ann.reload();
 }
-assert.ok(
-  await sheet.getByRole("button", { name: "Invite to event" }).count(),
-  "Invite + shown",
-);
-await sheet.getByRole("button", { name: "Promote to organizer" }).click();
-await sheet
-  .locator(".person-row", { hasText: guestName })
-  .locator(".badge", { hasText: "Organizer" })
-  .waitFor({ timeout: 60_000 });
-log("founder one promoted the invitee to organizer");
+await (await menu()).getByRole("menuitem", { name: "Make organiser" }).click();
+await row.locator(".member-badge", { hasText: "Organiser" }).waitFor({ timeout: 60_000 });
+log("founder one made the invitee an organiser");
 
-// web's "Remove organizer" (ADR 0073): the invitee goes back under Members.
-await sheet
-  .locator(".person-row", { hasText: guestName })
-  .getByRole("button", { name: "Remove organizer" })
-  .click();
-await sheet
-  .locator(".person-row", { hasText: guestName })
-  .getByRole("button", { name: "Promote to organizer" })
-  .waitFor({ timeout: 60_000 });
-log("founder one removed the invitee as organizer");
+await (await menu()).getByRole("menuitem", { name: "Remove" }).click();
+await row.locator(".member-badge").waitFor({ state: "detached", timeout: 60_000 });
+log("founder one removed the invitee as organiser");
 
 assert.deepEqual(errors, []);
 await browser.close();

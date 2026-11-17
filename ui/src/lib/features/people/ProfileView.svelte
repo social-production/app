@@ -17,6 +17,7 @@
   import FollowRequests from './FollowRequests.svelte';
   import { ProfileFollows } from './followState.svelte.ts';
   import MessageButton from './MessageButton.svelte';
+  import ProfileShare from './ProfileShare.svelte';
   import { ProfileEditor } from './profileEdit.svelte.ts';
   import TrustSheets from './TrustSheets.svelte';
   import { ProfileTrust } from './trustState.svelte.ts';
@@ -155,6 +156,7 @@
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
                 />
+                <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} />
                 <VouchButton
                   person={shown}
                   viewer={me}

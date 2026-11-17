@@ -2,7 +2,9 @@
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
-  import { keyTag } from '#lib/domain/people.ts';
+  import PlaceStanding from '#lib/components/people/PlaceStanding.svelte';
+  import { clashingNames, pickerName } from '#lib/domain/personLine.ts';
+  import { cachedPerson } from '#lib/services/people.ts';
 
   import NewGroupName from './NewGroupName.svelte';
 
@@ -30,6 +32,7 @@
   let chosen = $state<Contact[]>([]);
   let naming = $state(false);
 
+  const clashes = $derived(clashingNames(everyone ?? []));
   const shown = $derived.by(() => {
     const needle = query.trim().toLowerCase();
     return (everyone ?? [])
@@ -137,8 +140,8 @@
               {/if}
             </span>
             <span class="person-copy">
-              <strong>{person.name}</strong>
-              <small>{keyTag(person.agent)}</small>
+              <strong>{pickerName(person, clashes)}</strong>
+              <small><PlaceStanding agent={person.agent} load={cachedPerson} /></small>
             </span>
           </button>
         {/each}

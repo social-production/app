@@ -87,6 +87,10 @@ The owner's list of 2026-11-15. They are references, not gospel: the built scree
 on since, and later owner answers in this file win. Read them with the Artifact tool
 (`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
 frames under `project/*.dc.html`).
+0. **Loading, Region and Sign-up Fixes (2026-11-17, approved 12:55 am: "Artifacts look
+   amazing"; built in #182 and #183)**: https://claude.ai/artifact/Xk4u1Q4837qACCz5AudwUd,
+   the owner's fixes 3b to 3f (loading line and skeletons, the opening screen, Settings'
+   Region place and distance sheets, one-screen sign-up, "Show back buttons").
 0. **Profiles and Comments (2026-11-16 afternoon, approved: "all artifacts look great, i take
    your discretion go ahead!"; building on `claude/ux-profiles`)**: Home and profile cards as
    Global rows, the profile's cover / camera buttons / Edit profile sheet / tabs, "commented"
@@ -199,6 +203,36 @@ back buttons") touch Settings: mockup https://claude.ai/artifact/Xk4u1Q4837qACCz
 ask here before touching Settings files. `claude/ux-detail-pages` changes `displayName()` (name
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
+
+### Where things stand (8 am Melbourne, 2026-11-17, UX session)
+- **#181 (ADR 0111, project reset) merged 1:35 am**, live 2:07 am (seed `/readyz` lists project
+  `uhC0ky4AsBp4o9sQ…`; directory unchanged). Local `invites.rs` 3/3 and `private_events.rs` 3/3
+  passed first. Live smoke: UI 200, Home light/dark at 390px with no page errors (feed empty
+  after the reset, as expected).
+- **Owner's mockup reply (12:55 am): "Artifacts look amazing."** Changes: the dock's capsule
+  is centred (off-centre only when the back button is there and the capsule is too wide);
+  back buttons on by default; sheets put × and their action together in a dock. 3c: option A
+  (no pick given, recommended one built).
+- **#182 `claude/ux-settings-1117` (3d, 3f; parity cleared it):** Regional place sheet (list
+  stays still, "Use my location" first, area under each name, "Use Fitzroy"), a new Distance
+  row (chips + typed km; the Region feed starts from it), Appearance "Show back buttons".
+  `regional.mjs` passes locally; looked at 390px light/dark. **Merged 3:07 am, live** (smoke:
+  no page errors, the back-buttons setting applied).
+- **#183 `claude/ux-fixes-1117` (3a, 3b, 3c, 3e, 3g, sheet dock): merged 2:35 am, live** (smoke:
+  /onboarding and Home light/dark, no page errors). Before/after shots sent to the owner.
+  Before/after shots taken (3a detail chat strip gone, request chat fills the screen; 3g
+  panels run to the bottom). `chat`, `messages`, `help-requests`, `accounts` pass locally.
+  **`projects.mjs` is stale on main:** its `createProject` waits for the "Online" place radio
+  at step 2, but the create flow (c8a6735) asks channels there. Not fixed yet.
+- **`claude/ux-detail-pages`:** main merged in (with #181); the centred dock; browser tests
+  updated for the dock (Join keeps "Join project/event" as its name; Leave is under ⋯ "More
+  actions") and the People page; an effect loop on the People page fixed (it crashed the
+  event page with a 500). `private-events.mjs` passes. PR next, after `event-flow.mjs`,
+  `help-requests.mjs`, `threads.mjs` and the 390px light/dark screenshots.
+- The worker restarted around 4 am Melbourne and stopped the local seed and a test run; both
+  were restarted at 7:55 am.
+- Cross-session: the parity session's send_message reaches this session; this session's
+  sends to it are refused (trusted device), so replies go in PR comments.
 
 ### Where things stand (12:30 am Melbourne, 2026-11-17)
 - **UX session (cloud):** #176 merged 12:18 am and #177 12:20 am; live smoked read-only at

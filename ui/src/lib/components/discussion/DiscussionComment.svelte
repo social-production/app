@@ -143,7 +143,7 @@
             {:else if part.href}
               <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
               <a href={part.href} target="_blank" rel="noopener noreferrer">{part.text}</a>
-            {:else}{part.text}{/if}
+            {:else}<span class="body-text">{part.text}</span>{/if}
           {/each}
         </p>
       {/if}

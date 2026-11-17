@@ -9,7 +9,6 @@
   import LeftRail from '#lib/components/shell/LeftRail.svelte';
   import MobileBottomNav from '#lib/components/shell/MobileBottomNav.svelte';
   import MobileMoreSheet from '#lib/components/shell/MobileMoreSheet.svelte';
-  import SignedOutIntro from '#lib/components/shell/SignedOutIntro.svelte';
   import Topbar from '#lib/components/shell/Topbar.svelte';
   import { connect } from '#lib/services/account.ts';
   import { getPerson } from '#lib/services/people.ts';
@@ -62,12 +61,6 @@
   const signedIn = $derived(connection.current.status === 'connected');
   // web's isAuthSurface: onboarding shows only the brand (no rails, bottom nav or "+").
   const authSurface = $derived(page.url.pathname === '/onboarding');
-  // web shows the signed-out intro only on the feed, channels and communities.
-  const showIntro = $derived(
-    connection.current.status === 'signed-out' &&
-      /^\/($|channels\/|communities\/)/.test(page.url.pathname),
-  );
-  // "Sign in / Sign up" hides the intro banner; the sign-in card below it stays.
   const topbarHeight = $derived(compact ? 52 : 53);
   // web's immersiveChat: on phones an open detail chat hides the top bar and bottom nav.
   const immersive = $derived(compact && chatChrome.immersive);
@@ -241,12 +234,6 @@
 
     <main class="main-content" class:main-content-compact={compact}>
       <div class="main-frame">
-        {#if showIntro}
-          <SignedOutIntro
-            onSignup={() => goto(resolve('/onboarding'))}
-            aboutHref={resolve('/about')}
-          />
-        {/if}
         {@render children()}
       </div>
       {#if showCreateFab}
@@ -272,6 +259,7 @@
       {isActive}
       moreActive={moreOpen}
       collapsed={slid}
+      signUpHref={guest ? resolve('/onboarding') : null}
       onMore={toggleMore}
       onNavigate={() => {
         closeCompact();

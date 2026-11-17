@@ -1,9 +1,10 @@
 <script lang="ts">
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
-  import FactLine from '#lib/components/cards/FactLine.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
-  import PlaceRow from '#lib/components/cards/PlaceRow.svelte';
+  import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
+  import FactRow from '#lib/components/detail/FactRow.svelte';
+  import PlaceFact from '#lib/components/detail/PlaceFact.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -122,10 +123,14 @@
                     · {started}
                   </span>
                 </p>
-                {#if help.activity}
-                  <FactLine icon="when">{localDateTime(help.activity.startsAt)}</FactLine>
+                {#if help.activity || charter.location_label.trim()}
+                  <DetailFacts>
+                    {#if help.activity}
+                      <FactRow icon="when" title={localDateTime(help.activity.startsAt)} />
+                    {/if}
+                    <PlaceFact place={charter.location_label} />
+                  </DetailFacts>
                 {/if}
-                <PlaceRow place={charter.location_label} />
                 {#if charter.description.trim()}
                   <FoldedText text={charter.description} className="overview-copy" />
                 {/if}

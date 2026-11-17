@@ -1,11 +1,10 @@
 <script lang="ts">
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
-  import MembershipSplitButton from '#lib/components/MembershipSplitButton.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
-  import { isEvent } from '#lib/domain/projects.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
+  import JoinActions from './JoinActions.svelte';
 
   /**
    * web's Take part dock (ProjectDetailPage's participation DetailActionDock): Join for people
@@ -15,20 +14,11 @@
   interface Props {
     detail: DetailState;
     active: boolean;
-    membersOpen: boolean;
-    onOpenMembers: () => void;
     revealVote?: string | null;
     onRevealDone?: (() => void) | undefined;
   }
 
-  let {
-    detail,
-    active,
-    membersOpen,
-    onOpenMembers,
-    revealVote = null,
-    onRevealDone,
-  }: Props = $props();
+  let { detail, active, revealVote = null, onRevealDone }: Props = $props();
 
   // web's Take part votes: phase moves, a collective service's request settings (ADR 0089),
   // then a software project's (ADR 0086).
@@ -58,17 +48,7 @@
       {/if}
     {/snippet}
     {#if charter.mode !== 'personal-service' && !project.amMember}
-      <div class="participation-membership">
-        <MembershipSplitButton
-          joined={project.amMember}
-          count={project.members.length}
-          pending={detail.joining}
-          {membersOpen}
-          noun={isEvent(project.charter?.mode) ? 'event' : 'project'}
-          onToggleJoin={() => detail.requestToggleJoin()}
-          {onOpenMembers}
-        />
-      </div>
+      <JoinActions {detail} />
     {/if}
     <div id="detail-participation-actions"></div>
   </DetailActionDock>

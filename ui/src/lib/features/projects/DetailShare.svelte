@@ -15,19 +15,17 @@
   import type { DetailState } from './detailState.svelte.ts';
 
   /**
-   * web's "Share +" on ProjectOverviewHeader / EventOverviewHeader. Projects: anyone signed in
-   * sees it, members send (web-backend refuses others). Public events: members. Private
-   * events: organizers, as "Invite to event" (an invite to accept, no Create post).
+   * web's "Share +" on ProjectOverviewHeader / EventOverviewHeader. Detail Pages Cleanup §4:
+   * Share is always on the dock (members send; others copy or share the link). Private
+   * events: organizers only, as "Invite to event" (an invite to accept, no Create post).
    */
-  let { detail }: { detail: DetailState } = $props();
+  let { detail, label = 'Share' }: { detail: DetailState; label?: string } = $props();
 
   const project = $derived(detail.project);
   const event = $derived(isEvent(project?.charter?.mode));
   const isPrivate = $derived(event && project?.audience !== 'public');
   const signedIn = $derived(connection.current.status === 'connected');
-  const shown = $derived(
-    signedIn && !!project && (!event || (isPrivate ? !!project.amOrganizer : project.amMember)),
-  );
+  const shown = $derived(signedIn && !!project && (!isPrivate || !!project.amOrganizer));
   const url = $derived(`${location.origin}${location.pathname}`);
   const title = $derived(project?.charter?.title ?? '');
 
@@ -70,6 +68,7 @@
     recipientHint={isPrivate
       ? "It's a private event, so they get an invite to accept under Invites."
       : 'They get it as a message and a notification.'}
+    buttonLabel={label}
     copyLinkUrl={url}
     shareTitle={title}
     searchContacts={search}
