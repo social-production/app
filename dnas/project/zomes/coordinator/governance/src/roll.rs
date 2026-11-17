@@ -45,11 +45,8 @@ impl Roll {
                 left: deletes.iter().map(|d| d.action().timestamp()).min(),
             })
             .collect();
-        let platform = crate::calls::base_charter()?.is_some_and(|c| {
-            c.tags
-                .iter()
-                .any(|t| sp_scope::is_platform_tag(t))
-        });
+        let platform = crate::calls::base_charter()?
+            .is_some_and(|c| c.tags.iter().any(|t| sp_scope::is_platform_tag(t)));
         Ok(Self {
             spans,
             platform,

@@ -155,12 +155,19 @@ async fn any_full_member_votes_on_a_platform_project() {
     }
     net.settle().await;
     let proposal: ActionHash = net
-        .call(0, "governance", "propose", edit(Some("For the whole network."), None))
+        .call(
+            0,
+            "governance",
+            "propose",
+            edit(Some("For the whole network."), None),
+        )
         .await;
     net.settle().await;
     let new = vote(&net, 3, &proposal).await;
     assert!(new.is_err(), "a New non-member can't vote: {new:?}");
-    vote(&net, 2, &proposal).await.expect("a Full non-member votes");
+    vote(&net, 2, &proposal)
+        .await
+        .expect("a Full non-member votes");
     net.settle().await;
     assert_eq!(
         charter_of(&net, 1).await.description,

@@ -35,7 +35,9 @@ pub const JOIN_POLICIES: [&str; 2] = ["open", "closed"];
 /// on it (ADR 0095, 0109).
 #[must_use]
 pub fn is_platform_tag(tag: &str) -> bool {
-    tag.trim().trim_start_matches('#').eq_ignore_ascii_case(PLATFORM)
+    tag.trim()
+        .trim_start_matches('#')
+        .eq_ignore_ascii_case(PLATFORM)
 }
 
 #[must_use]

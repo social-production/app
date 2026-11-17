@@ -151,11 +151,8 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
     let membership = calls::my_membership()?;
     if membership.is_none() {
         // A #platform project takes any Full member's vote (ADR 0109).
-        let platform = calls::base_charter()?.is_some_and(|c| {
-            c.tags
-                .iter()
-                .any(|t| sp_scope::is_platform_tag(t))
-        });
+        let platform = calls::base_charter()?
+            .is_some_and(|c| c.tags.iter().any(|t| sp_scope::is_platform_tag(t)));
         if !platform {
             return Err(guest("Join the project to vote."));
         }
