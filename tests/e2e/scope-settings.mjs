@@ -62,6 +62,7 @@ for (let i = 0; ; i++) {
   if (await fab.waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
   if (i >= 20) throw new Error('the Vote button never showed');
 }
+await a.screenshot({ path: `${out}/phone390-scope-page.png` });
 await fab.click();
 const vote = a.locator('.scope-vote');
 await vote.getByText('New description').waitFor();
