@@ -204,6 +204,20 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (8:30 pm Melbourne, 2026-11-17, UX session)
+- **Live since 8:28 pm:** PR #193 (feed rows show the channel name without its picture, owner's
+  call) and PR #194 (Scope Filters and Empty States mockups, https://claude.ai/artifact/6HSJrceovwUMCY7r6NyWBv,
+  approved): channels, communities and the Platform get the feed bar and the shared
+  `FeedFilterSheet` (Type, Order, When); Home's Type filter now applies (it was ignored before)
+  with Events and Threads; profiles' sheet gains When; one `EmptyState` pattern and
+  "You're all caught up" everywhere. Live smoke: /platform, /, an empty search, 0 page errors.
+- Two stale browser tests fixed in #194: `projects.mjs` (notification rows read "Project · Ann"
+  since 1d2cc78) and `platform.mjs` (Moderators rows without a profile read "Unnamed").
+- **Not merged anywhere yet:** `claude/notice-mentions` (parity, 16 Nov: @mention notices; the
+  app shows mention notices but nothing sends them) and the ADR 0109 wording on
+  `claude/scope-pictures` (rows read the charter, not a listing mirror). Next: those, then ADR
+  0095's moderator merge and the audits.
+
 ### Where things stand (6:15 pm Melbourne, 2026-11-17, UX session)
 - **ADR 0109 is live.** PR #190 merged 4:49 pm; directory and project networks reset, live by
   ~5:02 pm (directory `uhC0kiXZib9v…`, project `uhC0kgtXO683…`, conversation unchanged
