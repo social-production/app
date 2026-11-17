@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Feed filters everywhere and clearer empty pages (PRs #193 and #194, 2026-11-17 8:28 pm
+  Melbourne):** channels, communities, the Platform and profiles can filter their feeds by
+  type, order and time like Home, and Home's type filter works; every empty feed or list says
+  what is missing and offers one next step. Feed rows show a channel's name without its picture.
 - **Pictures for channels and communities, and open #platform votes (PRs #190 and #191, ADR
   0109, 2026-11-17; directory and project networks reset, live ~5:02 pm Melbourne):** a channel
   or community takes a picture and a cover when created, and changes them by its own vote (or
