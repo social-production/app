@@ -54,6 +54,12 @@ pub struct ProjectCard {
     /// Its place is online (the Region feed's online list, ADR 0084); not sent.
     #[serde(skip)]
     pub online: bool,
+    /// A channel's or community's picture and cover (ADR 0109): base64 entry hashes of
+    /// directory `ScopeImage` records, from its current charter; absent on other cards.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub picture: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub cover: Option<String>,
 }
 
 /// The moderation state of an item a report took down.
