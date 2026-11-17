@@ -17,7 +17,8 @@ What works today:
 - **Mentions notify, and tidier map and region controls (PRs #196–#198, 2026-11-17 evening
   Melbourne):** @mentioning someone in a chat sends them a notice; guests' chat "Sign in" fits
   the message bar; the Region distance is one tap, location errors say what to do, place search
-  is steady while typing, and the map's fullscreen fills the screen.
+  is steady while typing, and the map's fullscreen fills the screen. Sheets dock × and actions
+  in one capsule, the map's distance is a sheet of chips, and an empty map says what to try (#200).
 - **Feed filters everywhere and clearer empty pages (PRs #193 and #194, 2026-11-17 8:28 pm
   Melbourne):** channels, communities, the Platform and profiles can filter their feeds by
   type, order and time like Home, and Home's type filter works; every empty feed or list says
