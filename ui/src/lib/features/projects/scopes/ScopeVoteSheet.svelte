@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { VoteChoice } from '#lib/domain/governance.ts';
 
@@ -79,7 +80,11 @@
     {:else if !gov.loaded}
       <p class="meta">Loading…</p>
     {:else}
-      <p class="meta">No open votes. You're all caught up.</p>
+      <EmptyState
+        icon="check"
+        title="No open votes"
+        text="New proposals for this space show up here."
+      />
     {/if}
   </div>
 </OverlaySheet>

@@ -47,7 +47,7 @@ async function waitInFeed(page, text, path = '/') {
   for (;;) {
     await page.goto(`${BASE}${path}`);
     await page.locator('.feed-page').waitFor();
-    await page.locator('.empty-card, .project-card').first().waitFor({ timeout: 60_000 });
+    await page.locator('.empty-block, .project-card').first().waitFor({ timeout: 60_000 });
     // Count only once the feed has loaded (its skeleton rows are gone).
     await page.locator('.feed-page .skeleton-list').waitFor({ state: 'detached', timeout: 60_000 });
     if (await page.locator('.project-card', { hasText: text }).count()) return (Date.now() - t0) / 1000;
@@ -132,7 +132,7 @@ for (let i = 0; ; i++) {
   if (await shared.first().waitFor({ timeout: 9_000 }).then(() => true, () => false)) break;
   if (i >= 40) throw new Error('the share never reached Bob');
 }
-await shared.first().getByText('Project', { exact: true }).waitFor();
+await shared.first().getByText(/^Project · /).waitFor();
 await shared.first().click();
 await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(bob.url()).pathname, new URL(projectUrl).pathname);

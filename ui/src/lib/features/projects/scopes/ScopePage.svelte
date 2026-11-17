@@ -6,8 +6,12 @@
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import PlatformBoardPanel from '#lib/components/board/PlatformBoardPanel.svelte';
-  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import { parseInvite, type ScopeKind } from '#lib/domain/scopes.ts';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
+  import FeedEnd from '#lib/components/empty/FeedEnd.svelte';
+  import { keepCard, type FeedType } from '#lib/domain/feedTypes.ts';
+  import { parseInvite, scopeTag, type ScopeKind } from '#lib/domain/scopes.ts';
+
+  import FeedFilterBar from '../FeedFilterBar.svelte';
 
   import { BoardState } from './boardState.svelte.ts';
   import { ScopeArt } from './scopeArt.svelte.ts';
@@ -59,6 +63,19 @@
   });
   const waiting = $derived(s.gov?.votable.length ?? 0);
   const noun = $derived(kind === 'channel' ? 'channel' : 'community');
+  // The feed bar's Type (Scope Filters mockups §1), applied to the loaded cards.
+  let type = $state<FeedType>('all');
+  const items = $derived(s.feed.items.filter((card) => keepCard(card, type)));
+  const narrowed = $derived(type !== 'all' || s.feed.window !== 'all');
+  const title = $derived(s.platform ? 'Platform' : (s.scope?.handle ?? slug));
+  const threadHref = $derived(
+    `${resolve('/create/thread')}?tag=${encodeURIComponent(scopeTag(kind, slug))}`,
+  );
+  function clearFilters(): void {
+    type = 'all';
+    s.feed.window = 'all';
+    void s.feed.reload();
+  }
 
   $effect(() => {
     void s.open();
@@ -112,37 +129,48 @@
       onVotes={() => (votesOpen = true)}
     />
 
+    {#if !s.scope?.isPrivate}<FeedFilterBar feed={s.feed} name={title} bind:type />{/if}
+
     <div class="stack">
-      {#if s.feed.loading && s.feed.items.length === 0}
+      {#if s.feed.loading && items.length === 0}
         <SkeletonRows count={3} />
-      {:else if s.feed.items.length === 0}
-        <section class="info-card">
-          {#if s.platform}
-            <div class="platform-empty">
-              <ToolbarIcon name="globe" />
-              <b>Nothing for the whole network yet</b>
-              <p>Projects and events tagged #platform show here.</p>
-              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
-              <a class="scope-pill primary" href={`${resolve('/create/project')}?tag=platform`}
-                >Start a platform project</a
-              >
-            </div>
-          {:else}
-            <p>
-              No tagged posts, help, or events in this {noun} yet. Tag content with this {noun} to show
-              it here.
-            </p>
-          {/if}
-        </section>
+      {:else if items.length === 0 && narrowed}
+        <EmptyState
+          icon="filter"
+          title="Nothing matches these filters"
+          text="Try a longer time or another type."
+        >
+          <button class="empty-action" type="button" onclick={clearFilters}>Clear filters</button>
+        </EmptyState>
+      {:else if items.length === 0 && s.platform}
+        <EmptyState
+          icon="globe"
+          title="Nothing for the whole network yet"
+          text="Projects and events tagged #platform show here."
+        >
+          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
+          <a class="empty-action primary" href={`${resolve('/create/project')}?tag=platform`}
+            >Start a platform project</a
+          >
+        </EmptyState>
+      {:else if items.length === 0}
+        <EmptyState
+          icon={kind === 'channel' ? 'hash' : 'people'}
+          title={`Nothing in ${title} yet`}
+          text={`Posts, events and projects tagged with this ${noun} show up here.`}
+        >
+          <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
+          <a class="empty-action primary" href={threadHref}>Start a thread</a>
+        </EmptyState>
       {:else}
-        {#each s.feed.items as card (card.id)}
+        {#each items as card (card.id)}
           <SpaceCard {card} onSignal={(next) => s.feed.signal(card, next)} />
         {/each}
         <InfiniteSentinel
           disabled={!s.feed.hasMore || s.feed.loading}
           onMore={() => void s.feed.more()}
         />
-        {#if !s.feed.hasMore}<p class="end-copy">You're caught up.</p>{/if}
+        {#if !s.feed.hasMore}<FeedEnd />{/if}
       {/if}
     </div>
 

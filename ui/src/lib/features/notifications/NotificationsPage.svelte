@@ -1,4 +1,5 @@
 <script lang="ts">
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -154,9 +155,11 @@
   {/if}
 
   {#if loaded && !error && notifications.items.length === 0}
-    <p class="notes-empty">
-      Nothing yet. Votes, replies, roles and invites from your projects show up here.
-    </p>
+    <EmptyState
+      icon="bell"
+      title="No notifications yet"
+      text="Votes, replies, roles and invites from your projects show up here."
+    />
   {/if}
 
   <div class="stack">

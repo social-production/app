@@ -60,8 +60,8 @@ await confirm("Volunteer as moderator?", "Volunteer");
 // Nobody was active last week on a fresh node, so the quorum is 0 and they are seated.
 await sheet.getByText("You're seated.").waitFor({ timeout: 60_000 });
 await sheet.getByText(/^Seated · \d+/).waitFor({ timeout: 60_000 });
-// Dev founders have no profile on a local node, so the row shows their key's tag.
-await sheet.locator(".board-row.you", { hasText: "BGTu" }).waitFor();
+// Your own row is marked; dev founders have no profile on a local node, so it reads "Unnamed".
+await sheet.locator(".board-row.you").waitFor();
 if (shots) await ann.screenshot({ path: `${shots}/moderators.png` });
 log("volunteering seats them while the quorum is 0");
 

@@ -6,6 +6,7 @@
   import ScopeTagsStep from '../scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
+  import { page } from '$app/state';
   import { resolve } from '$app/paths';
 
   /** web's CreateThreadPage: Basics (title, opening post) → Tags (ADR 0070). */
@@ -17,7 +18,9 @@
   let step = $state(0);
   let title = $state('');
   let body = $state('');
-  let tags = $state<string[]>([]);
+  // An empty channel's or community's "Start a thread" passes its tag (Scope Filters §2a).
+  const preset = page.url.searchParams.get('tag');
+  let tags = $state<string[]>(preset ? [preset] : []);
   let submitting = $state(false);
   let statusMessage = $state('');
 

@@ -1,15 +1,11 @@
-<script lang="ts" module>
-  export type FeedFilter = 'all' | 'projects';
-</script>
-
 <script lang="ts">
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
+  import type { FeedType } from '#lib/domain/feedTypes.ts';
   import type { FeedScope, HomeAudience } from '#lib/domain/homeFeed.ts';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
-  import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
 
+  import FeedFilterSheet from './FeedFilterSheet.svelte';
   import type { HomeFeedState } from './homeFeedState.svelte.ts';
   import RegionControls from './RegionControls.svelte';
 
@@ -23,9 +19,14 @@
     signedIn,
     guest = false,
     filter = $bindable(),
-  }: { feed: HomeFeedState; signedIn: boolean; guest?: boolean; filter: FeedFilter } = $props();
-
-  let open = $state(false);
+    open = $bindable(false),
+  }: {
+    feed: HomeFeedState;
+    signedIn: boolean;
+    guest?: boolean;
+    filter: FeedType;
+    open?: boolean;
+  } = $props();
 
   const allScopes: { value: FeedScope; label: string }[] = [
     { value: 'home', label: 'Home' },
@@ -38,22 +39,6 @@
     { value: 'following', label: 'Following only' },
     { value: 'popular', label: 'Following + popular' },
   ];
-  // web's filter menu; threads, events and help requests join it as they land.
-  const filters: { value: FeedFilter; label: string }[] = [
-    { value: 'all', label: 'All items' },
-    { value: 'projects', label: 'Projects' },
-  ];
-  const sorts: { value: FeedSort; label: string }[] = [
-    { value: 'trending', label: 'Trending' },
-    { value: 'recent', label: 'Most recent' },
-  ];
-  const windows: { value: FeedWindow; label: string }[] = [
-    { value: 'today', label: 'Today' },
-    { value: 'week', label: 'Week' },
-    { value: 'month', label: 'Month' },
-    { value: 'all', label: 'All time' },
-  ];
-
   const radiusLabel = $derived(
     radiusPresetOptions.find((o) => o.value === feed.region.radius)?.label ??
       `${feed.region.radius} km`,
@@ -105,14 +90,18 @@
   {/if}
 </header>
 
-<OverlaySheet
+<FeedFilterSheet
   {open}
   title={`Show in ${scopeLabel}`}
-  labelledById="feed-filter-title"
-  rootClass="shell feed-filter-sheet"
+  type={filter}
+  sort={feed.sort}
+  window={feed.window}
+  onType={(v) => (filter = v)}
+  onSort={(v) => void feed.setSort(v)}
+  onWindow={(v) => void feed.setWindow(v)}
   onClose={() => (open = false)}
 >
-  <div class="feed-filter-groups">
+  {#snippet before()}
     {#if feed.shownScope === 'region'}
       <RegionControls region={feed.region} />
     {/if}
@@ -127,38 +116,5 @@
         />
       </section>
     {/if}
-    <section>
-      <h3>Type</h3>
-      <SegmentedChoice
-        value={filter}
-        ariaLabel="Filter public feed"
-        options={filters}
-        onChange={(v) => (filter = v)}
-      />
-    </section>
-    <section>
-      <h3>Order</h3>
-      <SegmentedChoice
-        value={feed.sort}
-        ariaLabel="Sort public feed by"
-        options={sorts}
-        onChange={(v) => void feed.setSort(v)}
-      />
-    </section>
-    <section>
-      <h3>When</h3>
-      <SegmentedChoice
-        value={feed.window}
-        ariaLabel="Public feed time window"
-        options={windows}
-        onChange={(v) => void feed.setWindow(v)}
-      />
-    </section>
-  </div>
-  {#snippet footer()}
-    <div class="sheet-actions">
-      <button class="sheet-submit" type="button" onclick={() => (open = false)}>Show results</button
-      >
-    </div>
   {/snippet}
-</OverlaySheet>
+</FeedFilterSheet>

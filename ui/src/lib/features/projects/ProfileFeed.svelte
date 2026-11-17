@@ -4,7 +4,10 @@
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import CommentActivityCard from '#lib/components/cards/CommentActivityCard.svelte';
   import PersonalSpaceCard from '#lib/components/cards/PersonalSpaceCard.svelte';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
+  import FeedEnd from '#lib/components/empty/FeedEnd.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import { FEED_WINDOWS } from '#lib/domain/feedTypes.ts';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
@@ -60,6 +63,23 @@
     { value: 'top', label: 'Top' },
     { value: 'oldest', label: 'Oldest' },
   ];
+  // Each tab's empty line (Scope Filters mockups §2), naming the person.
+  const empty = $derived.by(() => {
+    const who = own ? 'you' : name || 'they';
+    const kinds = {
+      all: 'posts or projects',
+      posts: 'posts',
+      comments: 'comments',
+      projects: 'projects',
+    };
+    const noun = kinds[tab];
+    return {
+      title: `No ${noun} yet`,
+      text: own
+        ? `What you share shows up here.`
+        : `When ${who} ${tab === 'comments' ? 'comments' : 'posts or starts something'}, it shows here.`,
+    };
+  });
   const rows = $derived(
     forAudience(profileRows(feed.items, comments, tab, feed.sort), own ? audience : 'all'),
   );
@@ -96,7 +116,7 @@
     <button
       type="button"
       class="feed-tune"
-      class:narrowed={feed.sort !== 'recent'}
+      class:narrowed={feed.sort !== 'recent' || feed.window !== 'all'}
       aria-label="Profile filters"
       aria-haspopup="dialog"
       title="Profile filters"
@@ -109,13 +129,23 @@
 
 <section class="feed-stack">
   {#if feed.error}
-    <section class="empty-card"><p>{feed.error}</p></section>
+    <EmptyState icon="info" title="This profile didn't load" text={feed.error} />
   {:else if feed.loading && rows.length === 0}
     <SkeletonRows count={2} />
+  {:else if rows.length === 0 && feed.window !== 'all'}
+    <EmptyState icon="filter" title="Nothing in this time" text="Try a longer time.">
+      <button
+        class="empty-action"
+        type="button"
+        onclick={() => ((feed.window = 'all'), void feed.reload())}>Show all time</button
+      >
+    </EmptyState>
   {:else if rows.length === 0}
-    <section class="empty-card">
-      <p>{tab === 'comments' ? 'No comments yet.' : 'Nothing here yet.'}</p>
-    </section>
+    <EmptyState
+      icon={tab === 'comments' ? 'message' : tab === 'projects' ? 'layers' : 'doc'}
+      title={empty.title}
+      text={empty.text}
+    />
   {:else}
     {#each rows as row (row.key)}
       {#if 'comment' in row}
@@ -127,7 +157,7 @@
     {#if tab !== 'comments'}
       <InfiniteSentinel disabled={!feed.hasMore || feed.loading} onMore={() => void feed.more()} />
     {/if}
-    {#if !feed.hasMore || tab === 'comments'}<p class="end-copy">You're caught up.</p>{/if}
+    {#if !feed.hasMore || tab === 'comments'}<FeedEnd />{/if}
   {/if}
 </section>
 
@@ -146,6 +176,15 @@
         ariaLabel="Sort profile feed"
         options={sorts}
         onChange={(v) => ((feed.sort = v), void feed.reload())}
+      />
+    </section>
+    <section>
+      <h3>When</h3>
+      <SegmentedChoice
+        value={feed.window}
+        ariaLabel="Profile time window"
+        options={FEED_WINDOWS}
+        onChange={(v) => ((feed.window = v), void feed.reload())}
       />
     </section>
     {#if own}

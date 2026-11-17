@@ -17,7 +17,11 @@
 
   import { connection } from '#lib/stores/connection.svelte.ts';
 
-  import FeedHeader, { type FeedFilter } from './FeedHeader.svelte';
+  import EmptyFeedEnd from '#lib/components/empty/FeedEnd.svelte';
+  import { keepRow, type FeedType } from '#lib/domain/feedTypes.ts';
+
+  import FeedHeader from './FeedHeader.svelte';
+  import HomeFeedEmpty from './HomeFeedEmpty.svelte';
   import { HomeFeedState } from './homeFeedState.svelte.ts';
 
   import '#lib/components/styles/feed.css';
@@ -30,7 +34,10 @@
 
   const feed = new HomeFeedState(() => search);
   const signedIn = $derived(connection.current.status === 'connected');
-  let filter = $state<FeedFilter>('all');
+  let filter = $state<FeedType>('all');
+  let sheetOpen = $state(false);
+  const rows = $derived(feed.rows.filter((row) => keepRow(row, filter)));
+  const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
 
   // The Region centre is read once the connection settles (your default place is kept under
   // your key). The map's "Open as list" opens Region on its place (also while the feed shows).
@@ -71,25 +78,29 @@
 </script>
 
 <section class="feed-page">
-  <FeedHeader {feed} {signedIn} guest={connection.current.status === 'signed-out'} bind:filter />
+  <FeedHeader
+    {feed}
+    {signedIn}
+    guest={connection.current.status === 'signed-out'}
+    bind:filter
+    bind:open={sheetOpen}
+  />
 
   <div class="stack">
-    {#if feed.error}
-      <section class="empty-card"><p>{feed.error}</p></section>
-    {:else if feed.loading && feed.rows.length === 0}
+    {#if feed.loading && rows.length === 0 && !feed.error}
       <LoadingLine /><SkeletonRows count={4} />
-    {:else if feed.shownScope === 'region' && !feed.region.hasCenter}
-      <section class="empty-card">
-        <p>Choose a place or enable device location to load the region feed.</p>
-      </section>
-    {:else if feed.rows.length === 0}
-      <section class="empty-card">
-        <p>
-          {search ? 'No projects match this search yet.' : 'No Home items match this filter yet.'}
-        </p>
-      </section>
+    {:else if feed.error || rows.length === 0 || (feed.shownScope === 'region' && !feed.region.hasCenter)}
+      <HomeFeedEmpty
+        error={feed.error}
+        scope={feed.shownScope}
+        hasPlace={feed.region.hasCenter}
+        {narrowed}
+        {search}
+        onChoosePlace={() => (sheetOpen = true)}
+        onClear={() => ((filter = 'all'), void feed.setWindow('all'))}
+      />
     {:else}
-      {#each feed.rows as row (row.key)}
+      {#each rows as row (row.key)}
         {#if 'activity' in row}
           <ProjectActivityCard item={row.activity} href={activityHref(row.activity)} />
         {:else if 'comment' in row}
@@ -105,7 +116,7 @@
         {/if}
       {/each}
       <InfiniteSentinel disabled={!feed.hasMore || feed.loading} onMore={() => void feed.more()} />
-      {#if !feed.hasMore}<p class="end-copy">You're caught up.</p>{/if}
+      {#if !feed.hasMore}<EmptyFeedEnd />{/if}
     {/if}
   </div>
 </section>
