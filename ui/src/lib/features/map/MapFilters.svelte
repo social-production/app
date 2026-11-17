@@ -57,7 +57,7 @@
 {/snippet}
 
 {#if overlay}
-  <MapFilterCapsule {s} {picker} {onLocate} {onRadius} {onFilters} {onUpcoming} {onList} />
+  <MapFilterCapsule {s} {onPlace} {onLocate} {onRadius} {onFilters} {onUpcoming} {onList} />
 {:else}
   <div class="filter-bar filter-bar-desktop" aria-label="Map filters">
     <div class="place-field place-field-desktop">{@render picker()}</div>

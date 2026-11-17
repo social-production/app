@@ -11,6 +11,7 @@
   import { clearMapFocusRequest, mapFocus } from '#lib/stores/mapFocus.svelte.ts';
   import { readMapPreferences } from '#lib/stores/mapPreferences.svelte.ts';
   import MapFilters from './MapFilters.svelte';
+  import MapLoading from './MapLoading.svelte';
   import MapPeek from './MapPeek.svelte';
   import MapResults from './MapResults.svelte';
   import { markerHref } from './markerHref.ts';
@@ -135,6 +136,7 @@
     const pending = mapFocus.request;
     clearMapFocusRequest();
     await loader.boot(pending, missing);
+    if (!s.hasCenter) s.loading = false;
     s.updateStageHeight();
     await tick();
     view.adapter?.resize?.();
@@ -217,6 +219,7 @@
         >
           <ToolbarIcon name={s.mapFullscreen ? 'compress' : 'expand'} />
         </button>
+        <MapLoading {s} />
         {#if s.overlayFilters}
           {@render filters(true)}
         {/if}
