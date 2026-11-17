@@ -121,12 +121,16 @@ export function dayWindow(s: EventSchedule, iso: string): { min: string; max: st
 }
 
 /** The wizard's default times moved inside a plan day's window (web opens the composer on
- * the plan day). */
+ * the plan day). Times that start after the day's window (late on today's plan day, the next
+ * hour is tomorrow) stay: moving them back would put the start in the past. */
 export function withinWindow(
   times: { scheduledAt: string; endsAt: string },
   window: { min: string; max: string } | null,
 ): { scheduledAt: string; endsAt: string } {
-  if (!window || (times.scheduledAt >= window.min && times.endsAt <= window.max)) return times;
+  if (!window || times.scheduledAt > window.max) return times;
+  if (times.scheduledAt >= window.min && times.endsAt <= window.max) return times;
+  if (times.scheduledAt >= window.min)
+    return { scheduledAt: times.scheduledAt, endsAt: window.max };
   const start = new Date(window.min);
   const end = new Date(Math.min(start.getTime() + 3_600_000, new Date(window.max).getTime()));
   return { scheduledAt: window.min, endsAt: localStamp(end) };
