@@ -54,6 +54,7 @@ async function historyCard(page, kind, state) {
   const card = page.locator(`.history-shell .history-card.${state}`, { hasText: kind }).first();
   await card.waitFor({ timeout: 180_000 }).catch(async (e) => {
     log(await page.locator('.history-shell').innerText().catch(() => 'no history tab'));
+    await page.screenshot({ path: `${shots}/history-timeout.png`, fullPage: true });
     throw e;
   });
   return card;
