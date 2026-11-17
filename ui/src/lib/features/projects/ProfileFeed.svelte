@@ -82,7 +82,15 @@
       title: `No ${noun} yet`,
       text: own
         ? `What you share shows up here.`
-        : `When ${who} ${tab === 'comments' ? 'comments' : 'posts or starts something'}, it shows here.`,
+        : `When ${who} ${
+            who === 'they'
+              ? tab === 'comments'
+                ? 'comment'
+                : 'post or start something'
+              : tab === 'comments'
+                ? 'comments'
+                : 'posts or starts something'
+          }, it shows here.`,
     };
   });
   const rows = $derived(
