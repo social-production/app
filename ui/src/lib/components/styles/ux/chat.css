@@ -152,6 +152,19 @@
   color: var(--on-brand);
 }
 
+/* Guests' "Sign in" sits where Send goes: a pill the bar's round end wraps, not web's
+   square button pressed against the edge. */
+.shell .chat-panel .composer-row .primary-button {
+  height: 40px;
+  padding: 0 18px;
+  border: none;
+  border-radius: 999px;
+  color: var(--on-brand);
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .shell .chat-panel .send-button:disabled {
   background: var(--panel-hover);
   color: var(--text-soft);
