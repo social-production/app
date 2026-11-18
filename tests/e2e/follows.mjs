@@ -139,8 +139,10 @@ await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
 await feedScope(bob, 'Global');
 await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
 assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).count(), 1);
-assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context').count(), 0);
-log('bob\'s Home shows ann\'s project with her name over it; Global shows it once, as a public card');
+const globalLine = bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context');
+assert.equal((await globalLine.innerText()).trim(), `ann${stamp} proposed this`);
+await bob.screenshot({ path: `${out}/phone390-global-feed.png` });
+log('bob\'s Home and Global both show ann\'s project once, with her name over it');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);
