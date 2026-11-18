@@ -1,5 +1,9 @@
 import type { RequestSettings } from '#lib/domain/projects.ts';
-import type { RequestStatus, ServiceRequest } from '#lib/domain/serviceRequests.ts';
+import {
+  STATUS_LABELS,
+  type RequestStatus,
+  type ServiceRequest,
+} from '#lib/domain/serviceRequests.ts';
 import {
   callCell,
   conversationCell,
@@ -12,6 +16,7 @@ import {
 import { propose } from './governance.ts';
 import { chatSummary, myChats, startChat } from './messages.ts';
 import { myAgent } from './people.ts';
+import { requestNotice } from './pushNotices.ts';
 
 /**
  * Service requests (ADR 0076, web's personal-service requests). A request lives in the direct
@@ -125,12 +130,15 @@ export async function sendServiceRequest(
     starts_at: draft.startsAt,
     ends_at: draft.endsAt,
   });
-  return { chat: seed, id: hashToString(id) };
+  const found = { chat: seed, id: hashToString(id) };
+  const request = { project: project.id, id: found.id, service: project.title, title: draft.title };
+  void requestNotice(project.members ? others : [project.creator], request, 'open');
+  return found;
 }
 
 /** web's `update_service_request_status`: accept, decline (with a reason) or cancel. */
 export async function decideServiceRequest(
-  request: Pick<ServiceRequest, 'chat' | 'id'>,
+  request: ServiceRequest,
   status: Exclude<RequestStatus, 'open'>,
   reason = '',
 ): Promise<void> {
@@ -139,6 +147,9 @@ export async function decideServiceRequest(
     status,
     reason: status === 'declined' ? reason.trim() : '',
   });
+  // The person asking cancels and tells the other side; a decision tells the person asking.
+  const to = status === 'cancelled' ? request.other : request.requester;
+  void requestNotice([to], request, STATUS_LABELS[status].toLowerCase());
 }
 
 /** web's personal-service settings save (applied at once; a collective service votes). */

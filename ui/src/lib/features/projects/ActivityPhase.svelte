@@ -15,6 +15,7 @@
 
   import { page } from '$app/state';
 
+  import { tellActivity } from './phaseNotice.ts';
   import { ActivitiesState, stageOptions } from './activitiesState.svelte.ts';
   import type { DetailState } from './detailState.svelte.ts';
   import CollectiveRequests from './requests/CollectiveRequests.svelte';
@@ -37,7 +38,7 @@
 
   const me = $derived(connection.current.status === 'connected' ? connection.current.agent : '');
   // svelte-ignore state_referenced_locally
-  const state = new ActivitiesState(detail.id, () => me);
+  const state = new ActivitiesState(detail.id, () => me, tellActivity(detail));
   const project = $derived(detail.project);
   const personal = $derived(project?.charter?.mode === 'personal-service');
   // A collective service's requests (ADR 0089): planned requests are accepted once written.
