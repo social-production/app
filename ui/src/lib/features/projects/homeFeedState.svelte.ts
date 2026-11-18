@@ -57,7 +57,8 @@ function matching(cards: ProjectCard[], q: string): ProjectCard[] {
  * the public rows (Global, or Home: items tagged with any channel or community you joined, plus
  * the events listed on your private communities, as web-backend's home feed) merge with the
  * personal feed (web-backend's `get_personal_feed`: what the people you follow made, plus your
- * own posts; "Following + popular" adds everyone else's posts and threads). Scope and audience
+ * own posts; "Following + popular" adds everyone else's posts and threads). Global mixes in
+ * your channels' and communities' items with the personal feed. Scope and audience
  * are kept per device (web keeps them in its settings).
  */
 export class HomeFeedState {
@@ -65,6 +66,9 @@ export class HomeFeedState {
   audience = $state<HomeAudience>(read(KEYS.audience, ['following', 'popular'], 'popular'));
   readonly public = new FeedState(() => this.search());
   readonly personal = new FeedState(() => '');
+  /** Global: items tagged with your channels and communities, mixed in with the people you
+   * follow so Global leans towards what you joined. */
+  readonly joined = new FeedState(() => this.search());
   /** web's Region scope (ADR 0084): its own centre, radius and pages. */
   readonly region = new RegionFeedState(() => ({ sort: this.sort, window: this.window }));
   private signedIn = $state(false);
@@ -99,19 +103,23 @@ export class HomeFeedState {
       this.shownScope === 'region'
         ? this.region.items
         : this.shownScope === 'home'
-          ? [...this.public.items, ...matching(this.communityEvents, this.search())]
+          ? [...this.public.items, ...this.closedEvents]
           : this.public.items;
     if (!this.signedIn) return mergeHomeFeed(shown, [], 'trending');
     const sort = this.public.sort === 'recent' ? 'recent' : 'trending';
     const rules = this.rules;
+    const followed = this.personal.items.filter((c) => keepPersonal(rules, c.creator, c.mode));
+    const joined = this.shownScope === 'global' ? [...this.joined.items, ...this.closedEvents] : [];
+    const extra = joined.filter((c) => !followed.some((f) => f.id === c.id));
     return mergeHomeFeed(
       shown,
-      this.personal.items.filter((c) => keepPersonal(rules, c.creator, c.mode)),
+      [...followed, ...extra],
       sort,
       this.comments.filter((c) => !rules.quietFollows.has(c.author)),
     );
   });
 
+  private readonly closedEvents = $derived.by(() => matching(this.communityEvents, this.search()));
   private readonly regional = $derived(this.shownScope === 'region');
   readonly loading = $derived(
     (this.regional ? this.region.loading : this.public.loading) || this.personal.loading,
@@ -128,6 +136,8 @@ export class HomeFeedState {
     this.signedIn = signedIn;
     this.personal.sort = this.public.sort;
     this.personal.window = this.public.window;
+    this.joined.sort = this.public.sort;
+    this.joined.window = this.public.window;
     await Promise.all([this.reloadPublic(), this.reloadPersonal()]);
   }
 
@@ -178,19 +188,22 @@ export class HomeFeedState {
   private async reloadPublic(): Promise<void> {
     this.communityEvents = [];
     if (this.shownScope === 'region') return this.region.reload();
-    if (this.shownScope === 'global') {
-      this.public.tag = undefined;
-      return this.public.reload();
-    }
-    this.public.loading = true;
-    const scopes = await myScopes().catch(() => []);
+    this.joined.items = [];
+    const global = this.shownScope === 'global';
+    if (global) this.public.tag = undefined;
+    else this.public.loading = true;
+    const scopes = this.signedIn ? await myScopes().catch(() => []) : [];
     const open = scopes.filter((s) => !s.isPrivate);
     const closed = scopes.filter((s) => s.isPrivate);
-    this.public.tag = open.map((s) => scopeTag(s.kind, s.slug)).join(',');
-    await Promise.all([
-      open.length > 0 ? this.public.reload() : this.clearPublic(),
-      this.loadCommunityEvents(closed.map((s) => s.id)),
-    ]);
+    const tag = open.map((s) => scopeTag(s.kind, s.slug)).join(',');
+    const events = this.loadCommunityEvents(closed.map((s) => s.id));
+    if (global) {
+      this.joined.tag = tag;
+      await Promise.all([this.public.reload(), tag ? this.joined.reload() : undefined, events]);
+      return;
+    }
+    this.public.tag = tag;
+    await Promise.all([open.length > 0 ? this.public.reload() : this.clearPublic(), events]);
   }
 
   /** web-backend's home feed: no memberships, no public rows. */

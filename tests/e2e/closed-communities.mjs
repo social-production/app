@@ -154,6 +154,10 @@ await feedScope(b, 'Home');
 await b.locator('.event-card', { hasText: title }).waitFor({ timeout: 120_000 });
 await b.screenshot({ path: `${out}/phone390-community-event-home.png` });
 log('two sees the community event on Home');
+// Global leans towards what you joined: the community's event is mixed in there too.
+await feedScope(b, 'Global');
+await b.locator('.event-card', { hasText: title }).waitFor({ timeout: 120_000 });
+log('two sees the community event on Global');
 
 assert.deepEqual(errors, []);
 await browser.close();
