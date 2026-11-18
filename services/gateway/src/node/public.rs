@@ -30,6 +30,8 @@ const DIRECTORY: &[(&str, &[&str])] = &[(
         // are dropped by the reader, which needs `get_listing` for each one.
         "get_cover",
         "comments_of",
+        // The Platform's moderator board and its weekly active count (ADR 0095).
+        "get_board",
     ],
 )];
 const PROJECT: &[(&str, &[&str])] = &[
@@ -154,6 +156,7 @@ mod tests {
         assert!(!allowed(PROJECT, "activities", "take_role"));
         assert!(allowed(DIRECTORY, "identity", "get_profile"));
         assert!(allowed(DIRECTORY, "identity", "comments_of"));
+        assert!(allowed(DIRECTORY, "identity", "get_board"));
         assert!(allowed(DIRECTORY, "identity", "privacy_of"));
         assert!(!allowed(DIRECTORY, "identity", "set_privacy"));
         assert!(!allowed(PROJECT, "project", "join"));
