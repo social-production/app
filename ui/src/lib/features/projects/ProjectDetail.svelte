@@ -6,6 +6,7 @@
   import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
   import { removedLabel } from '#lib/domain/moderation.ts';
+  import { tellRemoved } from './outcomeNotices.ts';
   import { isEvent, isPrivateSeed, type DetailTabId, type Project } from '#lib/domain/projects.ts';
   import { eventInvites, type EventInvite } from '#lib/services/eventInvites.ts';
   import { placeSearch } from '#lib/services/locations.ts';
@@ -140,10 +141,10 @@
     if (await ok) sheet = null;
   }
 
-  /** web's sheet title and button: organizer-run events save; personal services save details. */
+  /** web's sheet title and button: organizer-run events save; others propose. */
   function editLabel(p: Project, submit: boolean): string {
     if (p.governance === 'organizer_controlled') return submit ? 'Save' : 'Edit event';
-    return p.charter?.mode === 'personal-service' ? 'Save details' : 'Propose Edit';
+    return 'Propose Edit';
   }
 
   /** web: after leaving a private event it can't be opened again, so go home. */
@@ -189,7 +190,7 @@
             plans={detail.plans}
             names={detail.names}
             moderation={moderation.value}
-            onModeration={(next) => moderation.set(next)}
+            onModeration={(next) => moderation.set(next, (m) => tellRemoved(detail, m))}
             onMembers={() => (sheet = 'members')}
             onPhase={() => (tab = 'participation')}
           />

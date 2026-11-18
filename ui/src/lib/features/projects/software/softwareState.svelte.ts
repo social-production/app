@@ -11,6 +11,8 @@ import { namesOf } from '#lib/services/people.ts';
 import { joinProject } from '#lib/services/projects.ts';
 import { loadSoftware, proposeSoftware } from '#lib/services/software.ts';
 
+import { tellApprovals } from '../outcomeNotices.ts';
+
 /** The five things web's SoftwareGovernanceWizard does. */
 export type SoftwareMode =
   'create-pr' | 'vote-pr' | 'record-merge' | 'merge-capability' | 'repository-replacement';
@@ -62,6 +64,8 @@ export class SoftwareState {
       if (missing.length > 0) this.names = { ...this.names, ...(await namesOf(missing)) };
       this.governance = g;
       this.error = '';
+      // A pull request this device's vote or close just approved tells its author (push).
+      void tellApprovals(this.projectId, g).catch(() => {});
     } catch (e) {
       this.error = explain(e);
     }
