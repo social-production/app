@@ -21,6 +21,7 @@ const DIRECTORY: &[(&str, &[&str])] = &[(
         "get_listing",
         "find_listing",
         "follow_view",
+        "privacy_of",
         "list_feedback",
         "get_feedback",
         // A channel's or community's picture and cover (ADR 0109).
@@ -153,6 +154,8 @@ mod tests {
         assert!(!allowed(PROJECT, "activities", "take_role"));
         assert!(allowed(DIRECTORY, "identity", "get_profile"));
         assert!(allowed(DIRECTORY, "identity", "comments_of"));
+        assert!(allowed(DIRECTORY, "identity", "privacy_of"));
+        assert!(!allowed(DIRECTORY, "identity", "set_privacy"));
         assert!(!allowed(PROJECT, "project", "join"));
         assert!(!allowed(PROJECT, "identity", "get_profile"));
         assert!(!allowed(DIRECTORY, "identity", "get_devices"));

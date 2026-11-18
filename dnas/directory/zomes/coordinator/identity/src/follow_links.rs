@@ -15,6 +15,8 @@ pub struct Edge {
     pub other: AgentPubKey,
     pub at: i64,
     pub hash: ActionHash,
+    /// Empty for follows and approval; a privacy switch's name otherwise (ADR 0112).
+    pub tag: Vec<u8>,
 }
 
 /// Live links of `link_type` from `base`. `Followers` links are written by the follower, so
@@ -31,6 +33,7 @@ pub fn edges(base: &AgentPubKey, link_type: LinkTypes) -> ExternResult<Vec<Edge>
                 other: l.target.into_agent_pub_key()?,
                 at: l.timestamp.as_micros(),
                 hash: l.create_link_hash,
+                tag: l.tag.0,
             })
         })
         .collect())
@@ -66,6 +69,7 @@ pub fn own_edges(link_type: LinkTypes) -> ExternResult<Vec<Edge>> {
                     other: other.clone().into_agent_pub_key()?,
                     at: r.action().timestamp().as_micros(),
                     hash: r.action_address().clone(),
+                    tag: c.tag.0.clone(),
                 })
             }
             _ => None,
@@ -77,17 +81,18 @@ pub fn own_edges(link_type: LinkTypes) -> ExternResult<Vec<Edge>> {
 #[derive(Debug, Default)]
 pub struct Policy {
     pub approval_since: Option<i64>,
+    /// The person's privacy switches (ADR 0112): tagged approval self-links.
+    pub privacy: Vec<String>,
     accepts: Vec<Edge>,
     rejects: Vec<Edge>,
 }
 
 impl Policy {
     pub fn of(person: &AgentPubKey) -> ExternResult<Self> {
+        let own = edges(person, LinkTypes::RequiresFollowApproval)?;
         Ok(Self {
-            approval_since: edges(person, LinkTypes::RequiresFollowApproval)?
-                .iter()
-                .map(|e| e.at)
-                .min(),
+            approval_since: own.iter().filter(|e| e.tag.is_empty()).map(|e| e.at).min(),
+            privacy: crate::privacy::switches(&own),
             accepts: edges(person, LinkTypes::FollowAccepts)?,
             rejects: edges(person, LinkTypes::FollowRejects)?,
         })

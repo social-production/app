@@ -19,6 +19,8 @@
     type ProfileTab,
   } from '#lib/domain/profileFeed.ts';
   import type { FeedSort } from '#lib/domain/projects.ts';
+  import { feedRules, postShown } from '#lib/domain/privacy.ts';
+  import { followView } from '#lib/services/follows.ts';
   import { cachedPerson } from '#lib/services/people.ts';
   import { commentsOf } from '#lib/services/profileNotes.ts';
 
@@ -93,8 +95,11 @@
           }, it shows here.`,
     };
   });
+  // ADR 0112: someone who keeps their posts to followers.
+  let postsHidden = $state(false);
+  const cards = $derived(postsHidden ? feed.items.filter((c) => c.mode !== 'post') : feed.items);
   const rows = $derived(
-    forAudience(profileRows(feed.items, comments, tab, feed.sort), own ? audience : 'all'),
+    forAudience(profileRows(cards, comments, tab, feed.sort), own ? audience : 'all'),
   );
 
   $effect(() => {
@@ -105,6 +110,16 @@
         (p) => (name = p.profile?.name ?? ''),
         () => undefined,
       );
+      if (!own)
+        void followView(who).then(
+          (view) => {
+            const followers = view.followers.filter((f) => f.status === 'accepted');
+            const insiders = [...followers.map((f) => f.agent), ...(me ? [me] : [])];
+            const hiders = view.privacy.includes('hide-posts') ? [who] : [];
+            postsHidden = !postShown(feedRules([], insiders, hiders), who);
+          },
+          () => undefined,
+        );
       void commentsOf([who]).then(
         (found) => (comments = found),
         () => undefined,

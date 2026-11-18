@@ -4,7 +4,9 @@
 
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import ProfileHero from '#lib/components/people/ProfileHero.svelte';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { acceptedCount, shownRows } from '#lib/domain/follows.ts';
+  import { profileHidden } from '#lib/domain/privacy.ts';
   import { VOUCHES_FOR_FULL, type Person } from '#lib/domain/people.ts';
   import { explain } from '#lib/services/errors.ts';
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
@@ -44,6 +46,8 @@
   );
 
   const follows = $derived(new ProfileFollows(agent, own));
+  // ADR 0112: the person shows their activity to followers only.
+  const hidden = $derived(!!follows.view && profileHidden(follows.view, agent, myAgent || null));
   const editor = $derived(new ProfileEditor(agent, load));
   const trust = $derived(new ProfileTrust(agent, load));
   // web: accounts found to be bots can't message, vouch or mark.
@@ -237,7 +241,15 @@
       <SkeletonRows count={2} />
     {/if}
     {#if error}<p class="warning-card">{error}</p>{/if}
-    {@render children?.()}
+    {#if hidden}
+      <EmptyState
+        icon="shield"
+        title={`${person?.profile?.name || 'This person'} shares their activity with followers`}
+        text="Follow them to see their projects, threads, events and posts here."
+      />
+    {:else}
+      {@render children?.()}
+    {/if}
   </section>
 </div>
 

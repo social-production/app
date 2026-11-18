@@ -9,7 +9,8 @@ import type { FeedSort, FeedWindow, ProjectCard, Stance } from '#lib/domain/proj
 import type { RegionLink } from '#lib/domain/regionFeed.ts';
 import { scopeTag } from '#lib/domain/scopes.ts';
 import { communityEventCards } from '#lib/services/closedCommunities.ts';
-import { followCircles } from '#lib/services/follows.ts';
+import { feedRules, keepPersonal, postHidersIn, type FeedRules } from '#lib/domain/privacy.ts';
+import { followCircles, privacyOf } from '#lib/services/follows.ts';
 import { myAgent } from '#lib/services/people.ts';
 import { commentsOf } from '#lib/services/profileNotes.ts';
 import { myScopes } from '#lib/services/scopes.ts';
@@ -73,6 +74,8 @@ export class HomeFeedState {
   private comments = $state<CommentActivity[]>([]);
   /** Who you follow: their cards get a "Maya Kim proposed this" line. */
   following = $state<string[]>([]);
+  /** What the authors' privacy switches leave out of Home (ADR 0112). */
+  private rules = $state<FeedRules>(feedRules([], []));
 
   constructor(private readonly search: () => string) {}
 
@@ -100,7 +103,13 @@ export class HomeFeedState {
           : this.public.items;
     if (!this.signedIn) return mergeHomeFeed(shown, [], 'trending');
     const sort = this.public.sort === 'recent' ? 'recent' : 'trending';
-    return mergeHomeFeed(shown, this.personal.items, sort, this.comments);
+    const rules = this.rules;
+    return mergeHomeFeed(
+      shown,
+      this.personal.items.filter((c) => keepPersonal(rules, c.creator, c.mode)),
+      sort,
+      this.comments.filter((c) => !rules.quietFollows.has(c.author)),
+    );
   });
 
   private readonly regional = $derived(this.shownScope === 'region');
@@ -128,6 +137,7 @@ export class HomeFeedState {
       shown.hasMore ? shown.more() : undefined,
       this.signedIn && this.personal.hasMore ? this.personal.more() : undefined,
     ]);
+    await this.checkPosts();
   }
 
   setScope(scope: FeedScope): Promise<void> {
@@ -205,11 +215,28 @@ export class HomeFeedState {
       this.comments = [];
       return;
     }
-    const [{ following }, me] = await Promise.all([followCircles(), myAgent()]);
+    const [{ following, quiet }, me] = await Promise.all([followCircles(), myAgent()]);
     this.following = following;
+    this.rules = feedRules(quiet, [...following, me]);
     this.personal.creator = following.join(',');
     this.personal.personal = { me, popular: this.audience === 'popular' };
     await Promise.all([this.personal.reload(), this.loadComments(following)]);
+    await this.checkPosts();
+  }
+
+  /** "Following + popular" brings posts by people you don't follow: leave out those whose
+   * authors show their posts to followers only (ADR 0112). */
+  private async checkPosts(): Promise<void> {
+    const { insiders, postHiders } = this.rules;
+    const authors = this.personal.items
+      .filter((c) => c.mode === 'post' && !insiders.has(c.creator) && !postHiders.has(c.creator))
+      .map((c) => c.creator);
+    if (!authors.length) return;
+    const hiders = postHidersIn(await privacyOf(authors));
+    if (hiders.length) {
+      const { quietFollows } = this.rules;
+      this.rules = feedRules([...quietFollows], [...insiders], [...postHiders, ...hiders]);
+    }
   }
 
   private async loadComments(following: string[]): Promise<void> {
