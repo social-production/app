@@ -2,7 +2,7 @@
   import type { Snippet } from 'svelte';
 
   import { dateLine } from '#lib/domain/activityTime.ts';
-  import type { ServiceRequest } from '#lib/domain/serviceRequests.ts';
+  import { notMet, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
   import { relativeTime } from '#lib/domain/time.ts';
 
   import '#lib/components/styles/service-requests.css';
@@ -25,18 +25,24 @@
 
   const over = $derived(!!request.endsAt && request.endsAt / 1000 < Date.now());
   const label = $derived(
-    request.status === 'accepted'
-      ? over
-        ? 'Done'
-        : 'Accepted'
-      : request.status === 'declined'
-        ? 'Declined'
-        : request.status === 'cancelled'
-          ? 'Cancelled'
-          : 'Pending',
+    notMet(request)
+      ? 'Not met'
+      : request.status === 'accepted'
+        ? over
+          ? 'Done'
+          : 'Accepted'
+        : request.status === 'declined'
+          ? 'Declined'
+          : request.status === 'cancelled'
+            ? 'Cancelled'
+            : 'Pending',
   );
   const tone = $derived(
-    request.status === 'accepted' ? 'complete' : request.status === 'open' ? 'upcoming' : 'locked',
+    request.status === 'accepted'
+      ? 'complete'
+      : request.status === 'open' && !notMet(request)
+        ? 'upcoming'
+        : 'locked',
   );
   const when = $derived(
     request.startsAt && request.endsAt

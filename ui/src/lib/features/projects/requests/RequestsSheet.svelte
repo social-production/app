@@ -2,7 +2,7 @@
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import ServiceRequestCard from '#lib/components/requests/ServiceRequestCard.svelte';
-  import { isPending, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
+  import { isPending, notMet, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
 
   import { resolve } from '$app/paths';
 
@@ -17,9 +17,14 @@
     requestsOff: boolean;
     highlighted: string | null;
     onPlan?: ((request: ServiceRequest) => void) | undefined;
+    /** A collective service's (ADR 0113): no Accept or Decline, a request stays open until
+     * planned, and its conversation is the planners' chat (null until you are in one). */
+    chatOf?: ((request: ServiceRequest) => string | null) | undefined;
   }
 
-  let { state, reviewer, requestsOff, highlighted, onPlan }: Props = $props();
+  let { state, reviewer, requestsOff, highlighted, onPlan, chatOf }: Props = $props();
+  const collective = $derived(!!chatOf);
+  const conversation = (r: ServiceRequest): string | null => (chatOf ? chatOf(r) : r.chat);
 
   const requests = $derived(state.shown);
   const chatHref = (seed: string): string =>
@@ -56,7 +61,15 @@
               requester={state.names[request.requester] ?? 'Someone'}
               highlighted={highlighted === request.id}
             >
-              {#if isPending(request.status) && reviewer}
+              {#if collective && reviewer}
+                {#if isPending(request.status) && !notMet(request) && onPlan}
+                  <div class="binary-row review-actions">
+                    <button class="vote-chip" type="button" onclick={() => onPlan(request)}>
+                      Plan request
+                    </button>
+                  </div>
+                {/if}
+              {:else if isPending(request.status) && reviewer}
                 {#if state.declining === request.id}
                   <textarea
                     bind:value={state.declineReason}
@@ -116,8 +129,11 @@
                   </button>
                 </div>
               {/if}
-              <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved here -->
-              <a class="conversation-link" href={chatHref(request.chat)}>Open conversation</a>
+              {@const seed = conversation(request)}
+              {#if seed}
+                <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved here -->
+                <a class="conversation-link" href={chatHref(seed)}>Open conversation</a>
+              {/if}
             </ServiceRequestCard>
           </div>
         {/each}

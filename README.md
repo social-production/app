@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Feeds, notifications and requests (PRs #213–#218, 2026-11-18 afternoon Melbourne):** Global
+  names the people you follow (with their picture) and leans towards your channels and
+  communities; notification icons match the map pins; push for follows, shares, invites, roles,
+  phase votes, new activities and service requests; the Request service sheet is modernised.
 - **Display timezone and privacy switches (PRs #210–#212, 2026-11-18 ~12 pm Melbourne):**
   Settings › Appearance has a Display timezone (activity, event and request times show and are
   typed in it); Privacy has web's three hide switches (profile activity and posts for

@@ -140,6 +140,9 @@ if (!(await card.count())) {
   log('bob messages:', await bob.locator('main').innerText().catch(() => 'no messages'));
 }
 await card.locator('summary').click();
+// ADR 0113: no declines, and no conversation until someone plans it.
+assert.equal(await card.getByRole('button', { name: /Decline/ }).count(), 0, 'no Decline');
+assert.equal(await card.getByRole('link', { name: 'Open conversation' }).count(), 0, 'no chat yet');
 await card.getByRole('button', { name: 'Plan request' }).click();
 await bob.screenshot({ path: `${out}/phone390-collective-plan.png` });
 assert.equal(await bob.getByPlaceholder('Activity title').inputValue(), ask);
@@ -168,6 +171,37 @@ for (let i = 0; i < 20; i++) {
 await cleo.screenshot({ path: `${out}/phone390-collective-accepted.png` });
 log("cleo's request reads Accepted");
 
+// The planners' chat (ADR 0113): Bob opened it with Cleo; the holder chat stays out of Messages.
+const cleoCard = cleo.locator('.request-card-shell', { hasText: ask });
+const talk = cleoCard.getByRole('link', { name: 'Open conversation' });
+for (let i = 0; i < 10 && !(await talk.count()); i++) {
+  await press(cleo, 'Your requests');
+  await cleoCard.locator('summary').click();
+  await talk.waitFor({ state: 'attached', timeout: 10_000 }).catch(() => {});
+}
+if (!(await talk.isVisible())) await cleoCard.locator('summary').click();
+const chatUrl = `${BASE}${await talk.getAttribute('href')}`;
+let opened = false;
+for (let i = 0; i < 12 && !opened; i++) {
+  await cleo.goto(chatUrl);
+  opened = await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 15_000 }).then(() => true, () => false);
+}
+if (!opened) {
+  await bob.goto(chatUrl);
+  await bob.waitForTimeout(15_000);
+  log('bob sees the chat as:', await bob.locator('main').innerText().catch(() => '?'));
+  await cleo.screenshot({ path: `${out}/collective-planners-missing.png` });
+  log('cleo sees:', cleo.url(), await cleo.locator('main').innerText().catch(() => '?'));
+  await bob.goto(`${BASE}/messages`);
+  await bob.waitForTimeout(10_000);
+  log('bob messages:', await bob.locator('main').innerText().catch(() => '?'));
+  throw new Error("cleo never saw the planners' chat");
+}
+log("cleo's conversation is the planners' chat, opened with her request");
+await cleo.goto(`${BASE}/messages`);
+await cleo.getByText(ask).first().waitFor({ timeout: 60_000 });
+assert.equal(await cleo.getByText(`Request · ${ask}`).count(), 0, 'the holder chat is hidden');
+
 // Ann signs up from her right rail: the planned activity is an ordinary activity.
 await ann.goto(projectUrl);
 const activityRow = () => rail(ann).locator('.activity-row', { hasText: ask });
@@ -177,6 +211,16 @@ const sheet = ann.getByRole('dialog', { name: ask });
 await sheet.getByRole('button', { name: 'Join', exact: true }).click();
 await sheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
 log('ann took the Service lead role from her rail');
+
+// Bob's device adds Ann to the planners' chat when it next loads the service.
+for (let i = 0; i < 20; i++) {
+  await bob.goto(projectUrl);
+  await bob.waitForTimeout(8000);
+  await ann.goto(`${BASE}/messages`);
+  if (await ann.getByText(ask).first().waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
+  if (i === 19) throw new Error("ann never joined the planners' chat");
+}
+log("ann, who took a role, joined the planners' chat");
 
 assert.deepEqual(errors, [], `page errors: ${errors.join('\n')}`);
 await browser.close();

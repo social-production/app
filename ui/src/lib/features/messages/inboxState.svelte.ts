@@ -1,3 +1,4 @@
+import { HOLDER_PREFIX } from '#lib/domain/serviceRequests.ts';
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
 import type { ChatSummary, Contact, ListPrefs, NewChat } from '#lib/domain/messages.ts';
 import {
@@ -59,8 +60,10 @@ export class InboxState {
         const old = this.all.find((c) => c.id === invites[i]?.seed);
         return old ? [old] : [];
       });
+      // A collective request's holder chat is reached from its service, not Messages (ADR 0113).
+      const shown = rows.filter((c) => !(c.kind === 'group' && c.title?.startsWith(HOLDER_PREFIX)));
       // web's byPinnedThenRecent.
-      this.all = rows.sort((a, b) => +b.pinned - +a.pinned || lastActivity(b) - lastActivity(a));
+      this.all = shown.sort((a, b) => +b.pinned - +a.pinned || lastActivity(b) - lastActivity(a));
       this.loaded = true;
       this.error = '';
       await this.loadNames();

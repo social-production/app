@@ -1,5 +1,6 @@
 import type { RequestSettings } from '#lib/domain/projects.ts';
 import {
+  HOLDER_PREFIX,
   STATUS_LABELS,
   type RequestStatus,
   type ServiceRequest,
@@ -109,7 +110,7 @@ export interface RequestDraft {
 }
 
 /** A group chat title: "Request · <title>", within the chat title limit. */
-const groupTitle = (title: string): string => `Request · ${title.trim()}`.slice(0, 60);
+const groupTitle = (title: string): string => `${HOLDER_PREFIX}${title.trim()}`.slice(0, 60);
 
 /** web's `create_service_request`: a personal service's opens the direct chat with its
  * creator; a collective service's starts a group chat with its members (ADR 0089). */

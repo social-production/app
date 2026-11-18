@@ -3,7 +3,13 @@
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { RequestSettings } from '#lib/domain/projects.ts';
-  import type { ServiceRequest } from '#lib/domain/serviceRequests.ts';
+  import type { Activity } from '#lib/domain/activities.ts';
+  import { plannersSeed, type ServiceRequest } from '#lib/domain/serviceRequests.ts';
+  import {
+    inPlannersChat,
+    openPlannersChat,
+    syncPlannersChat,
+  } from '#lib/services/requestChats.ts';
 
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -22,8 +28,10 @@
   /**
    * A collective service's requests (web's CollectiveServicePhaseFive, ADR 0089): Request
    * service for anyone signed in, the Requests sheet where any member plans a request into an
-   * activity (the page's activity wizard) or declines it, and Settings ▾ → Request settings,
-   * a change the members vote on. Each request lives in a group chat with the members.
+   * activity (the page's activity wizard), and Settings ▾ → Request settings, a change the
+   * members vote on. A request stays open until planned, or reads Not met once its time passes
+   * (ADR 0113). Its record lives in a holder chat with the members, hidden from Messages; the
+   * talk happens in the planners' chat, which grows with the activity's roles.
    */
   interface Props {
     detail: DetailState;
@@ -65,10 +73,44 @@
     if (highlighted && me) requests.listOpen = true;
   });
 
-  /** The page's wizard wrote the planned activity: the request is accepted in its chat. */
+  /** The page's wizard wrote the planned activity: the request is accepted in its holder
+   * chat, and the planner opens the planners' chat with the person asking (ADR 0113). */
   function accept(requestId: string): void {
     const request = requests.requests.find((r) => r.id === requestId);
-    if (request) void requests.decide(request, 'accepted');
+    if (!request) return;
+    void requests
+      .decide(request, 'accepted')
+      .then(() => openPlannersChat(request))
+      .catch(() => {});
+  }
+
+  /** The activity that planned each request. */
+  const plannedBy = $derived(
+    Object.fromEntries(
+      activities.activities.flatMap((a) => (a.booking ? [[a.booking.request, a]] : [])),
+    ) as Record<string, Activity>,
+  );
+
+  // The planner's device keeps each planners' chat in step with its activity's roles.
+  let synced = '';
+  $effect(() => {
+    if (!member || !requests.loaded || !activities.loaded) return;
+    const mine = requests.requests.filter((r) => plannedBy[r.id]?.author === me);
+    const key = mine
+      .map((r) => `${r.id}:${JSON.stringify(plannedBy[r.id]?.roles.map((x) => x.people))}`)
+      .join('|');
+    if (key === synced) return;
+    synced = key;
+    for (const r of mine) {
+      const a = plannedBy[r.id];
+      if (a) void syncPlannersChat(r, a).catch(() => {});
+    }
+  });
+
+  /** A request's conversation: the planners' chat, once planned and if you are in it. */
+  function chatOf(r: ServiceRequest): string | null {
+    const a = plannedBy[r.id];
+    return a && inPlannersChat(me, r, a) ? plannersSeed(a.author, r.id) : null;
   }
   $effect(() => register(accept));
 
@@ -136,6 +178,7 @@
   requestsOff={!settings.enabled}
   {highlighted}
   onPlan={member && canPlan ? plan : undefined}
+  {chatOf}
 />
 <RequestComposer
   state={requests}
