@@ -122,7 +122,9 @@ async fn seat_moderator(net: &Net) {
     let _: ActionHash = net.conductors[2].call(&zome, "volunteer_board", true).await;
     net.settle().await;
     let zome = net.cells[0].0.zome("identity");
-    let seated: bool = net.conductors[0].call(&zome, "is_moderator", agent(net, 2)).await;
+    let seated: bool = net.conductors[0]
+        .call(&zome, "is_moderator", agent(net, 2))
+        .await;
     assert!(seated, "agent 2 is a moderator");
 }
 
@@ -181,7 +183,10 @@ async fn only_platform_moderators_merge_on_platform_projects() {
     seat_moderator(&net).await;
     let start = view(&net, 0).await;
     assert!(start.platform);
-    assert!(start.mergers.is_empty(), "the plan's author merges nowhere on #platform");
+    assert!(
+        start.mergers.is_empty(),
+        "the plan's author merges nowhere on #platform"
+    );
 
     let pr = Kind::Software(SoftwareAsk::PullRequest {
         title: "Release 1.1".into(),

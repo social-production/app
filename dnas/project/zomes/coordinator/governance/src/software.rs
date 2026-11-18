@@ -61,7 +61,11 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
             }
         }
     }
-    let software = replay(events(&state, &requests, roll.platform().then_some(&moderated[..])));
+    let software = replay(events(
+        &state,
+        &requests,
+        roll.platform().then_some(&moderated[..]),
+    ));
     Ok(Ledger {
         state,
         software,
@@ -203,7 +207,9 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
                 ledger.software.can_merge(&me)
             };
             if !may && roll.platform() {
-                return Err(guest("Only platform moderators record merges on #platform projects"));
+                return Err(guest(
+                    "Only platform moderators record merges on #platform projects",
+                ));
             }
             if !may {
                 return Err(guest(
