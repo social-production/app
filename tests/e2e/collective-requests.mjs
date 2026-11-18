@@ -181,7 +181,15 @@ for (let i = 0; i < 10 && !(await talk.count()); i++) {
 }
 if (!(await talk.isVisible())) await cleoCard.locator('summary').click();
 await talk.click();
-await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 120_000 });
+const opened = await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 120_000 }).then(() => true, () => false);
+if (!opened) {
+  await cleo.screenshot({ path: `${out}/collective-planners-missing.png` });
+  log('cleo sees:', cleo.url(), await cleo.locator('main').innerText().catch(() => '?'));
+  await bob.goto(`${BASE}/messages`);
+  await bob.waitForTimeout(10_000);
+  log('bob messages:', await bob.locator('main').innerText().catch(() => '?'));
+  throw new Error("cleo never saw the planners' chat");
+}
 log("cleo's conversation is the planners' chat, opened with her request");
 await cleo.goto(`${BASE}/messages`);
 await cleo.getByText(ask).first().waitFor({ timeout: 60_000 });
