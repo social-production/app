@@ -222,56 +222,37 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
-### Before the FastAPI site can shut down, and screens still to modernise (owner asked, 18 Nov 1:30 am)
-**Must do before parity (shutting down Railway's FastAPI site):**
-1. **Settings rows (PARITY.md list item 2):** separate Public and Personal feeds, a display
-   timezone (also web's timezone selects in service bookings), and Privacy's three "hide …
-   from non-followers / personal feeds" switches.
-2. **Push notifications, the rest (ADR 0108):** notices exist for chat replies and
-   @mentions. Still to add: "Replied to your project", phase votes and results, follows,
-   invites and shares, roles, requests, bot reviews and plan leading. Then desktop OS
-   notifications (the Tauri plugin), and a real Web Push test on a phone.
-3. **Russian (PARITY.md item 4):** needs an ADR first (string catalogue, how the language is
-   chosen). It touches every screen, so do it once the UX branches have merged.
-4. **Compare the signed-in screens not compared yet** with web's source (PARITY.md "Not
-   compared yet").
-5. **ADR 0095's remainder:** moderators' merge capability on #platform software projects.
-   #platform voting by any Full member shipped with ADR 0109.
-6. **Audits:**
-   - Platform / Moderators, reporting and profile photos, end to end on live.
-   - Whether plan rating and vote errors reach the user.
-7. **Owner-only:** roll the Railway environment variables, then switch off the FastAPI
-   services. Nobody needs migrating: the FastAPI site is a prototype and gets wiped.
-- Not parity, but the plan after it:
-  - M7 cutover: seedless (docs/plans/SEEDLESS.md), and Android/iOS builds;
-  - files in project chats;
-  - code health (UX.md):
-    - one "kind profile" per type;
-    - split the files near 300 lines;
-    - one resolved-link helper.
+### Work left until modernisation and parity (updated 10:35 am Melbourne, 2026-11-18, UX session)
+The UX session now also owns the parity queue. In the order it builds them:
 
-**Screens still to modernise.** "Done" means restyled since the 13 Nov screen audit:
-- **Done:**
-  - feed rows and filters, chats (Messenger), detail pages, profile, sign-up and the opening
-    screen, every sheet's dock;
-  - Settings, People, Search, Feedback, Links, History, channel and community pages, create
-    flows, Invites;
-  - map pins, the tap card and feed icons (PR #203, live).
-- **Map Redesign, the approved items not built yet:**
-  - controls (zoom hidden on phones, fullscreen alone at top right, My location above the
-    capsule, the capsule reading "Place · distance" + Filters + List);
-  - "Upcoming / Include past" moved into Filters (the calendar button goes);
-  - the loading state (a loading line, pulsing ghost pins, skeleton list);
-  - the "N places" count pill.
-- **No mockup yet (mockup first):**
-  - the right rail (owner: "later");
-  - the Notifications page;
-  - About;
-  - the Platform page and its Moderators board;
-  - the project phase screens: the Activity phase agenda, the software pull-request flow,
-    service availability/booking calendars;
-  - the plan and vote wizards (the plan editor and phase moves);
-  - Settings > Devices and Account.
+**Modernisation (every screen has an approved mockup and is built; what remains is checking):**
+1. `tests/e2e/rail.mjs` rewritten around an event activity (it used the removed personal service).
+2. Capture with real data, at 390px light and dark, the screens the Screen Review could not:
+   Notifications with a full list, Settings > Devices and Account, a collective service's
+   availability and booking sheets. Fix what looks old; a mockup first if it needs a redesign.
+3. Owner's call: Invites always reachable (a More row) or only when one waits (today).
+
+**Parity (before Railway's FastAPI site shuts down):**
+1. **Settings rows (PARITY.md item 2):** a display timezone (and web's timezone selects in service
+   bookings), separate Public and Personal feeds, Privacy's three "hide … from non-followers /
+   personal feeds" switches.
+2. **Push for every notice kind (ADR 0108):** today only chat replies and @mentions call
+   `services/notices.ts` `notify()`. Still to wire at their write sites: phase votes and results,
+   follows and follow requests, invites and shares, roles and role suggestions, service
+   requests, bot reviews, plan leading, removed projects, approved pull requests. Then the
+   desktop's OS notifications (Tauri plugin) and one real Web Push on a phone (needs the owner).
+3. **ADR 0095's remainder:** moderators' merge on #platform software projects.
+4. **Compare the remaining signed-in screens** with web's source (PARITY.md "Not compared yet").
+5. **Audits on live:** Platform / Moderators, reporting, profile photos; plan rating and vote
+   errors reach the user.
+6. **Russian (PARITY.md item 4):** an ADR for the owner first (string catalogue, how the language
+   is chosen), then every screen's strings. Last, since it touches every file.
+7. **Owner only:** roll the Railway environment variables, then switch off the FastAPI services
+   (nobody needs migrating).
+
+**After parity:** M7 cutover (seedless, docs/plans/SEEDLESS.md; Android/iOS builds), files in
+project chats, code health (UX.md: one kind profile per type, split files near 300 lines, one
+resolved-link helper).
 
 ### Where things stand (1:30 am Melbourne, 2026-11-18, UX session)
 - **PR `claude/map-sheet-splash`** (owner's notes, 17 Nov evening): the opening screen is a
