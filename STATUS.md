@@ -222,10 +222,13 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
-### Where things stand (8:10 pm Melbourne, 2026-11-18, UX session)
+### Where things stand (8:20 pm Melbourne, 2026-11-18, UX session)
+- **Parity:** web's routes compared with the app's (PARITY.md "Routes compared"): all covered.
+  Left: live checks (Platform/Moderators, reporting, profile photos, plan rating and vote
+  errors), Russian (ADR first), then the owner switches off FastAPI.
 - **Live:** #222 (only platform moderators record merges on #platform software projects; the
   awaiting-merge push goes to them). Live smoke after: 15 cards, 0 errors.
-- **Open: `claude/desktop-notifications` (ADR 0108's desktop half):** the desktop app shows
+- **Live: #223 (ADR 0108's desktop half):** the desktop app shows
   the OS's own notifications for notices that arrive while its window isn't in front
   (`tauri-plugin-notification` =2.7.0), with the same switch, categories and "Show what it's
   about" as browsers. Checked: UI check, lint, boundaries, sizes, `cargo clippy -p native`.
