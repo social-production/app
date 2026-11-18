@@ -11,20 +11,22 @@
   overflow: hidden;
 }
 
-.shell .dock-capsule :is(button, a, .membership-split, .participation-membership, .dock-chip),
+.shell
+  .dock-capsule
+  :is(button, a, .membership-split, .participation-membership, .dock-chip):not(.dock-more-card *),
 .shell .dock-vote :is(.vote-dock, #participation-signals) :is(button, a) {
   min-height: 52px;
   border-radius: 0;
 }
 
 /* A hairline before every segment; the capsule's round end hides the first one. */
-.shell .dock-capsule :is(button, a, .dock-chip):not(.membership-split *),
+.shell .dock-capsule :is(button, a, .dock-chip):not(.membership-split *, .dock-more-card *),
 .shell .dock-capsule .membership-split,
 .shell .dock-vote :is(.vote-dock, #participation-signals) :is(button, a) {
   box-shadow: inset 1px 0 0 var(--float-border);
 }
 
-.shell .dock-capsule :is(button, a):active:not(:disabled) {
+.shell .dock-capsule :is(button, a):not(.dock-more-card *):active:not(:disabled) {
   transform: none;
   filter: brightness(0.94);
 }

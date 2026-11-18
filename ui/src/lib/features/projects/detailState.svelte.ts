@@ -57,9 +57,10 @@ export class DetailState {
     return !!p?.amMember && (!organized || p.amOrganizer);
   }
 
-  /** Join at once; leaving an event waits for the confirm dialog. */
+  /** Join at once; leaving always waits for the confirm dialog (owner, 2026-11-18: one tap
+   * on the ⋯ menu's Leave took a member out of a project). */
   requestToggleJoin(): void {
-    if (this.project?.amMember && this.project.charter?.mode === 'event') {
+    if (this.project?.amMember) {
       this.confirmingLeave = true;
       return;
     }

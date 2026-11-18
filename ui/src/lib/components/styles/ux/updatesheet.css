@@ -1,0 +1,96 @@
+/* The Update sheet (owner, 2026-11-18, option A): the project as a card, a soft field, and
+   the reminder that members vote it in. Sheets are portaled outside `.shell`. */
+.update-sheet.update-sheet .update-form {
+  display: grid;
+  gap: 14px;
+  padding: 0 20px;
+}
+
+.update-sheet .update-project {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.update-sheet .update-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  background: var(--surface-accent);
+  color: #fff;
+}
+
+.update-sheet .update-project-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.update-sheet .update-project-copy b {
+  overflow: hidden;
+  color: var(--text-main);
+  font-size: 15.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.update-sheet .update-project-copy small {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.update-sheet .update-field {
+  display: grid;
+  gap: 8px;
+}
+
+.update-sheet .update-label {
+  color: var(--text-main);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.update-sheet.update-sheet .update-field textarea {
+  min-height: 170px;
+  padding: 14px 16px;
+  border: none;
+  border-radius: 18px;
+  background: var(--panel-hover);
+  box-shadow: none;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+  line-height: 1.5;
+  outline: none;
+  resize: none;
+}
+
+.update-sheet.update-sheet .update-field textarea:focus-visible {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+}
+
+.update-sheet .update-field textarea::placeholder {
+  color: var(--text-soft);
+}
+
+.update-sheet .update-vote {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: -4px 0 0;
+  padding: 0 4px;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.update-sheet .update-vote svg {
+  width: 16px;
+  height: 16px;
+}
