@@ -36,3 +36,151 @@
 .shell .dock-capsule:has(.dock-more-card, [role='menu'], [role='dialog']) {
   overflow: visible;
 }
+
+/* One row, always: a capsule with more than fits drops the words of its labelled actions
+   (DetailActionDock's `tight`), keeping their icons, so the last ones are never cut off. */
+.shell .dock-capsule {
+  flex-wrap: nowrap;
+}
+
+.shell .dock-capsule > * {
+  flex-shrink: 0;
+}
+
+.shell .dock-capsule.tight :is(.dock-labelled, .dock-labelled.primary):not(:has(svg)) {
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.shell .dock-capsule.tight .dock-labelled:has(svg) {
+  gap: 0;
+  min-width: 50px;
+  padding: 0 14px;
+  font-size: 0;
+}
+
+.shell .dock-capsule.tight :is(.plus-label, .phase-action-group .label) {
+  display: none;
+}
+
+.shell .dock-capsule.tight .dock-chip {
+  padding: 0 10px;
+}
+
+/* The phase toolbar's last wrapper dissolves like the others, so Phase ▾ is a segment of its
+   own rather than squeezed inside a 21px box; its buttons are flat segments too. */
+.shell .dock-capsule .phase-action-group .phase-nav-side.phase-nav-side.phase-nav-side {
+  display: contents;
+}
+
+.shell .dock-capsule :is(button, a):not(.dock-more-card *) {
+  flex-shrink: 0;
+}
+
+.shell .dock-capsule .round-plus-button.round-plus-button.round-plus-button,
+.shell .dock-capsule .phase-shift-button.phase-shift-button.phase-shift-button,
+.shell .dock-capsule .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
+  min-height: 52px;
+  border-radius: 0;
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
+
+/* Support | % | Oppose (owner, 2026-11-19: "the percentage should be within two dividers"):
+   three segments, the two choices the same width and the share between them with a hairline
+   on each side. */
+.shell .dock-vote > #participation-signals .feed-vote {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button:first-child {
+  box-shadow: none;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > .signal-percent {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 64px;
+  padding: 0 12px;
+  box-shadow:
+    inset 1px 0 0 var(--float-border),
+    inset -1px 0 0 var(--float-border);
+  color: var(--text-soft);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button .signal-count {
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > .signal-percent + button {
+  box-shadow: none;
+}
+
+/* A request's like count in the dock (owner, 2026-11-19: "like count buttons on requests
+   which are not percentage based"): ↑ | count | ↓ as three segments, the count between two
+   hairlines like the Support | % | Oppose capsule. */
+.shell .dock-capsule .feed-vote.feed-vote {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > button {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  min-width: 52px;
+  padding: 0;
+}
+
+.shell .dock-capsule > .feed-vote:first-child > button:first-child {
+  width: 58px;
+  padding-left: 6px;
+  box-shadow: none;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > .vote-count {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  padding: 0 10px;
+  box-shadow:
+    inset 1px 0 0 var(--float-border),
+    inset -1px 0 0 var(--float-border);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > .vote-count + button {
+  box-shadow: none;
+}
+
+/* The capsule's last segment sits against its rounded end: a little more room on that side
+   so an icon there (Share, ⋯) isn't pinched by the curve. */
+.shell .dock-capsule > :is(button, a):last-child,
+.shell .dock-capsule > .share-sheet:last-child .share-button,
+.shell .dock-capsule > :last-child:not(button, a) > :is(button, a):last-child {
+  min-width: 58px;
+  padding-right: 6px;
+}

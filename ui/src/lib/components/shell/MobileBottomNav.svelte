@@ -84,7 +84,9 @@
 <style>
   /*
     ADR 0096: a floating capsule, not an edge-to-edge bar. The page scrolls under it and
-    shows through the blur; the current tab is a tinted pill that names itself.
+    shows through the blur. Its tabs are joined segments (owner, 2026-11-19: "all docks must
+    be new style"): flat where they meet with a hairline, rounded only by the capsule's ends;
+    the current one is tinted and names itself.
   */
   .mobile-bottom-nav {
     position: fixed;
@@ -94,10 +96,11 @@
     z-index: var(--z-shell-nav);
     box-sizing: border-box;
     display: flex;
-    gap: 4px;
+    gap: 0;
     height: var(--shell-nav-capsule-height);
     margin: 0;
-    padding: 6px;
+    padding: 0;
+    overflow: hidden;
     border: 1px solid var(--float-border);
     border-radius: 999px;
     background: var(--float-background);
@@ -131,8 +134,9 @@
     min-height: 0;
     padding: 0;
     border: none;
-    border-radius: 999px;
+    border-radius: 0;
     background: transparent;
+    box-shadow: inset 1px 0 0 var(--float-border);
     color: var(--text-soft);
     font-size: 13.5px;
     font-weight: 700;
@@ -144,16 +148,20 @@
       transform 0.12s ease;
   }
 
+  .bottom-nav-item:first-child {
+    box-shadow: none;
+  }
+
   .bottom-nav-item.active-link {
     flex: 0 0 auto;
-    padding: 0 16px;
+    padding: 0 18px;
   }
 
   .bottom-nav-signup {
     flex: 1.4 1 0;
     display: grid;
     place-items: center;
-    border-radius: 999px;
+    border-radius: 0;
     background: var(--brand);
     color: var(--on-brand, var(--page-bg));
     font-size: 15px;
@@ -163,7 +171,7 @@
 
   .bottom-nav-signup:active,
   .bottom-nav-item:active {
-    transform: scale(0.94);
+    filter: brightness(0.94);
   }
 
   .bottom-nav-label {
