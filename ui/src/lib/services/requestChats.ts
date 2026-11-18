@@ -20,8 +20,9 @@ function opening(r: ServiceRequest): string {
 export async function openPlannersChat(r: ServiceRequest): Promise<string> {
   const me = await myAgent();
   const seed = plannersSeed(me, r.id);
+  // Reading a chat nobody started answers with no members rather than failing.
   const there = await chatSummary(seed, 0).then(
-    () => true,
+    (c) => c.members.length > 0,
     () => false,
   );
   if (!there) await startChat('group', [r.requester], r.title.slice(0, 60), opening(r), seed);
@@ -34,7 +35,7 @@ export async function syncPlannersChat(r: ServiceRequest, a: Activity): Promise<
   if (a.author !== me) return;
   const seed = plannersSeed(me, r.id);
   const summary = await chatSummary(seed, 0).catch(() => null);
-  if (!summary) {
+  if (!summary?.members.length) {
     await openPlannersChat(r);
     return syncPlannersChat(r, a);
   }
