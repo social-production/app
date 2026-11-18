@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import EventAudiencePanel from '#lib/components/create/EventAudiencePanel.svelte';
@@ -31,7 +32,9 @@
 
   const organizerHelp = $derived(
     s.upfrontPlan
-      ? 'You keep full organizer authority. Chosen organizers can invite people, create activities, and manage event decisions; other invitees can only attend and sign up.'
+      ? t(
+          'You keep full organizer authority. Chosen organizers can invite people, create activities, and manage event decisions; other invitees can only attend and sign up.',
+        )
       : 'You keep full organizer authority. Chosen organizers can invite people; other invitees can create activities, plans, and proposals, but only organizers can invite.',
   );
   const missing = $derived(
@@ -39,8 +42,8 @@
   );
 
   function blocker(step: string, audience: EventAudience): string {
-    if (step === 'plan') return 'Plan details';
-    return audience === 'private_community' ? 'Private community' : 'Invites';
+    if (step === 'plan') return t('Plan details');
+    return audience === 'private_community' ? t('Private community') : t('Invites');
   }
 
   async function publish(): Promise<void> {
@@ -50,12 +53,14 @@
 </script>
 
 <CreateSheet
-  title="Private event"
-  description="A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one."
+  title={t('Private event')}
+  description={t(
+    'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
+  )}
   steps={s.steps}
   stepIndex={s.step}
   {missing}
-  submitLabel="Publish event"
+  submitLabel={t('Publish event')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
@@ -64,11 +69,11 @@
   {#if s.stepId === 'basics'}
     <div class="form-stack">
       <label>
-        <RequiredLabel>Event title</RequiredLabel>
+        <RequiredLabel>{t('Event title')}</RequiredLabel>
         <input bind:value={s.title} maxlength="200" aria-required="true" />
       </label>
       <label>
-        <RequiredLabel>Description</RequiredLabel>
+        <RequiredLabel>{t('Description')}</RequiredLabel>
         <textarea bind:value={s.description} rows="4" aria-required="true"></textarea>
       </label>
       <PolicyNotice event />
@@ -87,15 +92,15 @@
     <div class="form-stack">
       <ScopeTagsStep tags={s.tags} onChange={(t) => (s.tags = t)} variant="event" />
       {#if s.tags.length === 0}
-        <p class="status-note">Public events need at least one channel or community tag.</p>
+        <p class="status-note">{t('Public events need at least one channel or community tag.')}</p>
       {/if}
     </div>
   {:else if s.stepId === 'scope' && s.audience === 'private_community'}
     <div class="form-stack">
       <PeoplePicker
-        label="Private community"
-        placeholder="Type to choose one private community"
-        helperText="Pick exactly one private community. Its members can discover this event."
+        label={t('Private community')}
+        placeholder={t('Type to choose one private community')}
+        helperText={t('Pick exactly one private community. Its members can discover this event.')}
         selected={s.community
           ? [{ agent: s.community.id, name: `${s.community.handle} (Private)` }]
           : []}
@@ -104,11 +109,11 @@
         onRemove={() => s.chooseCommunity(null)}
       />
       {#if !s.community}
-        <p class="status-note">Choose one private community.</p>
+        <p class="status-note">{t('Choose one private community.')}</p>
       {/if}
       <PeoplePicker
-        label="Organizers (optional)"
-        placeholder="People with organizer authority"
+        label={t('Organizers (optional)')}
+        placeholder={t('People with organizer authority')}
         helperText={organizerHelp}
         selected={s.organizers}
         search={(q) => s.search(q)}
@@ -150,13 +155,13 @@
         place={s.intent === 'physical' ? s.locationLabel : ''}
       />
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('audience'))}>
-        <strong>Audience</strong><span>{AUDIENCE_LABELS[s.audience]}</span>
+        <strong>{t('Audience')}</strong><span>{AUDIENCE_LABELS[s.audience]}</span>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
-        <strong>{s.isPrivate ? 'Who' : 'Tags'}</strong>
+        <strong>{s.isPrivate ? t('Who') : t('Tags')}</strong>
         <span>
           {#if s.audience === 'private_community'}
-            {s.community?.handle ?? 'No community'}{#if s.organizers.length}
+            {s.community?.handle ?? t('No community')}{#if s.organizers.length}
               · {s.organizers.length} organizers{/if}
           {:else if s.isPrivate}
             {s.invitees.length} invites{#if s.organizers.length}
@@ -168,25 +173,32 @@
       </button>
       {#if s.isPrivate}
         <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('control'))}>
-          <strong>Control</strong>
-          <span>{s.governance === 'collaborative' ? 'Collaborative' : 'Organizer-controlled'}</span>
+          <strong>{t('Control')}</strong>
+          <span
+            >{s.governance === 'collaborative'
+              ? t('Collaborative')
+              : t('Organizer-controlled')}</span
+          >
         </button>
       {/if}
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
-        <strong>Location</strong><span>{s.locationLabel}</span>
+        <strong>{t('Location')}</strong><span>{t(s.locationLabel)}</span>
       </button>
       {#if s.upfrontPlan}
         <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('plan'))}>
-          <strong>Plan</strong>
+          <strong>{t('Plan')}</strong>
           <span
-            >{s.plan.title.trim() || 'Untitled plan'} · {s.plan.stages.length}
-            {s.plan.stages.length === 1 ? 'stage' : 'stages'}</span
+            >{s.plan.title.trim() || 'Untitled plan'} · {plural(
+              s.plan.stages.length,
+              '{n} stage',
+              '{n} stages',
+            )}</span
           >
         </button>
       {:else}
         <div class="overview-row static">
-          <strong>Dates</strong>
-          <span>Set when members approve the event's plan</span>
+          <strong>{t('Dates')}</strong>
+          <span>{t("Set when members approve the event's plan")}</span>
         </div>
       {/if}
       {#if s.message}<p class="status-note">{s.message}</p>{/if}

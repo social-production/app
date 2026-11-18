@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   import type { ServiceRequestsState } from './serviceRequestsState.svelte.ts';
@@ -21,7 +22,7 @@
 
 <OverlaySheet
   open={state.composing}
-  title="Request service"
+  title={t('Request service')}
   labelledById="personal-request-form-sheet"
   onClose={() => (state.composing = false)}
 >
@@ -30,20 +31,22 @@
       <div class="request-header-row">
         <div>
           <p>
-            Every member of the service sees your request; whoever plans it starts a chat with you.
+            {t(
+              'Every member of the service sees your request; whoever plans it starts a chat with you.',
+            )}
             {#if showSchedule}
-              Start from the selected available time and add the details.
+              {t('Start from the selected available time and add the details.')}
             {:else}
-              Describe what you need so they can review the request and reply.
+              {t('Describe what you need so they can review the request and reply.')}
             {/if}
           </p>
         </div>
       </div>
-      <input bind:value={state.form.title} maxlength="120" placeholder="Request title" />
+      <input bind:value={state.form.title} maxlength="120" placeholder={t('Request title')} />
       {#if showSchedule}
         <div class="number-grid">
           <label>
-            <span class="field-inline-label">Start time</span>
+            <span class="field-inline-label">{t('Start time')}</span>
             <input
               bind:value={state.form.scheduledAt}
               disabled={!!state.form.slot}
@@ -51,7 +54,7 @@
             />
           </label>
           <label>
-            <span class="field-inline-label">Finish time</span>
+            <span class="field-inline-label">{t('Finish time')}</span>
             <input
               bind:value={state.form.endsAt}
               disabled={!!state.form.slot}
@@ -61,25 +64,25 @@
         </div>
       {:else}
         <button class="text-button add-time" type="button" onclick={() => state.addPreferredTime()}>
-          + Add a preferred time (optional)
+          {t('+ Add a preferred time (optional)')}
         </button>
       {/if}
       <textarea
         bind:value={state.form.body}
         rows="3"
         placeholder={showSchedule
-          ? 'What do you need help with? (required)'
-          : 'What do you need, and what should they expect? (required)'}></textarea>
+          ? t('What do you need help with? (required)')
+          : t('What do you need, and what should they expect? (required)')}></textarea>
       {#if state.error}<p class="validation-copy" role="alert">{state.error}</p>{/if}
     </div>
   </div>
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-cancel" type="button" onclick={() => (state.composing = false)}
-        >Cancel</button
+        >{t('Cancel')}</button
       >
       <button class="sheet-submit" type="button" disabled={state.busy} onclick={onSend}
-        >{state.busy ? 'Sending…' : 'Request'}</button
+        >{state.busy ? t('Sending…') : t('Request')}</button
       >
     </div>
   {/snippet}

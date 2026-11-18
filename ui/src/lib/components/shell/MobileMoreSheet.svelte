@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -53,14 +54,14 @@
 {#if open}
   <div class="more-panel-root">
     <button
-      aria-label="Close menu"
-      title="Close menu"
+      aria-label={t('Close menu')}
+      title={t('Close menu')}
       class="more-panel-backdrop"
       type="button"
       onclick={onClose}
     ></button>
 
-    <div class="more-panel float-panel" role="dialog" aria-modal="true" aria-label="More menu">
+    <div class="more-panel float-panel" role="dialog" aria-modal="true" aria-label={t('More menu')}>
       <!-- eslint-disable svelte/no-navigation-without-resolve -- hrefs arrive resolved (ResolvedPathname) -->
       {#if viewer}
         <a
@@ -73,7 +74,7 @@
           <AvatarBadge name={viewer.name} />
           <span class="more-panel-me-copy">
             <strong>{viewer.name}</strong>
-            <span>View profile</span>
+            <span>{t('View profile')}</span>
           </span>
         </a>
         <div class="float-panel-sep"></div>
@@ -99,7 +100,7 @@
               stroke-linejoin="round"
             /></svg
           >
-          <span>Settings</span>
+          <span>{t('Settings')}</span>
         </a>
       {:else}
         <a class="float-panel-item" href={signInHref} onclick={onClose}>
@@ -119,7 +120,7 @@
               stroke-linecap="round"
             /></svg
           >
-          <span>Sign in / Sign up</span>
+          <span>{t('Sign in / Sign up')}</span>
         </a>
       {/if}
       <a
@@ -144,18 +145,18 @@
             stroke-linecap="round"
           /><circle cx="12" cy="8" r="0.9" fill="currentColor" /></svg
         >
-        <span>About</span>
+        <span>{t('About')}</span>
       </a>
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
       <div class="float-panel-sep"></div>
-      <div class="more-panel-theme" role="radiogroup" aria-label="Theme">
+      <div class="more-panel-theme" role="radiogroup" aria-label={t('Theme')}>
         {#each THEMES as [value, label] (value)}
           <button
             type="button"
             role="radio"
             aria-checked={theme === value}
             class:on={theme === value}
-            onclick={() => onTheme(value)}>{label}</button
+            onclick={() => onTheme(value)}>{t(label)}</button
           >
         {/each}
       </div>

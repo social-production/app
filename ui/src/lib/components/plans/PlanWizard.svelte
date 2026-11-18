@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { PlaceSearch } from '#lib/domain/places.ts';
   import type { ProductionLocation } from '#lib/domain/planForm.ts';
   import { DIRECT_USE_CORE, DIRECT_USE_PLAN } from '#lib/domain/policy.ts';
@@ -97,7 +98,7 @@
   title={`Create ${name}`}
   stepIndex={Math.min(index, steps.length - 1)}
   stepCount={steps.length}
-  nextLabel={reviewing ? (pending ? 'Working...' : `Submit ${name}`) : 'Next'}
+  nextLabel={reviewing ? (pending ? t('Working...') : `Submit ${name}`) : t('Next')}
   canGoBack={index > 0}
   canGoNext={!!step && !pending && stepReady(step.id, form)}
   onClose={close}
@@ -108,8 +109,8 @@
   <div class="plan-wizard">
     {#if index === 0}
       <div class="policy-notice-wrap">
-        <aside class="policy-notice" aria-label="Direct-use policy">
-          <strong>Direct use only — no commercial activity</strong>
+        <aside class="policy-notice" aria-label={t('Direct-use policy')}>
+          <strong>{t('Direct use only — no commercial activity')}</strong>
           <p>{DIRECT_USE_PLAN}</p>
           <p class="policy-core">{DIRECT_USE_CORE}</p>
         </aside>
@@ -117,7 +118,7 @@
     {/if}
     {#if message && reviewing}
       <div class="warning-card" role="alert">
-        <strong>Plan could not be submitted</strong>
+        <strong>{t('Plan could not be submitted')}</strong>
         <ul class="warning-list"><li>{message}</li></ul>
       </div>
     {/if}

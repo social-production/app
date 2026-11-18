@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
@@ -30,7 +31,7 @@
     children,
   }: Props = $props();
 
-  const commentLabel = $derived(`${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}`);
+  const commentLabel = $derived(`${plural(commentCount, '{n} comment', '{n} comments')}`);
   let shared = $state<'' | 'Link copied' | 'Copy failed'>('');
   let timer: ReturnType<typeof setTimeout> | null = null;
 
@@ -75,7 +76,13 @@
       <span>{formatCompactCount(memberCount)}</span>
     </span>
   {/if}
-  <button class="feed-action" type="button" aria-label="Share" title="Share" onclick={share}>
+  <button
+    class="feed-action"
+    type="button"
+    aria-label={t('Share')}
+    title={t('Share')}
+    onclick={share}
+  >
     <svg aria-hidden="true" viewBox="0 0 24 24" class="feed-action-icon"
       ><path
         d="M12 15V4.5M8 8l4-3.5L16 8M6 12.5V18a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-5.5"

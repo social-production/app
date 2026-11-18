@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ChatPin } from '#lib/domain/messages.ts';
 
   /**
@@ -20,7 +21,7 @@
 </script>
 
 {#if current}
-  <div class="pin-bar" aria-label="Pinned messages">
+  <div class="pin-bar" aria-label={t('Pinned messages')}>
     <span class="pin-rail" aria-hidden="true">
       {#each pins as pin, i (pin.messageId)}
         <span class="pin-rail-segment" class:active={i === pins.length - 1 - index}></span>
@@ -40,7 +41,7 @@
     {#if canUnpin}
       <button
         aria-label={`Unpin ${current.preview || 'message'}`}
-        title="Unpin"
+        title={t('Unpin')}
         class="pin-remove"
         type="button"
         onclick={() => onUnpin(current.messageId)}

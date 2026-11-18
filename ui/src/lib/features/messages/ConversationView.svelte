@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
@@ -192,9 +193,9 @@
 <ChatPanel
   {lines}
   {title}
-  placeholder="Write a message..."
-  submitLabel="Send"
-  emptyCopy={thread.loaded ? 'No messages yet.' : ''}
+  placeholder={t('Write a message...')}
+  submitLabel={t('Send')}
+  emptyCopy={thread.loaded ? t('No messages yet.') : ''}
   embedded={true}
   fitViewport={false}
   showHeader={false}

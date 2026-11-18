@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { pausedAgents } from './pausedAgents.ts';
 
   /** web's PausedBadge: a small "Paused" tag after a name that a bot review found to be a bot. */
@@ -13,6 +14,6 @@
 {#if agent && paused.has(agent)}
   <span class="paused-badge" title={explanation} aria-label={explanation}>
     <span class="dot" aria-hidden="true"></span>
-    <span class="text">Paused</span>
+    <span class="text">{t('Paused')}</span>
   </span>
 {/if}

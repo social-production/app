@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { portal } from '#lib/components/actions/portal.ts';
@@ -96,7 +97,12 @@
 
 {#if url}
   <div class="photo-viewer" role="presentation" use:portal>
-    <button class="scrim" type="button" aria-label="Close photo" title="Close photo" onclick={close}
+    <button
+      class="scrim"
+      type="button"
+      aria-label={t('Close photo')}
+      title={t('Close photo')}
+      onclick={close}
     ></button>
     <div
       aria-label={alt}
@@ -119,14 +125,14 @@
         style={`transform: translate(${view.x}px, ${view.y}px) scale(${view.scale})`}
         ondblclick={zoomToggle}
       />
-      <button aria-label="Close photo" class="close" type="button" onclick={close}>×</button>
+      <button aria-label={t('Close photo')} class="close" type="button" onclick={close}>×</button>
       {#if count > 1}
         <span class="photo-count">{index + 1} / {count}</span>
         {#if index > 0}
           <button
             class="photo-step prev"
             type="button"
-            aria-label="Previous photo"
+            aria-label={t('Previous photo')}
             onclick={() => step(-1)}>‹</button
           >
         {/if}
@@ -134,7 +140,7 @@
           <button
             class="photo-step next"
             type="button"
-            aria-label="Next photo"
+            aria-label={t('Next photo')}
             onclick={() => step(1)}>›</button
           >
         {/if}

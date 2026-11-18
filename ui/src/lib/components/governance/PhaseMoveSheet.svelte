@@ -15,6 +15,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   import '#lib/components/styles/governance.css';
@@ -62,12 +63,12 @@
 
 <OverlaySheet
   {open}
-  title="Where should this go next?"
+  title={t('Where should this go next?')}
   labelledById="phase-move-sheet"
   rootClass="phase-move-sheet"
   {onClose}
 >
-  <div class="phase-moves" role="radiogroup" aria-label="Phase moves">
+  <div class="phase-moves" role="radiogroup" aria-label={t('Phase moves')}>
     {#each moves as option (option.id)}
       <button
         role="radio"
@@ -81,25 +82,25 @@
       >
         <span class="radio" aria-hidden="true"></span>
         <span class="phase-move-copy">
-          <strong>{option.label}</strong>
+          <strong>{t(option.label)}</strong>
           <small>{option.detail}</small>
         </span>
       </button>
     {/each}
   </div>
   <label class="phase-move-reason">
-    <span>Reason, shown to members with the vote</span>
+    <span>{t('Reason, shown to members with the vote')}</span>
     <textarea
       bind:value={reason}
       rows="3"
       maxlength="2000"
-      placeholder="State why this phase change should happen now."></textarea>
+      placeholder={t('State why this phase change should happen now.')}></textarea>
   </label>
   {#if alert}<p class="phase-move-alert" role="alert">{alert}</p>{/if}
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-submit" disabled={pending || !move} type="button" onclick={submit}
-        >{pending ? 'Working...' : 'Start the vote'}</button
+        >{pending ? t('Working...') : t('Start the vote')}</button
       >
     </div>
   {/snippet}

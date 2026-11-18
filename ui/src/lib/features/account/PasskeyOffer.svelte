@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { viewer } from '#lib/stores/viewer.svelte.ts';
   import { addPasskey, devicePasskeysAvailable } from '#lib/services/account.ts';
@@ -47,18 +48,19 @@
 
 {#if visible && connection.current.status === 'connected'}
   <section class="empty-card passkey-offer">
-    <strong>Sign in faster on this device</strong>
+    <strong>{t('Sign in faster on this device')}</strong>
     <p>
-      Save a passkey here (fingerprint, face or screen lock) so you don't need your 24 words next
-      time. Optional — your words always work.
+      {t(
+        "Save a passkey here (fingerprint, face or screen lock) so you don't need your 24 words next time. Optional — your words always work.",
+      )}
     </p>
     {#if error}<p class="warning-card">{error}</p>{/if}
     <div class="button-row">
       <button class="button-primary" type="button" onclick={save} disabled={busy}
-        >Save a passkey</button
+        >{t('Save a passkey')}</button
       >
       <button class="button-secondary" type="button" onclick={() => close('dismissed')}
-        >Not now</button
+        >{t('Not now')}</button
       >
     </div>
   </section>

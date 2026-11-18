@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatModeration } from '#lib/components/chat/chatModeration.svelte.ts';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
@@ -40,9 +41,9 @@
     highlighted,
     onWrote,
     copy = {
-      title: '# project-chat',
-      placeholder: 'Message the project...',
-      empty: 'No project chat yet.',
+      title: t('# project-chat'),
+      placeholder: t('Message the project...'),
+      empty: t('No project chat yet.'),
     },
   }: Props = $props();
 
@@ -140,7 +141,7 @@
     {lines}
     title={copy.title}
     placeholder={copy.placeholder}
-    submitLabel="Send"
+    submitLabel={t('Send')}
     emptyCopy={chat.loaded ? copy.empty : ''}
     {embedded}
     fitViewport={embedded}

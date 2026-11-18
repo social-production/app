@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /** web's platform board (ADR 0095): moderators and candidates, replayed in the directory. */
 
 /** web's `confidenceStandingState`: a moderator is `active` or in `grace`; a candidate is
@@ -53,13 +54,13 @@ export function boardLine(m: BoardMember, quorum: number): string {
   const votes = votesOf(m);
   const pct = percent(m);
   if (m.standing === 'active') {
-    if (votes === 0) return quorum === 0 ? 'Seated straight away' : 'No votes yet';
+    if (votes === 0) return quorum === 0 ? t('Seated straight away') : t('No votes yet');
     return `${pct}% yes from ${plural(votes, 'vote')}`;
   }
   if (m.standing === 'grace') {
     return `${pct ?? 0}% yes, but ${votes} of ${quorum} votes this week`;
   }
-  if (m.standing === 'qualifying') return 'Has the votes; seated at the next count';
+  if (m.standing === 'qualifying') return t('Has the votes; seated at the next count');
   return votes ? `${votes} of ${quorum} votes · ${pct}% yes` : `0 of ${quorum} votes`;
 }
 

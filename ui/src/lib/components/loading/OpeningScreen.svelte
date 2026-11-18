@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
 
   import '#lib/components/styles/ux/loading.css';
@@ -16,11 +17,11 @@
 
 <div class="opening-screen" role="status">
   <span class="opening-logo"><img alt="" src={brandIcon} /></span>
-  <strong>Social Production</strong>
+  <strong>{t('Social Production')}</strong>
   <p>
     {message}<span class="opening-dots" aria-hidden="true"><i></i><i></i><i></i></span>
   </p>
   {#if slow}<p class="opening-slow">
-      Still connecting. This can take a minute on a slow network.
+      {t('Still connecting. This can take a minute on a slow network.')}
     </p>{/if}
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { inZone } from '#lib/domain/zone.ts';
   import type { Snippet } from 'svelte';
 
@@ -133,9 +134,9 @@
       {#if p.history}
         <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
       {:else}
-        <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+        <span class={`agenda-chip ${chip.tone}`}>{t(chip.label)}</span>
       {/if}
-      {#if joinable}<span class="agenda-join">Join</span>{/if}
+      {#if joinable}<span class="agenda-join">{t('Join')}</span>{/if}
     </span>
   </button>
 
@@ -157,7 +158,7 @@
           <a
             class="sheet-place sheet-line map-link"
             href={mapHref}
-            title="Show on map"
+            title={t('Show on map')}
             target="_blank"
             rel="noopener noreferrer"
             onclick={showOnMap}><ToolbarIcon name="map-pin" /><span>{place}</span></a
@@ -172,7 +173,7 @@
       {#if a.online && a.meetingUrl}
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- an outside meeting -->
         <a class="meeting-link" href={a.meetingUrl} target="_blank" rel="noopener noreferrer"
-          >Join meeting</a
+          >{t('Join meeting')}</a
         >
       {/if}
       {#if p.planStage}
@@ -202,10 +203,10 @@
         <button
           class="sheet-pill share-activity"
           type="button"
-          title="Copy a link to this activity"
+          title={t('Copy a link to this activity')}
           onclick={share}
         >
-          <ToolbarIcon name="link" />{copied ? 'Link copied' : 'Share activity'}
+          <ToolbarIcon name="link" />{copied ? t('Link copied') : t('Share activity')}
         </button>
         {#if !a.online && a.place}
           <!-- eslint-disable svelte/no-navigation-without-resolve -- an outside map -->
@@ -214,7 +215,7 @@
             href={mapHref}
             target="_blank"
             rel="noopener noreferrer"
-            onclick={showOnMap}><ToolbarIcon name="map-pin" />Show on map</a
+            onclick={showOnMap}><ToolbarIcon name="map-pin" />{t('Show on map')}</a
           >
           <!-- eslint-enable svelte/no-navigation-without-resolve -->
         {/if}

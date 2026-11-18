@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { tick } from 'svelte';
 
   import { MESSAGE_MAX, type ChatLine } from '#lib/domain/chat.ts';
@@ -169,7 +170,7 @@
           fill="currentColor"
         />
       </svg>
-      <div class="composer-context-text"><strong>Edit message</strong></div>
+      <div class="composer-context-text"><strong>{t('Edit message')}</strong></div>
       {@render cancel('Cancel edit', () => {
         draft = '';
         p.onCancelEdit?.();
@@ -201,9 +202,9 @@
               >{item.file.name}</span
             >{/if}
           <button
-            aria-label="Remove attachment"
+            aria-label={t('Remove attachment')}
             type="button"
-            onclick={() => files.release(item.id)}>Remove</button
+            onclick={() => files.release(item.id)}>{t('Remove')}</button
           >
         </div>
       {/each}
@@ -214,7 +215,7 @@
   {/if}
   {#if p.paused}
     <p class="composer-paused" role="status">
-      This account is read-only: a community review found it's a bot.
+      {t("This account is read-only: a community review found it's a bot.")}
     </p>
   {:else}
     <div class="composer-row">
@@ -233,13 +234,13 @@
           rows="1"></textarea>
       </div>
       {#if p.signIn}
-        <button class="primary-button" type="button" onclick={p.signIn}>Sign in</button>
+        <button class="primary-button" type="button" onclick={p.signIn}>{t('Sign in')}</button>
       {:else if p.editing}
         <button
           class="send-button save"
           disabled={pending || !canSend}
           type="button"
-          onclick={submit}>Save</button
+          onclick={submit}>{t('Save')}</button
         >
       {:else}
         <button

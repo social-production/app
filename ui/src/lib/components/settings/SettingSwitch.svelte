@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   /** A setting that is on or off, as a row: its name at the left, a switch at the right
    * (Remaining Screens, Settings). `note` is one quiet line under the name. */
   interface Props {
@@ -14,7 +15,7 @@
 
 <div class="set-row set-switch">
   <span class="set-row-label">
-    {label}
+    {t(label)}
     {#if note}<small>{note}</small>{/if}
   </span>
   <button
@@ -28,6 +29,6 @@
     onclick={onToggle}
   >
     <span class="switch-thumb"></span>
-    <span class="sr-only">{checked ? 'On' : 'Off'}</span>
+    <span class="sr-only">{checked ? t('On') : t('Off')}</span>
   </button>
 </div>

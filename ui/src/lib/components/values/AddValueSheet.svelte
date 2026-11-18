@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { IMPORTANCE_OPTIONS, VALUE_LABEL_MAX, type Importance } from '#lib/domain/values.ts';
 
@@ -35,7 +36,7 @@
 
 <OverlaySheet
   {open}
-  title="Add value"
+  title={t('Add value')}
   labelledById="add-value-sheet"
   rootClass="value-sheet"
   {onClose}
@@ -43,32 +44,32 @@
   <form id="add-value-form" class="add-value-form" onsubmit={submit}>
     {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
     <label class="field">
-      <span class="field-label">What should this achieve?</span>
+      <span class="field-label">{t('What should this achieve?')}</span>
       <input
         bind:value
         maxlength={VALUE_LABEL_MAX}
-        placeholder="Add a value, for example: should make use of unused space"
+        placeholder={t('Add a value, for example: should make use of unused space')}
       />
     </label>
     <div class="field">
-      <span class="field-label">How much does it matter to you?</span>
+      <span class="field-label">{t('How much does it matter to you?')}</span>
       <DiscreteScale
         options={IMPORTANCE_OPTIONS}
         selectedValue={importance}
-        leftLabel="Unnecessary"
-        rightLabel="Required"
+        leftLabel={t('Unnecessary')}
+        rightLabel={t('Required')}
         onSelect={(n) => (importance = n as Importance)}
       />
     </div>
   </form>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-cancel" type="button" onclick={onClose}>Cancel</button>
+      <button class="sheet-cancel" type="button" onclick={onClose}>{t('Cancel')}</button>
       <button
         class="sheet-submit"
         disabled={pending || !value.trim() || !importance}
         form="add-value-form"
-        type="submit">{pending ? 'Working...' : 'Add value'}</button
+        type="submit">{pending ? t('Working...') : t('Add value')}</button
       >
     </div>
   {/snippet}

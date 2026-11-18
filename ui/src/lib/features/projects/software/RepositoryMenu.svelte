@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
 
   /** web's RepositoryMenu: the rarely used repository votes, kept behind one button like Phase ▾. */
@@ -17,8 +18,8 @@
       list.push({
         id: 'replace-repository',
         glyph: '⇄',
-        label: 'Replace repository',
-        detail: 'Members vote to move the project to a different repository.',
+        label: t('Replace repository'),
+        detail: t('Members vote to move the project to a different repository.'),
         onSelect: onReplace,
       });
     }
@@ -26,8 +27,8 @@
       list.push({
         id: 'merge-capability',
         glyph: '⑂',
-        label: 'Grant or revoke merge capability',
-        detail: 'Members vote on who can merge approved pull requests.',
+        label: t('Grant or revoke merge capability'),
+        detail: t('Members vote on who can merge approved pull requests.'),
         onSelect: onChangeMerge,
       });
     }
@@ -37,7 +38,7 @@
 
 <PhaseMenu
   {items}
-  label="Repository"
-  sheetTitle="Repository"
+  label={t('Repository')}
+  sheetTitle={t('Repository')}
   labelledById="repository-menu-title"
 />

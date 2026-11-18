@@ -1,5 +1,6 @@
 /** Mirrors the project DNA's governance zome (Proposal → Vote → Outcome, ADR 0033). */
 
+import { t } from '#lib/i18n/index.ts';
 import type { Place } from './places.ts';
 
 export type VoteChoice = 'Yes' | 'No' | 'Neutral';
@@ -105,14 +106,14 @@ export function isPhaseChange(
 
 /** The sheet title for a proposal (web's pending-vote labels). */
 export function proposalLabel(kind: ProposalKind, phaseLabel: (id: string) => string): string {
-  if ('Edit' in kind) return 'Edit project';
-  if ('Update' in kind) return 'Post update';
-  if ('RemoveMember' in kind) return 'Remove member';
-  if ('RequestSettings' in kind) return 'Request settings';
+  if ('Edit' in kind) return t('Edit project');
+  if ('Update' in kind) return t('Post update');
+  if ('RemoveMember' in kind) return t('Remove member');
+  if ('RequestSettings' in kind) return t('Request settings');
   if ('Software' in kind) return kind.Software.label;
   // web's phaseChangeDecisionTitle('return', …).
   if ('Return' in kind) return `Return to ${phaseLabel(kind.Return.to)}`;
-  if ('Convert' in kind) return 'Convert to a new proposal';
+  if ('Convert' in kind) return t('Convert to a new proposal');
   return `Move to ${phaseLabel(kind.Phase.to)}`;
 }
 
@@ -122,14 +123,14 @@ export function outcomeSentence(
   from: string,
   to: (id: string) => string,
 ): string {
-  if ('Update' in kind) return 'If this passes, this update is posted.';
-  if ('RemoveMember' in kind) return 'If this passes, this member is removed.';
-  if ('RequestSettings' in kind) return 'If this passes, the request settings change.';
-  if ('Software' in kind) return 'If this passes, this change is applied.';
+  if ('Update' in kind) return t('If this passes, this update is posted.');
+  if ('RemoveMember' in kind) return t('If this passes, this member is removed.');
+  if ('RequestSettings' in kind) return t('If this passes, the request settings change.');
+  if ('Software' in kind) return t('If this passes, this change is applied.');
   if ('Phase' in kind) return `If this passes, this moves from ${from} to ${to(kind.Phase.to)}.`;
   if ('Return' in kind) return `If this passes, this moves from ${from} to ${to(kind.Return.to)}.`;
   if ('Convert' in kind)
-    return 'If this passes, this closes and its work continues as a new proposal.';
+    return t('If this passes, this closes and its work continues as a new proposal.');
   const e = kind.Edit;
   const names = [
     e.title !== null && 'title',
@@ -146,6 +147,6 @@ export function outcomeSentence(
 /** "2 yes · 1 no · 67%", or web's "No one has voted yet". */
 export function tallyLine(p: Pick<Proposal, 'yes' | 'no'>): string {
   const total = p.yes + p.no;
-  if (total === 0) return 'No one has voted yet';
+  if (total === 0) return t('No one has voted yet');
   return `${p.yes} yes · ${p.no} no · ${Math.round((p.yes / total) * 100)}%`;
 }

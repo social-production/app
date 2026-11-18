@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -53,28 +54,28 @@
   <div class="feed-filter-groups">
     {#if before}{@render before()}{/if}
     <section>
-      <h3>Type</h3>
+      <h3>{t('Type')}</h3>
       <PillChoice
         value={type}
-        ariaLabel="Filter public feed"
+        ariaLabel={t('Filter public feed')}
         options={FEED_TYPES}
         onChange={onType}
       />
     </section>
     <section>
-      <h3>Order</h3>
+      <h3>{t('Order')}</h3>
       <SegmentedChoice
         value={sort}
-        ariaLabel="Sort public feed by"
+        ariaLabel={t('Sort public feed by')}
         options={sorts}
         onChange={onSort}
       />
     </section>
     <section>
-      <h3>When</h3>
+      <h3>{t('When')}</h3>
       <SegmentedChoice
         value={window}
-        ariaLabel="Public feed time window"
+        ariaLabel={t('Public feed time window')}
         options={FEED_WINDOWS}
         onChange={onWindow}
       />
@@ -83,7 +84,7 @@
   </div>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-submit" type="button" onclick={onClose}>Show results</button>
+      <button class="sheet-submit" type="button" onclick={onClose}>{t('Show results')}</button>
     </div>
   {/snippet}
 </OverlaySheet>

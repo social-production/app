@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
 import type { TagRef } from '#lib/domain/scopes.ts';
 
@@ -20,7 +21,7 @@ export function tagHref(tag: TagRef): string {
 
 /** web's ScopeSheet kindLabel. */
 export function tagKindLabel(tag: TagRef): string {
-  if (tag.kind === 'channel' && tag.slug === 'platform') return 'Platform';
-  if (tag.kind === 'community') return 'Community';
-  return tag.kind === 'channel' ? 'Channel' : 'Tag';
+  if (tag.kind === 'channel' && tag.slug === 'platform') return t('Platform');
+  if (tag.kind === 'community') return t('Community');
+  return tag.kind === 'channel' ? t('Channel') : t('Tag');
 }

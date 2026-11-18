@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { FeedType } from '#lib/domain/feedTypes.ts';
@@ -29,35 +30,37 @@
   } = $props();
 
   const allScopes: { value: FeedScope; label: string }[] = [
-    { value: 'home', label: 'Home' },
-    { value: 'global', label: 'Global' },
-    { value: 'region', label: 'Region' },
+    { value: 'home', label: t('Home') },
+    { value: 'global', label: t('Global') },
+    { value: 'region', label: t('Region') },
   ];
   // Home is the feed of who you follow: someone signed out has none, so it isn't offered.
   const scopes = $derived(guest ? allScopes.filter((s) => s.value !== 'home') : allScopes);
   const audiences: { value: HomeAudience; label: string }[] = [
-    { value: 'following', label: 'Following only' },
-    { value: 'popular', label: 'Following + popular' },
+    { value: 'following', label: t('Following only') },
+    { value: 'popular', label: t('Following + popular') },
   ];
   const radiusLabel = $derived(
     radiusPresetOptions.find((o) => o.value === feed.region.radius)?.label ??
       `${feed.region.radius} km`,
   );
-  const scopeLabel = $derived(scopes.find((s) => s.value === feed.shownScope)?.label ?? 'Global');
+  const scopeLabel = $derived(
+    scopes.find((s) => s.value === feed.shownScope)?.label ?? t('Global'),
+  );
   // The dot: something narrower than the feed's widest view is on.
   const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
 </script>
 
 <header class="feed-header">
   <div class="feed-tabs">
-    <div class="feed-tablist" role="tablist" aria-label="Choose public feed scope">
+    <div class="feed-tablist" role="tablist" aria-label={t('Choose public feed scope')}>
       {#each scopes as scope (scope.value)}
         <button
           type="button"
           role="tab"
           aria-selected={feed.shownScope === scope.value}
           class:on={feed.shownScope === scope.value}
-          onclick={() => void feed.setScope(scope.value)}>{scope.label}</button
+          onclick={() => void feed.setScope(scope.value)}>{t(scope.label)}</button
         >
       {/each}
     </div>
@@ -65,10 +68,10 @@
       type="button"
       class="feed-tune"
       class:narrowed
-      aria-label="Feed filters"
+      aria-label={t('Feed filters')}
       aria-haspopup="dialog"
       aria-expanded={open}
-      title="Feed filters"
+      title={t('Feed filters')}
       onclick={() => (open = true)}
     >
       <ToolbarIcon name="filter" />
@@ -79,9 +82,9 @@
     <button type="button" class="region-near" aria-haspopup="dialog" onclick={() => (open = true)}>
       <ToolbarIcon name="map-pin" />
       {#if feed.region.placeQuery}
-        <span>Near <b>{feed.region.placeQuery}</b> · {radiusLabel}</span>
+        <span>{t('Near')} <b>{feed.region.placeQuery}</b> · {t(radiusLabel)}</span>
       {:else}
-        <span>Choose a place to see what is near it</span>
+        <span>{t('Choose a place to see what is near it')}</span>
       {/if}
     </button>
   {/if}
@@ -104,10 +107,10 @@
     {/if}
     {#if signedIn}
       <section>
-        <h3>From</h3>
+        <h3>{t('From')}</h3>
         <SegmentedChoice
           value={feed.audience}
-          ariaLabel="Choose personal audience"
+          ariaLabel={t('Choose personal audience')}
           options={audiences}
           onChange={(v) => void feed.setAudience(v)}
         />

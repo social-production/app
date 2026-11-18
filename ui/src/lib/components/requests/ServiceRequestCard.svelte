@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { dateLine } from '#lib/domain/activityTime.ts';
@@ -29,12 +30,12 @@
       ? 'Not met'
       : request.status === 'accepted'
         ? over
-          ? 'Done'
+          ? t('Done')
           : 'Accepted'
         : request.status === 'declined'
           ? 'Declined'
           : request.status === 'cancelled'
-            ? 'Cancelled'
+            ? t('Cancelled')
             : 'Pending',
   );
   const tone = $derived(
@@ -64,7 +65,7 @@
         <strong>{request.title}</strong>
         <span>{when}</span>
       </div>
-      <span class={`phase-badge ${tone}`}>{label}</span>
+      <span class={`phase-badge ${tone}`}>{t(label)}</span>
     </div>
     <div class="request-footer">
       <span class="request-meta">Requested by {requester} · {relativeTime(request.createdAt)}</span>

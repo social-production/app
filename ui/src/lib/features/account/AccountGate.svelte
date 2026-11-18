@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { connect, signOut } from '#lib/services/account.ts';
@@ -25,12 +26,14 @@
   <div class="onboarding">
     <section class="page">
       <section class="hero-card">
-        <h1>Can't reach the network</h1>
+        <h1>{t("Can't reach the network")}</h1>
         <p class="status-note">{connection.current.reason}</p>
         <div class="button-row">
-          <button class="button-primary" type="button" onclick={() => connect()}>Try again</button>
+          <button class="button-primary" type="button" onclick={() => connect()}
+            >{t('Try again')}</button
+          >
           <button class="button-secondary" type="button" onclick={() => signOut()}
-            >Sign in again</button
+            >{t('Sign in again')}</button
           >
         </div>
       </section>

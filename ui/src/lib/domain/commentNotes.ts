@@ -32,7 +32,7 @@ export function excerptOf(body: string): string {
 export const inChat = (mode: CharterMode): boolean => mode !== 'thread' && mode !== 'post';
 
 /**
- * The row's context line: "Maya Kim commented", "You replied to Priya R.", "Tomas B. commented
+ * The row's context line: t('Maya Kim commented'), "You replied to Priya R.", "Tomas B. commented
  * in the chat". `you` when the viewer wrote it.
  */
 export function commentContext(c: CommentActivity, you: boolean): string {

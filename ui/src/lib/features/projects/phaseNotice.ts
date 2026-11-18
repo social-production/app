@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { ProposalKind } from '#lib/domain/governance.ts';
 import type { Person } from '#lib/domain/people.ts';
 import type { Project } from '#lib/domain/projects.ts';
@@ -14,7 +15,7 @@ export function tellMembers(
   kind: ProposalKind,
 ): void {
   if (!('Phase' in kind) || !d.project) return;
-  const title = d.project.charter?.title ?? 'A project';
+  const title = d.project.charter?.title ?? t('A project');
   const to = d.members.map((m) => m.agent);
   void phaseVoteNotice(to, d.id, title, d.phaseLabel(kind.Phase.to));
 }
@@ -23,7 +24,7 @@ export function tellMembers(
 export const tellActivity =
   (d: { id: string; project?: Project | undefined; members: Person[] }) =>
   (a: { id: string; title: string }): void => {
-    const title = d.project?.charter?.title ?? 'A project';
+    const title = d.project?.charter?.title ?? t('A project');
     void activityAddedNotice(
       d.members.map((m) => m.agent),
       d.id,

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { portal } from '#lib/components/actions/portal.ts';
   import {
     moderationStatusLabel,
@@ -62,7 +63,7 @@
   const triggerLabel = $derived(
     `${status ? `${status} · ` : ''}${report || status ? `View ${itemLabel} report` : `Report ${itemLabel}`}`,
   );
-  const title = $derived(report ? resolutionLabel(report.resolution) : 'Options');
+  const title = $derived(report ? resolutionLabel(report.resolution) : t('Options'));
 
   $effect(() => {
     if (!open) copyLabel = 'Copy link';
@@ -70,7 +71,7 @@
 
   /** web shows a "Link copied" toast; the app has no toasts, so the item says it. */
   async function copy(): Promise<void> {
-    copyLabel = (await onCopy()) ? 'Link copied' : 'Could not copy the link';
+    copyLabel = (await onCopy()) ? t('Link copied') : t('Could not copy the link');
     setTimeout(onClose, 800);
   }
 
@@ -110,7 +111,7 @@
       type="button"
       onclick={trigger}
     >
-      {#if status}<span class="status-token">{status}</span>{/if}
+      {#if status}<span class="status-token">{t(status)}</span>{/if}
       <span aria-hidden="true" class="menu-dots"></span>
     </button>
   </div>
@@ -145,7 +146,7 @@
                   stroke-linecap="round"
                 /></svg
               >
-              <span>{copyLabel}</span>
+              <span>{t(copyLabel)}</span>
             </button>
             {#if canShare}
               <button class="menu-item" role="menuitem" type="button" onclick={share}>
@@ -159,17 +160,17 @@
                     stroke-linejoin="round"
                   /></svg
                 >
-                <span>Share</span>
+                <span>{t('Share')}</span>
               </button>
             {/if}
           {/if}
           {#if report}
             <div class="review-field">
-              <span class="field-label">Reason</span>
-              <p class="review-value">{reasonLabel(report.reason)}</p>
+              <span class="field-label">{t('Reason')}</span>
+              <p class="review-value">{t(reasonLabel(report.reason))}</p>
             </div>
             <div class="review-field">
-              <span class="field-label">Description</span>
+              <span class="field-label">{t('Description')}</span>
               <p class="report-message">
                 {report.description.trim() || 'No additional message was provided.'}
               </p>
@@ -179,7 +180,7 @@
               <p>{voteCountLine(report)}</p>
             </div>
           {:else if loading}
-            <p class="menu-label">Loading…</p>
+            <p class="menu-label">{t('Loading…')}</p>
           {:else if !blocked}
             <button class="menu-item menu-danger" role="menuitem" type="button" onclick={onCompose}>
               <svg aria-hidden="true" viewBox="0 0 24 24"
@@ -192,26 +193,28 @@
                   stroke-linejoin="round"
                 /></svg
               >
-              <span>Report {itemLabel}</span>
+              <span>Report {t(itemLabel)}</span>
             </button>
           {/if}
         </div>
         <footer class="menu-actions" class:votes={canVote}>
-          <button aria-label="Close" class="menu-dismiss" type="button" onclick={onClose}>×</button>
+          <button aria-label={t('Close')} class="menu-dismiss" type="button" onclick={onClose}
+            >×</button
+          >
           {#if canVote && report}
             <button
               class="vote-chip"
               class:active-vote={report.activeVote === 'no'}
               disabled={pending}
               type="button"
-              onclick={() => onVote(false)}>No</button
+              onclick={() => onVote(false)}>{t('No')}</button
             >
             <button
               class="vote-chip yes"
               class:active-vote={report.activeVote === 'yes'}
               disabled={pending}
               type="button"
-              onclick={() => onVote(true)}>Yes</button
+              onclick={() => onVote(true)}>{t('Yes')}</button
             >
           {/if}
         </footer>

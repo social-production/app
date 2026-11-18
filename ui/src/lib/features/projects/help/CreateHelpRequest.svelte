@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
   import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
@@ -51,12 +52,14 @@
 </script>
 
 <CreateSheet
-  title="Ask for help"
-  description="A help request asks people to take a role for a specific need, with a time and a place."
+  title={t('Ask for help')}
+  description={t(
+    'A help request asks people to take a role for a specific need, with a time and a place.',
+  )}
   steps={[...HELP_STEPS]}
   stepIndex={s.step}
   missing={s.missing}
-  submitLabel="Publish help request"
+  submitLabel={t('Publish help request')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
@@ -65,21 +68,21 @@
   {#if s.stepId === 'basics'}
     <div class="form-stack">
       <label class="field">
-        <RequiredLabel>Title</RequiredLabel>
+        <RequiredLabel>{t('Title')}</RequiredLabel>
         <input
           bind:value={s.title}
           maxlength="200"
           aria-required="true"
-          placeholder="e.g. Need a lift to the station"
+          placeholder={t('e.g. Need a lift to the station')}
         />
       </label>
       <label class="field">
-        <RequiredLabel>What do you need?</RequiredLabel>
+        <RequiredLabel>{t('What do you need?')}</RequiredLabel>
         <textarea
           bind:value={s.body}
           rows="4"
           aria-required="true"
-          placeholder="Describe the one-off help needed."></textarea>
+          placeholder={t('Describe the one-off help needed.')}></textarea>
       </label>
       <PolicyNotice request />
     </div>
@@ -91,7 +94,7 @@
         search={searchPlaces}
         failure={searchFailure}
         allowLater={false}
-        helperText="Where people should come, or that it happens online."
+        helperText={t('Where people should come, or that it happens online.')}
         onIntent={(i) => (s.intent = i)}
         onPlace={(p) => s.setPlace(p)}
       />
@@ -100,7 +103,7 @@
     <!-- Polish Pass mockups: a date and two times as rows that open the phone's own pickers. -->
     <div class="form-stack time-rows">
       <label class="tap-row">
-        <span>Date</span>
+        <span>{t('Date')}</span>
         <input
           type="date"
           value={s.neededAt.slice(0, 10)}
@@ -110,19 +113,19 @@
       </label>
       <div class="tap-pair">
         <label class="tap-row">
-          <span>Starts</span>
+          <span>{t('Starts')}</span>
           <input
             type="time"
-            aria-label="Start time"
+            aria-label={t('Start time')}
             value={s.neededAt.slice(11, 16)}
             onchange={(e) => setStart(e.currentTarget.value)}
           />
         </label>
         <label class="tap-row">
-          <span>Ends</span>
+          <span>{t('Ends')}</span>
           <input
             type="time"
-            aria-label="End time"
+            aria-label={t('End time')}
             value={s.endsAt.slice(11, 16)}
             onchange={(e) => setEnd(e.currentTarget.value)}
           />
@@ -152,17 +155,17 @@
         place={s.intent === 'physical' ? s.locationLabel : ''}
       />
       <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
-        <strong>Place</strong><span>{s.locationLabel}</span><em>Edit</em>
+        <strong>{t('Place')}</strong><span>{t(s.locationLabel)}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
-        <strong>When</strong><span>{s.schedule}</span><em>Edit</em>
+        <strong>{t('When')}</strong><span>{s.schedule}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 3)}>
-        <strong>Channels</strong><span>{tagCounts(s.tags)}</span><em>Edit</em>
+        <strong>{t('Channels')}</strong><span>{tagCounts(s.tags)}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 4)}>
-        <strong>Roles</strong>
-        <span>{s.namedRoles.map((r) => r.label).join(', ') || 'None yet'}</span><em>Edit</em>
+        <strong>{t('Roles')}</strong>
+        <span>{s.namedRoles.map((r) => r.label).join(', ') || 'None yet'}</span><em>{t('Edit')}</em>
       </button>
       {#if s.allProblems.length > 0}
         <ul class="status-message-list">

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { shareTargets } from '#lib/domain/share.ts';
 
   /**
@@ -36,7 +37,7 @@
   }
 </script>
 
-<section class="share-out" aria-label="Share outside the app">
+<section class="share-out" aria-label={t('Share outside the app')}>
   {#if title}<p class="share-subject">{title}</p>{/if}
   <div class="out-actions">
     {#if nativeShare}
@@ -51,7 +52,7 @@
             stroke-linejoin="round"
           /></svg
         >
-        Share via…
+        {t('Share via…')}
       </button>
     {/if}
     <button
@@ -70,7 +71,7 @@
           stroke-linecap="round"
         /></svg
       >
-      {copyLabel}
+      {t(copyLabel)}
     </button>
   </div>
   {#if !nativeShare}

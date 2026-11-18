@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { VoteChoice } from '#lib/domain/governance.ts';
 import {
   allRequests,
@@ -41,7 +42,7 @@ export class LinksState {
         .filter((a, i, list) => list.indexOf(a) === i && !(a in this.names));
       const people = await Promise.all(missing.map(getPerson));
       const names = { ...this.names };
-      for (const p of people) names[p.agent] = p.profile?.name ?? 'Unnamed';
+      for (const p of people) names[p.agent] = p.profile?.name ?? t('Unnamed');
       this.names = names;
       this.frame = this.withCast(frame);
       this.error = undefined;
@@ -60,7 +61,7 @@ export class LinksState {
     const linked = this.frame?.active.some((l) => l.create.target.id === targetId);
     if (open || linked) {
       this.composerMessage = linked
-        ? 'An active link already exists between these records.'
+        ? t('An active link already exists between these records.')
         : 'A link vote with that project is already open.';
       return false;
     }

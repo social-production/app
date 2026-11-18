@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { wallMicros } from '#lib/domain/zone.ts';
 import type { RequestMode, RequestSettings } from '#lib/domain/projects.ts';
 import {
@@ -117,11 +118,11 @@ export class ServiceRequestsState {
   }): Promise<boolean> {
     const f = this.form;
     if (!f.title.trim() || !f.body.trim()) {
-      this.error = 'Add a title and details before sending the request.';
+      this.error = t('Add a title and details before sending the request.');
       return false;
     }
     if (!!f.scheduledAt !== !!f.endsAt) {
-      this.error = 'Add both a start and a finish time, or neither.';
+      this.error = t('Add both a start and a finish time, or neither.');
       return false;
     }
     const start = micros(f.scheduledAt);

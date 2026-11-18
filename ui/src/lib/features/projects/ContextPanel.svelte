@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
   import FactRow from '#lib/components/detail/FactRow.svelte';
@@ -61,7 +62,7 @@
   const going = $derived(project.members.slice(0, 3));
   const count = $derived(project.members.length);
   const peopleTitle = $derived(
-    event ? `${count} going` : `${count} ${count === 1 ? 'member' : 'members'}`,
+    event ? `${count} going` : `${plural(count, '{n} member', '{n} members')}`,
   );
   const peopleLine = $derived(
     namesLine(
@@ -71,9 +72,7 @@
   );
   const phase = $derived(project.phases.find((p) => p.id === project.phase)?.label ?? '');
   const planCount = $derived(plans?.plans.length ?? 0);
-  const phaseLine = $derived(
-    planCount > 0 ? `${planCount} ${planCount === 1 ? 'plan' : 'plans'}` : '',
-  );
+  const phaseLine = $derived(planCount > 0 ? `${plural(planCount, '{n} plan', '{n} plans')}` : '');
 </script>
 
 {#snippet facts()}
@@ -81,8 +80,8 @@
     {#if project.lineage.continues}
       <FactRow
         icon="lineage"
-        title="A converted project"
-        sub="Continues the work of"
+        title={t('A converted project')}
+        sub={t('Continues the work of')}
         href={resolve('/projects/[id]', { id: project.lineage.continues })}
       />
     {/if}
@@ -102,7 +101,12 @@
       </FactRow>
     {/if}
     {#if !event && phase}
-      <FactRow icon="phase" title={`${phase} phase`} sub={phaseLine} onclick={() => onPhase?.()} />
+      <FactRow
+        icon="phase"
+        title={t('{phase} phase', { phase: t(phase) })}
+        sub={phaseLine}
+        onclick={() => onPhase?.()}
+      />
     {/if}
   </DetailFacts>
 {/snippet}
@@ -132,7 +136,7 @@
       <p class="detail-by">
         <AvatarBadge size="sm" name={author} />
         <span>
-          {event ? 'Organised by' : 'Started by'}
+          {event ? t('Organised by') : t('Started by')}
           <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>
           · {started}
         </span>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
   import { emptyPlaceValue, type PlaceSearch, type PlaceValue } from '#lib/domain/places.ts';
   import { charterDraft, type Charter, type CharterDraft } from '#lib/domain/projects.ts';
@@ -62,22 +63,25 @@
     <p class="sheet-lead">
       Change the title, description, or location.
       {appliesDirectly
-        ? 'It applies as soon as you save.'
-        : 'Members vote on it, and your proposal counts as your Yes. While few members are active, your Yes alone can be enough, and then it applies straight away.'}
+        ? t('It applies as soon as you save.')
+        : t(
+            'Members vote on it, and your proposal counts as your Yes. While few members are active, your Yes alone can be enough, and then it applies straight away.',
+          )}
     </p>
   {/snippet}
   <form id="project-edit-sheet-form" class="edit-form" onsubmit={submit}>
     {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
     <label class="field">
-      <span class="field-label">Title</span>
-      <input bind:value={title} maxlength="120" placeholder="Project title" />
+      <span class="field-label">{t('Title')}</span>
+      <input bind:value={title} maxlength="120" placeholder={t('Project title')} />
     </label>
     <label class="field">
-      <span class="field-label">Description</span>
-      <textarea bind:value={description} rows="6" placeholder="Describe the project..."></textarea>
+      <span class="field-label">{t('Description')}</span>
+      <textarea bind:value={description} rows="6" placeholder={t('Describe the project...')}
+      ></textarea>
     </label>
     <div class="field">
-      <span class="field-label">Location</span>
+      <span class="field-label">{t('Location')}</span>
       <LocationPicker
         value={location}
         portaled
@@ -91,12 +95,12 @@
   </form>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-cancel" type="button" onclick={onClose}>Cancel</button>
+      <button class="sheet-cancel" type="button" onclick={onClose}>{t('Cancel')}</button>
       <button
         class="sheet-submit"
         disabled={pending || !title.trim() || !description.trim()}
         form="project-edit-sheet-form"
-        type="submit">{pending ? 'Working...' : submitLabel}</button
+        type="submit">{pending ? t('Working...') : submitLabel}</button
       >
     </div>
   {/snippet}

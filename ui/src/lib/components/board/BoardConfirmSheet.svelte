@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   /**
@@ -22,26 +23,28 @@
   const copy = $derived.by(() => {
     if (ask === 'withdraw') {
       return {
-        title: 'Withdraw your candidacy?',
+        title: t('Withdraw your candidacy?'),
         body: ["You'll leave the candidates list. You can volunteer again later."],
-        yes: 'Withdraw',
+        yes: t('Withdraw'),
       };
     }
     if (ask === 'step-down') {
       return {
-        title: 'Step down as moderator?',
+        title: t('Step down as moderator?'),
         body: ["You'll leave the board straight away. To come back, volunteer again."],
-        yes: 'Step down',
+        yes: t('Step down'),
       };
     }
     const seat =
       quorum === 0
-        ? "Nobody voted last week, so you'll be seated straight away. Once people are active, your seat needs their votes. Moderators merge approved changes on platform software projects."
+        ? t(
+            "Nobody voted last week, so you'll be seated straight away. Once people are active, your seat needs their votes. Moderators merge approved changes on platform software projects.",
+          )
         : `You'll be listed as a candidate. Once ${quorum} people have voted and at least 66% say yes, you're seated, and you can merge approved changes on platform software projects.`;
     return {
-      title: 'Volunteer as moderator?',
+      title: t('Volunteer as moderator?'),
       body: [seat, 'You can step down any time.'],
-      yes: 'Volunteer',
+      yes: t('Volunteer'),
     };
   });
 </script>
@@ -63,7 +66,7 @@
         class="sheet-submit"
         type="button"
         disabled={working}
-        onclick={() => ask && onConfirm(ask)}>{working ? 'Working…' : copy.yes}</button
+        onclick={() => ask && onConfirm(ask)}>{working ? t('Working…') : copy.yes}</button
       >
     </div>
   {/snippet}

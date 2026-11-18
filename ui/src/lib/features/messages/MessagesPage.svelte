@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
@@ -20,7 +21,6 @@
   import NewMessagePage from './NewMessagePage.svelte';
   import PublicChatView from './PublicChatView.svelte';
   import { PublicState } from './publicState.svelte.ts';
-
   import '#lib/components/styles/messages.css';
 
   /**
@@ -124,10 +124,11 @@
       <div class="desktop-only-header">
         <header class="page-header">
           <div class="copy">
-            <h1>Messages</h1>
+            <h1>{t('Messages')}</h1>
             <p>
-              Direct messages, group chats, and the same project or event chat rooms you already use
-              elsewhere.
+              {t(
+                'Direct messages, group chats, and the same project or event chat rooms you already use elsewhere.',
+              )}
             </p>
           </div>
         </header>
@@ -179,7 +180,7 @@
           />
         {/key}
       {:else}
-        <div class="surface-tabs" role="tablist" aria-label="Messages tabs">
+        <div class="surface-tabs" role="tablist" aria-label={t('Messages tabs')}>
           <div class="surface-tab-list">
             {@render tabButton('personal', 'Personal', inbox.unreadTotal)}
             {@render tabButton('public', 'Public', publicChats.unreadTotal)}
@@ -193,16 +194,18 @@
           {:else if (openId || toAgent) && !inbox.loaded}
             <SkeletonRows kind="row" count={5} />
           {:else if inbox.error && inbox.chats.length === 0}
-            <EmptyState icon="info" title="Your chats didn't load" text={inbox.error} />
+            <EmptyState icon="info" title={t("Your chats didn't load")} text={inbox.error} />
           {:else if inbox.chats.length === 0}
             {#if inbox.loaded}
               <EmptyState
                 icon="send"
-                title="No messages yet"
-                text="Start a chat with someone you work with."
+                title={t('No messages yet')}
+                text={t('Start a chat with someone you work with.')}
               >
                 <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
-                <a class="empty-action" href={`${resolve('/messages')}?new=message`}>New message</a>
+                <a class="empty-action" href={`${resolve('/messages')}?new=message`}
+                  >{t('New message')}</a
+                >
               </EmptyState>
             {:else}
               <SkeletonRows kind="row" count={5} />
@@ -226,8 +229,8 @@
         <button
           class="message-fab"
           type="button"
-          aria-label="New message"
-          title="New message"
+          aria-label={t('New message')}
+          title={t('New message')}
           onclick={() => open('message', 'new')}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24">
@@ -265,7 +268,7 @@
     aria-label={unread > 0 ? `${label}, ${unread} unread` : label}
     onclick={() => (tab = id)}
   >
-    <span class="surface-tab-label">{label}</span>
+    <span class="surface-tab-label">{t(label)}</span>
     {#if unread > 0}<CountBadge count={unread} />{/if}
   </button>
 {/snippet}
@@ -278,7 +281,7 @@
   {:else if !publicChats.loaded}
     <SkeletonRows count={4} kind="row" />
   {:else if publicChats.chats.length === 0}
-    <div class="empty-state">No public chats yet.</div>
+    <div class="empty-state">{t('No public chats yet.')}</div>
   {:else}
     {#each publicChats.chats as chat (chat.id)}
       <ChatRow

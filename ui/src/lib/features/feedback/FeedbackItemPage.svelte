@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import BackButton from '#lib/components/BackButton.svelte';
@@ -70,9 +71,10 @@
           <ToolbarIcon name={item.kind === 'bug' ? 'bug' : 'lightbulb'} />
         </span>
         <span class="feedback-item-who">
-          <b>{item.kind === 'bug' ? 'Bug' : 'Suggestion'}</b>
+          <b>{item.kind === 'bug' ? t('Bug') : t('Suggestion')}</b>
           <small>
-            by <a href={resolve('/profile/[agent]', { agent: item.author })}>{name(item.author)}</a>
+            {t('by')}
+            <a href={resolve('/profile/[agent]', { agent: item.author })}>{name(item.author)}</a>
             · {relativeCompact(item.createdAt)}
           </small>
         </span>
@@ -90,10 +92,15 @@
         <span class="feedback-pill" aria-label={`${item.comments} comments`}>
           <ToolbarIcon name="message" />{item.comments}
         </span>
-        <button class="feedback-pill" type="button" aria-label="Share" onclick={() => void share()}>
+        <button
+          class="feedback-pill"
+          type="button"
+          aria-label={t('Share')}
+          onclick={() => void share()}
+        >
           <svg aria-hidden="true" viewBox="0 0 24 24"
             ><path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" /></svg
-          >{shared ? 'Copied' : ''}
+          >{shared ? t('Copied') : ''}
         </button>
       </div>
     </article>
@@ -103,7 +110,7 @@
         <BackButton />
         <CommentComposer
           bind:value={draft}
-          placeholder={replyTo ? `Reply to ${replyName}` : 'Add a comment'}
+          placeholder={replyTo ? `Reply to ${replyName}` : t('Add a comment')}
           {signedIn}
           onSignIn={(message) => requireViewer(message)}
           onSubmit={() => void send()}
@@ -111,8 +118,8 @@
       </div>
       {#if replyTo}
         <p class="replying-note">
-          Replying to <b>{replyName}</b>
-          <button type="button" onclick={() => (replyTo = null)}>Cancel</button>
+          {t('Replying to')} <b>{replyName}</b>
+          <button type="button" onclick={() => (replyTo = null)}>{t('Cancel')}</button>
         </p>
       {/if}
       {#each fb.comments as comment (comment.id)}
@@ -129,14 +136,14 @@
             {#if parent}<p class="replying-to">Replying to {name(parent.author)}</p>{/if}
             <p class="feedback-comment-body">{comment.body}</p>
             <div class="feedback-comment-actions">
-              <button type="button" aria-label="Reply" onclick={() => answer(comment.id)}>
+              <button type="button" aria-label={t('Reply')} onclick={() => answer(comment.id)}>
                 <ToolbarIcon name="message" />
               </button>
               <button
                 type="button"
                 class:liked={comment.liked}
                 aria-pressed={comment.liked}
-                aria-label={comment.liked ? 'Unlike' : 'Like'}
+                aria-label={comment.liked ? t('Unlike') : t('Like')}
                 onclick={() => void fb.like(comment)}
               >
                 <svg aria-hidden="true" viewBox="0 0 24 24"
@@ -149,7 +156,7 @@
           </div>
         </article>
       {:else}
-        <p class="feedback-note">No comments yet.</p>
+        <p class="feedback-note">{t('No comments yet.')}</p>
       {/each}
     </section>
   {:else}

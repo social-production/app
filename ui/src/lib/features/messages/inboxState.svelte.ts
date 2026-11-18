@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { HOLDER_PREFIX } from '#lib/domain/serviceRequests.ts';
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
 import type { ChatSummary, Contact, ListPrefs, NewChat } from '#lib/domain/messages.ts';
@@ -84,9 +85,9 @@ export class InboxState {
     if (chat.title?.trim()) return chat.title.trim();
     if (chat.kind === 'direct') {
       const partner = chat.members.find((m) => m !== this.me) ?? chat.members[0];
-      return partner ? (this.names[partner] ?? '…') : 'Direct message';
+      return partner ? (this.names[partner] ?? '…') : t('Direct message');
     }
-    return 'Group chat';
+    return t('Group chat');
   }
 
   /** The list's preview line; a leave reads "<name> left the group." */

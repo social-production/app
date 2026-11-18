@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { portal } from '#lib/components/actions/portal.ts';
 
   import '#lib/components/styles/links.css';
@@ -80,16 +81,16 @@
     >
       <div class="composer-head">
         <div class="heading-copy">
-          <h3 id="link-composer-title">Propose a new link</h3>
-          <p>Find the project or event by name, then say why they should be linked.</p>
+          <h3 id="link-composer-title">{t('Propose a new link')}</h3>
+          <p>{t('Find the project or event by name, then say why they should be linked.')}</p>
         </div>
-        <button class="text-action" type="button" onclick={onClose}>Cancel</button>
+        <button class="text-action" type="button" onclick={onClose}>{t('Cancel')}</button>
       </div>
       <label class="field-stack">
-        <span class="field-label">Search by name</span>
+        <span class="field-label">{t('Search by name')}</span>
         <input
           value={query}
-          placeholder="Start typing a project or event name"
+          placeholder={t('Start typing a project or event name')}
           type="search"
           oninput={(e) => schedule(e.currentTarget.value)}
         />
@@ -97,29 +98,31 @@
       {#if selected}
         <div class="selected-chip">
           <strong>{selected.title}</strong>
-          <button class="text-action" type="button" onclick={() => (selected = null)}>Clear</button>
+          <button class="text-action" type="button" onclick={() => (selected = null)}
+            >{t('Clear')}</button
+          >
         </div>
       {:else if searching}
-        <div class="search-status">Searching…</div>
+        <div class="search-status">{t('Searching…')}</div>
       {:else if searchError}
         <div class="search-status">{searchError}</div>
       {:else if query.trim().length >= 2 && results.length === 0}
-        <div class="search-status">No matching projects or events.</div>
+        <div class="search-status">{t('No matching projects or events.')}</div>
       {:else if results.length > 0}
         <div class="search-results">
           {#each results as item (item.id)}
             <button class="search-result" type="button" onclick={() => choose(item)}>
               <strong>{item.title}</strong>
-              <span class="row-meta">project</span>
+              <span class="row-meta">{t('project')}</span>
             </button>
           {/each}
         </div>
       {/if}
       <label class="field-stack">
-        <span class="field-label">Why are these linked?</span>
+        <span class="field-label">{t('Why are these linked?')}</span>
         <textarea
           bind:value={summary}
-          placeholder="Shared work, follow-on maintenance, related event, etc."
+          placeholder={t('Shared work, follow-on maintenance, related event, etc.')}
           rows="4"></textarea>
       </label>
       {#if message}<p class="search-status" role="alert">{message}</p>{/if}
@@ -129,7 +132,7 @@
           disabled={pending || !selected || !summary.trim()}
           type="button"
           onclick={() => selected && onSubmit(selected.id, summary.trim())}
-          >{pending ? 'Working...' : 'Create link vote'}</button
+          >{pending ? t('Working...') : t('Create link vote')}</button
         >
       </div>
     </div>

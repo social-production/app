@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import { scopeTag, tagScope, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
   import { listScopes } from '#lib/services/scopes.ts';
 
@@ -31,7 +32,7 @@
   const HINTS: Record<Variant, string> = {
     project: 'Pick at least one channel. The first channel is its main one.',
     thread: 'Pick at least one. The first is where it mainly lives.',
-    help: 'Pick at least one. Requests are tagged like threads; the first is the main one.',
+    help: t('Pick at least one. Requests are tagged like threads; the first is the main one.'),
     event: 'Pick the channels people follow, and any communities.',
   };
 
@@ -71,18 +72,18 @@
     >
     <input
       bind:value={query}
-      aria-label="Search channels and communities"
-      placeholder="Search channels and communities"
+      aria-label={t('Search channels and communities')}
+      placeholder={t('Search channels and communities')}
       autocomplete="off"
     />
   </label>
 
   {#if tags.length > 0}
-    <ul class="tag-chips" aria-label="Chosen">
+    <ul class="tag-chips" aria-label={t('Chosen')}>
       {#each tags as tag, i (tag)}
         <li class="tag-chip">
           <span>{kindOf(tag) === 'community' ? '' : '#'}{nameOf(tag)}</span>
-          {#if hasMain && i === 0}<small>main</small>{/if}
+          {#if hasMain && i === 0}<small>{t('main')}</small>{/if}
           <button type="button" aria-label={`Remove ${nameOf(tag)}`} onclick={() => remove(tag)}
             >×</button
           >
@@ -97,7 +98,7 @@
     class="tag-results"
     role="listbox"
     aria-multiselectable="true"
-    aria-label="Channels and communities"
+    aria-label={t('Channels and communities')}
   >
     {#each results as scope (scope.id)}
       {@const on = tags.includes(scopeTag(scope.kind, scope.slug))}
@@ -116,8 +117,11 @@
         <span class="tag-copy">
           <strong>{scope.handle}</strong>
           <small
-            >{scope.kind === 'community' ? 'Community' : 'Channel'} · {scope.members}
-            {scope.members === 1 ? 'member' : 'members'}</small
+            >{scope.kind === 'community' ? t('Community') : t('Channel')} · {plural(
+              scope.members,
+              '{n} member',
+              '{n} members',
+            )}</small
           >
         </span>
         <span class="tag-tick" aria-hidden="true"
@@ -126,7 +130,7 @@
       </button>
     {:else}
       <p class="tag-empty">
-        {searching ? 'Searching…' : query ? `Nothing called "${query}" yet.` : ''}
+        {searching ? t('Searching…') : query ? `Nothing called "${query}" yet.` : ''}
       </p>
     {/each}
   </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { onMount, tick, untrack } from 'svelte';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
@@ -212,7 +213,7 @@
           <div class="location-toast" role="alert">{s.locationToast}</div>
         {/if}
         <button
-          aria-label={s.mapFullscreen ? 'Exit fullscreen map' : 'Fullscreen map'}
+          aria-label={s.mapFullscreen ? t('Exit fullscreen map') : t('Fullscreen map')}
           class="fullscreen-button"
           type="button"
           onclick={() => void toggleFullscreen()}
@@ -274,15 +275,15 @@
       bind:this={dateMenu}
       class="custom-date-menu custom-date-menu-portaled"
       role="group"
-      aria-label="Custom date range"
+      aria-label={t('Custom date range')}
       style={dateMenuStyle}
     >
       <label class="custom-date-field">
-        <span>From</span>
+        <span>{t('From')}</span>
         <input class="date-input" type="date" bind:value={s.dateFrom} onchange={changed} />
       </label>
       <label class="custom-date-field">
-        <span>To</span>
+        <span>{t('To')}</span>
         <input class="date-input" type="date" bind:value={s.dateTo} onchange={changed} />
       </label>
     </div>

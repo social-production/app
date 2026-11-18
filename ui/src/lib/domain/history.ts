@@ -4,6 +4,7 @@
  * governance zome's proposals and plans, as web-backend's `_build_project_history` builds it
  * from its request tables.
  */
+import { t, plural } from '#lib/i18n/index.ts';
 import { APPROVAL_PERCENT, type Proposal, type VoteChoice } from './governance.ts';
 import type { PlanKind, PlanView } from './plans.ts';
 
@@ -33,13 +34,13 @@ function statusOf(status: Proposal['status']): HistoryStatus {
 /** web-backend's phase decision label: Return to …, Close project, Advance to …. */
 function proposalKindLabel(p: Proposal, stageLabel: (id: string) => string): string | null {
   const kind = p.kind;
-  if ('Update' in kind) return 'Update decision';
-  if ('Edit' in kind) return 'Edit decision';
+  if ('Update' in kind) return t('Update decision');
+  if ('Edit' in kind) return t('Edit decision');
   if ('Return' in kind) return `Return to ${stageLabel(kind.Return.to)}`;
-  if ('Convert' in kind) return 'Convert to a new proposal';
+  if ('Convert' in kind) return t('Convert to a new proposal');
   if ('Phase' in kind) {
     const to = stageLabel(kind.Phase.to);
-    return to === 'Closed' ? 'Close project' : `Advance to ${to}`;
+    return to === 'Closed' ? t('Close project') : `Advance to ${to}`;
   }
   return null;
 }
@@ -115,9 +116,9 @@ export function requirementLabel(e: HistoryEntry): string {
   if (e.status !== 'open') return `${APPROVAL_PERCENT}% approval needed`;
   const needed = yesStillNeeded(e) ?? 0;
   const left = Math.max(e.population - e.yes - e.no, 0);
-  const need = needed > 0 ? `Needs ${needed} more yes` : 'Enough yes votes so far';
+  const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
   const waiting =
-    left > 0 ? ` · ${left} ${left === 1 ? 'person has' : 'people have'} not voted` : '';
+    left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
 }
 

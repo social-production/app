@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { railKicker, type RailItem } from '#lib/domain/activityRail.ts';
   import {
     historyMatches,
@@ -18,22 +19,22 @@
   <summary class="rail-section-summary">
     <span class="summary-label">
       <span class="chevron" aria-hidden="true"></span>
-      <span>History</span>
+      <span>{t('History')}</span>
     </span>
   </summary>
   <div class="history-body">
     <label class="history-filter">
-      <span class="history-filter-label">Show</span>
-      <select aria-label="History filter" bind:value={filter}>
-        <option value="all">All</option>
-        <option value="votes">Votes</option>
-        <option value="activities">Activities</option>
-        <option value="help">Help</option>
-        <option value="requests">Requests</option>
+      <span class="history-filter-label">{t('Show')}</span>
+      <select aria-label={t('History filter')} bind:value={filter}>
+        <option value="all">{t('All')}</option>
+        <option value="votes">{t('Votes')}</option>
+        <option value="activities">{t('Activities')}</option>
+        <option value="help">{t('Help')}</option>
+        <option value="requests">{t('Requests')}</option>
       </select>
     </label>
     {#if shown.length === 0}
-      <p class="history-empty">No history items match this filter.</p>
+      <p class="history-empty">{t('No history items match this filter.')}</p>
     {:else}
       <div class="history-list">
         {#each shown as item (item.id)}

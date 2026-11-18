@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
 
   import RepositoryMenu from './RepositoryMenu.svelte';
@@ -12,8 +13,8 @@
 
 {#if can}
   <RoundPlusButton
-    label="Pull request"
-    ariaLabel="New pull request"
+    label={t('Pull request')}
+    ariaLabel={t('New pull request')}
     onclick={() => sw.open('create-pr')}
   />
   <RepositoryMenu

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Component } from 'svelte';
 
   /** Loads the map panel (and maplibre) only when it first opens, as web does (ADR 0085). */
@@ -16,6 +17,6 @@
   <Panel {onClose} {embedded} />
 {:else if failed}
   <p class="inline-alert" role="alert">
-    The map could not be loaded. Reload the page to try again.
+    {t('The map could not be loaded. Reload the page to try again.')}
   </p>
 {/if}

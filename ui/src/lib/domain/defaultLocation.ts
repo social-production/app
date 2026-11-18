@@ -2,6 +2,7 @@
  * web's default location (`location/defaults.ts`, `geolocation.ts`): the place the Region feed
  * and the map start from, plus the device-location opt-in. Kept per device (ADR 0081).
  */
+import { t } from '#lib/i18n/index.ts';
 import { emptyPlaceValue, type PlaceValue } from './places.ts';
 
 export interface DefaultLocation {
@@ -32,7 +33,7 @@ export function parseDefaultLocation(raw: string | null): DefaultLocation | null
     return {
       place: {
         ...emptyPlaceValue(),
-        displayLabel: label || (coords ? 'Current location' : ''),
+        displayLabel: label || (coords ? t('Current location') : ''),
         latitude: coords ? lat : null,
         longitude: coords ? lon : null,
         region: text(p.region),
@@ -69,14 +70,18 @@ export type DevicePositionError = 'disabled' | 'unsupported' | 'denied' | 'timeo
 export function devicePositionMessage(error: DevicePositionError): string {
   switch (error) {
     case 'denied':
-      return "Your browser is blocking location for this site. Allow it in the browser's site settings, or search for a place.";
+      return t(
+        "Your browser is blocking location for this site. Allow it in the browser's site settings, or search for a place.",
+      );
     case 'timeout':
-      return 'Finding your location took too long. Try again, or search for a place.';
+      return t('Finding your location took too long. Try again, or search for a place.');
     case 'unsupported':
-      return "This browser can't share your location. Search for a place instead.";
+      return t("This browser can't share your location. Search for a place instead.");
     case 'disabled':
-      return 'Location is turned off on this device. Turn it on in settings, or search for a place.';
+      return t(
+        'Location is turned off on this device. Turn it on in settings, or search for a place.',
+      );
     default:
-      return "We couldn't find your location. Search for a place instead.";
+      return t("We couldn't find your location. Search for a place instead.");
   }
 }

@@ -22,6 +22,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -89,11 +90,11 @@
       </p>{/if}{/snippet}
   {#snippet toolbar()}
     <div class="sheet-search">
-      <label class="sr-only" for="people-sheet-search">Search people</label>
+      <label class="sr-only" for="people-sheet-search">{t('Search people')}</label>
       <input
         id="people-sheet-search"
         bind:value={query}
-        placeholder="Search people"
+        placeholder={t('Search people')}
         type="search"
       />
     </div>
@@ -152,12 +153,12 @@
               type="button"
               onclick={action.run}
             >
-              {action.label}
+              {t(action.label)}
             </button>
           {/if}
         </div>
       {:else}
-        <p class="empty-row">{needle ? 'No matches.' : section.emptyCopy}</p>
+        <p class="empty-row">{needle ? t('No matches.') : section.emptyCopy}</p>
       {/each}
     </div>
     {#if !tabs && index < visible.length - 1}<div class="section-divider"></div>{/if}

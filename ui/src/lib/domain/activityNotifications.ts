@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { Activity, ActivityRole } from './activities.ts';
 import type { NotificationItem } from './notifications.ts';
 import type { CharterMode } from './projects.ts';
@@ -71,7 +72,7 @@ function roleNotifications(
       kind: 'prj-role-suggest',
       actor: d.person,
       title: `${role.label} suggestion declined`,
-      body: 'The person you suggested declined this role.',
+      body: t('The person you suggested declined this role.'),
       target,
       createdAt: d.at,
     });

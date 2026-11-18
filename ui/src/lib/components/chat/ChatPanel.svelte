@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { tick } from 'svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
@@ -16,7 +17,6 @@
   import { messageDayKey, messageDayLabel, showsAuthor } from './chatFormat.ts';
   import { BubbleMenuState } from './bubbleMenuState.svelte.ts';
   import { centerIn, scrollToEnd, syncPanelHeight } from './chatViewport.ts';
-
   import '#lib/components/styles/chat.css';
 
   /** web's LiveChatPanel for text chats (ADR 0038, 0049; reports: ADR 0071 part b). */
@@ -214,7 +214,7 @@
           {@const previous = i > 0 ? p.lines[i - 1] : undefined}
           {#if !previous || messageDayKey(previous.createdAt) !== messageDayKey(message.createdAt)}
             <div class="day-divider" role="separator">
-              <span>{messageDayLabel(message.createdAt)}</span>
+              <span>{t(messageDayLabel(message.createdAt))}</span>
             </div>
           {/if}
           {#if message.kind !== 'text'}
@@ -279,7 +279,7 @@
 
 <PhotoViewer
   url={photo?.url ?? null}
-  alt={photo?.name ?? 'Photo'}
+  alt={photo?.name ?? t('Photo')}
   onClose={() => {
     photo?.from?.focus();
     photo = null;
@@ -292,9 +292,9 @@
 
 <ConfirmDialog
   open={confirming !== null}
-  title="Delete this message?"
-  body="It is removed for everyone."
-  confirmLabel="Delete"
+  title={t('Delete this message?')}
+  body={t('It is removed for everyone.')}
+  confirmLabel={t('Delete')}
   danger
   onSettle={(ok) => void settleDelete(ok)}
 />

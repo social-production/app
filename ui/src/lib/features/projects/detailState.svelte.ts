@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   isPhaseChange,
   type Proposal,
@@ -154,10 +155,10 @@ export class DetailState {
 
   private async loadNames(agents: string[], known: Person[]): Promise<void> {
     const names: Record<string, string> = { ...this.names };
-    for (const p of known) names[p.agent] = p.profile?.name ?? 'Unnamed';
+    for (const p of known) names[p.agent] = p.profile?.name ?? t('Unnamed');
     const missing = agents.filter((a, i) => agents.indexOf(a) === i && !(a in names));
     for (const p of await Promise.all(missing.map(getPerson)))
-      names[p.agent] = p.profile?.name ?? 'Unnamed';
+      names[p.agent] = p.profile?.name ?? t('Unnamed');
     this.names = names;
   }
 

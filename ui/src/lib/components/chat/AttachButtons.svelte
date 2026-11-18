@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ComposerFiles } from './composerFiles.svelte.ts';
 
   /** web LiveChatPanel's "Add a photo" and "Add a file" buttons and their file inputs. The
@@ -15,8 +16,8 @@
 
 {#if part === 'buttons'}
   <button
-    aria-label="Add a photo"
-    title="Add a photo"
+    aria-label={t('Add a photo')}
+    title={t('Add a photo')}
     class="attach-button"
     type="button"
     onclick={() => document.getElementById(`${ids}-photo`)?.click()}
@@ -37,8 +38,8 @@
     </svg>
   </button>
   <button
-    aria-label="Add a file"
-    title="Add a file"
+    aria-label={t('Add a file')}
+    title={t('Add a file')}
     class="attach-button"
     type="button"
     onclick={() => document.getElementById(`${ids}-file`)?.click()}

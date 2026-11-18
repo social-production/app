@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { FollowRow, FollowView } from '#lib/domain/follows.ts';
 import type { Person } from '#lib/domain/people.ts';
 import { explain } from '#lib/services/errors.ts';
@@ -57,7 +58,7 @@ export class ProfileFollows {
       this.requests = this.requests.filter((r) => r.agent !== follower);
       await this.load();
     } catch {
-      this.error = 'Could not update follow request. Reload and try again.';
+      this.error = t('Could not update follow request. Reload and try again.');
     } finally {
       this.deciding = null;
     }
@@ -70,7 +71,7 @@ export class ProfileFollows {
       await action();
       await this.load();
     } catch {
-      this.error = 'Could not update follow status. Reload and try again.';
+      this.error = t('Could not update follow status. Reload and try again.');
     } finally {
       this.busy = false;
     }

@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
 import type { ChatAttachment, ChatLine, ChatMessage } from '#lib/domain/chat.ts';
 
@@ -66,7 +67,7 @@ export class ChatState {
   ]);
 
   private nameOf(agent: string | null): string {
-    return agent ? (this.names[agent] ?? '…') : 'Message';
+    return agent ? (this.names[agent] ?? '…') : t('Message');
   }
 
   private line(m: ChatMessage): ChatLine {
@@ -231,7 +232,7 @@ export class ChatState {
     try {
       await this.source.remove(id);
     } catch {
-      this.error = 'Could not delete that message';
+      this.error = t('Could not delete that message');
     }
     await this.refresh();
   }

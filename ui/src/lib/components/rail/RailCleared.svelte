@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { railKicker, type RailItem } from '#lib/domain/activityRail.ts';
 
   /** web's Cleared section: dismissed cards, with Restore and Restore all. */
@@ -17,7 +18,7 @@
   <summary class="rail-section-summary">
     <span class="summary-label">
       <span class="chevron" aria-hidden="true"></span>
-      <span>Cleared</span>
+      <span>{t('Cleared')}</span>
     </span>
   </summary>
   <div class="cleared-body">
@@ -29,7 +30,7 @@
         open = false;
       }}
     >
-      Restore all
+      {t('Restore all')}
     </button>
     <div class="cleared-list">
       {#each p.items as item (item.id)}
@@ -49,7 +50,7 @@
               p.onRestore(item.id);
             }}
           >
-            Restore
+            {t('Restore')}
           </button>
         </div>
       {/each}

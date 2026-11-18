@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { canVoteOn } from '#lib/domain/board.ts';
   import SignalStrip from '#lib/components/cards/SignalStrip.svelte';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
@@ -106,7 +107,7 @@
         class:opposed={stance.mine === 'Oppose'}
         aria-expanded={voteOpen}
         aria-label={`You ${stance.mine === 'Oppose' ? 'oppose' : 'support'} this, ${percent} support. Change`}
-        title="Change your stance"
+        title={t('Change your stance')}
         onclick={() => (voteOpen = !voteOpen)}
       >
         <svg aria-hidden="true" viewBox="0 0 24 24" class:flipped={stance.mine === 'Oppose'}
@@ -126,7 +127,7 @@
     {:else}
       {#if detail.canPropose}
         <button type="button" class="dock-labelled" onclick={onUpdate}>
-          <ToolbarIcon name="loudspeaker" />Update
+          <ToolbarIcon name="loudspeaker" />{t('Update')}
         </button>
       {/if}
       <DetailShare {detail} />

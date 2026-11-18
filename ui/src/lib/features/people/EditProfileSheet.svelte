@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
@@ -64,7 +65,7 @@
 
 <OverlaySheet
   open={editor.open}
-  title="Edit profile"
+  title={t('Edit profile')}
   labelledById="edit-profile-title"
   rootClass="edit-profile-sheet"
   onClose={() => (editor.open = false)}
@@ -76,18 +77,18 @@
           ><rect x="3" y="5" width="18" height="14" rx="2" /><circle cx="9" cy="10" r="2" /><path
             d="m21 16-5-5-8 8"
           /></svg
-        >{editor.cover ? 'Change cover' : 'Add a cover'}</button
+        >{editor.cover ? t('Change cover') : t('Add a cover')}</button
       >
       {#if editor.cover}
         <button class="edit-cover-remove" type="button" onclick={() => void editor.removeCover()}
-          >Remove</button
+          >{t('Remove')}</button
         >
       {/if}
     </div>
     <button
       class="edit-avatar"
       type="button"
-      aria-label="Change profile photo"
+      aria-label={t('Change profile photo')}
       onclick={() => photoInput?.click()}
     >
       <AvatarBadge
@@ -106,7 +107,7 @@
       hidden
       type="file"
       accept="image/*"
-      aria-label="Cover photo"
+      aria-label={t('Cover photo')}
       onchange={(e) => {
         const file = picked(e);
         if (file) void editor.pickCover(file);
@@ -117,30 +118,34 @@
       hidden
       type="file"
       accept="image/*"
-      aria-label="Profile photo"
+      aria-label={t('Profile photo')}
       onchange={(e) => {
         const file = picked(e);
         if (file) void editor.pickPhoto(person, file);
       }}
     />
     <label class="edit-field">
-      <span>Name</span>
+      <span>{t('Name')}</span>
       <input bind:value={name} maxlength={HANDLE_MAX} autocomplete="name" />
     </label>
     {#if problem}<p class="edit-hint">{problem}</p>{/if}
     <label class="edit-field">
-      <span>About you</span>
+      <span>{t('About you')}</span>
       <textarea bind:value={bio} maxlength={BIO_MAX} rows="3"></textarea>
     </label>
     <label class="edit-field">
-      <span>Area</span>
+      <span>{t('Area')}</span>
       <span class="edit-area">
-        <input bind:value={area} maxlength={HOME_AREA_MAX} placeholder="e.g. Fitzroy, Melbourne" />
+        <input
+          bind:value={area}
+          maxlength={HOME_AREA_MAX}
+          placeholder={t('e.g. Fitzroy, Melbourne')}
+        />
         <button
           class="edit-locate"
           type="button"
-          aria-label="Use my location"
-          title="Use my location"
+          aria-label={t('Use my location')}
+          title={t('Use my location')}
           disabled={locating}
           onclick={() => void locate()}><ToolbarIcon name="locate" /></button
         >
@@ -155,7 +160,7 @@
         class="sheet-submit"
         type="button"
         disabled={editor.saving || !!problem}
-        onclick={() => void save()}>{editor.saving ? 'Saving…' : 'Save'}</button
+        onclick={() => void save()}>{editor.saving ? t('Saving…') : t('Save')}</button
       >
     </div>
   {/snippet}

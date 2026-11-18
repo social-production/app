@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
@@ -26,15 +27,15 @@
   // web's options, in its order, for the kinds the app has (no activities yet; PARITY.md),
   // as a row of chips (Remaining Screens, 5).
   const typeOptions: { value: SearchType; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'project', label: 'Projects' },
-    { value: 'thread', label: 'Threads' },
-    { value: 'event', label: 'Events' },
-    { value: 'help_request', label: 'Help requests' },
-    { value: 'post', label: 'Posts' },
-    { value: 'channel', label: 'Channels' },
-    { value: 'community', label: 'Communities' },
-    { value: 'user', label: 'People' },
+    { value: 'all', label: t('All') },
+    { value: 'project', label: t('Projects') },
+    { value: 'thread', label: t('Threads') },
+    { value: 'event', label: t('Events') },
+    { value: 'help_request', label: t('Help requests') },
+    { value: 'post', label: t('Posts') },
+    { value: 'channel', label: t('Channels') },
+    { value: 'community', label: t('Communities') },
+    { value: 'user', label: t('People') },
   ];
 
   let draft = $state(untrack(() => query));
@@ -77,14 +78,14 @@
 <div class="search-page">
   <section class="page">
     <header class="page-header">
-      <h1>Search</h1>
+      <h1>{t('Search')}</h1>
       <form class="search-form" role="search" onsubmit={submit}>
         <div class="search-input-wrap">
           <svg aria-hidden="true" class="search-glyph" viewBox="0 0 24 24">
             <circle cx="11" cy="11" r="6" /><path d="m20 20-4.5-4.5" />
           </svg>
           <input
-            aria-label="Search"
+            aria-label={t('Search')}
             class="search-input"
             bind:value={draft}
             readonly
@@ -92,13 +93,13 @@
               event.currentTarget.blur();
               openSearch(draft);
             }}
-            placeholder="Channels, communities, projects, usernames..."
+            placeholder={t('Channels, communities, projects, usernames...')}
             type="search"
           />
         </div>
       </form>
 
-      <div class="type-chips" role="radiogroup" aria-label="Filter search">
+      <div class="type-chips" role="radiogroup" aria-label={t('Filter search')}>
         {#each typeOptions as option (option.value)}
           <button
             role="radio"
@@ -107,13 +108,15 @@
             class:on={type === option.value}
             type="button"
             onclick={() => open(searchHref(draft.trim() || query.trim(), option.value))}
-            >{option.label}</button
+            >{t(option.label)}</button
           >
         {/each}
       </div>
 
       {#if !query.trim()}
-        <p class="search-lede">Search channels, communities, projects, events, and profiles.</p>
+        <p class="search-lede">
+          {t('Search channels, communities, projects, events, and profiles.')}
+        </p>
         <div class="chip-row">
           {#each suggestedQueries as chip (chip)}
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- built from resolve('/search') -->
@@ -128,7 +131,7 @@
         <EmptyState
           icon="search"
           title={`No results for "${query.trim()}"`}
-          text="Try a channel name, community name, project title or username."
+          text={t('Try a channel name, community name, project title or username.')}
         />
       {:else if query.trim()}
         {#each results as result (result.id)}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
@@ -56,18 +57,18 @@
   const joined = $derived(!!s.project?.amMember);
   const count = $derived(s.project?.members.length ?? scope?.members ?? 0);
   const pending = $derived(s.joining || (!s.project && !!scope?.id));
-  const typeName = $derived(kind === 'channel' ? 'Channel' : 'Community');
+  const typeName = $derived(kind === 'channel' ? t('Channel') : t('Community'));
   const organized = $derived(s.project?.governance === 'organizer_controlled');
   // The Platform counts people active last week (what its votes are sized from), not members
   // (Platform and Moderators mockups §1).
   const sub = $derived.by(() => {
     if (!s.platform) {
-      const members = `${count} ${count === 1 ? 'member' : 'members'}`;
+      const members = `${plural(count, '{n} member', '{n} members')}`;
       return organized ? `${members} · organizers decide` : members;
     }
     const n = board?.weeklyActive;
-    if (n === undefined) return 'The whole network';
-    return n === 0 ? 'Nobody active last week' : `${n.toLocaleString()} active last week`;
+    if (n === undefined) return t('The whole network');
+    return n === 0 ? t('Nobody active last week') : `${n.toLocaleString()} active last week`;
   });
   let networkOpen = $state(false);
   const faces = $derived((board?.moderators ?? []).slice(0, 3));
@@ -90,10 +91,10 @@
       </span>
       <div class="scope-hero-title">
         <h1>
-          {s.platform ? 'Platform' : scope.handle}
-          {#if s.platform}<span class="scope-kind-chip">Whole network</span>{/if}
+          {s.platform ? t('Platform') : scope.handle}
+          {#if s.platform}<span class="scope-kind-chip">{t('Whole network')}</span>{/if}
           {#if !s.platform}<span class="scope-kind-chip"
-              >{scope.isPrivate ? 'Private' : typeName}</span
+              >{scope.isPrivate ? t('Private') : typeName}</span
             >{/if}
         </h1>
         <p class="scope-hero-sub">{sub}</p>
@@ -108,13 +109,13 @@
             active={inviteOpen}
             chip
             ariaLabel={`Join ${scope.handle} with invite, ${count} members`}
-            menuLabel="Join with invite"
+            menuLabel={t('Join with invite')}
             minWidth={300}
             onOpenChange={(o) => (inviteOpen = o)}
           >
             {#snippet icon()}
               <ToolbarIcon name="person-plus" />
-              <span>Join with invite</span>
+              <span>{t('Join with invite')}</span>
             {/snippet}
             {@render invitePanel()}
           </IconPopoverMenu>
@@ -128,7 +129,7 @@
             class:primary={!joined}
             disabled={pending}
             type="button"
-            onclick={() => void s.toggleJoin()}>{joined ? 'Joined' : 'Join'}</button
+            onclick={() => void s.toggleJoin()}>{joined ? t('Joined') : t('Join')}</button
           >
         {/if}
         {#if !s.platform}<button
@@ -136,14 +137,14 @@
             aria-label={`${count} members`}
             class="scope-pill membership-count"
             type="button"
-            onclick={() => (membersOpen = true)}>Members</button
+            onclick={() => (membersOpen = true)}>{t('Members')}</button
           >{/if}
         {#if scope.isPrivate && joined}
           <IconPopoverMenu
             open={inviteOpen}
             active={inviteOpen}
             ariaLabel={`Invite people to ${scope.handle}`}
-            menuLabel="Invite people"
+            menuLabel={t('Invite people')}
             minWidth={300}
             onOpenChange={(o) => (inviteOpen = o)}
           >
@@ -155,7 +156,7 @@
         {#if s.platform}
           <button
             aria-expanded={boardOpen}
-            aria-label="Moderators"
+            aria-label={t('Moderators')}
             class="scope-pill board-pill"
             type="button"
             onclick={() => (boardOpen = !boardOpen)}
@@ -174,12 +175,12 @@
             {:else}
               <ToolbarIcon name="shield" />
             {/if}
-            Moderators
+            {t('Moderators')}
           </button>
         {:else}
           <button
-            aria-label="Settings"
-            title="Settings"
+            aria-label={t('Settings')}
+            title={t('Settings')}
             class="icon-action"
             class:menu-active={settingsOpen}
             type="button"
@@ -192,8 +193,8 @@
       {#if s.platform}
         <button class="scope-rule" type="button" onclick={() => (networkOpen = true)}>
           <ToolbarIcon name="people" />
-          <span>Any Full member can vote on #platform projects</span>
-          <b>How</b>
+          <span>{t('Any Full member can vote on #platform projects')}</span>
+          <b>{t('How')}</b>
         </button>
       {/if}
     </div>
@@ -208,7 +209,7 @@
         <svg class="vote-fab-arrow" aria-hidden="true" viewBox="0 0 24 24"
           ><path d="M12 19V5M6 11l6-6 6 6" /></svg
         >
-        Vote
+        {t('Vote')}
         <span class="vote-fab-count">{waiting}</span>
       </button>
     {/if}

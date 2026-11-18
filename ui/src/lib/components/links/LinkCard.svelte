@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { resolve } from '$app/paths';
@@ -65,7 +66,7 @@
       {#if voteLine}<span class="side-vote-line">{voteLine}</span>{/if}
     </span>
     {#if outcomeLabel}
-      <span class={`outcome-label ${outcomeTone ?? 'pending'}`}>{outcomeLabel}</span>
+      <span class={`outcome-label ${outcomeTone ?? 'pending'}`}>{t(outcomeLabel)}</span>
     {:else}
       <svg class="link-chevron" aria-hidden="true" viewBox="0 0 24 24"
         ><path d="m7 10 5 5 5-5" /></svg

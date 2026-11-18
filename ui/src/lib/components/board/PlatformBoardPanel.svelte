@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { boardOrder, type Board, type BoardMember } from '#lib/domain/board.ts';
@@ -59,7 +60,7 @@
 
   const name = (m: BoardMember) => {
     const p = people[m.agent];
-    return p ? displayName(p) : 'Unnamed';
+    return p ? displayName(p) : t('Unnamed');
   };
   const quorum = $derived(board?.quorum ?? 0);
   const seated = $derived(boardOrder(board?.moderators ?? [], me, name));
@@ -85,10 +86,10 @@
     try {
       await onVolunteer(kind === 'volunteer');
       ask = null;
-      if (kind === 'withdraw') notice = 'You withdrew. You can volunteer again any time.';
-      else if (kind === 'step-down') notice = 'You stepped down.';
-      else if (board?.viewerState === 'member') notice = "You're seated.";
-      else notice = "You're a candidate. Members can vote on you now.";
+      if (kind === 'withdraw') notice = t('You withdrew. You can volunteer again any time.');
+      else if (kind === 'step-down') notice = t('You stepped down.');
+      else if (board?.viewerState === 'member') notice = t("You're seated.");
+      else notice = t("You're a candidate. Members can vote on you now.");
     } catch (e) {
       ask = null;
       problem = failed(e, "That didn't go through. Try again.");
@@ -114,36 +115,37 @@
 
 <OverlaySheet
   {open}
-  title="Moderators"
+  title={t('Moderators')}
   labelledById="platform-board-title"
   rootClass="platform-board"
   {onClose}
 >
   {#snippet headerActions()}
     <button class="board-how-link" type="button" onclick={() => (howOpen = true)}
-      >How it works</button
+      >{t('How it works')}</button
     >
   {/snippet}
   <div class="board-body">
     {#if board}
       {#if quorum === 0}
         <p class="board-summary board-note">
-          Nobody voted last week, so anyone who volunteers is seated straight away. Once people are
-          active, a seat needs their votes.
+          {t(
+            'Nobody voted last week, so anyone who volunteers is seated straight away. Once people are active, a seat needs their votes.',
+          )}
         </p>
       {:else}
         <p class="board-summary">
-          <span><b>{board.moderators.length}</b>seated</span>
+          <span><b>{board.moderators.length}</b>{t('seated')}</span>
           <span
             ><b>{board.candidates.length}</b>{board.candidates.length === 1
               ? 'candidate'
               : 'candidates'}</span
           >
-          <span><b>{quorum} votes</b>and 66% yes for a seat</span>
+          <span><b>{quorum} votes</b>{t('and 66% yes for a seat')}</span>
         </p>
       {/if}
       {#if seated.length === 0 && candidates.length === 0}
-        <p class="board-empty">Nobody has volunteered yet.</p>
+        <p class="board-empty">{t('Nobody has volunteered yet.')}</p>
       {/if}
       {@render section('Seated', seated)}
       {@render section('Candidates', candidates)}
@@ -151,7 +153,7 @@
       <div class="board-empty board-failed" role="alert">
         <p>The moderators couldn’t load. {error}</p>
         {#if onRetry}<button class="board-how-link" type="button" onclick={onRetry}
-            >Try again</button
+            >{t('Try again')}</button
           >{/if}
       </div>
     {:else}
@@ -164,18 +166,18 @@
     <div class="sheet-actions board-actions">
       {#if viewerState === 'member'}
         <button class="sheet-cancel" type="button" onclick={() => (ask = 'step-down')}
-          >Step down</button
+          >{t('Step down')}</button
         >
       {:else if viewerState === 'candidate'}
         <button class="sheet-cancel" type="button" onclick={() => (ask = 'withdraw')}
-          >Withdraw</button
+          >{t('Withdraw')}</button
         >
       {:else if canVolunteer}
         <button class="sheet-submit" type="button" onclick={() => (ask = 'volunteer')}
-          >Volunteer as moderator</button
+          >{t('Volunteer as moderator')}</button
         >
       {:else}
-        <p class="board-hint">Full members can volunteer.</p>
+        <p class="board-hint">{t('Full members can volunteer.')}</p>
       {/if}
     </div>
   {/snippet}

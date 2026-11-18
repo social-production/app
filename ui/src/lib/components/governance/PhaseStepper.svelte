@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { fitText } from '#lib/components/actions/fitText.ts';
   import type { PhaseStep } from '#lib/domain/projects.ts';
 
@@ -17,7 +18,7 @@
   const currentIndex = $derived(steps.findIndex((s) => s.id === current));
 </script>
 
-<nav class="phase-bar overview-phase-tabs" aria-label="Phases">
+<nav class="phase-bar overview-phase-tabs" aria-label={t('Phases')}>
   {#each steps as step, i (step.id)}
     {@const state = i < currentIndex ? 'complete' : i === currentIndex ? 'current' : 'future'}
     <button
@@ -33,7 +34,7 @@
       title={`${step.label} · ${state}`}
       onclick={() => onSelect(step.id)}
     >
-      <span class="label" use:fitText={{ min: 9, text: step.label }}>{step.label}</span>
+      <span class="label" use:fitText={{ min: 9, text: step.label }}>{t(step.label)}</span>
     </button>
   {/each}
 </nav>

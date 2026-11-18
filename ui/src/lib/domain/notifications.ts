@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { mentionsOf, type ChatMessage } from './chat.ts';
 import type { FollowView } from './follows.ts';
 import type { Proposal } from './governance.ts';
@@ -123,7 +124,7 @@ export function projectNotifications(p: ProjectActivity, me: string, myName: str
           id: `phase:${v.id}`,
           kind: 'prj-phase-done',
           actor: v.author,
-          title: 'Project phase change executed',
+          title: t('Project phase change executed'),
           body: `The project phase changed to ${p.phaseLabel(to)}.`,
           lead: null,
           target: null,
@@ -150,7 +151,7 @@ function chatNotifications(p: ProjectActivity, me: string, myName: string): Unre
         kind: 'mention',
         actor: m.author,
         title: p.title,
-        body: 'You were mentioned.',
+        body: t('You were mentioned.'),
         lead: null,
         target: { tab: 'chat', comment: m.id },
         createdAt: m.createdAt,
@@ -225,7 +226,7 @@ export function followNotifications(mine: FollowView): Unread[] {
     id: `follow:${r.agent}:${r.since}`,
     kind: r.status === 'pending' ? ('follow-request' as const) : ('new-follower' as const),
     actor: r.agent,
-    title: r.status === 'pending' ? 'Follow request' : 'New follower',
+    title: r.status === 'pending' ? t('Follow request') : t('New follower'),
     body: r.status === 'pending' ? 'requested to follow you.' : 'started following you.',
     target: null,
     // A request someone accepted later stays where it arrived.
@@ -240,7 +241,7 @@ export function followNotifications(mine: FollowView): Unread[] {
             id: `follow-accepted:${r.agent}:${r.acceptedAt}`,
             kind: 'follow-accepted' as const,
             actor: r.agent,
-            title: 'Follow request accepted',
+            title: t('Follow request accepted'),
             body: 'accepted your follow request.',
             target: null,
             createdAt: r.acceptedAt,

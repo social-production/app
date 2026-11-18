@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
 
   import FactLine from './FactLine.svelte';
@@ -25,7 +26,7 @@
     rel="noopener noreferrer"
     onclick={show}
   >
-    <FactLine icon="where"><strong>{where}<small>Show on the map</small></strong></FactLine>
+    <FactLine icon="where"><strong>{where}<small>{t('Show on the map')}</small></strong></FactLine>
     <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
   </a>
 {:else if where}

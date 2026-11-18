@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
@@ -36,7 +37,7 @@
 
   async function send(contact: Contact): Promise<string | null> {
     try {
-      await shareHelpRequest(contact, help.project?.charter?.title ?? 'Help request', url);
+      await shareHelpRequest(contact, help.project?.charter?.title ?? t('Help request'), url);
       return null;
     } catch (e) {
       return explain(e);
@@ -47,9 +48,9 @@
   const filled = $derived(roles.filter((r) => !help.hasRoom(r)).length);
 
   function label(role: ActivityRole): string {
-    if (help.pending === role.index) return 'Working...';
-    if (help.activity?.myRole === role.index) return 'Leave';
-    return help.hasRoom(role) ? 'Join' : 'Full';
+    if (help.pending === role.index) return t('Working...');
+    if (help.activity?.myRole === role.index) return t('Leave');
+    return help.hasRoom(role) ? t('Join') : t('Full');
   }
 </script>
 
@@ -57,7 +58,7 @@
 {#if help.activity && help.activity.roles.length > 0}
   <div class="help-roles help-roles-page">
     <div class="detail-section-head">
-      <h2>Roles</h2>
+      <h2>{t('Roles')}</h2>
       <span>{filled} of {roles.length} filled</span>
     </div>
     <div class="role-stack">
@@ -65,13 +66,13 @@
         {@const mine = help.activity.myRole === role.index}
         <article class="role-bar">
           <div class="role-copy">
-            <strong>{role.label}</strong>
+            <strong>{t(role.label)}</strong>
             {#if role.description}<p>{role.description}</p>{/if}
             <span>
               {slotsOf(role.maximum) > 0 ? `${slotsOf(role.maximum)} needed · ` : ''}{role.people
                 .length
                 ? role.people.map((a) => help.names[a] ?? '…').join(', ')
-                : 'nobody yet'}
+                : t('nobody yet')}
             </span>
           </div>
           <button
@@ -83,7 +84,7 @@
             type="button"
             onclick={() => void help.toggle(role)}
           >
-            {label(role)}
+            {t(label(role))}
           </button>
         </article>
       {/each}
@@ -102,7 +103,7 @@
     {#if signedIn}
       <ShareUserMenu
         copyLinkUrl={url}
-        menuTitle="Share help request"
+        menuTitle={t('Share help request')}
         compact
         shareTitle={help.project.charter?.title ?? null}
         searchContacts={search}

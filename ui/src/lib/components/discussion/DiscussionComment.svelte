@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import PausedBadge from '#lib/components/people/PausedBadge.svelte';
@@ -98,12 +99,12 @@
       </a>
       <PausedBadge agent={comment.author} />
       <span class="comment-time">{relativeCompact(comment.createdAt)}</span>
-      {#if comment.sending}<span class="comment-sending">Sending…</span>{/if}
+      {#if comment.sending}<span class="comment-sending">{t('Sending…')}</span>{/if}
       <button
         aria-expanded={!collapsed}
         aria-label={collapsed
-          ? 'Show this comment and its replies'
-          : 'Hide this comment and its replies'}
+          ? t('Show this comment and its replies')
+          : t('Hide this comment and its replies')}
         class="collapse-hit"
         type="button"
         onclick={() => (collapsed = !collapsed)}
@@ -121,14 +122,18 @@
           onclick={() => (revealed = !revealed)}
         >
           <span class="hidden-plus">{revealed ? '−' : '+'}</span>
-          <span>{revealed ? 'Hide again' : 'Hidden for serious harm report — reveal to read'}</span>
+          <span
+            >{revealed
+              ? t('Hide again')
+              : t('Hidden for serious harm report — reveal to read')}</span
+          >
         </button>
       {/if}
       {#if flat && replyingTo}
-        <p class="replying-to">Replying to <em>{replyingTo}</em></p>
+        <p class="replying-to">{t('Replying to')} <em>{replyingTo}</em></p>
       {/if}
       {#if removed}
-        <p class="body moderated">{removedLabel(moderation.report?.reason)}</p>
+        <p class="body moderated">{t(removedLabel(moderation.report?.reason))}</p>
       {:else if !canReveal || revealed}
         <p class="body">
           {#each bodyParts(comment.body) as part, i (i)}
@@ -161,7 +166,7 @@
           <button
             class="reply-button"
             type="button"
-            aria-label="Reply"
+            aria-label={t('Reply')}
             onclick={() => onReply(comment.id, comment.author)}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24">

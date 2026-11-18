@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -22,7 +23,7 @@
   async function create(): Promise<void> {
     if (creating) return;
     if (!title.trim()) {
-      error = 'Give the group a name.';
+      error = t('Give the group a name.');
       return;
     }
     creating = true;
@@ -30,7 +31,7 @@
     try {
       await onCreate(members, title.trim());
     } catch (e) {
-      error = e instanceof Error ? e.message : 'The group could not be created.';
+      error = e instanceof Error ? e.message : t('The group could not be created.');
     } finally {
       creating = false;
     }
@@ -42,16 +43,16 @@
     <button
       class="round-back"
       type="button"
-      aria-label="Back"
-      title="Back"
+      aria-label={t('Back')}
+      title={t('Back')}
       disabled={creating}
       onclick={onBack}
     >
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
     </button>
     <div class="new-message-title">
-      <h1>New group</h1>
-      <p>{members.length} {members.length === 1 ? 'member' : 'members'}</p>
+      <h1>{t('New group')}</h1>
+      <p>{plural(members.length, '{n} member', '{n} members')}</p>
     </div>
   </header>
 
@@ -66,14 +67,14 @@
     <input
       bind:value={title}
       type="text"
-      aria-label="Group name"
-      placeholder="Group name"
+      aria-label={t('Group name')}
+      placeholder={t('Group name')}
       maxlength="200"
       {@attach (node) => node.focus()}
     />
   </form>
   {#if error}<p class="new-message-note error" role="alert">{error}</p>{/if}
-  {#if creating}<p class="new-message-note">Creating the group…</p>{/if}
+  {#if creating}<p class="new-message-note">{t('Creating the group…')}</p>{/if}
 
   <div class="new-message-list">
     {#each members as person (person.agent)}
@@ -90,8 +91,8 @@
   <button
     class="message-fab"
     type="button"
-    aria-label="Create group"
-    title="Create group"
+    aria-label={t('Create group')}
+    title={t('Create group')}
     disabled={creating}
     onclick={() => void create()}
   >

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { inNativeApp } from '#lib/services/network.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
@@ -21,27 +22,27 @@
 
 <div class="settings-scope">
   <section class="settings-layout">
-    <nav class="settings-nav" aria-label="Settings sections">
-      <p class="settings-nav-label">Settings</p>
-      <a class="nav-item" href="#settings-profile">Profile</a>
-      <a class="nav-item" href="#settings-appearance">Appearance</a>
-      <a class="nav-item" href="#settings-regional">Regional</a>
-      <a class="nav-item" href="#settings-notifications">Notifications</a>
-      <a class="nav-item" href="#settings-devices">Devices</a>
+    <nav class="settings-nav" aria-label={t('Settings sections')}>
+      <p class="settings-nav-label">{t('Settings')}</p>
+      <a class="nav-item" href="#settings-profile">{t('Profile')}</a>
+      <a class="nav-item" href="#settings-appearance">{t('Appearance')}</a>
+      <a class="nav-item" href="#settings-regional">{t('Regional')}</a>
+      <a class="nav-item" href="#settings-notifications">{t('Notifications')}</a>
+      <a class="nav-item" href="#settings-devices">{t('Devices')}</a>
       {#if native}
-        <a class="nav-item" href="#settings-network">Network</a>
+        <a class="nav-item" href="#settings-network">{t('Network')}</a>
       {/if}
       {#if requestCount > 0}
-        <a class="nav-item" href="#settings-follow-requests">Follow requests</a>
+        <a class="nav-item" href="#settings-follow-requests">{t('Follow requests')}</a>
       {/if}
-      <a class="nav-item" href="#settings-privacy">Privacy</a>
-      <a class="nav-item" href="#settings-account">Account</a>
+      <a class="nav-item" href="#settings-privacy">{t('Privacy')}</a>
+      <a class="nav-item" href="#settings-account">{t('Account')}</a>
     </nav>
 
     <section class="settings-page">
       <header class="page-header">
-        <h1>Settings</h1>
-        <p>Your profile, appearance, notifications, devices, privacy and sign-in.</p>
+        <h1>{t('Settings')}</h1>
+        <p>{t('Your profile, appearance, notifications, devices, privacy and sign-in.')}</p>
       </header>
 
       {#if me}

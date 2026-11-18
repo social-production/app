@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { NotificationItem } from './notifications.ts';
 import type { CharterMode } from './projects.ts';
 import type { SoftwareGovernance } from './software.ts';
@@ -24,8 +25,8 @@ export function prApprovedNotifications(
             seed: p.seed,
             projectMode: p.mode,
             actor: pr.approved.by,
-            title: 'Pull request approved',
-            body: 'Voting passed and your pull request is approved for merge.',
+            title: t('Pull request approved'),
+            body: t('Voting passed and your pull request is approved for merge.'),
             lead: null,
             target: {
               open: 'vote' as const,

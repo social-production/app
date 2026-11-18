@@ -4,6 +4,7 @@
  * (web-backend's `build_software_history_entries`). Each becomes a `Software` proposal, so the
  * existing vote sheet and History cards show it and cast its vote.
  */
+import { t } from '#lib/i18n/index.ts';
 import type { Proposal, SoftwareVote } from './governance.ts';
 import type { HistoryEntry, HistoryStatus } from './history.ts';
 import {
@@ -45,7 +46,7 @@ function proposalOf(
 }
 
 const actionLabel = (grant: boolean): string =>
-  grant ? 'Grant merge capability' : 'Revoke merge capability';
+  grant ? t('Grant merge capability') : t('Revoke merge capability');
 
 const open = (t: SoftwareTally): boolean => t.status === 'Open' && !t.settled;
 
@@ -56,7 +57,7 @@ export function softwareDockVotes(g: SoftwareGovernance | null, names: Names): P
     .filter((c) => open(c.tally))
     .map((c) =>
       proposalOf(c.id, c.author, c.createdAt, c.tally, {
-        label: 'Merge capability',
+        label: t('Merge capability'),
         title: actionLabel(c.grant),
         description: '',
         reason: `Member: ${names[c.agent] ?? 'member'}`,
@@ -107,14 +108,14 @@ function entry(p: Proposal, kindLabel: string, status: HistoryStatus): HistoryEn
 function prEntry(pr: SoftwarePullRequest): HistoryEntry {
   const confirming = pr.stage === 'confirmation' || pr.stage === 'confirmed';
   const vote = proposalOf(votedProposal(pr), pr.author, pr.createdAt, pr.tally, {
-    label: 'Pull request',
+    label: t('Pull request'),
     title: pr.title,
     description: pr.summary,
     reason: pr.pullRequestId,
   });
   return entry(
     vote,
-    confirming ? 'Merge confirmation' : 'Pull request approval',
+    confirming ? t('Merge confirmation') : t('Pull request approval'),
     prStatus(pr.stage),
   );
 }
@@ -124,7 +125,7 @@ export function softwareHistory(g: SoftwareGovernance | null, names: Names): His
   if (!g) return [];
   const capability = g.capabilityRequests.map((c) => {
     const p = proposalOf(c.id, c.author, c.createdAt, c.tally, {
-      label: 'Merge capability',
+      label: t('Merge capability'),
       title: names[c.agent] ?? 'unknown',
       description: '',
       reason: actionLabel(c.grant),

@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { NotificationItem } from './notifications.ts';
 import type { PlanKind } from './plans.ts';
 import type { CharterMode } from './projects.ts';
@@ -33,9 +34,9 @@ export function planLeadNotifications(
       seed: p.seed,
       projectMode: p.mode,
       actor: c.by,
-      title: 'Plan became leading',
+      title: t('Plan became leading'),
       body: event
-        ? 'A vote passed and your event plan is now leading.'
+        ? t('A vote passed and your event plan is now leading.')
         : 'A vote passed and your plan is now leading.',
       lead: null,
       target: null,

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import '#lib/components/styles/governance.css';
 
   /** web's RoundPlusButton: a round "+" with an optional label ("Vote", "Add update"). */
@@ -30,5 +31,5 @@
   {onclick}
 >
   <span aria-hidden="true" class="plus-glyph">+</span>
-  {#if label}<span class="plus-label">{label}</span>{/if}
+  {#if label}<span class="plus-label">{t(label)}</span>{/if}
 </button>

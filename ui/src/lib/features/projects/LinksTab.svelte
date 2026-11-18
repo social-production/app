@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import LinkComposer from '#lib/components/links/LinkComposer.svelte';
   import LinkRequestsSection from '#lib/components/links/LinkRequestsSection.svelte';
@@ -45,7 +46,9 @@
       links.composerMessage = undefined;
       composing = true;
     }}
-    ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>Propose a link</button
+    ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></svg>{t(
+      'Propose a link',
+    )}</button
   >
 {/snippet}
 

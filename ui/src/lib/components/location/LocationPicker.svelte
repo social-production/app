@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { onMount, tick } from 'svelte';
   import { portal } from '#lib/components/actions/portal.ts';
   import {
@@ -218,7 +219,7 @@
           onmousedown={(e) => e.preventDefault()}
           onclick={() => pick(suggestion)}
         >
-          {suggestion.displayLabel}
+          {t(suggestion.displayLabel)}
         </button>
       </li>
     {/each}
@@ -227,7 +228,7 @@
 
 <div class="location-picker" class:compact class:elevated>
   {#if modes.length > 1}
-    <div class="mode-row" role="group" aria-label="Location type">
+    <div class="mode-row" role="group" aria-label={t('Location type')}>
       {#each modes as mode (mode)}
         <button
           class="mode-chip"
@@ -236,7 +237,7 @@
           type="button"
           onclick={() => selectMode(mode)}
         >
-          {mode === 'physical' ? 'Physical' : mode === 'online' ? 'Online' : 'TBD'}
+          {mode === 'physical' ? t('Physical') : mode === 'online' ? t('Online') : t('TBD')}
         </button>
       {/each}
     </div>
@@ -248,7 +249,7 @@
         bind:this={input}
         {disabled}
         {placeholder}
-        aria-label="Place"
+        aria-label={t('Place')}
         bind:value={query}
         autocomplete="off"
         {onfocus}
@@ -256,7 +257,7 @@
         {onblur}
         {onkeydown}
       />
-      {#if searching}<span class="status">Searching…</span>{/if}
+      {#if searching}<span class="status">{t('Searching…')}</span>{/if}
       {#if searchError}<p class="error" role="alert">{searchError}</p>{/if}
       {#if !compact && query.trim() && query.trim() !== value.displayLabel.trim()}
         <button class="use-typed-name" type="button" onclick={() => commitTyped(query)}>
@@ -277,7 +278,7 @@
         class="quick-picks"
         class:compact-picks={elevated}
         role="group"
-        aria-label="Suggested locations"
+        aria-label={t('Suggested locations')}
       >
         {#each quickPicks.slice(0, elevated ? 3 : quickPicks.length) as choice (choice.id)}
           <button
@@ -287,13 +288,13 @@
             type="button"
             onclick={() => selectQuickPick(choice)}
           >
-            <span class="quick-pick-label">{choice.label}</span>
-            <span class="quick-pick-source">{choice.sourceLabel}</span>
+            <span class="quick-pick-label">{t(choice.label)}</span>
+            <span class="quick-pick-source">{t(choice.sourceLabel)}</span>
           </button>
         {/each}
       </div>
     {/if}
   {:else if value.mode !== 'online'}
-    <p class="tbd-label">Location will be decided later.</p>
+    <p class="tbd-label">{t('Location will be decided later.')}</p>
   {/if}
 </div>

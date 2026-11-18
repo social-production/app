@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { fitText } from '#lib/components/actions/fitText.ts';
@@ -83,7 +84,8 @@
           <span class="wizard-title" use:fitText={{ min: 11, text: title }}>{title}</span>
         </div>
         {#if !compact}
-          <button aria-label="Close" class="cancel-button" type="button" onclick={onClose}>×</button
+          <button aria-label={t('Close')} class="cancel-button" type="button" onclick={onClose}
+            >×</button
           >
         {/if}
         <div class="progress-track" aria-hidden="true">
@@ -97,18 +99,18 @@
         <footer class="wizard-footer">
           {#if compact}
             <button
-              aria-label="Close"
+              aria-label={t('Close')}
               class="secondary-button wizard-close"
               type="button"
               onclick={onClose}>×</button
             >
           {/if}
           {#if showFooter && canGoBack}
-            <button class="secondary-button" type="button" onclick={onBack}>Back</button>
+            <button class="secondary-button" type="button" onclick={onBack}>{t('Back')}</button>
           {/if}
           {#if showFooter}
             <button class="primary-button" disabled={!canGoNext} type="button" onclick={onNext}>
-              {nextLabel}
+              {t(nextLabel)}
             </button>
           {/if}
         </footer>

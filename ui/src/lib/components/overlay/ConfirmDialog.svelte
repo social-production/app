@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { portal } from '#lib/components/actions/portal.ts';
 
   import '#lib/components/styles/confirm.css';
@@ -37,7 +38,11 @@
 
 {#if open}
   <div class="confirm-root" use:portal>
-    <button class="confirm-scrim" type="button" aria-label="Cancel" onclick={() => onSettle(false)}
+    <button
+      class="confirm-scrim"
+      type="button"
+      aria-label={t('Cancel')}
+      onclick={() => onSettle(false)}
     ></button>
     <div
       class="confirm-card"
@@ -50,13 +55,13 @@
         <p>{body}</p>
       {/if}
       <div class="confirm-actions">
-        <button class="keep" type="button" onclick={() => onSettle(false)}>Keep</button>
+        <button class="keep" type="button" onclick={() => onSettle(false)}>{t('Keep')}</button>
         <button
           bind:this={confirmButton}
           class="go"
           class:danger
           type="button"
-          onclick={() => onSettle(true)}>{confirmLabel}</button
+          onclick={() => onSettle(true)}>{t(confirmLabel)}</button
         >
       </div>
     </div>

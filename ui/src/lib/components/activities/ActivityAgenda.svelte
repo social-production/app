@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Activity } from '#lib/domain/activities.ts';
   import { dayHeading, dayKey } from '#lib/domain/activityTime.ts';
 
@@ -45,7 +46,7 @@
 <div class="agenda">
   {#each days as day (day.key)}
     <section class="agenda-day" aria-label={day.label}>
-      <h4 class="agenda-day-label">{day.label}</h4>
+      <h4 class="agenda-day-label">{t(day.label)}</h4>
       <div class="agenda-rows">
         {#each day.items as activity (activity.id)}
           <div id={`activity-card-${activity.id}`} class="rail-card">

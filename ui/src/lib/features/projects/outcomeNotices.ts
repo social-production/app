@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { Person } from '#lib/domain/people.ts';
 import type { Proposal } from '#lib/domain/governance.ts';
 import type { Moderation } from '#lib/domain/moderation.ts';
@@ -89,8 +90,8 @@ export function tellRemoved(
 ): void {
   const mode = d.project?.charter?.mode;
   if (!m.report || !mode || !isProjectMode(mode) || !once(`removed:${m.report.id}`)) return;
-  const title = d.project?.charter?.title ?? 'A project';
-  const reason = m.report.reason === 'spam' ? 'spam' : 'serious harm';
+  const title = d.project?.charter?.title ?? t('A project');
+  const reason = m.report.reason === 'spam' ? 'spam' : t('serious harm');
   void removedNotice(
     d.members.map((p) => p.agent),
     title,

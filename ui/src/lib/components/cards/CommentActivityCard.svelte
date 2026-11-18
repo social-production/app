@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
   import {
@@ -85,17 +86,18 @@
         <div class="comment-activity-actions">
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href is built from spaceHref, which resolves -->
           <a class="comment-activity-action" {href}
-            ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z" /></svg
-            >Reply</a
+            ><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z" /></svg>{t(
+              'Reply',
+            )}</a
           >
           <button
             class="comment-activity-action"
             type="button"
-            aria-label="Copy link to this comment"
+            aria-label={t('Copy link to this comment')}
             onclick={(e) => void share(e)}
             ><svg aria-hidden="true" viewBox="0 0 24 24"
               ><path d="M12 15V4M8 8l4-4 4 4M5 13v6h14v-6" /></svg
-            >{copied ? 'Copied' : ''}</button
+            >{copied ? t('Copied') : ''}</button
           >
         </div>
       </div>

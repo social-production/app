@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
   import CountBadge from '#lib/components/icons/CountBadge.svelte';
@@ -47,15 +48,15 @@
 </script>
 
 <header class="topbar" class:topbar-compact={p.compact} class:chrome-collapsed={p.collapsed}>
-  <a class="brand" href={resolve('/')} aria-label="Social Production home">
+  <a class="brand" href={resolve('/')} aria-label={t('Social Production home')}>
     <span class="brand-mark"><img alt="" class="brand-icon" src={brandIcon} /></span>
-    <span><strong>Social Production</strong></span>
+    <span><strong>{t('Social Production')}</strong></span>
   </a>
   {#if !p.auth}
     <div class="panel-controls">
       <button
-        aria-label="Open networks"
-        title="Networks"
+        aria-label={t('Open networks')}
+        title={t('Networks')}
         aria-expanded={p.leftOpen}
         class="panel-toggle"
         data-active={p.leftOpen}
@@ -65,8 +66,8 @@
         <GroupsIcon className="panel-toggle-icon groups-icon" />
       </button>
       <button
-        aria-label="Open map"
-        title="Map"
+        aria-label={t('Open map')}
+        title={t('Map')}
         aria-expanded={p.mapOpen ?? false}
         class="panel-toggle panel-toggle-map"
         data-active={p.mapOpen ?? false}
@@ -78,8 +79,8 @@
       <!-- Detail Pages Cleanup §4: the activity rail is for signed-in people. -->
       {#if !p.guest}
         <button
-          aria-label="Open activity"
-          title="Activity"
+          aria-label={t('Open activity')}
+          title={t('Activity')}
           aria-expanded={p.rightOpen}
           class="panel-toggle panel-toggle-right"
           data-active={p.rightOpen}
@@ -103,11 +104,11 @@
           <SvgGlyph name="search" className="search-icon" />
           <!-- The field opens the full-screen search (Chats, Search and Reports mockups §3). -->
           <input
-            aria-label="Search"
+            aria-label={t('Search')}
             bind:value={query}
             class="toolbar-search-input"
             enterkeyhint="search"
-            placeholder="Search"
+            placeholder={t('Search')}
             readonly
             type="search"
             onfocus={(event) => {
@@ -118,17 +119,17 @@
         </div>
       </form>
       {#if !p.compact}
-        <nav class="primary-nav" aria-label="Primary">
+        <nav class="primary-nav" aria-label={t('Primary')}>
           <a
-            aria-label="Home"
+            aria-label={t('Home')}
             class:active-link={p.isActive('/')}
             class="nav-link nav-link-icon"
             href={resolve('/')}><ToolbarIcon name="home" /></a
           >
           {#if !p.guest}
             <a
-              aria-label="Notifications"
-              title="Notifications"
+              aria-label={t('Notifications')}
+              title={t('Notifications')}
               class:active-link={p.isActive('/notifications')}
               class="nav-link nav-link-icon"
               href={resolve('/notifications')}
@@ -137,8 +138,8 @@
                 />{/if}</a
             >
             <a
-              aria-label="Messages"
-              title="Messages"
+              aria-label={t('Messages')}
+              title={t('Messages')}
               class:active-link={p.isActive('/messages')}
               class="nav-link nav-link-icon"
               href={resolve('/messages')}
@@ -151,10 +152,10 @@
       {/if}
     </div>
 
-    <nav class="utility-nav" aria-label="Utilities">
+    <nav class="utility-nav" aria-label={t('Utilities')}>
       {#if !p.compact}
         <a class:active-link={p.isActive('/about')} class="utility-link" href={resolve('/about')}
-          >About</a
+          >{t('About')}</a
         >
       {/if}
       {#if p.signedIn}
@@ -166,8 +167,8 @@
           >
           <div class="settings-wrap">
             <a
-              aria-label="Settings"
-              title="Settings"
+              aria-label={t('Settings')}
+              title={t('Settings')}
               class:active-link={p.isActive('/settings')}
               class="gear-button"
               href={resolve('/settings')}
@@ -177,7 +178,9 @@
           </div>
         {/if}
       {:else if !p.compact}
-        <button class="utility-link" type="button" onclick={p.onSignIn}>Sign in / Sign up</button>
+        <button class="utility-link" type="button" onclick={p.onSignIn}
+          >{t('Sign in / Sign up')}</button
+        >
       {/if}
     </nav>
   {/if}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -11,9 +12,9 @@
 <a
   aria-label={`Message ${person.name}`}
   class="action"
-  title="Message"
+  title={t('Message')}
   href={resolve(`/messages?to=${encodeURIComponent(person.agent)}` as '/messages')}
 >
   <ToolbarIcon name="message" />
-  <span class="action-text">Message</span>
+  <span class="action-text">{t('Message')}</span>
 </a>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import {
     DIRECT_USE_CORE,
@@ -17,19 +18,19 @@
   let open = $state(false);
 </script>
 
-<aside class="policy-notice policy-chip" aria-label="Direct-use policy">
+<aside class="policy-notice policy-chip" aria-label={t('Direct-use policy')}>
   <svg aria-hidden="true" viewBox="0 0 24 24"
     ><path
       d="M8 13V6a1.5 1.5 0 0 1 3 0v6M11 11V4.5a1.5 1.5 0 0 1 3 0V11M14 11V6a1.5 1.5 0 0 1 3 0v8a6 6 0 0 1-6 6h-1a6 6 0 0 1-5-3l-2-4a1.5 1.5 0 0 1 2.6-1.5L8 13"
     /></svg
   >
-  <span>Direct use only: nothing here is sold</span>
-  <button type="button" aria-haspopup="dialog" onclick={() => (open = true)}>Read</button>
+  <span>{t('Direct use only: nothing here is sold')}</span>
+  <button type="button" aria-haspopup="dialog" onclick={() => (open = true)}>{t('Read')}</button>
 </aside>
 
 <OverlaySheet
   {open}
-  title="Direct use only"
+  title={t('Direct use only')}
   labelledById="direct-use-rule"
   rootClass="create-sheet policy-sheet"
   elevated

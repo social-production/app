@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { shortDate, type BotReview } from '#lib/domain/botReview.ts';
 
   /** web's ProfilePage `.bot-review-card`: an open review with its tally and votes, or a
@@ -23,11 +24,13 @@
 <section class="bot-review-card" class:upheld={review.status === 'upheld'} aria-live="polite">
   {#if review.status === 'open'}
     <div class="bot-review-copy">
-      <strong>{review.isAppeal ? 'Re-review open' : 'Bot review open'}</strong>
+      <strong>{review.isAppeal ? t('Re-review open') : t('Bot review open')}</strong>
       <p>
         {own
-          ? 'Full members are voting on whether this account belongs to a real person. You can keep using the site meanwhile.'
-          : 'Full members are voting on whether this account belongs to a real person.'}
+          ? t(
+              'Full members are voting on whether this account belongs to a real person. You can keep using the site meanwhile.',
+            )
+          : t('Full members are voting on whether this account belongs to a real person.')}
       </p>
       <p class="bot-review-tally">
         {review.realVotes} real · {review.botVotes} bot · needs {review.votesRequired} votes, 66% bot
@@ -40,7 +43,8 @@
     {#if canVote}
       {#if review.myVote}
         <p class="bot-review-tally">
-          You voted {review.myVote === 'bot' ? 'Bot' : 'Real person'}. Tap the other to change it.
+          You voted {review.myVote === 'bot' ? t('Bot') : t('Real person')}. Tap the other to change
+          it.
         </p>
       {/if}
       <div class="bot-review-actions">
@@ -49,7 +53,7 @@
           class:chosen={review.myVote === 'real'}
           aria-pressed={review.myVote === 'real'}
           disabled={pending}
-          onclick={() => onVote('real')}>Real person</button
+          onclick={() => onVote('real')}>{t('Real person')}</button
         >
         <button
           type="button"
@@ -57,17 +61,17 @@
           class:chosen={review.myVote === 'bot'}
           aria-pressed={review.myVote === 'bot'}
           disabled={pending}
-          onclick={() => onVote('bot')}>Bot</button
+          onclick={() => onVote('bot')}>{t('Bot')}</button
         >
       </div>
     {/if}
   {:else}
     <div class="bot-review-copy">
-      <strong>Found to be a bot</strong>
-      <p>A community review decided this account is a bot, so it is read-only.</p>
+      <strong>{t('Found to be a bot')}</strong>
+      <p>{t('A community review decided this account is a bot, so it is read-only.')}</p>
       {#if canReReview}
         <button type="button" class="re-review" disabled={pending} onclick={onReReview}>
-          Ask for a re-review
+          {t('Ask for a re-review')}
         </button>
       {:else if own && review.reReviewFrom !== null}
         <p class="bot-review-tally">

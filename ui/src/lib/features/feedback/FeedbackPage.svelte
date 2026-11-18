@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import FeedbackCard from '#lib/components/feedback/FeedbackCard.svelte';
   import FeedbackComposeSheet from '#lib/components/feedback/FeedbackComposeSheet.svelte';
@@ -21,13 +22,13 @@
   /** web's FeedbackPage: bugs and suggestions with votes, compose and detail. The filter and
    * the order are in view (Plan, Phase and Feedback Screens, 7), not behind icons. */
   const filterOptions: { value: FeedbackFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'bugs', label: 'Bugs' },
-    { value: 'suggestions', label: 'Suggestions' },
+    { value: 'all', label: t('All') },
+    { value: 'bugs', label: t('Bugs') },
+    { value: 'suggestions', label: t('Suggestions') },
   ];
   const sortOptions: { value: FeedbackSort; label: string }[] = [
-    { value: 'trending', label: 'Trending' },
-    { value: 'recent', label: 'Most recent' },
+    { value: 'trending', label: t('Trending') },
+    { value: 'recent', label: t('Most recent') },
   ];
 
   const fb = new FeedbackState();
@@ -42,27 +43,27 @@
 
 <section class="feedback-page">
   <header class="feedback-head">
-    <h1>Feedback</h1>
-    <div class="feedback-seg" role="radiogroup" aria-label="Filter feedback">
+    <h1>{t('Feedback')}</h1>
+    <div class="feedback-seg" role="radiogroup" aria-label={t('Filter feedback')}>
       {#each filterOptions as option (option.value)}
         <button
           role="radio"
           aria-checked={filter === option.value}
           class:on={filter === option.value}
           type="button"
-          onclick={() => (filter = option.value)}>{option.label}</button
+          onclick={() => (filter = option.value)}>{t(option.label)}</button
         >
       {/each}
     </div>
   </header>
-  <div class="feedback-tabs" role="tablist" aria-label="Sort feedback">
+  <div class="feedback-tabs" role="tablist" aria-label={t('Sort feedback')}>
     {#each sortOptions as option (option.value)}
       <button
         role="tab"
         aria-selected={sort === option.value}
         class:on={sort === option.value}
         type="button"
-        onclick={() => (sort = option.value)}>{option.label}</button
+        onclick={() => (sort = option.value)}>{t(option.label)}</button
       >
     {/each}
   </div>
@@ -87,14 +88,14 @@
     </div>
   {/if}
   <p class="feedback-source">
-    The code is on <a href="https://github.com/social-production" rel="noreferrer" target="_blank"
-      >GitHub</a
+    {t('The code is on')}
+    <a href="https://github.com/social-production" rel="noreferrer" target="_blank">{t('GitHub')}</a
     >.
   </p>
 
   <button class="feedback-fab" type="button" onclick={() => fb.compose()}>
     <ToolbarIcon name="plus" />
-    <span>Add feedback</span>
+    <span>{t('Add feedback')}</span>
   </button>
 </section>
 

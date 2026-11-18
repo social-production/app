@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { devicePasskeysAvailable, signInWithPasskey } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
 
@@ -21,13 +22,13 @@
   const modes = [
     {
       value: 'signup',
-      label: 'Sign up',
-      description: 'New here? You get 24 words that are your account.',
+      label: t('Sign up'),
+      description: t('New here? You get 24 words that are your account.'),
     },
     {
       value: 'login',
-      label: 'Log in',
-      description: 'Type your 24 words, or use a passkey saved on this device.',
+      label: t('Log in'),
+      description: t('Type your 24 words, or use a passkey saved on this device.'),
     },
   ] as const;
   const active = $derived(modes.find((m) => m.value === mode));
@@ -53,12 +54,12 @@
   <section class="page">
     <header class="ob-head">
       <span class="ob-logo"><img alt="" src={brandIcon} /></span>
-      <h1>Join Social Production</h1>
-      <p>Organise useful work with the people around you.</p>
+      <h1>{t('Join Social Production')}</h1>
+      <p>{t('Organise useful work with the people around you.')}</p>
     </header>
 
     <section class="panel">
-      <div class="choice-row" role="tablist" aria-label="Account mode">
+      <div class="choice-row" role="tablist" aria-label={t('Account mode')}>
         {#each modes as option (option.value)}
           <button
             class:active={mode === option.value}
@@ -66,7 +67,7 @@
             type="button"
             role="tab"
             aria-selected={mode === option.value}
-            onclick={() => (mode = option.value)}>{option.label}</button
+            onclick={() => (mode = option.value)}>{t(option.label)}</button
           >
         {/each}
       </div>
@@ -78,7 +79,7 @@
         {#if passkeys}
           <div class="button-row">
             <button class="button-secondary" type="button" onclick={passkeyLogin} disabled={busy}>
-              {busy ? 'Waiting for your passkey…' : 'Log in with a passkey'}
+              {busy ? t('Waiting for your passkey…') : t('Log in with a passkey')}
             </button>
           </div>
         {/if}
@@ -89,7 +90,7 @@
     <!-- Owner, 2026-11-14: the way back floats at the bottom, like every other back button. -->
     <div class="ob-back"><BackButton /></div>
     <p class="keep-browsing">
-      Just looking? <a href={resolve('/')}>Keep browsing without an account</a>
+      {t('Just looking?')} <a href={resolve('/')}>{t('Keep browsing without an account')}</a>
     </p>
   </section>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
@@ -61,7 +62,7 @@
 
   $effect(() => mentions.watch(talk.messages.map((m) => m.body)));
 
-  const members = $derived(`${chat.members} ${chat.members === 1 ? 'member' : 'members'}`);
+  const members = $derived(`${plural(chat.members, '{n} member', '{n} members')}`);
 
   // web's members panel: the count opens the project's members, read when asked for.
   let membersOpen = $state(false);
@@ -100,8 +101,8 @@
   <button
     class="back-button"
     type="button"
-    aria-label="Back to chats"
-    title="Back to chats"
+    aria-label={t('Back to chats')}
+    title={t('Back to chats')}
     onclick={onBack}
   >
     <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
@@ -129,7 +130,7 @@
           </h2>
         </button>
         <p class="identity-note">
-          Project chat ·
+          {t('Project chat ·')}
           <button
             aria-expanded={membersOpen}
             class="members-link"
@@ -141,8 +142,8 @@
       <button
         class="avatar-hit"
         type="button"
-        aria-label="Chat options"
-        title="Chat options"
+        aria-label={t('Chat options')}
+        title={t('Chat options')}
         onclick={(event) => onMenu(event.clientX, event.clientY)}
       >
         <AvatarBadge size="md" name={chat.title} />
@@ -154,9 +155,9 @@
 <ChatPanel
   lines={talk.lines}
   title={chat.title}
-  placeholder="Message the project..."
-  submitLabel="Send"
-  emptyCopy={talk.loaded ? 'No project chat yet.' : ''}
+  placeholder={t('Message the project...')}
+  submitLabel={t('Send')}
+  emptyCopy={talk.loaded ? t('No project chat yet.') : ''}
   embedded={true}
   fitViewport={false}
   showHeader={false}
@@ -171,9 +172,9 @@
 
 <PeopleSheet
   open={membersOpen}
-  title="Project members"
-  description="Members coordinate planning, updates, and activity together."
-  emptyCopy="No members listed yet."
+  title={t('Project members')}
+  description={t('Members coordinate planning, updates, and activity together.')}
+  emptyCopy={t('No members listed yet.')}
   {people}
   onClose={() => (membersOpen = false)}
 />

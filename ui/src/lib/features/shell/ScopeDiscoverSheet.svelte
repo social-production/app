@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import { untrack } from 'svelte';
 
@@ -35,9 +36,9 @@
   type DiscoverFilter = 'all' | ScopeKind;
 
   const filters: { value: DiscoverFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'channel', label: 'Channels' },
-    { value: 'community', label: 'Communities' },
+    { value: 'all', label: t('All') },
+    { value: 'channel', label: t('Channels') },
+    { value: 'community', label: t('Communities') },
   ];
 
   let query = $state('');
@@ -97,7 +98,7 @@
         : 'channels or communities',
   );
 
-  const memberLabel = (count: number): string => `${count} ${count === 1 ? 'member' : 'members'}`;
+  const memberLabel = (count: number): string => `${plural(count, '{n} member', '{n} members')}`;
 
   let joining = $state<string | null>(null);
   let joinError = $state('');
@@ -123,7 +124,7 @@
   }
 </script>
 
-<OverlaySheet {open} title="Discover" rootClass="scope-discover" {onClose}>
+<OverlaySheet {open} title={t('Discover')} rootClass="scope-discover" {onClose}>
   {#snippet toolbar()}
     <div class="discover-top">
       <label class="discover-field">
@@ -134,18 +135,18 @@
         <input
           id="scope-discover-search"
           bind:value={query}
-          placeholder="Find channels and communities"
+          placeholder={t('Find channels and communities')}
           type="search"
         />
       </label>
-      <div class="discover-seg" role="radiogroup" aria-label="Filter channels and communities">
+      <div class="discover-seg" role="radiogroup" aria-label={t('Filter channels and communities')}>
         {#each filters as filter (filter.value)}
           <button
             role="radio"
             aria-checked={activeFilter === filter.value}
             class:on={activeFilter === filter.value}
             type="button"
-            onclick={() => (activeFilter = filter.value)}>{filter.label}</button
+            onclick={() => (activeFilter = filter.value)}>{t(filter.label)}</button
           >
         {/each}
       </div>
@@ -158,9 +159,9 @@
     {:else if loadError}
       <p class="empty-row">{loadError}</p>
     {:else if filtered.length === 0}
-      <p class="empty-row">{query.trim() ? 'No matches.' : `No ${emptyNoun} yet.`}</p>
+      <p class="empty-row">{query.trim() ? t('No matches.') : `No ${emptyNoun} yet.`}</p>
     {:else}
-      {#if !needle}<p class="discover-label">Most members</p>{/if}
+      {#if !needle}<p class="discover-label">{t('Most members')}</p>{/if}
       {#each filtered as scope (scope.id)}
         {@const isJoined = joined.has(scope.id)}
         <div class="scope-row">
@@ -179,10 +180,10 @@
             <span class="scope-copy">
               <strong>{scope.handle}</strong>
               <span class="scope-meta"
-                >{scope.kind === 'channel' ? 'Channel' : 'Community'} · {memberLabel(
-                  scope.members,
+                >{scope.kind === 'channel' ? t('Channel') : t('Community')} · {t(
+                  memberLabel(scope.members),
                 )}{#if scope.isPrivate}
-                  · Private{/if}</span
+                  {t('· Private')}{/if}</span
               >
             </span>
           </a>
@@ -193,7 +194,7 @@
             disabled={isJoined || joining === scope.id}
             aria-label={isJoined ? `Joined ${scope.handle}` : `Join ${scope.handle}`}
             onclick={() => void join(scope)}
-            >{isJoined ? 'Joined' : joining === scope.id ? 'Joining…' : 'Join'}</button
+            >{isJoined ? t('Joined') : joining === scope.id ? t('Joining…') : t('Join')}</button
           >
         </div>
       {/each}
@@ -204,7 +205,7 @@
         <span class="scope-icon">+</span>
         <span class="scope-copy">
           <strong>Start "{query.trim()}" yourself</strong>
-          <span class="scope-meta">Create a channel or a community</span>
+          <span class="scope-meta">{t('Create a channel or a community')}</span>
         </span>
       </a>
       <!-- eslint-enable svelte/no-navigation-without-resolve -->

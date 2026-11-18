@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import DistanceChoice from '#lib/components/settings/DistanceChoice.svelte';
   import PlaceSearchField from '#lib/components/settings/PlaceSearchField.svelte';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
@@ -54,8 +55,9 @@
     try {
       const [hint] = await ipPlaceHint();
       if (!hint || hint.latitude == null || hint.longitude == null) {
-        message =
-          'IP location is unavailable. On localhost use search or device location; on a deployed site this uses your public IP.';
+        message = t(
+          'IP location is unavailable. On localhost use search or device location; on a deployed site this uses your public IP.',
+        );
         return;
       }
       save({ ...hint, mode: 'physical', isOnline: false });
@@ -87,12 +89,12 @@
 </script>
 
 <section class="settings-section" id="settings-regional">
-  <h2>Regional</h2>
+  <h2>{t('Regional')}</h2>
   <div class="card stack flush">
     <SettingPanel
-      label="Default location"
+      label={t('Default location')}
       value={place.displayLabel.trim() || 'Add'}
-      hint="Used for the Region feed and the map."
+      hint={t('Used for the Region feed and the map.')}
       bind:open={placeOpen}
     >
       {#snippet footer()}
@@ -104,7 +106,7 @@
             onclick={() => {
               if (picked) save(picked);
               placeOpen = false;
-            }}>{picked ? `Use ${picked.displayLabel.split(',')[0]}` : 'Pick a place'}</button
+            }}>{picked ? `Use ${picked.displayLabel.split(',')[0]}` : t('Pick a place')}</button
           >
         </div>
       {/snippet}
@@ -120,9 +122,9 @@
       {/if}
     </SettingPanel>
     <SettingPanel
-      label="Distance"
+      label={t('Distance')}
       value={radiusLabel(radius)}
-      hint="How far the Region feed looks from your place."
+      hint={t('How far the Region feed looks from your place.')}
       bind:open={distanceOpen}
     >
       {#snippet footer()}
@@ -134,7 +136,7 @@
               radius = draftRadius;
               writeRegionRadius(radius);
               distanceOpen = false;
-            }}>Save</button
+            }}>{t('Save')}</button
           >
         </div>
       {/snippet}
@@ -145,21 +147,23 @@
       />
     </SettingPanel>
     <SettingSwitch
-      label="Device location (GPS)"
-      note="For the map’s “Use my location” button. Never used in the background."
+      label={t('Device location (GPS)')}
+      note={t('For the map’s “Use my location” button. Never used in the background.')}
       checked={device}
       onToggle={() => void toggleDevice()}
     />
     <SettingPanel
-      label="Network location"
+      label={t('Network location')}
       value=""
-      hint="A one-time set of your default place from your public IP, for when GPS isn’t available or you don’t want it. Coarser than GPS, and it only runs when you press the button."
+      hint={t(
+        'A one-time set of your default place from your public IP, for when GPS isn’t available or you don’t want it. Coarser than GPS, and it only runs when you press the button.',
+      )}
       bind:open={networkOpen}
     >
       {#snippet footer()}
         <div class="sheet-actions">
           <button class="sheet-submit" type="button" onclick={() => void fromNetwork()}>
-            Set from network
+            {t('Set from network')}
           </button>
         </div>
       {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import { bodyParts, formatByteSize } from '#lib/components/chat/chatFormat.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -98,12 +99,14 @@
 </script>
 
 {#snippet tile(icon: string, label: string, run: () => void)}
-  <button class="about-tile" type="button" onclick={run}><ToolbarIcon name={icon} />{label}</button>
+  <button class="about-tile" type="button" onclick={run}
+    ><ToolbarIcon name={icon} />{t(label)}</button
+  >
 {/snippet}
 
 <section class="chat-about" aria-label={`About ${p.title}`}>
   <div class="about-top">
-    <button class="about-round" type="button" aria-label="Back to the chat" onclick={p.onBack}>
+    <button class="about-round" type="button" aria-label={t('Back to the chat')} onclick={p.onBack}>
       <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22"
         ><path
           d="M15 5l-7 7 7 7"
@@ -118,7 +121,7 @@
     <button
       class="about-round"
       type="button"
-      aria-label="Chat menu"
+      aria-label={t('Chat menu')}
       onclick={(event) => {
         const box = event.currentTarget.getBoundingClientRect();
         p.onMenu(box.right - 220, box.bottom + 6);
@@ -134,8 +137,8 @@
       <h2>{p.title}</h2>
       <p class="about-sub">
         {#if group}{p.chat.members.length} members{#if p.chat.manager === p.me}
-            · you manage it{/if}
-        {:else if person}{standingLabel(person)}{#if person.profile?.home_area}
+            {t('· you manage it')}{/if}
+        {:else if person}{t(standingLabel(person))}{#if person.profile?.home_area}
             · {person.profile.home_area}{/if}{/if}
       </p>
       <div class="about-tiles">
@@ -152,7 +155,7 @@
         )}
         {#if partner}
           <a class="about-tile" href={resolve('/profile/[agent]', { agent: partner })}
-            ><ToolbarIcon name="user" />Profile</a
+            ><ToolbarIcon name="user" />{t('Profile')}</a
           >
         {/if}
       </div>
@@ -160,14 +163,14 @@
         <!-- Detail Pages Cleanup §5: no key row; the full key stays in Settings › Account. -->
         <div class="about-info">
           <div>
-            <span>Bio</span>
+            <span>{t('Bio')}</span>
             <p>{person.profile.bio}</p>
           </div>
         </div>
       {/if}
     </div>
 
-    <div class="about-tabs" role="tablist" aria-label="Shared in this chat">
+    <div class="about-tabs" role="tablist" aria-label={t('Shared in this chat')}>
       {#each tabs as name (name)}
         <button
           type="button"
@@ -184,13 +187,13 @@
         <a class="about-row" href={resolve('/profile/[agent]', { agent })}>
           <AvatarBadge size="md" name={p.names[agent] ?? '…'} />
           <span class="about-row-copy"
-            ><b>{agent === p.me ? 'You' : (p.names[agent] ?? '…')}</b></span
+            ><b>{agent === p.me ? t('You') : (p.names[agent] ?? '…')}</b></span
           >
-          {#if agent === p.chat.manager}<span class="about-chip">Manager</span>{/if}
+          {#if agent === p.chat.manager}<span class="about-chip">{t('Manager')}</span>{/if}
         </a>
       {/each}
     {:else if tab === 'Media'}
-      {#if photos.length === 0}<p class="about-empty">No photos in this chat yet.</p>{/if}
+      {#if photos.length === 0}<p class="about-empty">{t('No photos in this chat yet.')}</p>{/if}
       <div class="about-grid">
         {#each photos as { line, a }, i (i)}
           <button
@@ -203,7 +206,7 @@
         {/each}
       </div>
     {:else if tab === 'Files'}
-      {#if files.length === 0}<p class="about-empty">No files in this chat yet.</p>{/if}
+      {#if files.length === 0}<p class="about-empty">{t('No files in this chat yet.')}</p>{/if}
       {#each files as { line, a }, i (i)}
         <button class="about-row" type="button" onclick={() => void download(a)}>
           <span class="about-glyph"><ToolbarIcon name="copy" /></span>
@@ -212,7 +215,7 @@
         </button>
       {/each}
     {:else if tab === 'Links'}
-      {#if links.length === 0}<p class="about-empty">No links in this chat yet.</p>{/if}
+      {#if links.length === 0}<p class="about-empty">{t('No links in this chat yet.')}</p>{/if}
       {#each links as { line, part }, i (i)}
         <div class="about-row">
           <span class="about-glyph"><ToolbarIcon name="link" /></span>

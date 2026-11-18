@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -85,7 +86,7 @@
     direct
       ? 'Organizers decide: saved at once'
       : organized
-        ? 'Organizers decide: read only for you'
+        ? t('Organizers decide: read only for you')
         : `Members vote: ${APPROVAL_PERCENT}% yes`,
   );
 
@@ -97,7 +98,7 @@
     };
     if (await gov.proposeEdit(change)) {
       art.clearStaged();
-      notice = direct ? 'Saved' : 'Vote started';
+      notice = direct ? t('Saved') : t('Vote started');
       if (direct) onChanged();
       else tab = 'decisions';
     }
@@ -106,19 +107,19 @@
 
 <OverlaySheet
   {open}
-  title="Settings"
+  title={t('Settings')}
   labelledById="scope-settings-title"
   rootClass="scope-settings"
   {onClose}
 >
   {#snippet toolbar()}
-    <div class="sheet-tabs" role="tablist" aria-label="Settings sections">
+    <div class="sheet-tabs" role="tablist" aria-label={t('Settings sections')}>
       <button
         type="button"
         role="tab"
         aria-selected={tab === 'settings'}
         class:active={tab === 'settings'}
-        onclick={() => (tab = 'settings')}>Settings</button
+        onclick={() => (tab = 'settings')}>{t('Settings')}</button
       >
       <button
         type="button"
@@ -127,7 +128,7 @@
         class:active={tab === 'decisions'}
         onclick={() => (tab = 'decisions')}
       >
-        Decisions
+        {t('Decisions')}
         {#if gov.open.length}<span class="tab-count">{gov.open.length}</span>{/if}
       </button>
     </div>
@@ -136,14 +137,14 @@
     {#if gov.message}<p class="error">{gov.message}</p>{/if}
     {#if notice}<p class="how">{notice}</p>{/if}
     {#if tab === 'decisions'}
-      <section class="decisions" aria-label="Decisions">
+      <section class="decisions" aria-label={t('Decisions')}>
         {#if !gov.loaded}
           <SkeletonRows count={2} kind="row" />
         {:else if gov.open.length === 0 && gov.past.length === 0}
-          <p class="empty-card">No decisions yet.</p>
+          <p class="empty-card">{t('No decisions yet.')}</p>
         {/if}
         {#if gov.open.length > 0}
-          <h3 class="decisions-head">Open</h3>
+          <h3 class="decisions-head">{t('Open')}</h3>
           {#each gov.open as item (item.id)}
             <ScopeDecisionCard
               {item}
@@ -155,10 +156,12 @@
                 : undefined}
             />
           {/each}
-          {#if !isMember}<p class="vote-note">Members vote on these. Join to take part.</p>{/if}
+          {#if !isMember}<p class="vote-note">
+              {t('Members vote on these. Join to take part.')}
+            </p>{/if}
         {/if}
         {#if gov.past.length > 0}
-          <h3 class="decisions-head">Past</h3>
+          <h3 class="decisions-head">{t('Past')}</h3>
           {#each gov.past as item (item.id)}<ScopeDecisionCard {item} {memberName} {art} />{/each}
         {/if}
       </section>
@@ -166,24 +169,26 @@
       <ScopeSheetArt {kind} {art} {canEdit} />
 
       <label class="field">
-        <span>Name</span>
+        <span>{t('Name')}</span>
         <input value={handle} maxlength="32" aria-describedby="scope-name-hint" disabled />
-        <span id="scope-name-hint" class="hint">Tags use this name, so it stays as it is.</span>
+        <span id="scope-name-hint" class="hint"
+          >{t('Tags use this name, so it stays as it is.')}</span
+        >
       </label>
       <label class="field">
-        <span>Description</span>
+        <span>{t('Description')}</span>
         <textarea bind:value={draft} rows="3" maxlength="2000" disabled={!canEdit}></textarea>
       </label>
 
       <div class="scope-rule-strip">
         <ToolbarIcon name="people" />
         <span>{rule}</span>
-        <button type="button" aria-expanded={how} onclick={() => (how = !how)}>How</button>
+        <button type="button" aria-expanded={how} onclick={() => (how = !how)}>{t('How')}</button>
       </div>
       {#if how}
         <p class="how">
           {#if direct}
-            You're an organizer, so changes apply straight away.
+            {t("You're an organizer, so changes apply straight away.")}
           {:else if organized}
             Organizers ({organizerNames.join(', ')}) look after these settings.
           {:else}
@@ -214,7 +219,7 @@
     {#if canEdit && tab === 'settings'}
       <div class="sheet-actions">
         <button class="sheet-submit" type="button" disabled={gov.busy || !changed} onclick={save}>
-          {direct ? 'Save' : 'Propose change'}
+          {direct ? t('Save') : t('Propose change')}
         </button>
       </div>
     {/if}

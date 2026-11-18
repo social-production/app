@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { RequestSettings } from '#lib/domain/projects.ts';
 
@@ -26,7 +27,7 @@
 
 <OverlaySheet
   open={state.settingsOpen}
-  title="Request settings"
+  title={t('Request settings')}
   labelledById="personal-request-settings-sheet"
   onClose={() => (state.settingsOpen = false)}
 >
@@ -36,11 +37,13 @@
         <div>
           <p>
             {#if vote}
-              Each vote runs on its own and applies automatically once it reaches 66% approval and
-              the required vote count.
+              {t(
+                'Each vote runs on its own and applies automatically once it reaches 66% approval and the required vote count.',
+              )}
             {:else}
-              These settings apply immediately because the project creator is the only person
-              running this service.
+              {t(
+                'These settings apply immediately because the project creator is the only person running this service.',
+              )}
             {/if}
           </p>
         </div>
@@ -48,16 +51,16 @@
 
       <label class="checkbox-row">
         <input bind:checked={state.settingsForm.enabled} type="checkbox" />
-        <span>Enable requests</span>
+        <span>{t('Enable requests')}</span>
       </label>
 
       {#if form.enabled}
         <label>
-          <span class="field-inline-label">Request mode</span>
+          <span class="field-inline-label">{t('Request mode')}</span>
           <select bind:value={state.settingsForm.mode}>
-            <option value="calendar">Scheduled slots only</option>
-            <option value="direct">Message requests only</option>
-            <option value="both">Scheduled slots and message requests</option>
+            <option value="calendar">{t('Scheduled slots only')}</option>
+            <option value="direct">{t('Message requests only')}</option>
+            <option value="both">{t('Scheduled slots and message requests')}</option>
           </select>
         </label>
         {#if vote ? form.mode === 'both' : form.mode !== 'direct'}
@@ -65,34 +68,35 @@
             <input bind:checked={state.settingsForm.offSchedule} type="checkbox" />
             <span
               >{vote
-                ? 'Allow message requests when no slot is listed'
-                : 'Allow off-schedule requests'}</span
+                ? t('Allow message requests when no slot is listed')
+                : t('Allow off-schedule requests')}</span
             >
           </label>
         {/if}
         <p class="field-help">
-          Scheduled slots start from listed times. Message requests let people write in without
-          choosing a listed slot.
+          {t(
+            'Scheduled slots start from listed times. Message requests let people write in without choosing a listed slot.',
+          )}
           {#if form.mode !== 'direct' && !vote}
-            Off-schedule requests can ask for a time that is not already listed.
+            {t('Off-schedule requests can ask for a time that is not already listed.')}
           {/if}
         </p>
       {/if}
       {#if vote}
         {#if !changed}
           <p class="field-help">
-            Choose a different request setup before adding a reason or starting a vote.
+            {t('Choose a different request setup before adding a reason or starting a vote.')}
           </p>
         {/if}
         <label>
-          <span class="field-inline-label">Reason</span>
+          <span class="field-inline-label">{t('Reason')}</span>
           <textarea
             bind:value={state.settingsReason}
             disabled={!changed}
             rows="3"
             placeholder={changed
-              ? 'Explain why the request flow should change right now.'
-              : 'Choose a different request setup to unlock the reason field.'}></textarea>
+              ? t('Explain why the request flow should change right now.')
+              : t('Choose a different request setup to unlock the reason field.')}></textarea>
         </label>
       {/if}
       {#if state.error}<p class="validation-copy" role="alert">{state.error}</p>{/if}
@@ -101,13 +105,13 @@
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-cancel" type="button" onclick={() => (state.settingsOpen = false)}
-        >Cancel</button
+        >{t('Cancel')}</button
       >
       <button
         class="sheet-submit"
         disabled={!changed || state.busy || (vote && !state.settingsReason.trim())}
         type="button"
-        onclick={onSave}>{vote ? 'Start vote' : 'Save settings'}</button
+        onclick={onSave}>{vote ? t('Start vote') : t('Save settings')}</button
       >
     </div>
   {/snippet}

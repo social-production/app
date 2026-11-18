@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { page } from '$app/state';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
 
@@ -23,7 +24,7 @@
   <FactRow
     icon="where"
     title={where}
-    sub="Show on the map"
+    sub={t('Show on the map')}
     href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(where)}`}
     external
     onclick={show}

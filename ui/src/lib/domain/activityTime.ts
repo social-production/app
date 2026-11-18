@@ -43,7 +43,7 @@ export function dateLine(start: number, end: number): string {
   return `${startDate}, ${startTime} – ${endDate}, ${endTime}${suffix}`;
 }
 
-/** web's agenda day heading: "Today · Sat, 18 Oct", "Tomorrow · …" or the day. */
+/** web's agenda day heading: t('Today · Sat, 18 Oct'), "Tomorrow · …" or the day. */
 export function dayHeading(micros: number, now = Date.now()): string {
   const date = at(micros);
   const base = date.toLocaleDateString(

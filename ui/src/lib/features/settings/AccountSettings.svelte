@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CopyKey from '#lib/components/CopyKey.svelte';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
@@ -32,7 +33,7 @@
     error = message = undefined;
     try {
       await addPasskey(viewer.name || 'Social Production');
-      message = 'Passkey saved on this device.';
+      message = t('Passkey saved on this device.');
     } catch (e) {
       error = explain(e);
     } finally {
@@ -73,22 +74,24 @@
 </script>
 
 <section class="settings-section" id="settings-account">
-  <h2>Account</h2>
+  <h2>{t('Account')}</h2>
   <div class="card stack flush">
     <SettingPanel
-      label="Your key"
+      label={t('Your key')}
       value={me}
       key
-      hint="Others paste it to vouch for you or pair a device."
+      hint={t('Others paste it to vouch for you or pair a device.')}
     >
       <CopyKey value={me} />
     </SettingPanel>
 
     {#if passkeys}
       <SettingPanel
-        label="Passkey"
+        label={t('Passkey')}
         value=""
-        hint="Sign in on this device with fingerprint, face or screen lock. Your 24 words always work too."
+        hint={t(
+          'Sign in on this device with fingerprint, face or screen lock. Your 24 words always work too.',
+        )}
       >
         {#if error}<p class="setting-hint error">{error}</p>{:else if message}<p
             class="setting-hint"
@@ -98,7 +101,7 @@
         {#snippet footer()}
           <div class="sheet-actions">
             <button class="sheet-submit" disabled={busy} type="button" onclick={savePasskey}>
-              {busy ? 'Waiting…' : 'Save a passkey'}
+              {busy ? t('Waiting…') : t('Save a passkey')}
             </button>
           </div>
         {/snippet}
@@ -106,27 +109,29 @@
     {/if}
 
     <SettingPanel
-      label="Sign out"
+      label={t('Sign out')}
       value=""
-      hint="Sign out on this device. Sign back in with your 24 words."
+      hint={t('Sign out on this device. Sign back in with your 24 words.')}
     >
       {#snippet footer()}
         <div class="sheet-actions">
-          <button class="sheet-submit" type="button" onclick={leave}>Sign out</button>
+          <button class="sheet-submit" type="button" onclick={leave}>{t('Sign out')}</button>
         </div>
       {/snippet}
     </SettingPanel>
 
     <SettingPanel
-      label="Deactivate account"
+      label={t('Deactivate account')}
       value=""
-      hint="You will be signed out and cannot sign in again. Posts, threads, and vouches stay under this username."
+      hint={t(
+        'You will be signed out and cannot sign in again. Posts, threads, and vouches stay under this username.',
+      )}
     >
       <input
         autocomplete="off"
         bind:value={confirmName}
-        aria-label="Type your name to confirm"
-        placeholder="Type your name to confirm"
+        aria-label={t('Type your name to confirm')}
+        placeholder={t('Type your name to confirm')}
       />
       {#if deactivateError}<p class="setting-hint error">{deactivateError}</p>{/if}
       {#snippet footer()}
@@ -137,7 +142,7 @@
             type="button"
             onclick={() => void deactivate()}
           >
-            {deactivating ? 'Deactivating…' : 'Deactivate account'}
+            {deactivating ? t('Deactivating…') : t('Deactivate account')}
           </button>
         </div>
       {/snippet}
@@ -147,9 +152,11 @@
 
 <ConfirmDialog
   open={unheld}
-  title="Your account may not have reached the network yet"
-  body="No other node lists it yet, and this computer may hold the only copy. If you sign out now, your profile and history could be lost: your words would bring back an empty account. Wait a few minutes and try again, or sign out anyway."
-  confirmLabel="Sign out anyway"
+  title={t('Your account may not have reached the network yet')}
+  body={t(
+    'No other node lists it yet, and this computer may hold the only copy. If you sign out now, your profile and history could be lost: your words would bring back an empty account. Wait a few minutes and try again, or sign out anyway.',
+  )}
+  confirmLabel={t('Sign out anyway')}
   danger
   onSettle={(ok) => (ok ? void signOut() : (unheld = false))}
 />

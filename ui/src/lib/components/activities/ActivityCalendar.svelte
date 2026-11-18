@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
@@ -108,8 +109,8 @@
 >
   <div class="calendar-toolbar">
     <button
-      aria-label={strip ? 'Previous week' : 'Previous month'}
-      title={strip ? 'Previous week' : 'Previous month'}
+      aria-label={strip ? t('Previous week') : t('Previous month')}
+      title={strip ? t('Previous week') : t('Previous month')}
       class="month-button"
       type="button"
       onclick={() => shift(-1)}
@@ -126,8 +127,9 @@
       </svg>
     </button>
     {#snippet monthName()}
-      {label}{#if zone}
-        <span class="zone-label" title="Times are shown in your Display timezone">· {zone}</span
+      {t(label)}{#if zone}
+        <span class="zone-label" title={t('Times are shown in your Display timezone')}
+          >· {zone}</span
         >{/if}
     {/snippet}
     {#if p.week}
@@ -135,7 +137,7 @@
         class="month-label month-toggle"
         type="button"
         aria-expanded={wholeMonth}
-        title={wholeMonth ? 'Show one week' : 'Show the whole month'}
+        title={wholeMonth ? t('Show one week') : t('Show the whole month')}
         onclick={toggleMonth}
       >
         {@render monthName()}
@@ -154,8 +156,8 @@
       <strong class="month-label">{@render monthName()}</strong>
     {/if}
     <button
-      aria-label={strip ? 'Next week' : 'Next month'}
-      title={strip ? 'Next week' : 'Next month'}
+      aria-label={strip ? t('Next week') : t('Next month')}
+      title={strip ? t('Next week') : t('Next month')}
       class="month-button"
       type="button"
       onclick={() => shift(1)}
@@ -195,7 +197,7 @@
         role="button"
         tabindex={pickable(day.iso) ? 0 : -1}
         aria-disabled={!pickable(day.iso)}
-        aria-label={`${day.day}${day.bars.length ? `, ${day.bars.length} ${day.bars.length === 1 ? 'activity' : 'activities'}` : ''}`}
+        aria-label={`${day.day}${day.bars.length ? `, ${plural(day.bars.length, '{n} activity', '{n} activities')}` : ''}`}
         onmouseenter={() => (hoveredDay = day.iso)}
         onmouseleave={() => (hoveredDay = '')}
         onfocus={() => (hoveredDay = day.iso)}
@@ -253,8 +255,8 @@
       <RoundPlusButton
         standout
         active={p.createActive}
-        label="Add activity"
-        ariaLabel="Add activity"
+        label={t('Add activity')}
+        ariaLabel={t('Add activity')}
         onclick={p.onCreate}
       />
     {/if}

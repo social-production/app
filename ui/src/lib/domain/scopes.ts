@@ -1,3 +1,4 @@
+import { plural } from '#lib/i18n/index.ts';
 /** Channels and communities (ADR 0068), with web's handle rules (web/src/lib/utils/handles.ts). */
 
 export type ScopeKind = 'channel' | 'community';
@@ -102,7 +103,7 @@ export function tagCounts(tags: string[]): string {
   const kinds = tags.map((t) => tagScope(t)?.kind);
   const channels = kinds.filter((k) => k === 'channel').length;
   const communities = kinds.filter((k) => k === 'community').length;
-  return `${channels} ${channels === 1 ? 'channel' : 'channels'} · ${communities} ${
+  return `${plural(channels, '{n} channel', '{n} channels')} · ${communities} ${
     communities === 1 ? 'community' : 'communities'
   }`;
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   /**
@@ -30,7 +31,7 @@
 
 <OverlaySheet
   {open}
-  title="How moderators work"
+  title={t('How moderators work')}
   labelledById="board-how-title"
   rootClass="platform-board"
   elevated

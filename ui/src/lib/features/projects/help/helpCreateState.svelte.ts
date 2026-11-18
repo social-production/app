@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   endsAfter,
   hoursAfter,
@@ -11,12 +12,12 @@ import { explain } from '#lib/services/errors.ts';
 import { createHelpRequest } from '#lib/services/helpRequests.ts';
 
 export const HELP_STEPS = [
-  { id: 'basics', title: 'Basics', question: 'What do you need help with?' },
-  { id: 'location', title: 'Location', question: 'Where is it?' },
-  { id: 'timing', title: 'Timing', question: 'When do you need help?' },
-  { id: 'scope', title: 'Scope', question: 'Where should people find it?' },
-  { id: 'roles', title: 'Roles', question: 'Who do you need?' },
-  { id: 'overview', title: 'Overview', question: 'Check and publish' },
+  { id: 'basics', title: t('Basics'), question: t('What do you need help with?') },
+  { id: 'location', title: t('Location'), question: t('Where is it?') },
+  { id: 'timing', title: t('Timing'), question: t('When do you need help?') },
+  { id: 'scope', title: t('Scope'), question: t('Where should people find it?') },
+  { id: 'roles', title: t('Roles'), question: t('Who do you need?') },
+  { id: 'overview', title: t('Overview'), question: t('Check and publish') },
 ] as const;
 
 type StepId = (typeof HELP_STEPS)[number]['id'];

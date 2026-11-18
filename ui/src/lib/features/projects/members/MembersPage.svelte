@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -90,8 +91,8 @@
   function manage(agent: string, organizer: boolean) {
     if (!canManage || agent === project?.creator) return [];
     return organizer
-      ? [{ label: 'Remove', icon: 'x', danger: true, run: () => void actions.demote(agent) }]
-      : [{ label: 'Make organiser', icon: 'shield', run: () => void actions.promote(agent) }];
+      ? [{ label: t('Remove'), icon: 'x', danger: true, run: () => void actions.demote(agent) }]
+      : [{ label: t('Make organiser'), icon: 'shield', run: () => void actions.promote(agent) }];
   }
 </script>
 
@@ -101,21 +102,21 @@
     name={nameOf(agent)}
     line={line(agent)}
     you={agent === me}
-    badge={organizer ? 'Organiser' : ''}
+    badge={organizer ? t('Organiser') : ''}
     actions={manage(agent, organizer)}
     busy={actions.pending === agent}
   />
 {/snippet}
 
-<div class="members-page" role="dialog" aria-modal="true" aria-label="People">
+<div class="members-page" role="dialog" aria-modal="true" aria-label={t('People')}>
   <header class="members-head">
-    <button type="button" class="members-back" aria-label="Back" onclick={onClose}>
+    <button type="button" class="members-back" aria-label={t('Back')} onclick={onClose}>
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg>
     </button>
-    <h1>People</h1>
+    <h1>{t('People')}</h1>
   </header>
   {#if invites}
-    <div class="members-sides" role="tablist" aria-label="Members or invited">
+    <div class="members-sides" role="tablist" aria-label={t('Members or invited')}>
       <button
         type="button"
         role="tab"
@@ -132,7 +133,12 @@
   {/if}
   <label class="members-search">
     <ToolbarIcon name="search" />
-    <input type="search" placeholder="Search" aria-label="Search people" bind:value={query} />
+    <input
+      type="search"
+      placeholder={t('Search')}
+      aria-label={t('Search people')}
+      bind:value={query}
+    />
   </label>
   {#if actions.error}<p class="members-note" role="alert">{actions.error}</p>{/if}
 
@@ -143,7 +149,7 @@
         <MemberRow agent={i.agent} name={nameOf(i.agent)} line={invitedLine(i)} />
       {:else}
         <p class="members-note">
-          {needle ? 'No matches.' : 'Nobody is waiting: everyone invited has joined.'}
+          {needle ? t('No matches.') : t('Nobody is waiting: everyone invited has joined.')}
         </p>
       {/each}
     {:else}
@@ -154,10 +160,10 @@
       {/if}
       {#each rest as agent (agent)}{@render row(agent, false)}{/each}
       {#if rest.length === 0}
-        <p class="members-note">{needle ? 'No matches.' : 'Nobody else has joined yet.'}</p>
+        <p class="members-note">{needle ? t('No matches.') : t('Nobody else has joined yet.')}</p>
       {/if}
     {/if}
   </div>
 
-  <div class="members-invite"><DetailShare {detail} label="Invite people" /></div>
+  <div class="members-invite"><DetailShare {detail} label={t('Invite people')} /></div>
 </div>

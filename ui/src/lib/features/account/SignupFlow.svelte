@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PhraseGrid from '#lib/components/PhraseGrid.svelte';
   import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
   import {
@@ -56,7 +57,7 @@
 {#if step === 'name'}
   <form class="stack" data-step="name" onsubmit={(e) => (e.preventDefault(), (step = 'phrase'))}>
     <label>
-      <span class="field-label">Username</span>
+      <span class="field-label">{t('Username')}</span>
       <input
         bind:value={name}
         maxlength={HANDLE_MAX}
@@ -68,33 +69,37 @@
     <div class="handle-line">
       {#if problem && name.trim().length >= 3}<p class="status-note">{problem}</p>{/if}
     </div>
-    <p class="ob-note">Next you get 24 words. They are your account; keep them somewhere safe.</p>
+    <p class="ob-note">
+      {t('Next you get 24 words. They are your account; keep them somewhere safe.')}
+    </p>
     <div class="button-row">
-      <button class="button-primary" disabled={!!problem} type="submit">Next</button>
+      <button class="button-primary" disabled={!!problem} type="submit">{t('Next')}</button>
     </div>
   </form>
 {:else if step === 'phrase'}
   <div class="stack" data-step="phrase">
-    <p class="field-label">Your recovery phrase</p>
+    <p class="field-label">{t('Your recovery phrase')}</p>
     <p class="ob-phrase-note">
-      These 24 words <strong>are</strong> your account. Write them down and keep them safe: anyone with
-      them can act as you, and without them a lost device means a lost account.
+      {t('These 24 words')} <strong>{t('are')}</strong>
+      {t(
+        'your account. Write them down and keep them safe: anyone with them can act as you, and without them a lost device means a lost account.',
+      )}
     </p>
     <PhraseGrid {words} />
     <div class="button-row">
       <button class="button-secondary copy-words" type="button" onclick={() => void copyWords()}>
-        {copied ? 'Copied all 24 words' : 'Copy all 24 words'}
+        {copied ? t('Copied all 24 words') : t('Copy all 24 words')}
       </button>
     </div>
     <div class="button-row">
       <button class="button-primary" type="button" onclick={() => (step = 'confirm')}
-        >I've written them down</button
+        >{t("I've written them down")}</button
       >
     </div>
   </div>
 {:else if step === 'confirm'}
   <form class="stack" data-step="confirm" onsubmit={(e) => (e.preventDefault(), void finish())}>
-    <p class="field-label">Check your phrase</p>
+    <p class="field-label">{t('Check your phrase')}</p>
     {#each positions as position, i (position)}
       <label>
         <span class="field-label">Word #{position + 1}</span>
@@ -109,11 +114,13 @@
     {#if error}<p class="status-note">{error}</p>{/if}
     <div class="button-row">
       <button class="button-secondary" type="button" onclick={() => (step = 'phrase')}
-        >Show the words again</button
+        >{t('Show the words again')}</button
       >
     </div>
     <div class="button-row">
-      <button class="button-primary" disabled={!confirmed} type="submit">Create account</button>
+      <button class="button-primary" disabled={!confirmed} type="submit"
+        >{t('Create account')}</button
+      >
     </div>
   </form>
 {:else}

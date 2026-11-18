@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { VoteChoice } from '#lib/domain/governance.ts';
   import type { LinkRequest, LinkSide } from '#lib/domain/links.ts';
 
@@ -31,10 +32,11 @@
 
 <section class="request-stack">
   <h2 class="links-heading">
-    Votes open{#if requests.length > 0}<span class="links-count">{requests.length}</span>{/if}
+    {t('Votes open')}{#if requests.length > 0}<span class="links-count">{requests.length}</span
+      >{/if}
   </h2>
   {#if requests.length === 0}
-    <p class="links-quiet">No votes open.</p>
+    <p class="links-quiet">{t('No votes open.')}</p>
   {:else}
     <div class="request-list">
       {#each requests as request (request.id)}

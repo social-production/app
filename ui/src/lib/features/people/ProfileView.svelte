@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import type { Snippet } from 'svelte';
 
@@ -141,7 +142,8 @@
                 trust.open = false;
               }}
             >
-              <strong>{acceptedCount(view.following)}</strong> following
+              <strong>{acceptedCount(view.following)}</strong>
+              {t('following')}
             </button>
           {/if}
         {/snippet}
@@ -158,7 +160,7 @@
               />
               {#if !viewerPaused}
                 <MessageButton
-                  person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
+                  person={{ agent: shown.agent, name: shown.profile?.name ?? t('Unnamed') }}
                 />
                 <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} />
                 <VouchButton
@@ -182,7 +184,7 @@
           <!-- Edit profile opens over the profile, beside the photo (Profiles mockups §2). -->
           {#if own}
             <button class="edit-profile" type="button" onclick={() => (editor.open = true)}
-              >Edit profile</button
+              >{t('Edit profile')}</button
             >
           {/if}
         {/snippet}
@@ -214,8 +216,10 @@
       {/if}
       <PeopleSheet
         open={follows.list !== null}
-        title={follows.list === 'followers' ? 'Followers' : 'Following'}
-        emptyCopy={follows.list === 'followers' ? 'No followers yet.' : 'Not following anyone yet.'}
+        title={follows.list === 'followers' ? t('Followers') : t('Following')}
+        emptyCopy={follows.list === 'followers'
+          ? t('No followers yet.')
+          : t('Not following anyone yet.')}
         people={sheetPeople}
         onClose={() => (follows.list = null)}
       />
@@ -231,7 +235,7 @@
                 disabled={busy}
                 onclick={() => run(claimFullStanding)}
               >
-                Become a full member
+                {t('Become a full member')}
               </button>
             </div>
           {/if}
@@ -245,7 +249,7 @@
       <EmptyState
         icon="shield"
         title={`${person?.profile?.name || 'This person'} shares their activity with followers`}
-        text="Follow them to see their projects, threads, events and posts here."
+        text={t('Follow them to see their projects, threads, events and posts here.')}
       />
     {:else}
       {@render children?.()}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
@@ -24,9 +25,9 @@
   let { kind, title, sortMode = $bindable(), only }: Props = $props();
 
   const sortOptions: { value: CommentSort; label: string }[] = [
-    { value: 'oldest', label: 'Oldest first' },
-    { value: 'newest', label: 'Newest first' },
-    { value: 'top', label: 'Top voted' },
+    { value: 'oldest', label: t('Oldest first') },
+    { value: 'newest', label: t('Newest first') },
+    { value: 'top', label: t('Top voted') },
   ];
   const signedIn = $derived(connection.current.status === 'connected');
   const url = $derived(`${location.origin}${location.pathname}`);
@@ -55,7 +56,7 @@
     <span class="detail-tool">
       <ShareUserMenu
         copyLinkUrl={url}
-        menuTitle={kind === 'thread' ? 'Share thread' : 'Share post'}
+        menuTitle={kind === 'thread' ? t('Share thread') : t('Share post')}
         shareTitle={title}
         searchContacts={search}
         submitShare={send}
@@ -67,7 +68,7 @@
       <IconMenuButton
         showTriggerLabel
         value={sortMode}
-        ariaLabel="Sort comments"
+        ariaLabel={t('Sort comments')}
         defaultValue="oldest"
         options={sortOptions}
         onChange={(v) => (sortMode = v)}

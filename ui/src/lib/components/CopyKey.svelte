@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   let { value, label = 'Copy my key' }: { value: string; label?: string } = $props();
 
   let copied = $state(false);
@@ -15,7 +16,8 @@
 </script>
 
 <div class="copy-key">
-  <button class="button-secondary" type="button" onclick={copy}>{copied ? 'Copied!' : label}</button
+  <button class="button-secondary" type="button" onclick={copy}
+    >{copied ? t('Copied!') : label}</button
   >
   <code class="key">{value}</code>
 </div>

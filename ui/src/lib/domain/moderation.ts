@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /**
  * Reports (web's ⋮ Report, ADR 0071): the discussion zome's `ModerationView`, and web's
  * `utils/moderation.ts` labels and threshold lines.
@@ -64,12 +65,12 @@ export function resolutionLabel(resolution: ReportResolution): string {
     case 'dismissed':
       return 'Dismissed';
     default:
-      return 'Under review';
+      return t('Under review');
   }
 }
 
 export function reasonLabel(reason: ReportReason): string {
-  return reason === 'serious-harm' ? 'Serious harm' : 'Spam';
+  return reason === 'serious-harm' ? t('Serious harm') : 'Spam';
 }
 
 /** web's `formatReportThresholdLines`. */
@@ -81,7 +82,7 @@ export function thresholdLines(report: ContentReport): string[] {
     `Delete at ${report.deleteQuorum} votes cast · ${Math.round(report.deleteYesShare * 100)}% yes${note(report.deleteQuorum)}`,
   ];
   if (report.reason === 'serious-harm' && report.resolution !== 'removed') {
-    const prefix = report.resolution === 'hidden' ? 'Hidden at' : 'Hide at';
+    const prefix = report.resolution === 'hidden' ? t('Hidden at') : t('Hide at');
     lines.unshift(
       `${prefix} ${report.hideQuorum} votes cast · ${Math.round(report.hideYesShare * 100)}% yes${note(report.hideQuorum)}`,
     );

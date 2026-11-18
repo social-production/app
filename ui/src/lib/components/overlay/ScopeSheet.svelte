@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { getContext } from 'svelte';
 
   import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
@@ -37,18 +38,20 @@
 <OverlaySheet {open} title="Channels & communities" rootClass="scope-sheet" {onClose}>
   {#snippet toolbar()}
     <div class="sheet-search">
-      <label class="sr-only" for="scope-sheet-search">Search channels and communities</label>
+      <label class="sr-only" for="scope-sheet-search">{t('Search channels and communities')}</label>
       <input
         id="scope-sheet-search"
         bind:value={query}
-        placeholder="Search channels and communities"
+        placeholder={t('Search channels and communities')}
         type="search"
       />
     </div>
   {/snippet}
   <div class="scope-list">
     {#if filtered.length === 0}
-      <p class="empty-row">{query.trim() ? 'No matches.' : 'No tagged channels or communities.'}</p>
+      <p class="empty-row">
+        {query.trim() ? t('No matches.') : t('No tagged channels or communities.')}
+      </p>
     {:else}
       {#each filtered as tag (tag.tag)}
         {@const icon = tagIcon(tag)}
@@ -58,8 +61,8 @@
             {#if icon}<ScopeGlyph {icon} size="md" imageUrl={pictureOf?.(tag.slug) ?? null} />{/if}
           </span>
           <span class="scope-copy">
-            <strong>{tag.label}</strong>
-            <span>{tagKindLabel(tag)}</span>
+            <strong>{t(tag.label)}</strong>
+            <span>{t(tagKindLabel(tag))}</span>
           </span>
         </a>
       {/each}

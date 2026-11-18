@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { ChatLine } from '#lib/domain/chat.ts';
@@ -35,7 +36,7 @@
 
 {#snippet item(icon: string, label: string, run: () => void, danger = false)}
   <button type="button" role="menuitem" class:menu-danger={danger} onclick={run}
-    ><ToolbarIcon name={icon} />{label}</button
+    ><ToolbarIcon name={icon} />{t(label)}</button
   >
 {/snippet}
 
@@ -50,7 +51,7 @@
     )}{/if}
   {#if !m.own}
     <a role="menuitem" href={resolve('/profile/[agent]', { agent: m.author })} onclick={p.onClose}
-      ><ToolbarIcon name="user" />View profile</a
+      ><ToolbarIcon name="user" />{t('View profile')}</a
     >
   {/if}
   {#if report && p.onVote}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
@@ -37,9 +38,9 @@
 
   // web's EventChatTab wording.
   const EVENT_CHAT = {
-    title: 'Event chat',
-    placeholder: 'Message members...',
-    empty: 'No event chat yet.',
+    title: t('Event chat'),
+    placeholder: t('Message members...'),
+    empty: t('No event chat yet.'),
   };
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
@@ -143,8 +144,8 @@
 
   /** web's sheet title and button: organizer-run events save; others propose. */
   function editLabel(p: Project, submit: boolean): string {
-    if (p.governance === 'organizer_controlled') return submit ? 'Save' : 'Edit event';
-    return 'Propose Edit';
+    if (p.governance === 'organizer_controlled') return submit ? t('Save') : t('Edit event');
+    return t('Propose Edit');
   }
 
   /** web: after leaving a private event it can't be opened again, so go home. */
@@ -163,7 +164,7 @@
     {:else if moderation.value.state === 'removed'}
       <!-- web answers "not found" once a report removes it; the app says why. -->
       <section class="hero-card">
-        <p class="tab-loading">{removedLabel(moderation.value.report?.reason)}</p>
+        <p class="tab-loading">{t(removedLabel(moderation.value.report?.reason))}</p>
       </section>
     {:else if !detail.project?.charter}
       <LoadingLine /><SkeletonDetail />
@@ -175,7 +176,7 @@
         <DetailTopTabs
           active={tab}
           available={['context', 'participation', 'chat', 'links', 'history']}
-          ariaLabel={event ? 'Event detail tabs' : 'Project detail tabs'}
+          ariaLabel={event ? t('Event detail tabs') : t('Project detail tabs')}
           onSelect={(t) => (tab = t)}
         />
         <div
@@ -286,9 +287,9 @@
         open={detail.confirmingLeave}
         title={`Leave ${charter.title}?`}
         body={isPrivateSeed(id)
-          ? "It's private, so you'll need a new invite to come back."
-          : 'You can join again any time.'}
-        confirmLabel="Leave"
+          ? t("It's private, so you'll need a new invite to come back.")
+          : t('You can join again any time.')}
+        confirmLabel={t('Leave')}
         danger
         onSettle={(ok) => void leave(ok)}
       />

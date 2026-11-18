@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   type Charter,
   type LocationChoice,
@@ -25,10 +26,10 @@ import type { EventStepId } from '#lib/domain/eventCreate.ts';
 type Step = { id: EventStepId; title: string; question?: string };
 
 export const CREATE_STEPS: Step[] = [
-  { id: 'basics', title: 'Basics', question: 'What do you propose?' },
-  { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
-  { id: 'location', title: 'Location', question: 'Where does it happen?' },
-  { id: 'overview', title: 'Overview', question: 'Check and publish' },
+  { id: 'basics', title: t('Basics'), question: t('What do you propose?') },
+  { id: 'scope', title: t('Tags'), question: t('Where should people find it?') },
+  { id: 'location', title: t('Location'), question: t('Where does it happen?') },
+  { id: 'overview', title: t('Overview'), question: t('Check and publish') },
 ];
 
 /** The new-proposal wizard's draft (web's CreateProjectPage state without its Type step: a
@@ -73,7 +74,7 @@ export class CreateState {
 
   /** web: a project needs a channel tag (events override it); '' when nothing is needed. */
   protected scopeNeeded(): string {
-    return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : 'Channel';
+    return this.tags.some((t) => tagScope(t)?.kind === 'channel') ? '' : t('Channel');
   }
 
   /** The picked place's label (cut to the records' limit, as the old field's maxlength was). */

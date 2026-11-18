@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
 
   import '#lib/components/styles/detail.css';
@@ -42,7 +43,7 @@
     onclick={onToggleJoin}
   >
     <ToolbarIcon name={joined ? 'person-check' : 'person-plus'} />
-    <span class="join-text">{joined ? 'Joined' : 'Join'}</span>
+    <span class="join-text">{joined ? t('Joined') : t('Join')}</span>
   </button>
   <button
     aria-expanded={membersOpen}

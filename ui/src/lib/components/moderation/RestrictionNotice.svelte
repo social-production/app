@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import '#lib/components/styles/report.css';
@@ -15,9 +16,9 @@
 
 {#if active}
   <div class="restriction-notice">
-    <span>Serious harm report — content blurred until you choose to reveal it.</span>
+    <span>{t('Serious harm report — content blurred until you choose to reveal it.')}</span>
     <button class="reveal-btn" type="button" onclick={() => (revealed = !revealed)}>
-      {revealed ? 'Hide again' : 'Reveal'}
+      {revealed ? t('Hide again') : t('Reveal')}
     </button>
   </div>
 {/if}

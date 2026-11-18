@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import {
     directionsApps,
@@ -33,12 +34,12 @@
 
 <OverlaySheet
   {open}
-  title="Directions"
+  title={t('Directions')}
   labelledById="directions-title"
   rootClass="shell directions-sheet"
   {onClose}
 >
-  {#snippet subtitle()}<p class="directions-place">{to.label}</p>{/snippet}
+  {#snippet subtitle()}<p class="directions-place">{t(to.label)}</p>{/snippet}
   <ul class="directions-list">
     {#each apps as app (app.id)}
       <li>
@@ -71,7 +72,7 @@
             /></svg
           >
         </span>
-        <span class="directions-name">{copied ? 'Copied' : 'Copy address'}</span>
+        <span class="directions-name">{copied ? t('Copied') : t('Copy address')}</span>
       </button>
     </li>
   </ul>

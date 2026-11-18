@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Activity } from '#lib/domain/activities.ts';
   import {
     aggregate,
@@ -36,31 +37,31 @@
   let openComments = $state<Record<string, boolean>>({});
 
   const badgeTone = { complete: 'open', mixed: 'need', uncompleted: 'locked' } as const;
-  const nameOf = (agent: string): string => p.names[agent] ?? 'Unnamed';
+  const nameOf = (agent: string): string => p.names[agent] ?? t('Unnamed');
   const none = async (): Promise<{ agent: string; name: string }[]> => [];
 
   function summary(a: Activity): string {
     const average = ratingAverage(a);
-    return average === null ? 'No ratings yet' : `${average}★`;
+    return average === null ? t('No ratings yet') : `${average}★`;
   }
 </script>
 
 {#snippet side(label: string, canSet: boolean, selection: boolean | null, id: string)}
   {#if canSet}
     <div class="completion-side-row">
-      <span class="completion-side-label">{label}</span>
+      <span class="completion-side-label">{t(label)}</span>
       <div class="completion-actions">
         <button
           class="vote-chip"
           class:selected={selection === true}
           type="button"
-          onclick={() => selection !== true && p.onCheckIn(id, true)}>Completed</button
+          onclick={() => selection !== true && p.onCheckIn(id, true)}>{t('Completed')}</button
         >
         <button
           class="vote-chip negative"
           class:selected={selection === false}
           type="button"
-          onclick={() => selection !== false && p.onCheckIn(id, false)}>Uncompleted</button
+          onclick={() => selection !== false && p.onCheckIn(id, false)}>{t('Uncompleted')}</button
         >
       </div>
     </div>
@@ -105,7 +106,7 @@
           <div class="history-expanded-content">
             <div class="history-context">
               <p class="history-context-primary">
-                <strong>{context.label}</strong>
+                <strong>{t(context.label)}</strong>
                 <span> — {context.description}</span>
               </p>
               <p class="history-context-meta">
@@ -119,7 +120,7 @@
             <div class="history-expanded-actions">
               {#if needsFollowUp(a)}
                 <section class="history-panel history-follow-up-panel">
-                  <h4 class="history-section-heading">Your follow-up</h4>
+                  <h4 class="history-section-heading">{t('Your follow-up')}</h4>
                   {#if owesCheckIn(a)}
                     <div class="completion-follow-up">
                       {#if requester}
@@ -148,12 +149,12 @@
                 </section>
               {/if}
               <section class="history-panel history-community-panel">
-                <h4 class="history-section-heading">Community</h4>
+                <h4 class="history-section-heading">{t('Community')}</h4>
                 <div class="community-completion-lines">
                   {#if requester}
-                    <p><strong>Requester:</strong> {requesterText(requester)}</p>
+                    <p><strong>{t('Requester:')}</strong> {requesterText(requester)}</p>
                   {/if}
-                  <p><strong>Participants:</strong> {completionText(a)}</p>
+                  <p><strong>{t('Participants:')}</strong> {completionText(a)}</p>
                 </div>
                 {#if a.ratings.length > 0}
                   <p class="community-rating-summary">
@@ -165,7 +166,9 @@
                     onclick={() =>
                       (openComments = { ...openComments, [a.id]: !openComments[a.id] })}
                   >
-                    {openComments[a.id] ? 'Hide comments' : `Show comments (${a.ratings.length})`}
+                    {openComments[a.id]
+                      ? t('Hide comments')
+                      : `Show comments (${a.ratings.length})`}
                   </button>
                   {#if openComments[a.id]}
                     <div class="comments-list">
@@ -175,8 +178,8 @@
                             <strong>{nameOf(rating.author)}</strong>
                             <span class="role-badge"
                               >{a.booking?.requester === rating.author
-                                ? 'Requester'
-                                : 'Participant'}</span
+                                ? t('Requester')
+                                : t('Participant')}</span
                             >
                             <span>{rating.stars}★</span>
                           </div>

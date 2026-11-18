@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
 
   import '#lib/components/styles/ux/dock.css';
@@ -10,7 +11,7 @@
   }
 </script>
 
-<button class="dock-back" type="button" aria-label="Back" title="Back" onclick={back}>
+<button class="dock-back" type="button" aria-label={t('Back')} title={t('Back')} onclick={back}>
   <svg aria-hidden="true" viewBox="0 0 24 24"
     ><path
       d="M14.5 5.5 8 12l6.5 6.5"

@@ -1,4 +1,5 @@
 <script lang="ts" generics="V extends string">
+  import { t } from '#lib/i18n/index.ts';
   import { tick, type Snippet } from 'svelte';
 
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
@@ -102,7 +103,7 @@
     onclick={toggle}
   >
     {@render children()}
-    {#if showTriggerLabel}<span class="trigger-label">{triggerLabel}</span>{/if}
+    {#if showTriggerLabel}<span class="trigger-label">{t(triggerLabel)}</span>{/if}
   </button>
 
   {#if open}
@@ -117,7 +118,7 @@
           onclick={() => choose(option.value)}
         >
           {#if showOptionIcons && option.icon}<SurfaceIcon icon={option.icon} size="sm" />{/if}
-          <span class="item-label">{option.label}</span>
+          <span class="item-label">{t(option.label)}</span>
           {#if option.value === value}<span aria-hidden="true" class="check">✓</span>{/if}
         </button>
       {/each}

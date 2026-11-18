@@ -1,3 +1,4 @@
+import { t, plural } from '#lib/i18n/index.ts';
 /** Software projects (ADR 0086): what web's software panel shows, in the app's shape. */
 
 export type SoftwareStage =
@@ -121,17 +122,17 @@ export function stageFilled(stage: SoftwareStage): number {
 }
 
 export function stageTooltip(stage: SoftwareStage): string {
-  if (stage === 'awaiting-merge') return 'Stage 2 of 3: merge needed';
-  if (stage === 'confirmation') return 'Stage 3 of 3: merge confirmation needed';
-  return 'Stage 1 of 3: pull request vote needed';
+  if (stage === 'awaiting-merge') return t('Stage 2 of 3: merge needed');
+  if (stage === 'confirmation') return t('Stage 3 of 3: merge confirmation needed');
+  return t('Stage 1 of 3: pull request vote needed');
 }
 
 export function stageHelperCopy(stage: SoftwareStage): string {
   if (stage === 'awaiting-merge')
-    return 'Awaiting a merge-capable member to record the merge ID and merge link.';
+    return t('Awaiting a merge-capable member to record the merge ID and merge link.');
   if (stage === 'confirmation')
-    return 'Awaiting confirmation that the recorded merge matches this pull request.';
-  return 'Awaiting approval before anyone can record a merge.';
+    return t('Awaiting confirmation that the recorded merge matches this pull request.');
+  return t('Awaiting approval before anyone can record a merge.');
 }
 
 /** web's `normalizeExternalUrl`. */
@@ -176,6 +177,6 @@ export function voteRequirementLine(t: SoftwareTally): string {
   }
   const need = needed > 0 ? `Needs ${needed} more yes` : 'Enough yes votes so far';
   const waiting =
-    left > 0 ? ` · ${left} ${left === 1 ? 'person has' : 'people have'} not voted` : '';
+    left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
 }

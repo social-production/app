@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
 
@@ -146,7 +147,7 @@
           stroke-linejoin="round"
         /></svg
       >
-      {#if !compact}<span class="share-button-label">{buttonLabel}</span>{/if}
+      {#if !compact}<span class="share-button-label">{t(buttonLabel)}</span>{/if}
     </button>
   </div>
 </span>
@@ -163,7 +164,7 @@
       <ShareOutside url={copyLinkUrl} title={shareTitle ?? document.title} />
     {/if}
     <div class="share-search">
-      <span class="share-out-label">Send to people here</span>
+      <span class="share-out-label">{t('Send to people here')}</span>
       <label class="search-box" for="share-people-search">
         <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"
           ><circle cx="11" cy="11" r="7" fill="none" stroke="currentColor" stroke-width="2" /><path
@@ -188,7 +189,7 @@
     </div>
   {/snippet}
   {#if selected.length > 0}
-    <div class="selected-row" aria-label="Selected recipients">
+    <div class="selected-row" aria-label={t('Selected recipients')}>
       {#each selected as person (person.agent)}
         <button class="selected-chip" type="button" onclick={() => toggle(person)}>
           <AvatarBadge size="sm" name={person.name} />
@@ -199,7 +200,7 @@
     </div>
   {/if}
   {#if shown.length > 0}
-    {#if !needle}<p class="list-label">Suggested</p>{/if}
+    {#if !needle}<p class="list-label">{t('Suggested')}</p>{/if}
     <div class="contact-list">
       {#each shown as contact (contact.agent)}
         <button
@@ -229,7 +230,7 @@
       {/each}
     </div>
   {:else if needle && searching}
-    <p class="empty-row">Searching…</p>
+    <p class="empty-row">{t('Searching…')}</p>
   {:else if needle}
     <p class="empty-row">No one matches “{query.trim()}”.</p>
   {:else if selected.length === 0}
@@ -240,7 +241,7 @@
     <div class="sheet-actions">
       {#if createPost}
         <button class="sheet-cancel" type="button" onclick={() => (close(), createPost?.())}>
-          {createPostLabel}
+          {t(createPostLabel)}
         </button>
       {/if}
       <button
@@ -250,7 +251,7 @@
         onclick={() => void submit()}
       >
         {pending
-          ? 'Sending…'
+          ? t('Sending…')
           : selected.length > 1
             ? `${submitLabel} to ${selected.length}`
             : submitLabel}

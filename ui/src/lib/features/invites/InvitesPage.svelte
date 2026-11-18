@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
@@ -52,7 +53,7 @@
 
 <section class="invites invites-ux">
   <header class="invites-head">
-    <h1>Invites</h1>
+    <h1>{t('Invites')}</h1>
     {#if !loading && invites.length > 0}
       <span>{invites.length} waiting for your answer</span>
     {/if}
@@ -63,8 +64,8 @@
   {:else if invites.length === 0}
     <EmptyState
       icon="people"
-      title="No invites waiting"
-      text="When someone invites you to a private community or event, it shows up here."
+      title={t('No invites waiting')}
+      text={t('When someone invites you to a private community or event, it shows up here.')}
     />
   {:else}
     <ul>
@@ -79,8 +80,8 @@
               <strong>{invite.title}</strong>
               <span class="kind"
                 >{invite.kind === 'community'
-                  ? 'Private community'
-                  : 'Private event'}{#if invite.invitedBy}
+                  ? t('Private community')
+                  : t('Private event')}{#if invite.invitedBy}
                   · from {invite.invitedBy}{/if} · {endedAgo(invite.at)}</span
               >
             </span>
@@ -100,18 +101,20 @@
               class="decline"
               type="button"
               disabled={busyId === invite.seed}
-              onclick={() => answer(invite, false)}>Decline</button
+              onclick={() => answer(invite, false)}>{t('Decline')}</button
             >
             <button
               class="accept"
               type="button"
               disabled={busyId === invite.seed}
-              onclick={() => answer(invite, true)}>Accept</button
+              onclick={() => answer(invite, true)}>{t('Accept')}</button
             >
           </div>
         </li>
       {/each}
     </ul>
-    <p class="muted">When someone invites you to a private community or event, it shows up here.</p>
+    <p class="muted">
+      {t('When someone invites you to a private community or event, it shows up here.')}
+    </p>
   {/if}
 </section>

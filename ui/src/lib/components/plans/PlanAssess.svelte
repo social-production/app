@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { PlanCriterion, PlanRating } from '#lib/domain/plans.ts';
 
   import CriterionRatingRow from './CriterionRatingRow.svelte';
@@ -16,12 +17,12 @@
 
   const questions = $derived(criteria.filter((c) => c.kind !== 'Value').length);
   const kicker = (c: PlanCriterion, index: number): string =>
-    c.kind === 'Value' ? 'Shared value' : `Question ${index + 1} of ${questions}`;
+    c.kind === 'Value' ? t('Shared value') : `Question ${index + 1} of ${questions}`;
 </script>
 
 <section class="assess-panel" data-participation-action="assess-plan">
   {#if !canVote}
-    <p class="assess-blocked">Only members can rate this plan. Join to take part.</p>
+    <p class="assess-blocked">{t('Only members can rate this plan. Join to take part.')}</p>
   {/if}
   <div class="criterion-stack">
     {#each criteria as entry, index (entry.id)}

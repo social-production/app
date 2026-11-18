@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { compressChatPhoto, rejectOutgoingAttachment } from './attachmentLimits.ts';
 
 interface PendingFile {
@@ -44,7 +45,7 @@ export class ComposerFiles {
         const compressed = await compressChatPhoto(file);
         this.remember(compressed, URL.createObjectURL(compressed));
       } catch (err) {
-        this.error = err instanceof Error ? err.message : 'Could not process image.';
+        this.error = err instanceof Error ? err.message : t('Could not process image.');
       }
     }
   }

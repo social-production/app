@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { MapPanelState } from './panelState.svelte.ts';
 
   /** Map Redesign §4 (owner, 2026-11-17): while pins load, the app's green line runs along the
@@ -31,5 +32,5 @@
     <span class="map-ghost" style="left: 68%; top: 60%"></span>
   </div>
 {:else if count}
-  <span class="map-count-pill" role="status">{count === 1 ? '1 place' : `${count} places`}</span>
+  <span class="map-count-pill" role="status">{count === 1 ? t('1 place') : `${count} places`}</span>
 {/if}

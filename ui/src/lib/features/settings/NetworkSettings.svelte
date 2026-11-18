@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import { explain } from '#lib/services/errors.ts';
   import {
@@ -39,29 +40,30 @@
 
 {#if servers}
   <section class="settings-section" id="settings-network">
-    <h2>Network</h2>
+    <h2>{t('Network')}</h2>
     <p class="section-intro">
-      This app finds other people through a bootstrap server. It tries yours first, then the
-      built-in list, and uses the first that answers.
+      {t(
+        'This app finds other people through a bootstrap server. It tries yours first, then the built-in list, and uses the first that answers.',
+      )}
     </p>
     <div class="card stack flush">
       <SettingPanel
-        label="In use"
+        label={t('In use')}
         value={host(servers.current.bootstrap)}
-        hint={servers.fixed ? 'Set when the app was started; it can’t be changed here.' : ''}
+        hint={servers.fixed ? t('Set when the app was started; it can’t be changed here.') : ''}
       >
         <p class="setting-line server-url">{servers.current.bootstrap}</p>
       </SettingPanel>
 
       {#if !servers.fixed}
         <SettingPanel
-          label="Your server"
-          value={servers.saved ? host(servers.saved.bootstrap) : 'None'}
-          hint="A community copy of the bootstrap server. Saving restarts the app."
+          label={t('Your server')}
+          value={servers.saved ? host(servers.saved.bootstrap) : t('None')}
+          hint={t('A community copy of the bootstrap server. Saving restarts the app.')}
         >
           <input
             bind:value={url}
-            aria-label="Server address"
+            aria-label={t('Server address')}
             placeholder="https://bootstrap.example.org"
             spellcheck="false"
             inputmode="url"
@@ -74,7 +76,7 @@
                   class="sheet-cancel"
                   disabled={busy}
                   type="button"
-                  onclick={() => run(resetNetworkServer)}>Use the built-in list</button
+                  onclick={() => run(resetNetworkServer)}>{t('Use the built-in list')}</button
                 >
               {/if}
               <button
@@ -83,7 +85,7 @@
                 type="button"
                 onclick={() => run(() => saveNetworkServer(url))}
               >
-                {busy ? 'Restarting…' : 'Save and restart'}
+                {busy ? t('Restarting…') : t('Save and restart')}
               </button>
             </div>
           {/snippet}

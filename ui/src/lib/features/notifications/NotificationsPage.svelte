@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import { untrack } from 'svelte';
 
@@ -142,11 +143,11 @@
 <section class="page notifications-page">
   <header class="page-header">
     <div class="copy">
-      <h1>Notifications</h1>
-      <p>Project activity and event invites from your network.</p>
+      <h1>{t('Notifications')}</h1>
+      <p>{t('Project activity and event invites from your network.')}</p>
     </div>
     <div class="actions">
-      <button class="secondary-button" type="button" onclick={readAll}>Mark all read</button>
+      <button class="secondary-button" type="button" onclick={readAll}>{t('Mark all read')}</button>
     </div>
   </header>
 
@@ -157,8 +158,8 @@
   {#if loaded && !error && notifications.items.length === 0}
     <EmptyState
       icon="bell"
-      title="No notifications yet"
-      text="Votes, replies, roles and invites from your projects show up here."
+      title={t('No notifications yet')}
+      text={t('Votes, replies, roles and invites from your projects show up here.')}
     />
   {/if}
 
@@ -166,7 +167,7 @@
     {#each notifications.items as item (item.id)}
       <NotificationCard
         {item}
-        actorName={names[item.actor] ?? 'Someone'}
+        actorName={names[item.actor] ?? t('Someone')}
         onRead={() => read(item)}
         onActivate={() => activate(item)}
         deciding={deciding === item.id}

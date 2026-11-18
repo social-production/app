@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { PlanKind } from './plans.ts';
 import type { CharterMode } from './projects.ts';
 
@@ -47,7 +48,7 @@ export function phaseSummary(mode: CharterMode | undefined, phaseId: string): st
 export function phaseProgressLabel(phases: { id: string }[], current: string, id: string): string {
   const at = phases.findIndex((p) => p.id === current);
   const i = phases.findIndex((p) => p.id === id);
-  if (i === at) return 'Current phase';
+  if (i === at) return t('Current phase');
   return i < at ? 'Complete' : 'Upcoming';
 }
 
@@ -60,7 +61,8 @@ export function signalGateMet(demand: number, opposition: number): boolean {
 /** web's projectPlanGateMessage, for the plan kind the next move needs an approved leader of. */
 export function planGateMessage(gate: PlanKind, hasPlans: boolean): string {
   // web's EventPhaseChangeSection note.
-  if (gate === 'Event') return 'Planning cannot advance until a plan clears quorum and approval.';
+  if (gate === 'Event')
+    return t('Planning cannot advance until a plan clears quorum and approval.');
   const kind =
     gate === 'Production' || gate === 'Organisation'
       ? 'production or operations plan'

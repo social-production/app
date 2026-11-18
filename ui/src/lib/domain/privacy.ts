@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { FollowView } from './follows.ts';
 import type { CharterMode } from './projects.ts';
 
@@ -10,18 +11,18 @@ export type PrivacySwitch = 'hide-profile' | 'hide-posts' | 'hide-from-feeds';
 export const PRIVACY_SWITCHES: { name: PrivacySwitch; label: string; note: string }[] = [
   {
     name: 'hide-profile',
-    label: 'Hide profile activity from non-followers',
-    note: 'Only followers see your projects, threads, events and posts on your profile.',
+    label: t('Hide profile activity from non-followers'),
+    note: t('Only followers see your projects, threads, events and posts on your profile.'),
   },
   {
     name: 'hide-posts',
-    label: 'Hide personal posts from non-followers',
-    note: 'People who don’t follow you don’t see your posts.',
+    label: t('Hide personal posts from non-followers'),
+    note: t('People who don’t follow you don’t see your posts.'),
   },
   {
     name: 'hide-from-feeds',
-    label: 'Hide my public activity from others’ personal feeds',
-    note: 'Your projects, threads and events stay out of your followers’ Home feeds.',
+    label: t('Hide my public activity from others’ personal feeds'),
+    note: t('Your projects, threads and events stay out of your followers’ Home feeds.'),
   },
 ];
 

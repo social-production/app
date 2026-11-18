@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { fromWall, wall } from './zone.ts';
 import { toLocalInput } from './helpRequests.ts';
 import type { RequestSettings } from './projects.ts';
@@ -73,13 +74,15 @@ export function preferredTime(now = new Date()): { scheduledAt: string; endsAt: 
 /** web's `_ensure_requests_enabled`: why these settings refuse a request with or without a
  * time, or null; `fits` says whether the time lies in an open listed slot (ADR 0077). */
 export function refusal(settings: RequestSettings, timed: boolean, fits = true): string | null {
-  if (!settings.enabled) return 'Not taking requests.';
+  if (!settings.enabled) return t('Not taking requests.');
   if (settings.mode === 'calendar' && !timed)
-    return 'Calendar requests require a start and finish time';
+    return t('Calendar requests require a start and finish time');
   if (settings.mode === 'direct' && timed && !settings.offSchedule)
-    return 'This service only accepts direct unscheduled requests';
+    return t('This service only accepts direct unscheduled requests');
   if (timed && !settings.offSchedule && settings.mode !== 'direct' && !fits)
-    return 'That time is outside the listed availability slots. Off-schedule requests are turned off.';
+    return t(
+      'That time is outside the listed availability slots. Off-schedule requests are turned off.',
+    );
   return null;
 }
 
@@ -94,7 +97,7 @@ export function settingsSummary(s: {
     s.mode === 'calendar'
       ? 'Calendar only'
       : s.mode === 'direct'
-        ? 'Direct only'
+        ? t('Direct only')
         : 'Calendar and direct';
-  return `${mode} · ${s.offSchedule ? 'Off-schedule allowed' : 'Slot-bound only'}`;
+  return `${mode} · ${s.offSchedule ? t('Off-schedule allowed') : t('Slot-bound only')}`;
 }

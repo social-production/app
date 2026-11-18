@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { VoteChoice } from '#lib/domain/governance.ts';
 
   /** web's VoteChoiceBar. Votes are final here (ADR 0033), so a chosen bar is disabled. */
@@ -13,7 +14,7 @@
     type="button"
     aria-pressed={mine === 'Yes'}
     disabled={!!mine}
-    onclick={() => onChoose('Yes')}>Yes</button
+    onclick={() => onChoose('Yes')}>{t('Yes')}</button
   >
   <button
     class="choice no"
@@ -21,6 +22,6 @@
     type="button"
     aria-pressed={mine === 'No'}
     disabled={!!mine}
-    onclick={() => onChoose('No')}>No</button
+    onclick={() => onChoose('No')}>{t('No')}</button
   >
 </div>

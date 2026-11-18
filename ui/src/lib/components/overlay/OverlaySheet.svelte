@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { fitText } from '#lib/components/actions/fitText.ts';
@@ -95,7 +96,12 @@
 
 {#if open}
   <div class={`overlay-root ${rootClass}`} class:elevated role="presentation" use:portal>
-    <button aria-label="Close" title="Close" class="overlay-scrim" type="button" onclick={onClose}
+    <button
+      aria-label={t('Close')}
+      title={t('Close')}
+      class="overlay-scrim"
+      type="button"
+      onclick={onClose}
     ></button>
     <div
       aria-labelledby={labelledById}
@@ -121,8 +127,12 @@
         class:has-actions={!!footer}
         class:close-only={closeOnly}
       >
-        <button aria-label="Close" class="overlay-close sheet-close" type="button" onclick={onClose}
-          >×{#if closeOnly}<span class="close-label">Close</span>{/if}</button
+        <button
+          aria-label={t('Close')}
+          class="overlay-close sheet-close"
+          type="button"
+          onclick={onClose}
+          >×{#if closeOnly}<span class="close-label">{t('Close')}</span>{/if}</button
         >
         {@render footer?.()}
       </footer>

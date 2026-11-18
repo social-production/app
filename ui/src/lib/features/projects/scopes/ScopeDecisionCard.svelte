@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
 
   import { imageUrl, type ScopeArt } from './scopeArt.svelte.ts';
@@ -51,7 +52,7 @@
     open ? Math.min(100, Math.round((item.yes / Math.max(item.required, 1)) * 100)) : share,
   );
   const tag = $derived(
-    open ? 'Open' : `${item.status === 'Passed' ? 'Passed' : 'Rejected'} · ${share}% yes`,
+    open ? t('Open') : `${item.status === 'Passed' ? t('Passed') : t('Rejected')} · ${share}% yes`,
   );
   const text = $derived('Edit' in item.kind ? item.kind.Edit.description : null);
 </script>
@@ -72,13 +73,13 @@
       {#if open}
         <figure>
           <span style={nowUrl ? `background-image: url(${nowUrl})` : undefined}></span>
-          <figcaption>Now</figcaption>
+          <figcaption>{t('Now')}</figcaption>
         </figure>
         <span class="decision-art-arrow" aria-hidden="true">›</span>
       {/if}
       <figure>
         <span style={proposedUrl ? `background-image: url(${proposedUrl})` : undefined}></span>
-        <figcaption>{change.hash ? 'Proposed' : 'Removed'}</figcaption>
+        <figcaption>{change.hash ? t('Proposed') : t('Removed')}</figcaption>
       </figure>
     </div>
   {/if}
@@ -94,7 +95,7 @@
         class:chosen={chosen === 'No'}
         aria-pressed={chosen === 'No'}
         disabled={busy || chosen !== null}
-        onclick={() => onVote('No')}>No</button
+        onclick={() => onVote('No')}>{t('No')}</button
       >
       <button
         class="yes"
@@ -102,7 +103,7 @@
         class:chosen={chosen === 'Yes'}
         aria-pressed={chosen === 'Yes'}
         disabled={busy || chosen !== null}
-        onclick={() => onVote('Yes')}>Yes</button
+        onclick={() => onVote('Yes')}>{t('Yes')}</button
       >
     </div>
   {/if}

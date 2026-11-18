@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t, plural } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -42,9 +43,12 @@
   });
 
   const GROUPS: { label: string; kinds: SearchResultKind[] }[] = [
-    { label: 'Channels and communities', kinds: ['channel', 'community'] },
-    { label: 'People', kinds: ['profile'] },
-    { label: 'Posts and projects', kinds: ['project', 'thread', 'event', 'help-request', 'post'] },
+    { label: t('Channels and communities'), kinds: ['channel', 'community'] },
+    { label: t('People'), kinds: ['profile'] },
+    {
+      label: t('Posts and projects'),
+      kinds: ['project', 'thread', 'event', 'help-request', 'post'],
+    },
   ];
   const groups = $derived(
     GROUPS.map((g) => ({
@@ -109,7 +113,7 @@
 <svelte:window onkeydown={(event) => searchOverlay.open && event.key === 'Escape' && close()} />
 
 {#if searchOverlay.open}
-  <div class="search-overlay" role="dialog" aria-modal="true" aria-label="Search">
+  <div class="search-overlay" role="dialog" aria-modal="true" aria-label={t('Search')}>
     <div class="so-panel">
       <form
         class="so-bar"
@@ -128,14 +132,14 @@
             oninput={schedule}
             type="search"
             enterkeyhint="search"
-            aria-label="Search"
-            placeholder="Search Social Production"
+            aria-label={t('Search')}
+            placeholder={t('Search Social Production')}
           />
           {#if q}
             <button
               class="so-clear"
               type="button"
-              aria-label="Clear"
+              aria-label={t('Clear')}
               onclick={() => {
                 q = '';
                 schedule();
@@ -144,15 +148,15 @@
             >
           {/if}
         </label>
-        <button class="so-cancel" type="button" onclick={close}>Cancel</button>
+        <button class="so-cancel" type="button" onclick={close}>{t('Cancel')}</button>
       </form>
 
       <div class="so-body">
         {#if !q.trim()}
           {#if recent.length > 0}
             <div class="so-head">
-              <b>Recent</b><button type="button" onclick={() => (recent = clearSearches())}
-                >Clear all</button
+              <b>{t('Recent')}</b><button type="button" onclick={() => (recent = clearSearches())}
+                >{t('Clear all')}</button
               >
             </div>
             {#each recent as r (r)}
@@ -172,7 +176,7 @@
             {/each}
           {/if}
           {#if explore.length > 0}
-            <div class="so-head"><b>Channels to explore</b></div>
+            <div class="so-head"><b>{t('Channels to explore')}</b></div>
             {#each explore as s (s.id)}
               <button
                 class="so-main"
@@ -190,8 +194,11 @@
                 >
                 <span class="so-text"
                   >{s.handle}<small
-                    >{s.kind === 'channel' ? 'Channel' : 'Community'} · {s.members}
-                    {s.members === 1 ? 'member' : 'members'}</small
+                    >{s.kind === 'channel' ? t('Channel') : t('Community')} · {plural(
+                      s.members,
+                      '{n} member',
+                      '{n} members',
+                    )}</small
                   ></span
                 >
               </button>
@@ -200,10 +207,10 @@
         {:else}
           <button class="so-main" type="button" onclick={() => searchFor(q)}>
             <span class="so-icon"><ToolbarIcon name="search" /></span>
-            <span class="so-text"><span>Search for <b>“{q.trim()}”</b></span></span>
+            <span class="so-text"><span>{t('Search for')} <b>“{q.trim()}”</b></span></span>
           </button>
           {#each groups as g (g.label)}
-            <div class="so-head"><b>{g.label}</b></div>
+            <div class="so-head"><b>{t(g.label)}</b></div>
             {#each g.items as r (r.id)}
               {@const [before, match, after] = parts(r.title)}
               <button class="so-main" type="button" onclick={() => go(r.href, q)}>
@@ -218,7 +225,7 @@
           {/each}
           {#if groups.length === 0}
             <p class="so-quiet">
-              {loading ? 'Searching…' : 'No quick matches. Press Search to look everywhere.'}
+              {loading ? t('Searching…') : t('No quick matches. Press Search to look everywhere.')}
             </p>
           {/if}
         {/if}

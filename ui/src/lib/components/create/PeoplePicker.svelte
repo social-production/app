@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SuggestionList from '#lib/components/messages/SuggestionList.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
 
@@ -48,10 +49,10 @@
 </script>
 
 <div class="audience-selector">
-  <span class="field-label">{label}</span>
+  <span class="field-label">{t(label)}</span>
   <div class="token-input-stack">
     {#if selected.length > 0}
-      <div class="selected-row" aria-label="Selected audience">
+      <div class="selected-row" aria-label={t('Selected audience')}>
         {#each selected as item (item.agent)}
           <button class="selected-chip" type="button" onclick={() => onRemove(item.agent)}>
             <span>{item.name}</span>
@@ -61,7 +62,7 @@
       </div>
     {/if}
     <input bind:value={query} {placeholder} aria-label={label} onkeydown={onKeydown} />
-    <SuggestionList {items} {query} emptyCopy="No matching people." onSelect={add} />
+    <SuggestionList {items} {query} emptyCopy={t('No matching people.')} onSelect={add} />
   </div>
   {#if helperText}
     <p class="helper-text">{helperText}</p>

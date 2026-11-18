@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
@@ -35,7 +36,7 @@
       <strong>{p.item.title}</strong>
       {#if p.item.body}<span class="card-body-preview">{p.item.body}</span>{/if}
       {#if p.item.meta}<span class="card-meta">{p.item.meta}</span>{/if}
-      {#if p.item.countLabel}<span class="card-detail">{p.item.countLabel}</span>{/if}
+      {#if p.item.countLabel}<span class="card-detail">{t(p.item.countLabel)}</span>{/if}
     </span>
   </button>
   <button aria-label={p.dismissLabel} class="dismiss-card" type="button" onclick={p.onDismiss}>

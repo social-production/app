@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { scheduleSummary } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import type { PlanForm, PlanStep, PlanStepType } from '#lib/domain/planForm.ts';
@@ -14,7 +15,9 @@
   let { form, steps, onEdit }: Props = $props();
 
   const has = (id: PlanStepType): boolean => steps.some((s) => s.id === id);
-  const placeLabel = $derived(has('distribution-location') ? 'Distribution location' : 'Location');
+  const placeLabel = $derived(
+    has('distribution-location') ? t('Distribution location') : t('Location'),
+  );
   const placeStep = $derived<PlanStepType>(
     has('distribution-location') ? 'distribution-location' : 'location',
   );
@@ -23,10 +26,10 @@
 {#snippet row(label: string, value: string, step: PlanStepType)}
   <div class="review-row">
     <div class="review-copy">
-      <strong>{label}</strong>
+      <strong>{t(label)}</strong>
       <span>{value}</span>
     </div>
-    <button class="text-button" type="button" onclick={() => onEdit(step)}>Edit</button>
+    <button class="text-button" type="button" onclick={() => onEdit(step)}>{t('Edit')}</button>
   </div>
 {/snippet}
 
@@ -36,7 +39,9 @@
       <strong>Title & description</strong>
       <span><strong>{form.title}</strong> — {form.description}</span>
     </div>
-    <button class="text-button" type="button" onclick={() => onEdit('plan-overview')}>Edit</button>
+    <button class="text-button" type="button" onclick={() => onEdit('plan-overview')}
+      >{t('Edit')}</button
+    >
   </div>
   {#if has('schedule-mode')}
     {@render row('Schedule', scheduleSummary(form), 'schedule-mode')}

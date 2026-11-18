@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { getContext } from 'svelte';
 
   import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
@@ -77,7 +78,7 @@
         >{#if icon}<ScopeGlyph
             {icon}
             imageUrl={lead ? null : (pictureOf?.(tag.slug) ?? null)}
-          />{/if}<span>{tag.label}</span></a
+          />{/if}<span>{t(tag.label)}</span></a
       >
     {/each}
     {#if hidden > 0}
@@ -115,9 +116,9 @@
         <SurfaceTypeLabel projectMode={mode} />
         <!-- A proposal in its Proposal phase would read "Proposal · Proposal". -->
         {#if network}
-          <span class="feed-card-stage network-vote">Network vote</span>
+          <span class="feed-card-stage network-vote">{t('Network vote')}</span>
         {:else if stage && !(mode === 'proposal' && stage === 'Proposal')}
-          <span class="feed-card-stage">{stage}</span>
+          <span class="feed-card-stage">{t(stage)}</span>
         {/if}
         {@render clock()}
       </div>
@@ -136,7 +137,7 @@
     </div>
     <div class="feed-card-end">
       {#if isPrivate}<PrivateMark />{/if}
-      {#if stage}<span class="feed-card-stage">{stage}</span>{/if}
+      {#if stage}<span class="feed-card-stage">{t(stage)}</span>{/if}
       {@render children?.()}
     </div>
   </div>

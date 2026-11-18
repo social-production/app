@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { SoftwarePullRequest, SoftwareRequest } from '#lib/domain/software.ts';
 
 import type { SoftwareMode } from './softwareState.svelte.ts';
@@ -36,19 +37,19 @@ export function emptyForms(candidate = '', replaceable = ''): SoftwareForms {
 export function wizardTitle(mode: SoftwareMode | null, pr: SoftwarePullRequest | null): string {
   switch (mode) {
     case 'create-pr':
-      return 'Submit pull request';
+      return t('Submit pull request');
     case 'vote-pr':
       return pr?.stage === 'confirmation'
-        ? 'Merge confirmation needed'
+        ? t('Merge confirmation needed')
         : 'Pull request vote needed';
     case 'record-merge':
-      return 'Merge needed';
+      return t('Merge needed');
     case 'merge-capability':
-      return 'Merge capability change';
+      return t('Merge capability change');
     case 'repository-replacement':
-      return 'Replace repository';
+      return t('Replace repository');
     default:
-      return 'Software governance';
+      return t('Software governance');
   }
 }
 
@@ -60,17 +61,17 @@ export function stepCount(mode: SoftwareMode | null): number {
 export function submitLabel(mode: SoftwareMode | null): string {
   switch (mode) {
     case 'create-pr':
-      return 'Submit for approval';
+      return t('Submit for approval');
     case 'vote-pr':
-      return 'Done';
+      return t('Done');
     case 'record-merge':
-      return 'Submit merge details';
+      return t('Submit merge details');
     case 'merge-capability':
-      return 'Submit vote request';
+      return t('Submit vote request');
     case 'repository-replacement':
-      return 'Submit replacement vote';
+      return t('Submit replacement vote');
     default:
-      return 'Finish';
+      return t('Finish');
   }
 }
 
@@ -84,24 +85,24 @@ export function validation(
 ): string | null {
   switch (mode) {
     case 'create-pr':
-      if (step === 0 && !filled(f.title)) return 'Add a title to continue.';
+      if (step === 0 && !filled(f.title)) return t('Add a title to continue.');
       if (step === 1 && (!filled(f.pullRequestId) || !filled(f.pullRequestUrl)))
-        return 'Add both the PR ID and the pull request URL to continue.';
-      if (step === 2 && !filled(f.summary)) return 'Add a short summary to continue.';
+        return t('Add both the PR ID and the pull request URL to continue.');
+      if (step === 2 && !filled(f.summary)) return t('Add a short summary to continue.');
       return null;
     case 'record-merge':
       if (!filled(f.mergeId) || !filled(f.mergeUrl))
-        return 'Enter both the merge ID and the merge link to continue.';
+        return t('Enter both the merge ID and the merge link to continue.');
       return null;
     case 'merge-capability':
-      if (step === 0 && !filled(f.targetAgent)) return 'Choose a project member to continue.';
+      if (step === 0 && !filled(f.targetAgent)) return t('Choose a project member to continue.');
       return null;
     case 'repository-replacement':
       if (step === 0 && !filled(f.relatedPullRequest))
-        return 'Choose the blocked pull request that triggered this change.';
+        return t('Choose the blocked pull request that triggered this change.');
       if (step === 1 && !filled(f.repositoryUrl))
-        return 'Add the replacement repository URL to continue.';
-      if (step === 2 && !filled(f.reason)) return 'Explain why the repository must change.';
+        return t('Add the replacement repository URL to continue.');
+      if (step === 2 && !filled(f.reason)) return t('Explain why the repository must change.');
       return null;
     default:
       return null;

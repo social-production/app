@@ -1,4 +1,5 @@
 <script lang="ts" generics="V extends string">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   import SettingRow from './SettingRow.svelte';
@@ -46,7 +47,7 @@
         {#if option.swatch}
           <span class="setting-swatch" style={`background: ${option.swatch}`}></span>
         {/if}
-        <span>{option.label}</span>
+        <span>{t(option.label)}</span>
         {#if option.value === value}
           <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18">
             <path

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ActivityRating } from '#lib/domain/activities.ts';
 
   /** web's HistoryRatingComposer (flat): your saved stars and comment, or the 1–5 editor. */
@@ -46,13 +47,13 @@
     </div>
     {#if saved.comment}<p class="saved-comment">{saved.comment}</p>{/if}
     <button class="text-button" disabled={removing} type="button" onclick={remove}>
-      {removing ? 'Removing…' : 'Remove rating'}
+      {removing ? t('Removing…') : t('Remove rating')}
     </button>
   </div>
 {:else}
   <div class="rating-editor rating-flat">
-    <p class="rating-note">Ratings are separate from completion check-in.</p>
-    <div class="star-row" role="group" aria-label="Rate this activity from 1 to 5 stars">
+    <p class="rating-note">{t('Ratings are separate from completion check-in.')}</p>
+    <div class="star-row" role="group" aria-label={t('Rate this activity from 1 to 5 stars')}>
       {#each [1, 2, 3, 4, 5] as star (star)}
         <button
           class:selected={stars === star}
@@ -64,11 +65,11 @@
         </button>
       {/each}
     </div>
-    <textarea bind:value={comment} maxlength="2000" placeholder="Optional comment" rows="3"
+    <textarea bind:value={comment} maxlength="2000" placeholder={t('Optional comment')} rows="3"
     ></textarea>
     <div class="rating-actions">
       <button class="secondary-button" disabled={stars < 1 || saving} type="button" onclick={save}>
-        {saving ? 'Saving…' : 'Save rating'}
+        {saving ? t('Saving…') : t('Save rating')}
       </button>
     </div>
   </div>

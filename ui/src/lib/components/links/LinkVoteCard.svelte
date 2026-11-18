@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
   import { resultNote, type LinkHalf, type LinkRequest, type LinkSide } from '#lib/domain/links.ts';
 
@@ -43,7 +44,7 @@
     h && h.yes + h.no > 0 ? Math.round((h.yes / (h.yes + h.no)) * 100) : 0;
   // The mockup's "1 of 1 · 100%": who has voted of the members, and the share saying yes.
   const tally = (h: LinkHalf | null): string =>
-    h ? `${h.yes + h.no} of ${h.population} · ${percent(h)}%` : 'Not received yet';
+    h ? `${h.yes + h.no} of ${h.population} · ${percent(h)}%` : t('Not received yet');
   // One Approve / Oppose pair for the side the viewer belongs to (Polish Pass mockups §6).
   const mine = $derived(
     [request.thisSide, request.otherSide].find((s) => s.canVote || s.half?.myVote),
@@ -58,7 +59,7 @@
     {@const half = side.half}
     <div class="link-vote-side">
       <div class="link-vote-line">
-        <b>{side === request.thisSide ? 'This project' : side.projectTitle}</b>
+        <b>{side === request.thisSide ? t('This project') : side.projectTitle}</b>
         <span>{tally(half)}</span>
       </div>
       <div class="link-vote-bar" class:done={half?.status === 'Approved'}>
@@ -81,14 +82,14 @@
         class="vote-button yes"
         disabled={pending || !side.canVote}
         type="button"
-        onclick={() => onVote(side, 'Yes')}>{yesLabel}</button
+        onclick={() => onVote(side, 'Yes')}>{t(yesLabel)}</button
       >
       <button
         class:active={voted === 'No'}
         class="vote-button"
         disabled={pending || !side.canVote}
         type="button"
-        onclick={() => onVote(side, 'No')}>{noLabel}</button
+        onclick={() => onVote(side, 'No')}>{t(noLabel)}</button
       >
     </div>
   {/if}

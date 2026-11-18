@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SuggestionList from '#lib/components/messages/SuggestionList.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -53,18 +54,18 @@
   async function remove(): Promise<void> {
     if (!removeTarget) return;
     if (await gov.removeMember(removeTarget.agent)) {
-      onChanged(direct ? 'Member removed' : 'Vote started');
+      onChanged(direct ? t('Member removed') : t('Vote started'));
     }
     removeDraft = '';
   }
 </script>
 
 <section class="governance">
-  <h3>Who decides</h3>
+  <h3>{t('Who decides')}</h3>
   <p>
     {organized
       ? `Organizers: ${organizerNames.join(', ') || 'none'}`
-      : 'Collaborative: all members vote on changes.'}
+      : t('Collaborative: all members vote on changes.')}
   </p>
 
   {#if direct}
@@ -72,17 +73,17 @@
       <input
         bind:value={organizerDraft}
         oninput={() => (organizerPick = null)}
-        placeholder="Username to make organizer"
+        placeholder={t('Username to make organizer')}
       />
       <button type="button" disabled={gov.busy || !organizerTarget} onclick={addOrganizer}
-        >Add</button
+        >{t('Add')}</button
       >
     </div>
     {#if !organizerTarget}
       <SuggestionList
         items={matches(organizerDraft)}
         query={organizerDraft}
-        emptyCopy="No matching members."
+        emptyCopy={t('No matching members.')}
         onSelect={(c) => ((organizerPick = c), (organizerDraft = c.name))}
       />
     {/if}
@@ -93,20 +94,20 @@
       <input
         bind:value={removeDraft}
         oninput={() => (removePick = null)}
-        placeholder="Username to remove"
+        placeholder={t('Username to remove')}
       />
       <button
         type="button"
         disabled={gov.busy || !removeTarget}
         onclick={() => (direct ? (confirming = true) : void remove())}
-        >{direct ? 'Remove' : 'Propose'}</button
+        >{direct ? t('Remove') : t('Propose')}</button
       >
     </div>
     {#if !removeTarget}
       <SuggestionList
         items={matches(removeDraft)}
         query={removeDraft}
-        emptyCopy="No matching members."
+        emptyCopy={t('No matching members.')}
         onSelect={(c) => ((removePick = c), (removeDraft = c.name))}
       />
     {/if}
@@ -115,9 +116,11 @@
 
 <ConfirmDialog
   open={confirming}
-  title={`Remove ${removeTarget?.name ?? 'this member'}?`}
-  body="They stop being a member straight away, but anyone who still has the invite link can join again."
-  confirmLabel="Remove"
+  title={`Remove ${removeTarget?.name ?? t('this member')}?`}
+  body={t(
+    'They stop being a member straight away, but anyone who still has the invite link can join again.',
+  )}
+  confirmLabel={t('Remove')}
   danger
   onSettle={(ok) => {
     confirming = false;

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
   import RadiusChips from '#lib/components/map/RadiusChips.svelte';
@@ -24,14 +25,14 @@
 
 <OverlaySheet
   {open}
-  title="Place and distance"
+  title={t('Place and distance')}
   labelledById="map-place-title"
   rootClass="shell feed-filter-sheet radius-sheet place-sheet"
   {onClose}
 >
   <div class="feed-filter-groups">
     <section>
-      <h3>Place</h3>
+      <h3>{t('Place')}</h3>
       <LocationPicker
         value={place}
         onChange={onPlace}
@@ -40,25 +41,25 @@
         compact
         preserveCoordsWhileEditing
         modes={['physical']}
-        placeholder="Search a place"
+        placeholder={t('Search a place')}
       />
       <button class="place-locate" type="button" onclick={onLocate}>
-        <ToolbarIcon name="locate" /><span>Use my location</span>
+        <ToolbarIcon name="locate" /><span>{t('Use my location')}</span>
       </button>
     </section>
     <section>
-      <h3>Distance</h3>
+      <h3>{t('Distance')}</h3>
       <RadiusChips
         value={radius}
         options={radiusPresetOptions}
-        ariaLabel="Distance"
+        ariaLabel={t('Distance')}
         onChange={onRadius}
       />
     </section>
   </div>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-submit" type="button" onclick={onClose}>Done</button>
+      <button class="sheet-submit" type="button" onclick={onClose}>{t('Done')}</button>
     </div>
   {/snippet}
 </OverlaySheet>

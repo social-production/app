@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import SettingRow from '#lib/components/settings/SettingRow.svelte';
   import { allZones, deviceZone } from '#lib/domain/zone.ts';
@@ -31,27 +32,29 @@
 </script>
 
 <SettingRow
-  label="Display timezone"
-  value={displayZoneChoice.zone ? label(displayZoneChoice.zone) : 'This device'}
+  label={t('Display timezone')}
+  value={displayZoneChoice.zone ? label(displayZoneChoice.zone) : t('This device')}
   onOpen={() => (open = true)}
 />
 
 <OverlaySheet
   {open}
-  title="Display timezone"
+  title={t('Display timezone')}
   labelledById="setting-timezone"
   rootClass="setting-sheet timezone-sheet"
   onClose={() => (open = false)}
 >
-  <p class="setting-hint">Activity, event and request times show in it, and you type them in it.</p>
+  <p class="setting-hint">
+    {t('Activity, event and request times show in it, and you type them in it.')}
+  </p>
   <input
     class="timezone-search"
     bind:value={query}
-    aria-label="Filter timezones"
-    placeholder="Filter timezones"
+    aria-label={t('Filter timezones')}
+    placeholder={t('Filter timezones')}
     type="search"
   />
-  <ul class="timezone-list" aria-label="Timezones">
+  <ul class="timezone-list" aria-label={t('Timezones')}>
     {#if !query.trim()}
       <li>
         <button
@@ -61,7 +64,7 @@
           type="button"
           onclick={() => choose(null)}
         >
-          <span>This device's<small>{label(deviceZone())}</small></span>
+          <span>{t("This device's")}<small>{t(label(deviceZone()))}</small></span>
           <em>{offset(deviceZone())}</em>
         </button>
       </li>
@@ -75,7 +78,7 @@
           type="button"
           onclick={() => choose(zone)}
         >
-          <span>{label(zone)}</span>
+          <span>{t(label(zone))}</span>
           <em>{offset(zone)}</em>
         </button>
       </li>

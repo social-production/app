@@ -11,6 +11,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { tick } from 'svelte';
 
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -63,7 +64,7 @@
   {#if item.href}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- callers resolve it -->
     <a role="menuitem" href={item.href} onclick={onClose}
-      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{item.label}</a
+      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{t(item.label)}</a
     >
   {:else}
     <button
@@ -71,7 +72,7 @@
       type="button"
       role="menuitem"
       onclick={() => select(item)}
-      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{item.label}</button
+      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{t(item.label)}</button
     >
   {/if}
 {/snippet}

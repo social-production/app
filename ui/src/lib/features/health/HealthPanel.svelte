@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import StatusPill from '#lib/components/StatusPill.svelte';
   import { NOTE_MAX, type Heartbeat } from '#lib/domain/health.ts';
   import { listHeartbeats, ping, postHeartbeat } from '#lib/services/health.ts';
@@ -20,7 +21,7 @@
     connection.current.status === 'connected'
       ? `Connected to ${connection.current.node}`
       : connection.current.status === 'connecting'
-        ? 'Connecting…'
+        ? t('Connecting…')
         : 'Offline',
   );
 
@@ -52,18 +53,18 @@
 </script>
 
 <section class="panel">
-  <h1>Network health</h1>
+  <h1>{t('Network health')}</h1>
   <StatusPill {tone} {label} />
   {#if pong}<p>Node replied: {pong}</p>{/if}
   {#if error}<p class="error">{error}</p>{/if}
 
   <form onsubmit={(e) => (e.preventDefault(), post())}>
-    <input bind:value={note} maxlength={NOTE_MAX} placeholder="Leave a heartbeat note" />
-    <button disabled={!note.trim()}>Post</button>
+    <input bind:value={note} maxlength={NOTE_MAX} placeholder={t('Leave a heartbeat note')} />
+    <button disabled={!note.trim()}>{t('Post')}</button>
   </form>
 
   <p>{beats.length} heartbeat(s) visible from this node</p>
-  <button onclick={refresh}>Refresh</button>
+  <button onclick={refresh}>{t('Refresh')}</button>
 </section>
 
 <style>

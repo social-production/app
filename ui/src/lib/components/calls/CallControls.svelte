@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { CallView } from '#lib/domain/calls.ts';
 
   /** The call screen's buttons, ported from web/src/lib/calls/CallHost.svelte: Decline and
@@ -23,7 +24,7 @@
 <div class="call-controls">
   {#if view.phase === 'ringing'}
     <div class="control">
-      <button class="round decline" type="button" aria-label="Decline" onclick={onDecline}>
+      <button class="round decline" type="button" aria-label={t('Decline')} onclick={onDecline}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="30" height="30">
           <path
             fill="currentColor"
@@ -31,13 +32,13 @@
           />
         </svg>
       </button>
-      <span>Decline</span>
+      <span>{t('Decline')}</span>
     </div>
     <div class="control">
       <button
         class="round accept"
         type="button"
-        aria-label="Accept"
+        aria-label={t('Accept')}
         disabled={view.connecting}
         onclick={onAccept}
       >
@@ -48,7 +49,7 @@
           />
         </svg>
       </button>
-      <span>Accept</span>
+      <span>{t('Accept')}</span>
     </div>
   {:else if live}
     <div class="control">
@@ -56,7 +57,7 @@
         class="round"
         type="button"
         aria-pressed={view.muted}
-        aria-label={view.muted ? 'Unmute' : 'Mute'}
+        aria-label={view.muted ? t('Unmute') : t('Mute')}
         onclick={onMute}
       >
         {#if view.muted}
@@ -81,7 +82,7 @@
           </svg>
         {/if}
       </button>
-      <span>{view.muted ? 'Unmute' : 'Mute'}</span>
+      <span>{view.muted ? t('Unmute') : t('Mute')}</span>
     </div>
     {#if speaker}
       <div class="control">
@@ -89,7 +90,7 @@
           class="round"
           type="button"
           aria-pressed={view.speaker}
-          aria-label={view.speaker ? 'Speaker off' : 'Speaker on'}
+          aria-label={view.speaker ? t('Speaker off') : t('Speaker on')}
           onclick={onSpeaker}
         >
           <svg aria-hidden="true" viewBox="0 0 24 24" width="28" height="28">
@@ -103,11 +104,11 @@
             />
           </svg>
         </button>
-        <span>Speaker</span>
+        <span>{t('Speaker')}</span>
       </div>
     {/if}
     <div class="control">
-      <button class="round decline" type="button" aria-label="End call" onclick={onHangUp}>
+      <button class="round decline" type="button" aria-label={t('End call')} onclick={onHangUp}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="30" height="30">
           <path
             fill="currentColor"
@@ -115,11 +116,11 @@
           />
         </svg>
       </button>
-      <span>End</span>
+      <span>{t('End')}</span>
     </div>
   {:else}
     <div class="control">
-      <button class="round" type="button" aria-label="Close" onclick={onDismiss}>
+      <button class="round" type="button" aria-label={t('Close')} onclick={onDismiss}>
         <svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26">
           <path
             d="M6 6l12 12M18 6L6 18"
@@ -130,7 +131,7 @@
           />
         </svg>
       </button>
-      <span>Close</span>
+      <span>{t('Close')}</span>
     </div>
   {/if}
 </div>

@@ -1,5 +1,6 @@
 /** Mirrors the project DNA's zome and the gateway's project index. */
 
+import { t } from '#lib/i18n/index.ts';
 import type { ProjectUpdate } from './governance.ts';
 import {
   fitLabel,
@@ -212,19 +213,21 @@ export const PROJECT_TYPES: ProjectTypeOption[] = [
   {
     value: 'productive',
     label: 'Project',
-    summary:
+    summary: t(
       'Build or produce something new — e.g. construction, materials, tools, or software from scratch.',
+    ),
   },
   {
     value: 'collective-service',
     label: 'Service',
-    summary:
+    summary: t(
       'Maintain, update, or operate something already in use — e.g. keep software running, dinner service, shared care.',
+    ),
   },
   {
     value: 'personal-service',
-    label: 'Personal service',
-    summary: 'One person offering time or skill through calendar slots and/or written requests.',
+    label: t('Personal service'),
+    summary: t('One person offering time or skill through calendar slots and/or written requests.'),
   },
 ];
 
@@ -232,18 +235,18 @@ export const PROJECT_TYPES: ProjectTypeOption[] = [
 export const REQUEST_MODES: { value: RequestMode; label: string; summary: string }[] = [
   {
     value: 'calendar',
-    label: 'Calendar booking',
-    summary: 'Show availability on the calendar and let people request a slot.',
+    label: t('Calendar booking'),
+    summary: t('Show availability on the calendar and let people request a slot.'),
   },
   {
     value: 'direct',
-    label: 'Direct requests',
-    summary: 'Let people send written requests without calendar booking.',
+    label: t('Direct requests'),
+    summary: t('Let people send written requests without calendar booking.'),
   },
   {
     value: 'both',
-    label: 'Calendar + direct',
-    summary: 'Keep slot booking and allow standalone written requests.',
+    label: t('Calendar + direct'),
+    summary: t('Keep slot booking and allow standalone written requests.'),
   },
 ];
 

@@ -3,6 +3,7 @@
  * `bootstrap/activity_rail.py`), derived on this device from the projects open on its node,
  * as notifications are (ADR 0046). Times are Holochain microseconds.
  */
+import { t } from '#lib/i18n/index.ts';
 import { displayZone } from './zone.ts';
 import { committedOf, minimumOf, type Activity } from './activities.ts';
 import { zoneOf } from './activityTime.ts';
@@ -197,7 +198,7 @@ function linksToCast(projects: RailProject[]): RailItem[] {
       kind: 'vote' as const,
       title: p.title,
       query: linkQuery(l.id),
-      meta: `${l.sever ? 'Sever link' : 'Link vote'} · ${l.otherTitle}`,
+      meta: `${l.sever ? t('Sever link') : t('Link vote')} · ${l.otherTitle}`,
       createdAt: l.createdAt,
       countLabel: tally(l),
       projectMode: p.mode,
@@ -235,7 +236,7 @@ function planItem(p: RailProject, x: PlanView): RailItem {
     kind: 'vote',
     title: x.plan.title || p.title,
     query: voteQuery('plan', x.id, assessed),
-    meta: assessed ? `Approve “${x.plan.title}”?` : 'Assess and approve this plan',
+    meta: assessed ? `Approve “${x.plan.title}”?` : t('Assess and approve this plan'),
     createdAt: x.createdAt,
     countLabel: tally(x.tally),
     projectMode: p.mode,
@@ -269,9 +270,9 @@ export function railKicker(item: RailItem): string {
     if (software) return software;
     return item.voteKindLabel ? `Vote · ${item.voteKindLabel.replace('_', ' ')}` : 'Vote';
   }
-  if (item.kind === 'request') return 'Service request';
-  if (isHelpKind(item.kind)) return 'Help request';
-  return 'Project activity';
+  if (item.kind === 'request') return t('Service request');
+  if (isHelpKind(item.kind)) return t('Help request');
+  return t('Project activity');
 }
 
 /** web's `formatLocalDateTime`: "Tue, Oct 27, 2026, 6:00 PM AEDT" (the Display timezone). */

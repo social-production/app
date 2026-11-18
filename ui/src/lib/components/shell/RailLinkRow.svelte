@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
   import type { Snippet } from 'svelte';
 
@@ -21,7 +22,7 @@
 <!-- eslint-disable svelte/no-navigation-without-resolve -- hrefs arrive resolved (ResolvedPathname) -->
 <a class="rail-link-row" class:active {href} {onclick}>
   <span class="rail-glyph" data-icon={icon}><ScopeGlyph {icon} {imageUrl} /></span>
-  <span class="label">{label}</span>
+  <span class="label">{t(label)}</span>
   <span class="trailing">{@render trailing?.()}</span>
 </a>
 

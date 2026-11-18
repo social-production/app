@@ -5,6 +5,7 @@
  * time and roles, ADR 0067), so yours and your sign-ups come from the projects you are in and
  * open ones from the feed index. Times are Holochain microseconds.
  */
+import { t } from '#lib/i18n/index.ts';
 import { committedOf, type Activity } from './activities.ts';
 import type { RailItem, RailProject } from './activityRail.ts';
 import { HELP_MODE } from './helpRequests.ts';
@@ -55,7 +56,7 @@ function mineItem({ p, a, owned }: Mine, history: boolean): RailItem {
     kind: owned ? 'help-request-owned' : 'help-request-signup',
     title: p.title,
     query: '',
-    meta: owned ? 'Your request' : 'You signed up',
+    meta: owned ? t('Your request') : t('You signed up'),
     createdAt: a.startsAt,
     ...(history
       ? { viewerParticipated: true }

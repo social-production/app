@@ -3,6 +3,7 @@
  * broadening when a saved narrow filter finds nothing), the anchor place (`applyAnchor`), the
  * first centre (saved default, IP hint, device, Worldwide) and "show on map" requests.
  */
+import { t } from '#lib/i18n/index.ts';
 import { tick } from 'svelte';
 import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
 import { bySchedule, pinOf } from '#lib/domain/mapMarkers.ts';
@@ -74,7 +75,7 @@ export class MarkerLoader {
       this.view.syncRadiusOverlay();
     } catch (error) {
       if (token === this.token) {
-        s.errorMessage = error instanceof Error ? error.message : 'Could not load map markers';
+        s.errorMessage = error instanceof Error ? error.message : t('Could not load map markers');
       }
     } finally {
       if (token === this.token) s.loading = false;

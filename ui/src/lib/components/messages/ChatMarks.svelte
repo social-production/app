@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   /** web's pin and mute marks beside a chat's name (list rows and the chat header). */
   interface Props {
     pinned?: boolean | undefined;
@@ -11,7 +12,7 @@
 </script>
 
 {#if pinned}
-  <span class="pin-mark" aria-label="Pinned">
+  <span class="pin-mark" aria-label={t('Pinned')}>
     <svg aria-hidden="true" viewBox="0 0 24 24">
       <path
         d="M16 3l5 5-1.5 1.5-2.2-.7-3.1 3.1.8 3.6L12 13.5 8.2 17.3 6.7 15.8l3.8-3.8-2.1-3.1 3.1-3.1L11 3.5 16 3z"
@@ -21,7 +22,7 @@
   </span>
 {/if}
 {#if muted}
-  <span class:header-mute={header} class="muted-mark" aria-label="Muted" title="Muted">
+  <span class:header-mute={header} class="muted-mark" aria-label={t('Muted')} title={t('Muted')}>
     <svg aria-hidden="true" viewBox="0 0 24 24">
       <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
       <path

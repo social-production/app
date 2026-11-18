@@ -3,6 +3,7 @@
  * and `activity_rail_history.py` build them from its pull request, merge capability and
  * repository replacement tables.
  */
+import { t } from '#lib/i18n/index.ts';
 import { voteQuery, type RailItem, type RailProject, type RailVoteKind } from './activityRail.ts';
 import type { VoteChoice } from './governance.ts';
 import type { SoftwareStage, SoftwareTally } from './software.ts';
@@ -62,7 +63,7 @@ function pullRequestVotes(projects: RailProject[]): RailItem[] {
       r.id,
       'pull_request',
       voteQuery('pull_request', r.id, true),
-      `${r.stage === 'confirmation' ? 'Merge confirmation' : 'Pull request vote'} · ${r.title}`,
+      `${r.stage === 'confirmation' ? t('Merge confirmation') : t('Pull request vote')} · ${r.title}`,
       r.createdAt,
       tally(r.tally),
     ),

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -53,8 +54,8 @@
 
   /** The card's action: vote while approving, record the merge, then confirm it. */
   function actionLabel(pr: SoftwarePullRequest): string {
-    if (pr.stage === 'awaiting-merge') return 'Record merge';
-    return pr.stage === 'confirmation' ? 'Confirm merge' : 'Vote';
+    if (pr.stage === 'awaiting-merge') return t('Record merge');
+    return pr.stage === 'confirmation' ? t('Confirm merge') : t('Vote');
   }
 
   function toggle(id: string): void {
@@ -76,7 +77,7 @@
           <svg viewBox="0 0 24 24"><path d="M8 7 3 12l5 5M16 7l5 5-5 5M13.5 4.5l-3 15" /></svg>
         </span>
         <span class="repo-copy">
-          <small class="repo-title">Repository</small>
+          <small class="repo-title">{t('Repository')}</small>
           <b class="repo-value">{g.repositoryUrl.replace(/^https?:\/\//, '')}</b>
         </span>
         <svg class="chev" aria-hidden="true" viewBox="0 0 24 24"
@@ -92,9 +93,9 @@
           </span>
         {/if}
         <span class="repo-copy">
-          <small class="repo-title">Mergers</small>
+          <small class="repo-title">{t('Mergers')}</small>
           {#if g.platform}
-            <b class="merger-names">Platform moderators</b>
+            <b class="merger-names">{t('Platform moderators')}</b>
           {:else if g.mergers.length > 0}
             <b class="merger-names">
               {#each g.mergers as member, index (member.agent)}
@@ -104,14 +105,14 @@
               {/each}
             </b>
           {:else}
-            <b class="merger-empty">No one yet</b>
+            <b class="merger-empty">{t('No one yet')}</b>
           {/if}
         </span>
       </div>
     </div>
 
     <div class="pr-head">
-      <h3>Pull requests</h3>
+      <h3>{t('Pull requests')}</h3>
       <span>{open.length} in progress</span>
     </div>
     {#each open as pr (pr.id)}
@@ -130,7 +131,7 @@
               class="pr-action"
               class:merge={pr.stage !== 'approval'}
               type="button"
-              onclick={() => act(pr)}>{actionLabel(pr)}</button
+              onclick={() => act(pr)}>{t(actionLabel(pr))}</button
             >
           {/if}
         </div>
@@ -154,7 +155,7 @@
             {#if pr.summary}<span class="summary-copy">{pr.summary}</span>{/if}
             {#if pr.merge}
               <span class="merge-row">
-                Merge
+                {t('Merge')}
                 <a href={externalUrl(pr.merge.mergeUrl)} rel="noreferrer" target="_blank"
                   >{pr.merge.mergeId}</a
                 >
@@ -164,12 +165,12 @@
         {/if}
       </article>
     {:else}
-      <p class="pr-empty">No pull requests in progress.</p>
+      <p class="pr-empty">{t('No pull requests in progress.')}</p>
     {/each}
 
     {#if history.length > 0}
       <div class="detail-card">
-        <span>Repository replacement history</span>
+        <span>{t('Repository replacement history')}</span>
         <div class="history-list">
           {#each history as entry (entry.id)}
             <div class="history-item">
@@ -182,7 +183,7 @@
                 >
               </strong>
               <small>
-                Replaced
+                {t('Replaced')}
                 <a
                   class="repo-link"
                   href={externalUrl(entry.previousRepositoryUrl)}

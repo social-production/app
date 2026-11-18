@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
@@ -35,12 +36,14 @@
 </script>
 
 <CreateSheet
-  title="New proposal"
-  description="A proposal is shared work people can find, join and shape. Its plan decides what it becomes."
+  title={t('New proposal')}
+  description={t(
+    'A proposal is shared work people can find, join and shape. Its plan decides what it becomes.',
+  )}
   {steps}
   stepIndex={s.step}
   missing={s.missing}
-  submitLabel="Publish proposal"
+  submitLabel={t('Publish proposal')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
@@ -49,27 +52,28 @@
   {#if s.stepId === 'basics'}
     <div class="form-stack">
       <label>
-        <RequiredLabel>Title</RequiredLabel>
+        <RequiredLabel>{t('Title')}</RequiredLabel>
         <input
           bind:value={s.title}
           maxlength="200"
           aria-required="true"
-          placeholder="Shared seed library"
+          placeholder={t('Shared seed library')}
         />
       </label>
       <label>
-        <RequiredLabel>Description</RequiredLabel>
+        <RequiredLabel>{t('Description')}</RequiredLabel>
         <!-- The step asks "What do you propose?"; the field keeps that in its name. -->
         <textarea
           bind:value={s.description}
           rows="5"
           aria-required="true"
-          aria-label="What do you propose? Description"
-          placeholder="The idea, and why it is worth doing."></textarea>
+          aria-label={t('What do you propose? Description')}
+          placeholder={t('The idea, and why it is worth doing.')}></textarea>
       </label>
       <p class="soft-note">
-        <strong>No type yet</strong>It becomes a project, a service or an event when its members
-        approve a plan.
+        <strong>{t('No type yet')}</strong>{t(
+          'It becomes a project, a service or an event when its members approve a plan.',
+        )}
       </p>
       <!-- The weekly limit shows only when it is close (Polish Pass mockups). -->
       {#if s.allowance !== null && s.allowance <= 1}
@@ -102,10 +106,10 @@
         place={s.intent === 'physical' ? s.locationLabel : ''}
       />
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
-        <strong>Channels</strong><span>{tagCounts(s.tags)}</span><em>Edit</em>
+        <strong>{t('Channels')}</strong><span>{tagCounts(s.tags)}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
-        <strong>Place</strong><span>{s.locationLabel}</span><em>Edit</em>
+        <strong>{t('Place')}</strong><span>{t(s.locationLabel)}</span><em>{t('Edit')}</em>
       </button>
       <PolicyNotice />
       {#if s.message}<p class="status-note">{s.message}</p>{/if}

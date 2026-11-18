@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CopyKey from '#lib/components/CopyKey.svelte';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import { taggedName, type Person } from '#lib/domain/people.ts';
@@ -55,52 +56,58 @@
 </script>
 
 <section class="settings-section" id="settings-devices">
-  <h2>Devices</h2>
+  <h2>{t('Devices')}</h2>
   <p class="section-intro">
-    Each app install has its own key. Pair it with your main account so people see one person.
+    {t(
+      'Each app install has its own key. Pair it with your main account so people see one person.',
+    )}
   </p>
   <div class="card stack flush">
     <SettingPanel
-      label="Paired devices"
-      value={paired.length ? paired.map((d) => d.profile?.name ?? 'Unnamed').join(', ') : 'None'}
+      label={t('Paired devices')}
+      value={paired.length
+        ? paired.map((d) => d.profile?.name ?? t('Unnamed')).join(', ')
+        : t('None')}
     >
       {#each paired as device (device.agent)}
         <p class="setting-line">{taggedName(device)}</p>
       {:else}
-        <p class="setting-hint">No other devices paired yet.</p>
+        <p class="setting-hint">{t('No other devices paired yet.')}</p>
       {/each}
     </SettingPanel>
 
     {#each requests as request (request.link.device + request.link.primary)}
       <div class="set-row set-action">
         <span class="set-row-label">
-          Pairing request
+          {t('Pairing request')}
           <small>From {taggedName(request.from)}</small>
         </span>
         <button class="set-pill" type="button" onclick={() => act(request.link, 'Device paired.')}
-          >Confirm</button
+          >{t('Confirm')}</button
         >
       </div>
     {/each}
 
     <SettingPanel
-      label="This device’s key"
+      label={t('This device’s key')}
       value={me}
       key
-      hint="Paste it on your main account, or paste the main account’s key under “Pair with my main account”."
+      hint={t(
+        'Paste it on your main account, or paste the main account’s key under “Pair with my main account”.',
+      )}
     >
-      <CopyKey value={me} label="Copy this device's key" />
+      <CopyKey value={me} label={t("Copy this device's key")} />
     </SettingPanel>
 
     <SettingPanel
-      label="Pair with my main account"
+      label={t('Pair with my main account')}
       value=""
-      hint="Paste the key from “Copy my key” on your main account."
+      hint={t('Paste the key from “Copy my key” on your main account.')}
       bind:open={pairing}
     >
       <input
         bind:value={mainKey}
-        aria-label="Main account key"
+        aria-label={t('Main account key')}
         placeholder="uhCAk…"
         spellcheck="false"
       />
@@ -116,7 +123,7 @@
                 { primary: mainKey.trim(), device: me },
                 'Request sent. Confirm it on your main account.',
               );
-            }}>Send pairing request</button
+            }}>{t('Send pairing request')}</button
           >
         </div>
       {/snippet}
