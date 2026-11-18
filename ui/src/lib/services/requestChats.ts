@@ -16,8 +16,21 @@ function opening(r: ServiceRequest): string {
   return r.body.trim() ? `${r.title}\n\n${r.body.trim()}` : r.title;
 }
 
+// Accepting and the page's sync can both reach for a new chat: start it once.
+const opening_ = new Map<string, Promise<string>>();
+
 /** Opens the chat once its activity is written (does nothing if it is already there). */
-export async function openPlannersChat(r: ServiceRequest): Promise<string> {
+export function openPlannersChat(r: ServiceRequest): Promise<string> {
+  let found = opening_.get(r.id);
+  if (!found) {
+    found = openOnce(r);
+    found.catch(() => opening_.delete(r.id));
+    opening_.set(r.id, found);
+  }
+  return found;
+}
+
+async function openOnce(r: ServiceRequest): Promise<string> {
   const me = await myAgent();
   const seed = plannersSeed(me, r.id);
   // Reading a chat nobody started answers with no members rather than failing.
@@ -36,8 +49,9 @@ export async function syncPlannersChat(r: ServiceRequest, a: Activity): Promise<
   const seed = plannersSeed(me, r.id);
   const summary = await chatSummary(seed, 0).catch(() => null);
   if (!summary?.members.length) {
+    // Just opened: its roles are synced on the next load, once the chat reads back.
     await openPlannersChat(r);
-    return syncPlannersChat(r, a);
+    return;
   }
   const want = new Set([r.requester, ...a.roles.flatMap((role) => role.people)]);
   want.delete(me);
