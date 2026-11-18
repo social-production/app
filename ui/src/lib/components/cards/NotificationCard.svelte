@@ -2,10 +2,10 @@
   import { resolve } from '$app/paths';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { NotificationItem } from '#lib/domain/notifications.ts';
-  import { modeAccent } from '#lib/domain/projects.ts';
+  import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
+  import { kindColor, kindOf, type Kind } from '#lib/domain/kindGlyphs.ts';
 
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
-  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
 
   import '#lib/components/styles/notifications.css';
@@ -39,20 +39,18 @@
               ? 'Help request'
               : 'Project',
   );
-  const icon = $derived<SurfaceIconId>(
+  /** The map pins' and feed cards' symbol and colour for what the notice is about. */
+  const kind = $derived<Kind>(
     subject === 'Thread'
-      ? 'bubble'
+      ? 'thread'
       : subject === 'Post'
         ? 'post'
         : subject === 'Event'
           ? 'event'
           : subject === 'Help request'
-            ? 'help-request'
-            : subject === 'Account'
-              ? 'user'
-              : 'cube',
+            ? 'request'
+            : kindOf(item.projectMode),
   );
-  const accent = $derived(item.projectMode ? modeAccent(item.projectMode) : 'var(--brand)');
 
   function handleCardClick(event: MouseEvent): void {
     if ((event.target as HTMLElement).closest('a, button')) return;
@@ -82,8 +80,17 @@
       aria-label={actorName}><AvatarBadge size="md" name={actorName} avatar={null} /></a
     >
   {:else}
-    <span class="note-icon" style={`--note-accent: ${accent}`} aria-hidden="true">
-      <SurfaceIcon {icon} size="md" />
+    <span
+      class="note-icon"
+      class:kind-tile={subject !== 'Account'}
+      style={`--note-accent: ${kindColor(kind)}`}
+      aria-hidden="true"
+    >
+      {#if subject === 'Account'}
+        <SurfaceIcon icon="user" size="md" />
+      {:else}
+        <KindGlyph {kind} size={20} />
+      {/if}
     </span>
   {/if}
   <div class="note-copy">

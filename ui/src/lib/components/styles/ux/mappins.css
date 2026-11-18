@@ -206,12 +206,17 @@
   gap: 8px;
 }
 
-.shell .map-panel .map-peek-actions a {
+.shell .map-panel .map-peek-actions a,
+.shell .map-panel .map-peek-actions button {
   display: grid;
   flex: 1;
   place-items: center;
   height: 40px;
+  padding: 0 16px;
+  border: 0;
   border-radius: 999px;
+  font-family: inherit;
+  cursor: pointer;
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
