@@ -1,7 +1,8 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import { proposalLabel, type Proposal, type VoteChoice } from '#lib/domain/governance.ts';
+  import type { Proposal, VoteChoice } from '#lib/domain/governance.ts';
+  import { voteHeadline, voteKindLabel } from '#lib/domain/voteSheet.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import {
     historyIcon,
@@ -14,6 +15,7 @@
 
   import VoteChoiceBar from './VoteChoiceBar.svelte';
   import VoteDecisionBody from './VoteDecisionBody.svelte';
+  import VoteKicker from './VoteKicker.svelte';
 
   import '#lib/components/styles/governance.css';
   import '#lib/components/styles/history.css';
@@ -97,29 +99,34 @@
 
 <OverlaySheet
   open={sheet !== null}
-  title={sheet ? proposalLabel(sheet.kind, phaseLabel) : t('Vote')}
+  title={sheet ? voteHeadline(sheet.kind, phaseLabel) : t('Vote')}
   labelledById={`history-vote-${entry.id}`}
   rootClass="vote-dock-root"
   onClose={() => (showing = false)}
 >
+  {#snippet kicker()}
+    {#if sheet}
+      <VoteKicker
+        label={voteKindLabel(sheet.kind)}
+        status={sheet.status === 'Passed'
+          ? t('Passed')
+          : sheet.status === 'Open'
+            ? null
+            : t("Didn't pass")}
+        meta={`${names[sheet.author] ?? '…'} · ${relativeTime(sheet.createdAt)}`}
+      />
+    {/if}
+  {/snippet}
   {#if sheet}
     <div class="vote-list">
       <article class="vote-block">
-        <VoteDecisionBody
-          proposal={sheet}
-          authorName={names[sheet.author] ?? '…'}
-          {charter}
-          stage={stageOf(sheet)}
-          {phaseLabel}
-        />
+        <VoteDecisionBody proposal={sheet} {charter} stage={stageOf(sheet)} {phaseLabel} />
       </article>
     </div>
   {/if}
   {#snippet footer()}
     {#if sheet && sheet.status === 'Open'}
-      <div class="vote-footer">
-        <VoteChoiceBar mine={sheet.myVote} onChoose={(c) => cast(sheet, c)} />
-      </div>
+      <VoteChoiceBar docked mine={sheet.myVote} onChoose={(c) => cast(sheet, c)} />
     {/if}
   {/snippet}
 </OverlaySheet>

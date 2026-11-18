@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, shots, signUp } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, shots, signUp, reviewPlan } from './lib.mjs';
 import { advanceTo, signInFounders, until, voteYes } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -62,15 +62,7 @@ await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_00
 async function assessPlan(page, yes) {
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.locator('.plan-card', { hasText: planTitle }).click();
-  await page.getByRole('button', { name: 'Review this plan' }).click();
-  const sheet = page.locator('.plan-sheet');
-  await sheet.locator('.criterion-row').first().waitFor();
-  for (const row of await sheet.locator('.criterion-row').all()) {
-    await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
-    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
-  }
-  await page.getByRole('button', { name: 'Yes, approve' }).click();
-  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
+  await reviewPlan(page);
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
   await page.keyboard.press('Escape');
 }

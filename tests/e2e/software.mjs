@@ -12,7 +12,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, addPlan, browser, continueSteps, errors, log, rail, railShows } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, errors, log, rail, railShows, reviewPlan } from './lib.mjs';
 import { advanceTo, signInFounders, until } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -67,15 +67,7 @@ await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_00
 async function assessPlan(page, yes) {
   await page.getByRole('tab', { name: 'Participation' }).click();
   await page.locator('.plan-card', { hasText: planTitle }).click();
-  await page.getByRole('button', { name: 'Review this plan' }).click();
-  const sheet = page.locator('.plan-sheet');
-  await sheet.locator('.criterion-row').first().waitFor();
-  for (const row of await sheet.locator('.criterion-row').all()) {
-    await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
-    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
-  }
-  await page.getByRole('button', { name: 'Yes, approve' }).click();
-  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
+  await reviewPlan(page);
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
   await page.keyboard.press('Escape');
 }
@@ -137,12 +129,12 @@ async function openAction(page, action, what) {
 
 async function voteYes(page, dialog, what) {
   await openAction(page, /^(Vote|Confirm merge)$/, what);
-  const sheet = page.getByRole('dialog', { name: dialog });
+  const sheet = page.getByRole('dialog', { name: dialog, exact: true });
   await sheet.locator('.choice-bar .choice.yes').click();
   await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 }
 
-await voteYes(ann, 'Pull request vote needed', 'the pull request');
+await voteYes(ann, prTitle, 'the pull request');
 // Bob's rail: web's "Vote · pull request"; Assess opens the pull request's wizard.
 await bob.goto(projectUrl);
 const prVote = () => rail(bob).locator('.vote-row', { hasText: `Pull request vote · ${prTitle}` });
@@ -150,7 +142,7 @@ await railShows(bob, prVote, 'the pull request vote', 30_000);
 assert.match(await prVote().innerText(), /Vote · pull request/i);
 await bob.screenshot({ path: `${out}/software-rail-vote-390.png` });
 await prVote().getByRole('button', { name: 'Assess' }).click();
-const bobVote = bob.getByRole('dialog', { name: 'Pull request vote needed' });
+const bobVote = bob.getByRole('dialog', { name: prTitle, exact: true });
 await bobVote.locator('.choice-bar .choice.yes').click({ timeout: 120_000 });
 await bobVote.waitFor({ state: 'hidden', timeout: 60_000 });
 log('both approved the pull request, bob from his rail');
@@ -168,15 +160,15 @@ for (let i = 0; i < 40 && !(await approved().count()); i++) {
 }
 assert.match(await approved().first().innerText(), /your pull request is approved for merge/);
 await approved().first().click();
-const merge = ann.getByRole('dialog', { name: 'Merge needed' });
+const merge = ann.getByRole('dialog', { name: 'Record the merge' });
 await merge.getByLabel('Merge ID').fill('a1b2c3');
 await merge.getByLabel('Merge link').fill('https://example.org/garden/commit/a1b2c3');
-await merge.getByRole('button', { name: 'Submit merge details' }).click();
+await merge.getByRole('button', { name: 'Send to confirm' }).click();
 await merge.waitFor({ state: 'hidden', timeout: 60_000 });
 log('ann recorded the merge');
 
-await voteYes(bob, 'Merge confirmation needed', 'the merge confirmation');
-await voteYes(ann, 'Merge confirmation needed', 'the merge confirmation on ann');
+await voteYes(bob, `Was ${prTitle} merged?`, 'the merge confirmation');
+await voteYes(ann, `Was ${prTitle} merged?`, 'the merge confirmation on ann');
 const queue = () => ann.locator('.pr-card', { hasText: prTitle });
 for (let i = 0; i < 40 && (await queue().count()); i++) {
   await ann.waitForTimeout(3000);
@@ -204,8 +196,8 @@ await ann.goto(projectUrl);
 await railShows(ann, grant, 'the merge capability vote', 60_000);
 assert.match(await grant().innerText(), /Vote · merge capability/i);
 await grant().getByRole('button', { name: 'Assess' }).click();
-const sheet = ann.getByRole('dialog', { name: 'Merge capability' });
-await sheet.getByText('Grant merge capability').waitFor({ timeout: 120_000 });
+const sheet = ann.getByRole('dialog', { name: /^Let .+ merge\?$/ });
+await sheet.locator('.vote-kicker', { hasText: 'Merge capability' }).waitFor({ timeout: 120_000 });
 await sheet.locator('.choice-bar .choice.yes').click();
 await sheet.waitFor({ state: 'hidden', timeout: 60_000 });
 

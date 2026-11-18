@@ -1,0 +1,36 @@
+/** Russian, part of the catalogue (ADR 0114; see ../ru.ts): the one vote sheet. */
+import type { Entry } from '../languages.ts';
+
+export const part17: Record<string, Entry> = {
+  'Phase change': 'Смена этапа',
+  Member: 'Участник',
+  'New details': 'Новые данные',
+  'New title': 'Новое название',
+  'New location': 'Новое место',
+  'New update': 'Новое обновление',
+  'Return to {phase}': 'Вернуть на этап «{phase}»',
+  'Move to {phase}': 'Перейти к этапу «{phase}»',
+  '{yes} yes · {no} no': '{yes} за · {no} против',
+  '{n} of {total} voted': 'проголосовали {n} из {total}',
+  'needs {percent}%': 'нужно {percent}%',
+  'You voted Yes': 'Вы проголосовали «за»',
+  'You voted No': 'Вы проголосовали «против»',
+  'Let {name} merge?': 'Разрешить {name} сливать?',
+  'Stop {name} merging?': 'Запретить {name} сливать?',
+  'Record the merge': 'Записать слияние',
+  'Was {title} merged?': '«{title}» слит?',
+  'Recorded by {name}': 'Записал(а) {name}',
+  'step {n} of 3': 'шаг {n} из 3',
+  'Commit {id}': 'Коммит {id}',
+  'Check the commit, then confirm.': 'Проверьте коммит и подтвердите.',
+  'Send to confirm': 'Отправить на подтверждение',
+  '{n} of {total}': '{n} из {total}',
+  'How well does it satisfy "{value}"?': 'Насколько он отвечает ценности «{value}»?',
+  'Does this plan meet the need? Your vote is final.':
+    'Отвечает ли план потребности? Голос нельзя изменить.',
+  'Review · {n} questions': 'Оценить · вопросов: {n}',
+  "What's new?": 'Что нового?',
+  'Members vote before it appears.': 'Участники голосуют, прежде чем оно появится.',
+  'Twelve bikes fixed on Saturday…': 'В субботу починили двенадцать велосипедов…',
+  'Send to vote': 'Отправить на голосование',
+};

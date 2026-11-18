@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, addPlan, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps, feedChoice } from './lib.mjs';
+import { BASE, addPlan, browser, device, errors, log, phraseSignIn, rail, railShows, continueSteps, feedChoice, reviewPlan } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const stamp = Date.now().toString(36).slice(-4);
@@ -100,7 +100,7 @@ log('an edit passed with both founders and applied');
 await ann.reload();
 await ann.getByRole('button', { name: 'Update', exact: true }).click();
 await ann.locator('.update-sheet textarea').fill('First repair night went well.');
-await ann.getByRole('button', { name: 'Post update' }).click();
+await ann.getByRole('button', { name: 'Send to vote' }).click();
 await voteYes(bob);
 // The Details tab shows only the newest update, in its own block (Plan, Phase and Feedback
 // Screens, 1).
@@ -197,15 +197,8 @@ async function assess(page, yes, fromRail = false) {
     await page.getByRole('tab', { name: 'Participation' }).click();
     await page.locator('.plan-card', { hasText: planTitle }).click();
   }
-  await page.getByRole('button', { name: 'Review this plan' }).click();
-  const sheet = page.locator('.plan-sheet');
-  await sheet.locator('.criterion-row', { hasText: valueLabel }).getByText('Shared value').waitFor();
-  for (const row of await sheet.locator('.criterion-row').all()) {
-    await row.getByRole('button', { name: /^4(\s*Support)?$/ }).click();
-    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
-  }
-  await page.getByRole('button', { name: 'Yes, approve' }).click();
-  await page.getByText('You voted yes.', { exact: false }).waitFor({ timeout: 30_000 });
+  const kinds = await reviewPlan(page);
+  assert.ok(kinds.some((k) => k.includes('Shared value') && k.includes(valueLabel)), kinds.join('\n'));
   await page.locator('.plan-card', { hasText: `${yes} yes` }).waitFor({ timeout: 120_000 });
 }
 

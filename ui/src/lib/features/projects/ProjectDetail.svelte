@@ -280,7 +280,7 @@
         open={sheet === 'update'}
         pending={detail.saving}
         message={detail.sheetMessage}
-        project={{ title: charter.title, mode: charter.mode, members: project.members.length }}
+        projectTitle={charter.title}
         onSubmit={(body) => void filed(detail.proposeUpdate(body))}
         onClose={() => (sheet = null)}
       />
