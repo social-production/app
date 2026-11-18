@@ -1,4 +1,3 @@
-import { t } from '#lib/i18n/index.ts';
 /** SVG bodies of web's FeedToolbarIcon, keyed by name (ported verbatim). */
 export const toolbarIcons: Record<string, string> = {
   check:
@@ -42,9 +41,8 @@ export const toolbarIcons: Record<string, string> = {
     '<path d="M12 3.5 3.5 8 12 12.5 20.5 8 12 3.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M3.5 12 12 16.5 20.5 12" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /> <path d="M3.5 16 12 20.5 20.5 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   user: '<circle cx="12" cy="9" r="3.5" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M5.5 19.5c.9-2.8 2.8-4.5 6.5-4.5s5.6 1.7 6.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
   bell: '<path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22Zm7-6V11a7 7 0 1 0-14 0v5l-2 2v1h18v-1l-2-2Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />',
-  message: t(
+  message:
     '<path d="M4 4h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H8l-4 3v-3H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />',
-  ),
   send: '<path d="M20.5 4.2 3.8 10.2c-.8.3-.7 1.4.1 1.6l6.2 1.6 1.6 6.2c.2.8 1.3.9 1.6.1l6.8-15.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <path d="M10.1 13.4 14.4 9.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />',
   more: '<circle cx="6" cy="12" r="1.5" fill="currentColor" /> <circle cx="12" cy="12" r="1.5" fill="currentColor" /> <circle cx="18" cy="12" r="1.5" fill="currentColor" />',
   calendar:
@@ -75,9 +73,7 @@ export const toolbarIcons: Record<string, string> = {
   flag: '<path d="M6 21V4M6 4h11l-2.5 4.5L17 13H6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   reply:
     '<path d="M10 8V4.5L3.5 11l6.5 6.5V14c4.5 0 7.5 1.4 10 5-.8-5.5-3.8-10.3-10-11Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
-  copy: t(
-    '<rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /> <path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
-  ),
+  copy: '<rect x="8.5" y="8.5" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /> <path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   kebab:
     '<circle cx="12" cy="5.5" r="1.6" fill="currentColor" /> <circle cx="12" cy="12" r="1.6" fill="currentColor" /> <circle cx="12" cy="18.5" r="1.6" fill="currentColor" />',
   share:

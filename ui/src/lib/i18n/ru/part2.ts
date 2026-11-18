@@ -1,0 +1,111 @@
+/** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
+import type { Entry } from '../ru.ts';
+
+export const part2: Record<string, Entry> = {
+  'Ask this device once': 'Спрашивать на этом устройстве один раз',
+  'Asked by': 'Запросил(а)',
+  Assess: 'Оценить',
+  'Assess and approve this plan': 'Оценить и одобрить этот план',
+  Audience: 'Аудитория',
+  'Awaiting a merge-capable member to record the merge ID and merge link.':
+    'Ожидается, что участник с правом слияния запишет ID и ссылку слияния.',
+  'Awaiting approval before anyone can record a merge.':
+    'Ожидается одобрение, прежде чем кто-то сможет записать слияние.',
+  'Awaiting confirmation that the recorded merge matches this pull request.':
+    'Ожидается подтверждение, что записанное слияние соответствует этому пул-реквесту.',
+  Back: 'Назад',
+  'Back to chats': 'Назад к чатам',
+  'Back to the app': 'Назад в приложение',
+  'Back to the chat': 'Назад в чат',
+  Basics: 'Основное',
+  'Become a full member': 'Стать полноправным участником',
+  Bio: 'О себе',
+  Bot: 'Бот',
+  'Bot review open': 'Идёт проверка на бота',
+  'Break the plan into ordered stages people can follow.':
+    'Разбейте план на последовательные этапы, понятные людям.',
+  'Break the work into stages. Each stage needs a title and details. You can add, remove, and reorder stages.':
+    'Разбейте работу на этапы. У каждого этапа должны быть название и подробности. Этапы можно добавлять, удалять и менять местами.',
+  Bug: 'Ошибка',
+  Bugs: 'Ошибки',
+  'Build or produce something new — e.g. construction, materials, tools, or software from scratch.':
+    'Построить или произвести что-то новое — например, стройка, материалы, инструменты или программы с нуля.',
+  'Build or produce something new. Makes this a project.':
+    'Построить или произвести что-то новое. Это сделает его проектом.',
+  'Buttons, links and highlights. Each one stays readable in light and dark.':
+    'Кнопки, ссылки и выделения. Каждый вариант остаётся читаемым в светлой и тёмной теме.',
+  'Calendar + direct': 'Календарь + напрямую',
+  'Calendar booking': 'Запись по календарю',
+  'Calendar requests require a start and finish time':
+    'Для запросов по календарю нужны время начала и окончания',
+  'Call declined': 'Звонок отклонён',
+  Cancel: 'Отмена',
+  'Cancel reply': 'Отменить ответ',
+  'Cancel request': 'Отменить запрос',
+  Cancelled: 'Отменено',
+  'Change cover': 'Сменить обложку',
+  'Change distance': 'Изменить расстояние',
+  'Change photo': 'Сменить фото',
+  'Change picture': 'Сменить картинку',
+  'Change profile photo': 'Сменить фото профиля',
+  'Change your stance': 'Изменить позицию',
+  Channel: 'Канал',
+  'Channel or community tag': 'Тег канала или сообщества',
+  Channels: 'Каналы',
+  'Channels and communities': 'Каналы и сообщества',
+  'Channels to explore': 'Каналы для знакомства',
+  'Channels, communities, projects, usernames...':
+    'Каналы, сообщества, проекты, имена пользователей...',
+  Chat: 'Чат',
+  'Chat info': 'О чате',
+  'Chat menu': 'Меню чата',
+  'Chat options': 'Настройки чата',
+  'Check and publish': 'Проверить и опубликовать',
+  'Check each section, then submit when you are ready.':
+    'Проверьте каждый раздел и отправьте, когда будете готовы.',
+  'Check the spelling or try fewer words.': 'Проверьте написание или попробуйте меньше слов.',
+  'Check your phrase': 'Проверьте фразу',
+  'Choose a date.': 'Выберите дату.',
+  'Choose a different request setup before adding a reason or starting a vote.':
+    'Выберите другой вариант запроса, прежде чем добавлять причину или начинать голосование.',
+  'Choose a different request setup to unlock the reason field.':
+    'Выберите другой вариант запроса, чтобы открыть поле причины.',
+  'Choose a place': 'Выбрать место',
+  'Choose a place to see what is near it': 'Выберите место, чтобы увидеть, что рядом',
+  'Choose a project member to continue.': 'Выберите участника проекта, чтобы продолжить.',
+  'Choose a single date or a date range.': 'Выберите одну дату или диапазон дат.',
+  'Choose a start and end date.': 'Выберите дату начала и окончания.',
+  'Choose a start and finish time.': 'Выберите время начала и окончания.',
+  'Choose one private community.': 'Выберите одно закрытое сообщество.',
+  'Choose personal audience': 'Выбрать личную аудиторию',
+  'Choose public feed scope': 'Выбрать охват публичной ленты',
+  'Choose stage': 'Выбрать этап',
+  'Choose the blocked pull request that triggered this change.':
+    'Выберите заблокированный пул-реквест, из-за которого понадобилось это изменение.',
+  'Choose the primary project or production site.':
+    'Выберите основное место проекта или производства.',
+  'Choose valid start and finish times.': 'Укажите корректное время начала и окончания.',
+  'Choose which activity shows up in your notifications.':
+    'Выберите, какая активность попадает в ваши уведомления.',
+  Chosen: 'Выбрано',
+  Clear: 'Очистить',
+  'Clear all': 'Очистить всё',
+  'Clear bot mark': 'Снять отметку «бот»',
+  'Clear filters': 'Сбросить фильтры',
+  'Clear place': 'Убрать место',
+  Cleared: 'Убрано',
+  Close: 'Закрыть',
+  'Close create menu': 'Закрыть меню создания',
+  'Close event': 'Закрыть событие',
+  'Close menu': 'Закрыть меню',
+  'Close photo': 'Закрыть фото',
+  'Close project': 'Закрыть проект',
+  'Close side panels': 'Закрыть боковые панели',
+  Closed: 'Закрыто',
+  Collaborative: 'Совместный',
+  'Collaborative: all members vote on changes': 'Совместный: все участники голосуют за изменения',
+  'Collaborative: all members vote on changes.': 'Совместный: все участники голосуют за изменения.',
+  'Coming up': 'Скоро',
+  Comments: 'Комментарии',
+  'Committed activity': 'Запланированное мероприятие',
+};

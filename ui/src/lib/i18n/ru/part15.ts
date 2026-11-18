@@ -1,0 +1,78 @@
+/** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
+import type { Entry } from '../ru.ts';
+
+export const part15: Record<string, Entry> = {
+  'Withdraw your candidacy?': 'Отозвать свою кандидатуру?',
+  'Working...': 'Обработка...',
+  'Working…': 'Обработка…',
+  'Write a message...': 'Напишите сообщение...',
+  Yes: 'Да',
+  'Yes, approve': 'Да, одобрить',
+  Yesterday: 'Вчера',
+  You: 'Вы',
+  'You can join again any time.': 'Вы можете вернуться в любой момент.',
+  'You did not participate': 'Вы не участвовали',
+  'You have not requested this service yet.': 'Вы ещё не запрашивали эту услугу.',
+  'You keep full organizer authority. Chosen organizers can invite people, create activities, and manage event decisions; other invitees can only attend and sign up.':
+    'У вас остаются все права организатора. Выбранные организаторы могут приглашать людей, создавать мероприятия и принимать решения по событию; остальные приглашённые могут только прийти и записаться.',
+  'You participated': 'Вы участвовали',
+  'You signed up': 'Вы записались',
+  'You stepped down.': 'Вы ушли с поста.',
+  'You were mentioned.': 'Вас упомянули.',
+  'You will be signed out and cannot sign in again. Posts, threads, and vouches stay under this username.':
+    'Вы выйдете и не сможете войти снова. Посты, обсуждения и поручительства останутся под этим именем пользователя.',
+  'You withdrew. You can volunteer again any time.':
+    'Вы отозвали кандидатуру. Вызваться снова можно в любой момент.',
+  'Your Home is quiet': 'На главной пока тихо',
+  'Your account may not have reached the network yet': 'Возможно, ваш аккаунт ещё не дошёл до сети',
+  'Your account now lives on this computer. If you used it on a website, the website stops hosting it once your history arrives here (you can take it back there with your words). Logging in can take up to two minutes while your history arrives from the network.':
+    'Теперь ваш аккаунт живёт на этом компьютере. Если вы пользовались им на сайте, сайт перестанет его хранить, как только ваша история окажется здесь (вернуть его туда можно своими словами). Вход может занять до двух минут, пока история приходит из сети.',
+  'Your activity': 'Ваша активность',
+  'Your computer shows the categories above while the app runs in the background.':
+    'Ваш компьютер показывает категории выше, пока приложение работает в фоне.',
+  'Your follow-up': 'Ваш ответ',
+  'Your key': 'Ваш ключ',
+  'Your profile, appearance, notifications, devices, privacy and sign-in.':
+    'Ваш профиль, внешний вид, уведомления, устройства, приватность и вход.',
+  'Your projects, threads and events stay out of your followers’ Home feeds.':
+    'Ваши проекты, обсуждения и события не попадают в ленты «Главная» ваших подписчиков.',
+  'Your recovery phrase': 'Ваша фраза восстановления',
+  'Your request': 'Ваш запрос',
+  'Your requests': 'Ваши запросы',
+  'Your review': 'Ваша оценка',
+  'Your server': 'Ваш сервер',
+  'Your vote is final once cast.': 'После голосования изменить голос нельзя.',
+  'a longer time': 'больший период',
+  'a member': 'участник',
+  'a merge is recorded, then members confirm it':
+    'записывается слияние, затем участники его подтверждают',
+  'a wider distance': 'большее расстояние',
+  'and 66% yes for a seat': 'и 66% «за» для места',
+  are: '—',
+  by: 'от',
+  decisions: 'решения',
+  'e.g. Fitzroy, Melbourne': 'например, Фицрой, Мельбурн',
+  'e.g. Need a lift to the station': 'например, нужно подвезти до станции',
+  edited: 'изменено',
+  following: 'подписки',
+  'help request': 'запрос помощи',
+  'it is done': 'готово',
+  km: 'км',
+  main: 'основной',
+  'member who joined': 'присоединившийся участник',
+  'members confirm it': 'участники подтверждают',
+  'members who joined': 'присоединившиеся участники',
+  'nobody yet': 'пока никого',
+  now: 'сейчас',
+  'people took part': 'человек участвовали',
+  project: 'проект',
+  seated: 'на месте',
+  'serious harm': 'серьёзный вред',
+  'the people active last week': 'люди, активные на прошлой неделе',
+  'this member': 'этот участник',
+  updates: 'обновления',
+  'your account. Write them down and keep them safe: anyone with them can act as you, and without them a lost device means a lost account.':
+    'ваш аккаунт. Запишите их и храните надёжно: любой, у кого они есть, может действовать от вашего имени, а без них потеря устройства означает потерю аккаунта.',
+  '· Private': '· Закрытое',
+  '· you manage it': '· вы управляете',
+};
