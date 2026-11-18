@@ -7,7 +7,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-import { BASE, browser, device, errors, log, phraseSignIn, continueSteps } from './lib.mjs';
+import { BASE, browser, device, errors, log, phraseSignIn, shots, continueSteps } from './lib.mjs';
 
 const [one, two] = JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
 const out = process.argv[3] ?? 'screens';
@@ -78,7 +78,7 @@ log('bob joined and wrote in the chat');
 const toAnn = await notified(ann, 'Replied to your project');
 assert.match(await toAnn.innerText(), new RegExp(hello));
 await bell(ann).waitFor({ timeout: 60_000 });
-await ann.screenshot({ path: `${out}/phone390-notifications.png` });
+await shots(ann, `${out}/phone390-notifications`);
 await toAnn.click();
 await ann.waitForURL(/\/projects\/[^?]+\?tab=chat&comment=/, { timeout: 60_000 });
 await bubble(ann, hello).waitFor({ timeout: 60_000 });
@@ -150,6 +150,14 @@ await bob.getByRole('button', { name: 'Mark all read' }).click();
 await bell(bob).waitFor({ state: 'detached', timeout: 10_000 });
 assert.equal(await bob.locator('.notification-card .unread-dot').count(), 0);
 log('bob got the phase change; Mark all read cleared the bell');
+await shots(bob, `${out}/phone390-notifications-read`);
+
+// Settings' Devices and Account sections, light and dark (the modernisation checks).
+await bob.goto(`${BASE}/settings`);
+for (const id of ['devices', 'account']) {
+  await bob.locator(`#settings-${id}`).scrollIntoViewIfNeeded();
+  await shots(bob, `${out}/phone390-settings-${id}`);
+}
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all notification checks passed');

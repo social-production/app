@@ -60,6 +60,14 @@ function watch(page) {
 }
 
 // The shell marks itself once the account is connected (any screen width).
+/** Screenshot `page` in light and dark (`<path>.png` and `<path>-dark.png`). */
+export async function shots(page, path) {
+  await page.screenshot({ path: `${path}.png` });
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.screenshot({ path: `${path}-dark.png` });
+  await page.emulateMedia({ colorScheme: 'light' });
+}
+
 export const signedIn = (page) => page.locator('.shell[data-signed-in="true"]').waitFor({ timeout: 120_000 });
 export const open = (page, name) => page.getByRole('link', { name, exact: true }).first().click();
 

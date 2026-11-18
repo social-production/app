@@ -8,7 +8,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, browser, continueSteps, device, errors, log, signUp } from './lib.mjs';
+import { BASE, browser, continueSteps, device, errors, log, shots, signUp } from './lib.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -52,6 +52,7 @@ await participation(ann);
 await until(ann, button(ann, 'Add availability'), 'Add availability');
 await button(ann, 'Add availability').click();
 let sheet = ann.getByRole('dialog');
+await shots(ann, `${out}/phone390-availability-sheet`);
 await sheet.getByRole('button', { name: 'Weekly', exact: true }).click();
 await sheet.getByRole('button', { name: 'Add weekly hours' }).click();
 await ann.locator('.rule-row', { hasText: 'Tuesday 09:00–12:00' }).waitFor({ timeout: 60_000 });
@@ -75,6 +76,7 @@ await until(bob, slot, 'the one-off row');
 await slot.click();
 sheet = bob.getByRole('dialog');
 assert.ok(await sheet.getByLabel('Start time').isDisabled(), "the slot's times are locked");
+await shots(bob, `${out}/phone390-booking-sheet`);
 await sheet.getByPlaceholder('Request title').fill(ask);
 await sheet.getByPlaceholder(/What do you need/).fill('Complete beginner.');
 await sheet.getByRole('button', { name: 'Request', exact: true }).click();
