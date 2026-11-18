@@ -148,4 +148,25 @@ export const part18: Record<string, Entry> = {
   candidates: 'кандидатов',
   seated: 'на местах',
   '{n} votes': { one: '{n} голос', few: '{n} голоса', many: '{n} голосов' },
+  Candidates: 'Кандидаты',
+  'Seated at the next count': 'Займёт место при следующем подсчёте',
+  'Has the votes': 'Хватает голосов',
+  '{n} days': { one: '{n} день', few: '{n} дня', many: '{n} дней' },
+  'Yes to {name} · {n}': '«За» {name} · {n}',
+  'No to {name} · {n}': '«Против» {name} · {n}',
+  '{yes} of {n} yes': '{yes} из {n} «за»',
+  'needs {n} more votes': {
+    one: 'нужен ещё {n} голос',
+    few: 'нужно ещё {n} голоса',
+    many: 'нужно ещё {n} голосов',
+  },
+  '{n} seated': 'на местах: {n}',
+  '{n} candidates': { one: '{n} кандидат', few: '{n} кандидата', many: '{n} кандидатов' },
+  'open seats are filled straight away while nobody votes':
+    'пока никто не голосует, свободные места занимают сразу',
+  'a seat needs {n} votes and 66% yes': 'для места нужно голосов: {n} и 66% «за»',
+  'Moderators look after reports across the whole network.':
+    'Модераторы разбирают жалобы во всей сети.',
+  'Seats are checked every week. Once people vote, a seat needs their votes and 66% yes.':
+    'Места проверяются каждую неделю. Когда люди голосуют, для места нужны их голоса и 66% «за».',
 };

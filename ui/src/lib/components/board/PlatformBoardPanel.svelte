@@ -1,6 +1,8 @@
 <script lang="ts">
   import { plural, t } from '#lib/i18n/index.ts';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
+  import VoteKicker from '#lib/components/governance/VoteKicker.svelte';
+  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { boardOrder, type Board, type BoardMember } from '#lib/domain/board.ts';
@@ -68,6 +70,22 @@
   const candidates = $derived(boardOrder(board?.candidates ?? [], me, name));
   const viewerState = $derived(board?.viewerState ?? null);
   const empty = $derived(seated.length === 0 && candidates.length === 0);
+  // One plain line under the title says where the board stands and what a seat takes.
+  const lede = $derived(
+    empty
+      ? t('Moderators look after reports across the whole network.')
+      : [
+          t('{n} seated', { n: seated.length }),
+          ...(candidates.length
+            ? [plural(candidates.length, '{n} candidate', '{n} candidates')]
+            : []),
+          quorum === 0
+            ? t('open seats are filled straight away while nobody votes')
+            : t('a seat needs {n} votes and 66% yes', { n: quorum }),
+        ]
+          .join(' · ')
+          .replace(/^./, (c) => c.toUpperCase()) + '.',
+  );
   // An empty board says it once, like an empty feed: what's missing and how a seat is won.
   const emptyText = $derived(
     quorum === 0
@@ -114,16 +132,18 @@
 
 {#snippet section(title: string, list: BoardMember[])}
   {#if list.length > 0}
-    <h3 class="board-head">{title} · {list.length}</h3>
-    {#each list as m (m.agent)}
-      <BoardRow
-        member={m}
-        person={people[m.agent]}
-        {quorum}
-        you={m.agent === me}
-        onVote={(member, v) => void vote(member, v)}
-      />
-    {/each}
+    <h3 class="board-head">{title}<span>{list.length}</span></h3>
+    <div class="board-card">
+      {#each list as m (m.agent)}
+        <BoardRow
+          member={m}
+          person={people[m.agent]}
+          {quorum}
+          you={m.agent === me}
+          onVote={(member, v) => void vote(member, v)}
+        />
+      {/each}
+    </div>
   {/if}
 {/snippet}
 
@@ -134,34 +154,28 @@
   rootClass="platform-board"
   {onClose}
 >
+  {#snippet kicker()}<VoteKicker label={t('Platform')} meta={t('Whole network')} />{/snippet}
   {#snippet headerActions()}
     <button class="board-how-link" type="button" onclick={() => (howOpen = true)}
-      >{t('How it works')}</button
+      ><ToolbarIcon name="info" />{t('How it works')}</button
     >
   {/snippet}
   <div class="board-body">
+    {#if board}<p class="board-lede">{lede}</p>{/if}
     {#if board && empty}
-      <EmptyState icon="shield" title={t('No moderators yet')} text={emptyText} />
+      <div class="board-card">
+        <EmptyState icon="shield" title={t('No moderators yet')} text={emptyText} />
+      </div>
     {:else if board}
+      {@render section(t('Seated'), seated)}
+      {@render section(t('Candidates'), candidates)}
       {#if quorum === 0}
-        <p class="board-summary board-note">
-          {t(
-            'Nobody voted last week, so anyone who volunteers is seated straight away. Once people are active, a seat needs their votes.',
+        <p class="board-note">
+          <ToolbarIcon name="clock" />{t(
+            'Seats are checked every week. Once people vote, a seat needs their votes and 66% yes.',
           )}
         </p>
-      {:else}
-        <p class="board-summary">
-          <span><b>{board.moderators.length}</b>{t('seated')}</span>
-          <span
-            ><b>{board.candidates.length}</b>{board.candidates.length === 1
-              ? t('candidate')
-              : t('candidates')}</span
-          >
-          <span><b>{plural(quorum, '{n} vote', '{n} votes')}</b>{t('and 66% yes for a seat')}</span>
-        </p>
       {/if}
-      {@render section('Seated', seated)}
-      {@render section('Candidates', candidates)}
     {:else if error}
       <div class="board-empty board-failed" role="alert">
         <p>{t('The moderators couldn’t load.')} {error}</p>
@@ -189,8 +203,11 @@
             >{t('Withdraw')}</button
           >
         {:else if canVolunteer}
-          <button class="sheet-submit" type="button" onclick={() => (ask = 'volunteer')}
-            >{t('Volunteer as moderator')}</button
+          <button
+            class="sheet-submit"
+            type="button"
+            aria-label={t('Volunteer as moderator')}
+            onclick={() => (ask = 'volunteer')}>{t('Volunteer')}</button
           >
         {/if}
       </div>{/if}

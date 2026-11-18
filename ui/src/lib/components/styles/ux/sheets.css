@@ -235,13 +235,15 @@
    to outweigh the ported rule, which names the root with :not(:has()). */
 @media (max-width: 1080px) {
   .overlay-root.setting-sheet.setting-sheet.setting-sheet,
-  .overlay-root.feed-filter-sheet.feed-filter-sheet.feed-filter-sheet {
+  .overlay-root.feed-filter-sheet.feed-filter-sheet.feed-filter-sheet,
+  .overlay-root.platform-board.platform-board.platform-board {
     align-items: end;
     justify-items: stretch;
   }
 
   .overlay-root.setting-sheet.setting-sheet .overlay-sheet.overlay-sheet,
-  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-sheet.overlay-sheet {
+  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-sheet.overlay-sheet,
+  .overlay-root.platform-board.platform-board .overlay-sheet.overlay-sheet {
     align-self: end;
     height: auto;
     max-height: 88dvh;
@@ -250,7 +252,14 @@
   }
 
   .overlay-root.setting-sheet.setting-sheet .overlay-header-copy,
-  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-header-copy {
+  .overlay-root.feed-filter-sheet.feed-filter-sheet .overlay-header-copy,
+  .overlay-root.platform-board.platform-board .overlay-header-copy {
     padding-top: 18px;
+  }
+
+  /* The Moderators sheets' dock floats clear of the screen's edge (owner, 2026-11-19: "that
+     close button is still attached to bottom of screen"). */
+  .overlay-root.platform-board.platform-board .overlay-footer.overlay-footer {
+    padding-bottom: calc(22px + var(--shell-safe-bottom, 0px));
   }
 }
