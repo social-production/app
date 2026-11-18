@@ -9,7 +9,7 @@
 import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
-import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, signUp } from './lib.mjs';
+import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, shots, signUp } from './lib.mjs';
 import { advanceTo, signInFounders, until, voteYes } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
@@ -113,6 +113,8 @@ const cleo = await device({ viewport: phone });
 await signUp(cleo, `cleo${stamp}`);
 await press(cleo, 'Request service');
 const composer = cleo.getByRole('dialog');
+await composer.getByPlaceholder('Request title').waitFor({ timeout: 30_000 });
+await shots(cleo, `${out}/phone390-request-sheet`);
 await composer.getByPlaceholder('Request title').fill(ask);
 await composer.locator('textarea').first().fill('The back tyre keeps going flat.');
 await composer.getByRole('button', { name: 'Request', exact: true }).click();
