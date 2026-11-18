@@ -114,3 +114,34 @@ export function phaseVoteNotice(
     `/projects/${project}`,
   );
 }
+
+/** activities.py: "<activity> was added." to the project's other members. */
+export function activityAddedNotice(
+  members: string[],
+  project: string,
+  title: string,
+  activity: { id: string; title: string },
+): Promise<void> {
+  return notify(
+    members,
+    'prj-activity',
+    () => title,
+    `${activity.title} was added.`,
+    activityLink(project, activity.id),
+  );
+}
+
+/** service_requests.py: a new request, or a decision on one ("Request accepted: …"). */
+export function requestNotice(
+  to: string[],
+  request: { project: string; id: string; service: string; title: string },
+  status: string,
+): Promise<void> {
+  return notify(
+    to,
+    'svc-request',
+    () => request.service,
+    `Request ${status}: ${request.title}`,
+    `/projects/${request.project}?request=${encodeURIComponent(request.id)}`,
+  );
+}

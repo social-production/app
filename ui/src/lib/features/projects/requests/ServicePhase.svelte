@@ -18,6 +18,7 @@
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
 
+  import { tellActivity } from '../phaseNotice.ts';
   import { ActivitiesState } from '../activitiesState.svelte.ts';
   import type { DetailState } from '../detailState.svelte.ts';
   import { AvailabilityState } from './availabilityState.svelte.ts';
@@ -44,7 +45,7 @@
   const creator = $derived(!!me && project?.creator === me);
   const place = $derived(project?.charter?.location_label ?? '');
   // svelte-ignore state_referenced_locally
-  const activities = new ActivitiesState(detail.id, () => me);
+  const activities = new ActivitiesState(detail.id, () => me, tellActivity(detail));
   // svelte-ignore state_referenced_locally
   const availability = new AvailabilityState(detail.id);
   // svelte-ignore state_referenced_locally

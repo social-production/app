@@ -61,6 +61,8 @@ export class ActivitiesState {
   constructor(
     readonly projectId: string,
     readonly me: () => string,
+    /** Tells the other members about a new activity (push, ADR 0108). */
+    private readonly added: (a: { id: string; title: string }) => void = () => {},
   ) {}
 
   readonly live = $derived(this.activities.filter((a) => a.rolesOpen));
@@ -145,7 +147,8 @@ export class ActivitiesState {
     const place = fitLabel(f.online ? f.place.trim() || 'Online' : f.place, LOCATION_LABEL_MAX);
     this.busy = true;
     try {
-      await createActivity(this.projectId, {
+      const roles = namedRoles(f.roles);
+      const id = await createActivity(this.projectId, {
         title: f.title.trim(),
         startsAt: wallMicros(f.scheduledAt),
         endsAt: wallMicros(f.endsAt),
@@ -155,9 +158,14 @@ export class ActivitiesState {
         meetingUrl: f.online && f.meetingUrl.trim() ? f.meetingUrl.trim() : null,
         note: f.note.trim(),
         planStage: f.planStage,
-        roles: namedRoles(f.roles).map((r) => ({ ...r, suggest: r.suggest?.agent ?? null })),
+        roles: roles.map((r) => ({ ...r, suggest: r.suggest?.agent ?? null })),
         booking: this.planning,
       });
+      const made = { id, title: f.title.trim() };
+      this.added(made);
+      for (const r of roles) {
+        if (r.suggest) void roleSuggestedNotice(r.suggest.agent, this.projectId, made, r.label);
+      }
       this.composing = false;
       this.planning = null;
       await this.load();
