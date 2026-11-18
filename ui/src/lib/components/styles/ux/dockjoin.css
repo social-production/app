@@ -15,7 +15,7 @@
   .dock-capsule
   :is(button, a, .membership-split, .participation-membership, .dock-chip):not(.dock-more-card *),
 .shell .dock-vote :is(.vote-dock, #participation-signals) :is(button, a) {
-  min-height: 52px;
+  min-height: 46px;
   border-radius: 0;
 }
 
@@ -54,7 +54,7 @@
 
 .shell .dock-capsule.tight .dock-labelled:has(svg) {
   gap: 0;
-  min-width: 50px;
+  min-width: 46px;
   padding: 0 14px;
   font-size: 0;
 }
@@ -80,7 +80,7 @@
 .shell .dock-capsule .round-plus-button.round-plus-button.round-plus-button,
 .shell .dock-capsule .phase-shift-button.phase-shift-button.phase-shift-button,
 .shell .dock-capsule .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
-  min-height: 52px;
+  min-height: 46px;
   border-radius: 0;
   box-shadow: inset 1px 0 0 var(--float-border);
 }
@@ -148,13 +148,13 @@
 .shell .dock-capsule .feed-vote.feed-vote > button {
   display: grid;
   place-items: center;
-  width: 52px;
-  min-width: 52px;
+  width: 46px;
+  min-width: 46px;
   padding: 0;
 }
 
 .shell .dock-capsule > .feed-vote:first-child > button:first-child {
-  width: 58px;
+  width: 52px;
   padding-left: 6px;
   box-shadow: none;
 }
@@ -181,6 +181,6 @@
 .shell .dock-capsule > :is(button, a):last-child,
 .shell .dock-capsule > .share-sheet:last-child .share-button,
 .shell .dock-capsule > :last-child:not(button, a) > :is(button, a):last-child {
-  min-width: 58px;
-  padding-right: 6px;
+  min-width: 48px;
+  padding-right: 4px;
 }
