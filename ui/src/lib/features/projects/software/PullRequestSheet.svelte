@@ -88,20 +88,22 @@
       meta={who}
     />
   {/snippet}
-  <div class="vote-sheet">
-    {#if confirming && pr.merge}
-      {@render link(pr.merge.mergeUrl, t('Commit {id}', { id: pr.merge.mergeId }))}
-      <p class="outcome">{t('Check the commit, then confirm.')}</p>
-    {:else}
-      {#if mode === 'record-merge'}<p class="vote-text vote-pr-title">{pr.title}</p>{/if}
-      {#if pr.summary && mode === 'vote-pr'}<p class="vote-text">{pr.summary}</p>{/if}
-      {@render link(pr.pullRequestUrl, `${pr.pullRequestId}`)}
-    {/if}
-    {#if mode === 'vote-pr'}
-      <VoteTally yes={pr.tally.yes} no={pr.tally.no} population={pr.tally.population} />
-    {:else}
-      {@render children?.()}
-    {/if}
+  <div class="vote-list">
+    <div class="vote-sheet">
+      {#if confirming && pr.merge}
+        {@render link(pr.merge.mergeUrl, t('Commit {id}', { id: pr.merge.mergeId }))}
+        <p class="outcome">{t('Check the commit, then confirm.')}</p>
+      {:else}
+        {#if mode === 'record-merge'}<p class="vote-text vote-pr-title">{pr.title}</p>{/if}
+        {#if pr.summary && mode === 'vote-pr'}<p class="vote-text">{pr.summary}</p>{/if}
+        {@render link(pr.pullRequestUrl, `${pr.pullRequestId}`)}
+      {/if}
+      {#if mode === 'vote-pr'}
+        <VoteTally yes={pr.tally.yes} no={pr.tally.no} population={pr.tally.population} />
+      {:else}
+        {@render children?.()}
+      {/if}
+    </div>
   </div>
   {#snippet footer()}
     {#if mode === 'vote-pr'}

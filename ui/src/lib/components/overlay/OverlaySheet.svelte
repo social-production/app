@@ -118,7 +118,12 @@
       <header class="overlay-header">
         <div class="overlay-header-copy">
           {@render kicker?.()}
-          <h2 id={labelledById} use:fitText={{ min: 13, text: title }}>{title}</h2>
+          {#if kicker}
+            <!-- A vote's headline wraps instead of shrinking to one line. -->
+            <h2 id={labelledById}>{title}</h2>
+          {:else}
+            <h2 id={labelledById} use:fitText={{ min: 13, text: title }}>{title}</h2>
+          {/if}
           {@render subtitle?.()}
         </div>
         {#if headerActions}<div class="overlay-header-actions">{@render headerActions()}</div>{/if}
