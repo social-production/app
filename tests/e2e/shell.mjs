@@ -57,6 +57,13 @@ await guest.waitForURL(/section=how/);
 await guest.getByRole('heading', { name: 'Signals instead of prices' }).waitFor();
 log('signed out: More shows sign in and About');
 
+// A page that needs an account sends you to the real sign-up page, not one inside the shell.
+await guest.goto(`${BASE}/settings`);
+await guest.waitForURL(/\/onboarding\?next=%2Fsettings/, { timeout: 60_000 });
+await guest.getByRole('heading', { name: 'Join Social Production' }).waitFor();
+assert.equal(await guest.locator('.mobile-bottom-nav').count(), 0, 'no bottom nav on sign-up');
+log('signed out: an account page opens the sign-up page');
+
 // web's isAuthSurface: onboarding shows only the brand.
 await guest.goto(`${BASE}/onboarding`);
 await guest.getByRole('heading', { name: 'Join Social Production' }).waitFor();
