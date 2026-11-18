@@ -222,6 +222,31 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
+### Where things stand (3:30 pm Melbourne, 2026-11-18, UX session)
+- **Live:** #213 (push for follows, shares, invites, roles, phase votes), #215 (Global names the
+  people you follow over their cards and mixes in your channels' and communities' items; owner:
+  Home = only what you follow, Global = everything leaning towards it), #216 (the follow line
+  shows the person's picture; notification icons use the map pins' kind symbols and colours;
+  the map card's Directions is a round pill and the locate button no longer covers Open),
+  #217 (Request service sheet modernised; `shots()` light/dark captures of Notifications,
+  Settings › Devices/Account and the request sheet; those screens checked), #218 (push for new
+  activities, role suggestions at creation and service requests). Live smoke signed out after
+  each: 15 cards, 0 errors.
+- **Open: `claude/requests-stay-open` (ADR 0113, owner's design):** collective requests have no
+  declines and stay open until a member plans them; an unplanned one reads Not met once its
+  time (or 30 days) passes; the planner's device opens a chat with the person asking (seed
+  `<planner>.group.<request id's last 24>`) and adds/removes role-takers; holder chats
+  ("Request · …") are hidden from Messages. `collective-requests.mjs` passes.
+- **Owner decisions today:** Invites stays a rail row only while one waits (already so). Personal
+  services are retired (new projects can't be one); `bookings.mjs` fails for that reason. Asked
+  the owner whether to delete the personal-service code (~25 files).
+- **Lesson:** the local seed process is `target/debug/gateway` (plus `kitsune2-bootstrap-srv`
+  and `dev-seed.sh`); `pkill -f holochain` doesn't stop it. It slows to timeouts after about an
+  hour of tests: restart it then.
+- **Next:** push for the remaining kinds (bot reviews, plan leading, removed projects, approved
+  pull requests), then desktop OS notifications; ADR 0095's remainder; compare the remaining
+  signed-in screens with web.
+
 ### Where things stand (12:10 pm Melbourne, 2026-11-18, UX session)
 - **Live:** #210 (rail test rewritten around an event activity; `withinWindow` no longer moves a
   late default start into the past; `rail.mjs`/`governance.mjs` open Edit from the dock's ⋯),
@@ -242,10 +267,9 @@ The UX session now also owns the parity queue. In the order it builds them:
 
 **Modernisation (every screen has an approved mockup and is built; what remains is checking):**
 1. ~~`tests/e2e/rail.mjs` rewritten~~ (#210).
-2. Capture with real data, at 390px light and dark, the screens the Screen Review could not:
-   Notifications with a full list, Settings > Devices and Account, a collective service's
-   availability and booking sheets. Fix what looks old; a mockup first if it needs a redesign.
-3. Owner's call: Invites always reachable (a More row) or only when one waits (today).
+2. ~~Capture Notifications, Settings > Devices and Account, the request sheet~~ (#217; the
+   availability and booking sheets were personal-service only, now retired).
+3. ~~Invites~~: only when one waits (owner, 2026-11-18; already so).
 
 **Parity (before Railway's FastAPI site shuts down):**
 1. ~~**Settings rows**~~: Display timezone (#211), privacy switches (#212); the feed split isn't
