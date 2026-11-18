@@ -180,25 +180,31 @@
     background: var(--panel);
   }
 
+  /* Sizes come from min-width, not flex-basis: some browsers (Android Chrome) size a
+     fit-content capsule from its items' content and ignore their basis, so ⋯ was pushed
+     outside and clipped (owner's Android screenshots, 2026-11-19). */
+  .mobile-bottom-nav.guest > * {
+    flex: none;
+  }
+
   .mobile-bottom-nav.guest .bottom-nav-item {
-    flex: 0 0 56px;
+    min-width: 56px;
   }
 
   /* The capsule's round end eats into the last segment: More gets room so ⋯ stays clear. */
   .mobile-bottom-nav.guest .bottom-nav-item:last-child {
-    flex-basis: 66px;
+    min-width: 66px;
     padding-right: 10px;
   }
 
   .mobile-bottom-nav.guest .bottom-nav-item.active-link {
-    flex: 0 0 auto;
     padding: 0 16px;
   }
 
   .mobile-bottom-nav.guest .bottom-nav-signup {
-    flex: none;
     padding: 0 24px;
     font-size: 14.5px;
+    white-space: nowrap;
   }
 
   .bottom-nav-signup:active,
