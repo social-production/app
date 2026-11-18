@@ -8,6 +8,7 @@ import { softwareDockVotes, softwareHistory } from '#lib/domain/softwareVotes.ts
 import { explain } from '#lib/services/errors.ts';
 import { castVote, closeProposal } from '#lib/services/governance.ts';
 import { namesOf } from '#lib/services/people.ts';
+import { joinProject } from '#lib/services/projects.ts';
 import { loadSoftware, proposeSoftware } from '#lib/services/software.ts';
 
 /** The five things web's SoftwareGovernanceWizard does. */
@@ -92,8 +93,14 @@ export class SoftwareState {
     }
   }
 
+  /** A platform moderator who isn't a member joins before recording a merge: the network
+   * takes proposals from members only (ADR 0095). */
   submit(request: SoftwareRequest): Promise<boolean> {
-    return this.run(() => proposeSoftware(this.projectId, request));
+    const join = 'Merge' in request && !this.governance?.canPropose;
+    return this.run(async () => {
+      if (join) await joinProject(this.projectId, true);
+      await proposeSoftware(this.projectId, request);
+    });
   }
 
   /** The vote open on `pr`: its own, or its recorded merge's (the confirmation). */

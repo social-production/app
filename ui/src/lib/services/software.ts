@@ -65,6 +65,7 @@ interface SoftwareWire {
     pull_request: ActionHash;
   })[];
   can_propose: boolean;
+  platform?: boolean;
 }
 
 const tally = (t: TallyWire): SoftwareTally => ({
@@ -126,6 +127,7 @@ export async function loadSoftware(project: ProjectRef): Promise<SoftwareGoverna
       pullRequest: hashToString(r.pull_request),
     })),
     canPropose: w.can_propose,
+    platform: !!w.platform,
   };
 }
 

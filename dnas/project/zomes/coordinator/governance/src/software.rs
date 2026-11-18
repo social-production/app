@@ -50,24 +50,18 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
             decided,
         });
     }
-    let mut software = replay(events(&state, &requests, &[]));
-    // On a #platform project a merge also counts from a platform moderator (ADR 0095): a merge
-    // the replay ignored is replayed again with its author as a merger for that moment only.
+    // On a #platform project only platform moderators merge (ADR 0095, owner 2026-11-18): no
+    // one holds the capability, and each moderator's merge carries it for that moment only.
+    let mut moderated = Vec::new();
     if roll.platform() {
-        let mut moderated = Vec::new();
         for r in &requests {
             let merge = matches!(r.kind, SoftwareRequest::Merge { .. });
-            if merge
-                && software.ignored.contains(&r.found.hash)
-                && crate::calls::moderator_at(&r.found.author, r.found.at)?
-            {
+            if merge && crate::calls::moderator_at(&r.found.author, r.found.at)? {
                 moderated.push(r.found.hash.clone());
             }
         }
-        if !moderated.is_empty() {
-            software = replay(events(&state, &requests, &moderated));
-        }
     }
+    let software = replay(events(&state, &requests, roll.platform().then_some(&moderated[..])));
     Ok(Ledger {
         state,
         software,
@@ -75,11 +69,11 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
     })
 }
 
-/// `moderated`: merges whose author merges as a platform moderator, granted just for them.
+/// `platform`: a #platform project's moderators' merges, the only ones that count there.
 fn events(
     state: &State,
     requests: &[Request],
-    moderated: &[ActionHash],
+    platform: Option<&[ActionHash]>,
 ) -> Vec<Event<ActionHash, AgentPubKey>> {
     let mut timed = Vec::new();
     for lead in plan_lead::replay(&state.approved, state.born()) {
@@ -88,17 +82,26 @@ fn events(
         }
         let plan = state.approved.iter().find(|a| a.hash == lead.plan);
         let repository = plan.and_then(|a| a.repository.clone()).unwrap_or_default();
+        let author = lead.author;
         timed.push((
             lead.at,
             Event::Lead {
-                author: lead.author,
+                author: author.clone(),
                 repository,
             },
         ));
+        // The plan's author merges nowhere on #platform: moderators do.
+        if platform.is_some() {
+            let revoke = Event::Capability {
+                target: author,
+                grant: false,
+            };
+            timed.push((lead.at, revoke));
+        }
     }
     for r in requests {
         let hash = r.found.hash.clone();
-        push_filed(&mut timed, r, moderated.contains(&hash));
+        push_filed(&mut timed, r, platform.is_some_and(|m| m.contains(&hash)));
         let Some((passed, at)) = r.decided else {
             continue;
         };
@@ -111,6 +114,8 @@ fn events(
                 proposal: hash,
                 passed,
             }),
+            // Capability votes don't apply on #platform: only moderators merge there.
+            SoftwareRequest::MergeCapability { .. } if platform.is_some() => None,
             SoftwareRequest::MergeCapability { agent, grant } => {
                 passed.then(|| Event::Capability {
                     target: agent.clone(),
@@ -192,8 +197,15 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
     match request {
         SoftwareRequest::PullRequest { .. } => Ok(()),
         SoftwareRequest::Merge { pull_request, .. } => {
-            let moderator = roll.platform() && crate::calls::moderator_at(&me, sys_time()?)?;
-            if !ledger.software.can_merge(&me) && !moderator {
+            let may = if roll.platform() {
+                crate::calls::moderator_at(&me, sys_time()?)?
+            } else {
+                ledger.software.can_merge(&me)
+            };
+            if !may && roll.platform() {
+                return Err(guest("Only platform moderators record merges on #platform projects"));
+            }
+            if !may {
                 return Err(guest(
                     "Only members with merge capability can record merges",
                 ));
@@ -205,6 +217,9 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
             }
             Ok(())
         }
+        SoftwareRequest::MergeCapability { .. } if roll.platform() => Err(guest(
+            "On #platform projects platform moderators merge; there is no capability to grant",
+        )),
         SoftwareRequest::MergeCapability { agent, .. } => {
             if !roll.members_at(sys_time()?).contains_key(agent) {
                 return Err(guest("Only project members can perform this action"));

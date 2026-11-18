@@ -73,6 +73,8 @@ export interface SoftwareGovernance {
   capabilityRequests: SoftwareCapabilityRequest[];
   repositoryRequests: SoftwareRepositoryRequest[];
   canPropose: boolean;
+  /** #platform: platform moderators merge; no merge capability is granted (ADR 0095). */
+  platform: boolean;
 }
 
 export type SoftwareRequest =
