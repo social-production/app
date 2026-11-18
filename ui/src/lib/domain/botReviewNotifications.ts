@@ -43,7 +43,7 @@ export function botReviewNotifications(
   });
 }
 
-function ownCopy(n: BotNotice): [string, string] {
+export function ownCopy(n: BotNotice): [string, string] {
   if (n.kind === 'opened') {
     return [
       'Members asked for a bot review of your account',
@@ -63,7 +63,7 @@ function ownCopy(n: BotNotice): [string, string] {
   ];
 }
 
-function theirCopy(n: BotNotice, name: string): [string, string] {
+export function theirCopy(n: BotNotice, name: string): [string, string] {
   if (n.kind === 'vote') {
     return [
       `Is ${name} a real person?`,
