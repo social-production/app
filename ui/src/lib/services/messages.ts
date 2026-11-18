@@ -114,9 +114,11 @@ export async function startChat(
   members: string[],
   title: string | null,
   body: string | null,
+  /** A seed worked out ahead (a request's planners' chat, ADR 0113); else a new one. */
+  given?: string,
 ): Promise<string> {
   const me = await myAgent();
-  const seed = newChatSeed(me, kind);
+  const seed = given ?? newChatSeed(me, kind);
   await chat<null>(seed, 'start_chat', { members: members.map(stringToHash), title });
   for (const to of [me, ...members]) {
     await inbox<null>('send_invite', { to: stringToHash(to), seed });

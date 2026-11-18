@@ -140,6 +140,9 @@ if (!(await card.count())) {
   log('bob messages:', await bob.locator('main').innerText().catch(() => 'no messages'));
 }
 await card.locator('summary').click();
+// ADR 0113: no declines, and no conversation until someone plans it.
+assert.equal(await card.getByRole('button', { name: /Decline/ }).count(), 0, 'no Decline');
+assert.equal(await card.getByRole('link', { name: 'Open conversation' }).count(), 0, 'no chat yet');
 await card.getByRole('button', { name: 'Plan request' }).click();
 await bob.screenshot({ path: `${out}/phone390-collective-plan.png` });
 assert.equal(await bob.getByPlaceholder('Activity title').inputValue(), ask);
@@ -168,6 +171,15 @@ for (let i = 0; i < 20; i++) {
 await cleo.screenshot({ path: `${out}/phone390-collective-accepted.png` });
 log("cleo's request reads Accepted");
 
+// The planners' chat (ADR 0113): Bob opened it with Cleo; the holder chat stays out of Messages.
+const cleoCard = cleo.locator('.request-card-shell', { hasText: ask });
+await cleoCard.getByRole('link', { name: 'Open conversation' }).click();
+await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 120_000 });
+log("cleo's conversation is the planners' chat, opened with her request");
+await cleo.goto(`${BASE}/messages`);
+await cleo.getByText(ask).first().waitFor({ timeout: 60_000 });
+assert.equal(await cleo.getByText(`Request · ${ask}`).count(), 0, 'the holder chat is hidden');
+
 // Ann signs up from her right rail: the planned activity is an ordinary activity.
 await ann.goto(projectUrl);
 const activityRow = () => rail(ann).locator('.activity-row', { hasText: ask });
@@ -177,6 +189,16 @@ const sheet = ann.getByRole('dialog', { name: ask });
 await sheet.getByRole('button', { name: 'Join', exact: true }).click();
 await sheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
 log('ann took the Service lead role from her rail');
+
+// Bob's device adds Ann to the planners' chat when it next loads the service.
+for (let i = 0; i < 20; i++) {
+  await bob.goto(projectUrl);
+  await bob.waitForTimeout(8000);
+  await ann.goto(`${BASE}/messages`);
+  if (await ann.getByText(ask).first().waitFor({ timeout: 15_000 }).then(() => true, () => false)) break;
+  if (i === 19) throw new Error("ann never joined the planners' chat");
+}
+log("ann, who took a role, joined the planners' chat");
 
 assert.deepEqual(errors, [], `page errors: ${errors.join('\n')}`);
 await browser.close();

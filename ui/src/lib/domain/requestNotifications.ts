@@ -1,11 +1,17 @@
-import { STATUS_LABELS, type ServiceRequest } from './serviceRequests.ts';
+import {
+  notMet,
+  REQUEST_OPEN_DAYS,
+  STATUS_LABELS,
+  type ServiceRequest,
+} from './serviceRequests.ts';
 import type { NotificationItem } from './notifications.ts';
 
 type Unread = Omit<NotificationItem, 'isUnread'>;
 
 /**
  * web-backend's `svc-request` cards (ADR 0076, `_notify_service_request`): a new request
- * tells the service's creator; each decision tells the other person ("Request accepted: …").
+ * tells the service's creator; each decision tells the other person ("Request accepted: …"),
+ * and a request nobody planned in time tells the person asking ("Request not met: …", ADR 0113).
  * Read from the direct chats the requests live in.
  */
 export function requestNotifications(requests: ServiceRequest[], me: string): Unread[] {
@@ -26,6 +32,15 @@ export function requestNotifications(requests: ServiceRequest[], me: string): Un
     });
     const out: Unread[] = [];
     if (!mine) out.push(card('open', r.requester, r.createdAt));
+    // Nobody planned it in time (ADR 0113): the person asking hears once, at the cut-off.
+    if (mine && notMet(r)) {
+      const at = r.endsAt ?? r.createdAt + REQUEST_OPEN_DAYS * 86_400_000_000;
+      out.push({
+        ...card('open', r.other, at),
+        id: `svc-request:${r.id}:not-met`,
+        body: `Request not met: ${r.title}`,
+      });
+    }
     // Who decided: the person asking cancels; the creator accepts or declines.
     const byRequester = r.status === 'cancelled';
     if (r.status !== 'open' && byRequester !== mine) {

@@ -30,9 +30,9 @@
       <div class="request-header-row">
         <div>
           <p>
-            Sending a request opens a chat with the service’s members in Messages.
+            Every member of the service sees your request; whoever plans it starts a chat with you.
             {#if showSchedule}
-              Start from the selected available time and add the details for the members.
+              Start from the selected available time and add the details.
             {:else}
               Describe what you need so they can review the request and reply.
             {/if}
