@@ -180,9 +180,16 @@ for (let i = 0; i < 10 && !(await talk.count()); i++) {
   await talk.waitFor({ state: 'attached', timeout: 10_000 }).catch(() => {});
 }
 if (!(await talk.isVisible())) await cleoCard.locator('summary').click();
-await talk.click();
-const opened = await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 120_000 }).then(() => true, () => false);
+const chatUrl = `${BASE}${await talk.getAttribute('href')}`;
+let opened = false;
+for (let i = 0; i < 12 && !opened; i++) {
+  await cleo.goto(chatUrl);
+  opened = await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 15_000 }).then(() => true, () => false);
+}
 if (!opened) {
+  await bob.goto(chatUrl);
+  await bob.waitForTimeout(15_000);
+  log('bob sees the chat as:', await bob.locator('main').innerText().catch(() => '?'));
   await cleo.screenshot({ path: `${out}/collective-planners-missing.png` });
   log('cleo sees:', cleo.url(), await cleo.locator('main').innerText().catch(() => '?'));
   await bob.goto(`${BASE}/messages`);
