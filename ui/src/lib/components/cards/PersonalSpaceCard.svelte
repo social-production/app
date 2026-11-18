@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { FeedContext } from '#lib/domain/homeFeed.ts';
   import type { ProjectCard, Stance } from '#lib/domain/projects.ts';
 
   import PersonalPostCard from './PersonalPostCard.svelte';
@@ -12,10 +13,10 @@
   interface Props {
     card: ProjectCard;
     onSignal: (next: Stance | null) => Promise<void>;
-    context?: string;
+    context?: FeedContext | null;
   }
 
-  let { card, onSignal, context = '' }: Props = $props();
+  let { card, onSignal, context = null }: Props = $props();
 </script>
 
 {#if card.mode === 'post'}

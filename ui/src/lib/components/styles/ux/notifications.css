@@ -107,6 +107,16 @@
   color: var(--text-soft);
 }
 
+/* The map pins' and feed cards' tile: the kind's symbol on its colour. */
+.shell .notification-row .note-icon.kind-tile {
+  background: var(--note-accent);
+  color: var(--kind-on);
+}
+
+.shell .notification-row:not(.unread) .note-icon.kind-tile {
+  opacity: 0.75;
+}
+
 .shell .notification-row.social .note-icon {
   background: none;
 }

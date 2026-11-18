@@ -11,7 +11,9 @@
   import ProjectActivityCard from '#lib/components/cards/ProjectActivityCard.svelte';
   import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
   import InfiniteSentinel from '#lib/components/InfiniteSentinel.svelte';
-  import { madeContext } from '#lib/domain/homeFeed.ts';
+  import { madeContext, type FeedContext } from '#lib/domain/homeFeed.ts';
+  import type { Avatar } from '#lib/domain/people.ts';
+  import { cachedPerson } from '#lib/services/people.ts';
   import type { ProjectCard } from '#lib/domain/projects.ts';
   import { regionLink, type RegionActivity } from '#lib/domain/regionFeed.ts';
 
@@ -73,12 +75,25 @@
   });
 
   /** "Maya Kim proposed this" over a card by someone you follow (ADR 0107). */
-  // Home and Global name the person you follow over their cards (Profiles and Comments §1);
-  // Region shows the plain public card.
-  const contextOf = (card: ProjectCard): string =>
-    feed.shownScope !== 'region' && feed.following.includes(card.creator)
-      ? madeContext(card.creatorName || 'Unnamed', card.mode)
-      : '';
+  // Home and Global name the person you follow over their cards, with their picture (Profiles
+  // and Comments §1); Region shows the plain public card.
+  const contextOf = (card: ProjectCard): FeedContext | null => {
+    if (feed.shownScope === 'region' || !feed.following.includes(card.creator)) return null;
+    const name = card.creatorName || 'Unnamed';
+    return { text: madeContext(name, card.mode), name, avatar: avatars[card.creator] ?? null };
+  };
+
+  /** The followed people's pictures, for the line over their cards. */
+  let avatars = $state<Record<string, Avatar | null>>({});
+  $effect(() => {
+    for (const agent of feed.following) {
+      if (agent in untrack(() => avatars)) continue;
+      avatars = { ...untrack(() => avatars), [agent]: null };
+      void cachedPerson(agent)
+        .then((p) => (avatars = { ...avatars, [agent]: p.profile?.avatar ?? null }))
+        .catch(() => {});
+    }
+  });
 
   /** An activity's project page, with web's `?activity=`. */
   const activityHref = (a: RegionActivity): ResolvedPathname =>
