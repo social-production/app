@@ -2,7 +2,7 @@
   import { t } from '#lib/i18n/index.ts';
   import PlanWizardShell from '#lib/components/plans/PlanWizardShell.svelte';
 
-  import PullRequestReview from './PullRequestReview.svelte';
+  import PullRequestSheet from './PullRequestSheet.svelte';
   import type { SoftwareState } from './softwareState.svelte.ts';
   import {
     emptyForms,
@@ -57,7 +57,36 @@
   }
 </script>
 
-{#if mode && g}
+{#if (mode === 'vote-pr' || mode === 'record-merge') && pr}
+  <PullRequestSheet
+    {pr}
+    {mode}
+    names={sw.names}
+    busy={sw.busy}
+    canSubmit={canGoNext}
+    onVote={(c) => void vote(c)}
+    onSubmit={() => void next()}
+    onClose={() => sw.close()}
+  >
+    <div class="vote-fields">
+      <label class="vote-field-name" for="merge-id-input">{t('Merge ID')}</label>
+      <input
+        id="merge-id-input"
+        bind:value={forms.mergeId}
+        maxlength="120"
+        placeholder={t('Merge commit or release ID')}
+      />
+      <label class="vote-field-name" for="merge-url-input">{t('Merge link')}</label>
+      <input
+        id="merge-url-input"
+        bind:value={forms.mergeUrl}
+        maxlength="240"
+        placeholder={t('Merge commit or release URL')}
+      />
+    </div>
+    {#if sw.error}<p class="validation-copy" role="alert">{sw.error}</p>{/if}
+  </PullRequestSheet>
+{:else if mode && g}
   <PlanWizardShell
     open={true}
     title={wizardTitle(mode, pr)}
@@ -66,7 +95,6 @@
     nextLabel={step >= count - 1 ? submitLabel(mode) : t('Next')}
     canGoBack={step > 0}
     {canGoNext}
-    showFooter={mode !== 'vote-pr'}
     onClose={() => sw.close()}
     onDismiss={() => sw.close()}
     onBack={() => (step = Math.max(step - 1, 0))}
@@ -113,25 +141,6 @@
               <p>{forms.summary}</p>
             </div>
           {/if}
-        {:else if (mode === 'vote-pr' || mode === 'record-merge') && pr}
-          <PullRequestReview {pr} {mode} author={name(pr.author)} onVote={(c) => void vote(c)}>
-            <div class="field-stack">
-              <label class="field-label" for="merge-id-input">{t('Merge ID')}</label>
-              <input
-                id="merge-id-input"
-                bind:value={forms.mergeId}
-                maxlength="120"
-                placeholder={t('Merge commit or release ID')}
-              />
-              <label class="field-label" for="merge-url-input">{t('Merge link')}</label>
-              <input
-                id="merge-url-input"
-                bind:value={forms.mergeUrl}
-                maxlength="240"
-                placeholder={t('Merge commit or release URL')}
-              />
-            </div>
-          </PullRequestReview>
         {:else if mode === 'merge-capability'}
           {#if step === 0}
             <h2>{t('Which member?')}</h2>
@@ -190,7 +199,7 @@
             </div>
           {/if}
         {/if}
-        {#if message && (mode === 'create-pr' || mode === 'record-merge')}
+        {#if message && mode === 'create-pr'}
           <p class="validation-copy" role="status">{message}</p>
         {/if}
         {#if sw.error}

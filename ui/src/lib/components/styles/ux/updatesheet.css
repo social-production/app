@@ -1,96 +1,38 @@
-/* The Update sheet (owner, 2026-11-18, option A): the project as a card, a soft field, and
-   the reminder that members vote it in. Sheets are portaled outside `.shell`. */
+/* The Update sheet in the one vote sheet's style (owner, 2026-11-18): the kind line, the
+   headline, a plain writing area and one line under a hairline. Sheets are portaled outside
+   `.shell`. */
 .update-sheet.update-sheet .update-form {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   padding: 0 20px;
 }
 
-.update-sheet .update-project {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 18px;
-  background: var(--panel-hover);
-}
-
-.update-sheet .update-glyph {
-  display: grid;
-  flex: none;
-  place-items: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 12px;
-  background: var(--surface-accent);
-  color: #fff;
-}
-
-.update-sheet .update-project-copy {
-  display: grid;
-  gap: 2px;
-  min-width: 0;
-}
-
-.update-sheet .update-project-copy b {
-  overflow: hidden;
-  color: var(--text-main);
-  font-size: 15.5px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.update-sheet .update-project-copy small {
-  color: var(--text-soft);
-  font-size: 13px;
-}
-
-.update-sheet .update-field {
-  display: grid;
-  gap: 8px;
-}
-
-.update-sheet .update-label {
-  color: var(--text-main);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.update-sheet.update-sheet .update-field textarea {
-  min-height: 170px;
-  padding: 14px 16px;
+.update-sheet.update-sheet .update-form textarea {
+  min-height: 200px;
+  padding: 0;
   border: none;
-  border-radius: 18px;
-  background: var(--panel-hover);
+  border-radius: 0;
+  background: transparent;
   box-shadow: none;
   color: var(--text-main);
   font: inherit;
-  font-size: 16px;
-  line-height: 1.5;
-  outline: none;
+  font-size: 18px;
+  line-height: 1.55;
   resize: none;
 }
 
-.update-sheet.update-sheet .update-field textarea:focus-visible {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+.update-sheet.update-sheet .update-form textarea:focus {
+  outline: none;
 }
 
-.update-sheet .update-field textarea::placeholder {
+.update-sheet.update-sheet .update-form textarea::placeholder {
+  color: color-mix(in srgb, var(--text-soft) 70%, transparent);
+}
+
+.update-sheet.update-sheet .update-vote {
+  margin: 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--panel-border);
   color: var(--text-soft);
-}
-
-.update-sheet .update-vote {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin: -4px 0 0;
-  padding: 0 4px;
-  color: var(--brand-strong);
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.update-sheet .update-vote svg {
-  width: 16px;
-  height: 16px;
+  font-size: 14px;
 }

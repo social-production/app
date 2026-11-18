@@ -23,6 +23,8 @@
     /** Extra class on the root, so a sheet's own ported styles can scope under it. */
     rootClass?: string;
     onClose: () => void;
+    /** A line above the title (the vote sheet's kind line, owner 2026-11-18). */
+    kicker?: Snippet;
     subtitle?: Snippet;
     /** web's header-actions slot (e.g. the event members sheet's Invite +). */
     headerActions?: Snippet | undefined;
@@ -40,6 +42,7 @@
     elevated = false,
     rootClass = '',
     onClose,
+    kicker,
     subtitle,
     headerActions,
     toolbar,
@@ -114,6 +117,7 @@
     >
       <header class="overlay-header">
         <div class="overlay-header-copy">
+          {@render kicker?.()}
           <h2 id={labelledById} use:fitText={{ min: 13, text: title }}>{title}</h2>
           {@render subtitle?.()}
         </div>

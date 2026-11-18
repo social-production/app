@@ -293,3 +293,30 @@ export async function startGroup(page, title, members, body, shot = async () => 
   await page.getByRole('textbox', { name: 'Write a message...' }).fill(body);
   await page.getByRole('button', { name: 'Send', exact: true }).click();
 }
+
+/**
+ * Review an opened plan sheet one question at a time (owner, 2026-11-18): rate each "4" and
+ * vote Yes on the last. Returns each question's kind line, e.g. "Plan · Shared value · 3 of 3".
+ */
+export async function reviewPlan(page, onQuestion = async () => {}) {
+  await page.getByRole('button', { name: /^Review · \d+ questions$/ }).click();
+  const sheet = page.locator('.overlay-root.plan-scope');
+  const kinds = [];
+  for (let i = 0; i < 20; i++) {
+    const row = sheet.locator('.criterion-row');
+    await row.waitFor();
+    kinds.push(`${await sheet.locator('.vote-kicker').innerText()} · ${await sheet.locator('h2').innerText()}`);
+    await row.getByRole('button', { name: /^4$/ }).click();
+    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
+    await onQuestion(i);
+    const yes = sheet.locator('.choice-bar .choice.yes');
+    if (await yes.count()) {
+      await yes.click();
+      break;
+    }
+    await sheet.getByRole('button', { name: 'Next', exact: true }).click();
+    await sheet.getByText(`${i + 2} of`).waitFor();
+  }
+  await sheet.getByRole('button', { name: /You voted Yes/ }).waitFor({ timeout: 30_000 });
+  return kinds;
+}

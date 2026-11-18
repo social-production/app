@@ -58,9 +58,11 @@ export function softwareDockVotes(g: SoftwareGovernance | null, names: Names): P
     .map((c) =>
       proposalOf(c.id, c.author, c.createdAt, c.tally, {
         label: t('Merge capability'),
-        title: actionLabel(c.grant),
+        title: c.grant
+          ? t('Let {name} merge?', { name: names[c.agent] ?? 'member' })
+          : t('Stop {name} merging?', { name: names[c.agent] ?? 'member' }),
         description: '',
-        reason: `Member: ${names[c.agent] ?? 'member'}`,
+        reason: '',
       }),
     );
   const repository = g.repositoryRequests
@@ -111,7 +113,7 @@ function prEntry(pr: SoftwarePullRequest): HistoryEntry {
     label: t('Pull request'),
     title: pr.title,
     description: pr.summary,
-    reason: pr.pullRequestId,
+    reason: '',
   });
   return entry(
     vote,

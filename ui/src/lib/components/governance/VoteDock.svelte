@@ -2,11 +2,14 @@
   import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
-  import { proposalLabel, type Proposal, type VoteChoice } from '#lib/domain/governance.ts';
+  import type { Proposal, VoteChoice } from '#lib/domain/governance.ts';
+  import { relativeTime } from '#lib/domain/time.ts';
+  import { voteHeadline, voteKindLabel } from '#lib/domain/voteSheet.ts';
   import type { Charter } from '#lib/domain/projects.ts';
 
   import VoteChoiceBar from './VoteChoiceBar.svelte';
   import VoteDecisionBody from './VoteDecisionBody.svelte';
+  import VoteKicker from './VoteKicker.svelte';
 
   import '#lib/components/styles/governance.css';
 
@@ -89,49 +92,42 @@
 
 <OverlaySheet
   {open}
-  title={current ? proposalLabel(current.kind, phaseLabel) : t('Vote')}
+  title={current ? voteHeadline(current.kind, phaseLabel) : t('Vote')}
   labelledById="project-votes"
   rootClass="vote-dock-root"
   onClose={close}
 >
+  {#snippet kicker()}
+    {#if current}
+      <VoteKicker
+        label={voteKindLabel(current.kind)}
+        meta={`${names[current.author] ?? '…'} · ${relativeTime(current.createdAt)}`}
+      />
+    {/if}
+  {/snippet}
   {#if current}
     <div class="vote-list">
       <article class="vote-block">
-        <VoteDecisionBody
-          proposal={current}
-          authorName={names[current.author] ?? '…'}
-          {charter}
-          {stage}
-          {phaseLabel}
-        />
+        <VoteDecisionBody proposal={current} {charter} {stage} {phaseLabel} />
       </article>
     </div>
   {/if}
   {#snippet footer()}
     {#if current}
-      <div class="vote-footer">
-        {#if proposals.length > 1}
-          <button
-            class="vote-next"
-            type="button"
-            onclick={() => (index = (index + 1) % proposals.length)}
-          >
-            <span>{t('Next')}</span>
-            <span class="vote-progress">· {remaining} left</span>
-            <svg aria-hidden="true" viewBox="0 0 24 24"
-              ><path
-                d="M9 6.5 14.5 12 9 17.5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              /></svg
+      <VoteChoiceBar docked mine={current.myVote} onChoose={(c) => cast(current, c)}>
+        {#snippet lead()}
+          {#if proposals.length > 1}
+            <button
+              class="vote-next"
+              type="button"
+              onclick={() => (index = (index + 1) % proposals.length)}
             >
-          </button>
-        {/if}
-        <VoteChoiceBar mine={current.myVote} onChoose={(c) => cast(current, c)} />
-      </div>
+              <span>{t('Next')}</span>
+              <span class="vote-progress">{remaining}</span>
+            </button>
+          {/if}
+        {/snippet}
+      </VoteChoiceBar>
     {/if}
   {/snippet}
 </OverlaySheet>

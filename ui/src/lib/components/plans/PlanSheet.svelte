@@ -1,20 +1,27 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
-  import { allCriteriaRated, planChip, type PlanRating, type PlanView } from '#lib/domain/plans.ts';
-  import { relativeCompact } from '#lib/domain/time.ts';
+  import VoteChoiceBar from '#lib/components/governance/VoteChoiceBar.svelte';
+  import VoteKicker from '#lib/components/governance/VoteKicker.svelte';
+  import VoteTally from '#lib/components/governance/VoteTally.svelte';
+  import type { VoteChoice } from '#lib/domain/governance.ts';
+  import {
+    planChip,
+    type PlanCriterion,
+    type PlanRating,
+    type PlanView,
+  } from '#lib/domain/plans.ts';
+  import { relativeTime } from '#lib/domain/time.ts';
 
-  import PlanAssess from './PlanAssess.svelte';
+  import CriterionRatingRow from './CriterionRatingRow.svelte';
   import PlanDetails from './PlanDetails.svelte';
 
   import '#lib/components/styles/plans.css';
 
   /**
-   * An opened plan (Plan, Phase and Feedback Screens, 3). It reads like a page, with the
-   * result so far and "Review this plan" at the bottom. The review asks every question with
-   * large targets and counts what is answered; the final Yes / No stays in view and wakes up
-   * once every question is answered. The final vote is final (ADR 0033).
+   * An opened plan as the one vote sheet (owner, 2026-11-18): the plan, the count, and
+   * "Review · N questions" in the dock. The review asks one question per screen; the last
+   * one's dock is No / Yes. The final vote is final (ADR 0033).
    */
   interface Props {
     open: boolean;
@@ -30,108 +37,116 @@
 
   let { open, plan, authorName, kindLine, canVote, onRate, onVote, onClose }: Props = $props();
 
-  let reviewing = $state(false);
+  /** The question on screen, or null for the plan itself. */
+  let question = $state<number | null>(null);
   // Shown at once; the next load brings the network's view.
   let local = $state<Record<string, PlanRating | null>>({});
   let localVote = $state<VoteChoice>();
 
   $effect(() => {
-    if (!open) reviewing = false;
+    if (!open) question = null;
   });
 
   const criteria = $derived(
     plan.criteria.map((c) => (c.id in local ? { ...c, mine: local[c.id] ?? null } : c)),
   );
   const myVote = $derived(localVote ?? plan.tally.myVote);
-  const answered = $derived(criteria.filter((c) => c.mine !== null).length);
-  const complete = $derived(allCriteriaRated(criteria));
   const voteOpen = $derived(plan.tally.status === 'Open');
-  const voted = $derived(plan.tally.yes + plan.tally.no);
-  const percent = $derived(voted === 0 ? 0 : Math.round((plan.tally.yes / voted) * 100));
   const chip = $derived(planChip(plan));
+  const current = $derived(question === null ? null : (criteria[question] ?? null));
+  const last = $derived(question !== null && question === criteria.length - 1);
+  const allRated = $derived(criteria.every((c) => c.mine !== null));
+  const ask = (c: PlanCriterion): string =>
+    c.kind === 'Value' ? t('How well does it satisfy "{value}"?', { value: c.label }) : c.label;
 
   function rate(id: string, rating: PlanRating | null): void {
     local = { ...local, [id]: rating };
     onRate(id, rating);
   }
 
+  function step(by: number): void {
+    if (question !== null) question = Math.max(question + by, 0);
+  }
+
   function vote(choice: VoteChoice): void {
     localVote = choice;
-    reviewing = false;
+    question = null;
     onVote(choice);
   }
 </script>
 
+{#snippet back()}
+  <button class="vote-back" type="button" aria-label={t('Back')} onclick={() => step(-1)}>‹</button>
+{/snippet}
+
 <OverlaySheet
   {open}
-  title={reviewing ? t('Your review') : plan.plan.title}
+  title={current ? ask(current) : plan.plan.title}
   labelledById={`plan-sheet-${plan.id}`}
-  rootClass="plan-scope"
+  rootClass="plan-scope vote-dock-root"
   wide
   {onClose}
 >
-  {#snippet subtitle()}
-    <p class="sheet-author">
-      {#if reviewing}
-        {plan.plan.title} · {answered} of {criteria.length} answered
-      {:else}
-        {kindLine} · by {authorName} · {relativeCompact(plan.createdAt)}
-      {/if}
-    </p>
-  {/snippet}
-  {#snippet headerActions()}
-    {#if reviewing}
-      <button class="sheet-back" type="button" onclick={() => (reviewing = false)}
-        >{t('Back')}</button
-      >
-    {:else if chip}
-      <span class="sheet-chip" class:leading={chip !== 'Rejected'}>{chip}</span>
+  {#snippet kicker()}
+    {#if current && question !== null}
+      <VoteKicker
+        label={t('Plan')}
+        status={current.kind === 'Value' ? t('Shared value') : null}
+        meta={t('{n} of {total}', { n: question + 1, total: criteria.length })}
+      />
+    {:else}
+      <VoteKicker
+        label={kindLine}
+        status={chip ? t(chip) : null}
+        meta={`${authorName} · ${relativeTime(plan.createdAt)}`}
+      />
     {/if}
   {/snippet}
-  <div class="plan-sheet">
-    {#if reviewing}
-      <PlanAssess {criteria} {canVote} onRate={rate} />
+  <div class="plan-sheet vote-sheet">
+    {#if current}
+      <CriterionRatingRow
+        criterion={current}
+        {canVote}
+        onSelect={(rating) => rate(current.id, rating)}
+      />
+      {#if last}<p class="outcome">{t('Does this plan meet the need? Your vote is final.')}</p>{/if}
     {:else}
       <PlanDetails plan={plan.plan} onMap={onClose} />
+      <VoteTally
+        yes={plan.tally.yes}
+        no={plan.tally.no}
+        population={plan.tally.population}
+        failed={plan.tally.status === 'Rejected'}
+      />
     {/if}
   </div>
   {#snippet footer()}
-    <div class="plan-sheet-foot">
-      {#if reviewing}
-        <p class="plan-final">
-          <strong>{t('Does this plan meet the need?')}</strong>
-          {#if !voteOpen}{t('This vote has closed.')}
-          {:else if !complete}{t('Answer every question first.')}
-          {:else}{t('Your vote is final once cast.')}{/if}
-        </p>
-        <div class="plan-yes-no">
-          {#each ['No', 'Yes'] as const as choice (choice)}
-            <button
-              class:selected={myVote === choice}
-              class:yes={choice === 'Yes'}
-              disabled={!canVote || !complete || !voteOpen || !!myVote}
-              type="button"
-              onclick={() => vote(choice)}>{choice === 'Yes' ? t('Yes, approve') : t('No')}</button
-            >
-          {/each}
-        </div>
+    {#if current && question !== null}
+      {#if last}
+        <VoteChoiceBar docked mine={null} disabled={!allRated} onChoose={vote}>
+          {#snippet lead()}{@render back()}{/snippet}
+        </VoteChoiceBar>
       {:else}
-        <div class="plan-result">
-          <span><strong>{percent}% yes</strong> · {voted} of {plan.tally.population} voted</span>
-          <i style={`--share: ${percent}%`}></i>
-          <span>needs {APPROVAL_PERCENT}%</span>
-        </div>
-        {#if myVote}
-          <p class="plan-final">
-            You voted {myVote === 'Yes' ? 'yes' : myVote.toLowerCase()}. Your vote is final once
-            cast.
-          </p>
-        {:else if canVote && voteOpen}
-          <button class="plan-review-button" type="button" onclick={() => (reviewing = true)}
-            >{t('Review this plan')}</button
+        <div class="sheet-actions">
+          {#if question > 0}{@render back()}{/if}
+          <button
+            class="sheet-submit"
+            type="button"
+            disabled={!current.mine}
+            onclick={() => step(1)}>{t('Next')}</button
           >
-        {/if}
+        </div>
       {/if}
-    </div>
+    {:else if myVote}
+      <VoteChoiceBar docked mine={myVote} onChoose={() => undefined} />
+    {:else if canVote && voteOpen && criteria.length === 0}
+      <VoteChoiceBar docked mine={null} onChoose={vote} />
+    {:else if canVote && voteOpen}
+      <div class="sheet-actions">
+        <button class="sheet-submit" type="button" onclick={() => (question = 0)}
+          >{t('Review · {n} questions', { n: criteria.length })}</button
+        >
+      </div>
+    {/if}
   {/snippet}
 </OverlaySheet>
