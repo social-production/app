@@ -73,8 +73,10 @@
   });
 
   /** "Maya Kim proposed this" over a card by someone you follow (ADR 0107). */
+  // Home names the person you follow over their cards (Profiles and Comments §1); Global
+  // and Region show the plain public card.
   const contextOf = (card: ProjectCard): string =>
-    feed.following.includes(card.creator)
+    feed.shownScope === 'home' && feed.following.includes(card.creator)
       ? madeContext(card.creatorName || 'Unnamed', card.mode)
       : '';
 

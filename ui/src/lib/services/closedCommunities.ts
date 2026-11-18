@@ -108,7 +108,7 @@ export async function myClosedCommunities(): Promise<Scope[]> {
 
 /** web's inviteUserToCommunity: the seed goes to their inbox; they join once they accept. */
 export const inviteToCommunity = (agent: string, seed: string): Promise<void> =>
-  sendEventInvite(agent, seed);
+  sendEventInvite(agent, seed, true);
 
 /** web's "Username to make organizer" (organizer-run communities, ADR 0061's grant). */
 export async function addCommunityOrganizer(seed: string, agent: string): Promise<void> {

@@ -1,3 +1,4 @@
+import { roleSuggestedNotice, roleTakenNotice } from '#lib/services/pushNotices.ts';
 import { wallMicros } from '#lib/domain/zone.ts';
 import type { Activity } from '#lib/domain/activities.ts';
 import { defaultTimes } from '#lib/domain/activityCalendar.ts';
@@ -170,10 +171,25 @@ export class ActivitiesState {
   }
 
   commit = (activity: string, role: number | null): Promise<void> =>
-    this.write(() => setCommitment(this.projectId, activity, role));
+    this.write(async () => {
+      await setCommitment(this.projectId, activity, role);
+      const [a, label] = this.roleOf(activity, role);
+      if (a && label && a.author !== this.me())
+        void roleTakenNotice(a.author, this.projectId, a, label);
+    });
 
   suggest = (activity: string, role: number, agent: string): Promise<void> =>
-    this.write(() => suggestRole(this.projectId, activity, role, agent));
+    this.write(async () => {
+      await suggestRole(this.projectId, activity, role, agent);
+      const [a, label] = this.roleOf(activity, role);
+      if (a && label) void roleSuggestedNotice(agent, this.projectId, a, label);
+    });
+
+  /** The activity and its role's name, for the push that tells someone (ADR 0108). */
+  private roleOf(id: string, role: number | null): [Activity | undefined, string] {
+    const a = this.activities.find((x) => x.id === id);
+    return [a, a?.roles.find((r) => r.index === role)?.label ?? ''];
+  }
 
   checkIn = (activity: string, done: boolean): Promise<void> =>
     this.write(() => checkIn(this.projectId, activity, done));

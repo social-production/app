@@ -1,3 +1,4 @@
+import { shareNotice } from './pushNotices.ts';
 import type { Contact } from '#lib/domain/messages.ts';
 import { shareMessage } from '#lib/domain/share.ts';
 
@@ -20,6 +21,7 @@ export async function shareSpace(
     title: '',
     body: shareMessage(label, title, url),
   });
+  void shareNotice(to.agent, label, title, url);
 }
 
 /** web's `buildSharePrefill`: the body "Create post" starts from. */

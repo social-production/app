@@ -23,6 +23,7 @@ import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
+import { tellMembers } from './phaseNotice.ts';
 import { SoftwareState } from './software/softwareState.svelte.ts';
 
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
@@ -41,7 +42,6 @@ export class DetailState {
 
   /** A software project's pull requests and their votes (ADR 0086), read with the page. */
   readonly software: SoftwareState;
-
   constructor(readonly id: string) {
     this.software = new SoftwareState(id);
   }
@@ -287,7 +287,7 @@ export class DetailState {
     this.saving = true;
     this.sheetMessage = undefined;
     try {
-      await propose(this.id, kind);
+      await propose(this.id, kind).then(() => tellMembers(this, kind));
       await this.load();
       return true;
     } catch (e) {

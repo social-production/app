@@ -1,3 +1,4 @@
+import { followAcceptedNotice, followNotice } from './pushNotices.ts';
 import type { FollowRow, FollowStatus, FollowView } from '#lib/domain/follows.ts';
 import type { PrivacySwitch } from '#lib/domain/privacy.ts';
 import {
@@ -49,7 +50,9 @@ export async function followView(agent: string): Promise<FollowView> {
 
 /** Follow someone; pending while they require approval. */
 export async function follow(agent: string): Promise<FollowStatus | null> {
-  return identity<FollowStatus | null>('follow', stringToHash(agent));
+  const status = await identity<FollowStatus | null>('follow', stringToHash(agent));
+  if (status) void followNotice(agent, status === 'pending');
+  return status;
 }
 
 export async function unfollow(agent: string): Promise<void> {
@@ -58,6 +61,7 @@ export async function unfollow(agent: string): Promise<void> {
 
 export async function decideFollow(follower: string, accept: boolean): Promise<void> {
   await identity<ActionHash>(accept ? 'accept_follow' : 'reject_follow', stringToHash(follower));
+  if (accept) void followAcceptedNotice(follower);
 }
 
 export async function followRequests(): Promise<FollowRow[]> {

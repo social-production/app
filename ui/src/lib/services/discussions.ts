@@ -1,3 +1,4 @@
+import { shareNotice } from './pushNotices.ts';
 import type { ChatAttachment } from '#lib/domain/chat.ts';
 import type { Contact } from '#lib/domain/messages.ts';
 import type { Charter } from '#lib/domain/projects.ts';
@@ -138,4 +139,5 @@ export async function shareDiscussion(
     title: '',
     body: shareMessage(kind, title, url),
   });
+  void shareNotice(to.agent, kind, title, url);
 }
