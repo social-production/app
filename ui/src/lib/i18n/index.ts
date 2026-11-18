@@ -24,13 +24,16 @@ function stored(): Language | null {
   }
 }
 
-/** The first time, the browser's (or the device's) language decides (owner, 2026-11-18). */
+/**
+ * The first time, the browser's (or the device's) main language decides (owner, 2026-11-18):
+ * only the first one, so a phone set to English that also lists Russian stays English.
+ */
 function detect(): Language {
   const s = stored();
   if (s) return s;
-  const wanted =
-    typeof navigator === 'undefined' ? [] : (navigator.languages ?? [navigator.language]);
-  return wanted.some((l) => l?.toLowerCase().startsWith('ru')) ? 'ru' : 'en';
+  const main =
+    typeof navigator === 'undefined' ? '' : (navigator.languages?.[0] ?? navigator.language);
+  return main?.toLowerCase().startsWith('ru') ? 'ru' : 'en';
 }
 
 export const language: Language = detect();
