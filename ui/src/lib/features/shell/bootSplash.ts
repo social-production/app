@@ -4,13 +4,15 @@
  * connection is still being made it stays, and after 8 s says a slow network can take a
  * minute; once the connection settles (connected, signed out or offline) it fades away.
  */
+import { t } from '#lib/i18n/index.ts';
+
 export function settleBootSplash(status: string): (() => void) | undefined {
   const splash = document.getElementById('boot-splash');
   if (!splash) return undefined;
   if (status === 'connecting') {
     const timer = setTimeout(() => {
       const note = document.createElement('p');
-      note.textContent = 'Still connecting. This can take a minute on a slow network.';
+      note.textContent = t('Still connecting. This can take a minute on a slow network.');
       splash.append(note);
     }, 8000);
     return () => clearTimeout(timer);

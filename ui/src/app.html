@@ -144,6 +144,25 @@
       <strong>Social Production</strong>
       <p>Connecting to the network<span>.</span><span>.</span><span>.</span></p>
     </div>
+    <!-- The opening screen in the chosen language (owner, 2026-11-19), worked out as the app
+         does (i18n/index.ts): this device's choice, else the main language. The app's own
+         catalogue isn't loaded yet, so the line is here for each language. -->
+    <script>
+      (function () {
+        var lines = { ru: 'Подключение к сети' };
+        var lang = '';
+        try {
+          lang = localStorage.getItem('sp_language') || '';
+        } catch (e) {}
+        if (!lang)
+          lang = (navigator.languages && navigator.languages[0]) || navigator.language || '';
+        lang = lang.toLowerCase().split('-')[0];
+        if (lang === 'en' || !lines[lang]) return;
+        document.documentElement.lang = lang;
+        var p = document.querySelector('#boot-splash p');
+        if (p && p.firstChild) p.firstChild.nodeValue = lines[lang];
+      })();
+    </script>
     <div style="display: contents">%sveltekit.body%</div>
   </body>
 </html>

@@ -36,3 +36,51 @@
 .shell .dock-capsule:has(.dock-more-card, [role='menu'], [role='dialog']) {
   overflow: visible;
 }
+
+/* One row, always: a capsule with more than fits drops the words of its labelled actions
+   (DetailActionDock's `tight`), keeping their icons, so the last ones are never cut off. */
+.shell .dock-capsule {
+  flex-wrap: nowrap;
+}
+
+.shell .dock-capsule > * {
+  flex-shrink: 0;
+}
+
+.shell .dock-capsule.tight :is(.dock-labelled, .dock-labelled.primary):not(:has(svg)) {
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.shell .dock-capsule.tight .dock-labelled:has(svg) {
+  gap: 0;
+  min-width: 50px;
+  padding: 0 14px;
+  font-size: 0;
+}
+
+.shell .dock-capsule.tight :is(.plus-label, .phase-action-group .label) {
+  display: none;
+}
+
+.shell .dock-capsule.tight .dock-chip {
+  padding: 0 10px;
+}
+
+/* The phase toolbar's last wrapper dissolves like the others, so Phase ▾ is a segment of its
+   own rather than squeezed inside a 21px box; its buttons are flat segments too. */
+.shell .dock-capsule .phase-action-group .phase-nav-side.phase-nav-side.phase-nav-side {
+  display: contents;
+}
+
+.shell .dock-capsule :is(button, a):not(.dock-more-card *) {
+  flex-shrink: 0;
+}
+
+.shell .dock-capsule .round-plus-button.round-plus-button.round-plus-button,
+.shell .dock-capsule .phase-shift-button.phase-shift-button.phase-shift-button,
+.shell .dock-capsule .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
+  min-height: 52px;
+  border-radius: 0;
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
