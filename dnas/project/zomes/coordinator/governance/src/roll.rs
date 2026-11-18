@@ -54,6 +54,11 @@ impl Roll {
         })
     }
 
+    /// A #platform project (ADR 0095, 0109).
+    pub fn platform(&self) -> bool {
+        self.platform
+    }
+
     /// Who made the membership link `hash`; asks the network when the roll hasn't seen it.
     pub fn agent(&self, hash: &ActionHash) -> ExternResult<Option<AgentPubKey>> {
         if let Some(span) = self.spans.iter().find(|s| &s.hash == hash) {

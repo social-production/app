@@ -91,6 +91,9 @@ struct Ctx<'a> {
     me: AgentPubKey,
     roll: &'a Roll,
     member: bool,
+    /// May record merges: holds the capability, or moderates the platform on a #platform
+    /// project (ADR 0095).
+    merger: bool,
 }
 
 pub fn view() -> ExternResult<SoftwareView> {
@@ -102,11 +105,14 @@ pub fn view() -> ExternResult<SoftwareView> {
         .into_keys()
         .filter(|a| !sw.can_merge(a))
         .collect();
+    let me = agent_info()?.agent_initial_pubkey;
+    let merger = sw.can_merge(&me) || (roll.platform() && calls::moderator_at(&me, sys_time()?)?);
     let ctx = Ctx {
         ledger: &ledger,
-        me: agent_info()?.agent_initial_pubkey,
+        me,
         roll: &roll,
         member: calls::my_membership()?.is_some(),
+        merger,
     };
     let mut out = SoftwareView {
         repository_url: sw.repository.clone(),
@@ -204,7 +210,7 @@ fn pull_request(ctx: &Ctx, r: &Request) -> ExternResult<Option<PullRequestView>>
         approved: approved(ctx, r)?,
         can_record_merge: ctx.member
             && pr.stage == Stage::AwaitingMerge
-            && ctx.ledger.software.can_merge(&ctx.me),
+            && ctx.merger,
     }))
 }
 

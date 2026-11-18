@@ -26,6 +26,13 @@ pub fn is_moderator(agent: AgentPubKey) -> ExternResult<bool> {
     board::is_moderator(&agent)
 }
 
+/// Whether `agent` was a moderator (or in grace) at `at`: a merge recorded on a #platform
+/// software project counts when its author was (ADR 0095).
+#[hdk_extern]
+pub fn moderator_at(q: crate::StandingAt) -> ExternResult<bool> {
+    board::moderator_at(&q.agent, q.at)
+}
+
 /// Write this week's `Active` link if the caller hasn't (ADR 0095). Returns whether it wrote.
 #[hdk_extern]
 pub fn record_active(_: ()) -> ExternResult<bool> {

@@ -50,7 +50,24 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
             decided,
         });
     }
-    let software = replay(events(&state, &requests));
+    let mut software = replay(events(&state, &requests, &[]));
+    // On a #platform project a merge also counts from a platform moderator (ADR 0095): a merge
+    // the replay ignored is replayed again with its author as a merger for that moment only.
+    if roll.platform() {
+        let mut moderated = Vec::new();
+        for r in &requests {
+            let merge = matches!(r.kind, SoftwareRequest::Merge { .. });
+            if merge
+                && software.ignored.contains(&r.found.hash)
+                && crate::calls::moderator_at(&r.found.author, r.found.at)?
+            {
+                moderated.push(r.found.hash.clone());
+            }
+        }
+        if !moderated.is_empty() {
+            software = replay(events(&state, &requests, &moderated));
+        }
+    }
     Ok(Ledger {
         state,
         software,
@@ -58,7 +75,12 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
     })
 }
 
-fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPubKey>> {
+/// `moderated`: merges whose author merges as a platform moderator, granted just for them.
+fn events(
+    state: &State,
+    requests: &[Request],
+    moderated: &[ActionHash],
+) -> Vec<Event<ActionHash, AgentPubKey>> {
     let mut timed = Vec::new();
     for lead in plan_lead::replay(&state.approved, state.born()) {
         if !matches!(lead.kind, PlanKind::Production | PlanKind::Organisation) {
@@ -77,7 +99,19 @@ fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPub
     for r in requests {
         let hash = r.found.hash.clone();
         if let Some(filed) = filed(r) {
+            let by_moderator = moderated.contains(&hash);
+            let grant = |grant| Event::Capability {
+                target: r.found.author.clone(),
+                grant,
+            };
+            // Same time, kept in this order by the stable sort below.
+            if by_moderator {
+                timed.push((r.found.at, grant(true)));
+            }
             timed.push((r.found.at, filed));
+            if by_moderator {
+                timed.push((r.found.at, grant(false)));
+            }
         }
         let Some((passed, at)) = r.decided else {
             continue;
@@ -149,7 +183,8 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
     match request {
         SoftwareRequest::PullRequest { .. } => Ok(()),
         SoftwareRequest::Merge { pull_request, .. } => {
-            if !ledger.software.can_merge(&me) {
+            let moderator = roll.platform() && crate::calls::moderator_at(&me, sys_time()?)?;
+            if !ledger.software.can_merge(&me) && !moderator {
                 return Err(guest(
                     "Only members with merge capability can record merges",
                 ));
