@@ -358,32 +358,28 @@ nav and Topbar, and removes `SignedOutIntro`.
   the seed was overloaded; recheck. The cloud container restarted twice; restart the seed with
   `bash scripts/cloud-seed.sh` and give it ~4 minutes before sign-ups work.
 
-### Work left until modernisation and parity (updated 10:35 am Melbourne, 2026-11-18, UX session)
-The UX session now also owns the parity queue. In the order it builds them:
+### Work left until completion (updated 10:35 am Melbourne, 2026-11-19, UX session)
+Modernisation is done: every screen has an approved look and is built. Push covers every
+notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a counterpart.
 
-**Modernisation (every screen has an approved mockup and is built; what remains is checking):**
-1. ~~`tests/e2e/rail.mjs` rewritten~~ (#210).
-2. ~~Capture Notifications, Settings > Devices and Account, the request sheet~~ (#217; the
-   availability and booking sheets were personal-service only, now retired).
-3. ~~Invites~~: only when one waits (owner, 2026-11-18; already so).
+**First thing next session**
+1. **#241** (Firefox: the signed-out bar sized from `min-width`, not `flex-basis`): merge when
+   CI is green, then ask the owner to check Firefox on Android. Sweep other `fit-content`
+   capsules for the same Firefox sizing (sheet docks, map capsule) while there.
+2. **Nightly `ci` run 708** (started 9:58 am Melbourne, 2026-11-19) was still running: check it;
+   a red nightly comes first.
 
-**Parity (before Railway's FastAPI site shuts down):**
-1. ~~**Settings rows**~~: Display timezone (#211), privacy switches (#212); the feed split isn't
-   needed (Home / Global / Region already separate them).
-2. **Push for every notice kind (ADR 0108):** today only chat replies and @mentions call
-   `services/notices.ts` `notify()`; #213 adds follows, shares, invites, roles and phase votes.
-   Still to wire at their write sites: phase votes and results,
-   follows and follow requests, invites and shares, roles and role suggestions, service
-   requests, bot reviews, plan leading, removed projects, approved pull requests. Then the
-   desktop's OS notifications (Tauri plugin) and one real Web Push on a phone (needs the owner).
-3. **ADR 0095's remainder:** moderators' merge on #platform software projects.
-4. **Compare the remaining signed-in screens** with web's source (PARITY.md "Not compared yet").
-5. **Audits on live:** Platform / Moderators, reporting, profile photos; plan rating and vote
-   errors reach the user.
-6. **Russian (PARITY.md item 4):** an ADR for the owner first (string catalogue, how the language
-   is chosen), then every screen's strings. Last, since it touches every file.
-7. **Owner only:** roll the Railway environment variables, then switch off the FastAPI services
-   (nobody needs migrating).
+**Parity (before the FastAPI site shuts down)**
+3. **Russian fixes** from the owner and their wife, when they send them. Known leftovers: push
+   text is worded by the sender's device (`pushNotices.ts`), so a Russian reader gets English
+   pushes from English senders; the "Unnamed" fallback stays English.
+4. **Audits on live:** reporting a post or person, profile photos, plan rating and vote
+   errors reaching the user. Platform and Moderators were checked on 2026-11-19 (three demo
+   moderators seated).
+5. **One real Web Push on a phone** and the desktop's OS notification look (both need the
+   owner's devices).
+6. **Owner only:** roll the Railway environment variables, then switch off the FastAPI
+   services (nobody needs migrating).
 
 **After parity:** M7 cutover (seedless, docs/plans/SEEDLESS.md; Android/iOS builds), files in
 project chats, code health (UX.md: one kind profile per type, split files near 300 lines, one
