@@ -1,21 +1,40 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
+  import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
+  import type { CharterMode } from '#lib/domain/projects.ts';
+  import { plural, t } from '#lib/i18n/index.ts';
+
   import OverlaySheet from './OverlaySheet.svelte';
 
   import '#lib/components/styles/governance.css';
+  import '#lib/components/styles/ux/updatesheet.css';
 
-  /** web's AddUpdateSheet. The update is a proposal: members vote it onto the project. */
+  /**
+   * web's AddUpdateSheet, modernised (owner, 2026-11-18, option A): the project it goes to as a
+   * card, "What changed?" in a soft field, and the reminder that members vote it in. The update
+   * is a proposal: it shows once members approve it.
+   */
   interface Props {
     open: boolean;
     pending: boolean;
     message: string | undefined;
+    project: { title: string; mode: CharterMode; members: number };
     onSubmit: (body: string) => void;
     onClose: () => void;
   }
 
-  let { open, pending, message, onSubmit, onClose }: Props = $props();
+  let { open, pending, message, project, onSubmit, onClose }: Props = $props();
 
   let body = $state('');
+
+  const TYPES: Partial<Record<CharterMode, string>> = {
+    proposal: 'Proposal',
+    productive: 'Project',
+    'collective-service': 'Service',
+    event: 'Event',
+    'help-request': 'Request',
+  };
+  const typeLabel = $derived(TYPES[project.mode] ?? 'Project');
 
   $effect(() => {
     if (open) body = '';
@@ -34,18 +53,35 @@
   rootClass="update-sheet"
   {onClose}
 >
-  {#snippet subtitle()}
-    <p class="sheet-lead">
-      {t('Share what changed so people following this can see the latest status.')}
-    </p>
-  {/snippet}
   <form id="project-add-update-sheet-form" class="update-form" onsubmit={submit}>
+    <div class="update-project">
+      <span class="update-glyph" style={`--surface-accent: ${kindColor(kindOf(project.mode))}`}>
+        <KindGlyph kind={kindOf(project.mode)} size={22} />
+      </span>
+      <span class="update-project-copy">
+        <b>{project.title}</b>
+        <small>{t(typeLabel)} · {plural(project.members, '{n} member', '{n} members')}</small>
+      </span>
+    </div>
     {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
-    <label class="field">
-      <span class="sr-only">{t('Update')}</span>
-      <textarea bind:value={body} rows="8" placeholder={t('Share what changed on this project...')}
+    <label class="update-field">
+      <span class="update-label">{t('What changed?')}</span>
+      <textarea bind:value={body} rows="7" placeholder={t('Share what changed on this project...')}
       ></textarea>
     </label>
+    <p class="update-vote">
+      <svg aria-hidden="true" viewBox="0 0 24 24">
+        <path
+          d="M5 12.5 10 17.5 19 7.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+      {t('Members vote it in')}
+    </p>
   </form>
   {#snippet footer()}
     <div class="sheet-actions">

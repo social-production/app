@@ -1,0 +1,53 @@
+/* Sheet docks as joined segments (owner, 2026-11-18: "all docks need new style", the page
+   dock's look approved): the × and the actions fill the one capsule edge to edge, flat where
+   they meet with a hairline, rounded only by the capsule's ends. Same capsule as
+   sheetdock.css (loaded before this). */
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p)) {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
+  .sheet-close {
+  width: 56px;
+  min-width: 56px;
+  height: 54px;
+  border-radius: 0;
+  background: transparent;
+}
+
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
+  .sheet-actions {
+  gap: 0;
+}
+
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
+  .sheet-actions
+  > :is(button, a) {
+  min-height: 54px;
+  margin: 0;
+  border-radius: 0;
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
+
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
+  .sheet-actions
+  > .sheet-submit {
+  padding: 0 26px;
+}
+
+/* A sheet without its own ×: the first action starts at the capsule's rounded end. */
+.overlay-root.overlay-root:not(.create-main)
+  .overlay-footer:not(.close-only):not(:has(.sheet-close)):has(> .sheet-actions :is(button, a)):not(
+    :has(> p)
+  )
+  .sheet-actions
+  > :is(button, a):first-child {
+  box-shadow: none;
+}
