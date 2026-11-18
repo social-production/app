@@ -14,6 +14,9 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Moderators sheet and sign-up (PRs #237–#239, 2026-11-19 morning Melbourne):** the
+  Moderators sheet is redesigned (rounded cards, plain-words progress, a floating dock);
+  account pages open the real sign-up page and return you after.
 - **Smaller docks, Russian sentences, demo moderators (PRs #233–#235, 2026-11-19 morning
   Melbourne):** docks and the bottom bar are a size smaller (signed out, a compact capsule);
   the map's capsule is joined like every dock; notifications and history read fully in
