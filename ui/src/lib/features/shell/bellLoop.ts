@@ -4,6 +4,7 @@ import { myNotifications } from '#lib/services/notifications.ts';
 import { unreadMessageCount } from '#lib/services/unread.ts';
 import { messageBadge } from '#lib/stores/messageBadge.svelte.ts';
 import * as bell from '#lib/stores/notifications.svelte.ts';
+import { showOnDesktop } from '#lib/stores/push.svelte.ts';
 
 /**
  * The bell's and the send icon's counts stay fresh while someone is signed in (every 30 s
@@ -22,9 +23,12 @@ export function startBell(onMessages: () => boolean): () => void {
   void refresh();
   const stop = startVisibilityPoll(refresh, { activeMs: 30_000 });
   // Other people's apps may now tell this one about new cards (ADR 0108); one arriving
-  // refreshes the bell at once instead of at the next round.
+  // refreshes the bell at once instead of at the next round, and the desktop app shows it.
   void enableNotices().catch(() => undefined);
-  const quiet = onNotice(() => void refresh());
+  const quiet = onNotice((notice) => {
+    void refresh();
+    showOnDesktop(notice);
+  });
   return () => {
     quiet();
     stop();

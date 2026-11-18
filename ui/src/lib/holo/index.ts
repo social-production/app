@@ -46,6 +46,7 @@ export {
 } from './servers.ts';
 export { acceptSignals, onSignal, sendSignal } from './signals.ts';
 export { enableNotices, onNotice, sendNotice, type Notice } from './notices.ts';
+export { osNotificationsAllowed, osNotify } from './osNotify.ts';
 export {
   pushIsOn,
   pushSupported,
