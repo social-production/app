@@ -1,3 +1,4 @@
+import { plural } from '#lib/i18n/index.ts';
 /**
  * Activities and roles (ADR 0056), shaped like web's `ProjectActivityItem` as far as the card
  * needs. Times are Holochain microseconds; agents are base64 keys.
@@ -105,7 +106,7 @@ export function fillChip(a: Activity): {
     : null;
   if (left === 0) return { label: 'Full', tone: 'full' };
   if (left !== null)
-    return { label: `${left} ${left === 1 ? 'spot' : 'spots'} left`, tone: 'open' };
+    return { label: `${plural(left, '{n} spot', '{n} spots')} left`, tone: 'open' };
   return { label: `${committed} going`, tone: 'open' };
 }
 

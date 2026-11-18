@@ -164,7 +164,7 @@
     {:else if moderation.value.state === 'removed'}
       <!-- web answers "not found" once a report removes it; the app says why. -->
       <section class="hero-card">
-        <p class="tab-loading">{removedLabel(moderation.value.report?.reason)}</p>
+        <p class="tab-loading">{t(removedLabel(moderation.value.report?.reason))}</p>
       </section>
     {:else if !detail.project?.charter}
       <LoadingLine /><SkeletonDetail />

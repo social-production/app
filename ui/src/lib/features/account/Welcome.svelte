@@ -67,7 +67,7 @@
             type="button"
             role="tab"
             aria-selected={mode === option.value}
-            onclick={() => (mode = option.value)}>{option.label}</button
+            onclick={() => (mode = option.value)}>{t(option.label)}</button
           >
         {/each}
       </div>

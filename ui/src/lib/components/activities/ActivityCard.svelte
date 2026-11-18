@@ -134,7 +134,7 @@
       {#if p.history}
         <span class={`agenda-chip ${p.history.tone}`}>{p.history.badge}</span>
       {:else}
-        <span class={`agenda-chip ${chip.tone}`}>{chip.label}</span>
+        <span class={`agenda-chip ${chip.tone}`}>{t(chip.label)}</span>
       {/if}
       {#if joinable}<span class="agenda-join">{t('Join')}</span>{/if}
     </span>

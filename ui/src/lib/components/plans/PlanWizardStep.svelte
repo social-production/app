@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
   import {
     SOFTWARE_LICENSE_BODY,
@@ -70,7 +70,7 @@
 {:else if step.id === 'subtype'}
   <select bind:value={form.subtype} aria-label={t('Plan type')}>
     {#each subtypes as option (option.value)}
-      <option value={option.value}>{option.label}</option>
+      <option value={option.value}>{t(option.label)}</option>
     {/each}
   </select>
 {:else if step.id === 'repository'}
@@ -109,7 +109,7 @@
           onchange={(e) =>
             (form = sameAsProduction(form, e.currentTarget.checked, productionLocation))}
         />
-        <span>Same as production plan location ({productionLocation.label})</span>
+        <span>Same as production plan location ({t(productionLocation.label)})</span>
       </label>
     {/if}
     {#if !form.sameAsProduction}
@@ -136,7 +136,7 @@
   <select bind:value={form.requests} aria-label={t('Requests')}>
     <option value="">{t('No requests for now')}</option>
     {#each REQUEST_MODES as option (option.value)}
-      <option value={option.value}>{option.label}</option>
+      <option value={option.value}>{t(option.label)}</option>
     {/each}
   </select>
   {#if form.requests}
@@ -151,8 +151,8 @@
     </p>
   </div>
   <p class="helper-copy">
-    Approval needs {required} of {members}
-    {members === 1 ? 'member' : 'members'} to vote and at least 66% yes.
+    Approval needs {required} of {plural(members, '{n} member', '{n} members')} to vote and at least 66%
+    yes.
   </p>
   <textarea
     bind:value={form.demandNote}

@@ -155,7 +155,7 @@
         place={s.intent === 'physical' ? s.locationLabel : ''}
       />
       <button class="overview-row" type="button" onclick={() => (s.step = 1)}>
-        <strong>{t('Place')}</strong><span>{s.locationLabel}</span><em>{t('Edit')}</em>
+        <strong>{t('Place')}</strong><span>{t(s.locationLabel)}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = 2)}>
         <strong>{t('When')}</strong><span>{s.schedule}</span><em>{t('Edit')}</em>

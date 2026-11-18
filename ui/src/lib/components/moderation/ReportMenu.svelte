@@ -111,7 +111,7 @@
       type="button"
       onclick={trigger}
     >
-      {#if status}<span class="status-token">{status}</span>{/if}
+      {#if status}<span class="status-token">{t(status)}</span>{/if}
       <span aria-hidden="true" class="menu-dots"></span>
     </button>
   </div>
@@ -146,7 +146,7 @@
                   stroke-linecap="round"
                 /></svg
               >
-              <span>{copyLabel}</span>
+              <span>{t(copyLabel)}</span>
             </button>
             {#if canShare}
               <button class="menu-item" role="menuitem" type="button" onclick={share}>
@@ -167,7 +167,7 @@
           {#if report}
             <div class="review-field">
               <span class="field-label">{t('Reason')}</span>
-              <p class="review-value">{reasonLabel(report.reason)}</p>
+              <p class="review-value">{t(reasonLabel(report.reason))}</p>
             </div>
             <div class="review-field">
               <span class="field-label">{t('Description')}</span>
@@ -193,7 +193,7 @@
                   stroke-linejoin="round"
                 /></svg
               >
-              <span>Report {itemLabel}</span>
+              <span>Report {t(itemLabel)}</span>
             </button>
           {/if}
         </div>

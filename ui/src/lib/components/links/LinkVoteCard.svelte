@@ -82,14 +82,14 @@
         class="vote-button yes"
         disabled={pending || !side.canVote}
         type="button"
-        onclick={() => onVote(side, 'Yes')}>{yesLabel}</button
+        onclick={() => onVote(side, 'Yes')}>{t(yesLabel)}</button
       >
       <button
         class:active={voted === 'No'}
         class="vote-button"
         disabled={pending || !side.canVote}
         type="button"
-        onclick={() => onVote(side, 'No')}>{noLabel}</button
+        onclick={() => onVote(side, 'No')}>{t(noLabel)}</button
       >
     </div>
   {/if}

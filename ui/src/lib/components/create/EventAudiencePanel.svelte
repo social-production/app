@@ -84,7 +84,7 @@
     <div class="body">
       <p class="helper-text">
         {#if audience === 'private_community' && communityLabel}
-          {t('Private community:')} <strong>{communityLabel}</strong>.
+          {t('Private community:')} <strong>{t(communityLabel)}</strong>.
         {:else if audience === 'invite_only'}
           Invite-only ({inviteeCount} invited).
         {:else}

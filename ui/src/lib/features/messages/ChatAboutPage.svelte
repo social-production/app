@@ -99,7 +99,9 @@
 </script>
 
 {#snippet tile(icon: string, label: string, run: () => void)}
-  <button class="about-tile" type="button" onclick={run}><ToolbarIcon name={icon} />{label}</button>
+  <button class="about-tile" type="button" onclick={run}
+    ><ToolbarIcon name={icon} />{t(label)}</button
+  >
 {/snippet}
 
 <section class="chat-about" aria-label={`About ${p.title}`}>
@@ -136,7 +138,7 @@
       <p class="about-sub">
         {#if group}{p.chat.members.length} members{#if p.chat.manager === p.me}
             {t('· you manage it')}{/if}
-        {:else if person}{standingLabel(person)}{#if person.profile?.home_area}
+        {:else if person}{t(standingLabel(person))}{#if person.profile?.home_area}
             · {person.profile.home_area}{/if}{/if}
       </p>
       <div class="about-tiles">

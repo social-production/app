@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import IconPopoverMenu from '#lib/components/IconPopoverMenu.svelte';
@@ -63,7 +63,7 @@
   // (Platform and Moderators mockups §1).
   const sub = $derived.by(() => {
     if (!s.platform) {
-      const members = `${count} ${count === 1 ? 'member' : 'members'}`;
+      const members = `${plural(count, '{n} member', '{n} members')}`;
       return organized ? `${members} · organizers decide` : members;
     }
     const n = board?.weeklyActive;

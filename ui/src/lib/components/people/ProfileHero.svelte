@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -104,13 +105,13 @@
                 class:paused={person.standing.level === 'Paused'}
                 title={standingHint(person)}
                 type="button"
-                onclick={onStanding}>{standingLabel(person)}</button
+                onclick={onStanding}>{t(standingLabel(person))}</button
               >
             {:else}
               <span
                 class="standing-chip"
                 class:paused={person.standing.level === 'Paused'}
-                title={standingHint(person)}>{standingLabel(person)}</span
+                title={standingHint(person)}>{t(standingLabel(person))}</span
               >
             {/if}
           </div>

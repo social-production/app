@@ -76,14 +76,15 @@
 <section class="rail-panel rail-tabs-panel">
   <h2 class="rail-title">{t('Your activity')}</h2>
   <div class="rail-tabs" role="tablist" aria-label={t('Your activity')}>
-    {#each tabs as t (t.id)}
+    {#each tabs as tb (tb.id)}
       <button
         type="button"
         role="tab"
-        aria-selected={tab === t.id}
-        class:on={tab === t.id}
-        onclick={() => (tab = t.id)}
-        >{t.label}{#if t.count > 0}<span class="rail-tab-count" class:hot={t.hot}>{t.count}</span
+        aria-selected={tab === tb.id}
+        class:on={tab === tb.id}
+        onclick={() => (tab = tb.id)}
+        >{t(tb.label)}{#if tb.count > 0}<span class="rail-tab-count" class:hot={tb.hot}
+            >{tb.count}</span
           >{/if}</button
       >
     {/each}

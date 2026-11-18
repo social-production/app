@@ -108,7 +108,7 @@
             class:on={type === option.value}
             type="button"
             onclick={() => open(searchHref(draft.trim() || query.trim(), option.value))}
-            >{option.label}</button
+            >{t(option.label)}</button
           >
         {/each}
       </div>

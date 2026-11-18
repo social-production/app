@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import EventAudiencePanel from '#lib/components/create/EventAudiencePanel.svelte';
@@ -182,14 +182,17 @@
         </button>
       {/if}
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
-        <strong>{t('Location')}</strong><span>{s.locationLabel}</span>
+        <strong>{t('Location')}</strong><span>{t(s.locationLabel)}</span>
       </button>
       {#if s.upfrontPlan}
         <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('plan'))}>
           <strong>{t('Plan')}</strong>
           <span
-            >{s.plan.title.trim() || 'Untitled plan'} · {s.plan.stages.length}
-            {s.plan.stages.length === 1 ? 'stage' : 'stages'}</span
+            >{s.plan.title.trim() || 'Untitled plan'} · {plural(
+              s.plan.stages.length,
+              '{n} stage',
+              '{n} stages',
+            )}</span
           >
         </button>
       {:else}

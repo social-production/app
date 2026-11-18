@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import { formatCompactCount } from '#lib/domain/count.ts';
   import { countComments } from '#lib/domain/discussions.ts';
@@ -15,7 +15,7 @@
     $props();
 
   const count = $derived(countComments(state.comments));
-  const label = $derived(`${count} ${count === 1 ? 'comment' : 'comments'}`);
+  const label = $derived(`${plural(count, '{n} comment', '{n} comments')}`);
 </script>
 
 {#if state.project}

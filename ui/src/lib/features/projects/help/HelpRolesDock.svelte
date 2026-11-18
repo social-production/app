@@ -66,7 +66,7 @@
         {@const mine = help.activity.myRole === role.index}
         <article class="role-bar">
           <div class="role-copy">
-            <strong>{role.label}</strong>
+            <strong>{t(role.label)}</strong>
             {#if role.description}<p>{role.description}</p>{/if}
             <span>
               {slotsOf(role.maximum) > 0 ? `${slotsOf(role.maximum)} needed · ` : ''}{role.people
@@ -84,7 +84,7 @@
             type="button"
             onclick={() => void help.toggle(role)}
           >
-            {label(role)}
+            {t(label(role))}
           </button>
         </article>
       {/each}

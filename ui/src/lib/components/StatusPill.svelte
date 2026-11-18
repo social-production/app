@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   interface Props {
     tone: 'ok' | 'pending' | 'error';
     label: string;
@@ -7,7 +8,7 @@
   let { tone, label }: Props = $props();
 </script>
 
-<span class="pill {tone}">{label}</span>
+<span class="pill {tone}">{t(label)}</span>
 
 <style>
   .pill {

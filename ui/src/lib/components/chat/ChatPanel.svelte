@@ -214,7 +214,7 @@
           {@const previous = i > 0 ? p.lines[i - 1] : undefined}
           {#if !previous || messageDayKey(previous.createdAt) !== messageDayKey(message.createdAt)}
             <div class="day-divider" role="separator">
-              <span>{messageDayLabel(message.createdAt)}</span>
+              <span>{t(messageDayLabel(message.createdAt))}</span>
             </div>
           {/if}
           {#if message.kind !== 'text'}

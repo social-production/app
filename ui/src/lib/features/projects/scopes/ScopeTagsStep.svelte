@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import { scopeTag, tagScope, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
   import { listScopes } from '#lib/services/scopes.ts';
 
@@ -117,8 +117,11 @@
         <span class="tag-copy">
           <strong>{scope.handle}</strong>
           <small
-            >{scope.kind === 'community' ? t('Community') : t('Channel')} · {scope.members}
-            {scope.members === 1 ? 'member' : 'members'}</small
+            >{scope.kind === 'community' ? t('Community') : t('Channel')} · {plural(
+              scope.members,
+              '{n} member',
+              '{n} members',
+            )}</small
           >
         </span>
         <span class="tag-tick" aria-hidden="true"

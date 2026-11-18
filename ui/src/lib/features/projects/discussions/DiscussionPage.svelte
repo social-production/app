@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
@@ -63,7 +64,7 @@
     {#if state.error && !state.project}
       <p class="tab-loading">{state.error}</p>
     {:else if state.moderation.value.state === 'removed'}
-      <p class="tab-loading">{removedLabel(state.moderation.value.report?.reason)}</p>
+      <p class="tab-loading">{t(removedLabel(state.moderation.value.report?.reason))}</p>
     {:else if !state.project?.charter}
       <LoadingLine /><SkeletonDetail />
     {:else}

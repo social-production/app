@@ -268,7 +268,7 @@
     aria-label={unread > 0 ? `${label}, ${unread} unread` : label}
     onclick={() => (tab = id)}
   >
-    <span class="surface-tab-label">{label}</span>
+    <span class="surface-tab-label">{t(label)}</span>
     {#if unread > 0}<CountBadge count={unread} />{/if}
   </button>
 {/snippet}

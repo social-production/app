@@ -68,7 +68,7 @@
             onclick={() => (kind = option.value)}
           >
             <ToolbarIcon name={option.icon} />
-            <span>{option.label}</span>
+            <span>{t(option.label)}</span>
           </button>
         {/each}
       </div>

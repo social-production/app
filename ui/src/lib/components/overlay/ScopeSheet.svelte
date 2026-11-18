@@ -61,8 +61,8 @@
             {#if icon}<ScopeGlyph {icon} size="md" imageUrl={pictureOf?.(tag.slug) ?? null} />{/if}
           </span>
           <span class="scope-copy">
-            <strong>{tag.label}</strong>
-            <span>{tagKindLabel(tag)}</span>
+            <strong>{t(tag.label)}</strong>
+            <span>{t(tagKindLabel(tag))}</span>
           </span>
         </a>
       {/each}

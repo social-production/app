@@ -1,4 +1,5 @@
 <script lang="ts" generics="V extends string">
+  import { t } from '#lib/i18n/index.ts';
   /** web's CreateTypeSelector (without the detail panel, as the project flow uses it). */
   interface Props {
     label: string;
@@ -12,7 +13,7 @@
 </script>
 
 <div class="type-selector">
-  <span class="type-selector-label" id="{name}-label">{label}</span>
+  <span class="type-selector-label" id="{name}-label">{t(label)}</span>
   <div class="type-options" role="radiogroup" aria-labelledby="{name}-label">
     {#each options as option (option.value)}
       <button
@@ -23,7 +24,7 @@
         aria-checked={selected === option.value}
         onclick={() => onSelect(option.value)}
       >
-        <span class="type-option-title">{option.label}</span>
+        <span class="type-option-title">{t(option.label)}</span>
         <span class="type-option-summary">{option.summary}</span>
       </button>
     {/each}

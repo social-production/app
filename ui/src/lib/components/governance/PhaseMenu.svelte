@@ -58,7 +58,7 @@
       title={sheetTitle}
       onclick={() => (onOpen ? onOpen() : (open = true))}
     >
-      <span class="label">{label}</span>
+      <span class="label">{t(label)}</span>
       <span class="caret" aria-hidden="true">▾</span>
     </button>
   </span>
@@ -72,7 +72,7 @@
   >
     <div class="phase-menu-body">
       {#if currentPhaseLabel}
-        <p class="phase-menu-current">{t('Now in')} <strong>{currentPhaseLabel}</strong></p>
+        <p class="phase-menu-current">{t('Now in')} <strong>{t(currentPhaseLabel)}</strong></p>
       {/if}
       <ul class="phase-menu-list">
         {#each items as item (item.id)}
@@ -85,7 +85,7 @@
             >
               <span class="glyph" aria-hidden="true">{item.disabled ? '🔒' : item.glyph}</span>
               <span class="text">
-                <strong>{item.label}</strong>
+                <strong>{t(item.label)}</strong>
                 <span>{item.detail}</span>
               </span>
             </button>

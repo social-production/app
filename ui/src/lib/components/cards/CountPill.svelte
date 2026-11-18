@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { formatCompactCount } from '#lib/domain/count.ts';
 
   /** web's CountPill: an icon and a compact count; `label` ("3 comments") is read aloud. */
@@ -21,7 +22,7 @@
       />
     </svg>
   </span>
-  <span class="pill-text">{label}</span>
+  <span class="pill-text">{t(label)}</span>
   {#if compactCount}
     <span aria-hidden="true" class="pill-count">{compactCount}</span>
   {/if}

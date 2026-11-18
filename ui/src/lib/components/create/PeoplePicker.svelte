@@ -49,7 +49,7 @@
 </script>
 
 <div class="audience-selector">
-  <span class="field-label">{label}</span>
+  <span class="field-label">{t(label)}</span>
   <div class="token-input-stack">
     {#if selected.length > 0}
       <div class="selected-row" aria-label={t('Selected audience')}>

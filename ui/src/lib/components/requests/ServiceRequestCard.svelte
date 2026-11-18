@@ -65,7 +65,7 @@
         <strong>{request.title}</strong>
         <span>{when}</span>
       </div>
-      <span class={`phase-badge ${tone}`}>{label}</span>
+      <span class={`phase-badge ${tone}`}>{t(label)}</span>
     </div>
     <div class="request-footer">
       <span class="request-meta">Requested by {requester} · {relativeTime(request.createdAt)}</span>

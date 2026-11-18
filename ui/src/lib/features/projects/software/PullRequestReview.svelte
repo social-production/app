@@ -101,7 +101,7 @@
       <span class="meta-value">{author}</span>
     </div>
   {/if}
-  <span class="stage-pill">{pr.stageLabel}</span>
+  <span class="stage-pill">{t(pr.stageLabel)}</span>
 </div>
 
 {#if mode === 'vote-pr'}

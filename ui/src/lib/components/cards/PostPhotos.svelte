@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { plural } from '#lib/i18n/index.ts';
   import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
   import type { ChatAttachment } from '#lib/domain/chat.ts';
 
@@ -95,8 +96,6 @@
   <p class="photo-caption">{caption}</p>
   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- postHref arrives resolved -->
   <a class="photo-open" href={postHref}
-    >Open post{commentCount
-      ? ` · ${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}`
-      : ''} ›</a
+    >Open post{commentCount ? ` · ${plural(commentCount, '{n} comment', '{n} comments')}` : ''} ›</a
   >
 {/snippet}

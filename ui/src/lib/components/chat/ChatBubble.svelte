@@ -158,7 +158,7 @@
     {#if removed}
       <div class="caption-block">
         <p class="moderated">
-          {removedLabel(message.moderation?.report?.reason)}
+          {t(removedLabel(message.moderation?.report?.reason))}
           <span class="message-footer">{@render stamp()}</span>
         </p>
       </div>

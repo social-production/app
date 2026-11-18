@@ -64,7 +64,7 @@
           type="button"
           onclick={() => choose(null)}
         >
-          <span>{t("This device's")}<small>{label(deviceZone())}</small></span>
+          <span>{t("This device's")}<small>{t(label(deviceZone()))}</small></span>
           <em>{offset(deviceZone())}</em>
         </button>
       </li>
@@ -78,7 +78,7 @@
           type="button"
           onclick={() => choose(zone)}
         >
-          <span>{label(zone)}</span>
+          <span>{t(label(zone))}</span>
           <em>{offset(zone)}</em>
         </button>
       </li>

@@ -132,7 +132,7 @@
           {initials}
         </div>
         <h2 id="call-title">{view.peerName || 'Someone'}</h2>
-        <p class="call-status" aria-live="polite">{status}</p>
+        <p class="call-status" aria-live="polite">{t(status)}</p>
       </div>
 
       <CallControls

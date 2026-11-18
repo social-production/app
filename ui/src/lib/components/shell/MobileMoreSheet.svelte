@@ -156,7 +156,7 @@
             role="radio"
             aria-checked={theme === value}
             class:on={theme === value}
-            onclick={() => onTheme(value)}>{label}</button
+            onclick={() => onTheme(value)}>{t(label)}</button
           >
         {/each}
       </div>

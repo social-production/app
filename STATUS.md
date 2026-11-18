@@ -222,6 +222,19 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
+### Where things stand (10:00 pm Melbourne, 2026-11-18, UX session)
+- **Live: #225** (the Platform's moderator board loads for guests: `get_board` on the gateway's
+  guest list; a board that can't load says so with Try again).
+- **Open: `claude/russian` (ADR 0114, owner checks tonight with a native speaker):**
+  Settings › Appearance › Language (English / Русский; first open follows the browser), every
+  screen's fixed text through `t()` (`ui/src/lib/i18n`), ~1,450 Russian entries in
+  `i18n/ru/part*.ts`, counts with Russian plural forms (`plural()`), relative times. Still
+  English: text built in code from pieces (`Needs ${n} more yes`, error messages), pushes
+  (worded by the sender), dates where the code passes no locale (they follow the browser).
+- **Demo moderators: blocked on the owner.** The demo accounts are New; each needs vouches
+  from 2 Full members (VOUCHES_FOR_FULL), then they can claim Full and volunteer (seated at
+  once while the quorum is 0).
+
 ### Where things stand (8:20 pm Melbourne, 2026-11-18, UX session)
 - **Parity:** web's routes compared with the app's (PARITY.md "Routes compared"): all covered.
   Left: live checks (Platform/Moderators, reporting, profile photos, plan rating and vote

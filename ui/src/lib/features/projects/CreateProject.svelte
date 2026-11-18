@@ -109,7 +109,7 @@
         <strong>{t('Channels')}</strong><span>{tagCounts(s.tags)}</span><em>{t('Edit')}</em>
       </button>
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('location'))}>
-        <strong>{t('Place')}</strong><span>{s.locationLabel}</span><em>{t('Edit')}</em>
+        <strong>{t('Place')}</strong><span>{t(s.locationLabel)}</span><em>{t('Edit')}</em>
       </button>
       <PolicyNotice />
       {#if s.message}<p class="status-note">{s.message}</p>{/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -52,7 +52,7 @@
     </button>
     <div class="new-message-title">
       <h1>{t('New group')}</h1>
-      <p>{members.length} {members.length === 1 ? 'member' : 'members'}</p>
+      <p>{plural(members.length, '{n} member', '{n} members')}</p>
     </div>
   </header>
 

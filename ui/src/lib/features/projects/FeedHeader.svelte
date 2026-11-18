@@ -60,7 +60,7 @@
           role="tab"
           aria-selected={feed.shownScope === scope.value}
           class:on={feed.shownScope === scope.value}
-          onclick={() => void feed.setScope(scope.value)}>{scope.label}</button
+          onclick={() => void feed.setScope(scope.value)}>{t(scope.label)}</button
         >
       {/each}
     </div>
@@ -82,7 +82,7 @@
     <button type="button" class="region-near" aria-haspopup="dialog" onclick={() => (open = true)}>
       <ToolbarIcon name="map-pin" />
       {#if feed.region.placeQuery}
-        <span>{t('Near')} <b>{feed.region.placeQuery}</b> · {radiusLabel}</span>
+        <span>{t('Near')} <b>{feed.region.placeQuery}</b> · {t(radiusLabel)}</span>
       {:else}
         <span>{t('Choose a place to see what is near it')}</span>
       {/if}

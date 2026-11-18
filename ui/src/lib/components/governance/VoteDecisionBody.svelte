@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import { resultSentence } from '#lib/domain/decided.ts';
   import { APPROVAL_PERCENT, type Proposal } from '#lib/domain/governance.ts';
   import { relativeTime } from '#lib/domain/time.ts';
@@ -22,7 +22,7 @@
   const total = $derived(proposal.yes + proposal.no);
   const percent = $derived(total > 0 ? Math.round((proposal.yes / total) * 100) : 0);
   const turnout = $derived(
-    `${total} of ${proposal.population} ${proposal.population === 1 ? 'member' : 'members'} voted · at least ${proposal.required} needed`,
+    `${total} of ${plural(proposal.population, '{n} member', '{n} members')} voted · at least ${proposal.required} needed`,
   );
   const state = $derived(
     proposal.status === 'Open' ? 'open' : proposal.status === 'Passed' ? 'passed' : 'failed',
@@ -130,8 +130,8 @@
     <!-- App-only (ADR 0040): challenged counts and members still left out. -->
     {#if proposal.added > 0}
       <p class="tally-note">
-        Reopened: a challenge added {proposal.added}
-        {proposal.added === 1 ? 'member' : 'members'} the first count left out.
+        Reopened: a challenge added {plural(proposal.added, '{n} member', '{n} members')} the first count
+        left out.
       </p>
     {/if}
     {#if proposal.canChallenge}

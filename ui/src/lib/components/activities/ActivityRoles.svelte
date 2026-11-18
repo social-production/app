@@ -58,7 +58,7 @@
         !p.past && !role.suggestion && p.canSuggest && p.activity.rolesOpen && !mine}
       <div class="role-bar">
         <div class="role-copy">
-          <strong>{role.label}</strong>
+          <strong>{t(role.label)}</strong>
           <span>{roleLine(role, nameOf)}</span>
           {#if !p.past && role.suggestion}
             <span class="suggested-chip">Suggested · {nameOf(role.suggestion.person)}</span>
@@ -107,7 +107,7 @@
             class:selected={mine}
             aria-pressed={mine}
             type="button"
-            onclick={() => p.onCommit(mine ? null : role.index)}>{label}</button
+            onclick={() => p.onCommit(mine ? null : role.index)}>{t(label)}</button
           >
         {/if}
       </div>

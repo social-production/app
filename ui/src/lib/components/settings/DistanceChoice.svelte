@@ -23,7 +23,7 @@
         type="button"
         class:active={preset.value === value}
         aria-pressed={preset.value === value}
-        onclick={() => onChange(preset.value)}>{preset.label}</button
+        onclick={() => onChange(preset.value)}>{t(preset.label)}</button
       >
     {/each}
   </div>

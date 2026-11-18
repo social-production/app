@@ -26,7 +26,7 @@
 {#snippet row(label: string, value: string, step: PlanStepType)}
   <div class="review-row">
     <div class="review-copy">
-      <strong>{label}</strong>
+      <strong>{t(label)}</strong>
       <span>{value}</span>
     </div>
     <button class="text-button" type="button" onclick={() => onEdit(step)}>{t('Edit')}</button>

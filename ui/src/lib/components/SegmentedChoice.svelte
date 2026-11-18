@@ -1,4 +1,5 @@
 <script lang="ts" generics="V extends string">
+  import { t } from '#lib/i18n/index.ts';
   /**
    * One choice out of a few, as a soft segmented pill (ADR 0102): the UX pass's replacement
    * for an icon menu when the options fit on one line.
@@ -20,7 +21,7 @@
       role="radio"
       aria-checked={option.value === value}
       class:on={option.value === value}
-      onclick={() => onChange(option.value)}>{option.label}</button
+      onclick={() => onChange(option.value)}>{t(option.label)}</button
     >
   {/each}
 </div>

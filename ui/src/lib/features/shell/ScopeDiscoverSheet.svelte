@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import { untrack } from 'svelte';
 
@@ -98,7 +98,7 @@
         : 'channels or communities',
   );
 
-  const memberLabel = (count: number): string => `${count} ${count === 1 ? 'member' : 'members'}`;
+  const memberLabel = (count: number): string => `${plural(count, '{n} member', '{n} members')}`;
 
   let joining = $state<string | null>(null);
   let joinError = $state('');
@@ -146,7 +146,7 @@
             aria-checked={activeFilter === filter.value}
             class:on={activeFilter === filter.value}
             type="button"
-            onclick={() => (activeFilter = filter.value)}>{filter.label}</button
+            onclick={() => (activeFilter = filter.value)}>{t(filter.label)}</button
           >
         {/each}
       </div>
@@ -180,8 +180,8 @@
             <span class="scope-copy">
               <strong>{scope.handle}</strong>
               <span class="scope-meta"
-                >{scope.kind === 'channel' ? t('Channel') : t('Community')} · {memberLabel(
-                  scope.members,
+                >{scope.kind === 'channel' ? t('Channel') : t('Community')} · {t(
+                  memberLabel(scope.members),
                 )}{#if scope.isPrivate}
                   {t('· Private')}{/if}</span
               >

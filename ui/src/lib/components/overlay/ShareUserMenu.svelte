@@ -147,7 +147,7 @@
           stroke-linejoin="round"
         /></svg
       >
-      {#if !compact}<span class="share-button-label">{buttonLabel}</span>{/if}
+      {#if !compact}<span class="share-button-label">{t(buttonLabel)}</span>{/if}
     </button>
   </div>
 </span>
@@ -241,7 +241,7 @@
     <div class="sheet-actions">
       {#if createPost}
         <button class="sheet-cancel" type="button" onclick={() => (close(), createPost?.())}>
-          {createPostLabel}
+          {t(createPostLabel)}
         </button>
       {/if}
       <button

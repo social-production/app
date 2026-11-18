@@ -110,7 +110,7 @@
           {/if}
           {#if showFooter}
             <button class="primary-button" disabled={!canGoNext} type="button" onclick={onNext}>
-              {nextLabel}
+              {t(nextLabel)}
             </button>
           {/if}
         </footer>

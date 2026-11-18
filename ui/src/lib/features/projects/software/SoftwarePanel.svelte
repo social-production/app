@@ -131,7 +131,7 @@
               class="pr-action"
               class:merge={pr.stage !== 'approval'}
               type="button"
-              onclick={() => act(pr)}>{actionLabel(pr)}</button
+              onclick={() => act(pr)}>{t(actionLabel(pr))}</button
             >
           {/if}
         </div>

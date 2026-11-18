@@ -86,7 +86,8 @@
         >
         <span class="item-copy">
           <span class="item-label"
-            >{link.label}{#if link.badge}<small class="item-badge">{link.badge}</small>{/if}</span
+            >{t(link.label)}{#if link.badge}<small class="item-badge">{link.badge}</small
+              >{/if}</span
           >
           <span class="item-description">{link.description}</span>
         </span>

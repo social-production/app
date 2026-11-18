@@ -15,7 +15,7 @@
 
 <div class="set-row set-switch">
   <span class="set-row-label">
-    {label}
+    {t(label)}
     {#if note}<small>{note}</small>{/if}
   </span>
   <button

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
@@ -31,7 +31,7 @@
     children,
   }: Props = $props();
 
-  const commentLabel = $derived(`${commentCount} ${commentCount === 1 ? 'comment' : 'comments'}`);
+  const commentLabel = $derived(`${plural(commentCount, '{n} comment', '{n} comments')}`);
   let shared = $state<'' | 'Link copied' | 'Copy failed'>('');
   let timer: ReturnType<typeof setTimeout> | null = null;
 

@@ -219,7 +219,7 @@
           onmousedown={(e) => e.preventDefault()}
           onclick={() => pick(suggestion)}
         >
-          {suggestion.displayLabel}
+          {t(suggestion.displayLabel)}
         </button>
       </li>
     {/each}
@@ -288,8 +288,8 @@
             type="button"
             onclick={() => selectQuickPick(choice)}
           >
-            <span class="quick-pick-label">{choice.label}</span>
-            <span class="quick-pick-source">{choice.sourceLabel}</span>
+            <span class="quick-pick-label">{t(choice.label)}</span>
+            <span class="quick-pick-source">{t(choice.sourceLabel)}</span>
           </button>
         {/each}
       </div>

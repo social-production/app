@@ -84,7 +84,7 @@
           <button
             type="button"
             onmousedown={(e) => e.preventDefault()}
-            onclick={() => void region.select(place)}>{place.displayLabel}</button
+            onclick={() => void region.select(place)}>{t(place.displayLabel)}</button
           >
         </li>
       {/each}

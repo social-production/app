@@ -161,7 +161,8 @@
             <select bind:value={forms.relatedPullRequest}>
               <option value="" disabled>{t('Select blocked pull request')}</option>
               {#each replaceable as blocked (blocked.id)}
-                <option value={blocked.id}>{blocked.pullRequestId} · {blocked.stageLabel}</option>
+                <option value={blocked.id}>{blocked.pullRequestId} · {t(blocked.stageLabel)}</option
+                >
               {/each}
             </select>
           {:else if step === 1}

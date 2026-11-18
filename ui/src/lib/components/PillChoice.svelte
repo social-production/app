@@ -1,4 +1,5 @@
 <script lang="ts" generics="V extends string">
+  import { t } from '#lib/i18n/index.ts';
   /**
    * One choice out of several, as soft pills that wrap whole (Polish Pass mockups, 2026-11-16):
    * for choices too many or too long for a segmented control's one line.
@@ -20,7 +21,7 @@
       role="radio"
       aria-checked={option.value === value}
       class:on={option.value === value}
-      onclick={() => onChange(option.value)}>{option.label}</button
+      onclick={() => onChange(option.value)}>{t(option.label)}</button
     >
   {/each}
 </div>

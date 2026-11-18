@@ -51,7 +51,7 @@
           aria-checked={filter === option.value}
           class:on={filter === option.value}
           type="button"
-          onclick={() => (filter = option.value)}>{option.label}</button
+          onclick={() => (filter = option.value)}>{t(option.label)}</button
         >
       {/each}
     </div>
@@ -63,7 +63,7 @@
         aria-selected={sort === option.value}
         class:on={sort === option.value}
         type="button"
-        onclick={() => (sort = option.value)}>{option.label}</button
+        onclick={() => (sort = option.value)}>{t(option.label)}</button
       >
     {/each}
   </div>

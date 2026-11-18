@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /** Mirrors the directory DNA's identity zome. Agent keys cross the UI as base64 strings. */
 
 export type StandingLevel = 'Paused' | 'New' | 'Full';
@@ -57,5 +58,5 @@ export function namesLine(names: string[], total = names.length): string {
   const first = names.slice(0, 2).map((n) => n.trim().split(/\s+/)[0] || 'Unnamed');
   const more = total - first.length;
   if (more <= 0) return first.length === 2 ? `${first[0]} and ${first[1]}` : (first[0] ?? '');
-  return `${first.join(', ')} and ${more} more`;
+  return t('{names} and {more} more', { names: first.join(', '), more });
 }

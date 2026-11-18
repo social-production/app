@@ -80,7 +80,7 @@
       <section class="hero-card"><p class="tab-loading">{help.error}</p></section>
     {:else if help.moderation.value.state === 'removed'}
       <section class="hero-card">
-        <p class="tab-loading">{removedLabel(help.moderation.value.report?.reason)}</p>
+        <p class="tab-loading">{t(removedLabel(help.moderation.value.report?.reason))}</p>
       </section>
     {:else if !help.project?.charter}
       <LoadingLine /><SkeletonDetail />

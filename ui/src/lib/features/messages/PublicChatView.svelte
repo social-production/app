@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
@@ -62,7 +62,7 @@
 
   $effect(() => mentions.watch(talk.messages.map((m) => m.body)));
 
-  const members = $derived(`${chat.members} ${chat.members === 1 ? 'member' : 'members'}`);
+  const members = $derived(`${plural(chat.members, '{n} member', '{n} members')}`);
 
   // web's members panel: the count opens the project's members, read when asked for.
   let membersOpen = $state(false);

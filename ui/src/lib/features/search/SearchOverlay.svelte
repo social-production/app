@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -194,8 +194,11 @@
                 >
                 <span class="so-text"
                   >{s.handle}<small
-                    >{s.kind === 'channel' ? t('Channel') : t('Community')} · {s.members}
-                    {s.members === 1 ? 'member' : 'members'}</small
+                    >{s.kind === 'channel' ? t('Channel') : t('Community')} · {plural(
+                      s.members,
+                      '{n} member',
+                      '{n} members',
+                    )}</small
                   ></span
                 >
               </button>
@@ -207,7 +210,7 @@
             <span class="so-text"><span>{t('Search for')} <b>“{q.trim()}”</b></span></span>
           </button>
           {#each groups as g (g.label)}
-            <div class="so-head"><b>{g.label}</b></div>
+            <div class="so-head"><b>{t(g.label)}</b></div>
             {#each g.items as r (r.id)}
               {@const [before, match, after] = parts(r.title)}
               <button class="so-main" type="button" onclick={() => go(r.href, q)}>

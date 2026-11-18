@@ -49,7 +49,7 @@
 {#snippet side(label: string, canSet: boolean, selection: boolean | null, id: string)}
   {#if canSet}
     <div class="completion-side-row">
-      <span class="completion-side-label">{label}</span>
+      <span class="completion-side-label">{t(label)}</span>
       <div class="completion-actions">
         <button
           class="vote-chip"
@@ -106,7 +106,7 @@
           <div class="history-expanded-content">
             <div class="history-context">
               <p class="history-context-primary">
-                <strong>{context.label}</strong>
+                <strong>{t(context.label)}</strong>
                 <span> — {context.description}</span>
               </p>
               <p class="history-context-meta">

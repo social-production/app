@@ -1,7 +1,8 @@
 # 0114. Russian: a typed string catalogue, chosen per device
 
-Status: **proposed** (2026-11-18, UX session; waiting for the owner). From the owner's parity
-list: "One language besides English: Russian".
+Status: **accepted** (2026-11-18, owner: "Do a russian translation and ill check it with my wife
+tonight"; first open follows the browser or device language; push in the reader's language is fine).
+From the owner's parity list: "One language besides English: Russian".
 
 ## Context
 Every screen's words are written in place in about 320 Svelte files (web is the same; its
@@ -16,9 +17,13 @@ people:
 What people write (posts, titles, chats) is never translated.
 
 ## Proposal
-- **Catalogue:** `ui/src/lib/i18n/en.ts` is the source (`export const en = { 'nav.home': 'Home', … }`),
-  `ru.ts` is typed `Record<keyof typeof en, string>`, so a key missing in Russian fails
-  `npm run check`. A small `t(key, vars)` fills `{name}` slots; plurals use `Intl.PluralRules`
+- **Catalogue (as built):** the English text is the key, gettext style: `t('Home')` is "Home"
+  in English and `ru['Home']` in Russian, and anything missing stays English. This let every
+  screen be converted mechanically (a script wrapped fixed text between tags, word-holding
+  attributes, and text choices in code) instead of inventing thousands of key names.
+  `ui/src/lib/i18n/ru.ts` merges `ru/part*.ts` (files stay under 300 lines). Words that are
+  also used as values in code (phase names, statuses) are translated where they are shown,
+  `{t(stage)}`, never where they are defined. `t(text, vars)` fills `{name}` slots; plurals use `Intl.PluralRules`
   (Russian has one, few and many: `{count, plural, one {# участник} few {# участника} many
   {# участников}}`). No library: the whole thing is a few dozen lines and adds nothing to
   load. Dates, times and numbers go through `Intl` with the chosen locale (the Display
@@ -39,12 +44,11 @@ What people write (posts, titles, chats) is never translated.
   check script flags literal text left in `.svelte` templates in areas already moved, so
   nothing new slips back.
 
-## Questions for the owner
-1. Is Claude's Russian draft, read by you, good enough to switch it on, or should a native
-   speaker review it first?
-2. Should the language follow the browser the first time (proposed), or always start in
-   English?
-3. Push in the recipient's language (proposed) needs the small gateway change above. Fine?
+## Questions for the owner (answered 2026-11-18)
+1. Claude's draft ships; the owner and a native speaker read it on the live site.
+2. The first open follows the browser or device language.
+3. Push in the recipient's language: fine (not built yet; notices are still worded by the
+   sender's device).
 
 ## Consequences
 - Every UI file is touched once, so the work goes area by area after open UX branches merge.

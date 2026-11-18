@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
@@ -127,7 +127,7 @@
       </svg>
     </button>
     {#snippet monthName()}
-      {label}{#if zone}
+      {t(label)}{#if zone}
         <span class="zone-label" title={t('Times are shown in your Display timezone')}
           >· {zone}</span
         >{/if}
@@ -197,7 +197,7 @@
         role="button"
         tabindex={pickable(day.iso) ? 0 : -1}
         aria-disabled={!pickable(day.iso)}
-        aria-label={`${day.day}${day.bars.length ? `, ${day.bars.length} ${day.bars.length === 1 ? 'activity' : 'activities'}` : ''}`}
+        aria-label={`${day.day}${day.bars.length ? `, ${plural(day.bars.length, '{n} activity', '{n} activities')}` : ''}`}
         onmouseenter={() => (hoveredDay = day.iso)}
         onmouseleave={() => (hoveredDay = '')}
         onfocus={() => (hoveredDay = day.iso)}

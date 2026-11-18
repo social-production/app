@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import '#lib/components/styles/values.css';
 
   /** A 1–10 rating as ten round targets you can hit with a thumb, filled up to your choice
@@ -46,8 +47,8 @@
   </div>
   {#if leftLabel || rightLabel}
     <div class="ends">
-      <span>{leftLabel}</span>
-      <span>{rightLabel}</span>
+      <span>{t(leftLabel)}</span>
+      <span>{t(rightLabel)}</span>
     </div>
   {/if}
 </div>

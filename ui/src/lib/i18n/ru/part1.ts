@@ -55,7 +55,6 @@ export const part1: Record<string, Entry> = {
   'Activities and events you join show up here.':
     'Здесь появятся мероприятия и события, к которым вы присоединились.',
   'Activities shown': 'Показанные мероприятия',
-  Activity: 'Мероприятие',
   'Activity title': 'Название мероприятия',
   'Activity, event and request times show in it, and you type them in it.':
     'Время мероприятий, событий и запросов показывается и вводится в нём.',

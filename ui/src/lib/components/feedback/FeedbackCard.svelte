@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { t, plural } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { approvalPercent, type FeedbackItem, type FeedbackVote } from '#lib/domain/feedback.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
@@ -48,7 +48,7 @@
       >{item.kind === 'bug' ? t('Bug') : t('Suggestion')} · {relativeCompact(
         item.createdAt,
       )}{#if item.comments}
-        · {item.comments} {item.comments === 1 ? 'reply' : 'replies'}{/if}</small
+        · {plural(item.comments, '{n} reply', '{n} replies')}{/if}</small
     >
   </span>
   <div class="votes">

@@ -36,7 +36,7 @@
 
 {#snippet item(icon: string, label: string, run: () => void, danger = false)}
   <button type="button" role="menuitem" class:menu-danger={danger} onclick={run}
-    ><ToolbarIcon name={icon} />{label}</button
+    ><ToolbarIcon name={icon} />{t(label)}</button
   >
 {/snippet}
 

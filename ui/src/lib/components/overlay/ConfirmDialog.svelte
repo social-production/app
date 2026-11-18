@@ -61,7 +61,7 @@
           class="go"
           class:danger
           type="button"
-          onclick={() => onSettle(true)}>{confirmLabel}</button
+          onclick={() => onSettle(true)}>{t(confirmLabel)}</button
         >
       </div>
     </div>

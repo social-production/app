@@ -81,7 +81,7 @@
             type="button"
             onclick={() => selectSection(tab.id)}
           >
-            <span class="tab-label-full">{tab.label}</span>
+            <span class="tab-label-full">{t(tab.label)}</span>
             <span class="tab-label-compact">{tab.short}</span>
           </button>
         {/each}
@@ -101,7 +101,7 @@
           <h3>{t('Further reading')}</h3>
           {#each aboutReading as link (link.href)}
             <p>
-              <a href={link.href} rel="external noreferrer" target="_blank">{link.label}</a>
+              <a href={link.href} rel="external noreferrer" target="_blank">{t(link.label)}</a>
               {link.blurb}
             </p>
           {/each}
@@ -109,7 +109,7 @@
           <p class="about-links">
             {#each aboutLinks as link, i (link.href)}
               {#if i > 0}·{/if}
-              <a href={link.href} rel="external noreferrer" target="_blank">{link.label}</a>
+              <a href={link.href} rel="external noreferrer" target="_blank">{t(link.label)}</a>
             {/each}
           </p>
         {/if}

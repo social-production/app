@@ -73,7 +73,7 @@
               onclick={() => {
                 open = false;
                 action.run();
-              }}><ToolbarIcon name={action.icon} />{action.label}</button
+              }}><ToolbarIcon name={action.icon} />{t(action.label)}</button
             >
           {/each}
         </div>

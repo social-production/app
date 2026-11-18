@@ -132,13 +132,13 @@
 <header class="feed-header profile-feed-header">
   <div class="feed-tabs">
     <div class="feed-tablist" role="tablist" aria-label={t('Show on this profile')}>
-      {#each tabs as t (t.value)}
+      {#each tabs as tb (tb.value)}
         <button
           type="button"
           role="tab"
-          aria-selected={tab === t.value}
-          class:on={tab === t.value}
-          onclick={() => (tab = t.value)}>{t.label}</button
+          aria-selected={tab === tb.value}
+          class:on={tab === tb.value}
+          onclick={() => (tab = tb.value)}>{t(tb.label)}</button
         >
       {/each}
     </div>

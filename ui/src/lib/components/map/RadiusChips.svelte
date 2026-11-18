@@ -32,7 +32,7 @@
       role="radio"
       aria-checked={option.value === value}
       class:on={option.value === value}
-      onclick={() => option.value !== value && onChange(option.value)}>{option.label}</button
+      onclick={() => option.value !== value && onChange(option.value)}>{t(option.label)}</button
     >
   {/each}
 </div>

@@ -54,7 +54,7 @@
           <CountBadge count={tab.badge} />
         {/if}
       </span>
-      {#if isActive(tab.href)}<span class="bottom-nav-label" aria-hidden="true">{tab.label}</span
+      {#if isActive(tab.href)}<span class="bottom-nav-label" aria-hidden="true">{t(tab.label)}</span
         >{/if}
     </a>
     <!-- eslint-enable svelte/no-navigation-without-resolve -->

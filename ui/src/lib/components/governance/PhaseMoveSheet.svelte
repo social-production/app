@@ -82,7 +82,7 @@
       >
         <span class="radio" aria-hidden="true"></span>
         <span class="phase-move-copy">
-          <strong>{option.label}</strong>
+          <strong>{t(option.label)}</strong>
           <small>{option.detail}</small>
         </span>
       </button>

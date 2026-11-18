@@ -98,7 +98,7 @@
     <dl class="plan-facts">
       {#each facts as [label, value] (label)}
         <div class="fact">
-          <dt>{label}</dt>
+          <dt>{t(label)}</dt>
           <dd>{value}</dd>
         </div>
       {/each}

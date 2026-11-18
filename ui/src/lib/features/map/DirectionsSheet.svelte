@@ -39,7 +39,7 @@
   rootClass="shell directions-sheet"
   {onClose}
 >
-  {#snippet subtitle()}<p class="directions-place">{to.label}</p>{/snippet}
+  {#snippet subtitle()}<p class="directions-place">{t(to.label)}</p>{/snippet}
   <ul class="directions-list">
     {#each apps as app (app.id)}
       <li>

@@ -1,6 +1,6 @@
 /** Links between projects (web's Links tab, ADR 0042). Each project votes on its own half. */
 
-import { t } from '#lib/i18n/index.ts';
+import { t, plural } from '#lib/i18n/index.ts';
 import { APPROVAL_PERCENT, type VoteChoice } from './governance.ts';
 import type { CharterMode } from './projects.ts';
 
@@ -107,7 +107,7 @@ export function voteRequirement(half: LinkHalf): string {
   const left = Math.max(half.population - half.yes - half.no, 0);
   const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
   const waiting =
-    left > 0 ? ` · ${left} ${left === 1 ? 'person has' : 'people have'} not voted` : '';
+    left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
 }
 

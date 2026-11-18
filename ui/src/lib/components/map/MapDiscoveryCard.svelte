@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
   import CardFacts from '#lib/components/cards/CardFacts.svelte';
   import FeedSurface from '#lib/components/cards/FeedSurface.svelte';
@@ -72,7 +73,7 @@
         {#if parent}<div class="feed-lead-tags"><span class="map-parent">{parent}</span></div>{/if}
         <div class="feed-lead-meta" class:alone={!parent}>
           <SurfaceTypeLabel projectMode={mode} />
-          {#if status}<span class="feed-card-stage">{status}</span>{/if}
+          {#if status}<span class="feed-card-stage">{t(status)}</span>{/if}
           <span class="feed-card-time">{distance}</span>
         </div>
       </div>

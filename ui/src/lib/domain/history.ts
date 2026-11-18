@@ -4,7 +4,7 @@
  * governance zome's proposals and plans, as web-backend's `_build_project_history` builds it
  * from its request tables.
  */
-import { t } from '#lib/i18n/index.ts';
+import { t, plural } from '#lib/i18n/index.ts';
 import { APPROVAL_PERCENT, type Proposal, type VoteChoice } from './governance.ts';
 import type { PlanKind, PlanView } from './plans.ts';
 
@@ -118,7 +118,7 @@ export function requirementLabel(e: HistoryEntry): string {
   const left = Math.max(e.population - e.yes - e.no, 0);
   const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
   const waiting =
-    left > 0 ? ` · ${left} ${left === 1 ? 'person has' : 'people have'} not voted` : '';
+    left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
 }
 

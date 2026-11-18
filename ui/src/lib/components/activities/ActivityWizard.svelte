@@ -158,7 +158,7 @@
             {#each groups as group (group.label)}
               <optgroup label={group.label}>
                 {#each group.stages as stage (stage.id)}
-                  <option value={stage.id}>{stage.label}</option>
+                  <option value={stage.id}>{t(stage.label)}</option>
                 {/each}
               </optgroup>
             {/each}
@@ -189,7 +189,7 @@
             </div>
             {#if planStages.length > 0}
               <div class="review-row">
-                <span>{t('Linked stage')}</span><strong>{stageLabel}</strong>
+                <span>{t('Linked stage')}</span><strong>{t(stageLabel)}</strong>
               </div>
             {/if}
             <div class="review-row">

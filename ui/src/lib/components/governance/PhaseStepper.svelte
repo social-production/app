@@ -34,7 +34,7 @@
       title={`${step.label} · ${state}`}
       onclick={() => onSelect(step.id)}
     >
-      <span class="label" use:fitText={{ min: 9, text: step.label }}>{step.label}</span>
+      <span class="label" use:fitText={{ min: 9, text: step.label }}>{t(step.label)}</span>
     </button>
   {/each}
 </nav>

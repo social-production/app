@@ -17,7 +17,7 @@
 
   const all: { id: DetailTabId; label: string; short?: string; icon: string }[] = [
     { id: 'context', label: t('Details'), icon: 'list' },
-    { id: 'participation', label: t('Participation'), short: 'Take part', icon: 'people' },
+    { id: 'participation', label: t('Participation'), short: t('Take part'), icon: 'people' },
     { id: 'chat', label: t('Chat'), icon: 'message' },
     { id: 'links', label: t('Links'), icon: 'link' },
     { id: 'history', label: t('History'), icon: 'clock' },
@@ -44,7 +44,7 @@
       onclick={() => onSelect(tab.id)}
     >
       <span class="tab-icon" aria-hidden="true"><ToolbarIcon name={tab.icon} /></span>
-      <span class="tab-label">{tab.label}</span>
+      <span class="tab-label">{t(tab.label)}</span>
       {#if tab.short}<span class="tab-label-short">{tab.short}</span>{/if}
     </button>
   {/each}

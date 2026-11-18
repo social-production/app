@@ -153,7 +153,7 @@
               type="button"
               onclick={action.run}
             >
-              {action.label}
+              {t(action.label)}
             </button>
           {/if}
         </div>

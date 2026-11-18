@@ -38,7 +38,7 @@
   data-participation-action={needsVote ? 'rate-value' : undefined}
 >
   <div class="value-head">
-    <strong class="value-title">{value.label}</strong>
+    <strong class="value-title">{t(value.label)}</strong>
     {#if localVote > 0}
       <span class="value-chip mine">You: {localVote}</span>
     {:else if canVote}

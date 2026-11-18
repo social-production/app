@@ -133,7 +133,7 @@
         <p class="replying-to">{t('Replying to')} <em>{replyingTo}</em></p>
       {/if}
       {#if removed}
-        <p class="body moderated">{removedLabel(moderation.report?.reason)}</p>
+        <p class="body moderated">{t(removedLabel(moderation.report?.reason))}</p>
       {:else if !canReveal || revealed}
         <p class="body">
           {#each bodyParts(comment.body) as part, i (i)}

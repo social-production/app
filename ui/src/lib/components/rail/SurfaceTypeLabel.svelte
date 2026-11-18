@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
   import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
@@ -54,11 +55,11 @@
     style={`--surface-accent: ${kindColor(kindOf(projectMode))}`}
   >
     <KindGlyph kind={kindOf(projectMode)} size={18} />
-    <span class="label-copy">{LABELS[projectMode]}</span>
+    <span class="label-copy">{t(LABELS[projectMode] ?? projectMode)}</span>
   </span>
 {:else}
   <span class="surface-type-label" style={`--surface-accent: ${modeAccent(projectMode)}`}>
     <SurfaceIcon {icon} size="sm" />
-    <span class="label-copy">{LABELS[projectMode]}</span>
+    <span class="label-copy">{t(LABELS[projectMode] ?? projectMode)}</span>
   </span>
 {/if}

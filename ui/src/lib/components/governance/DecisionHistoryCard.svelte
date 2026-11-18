@@ -70,7 +70,7 @@
     >
       <span class="history-icon"><ToolbarIcon name={historyIcon(entry.kindLabel)} /></span>
       <span class="history-copy">
-        <span class="history-kicker">{entry.kindLabel}</span>
+        <span class="history-kicker">{t(entry.kindLabel)}</span>
         <span class="history-meta"
           >{names[entry.author] ?? '…'} · {relativeTime(entry.createdAt)} · {entry.yes} yes, {entry.no}
           no</span
@@ -83,7 +83,7 @@
     {#if entry.status === 'open'}
       <div class="history-progress">
         <div class="history-bar"><i style={`width: ${Math.max(approval, 3)}%`}></i></div>
-        <span class="history-requirement">{requirementLabel(entry)}</span>
+        <span class="history-requirement">{t(requirementLabel(entry))}</span>
       </div>
       {#if entry.proposal}
         {@const proposal = entry.proposal}

@@ -71,7 +71,7 @@
           stroke-linecap="round"
         /></svg
       >
-      {copyLabel}
+      {t(copyLabel)}
     </button>
   </div>
   {#if !nativeShare}

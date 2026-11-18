@@ -14,8 +14,8 @@ export const part12: Record<string, Entry> = {
   'Sign out anyway': 'Всё равно выйти',
   'Sign out on this device. Sign back in with your 24 words.':
     'Выйти на этом устройстве. Войти снова можно с вашими 24 словами.',
-  'Sign up': 'Зарегистрироваться',
-  'Sign up to join': 'Зарегистрируйтесь, чтобы присоединиться',
+  'Sign up': 'Регистрация',
+  'Sign up to join': 'Присоединиться',
   'Signals instead of prices': 'Сигналы вместо цен',
   'Single date': 'Одна дата',
   'Skip signals, values, and proposal votes. Set the plan up front and start in Activity. Creators and co-organizers manage changes; members can still join and sign up for roles.':

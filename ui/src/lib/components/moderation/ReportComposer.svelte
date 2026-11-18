@@ -88,7 +88,7 @@
         {#each REASONS as r (r.value)}
           <label class="report-reason" class:on={reason === r.value}>
             <input type="radio" name="report-reason" value={r.value} bind:group={reason} />
-            <span><b>{r.label}</b><span>{r.examples}</span></span>
+            <span><b>{t(r.label)}</b><span>{r.examples}</span></span>
           </label>
         {/each}
       </div>
