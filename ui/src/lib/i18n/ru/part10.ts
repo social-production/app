@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part10: Record<string, Entry> = {
   'Propose change': 'Предложить изменение',

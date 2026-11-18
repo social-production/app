@@ -45,8 +45,8 @@ export function relativeTime(micros: number, nowMs = Date.now()): string {
 /** When an opened post or thread was written: "3:12 pm · 13 Nov 2026" in the reader's locale. */
 export function postedAt(micros: number): string {
   const at = new Date(micros / 1000);
-  const time = at.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-  const day = at.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+  const time = at.toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
+  const day = at.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   return `${time} · ${day}`;
 }
 

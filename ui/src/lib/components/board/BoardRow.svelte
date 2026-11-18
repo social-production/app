@@ -21,7 +21,7 @@
 
   let { member: m, person, quorum, you, onVote }: Props = $props();
 
-  const name = $derived(person ? displayName(person) : t('Unnamed'));
+  const name = $derived(person ? displayName(person) : 'Unnamed');
   const pct = $derived(m.ratio === null ? '—' : `${Math.round(m.ratio * 100)}%`);
   const tone = $derived(m.standing === 'grace' ? 'warn' : m.moderator ? 'seated' : 'candidate');
   const vote = (value: 1 | -1) => onVote(m, m.myVote === value ? 0 : value);

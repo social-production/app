@@ -50,7 +50,7 @@
       hint={t('The app’s own words. What people write stays as they wrote it.')}
       value={language}
       options={LANGUAGES}
-      onChange={(next) => next !== language && setLanguage(next)}
+      onChange={setLanguage}
     />
     <SettingChoice
       label={t('Theme')}

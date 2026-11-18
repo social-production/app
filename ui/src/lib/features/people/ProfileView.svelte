@@ -160,7 +160,7 @@
               />
               {#if !viewerPaused}
                 <MessageButton
-                  person={{ agent: shown.agent, name: shown.profile?.name ?? t('Unnamed') }}
+                  person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
                 />
                 <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} />
                 <VouchButton

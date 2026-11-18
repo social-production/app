@@ -28,7 +28,7 @@
         {@const person = people[request.agent]}
         <div class="person-row">
           <a class="person-link" href={resolve('/profile/[agent]', { agent: request.agent })}>
-            <strong>{person ? displayName(person) : t('Unnamed')}</strong>
+            <strong>{person ? displayName(person) : 'Unnamed'}</strong>
             {#if person?.profile?.bio}<span>{person.profile.bio}</span>{/if}
           </a>
           <div class="request-actions">

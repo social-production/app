@@ -1,3 +1,4 @@
+import { locale } from '#lib/i18n/index.ts';
 /**
  * Dates and times on activity cards, as web's CollapsibleActivityCard and ActivityAgendaList
  * write them, in the Display timezone (`zone.ts`). Activity times are Holochain microseconds.
@@ -16,7 +17,7 @@ const isoDay = (date: Date): string =>
 export const dayKey = (micros: number): string => isoDay(wall(micros / 1000));
 
 export function clockTime(micros: number): string {
-  return at(micros).toLocaleTimeString(undefined, inZone({ hour: 'numeric', minute: '2-digit' }));
+  return at(micros).toLocaleTimeString(locale(), inZone({ hour: 'numeric', minute: '2-digit' }));
 }
 
 /** "Sat 18" when an activity runs past midnight, else "". */
@@ -35,11 +36,11 @@ export function dateLine(start: number, end: number): string {
   const time = inZone({ hour: 'numeric', minute: '2-digit' });
   const zone = zoneOf(s);
   const suffix = zone ? ` ${zone}` : '';
-  const startDate = s.toLocaleDateString(undefined, day);
-  const startTime = s.toLocaleTimeString(undefined, time);
-  const endTime = e.toLocaleTimeString(undefined, time);
+  const startDate = s.toLocaleDateString(locale(), day);
+  const startTime = s.toLocaleTimeString(locale(), time);
+  const endTime = e.toLocaleTimeString(locale(), time);
   if (dayKey(start) === dayKey(end)) return `${startDate} · ${startTime}–${endTime}${suffix}`;
-  const endDate = e.toLocaleDateString(undefined, day);
+  const endDate = e.toLocaleDateString(locale(), day);
   return `${startDate}, ${startTime} – ${endDate}, ${endTime}${suffix}`;
 }
 

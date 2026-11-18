@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part3: Record<string, Entry> = {
   'Commons-based peer production': 'Общинное равноправное производство',
@@ -84,7 +84,7 @@ export const part3: Record<string, Entry> = {
   'Describe what you need so they can review the request and reply.':
     'Опишите, что вам нужно, чтобы они могли рассмотреть запрос и ответить.',
   Description: 'Описание',
-  Details: 'Подробности',
+  Details: 'Детали',
   'Device location (GPS)': 'Местоположение устройства (GPS)',
   Devices: 'Устройства',
   'Did not pass': 'Не прошло',

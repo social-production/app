@@ -1,3 +1,4 @@
+import { locale } from '#lib/i18n/index.ts';
 /** A public vote among full members on whether an account is a bot (web's `BotReview`,
  * ADR 0074). Times are milliseconds. */
 export interface BotReview {
@@ -18,5 +19,5 @@ export interface BotReview {
 
 /** web's `toLocaleDateString(undefined, { day: 'numeric', month: 'short' })`. */
 export function shortDate(ms: number): string {
-  return new Date(ms).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+  return new Date(ms).toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 }

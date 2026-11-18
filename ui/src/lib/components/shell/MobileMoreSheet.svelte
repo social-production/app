@@ -3,10 +3,12 @@
   import type { ResolvedPathname } from '$app/types';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import LanguagePicker from '#lib/components/language/LanguagePicker.svelte';
   import '#lib/components/styles/ux/menus.css';
 
   /** The phone "More" tab's menu (ADR 0098): a floating panel above the nav capsule with
-   * web's MobileMoreSheet links (profile or sign in, Settings, About) and the theme. */
+   * web's MobileMoreSheet links (profile or sign in, Settings, About), the theme and the
+   * language (ADR 0114: here so people who aren't signed in can change it too). */
   type Theme = 'system' | 'light' | 'dark';
   const THEMES: [Theme, string][] = [
     ['system', 'System'],
@@ -147,6 +149,7 @@
         >
         <span>{t('About')}</span>
       </a>
+      <LanguagePicker />
       <!-- eslint-enable svelte/no-navigation-without-resolve -->
       <div class="float-panel-sep"></div>
       <div class="more-panel-theme" role="radiogroup" aria-label={t('Theme')}>

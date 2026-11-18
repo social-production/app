@@ -1,6 +1,6 @@
 /** Help requests (ADR 0067): commons spaces with mode `help-request` and one activity. */
 
-import { t } from '#lib/i18n/index.ts';
+import { locale, t } from '#lib/i18n/index.ts';
 import { displayZone, fromWall, wall } from './zone.ts';
 import { zoneOf } from './activityTime.ts';
 
@@ -60,7 +60,7 @@ export function scheduleLabel(startValue: string, endValue: string): string {
   const start = startValue ? new Date(startValue) : null;
   const end = endValue ? new Date(endValue) : null;
   if (!start || Number.isNaN(start.getTime())) return t('Time TBD');
-  const startLabel = start.toLocaleString(undefined, {
+  const startLabel = start.toLocaleString(locale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -69,8 +69,8 @@ export function scheduleLabel(startValue: string, endValue: string): string {
   });
   if (!end || Number.isNaN(end.getTime()) || end <= start) return startLabel;
   if (end.toDateString() === start.toDateString())
-    return `${startLabel} – ${end.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' })}`;
-  return `${startLabel} – ${end.toLocaleString(undefined, {
+    return `${startLabel} – ${end.toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' })}`;
+  return `${startLabel} – ${end.toLocaleString(locale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',
@@ -83,7 +83,7 @@ export function scheduleLabel(startValue: string, endValue: string): string {
 export function localDateTime(micros: number | null): string {
   if (micros === null) return '';
   const date = new Date(micros / 1000);
-  const formatted = date.toLocaleString(undefined, {
+  const formatted = date.toLocaleString(locale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

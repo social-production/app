@@ -1,3 +1,4 @@
+import { locale } from '#lib/i18n/index.ts';
 import { signupTone, type Activity } from './activities.ts';
 import { localNow } from './activityForm.ts';
 import { wall } from './zone.ts';
@@ -34,7 +35,8 @@ export function isoOf(date: Date): string {
   return localNow(date).slice(0, 10);
 }
 
-const time = (d: Date): string => d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+const time = (d: Date): string =>
+  d.toLocaleTimeString(locale(), { hour: '2-digit', minute: '2-digit' });
 
 /** A bar's colour by sign-ups, unless `toneOf` says otherwise (a service's slots, ADR 0077). */
 export type ToneOf = (a: Activity) => DayBar['tone'] | null;

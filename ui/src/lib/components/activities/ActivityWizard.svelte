@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import PlanWizardShell from '#lib/components/plans/PlanWizardShell.svelte';
   import {
     activitySteps,
@@ -83,7 +83,7 @@
 
   const when = (value: string): string =>
     value
-      ? new Date(value).toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' })
+      ? new Date(value).toLocaleString(locale(), { dateStyle: 'medium', timeStyle: 'short' })
       : '—';
 </script>
 

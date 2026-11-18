@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -78,7 +78,7 @@
 
   function invitedLine(i: EventInvite): string {
     const place = people[i.agent]?.profile?.home_area.trim();
-    const when = new Date(i.at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    const when = new Date(i.at).toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
     const by = `invited by ${i.by === me ? 'you' : nameOf(i.by)}, ${when}`;
     return place ? `${place} · ${by}` : by;
   }

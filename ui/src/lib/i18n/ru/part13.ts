@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part13: Record<string, Entry> = {
   'The app’s own words. What people write stays as they wrote it.':
@@ -91,7 +91,6 @@ export const part13: Record<string, Entry> = {
   'Unlocks after this project gets a Support signal.':
     'Станет доступно после сигнала «Поддержка» для этого проекта.',
   Unmute: 'Включить звук',
-  Unnamed: 'Безымянный',
   Unnecessary: 'Не нужно',
   Unpin: 'Открепить',
   Upcoming: 'Предстоящие',

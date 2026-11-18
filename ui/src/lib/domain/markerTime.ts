@@ -1,3 +1,4 @@
+import { locale } from '#lib/i18n/index.ts';
 /** web's map times (`utils/time.ts` `formatMarkerScheduleRange`, `formatLocalDateTimeRange`):
  * a pin's or card's start–end, with a +2 h end when it has none, in the Display timezone. */
 import { displayZone, wall } from './zone.ts';
@@ -24,7 +25,7 @@ const valid = (iso: string | null | undefined): Date | null => {
 
 function full(d: Date): string {
   const zone = zoneOf(d);
-  const text = d.toLocaleString(undefined, { ...dateOptions(), ...timeOptions() });
+  const text = d.toLocaleString(locale(), { ...dateOptions(), ...timeOptions() });
   return zone ? `${text} ${zone}` : text;
 }
 
@@ -50,7 +51,7 @@ export function formatMarkerScheduleRange(
   if (wall(start.getTime()).toDateString() !== wall(end.getTime()).toDateString())
     return `${full(start)} – ${full(end)}`;
   const zone = zoneOf(end);
-  const day = start.toLocaleDateString(undefined, dateOptions());
-  const range = `${day}, ${start.toLocaleTimeString(undefined, timeOptions())} – ${end.toLocaleTimeString(undefined, timeOptions())}`;
+  const day = start.toLocaleDateString(locale(), dateOptions());
+  const range = `${day}, ${start.toLocaleTimeString(locale(), timeOptions())} – ${end.toLocaleTimeString(locale(), timeOptions())}`;
   return zone ? `${range} ${zone}` : range;
 }

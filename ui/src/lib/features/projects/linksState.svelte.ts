@@ -42,7 +42,7 @@ export class LinksState {
         .filter((a, i, list) => list.indexOf(a) === i && !(a in this.names));
       const people = await Promise.all(missing.map(getPerson));
       const names = { ...this.names };
-      for (const p of people) names[p.agent] = p.profile?.name ?? t('Unnamed');
+      for (const p of people) names[p.agent] = p.profile?.name ?? 'Unnamed';
       this.names = names;
       this.frame = this.withCast(frame);
       this.error = undefined;

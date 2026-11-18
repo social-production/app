@@ -7,6 +7,7 @@
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
 
   import BackButton from '#lib/components/BackButton.svelte';
+  import LanguagePicker from '#lib/components/language/LanguagePicker.svelte';
 
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
@@ -92,5 +93,7 @@
     <p class="keep-browsing">
       {t('Just looking?')} <a href={resolve('/')}>{t('Keep browsing without an account')}</a>
     </p>
+    <!-- ADR 0114: the language can be changed before signing in. -->
+    <LanguagePicker variant="link" />
   </section>
 </div>

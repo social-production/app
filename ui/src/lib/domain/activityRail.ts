@@ -3,7 +3,7 @@
  * `bootstrap/activity_rail.py`), derived on this device from the projects open on its node,
  * as notifications are (ADR 0046). Times are Holochain microseconds.
  */
-import { t } from '#lib/i18n/index.ts';
+import { locale, t } from '#lib/i18n/index.ts';
 import { displayZone } from './zone.ts';
 import { committedOf, minimumOf, type Activity } from './activities.ts';
 import { zoneOf } from './activityTime.ts';
@@ -278,7 +278,7 @@ export function railKicker(item: RailItem): string {
 /** web's `formatLocalDateTime`: "Tue, Oct 27, 2026, 6:00 PM AEDT" (the Display timezone). */
 export function railTime(micros: number): string {
   const date = new Date(micros / 1000);
-  const formatted = date.toLocaleString(undefined, {
+  const formatted = date.toLocaleString(locale(), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

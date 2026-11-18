@@ -62,7 +62,7 @@
     <div class="card stack">
       {#each requests as request (request.agent)}
         <div class="follow-request-row">
-          <div><strong>@{names[request.agent] ?? t('Unnamed')}</strong></div>
+          <div><strong>@{names[request.agent] ?? 'Unnamed'}</strong></div>
           <div class="follow-request-actions">
             <button
               class="button-primary"

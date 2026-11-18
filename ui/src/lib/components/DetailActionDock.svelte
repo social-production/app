@@ -4,6 +4,7 @@
   import BackButton from '#lib/components/BackButton.svelte';
   import '#lib/components/styles/detail.css';
   import '#lib/components/styles/ux/dock.css';
+  import '#lib/components/styles/ux/dockjoin.css';
 
   /**
    * web's DetailActionDock: a detail page's action bar. While `active` it moves into the

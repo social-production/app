@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Russian (PRs #226–#227, 2026-11-18 night Melbourne, ADR 0114):** a general language picker
+  (Settings › Appearance, the More menu and the sign-in page, so guests can switch too); the
+  first open follows the device's main language; every screen's own words are in Russian
+  (people's posts stay as written).
 - **Requests, push and #platform merges (PRs #219–#223, 2026-11-18 evening
   Melbourne):** collective requests stay open until planned and read Not met after their time;
   personal services are gone; decided votes send push (phases, plan leads, approved pull

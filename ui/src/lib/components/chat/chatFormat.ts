@@ -1,11 +1,11 @@
-import { t } from '#lib/i18n/index.ts';
+import { locale, t } from '#lib/i18n/index.ts';
 import { MENTION, type ChatLine } from '#lib/domain/chat.ts';
 
 /** Display helpers ported from web's LiveChatPanel and utils/linkifyMessageBody. */
 
 /** Clock time in the bubble; the day goes in a divider above, as in other messaging apps. */
 export function formatMessageTime(ms: number): string {
-  return new Date(ms).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  return new Date(ms).toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' });
 }
 
 export function messageDayKey(ms: number): string {
@@ -20,7 +20,7 @@ export function messageDayLabel(ms: number): string {
   if (date.toDateString() === today.toDateString()) return t('Today');
   if (date.toDateString() === yesterday.toDateString()) return t('Yesterday');
   const sameYear = date.getFullYear() === today.getFullYear();
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(locale(), {
     weekday: 'short',
     day: 'numeric',
     month: 'short',

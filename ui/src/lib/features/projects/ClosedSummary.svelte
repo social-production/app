@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
 
   import type { DetailState } from './detailState.svelte.ts';
@@ -38,7 +38,7 @@
   );
   const lineage = $derived(detail.project?.lineage);
   const when = $derived(
-    new Date((closing?.closedAt ?? closing?.createdAt ?? 0) / 1000).toLocaleDateString(undefined, {
+    new Date((closing?.closedAt ?? closing?.createdAt ?? 0) / 1000).toLocaleDateString(locale(), {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
