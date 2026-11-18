@@ -201,3 +201,19 @@ export function removedNotice(members: string[], title: string, reason: string):
     '/',
   );
 }
+
+/** A pull request waits for someone to merge it on the repository and record it. */
+export function awaitingMergeNotice(
+  mergers: string[],
+  project: string,
+  pr: string,
+  title: string,
+): Promise<void> {
+  return notify(
+    mergers,
+    'pr-approved',
+    () => 'Pull request awaiting merge',
+    `${title} was approved. Merge it on the repository, then record the merge.`,
+    `/projects/${project}?open=vote&voteTarget=${encodeURIComponent(pr)}&voteKind=pull_request_merge`,
+  );
+}

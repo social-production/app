@@ -7,6 +7,7 @@ import { planLeadChanges } from '#lib/services/governance.ts';
 import { myAgent } from '#lib/services/people.ts';
 import {
   phaseDoneNotice,
+  awaitingMergeNotice,
   planLeadNotice,
   prApprovedNotice,
   removedNotice,
@@ -60,6 +61,9 @@ export async function tellApprovals(project: string, g: SoftwareGovernance): Pro
     const a = pr.approved;
     if (!a || a.by !== me || !recent(a.at) || !once(`pr:${pr.id}`)) continue;
     void prApprovedNotice(pr.author, project, pr.id);
+    // Whoever can merge is asked to (ADR 0086): the merge happens on the repository by hand.
+    const mergers = g.mergers.map((m) => m.agent).filter((m) => m !== pr.author);
+    void awaitingMergeNotice(mergers, project, pr.id, pr.title);
   }
 }
 
