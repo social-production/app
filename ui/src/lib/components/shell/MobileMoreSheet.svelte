@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { language, LANGUAGES, setLanguage, t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import '#lib/components/styles/ux/menus.css';
 
   /** The phone "More" tab's menu (ADR 0098): a floating panel above the nav capsule with
-   * web's MobileMoreSheet links (profile or sign in, Settings, About) and the theme. */
+   * web's MobileMoreSheet links (profile or sign in, Settings, About), the theme and the
+   * language (ADR 0114: here so people who aren't signed in can change it too). */
   type Theme = 'system' | 'light' | 'dark';
   const THEMES: [Theme, string][] = [
     ['system', 'System'],
@@ -157,6 +158,19 @@
             aria-checked={theme === value}
             class:on={theme === value}
             onclick={() => onTheme(value)}>{t(label)}</button
+          >
+        {/each}
+      </div>
+      <div class="more-panel-theme" role="radiogroup" aria-label={t('Language')}>
+        {#each LANGUAGES as option (option.value)}
+          <button
+            type="button"
+            role="radio"
+            lang={option.value}
+            aria-checked={language === option.value}
+            class:on={language === option.value}
+            onclick={() => option.value !== language && setLanguage(option.value)}
+            >{option.label}</button
           >
         {/each}
       </div>
