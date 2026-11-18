@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import FactLine from '#lib/components/cards/FactLine.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
@@ -33,7 +33,7 @@
     const date = new Date(`${value}T00:00:00`);
     return Number.isNaN(date.getTime())
       ? value
-      : date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+      : date.toLocaleDateString(locale(), { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   function stageDates(stage: PlanStage): string {

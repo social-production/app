@@ -65,9 +65,7 @@
   <div class="card stack flush">
     <SettingPanel
       label={t('Paired devices')}
-      value={paired.length
-        ? paired.map((d) => d.profile?.name ?? t('Unnamed')).join(', ')
-        : t('None')}
+      value={paired.length ? paired.map((d) => d.profile?.name ?? 'Unnamed').join(', ') : t('None')}
     >
       {#each paired as device (device.agent)}
         <p class="setting-line">{taggedName(device)}</p>

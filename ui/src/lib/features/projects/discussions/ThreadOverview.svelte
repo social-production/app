@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -26,7 +26,7 @@
   const name = $derived(project ? (state.names[project.creator] ?? '…') : '…');
   const started = $derived(
     project
-      ? new Date(project.createdAt / 1000).toLocaleDateString(undefined, {
+      ? new Date(project.createdAt / 1000).toLocaleDateString(locale(), {
           day: 'numeric',
           month: 'short',
         })

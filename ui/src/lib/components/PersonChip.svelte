@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import { standingLabel } from '#lib/components/people/standing.ts';
@@ -40,7 +39,7 @@
     avatar={person.profile?.avatar ?? null}
   />
   <span class="people-copy">
-    <strong>{person.profile?.name ?? t('Unnamed')}</strong>
+    <strong>{person.profile?.name ?? 'Unnamed'}</strong>
     <small>{facts.join(' · ')}</small>
   </span>
   <svg class="people-chevron" aria-hidden="true" viewBox="0 0 24 24"><path d="m10 7 5 5-5 5" /></svg

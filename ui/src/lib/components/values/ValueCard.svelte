@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { IMPORTANCE_OPTIONS, type Importance, type ProjectValue } from '#lib/domain/values.ts';
 
@@ -94,6 +94,6 @@
   <p class="value-about">
     {t('Added by')} <strong>{authorName}</strong> · {new Date(
       value.createdAt / 1000,
-    ).toLocaleDateString()}
+    ).toLocaleDateString(locale())}
   </p>
 </OverlaySheet>

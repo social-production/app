@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import { bodyParts, formatByteSize } from '#lib/components/chat/chatFormat.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -79,7 +79,7 @@
     }
   }
   const day = (at: number): string =>
-    new Date(at).toLocaleDateString(undefined, { day: 'numeric', month: 'short' });
+    new Date(at).toLocaleDateString(locale(), { day: 'numeric', month: 'short' });
 
   function photoSrc(node: HTMLImageElement, a: ChatAttachment): void {
     void p.fileUrl(a).then(

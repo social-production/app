@@ -1,0 +1,36 @@
+/* The dock's buttons as joined segments (owner, 2026-11-18, mockup approved: "exactly what
+   u meant"): they fill the capsule edge to edge, flat where they meet with a hairline
+   between, and the capsule's rounded ends shape the first and last. The same for the
+   Support / Oppose capsule. Loaded after dock.css; every rule starts with `.shell`. */
+
+.shell .dock-capsule,
+.shell .dock-vote > .vote-dock-root > .vote-dock,
+.shell .dock-vote > #participation-signals {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.shell .dock-capsule :is(button, a, .membership-split, .participation-membership, .dock-chip),
+.shell .dock-vote :is(.vote-dock, #participation-signals) :is(button, a) {
+  min-height: 52px;
+  border-radius: 0;
+}
+
+/* A hairline before every segment; the capsule's round end hides the first one. */
+.shell .dock-capsule :is(button, a, .dock-chip):not(.membership-split *),
+.shell .dock-capsule .membership-split,
+.shell .dock-vote :is(.vote-dock, #participation-signals) :is(button, a) {
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
+
+.shell .dock-capsule :is(button, a):active:not(:disabled) {
+  transform: none;
+  filter: brightness(0.94);
+}
+
+/* A menu opened from inside the dock (⋯, Phase, Repository) hangs outside it: stop clipping
+   while one is open, or the capsule's rounded edge would hide it. */
+.shell .dock-capsule:has(.dock-more-card, [role='menu'], [role='dialog']) {
+  overflow: visible;
+}

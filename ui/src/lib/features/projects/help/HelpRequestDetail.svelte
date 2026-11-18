@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
@@ -44,7 +44,7 @@
   const author = $derived(help.names[help.project?.creator ?? ''] ?? '…');
   const started = $derived(
     help.project
-      ? new Date(help.project.createdAt / 1000).toLocaleDateString(undefined, {
+      ? new Date(help.project.createdAt / 1000).toLocaleDateString(locale(), {
           day: 'numeric',
           month: 'short',
         })

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t, plural } from '#lib/i18n/index.ts';
+  import { locale, plural, t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
@@ -65,7 +65,7 @@
   const monthGrid = $derived(monthDays(month, p.activities, Date.now(), p.toneOf));
   const days = $derived(strip ? weekOf(monthGrid, isoOf(cursor)) : monthGrid);
   const WEEKDAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-  const label = $derived(month.toLocaleDateString([], { month: 'long', year: 'numeric' }));
+  const label = $derived(month.toLocaleDateString(locale(), { month: 'long', year: 'numeric' }));
   const zone = zoneOf(new Date());
   const today = isoOf(wall(Date.now()));
   const agendaDay = $derived(

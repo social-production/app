@@ -91,7 +91,6 @@ export const part13: Record<string, Entry> = {
   'Unlocks after this project gets a Support signal.':
     'Станет доступно после сигнала «Поддержка» для этого проекта.',
   Unmute: 'Включить звук',
-  Unnamed: 'Безымянный',
   Unnecessary: 'Не нужно',
   Unpin: 'Открепить',
   Upcoming: 'Предстоящие',

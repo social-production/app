@@ -4,7 +4,7 @@
  * shown in each reader's Display timezone (`zone.ts`).
  */
 
-import { t } from '#lib/i18n/index.ts';
+import { locale, t } from '#lib/i18n/index.ts';
 import { fromWall, inZone, wall } from './zone.ts';
 
 /** project_integrity::EventSchedule. */
@@ -156,12 +156,12 @@ export function scheduleLine(s: EventSchedule, zone: (d: Date) => string): strin
   const end = new Date(bounds.end);
   const suffix = (d: Date): string => (zone(d) ? ` ${zone(d)}` : '');
   const full = (d: Date): string =>
-    `${d.toLocaleString(undefined, inZone({ ...dateOptions, ...timeOptions }))}${suffix(d)}`;
+    `${d.toLocaleString(locale(), inZone({ ...dateOptions, ...timeOptions }))}${suffix(d)}`;
   if (localDay(wall(bounds.start)) !== localDay(wall(bounds.end)))
     return `${full(start)} – ${full(end)}`;
-  const day = start.toLocaleDateString(undefined, inZone(dateOptions));
-  const from = start.toLocaleTimeString(undefined, inZone(timeOptions));
-  const to = end.toLocaleTimeString(undefined, inZone(timeOptions));
+  const day = start.toLocaleDateString(locale(), inZone(dateOptions));
+  const from = start.toLocaleTimeString(locale(), inZone(timeOptions));
+  const to = end.toLocaleTimeString(locale(), inZone(timeOptions));
   return `${day}, ${from} – ${to}${suffix(end)}`;
 }
 

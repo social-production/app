@@ -60,7 +60,7 @@
 
   const name = (m: BoardMember) => {
     const p = people[m.agent];
-    return p ? displayName(p) : t('Unnamed');
+    return p ? displayName(p) : 'Unnamed';
   };
   const quorum = $derived(board?.quorum ?? 0);
   const seated = $derived(boardOrder(board?.moderators ?? [], me, name));

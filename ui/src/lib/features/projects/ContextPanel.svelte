@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t, plural } from '#lib/i18n/index.ts';
+  import { locale, plural, t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
   import FactRow from '#lib/components/detail/FactRow.svelte';
@@ -54,7 +54,7 @@
   const latest = $derived(update?.body.replace(/^\s*update:\s*/i, '') ?? null);
   const author = $derived(names[project.creator] ?? '…');
   const started = $derived(
-    new Date(project.createdAt / 1000).toLocaleDateString(undefined, {
+    new Date(project.createdAt / 1000).toLocaleDateString(locale(), {
       day: 'numeric',
       month: 'short',
     }),

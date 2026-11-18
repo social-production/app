@@ -50,8 +50,16 @@ export function setLanguage(next: Language): void {
   location.reload();
 }
 
+/** The device's own form of the chosen language (en-US, en-GB…), else the language's default. */
+function regional(): string {
+  const device = typeof navigator === 'undefined' ? '' : (navigator.language ?? '');
+  return device.toLowerCase().split('-')[0] === current.value ? device : current.locale;
+}
+
+const shownLocale = regional();
+
 /** The locale for dates and numbers. */
-export const locale = (): string => current.locale;
+export const locale = (): string => shownLocale;
 
 const fill = (text: string, vars?: Record<string, string | number>): string =>
   vars ? text.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m)) : text;
@@ -73,7 +81,7 @@ export function plural(
   other: string,
   vars?: Record<string, string | number>,
 ): string {
-  const all = { n: n.toLocaleString(current.locale), ...vars };
+  const all = { n: n.toLocaleString(shownLocale), ...vars };
   const hit = current.catalogue?.[other];
   if (hit && typeof hit === 'object') {
     const form = hit[rules.select(n)] ?? hit.other ?? hit.many;
