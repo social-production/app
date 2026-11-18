@@ -24,7 +24,7 @@
         : person.standing.level === 'Paused'
           ? 'A community review found this account is a bot.'
           : canVouch
-            ? 'Vouch'
+            ? t('Vouch')
             : 'Vouching opens once your own votes count fully.',
   );
 </script>

@@ -54,8 +54,8 @@
 
   /** The card's action: vote while approving, record the merge, then confirm it. */
   function actionLabel(pr: SoftwarePullRequest): string {
-    if (pr.stage === 'awaiting-merge') return 'Record merge';
-    return pr.stage === 'confirmation' ? 'Confirm merge' : 'Vote';
+    if (pr.stage === 'awaiting-merge') return t('Record merge');
+    return pr.stage === 'confirmation' ? t('Confirm merge') : t('Vote');
   }
 
   function toggle(id: string): void {

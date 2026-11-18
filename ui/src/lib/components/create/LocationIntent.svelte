@@ -33,12 +33,12 @@
   // Polish Pass mockups: three words in one segmented control, and one line that says
   // what the choice means.
   const choices: { value: LocationChoice; label: string; hint: string }[] = [
-    { value: 'physical', label: 'In person', hint: '' },
-    { value: 'online', label: 'Online', hint: 'It will not show on the map.' },
+    { value: 'physical', label: t('In person'), hint: '' },
+    { value: 'online', label: t('Online'), hint: t('It will not show on the map.') },
     {
       value: 'later',
-      label: 'Not yet',
-      hint: 'Add a place later. Until then it is not on the map.',
+      label: t('Not yet'),
+      hint: t('Add a place later. Until then it is not on the map.'),
     },
   ];
   const shown = $derived(choices.filter((c) => allowLater || c.value !== 'later'));

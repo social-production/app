@@ -52,7 +52,7 @@
     open ? Math.min(100, Math.round((item.yes / Math.max(item.required, 1)) * 100)) : share,
   );
   const tag = $derived(
-    open ? 'Open' : `${item.status === 'Passed' ? 'Passed' : 'Rejected'} · ${share}% yes`,
+    open ? t('Open') : `${item.status === 'Passed' ? t('Passed') : t('Rejected')} · ${share}% yes`,
   );
   const text = $derived('Edit' in item.kind ? item.kind.Edit.description : null);
 </script>

@@ -44,14 +44,14 @@
   const tabs = $derived([
     {
       id: 'coming' as Tab,
-      label: 'Coming up',
+      label: t('Coming up'),
       count: activities.length,
       hot: activities.some(unseen),
     },
-    { id: 'votes' as Tab, label: 'Votes', count: votes.length, hot: votes.length > 0 },
+    { id: 'votes' as Tab, label: t('Votes'), count: votes.length, hot: votes.length > 0 },
     {
       id: 'requests' as Tab,
-      label: 'Requests',
+      label: t('Requests'),
       count: help.length + requests.length,
       hot: help.some(unseen) || requests.some(unseen),
     },

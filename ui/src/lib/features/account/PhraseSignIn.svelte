@@ -29,8 +29,9 @@
     if (words.length < 24)
       return `${24 - words.length} more word${words.length === 23 ? '' : 's'} needed.`;
     if (words.length > 24) return `That's ${words.length} words; a phrase has 24.`;
-    if (!valid) return 'All words are real, but they are not a valid phrase — check their order.';
-    return 'Looks right.';
+    if (!valid)
+      return t('All words are real, but they are not a valid phrase — check their order.');
+    return t('Looks right.');
   });
 
   async function go(event: SubmitEvent): Promise<void> {

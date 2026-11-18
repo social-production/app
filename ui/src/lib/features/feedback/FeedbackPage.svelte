@@ -22,13 +22,13 @@
   /** web's FeedbackPage: bugs and suggestions with votes, compose and detail. The filter and
    * the order are in view (Plan, Phase and Feedback Screens, 7), not behind icons. */
   const filterOptions: { value: FeedbackFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'bugs', label: 'Bugs' },
-    { value: 'suggestions', label: 'Suggestions' },
+    { value: 'all', label: t('All') },
+    { value: 'bugs', label: t('Bugs') },
+    { value: 'suggestions', label: t('Suggestions') },
   ];
   const sortOptions: { value: FeedbackSort; label: string }[] = [
-    { value: 'trending', label: 'Trending' },
-    { value: 'recent', label: 'Most recent' },
+    { value: 'trending', label: t('Trending') },
+    { value: 'recent', label: t('Most recent') },
   ];
 
   const fb = new FeedbackState();

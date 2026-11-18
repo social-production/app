@@ -17,7 +17,7 @@
 
   const questions = $derived(criteria.filter((c) => c.kind !== 'Value').length);
   const kicker = (c: PlanCriterion, index: number): string =>
-    c.kind === 'Value' ? 'Shared value' : `Question ${index + 1} of ${questions}`;
+    c.kind === 'Value' ? t('Shared value') : `Question ${index + 1} of ${questions}`;
 </script>
 
 <section class="assess-panel" data-participation-action="assess-plan">

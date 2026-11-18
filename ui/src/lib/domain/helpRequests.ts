@@ -1,5 +1,6 @@
 /** Help requests (ADR 0067): commons spaces with mode `help-request` and one activity. */
 
+import { t } from '#lib/i18n/index.ts';
 import { displayZone, fromWall, wall } from './zone.ts';
 import { zoneOf } from './activityTime.ts';
 
@@ -58,7 +59,7 @@ export const endsAfter = (start: string, end: string): boolean =>
 export function scheduleLabel(startValue: string, endValue: string): string {
   const start = startValue ? new Date(startValue) : null;
   const end = endValue ? new Date(endValue) : null;
-  if (!start || Number.isNaN(start.getTime())) return 'Time TBD';
+  if (!start || Number.isNaN(start.getTime())) return t('Time TBD');
   const startLabel = start.toLocaleString(undefined, {
     weekday: 'short',
     month: 'short',

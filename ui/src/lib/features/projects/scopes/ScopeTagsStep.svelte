@@ -32,7 +32,7 @@
   const HINTS: Record<Variant, string> = {
     project: 'Pick at least one channel. The first channel is its main one.',
     thread: 'Pick at least one. The first is where it mainly lives.',
-    help: 'Pick at least one. Requests are tagged like threads; the first is the main one.',
+    help: t('Pick at least one. Requests are tagged like threads; the first is the main one.'),
     event: 'Pick the channels people follow, and any communities.',
   };
 

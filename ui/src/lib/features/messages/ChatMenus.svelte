@@ -42,7 +42,7 @@
       at.list === 'personal' ? inbox.setPrefs(at.id, prefs) : publicChats.setPrefs(at.id, prefs);
     void write.then(
       () => prefs.hidden && onGone(at.id),
-      (e: unknown) => onError(e instanceof Error ? e.message : 'Could not update the chat'),
+      (e: unknown) => onError(e instanceof Error ? e.message : t('Could not update the chat')),
     );
   }
 
@@ -50,20 +50,20 @@
     if (at.list === 'public') {
       const chat = publicChats.chats.find((c) => c.id === at.id);
       const mute = {
-        label: chat?.muted ? 'Unmute' : 'Mute',
+        label: chat?.muted ? t('Unmute') : t('Mute'),
         icon: chat?.muted ? 'bell' : 'mute',
         onSelect: () => apply(at, { muted: !chat?.muted }),
       };
       if (at.header) return [mute];
       return [
         {
-          label: chat?.pinned ? 'Unpin' : 'Pin',
+          label: chat?.pinned ? t('Unpin') : t('Pin'),
           icon: 'pin',
           onSelect: () => apply(at, { pinned: !chat?.pinned }),
         },
         mute,
         {
-          label: 'Delete',
+          label: t('Delete'),
           icon: 'trash',
           danger: true,
           onSelect: () => apply(at, { hidden: true }),
@@ -77,29 +77,29 @@
     const list: ChatMenuItem[] = [];
     if (partner)
       list.push({
-        label: 'View profile',
+        label: t('View profile'),
         icon: 'user',
         href: resolve('/profile/[agent]', { agent: partner }),
       });
     list.push(
       {
-        label: chat.pinned ? 'Unpin' : 'Pin',
+        label: chat.pinned ? t('Unpin') : t('Pin'),
         icon: 'pin',
         onSelect: () => apply(at, { pinned: !chat.pinned }),
       },
       {
-        label: chat.muted ? 'Unmute' : 'Mute',
+        label: chat.muted ? t('Unmute') : t('Mute'),
         icon: chat.muted ? 'bell' : 'mute',
         onSelect: () => apply(at, { muted: !chat.muted }),
       },
     );
-    if (group) list.push({ label: 'Chat info', icon: 'info', onSelect: () => onInfo(at.id) });
+    if (group) list.push({ label: t('Chat info'), icon: 'info', onSelect: () => onInfo(at.id) });
     // web: deleting a group from your list is leaving it.
     const del = group ? () => leave(at.id) : () => apply(at, { hidden: true });
-    list.push({ label: 'Delete chat', icon: 'trash', danger: true, onSelect: del });
+    list.push({ label: t('Delete chat'), icon: 'trash', danger: true, onSelect: del });
     if (group) {
       list.push({
-        label: 'Leave group',
+        label: t('Leave group'),
         icon: 'leave',
         danger: true,
         onSelect: () => (leaving = { id: at.id, started: chat.manager === inbox.me }),
@@ -113,7 +113,7 @@
       await inbox.leave(id);
       onGone(id);
     } catch (e) {
-      onError(e instanceof Error ? e.message : 'Could not leave the group.');
+      onError(e instanceof Error ? e.message : t('Could not leave the group.'));
     }
   }
 

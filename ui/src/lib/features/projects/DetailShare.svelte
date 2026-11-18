@@ -43,7 +43,7 @@
   async function send(contact: Contact): Promise<string | null> {
     if (!project?.amMember && !isPrivate) {
       return event
-        ? 'Only event members can perform this action'
+        ? t('Only event members can perform this action')
         : 'Only project members can perform this action';
     }
     try {

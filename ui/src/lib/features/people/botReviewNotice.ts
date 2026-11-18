@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { BotReview } from '#lib/domain/botReview.ts';
 import { ownCopy, theirCopy, type BotNotice } from '#lib/domain/botReviewNotifications.ts';
 import { getBotReview } from '#lib/services/botReview.ts';
@@ -27,7 +28,7 @@ export async function tellReview(account: string, before: BotReview | undefined)
     at: Date.now() * 1000,
     reReviewFrom: after.reReviewFrom === null ? null : after.reReviewFrom * 1000,
   };
-  const name = (await namesOf([account]))[account] ?? 'Unnamed';
+  const name = (await namesOf([account]))[account] ?? t('Unnamed');
   const markers = [...new Set([...before.markers, ...after.markers])].filter((m) => m !== account);
   await botReviewNotice([account], 'bot-review', ownCopy(n), account);
   await botReviewNotice(markers, 'bot-review-result', theirCopy(n, name), account);

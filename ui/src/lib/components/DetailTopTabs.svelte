@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { DetailTabId } from '#lib/domain/projects.ts';
 
@@ -15,11 +16,11 @@
   let { active, available, ariaLabel, onSelect }: Props = $props();
 
   const all: { id: DetailTabId; label: string; short?: string; icon: string }[] = [
-    { id: 'context', label: 'Details', icon: 'list' },
-    { id: 'participation', label: 'Participation', short: 'Take part', icon: 'people' },
-    { id: 'chat', label: 'Chat', icon: 'message' },
-    { id: 'links', label: 'Links', icon: 'link' },
-    { id: 'history', label: 'History', icon: 'clock' },
+    { id: 'context', label: t('Details'), icon: 'list' },
+    { id: 'participation', label: t('Participation'), short: 'Take part', icon: 'people' },
+    { id: 'chat', label: t('Chat'), icon: 'message' },
+    { id: 'links', label: t('Links'), icon: 'link' },
+    { id: 'history', label: t('History'), icon: 'clock' },
   ];
   const tabs = $derived(all.filter((t) => available.includes(t.id)));
 </script>

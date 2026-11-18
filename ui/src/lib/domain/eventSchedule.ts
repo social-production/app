@@ -4,6 +4,7 @@
  * shown in each reader's Display timezone (`zone.ts`).
  */
 
+import { t } from '#lib/i18n/index.ts';
 import { fromWall, inZone, wall } from './zone.ts';
 
 /** project_integrity::EventSchedule. */
@@ -65,10 +66,10 @@ export function scheduleProblem(f: ScheduleForm): string | null {
   const range = f.scheduleMode === 'range';
   const startDay = range ? f.rangeStartDate : f.scheduledDate;
   const endDay = range ? f.rangeEndDate : f.scheduledDate;
-  if (!startDay || !endDay) return range ? 'Choose a start and end date.' : 'Choose a date.';
-  if (!f.startTime || !f.finishTime) return 'Choose a start and finish time.';
+  if (!startDay || !endDay) return range ? t('Choose a start and end date.') : t('Choose a date.');
+  if (!f.startTime || !f.finishTime) return t('Choose a start and finish time.');
   if (local(endDay, f.finishTime) <= local(startDay, f.startTime))
-    return 'The finish must be after the start.';
+    return t('The finish must be after the start.');
   return null;
 }
 

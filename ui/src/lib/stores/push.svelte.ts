@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   inNativeApp,
   osNotificationsAllowed,
@@ -74,8 +75,8 @@ export async function loadPush(): Promise<void> {
 export function showOnDesktop(notice: Notice): void {
   if (!inNativeApp() || !readDesktop() || document.hasFocus()) return;
   if ((notificationsOff.categories as string[]).includes(notice.category)) return;
-  const title = push.details ? notice.title : 'Social Production';
-  const body = push.details ? notice.body : 'Something new is waiting for you.';
+  const title = push.details ? notice.title : t('Social Production');
+  const body = push.details ? notice.body : t('Something new is waiting for you.');
   void osNotify(title, body).catch(() => undefined);
 }
 
@@ -97,7 +98,7 @@ export function setPushOn(on: boolean): Promise<void> {
       push.on = on && (await osNotificationsAllowed());
       saveDesktop(on);
       if (on && !push.on)
-        push.problem = 'Notifications are off for the app in your system settings.';
+        push.problem = t('Notifications are off for the app in your system settings.');
       return;
     }
     if (!on) {
@@ -107,7 +108,7 @@ export function setPushOn(on: boolean): Promise<void> {
     }
     push.on = await turnPushOn(choices());
     if (!push.on)
-      push.problem = 'Notifications are blocked for this site in your browser settings.';
+      push.problem = t('Notifications are blocked for this site in your browser settings.');
   });
 }
 

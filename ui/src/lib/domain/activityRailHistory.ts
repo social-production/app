@@ -2,6 +2,7 @@
  * The right rail's History (web-backend's `bootstrap/activity_rail_history.py`): activities
  * that ended, roles you hold now, and the votes you cast, newest first.
  */
+import { t } from '#lib/i18n/index.ts';
 import {
   activityQuery,
   inActivityPhase,
@@ -194,7 +195,7 @@ function linkCasts(projects: RailProject[]): Cast[] {
               kind: linkKind(l),
               query: linkQuery(l.id),
               title: p.title,
-              meta: l.sever ? 'Sever link' : 'Link vote',
+              meta: l.sever ? t('Sever link') : t('Link vote'),
               createdAt: l.createdAt,
               vote: l.myVote,
               outcome:
@@ -218,9 +219,9 @@ export function historyMatches(item: RailItem, filter: HistoryFilter): boolean {
 export function historyOutcome(item: RailItem): string {
   if (item.kind === 'vote') {
     if (item.outcome === 'passed') return 'Passed';
-    if (item.outcome === 'failed') return 'Did not pass';
-    return 'Still open';
+    if (item.outcome === 'failed') return t('Did not pass');
+    return t('Still open');
   }
   if (isHelpKind(item.kind)) return item.viewerParticipated ? 'You participated' : item.meta;
-  return item.viewerParticipated ? 'You participated' : 'You did not participate';
+  return item.viewerParticipated ? t('You participated') : t('You did not participate');
 }

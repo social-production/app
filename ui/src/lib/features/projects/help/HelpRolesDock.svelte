@@ -37,7 +37,7 @@
 
   async function send(contact: Contact): Promise<string | null> {
     try {
-      await shareHelpRequest(contact, help.project?.charter?.title ?? 'Help request', url);
+      await shareHelpRequest(contact, help.project?.charter?.title ?? t('Help request'), url);
       return null;
     } catch (e) {
       return explain(e);
@@ -48,9 +48,9 @@
   const filled = $derived(roles.filter((r) => !help.hasRoom(r)).length);
 
   function label(role: ActivityRole): string {
-    if (help.pending === role.index) return 'Working...';
-    if (help.activity?.myRole === role.index) return 'Leave';
-    return help.hasRoom(role) ? 'Join' : 'Full';
+    if (help.pending === role.index) return t('Working...');
+    if (help.activity?.myRole === role.index) return t('Leave');
+    return help.hasRoom(role) ? t('Join') : t('Full');
   }
 </script>
 

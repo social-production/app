@@ -1,5 +1,6 @@
 /** Links between projects (web's Links tab, ADR 0042). Each project votes on its own half. */
 
+import { t } from '#lib/i18n/index.ts';
 import { APPROVAL_PERCENT, type VoteChoice } from './governance.ts';
 import type { CharterMode } from './projects.ts';
 
@@ -104,7 +105,7 @@ function yesNeeded(half: LinkHalf): number | null {
 export function voteRequirement(half: LinkHalf): string {
   const needed = yesNeeded(half) ?? 0;
   const left = Math.max(half.population - half.yes - half.no, 0);
-  const need = needed > 0 ? `Needs ${needed} more yes` : 'Enough yes votes so far';
+  const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
   const waiting =
     left > 0 ? ` · ${left} ${left === 1 ? 'person has' : 'people have'} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;
@@ -112,10 +113,10 @@ export function voteRequirement(half: LinkHalf): string {
 
 /** web's `resultNote`; a half not received yet is an app addition (no server delivers it). */
 export function resultNote(half: LinkHalf | null): string {
-  if (!half) return 'Waiting for this project to receive the request.';
-  if (half.status === 'Approved') return 'Approved on this side.';
+  if (!half) return t('Waiting for this project to receive the request.');
+  if (half.status === 'Approved') return t('Approved on this side.');
   return half.status === 'Open'
-    ? 'Waiting for more approvals.'
+    ? t('Waiting for more approvals.')
     : 'This side can no longer approve the request.';
 }
 
@@ -135,7 +136,7 @@ export function tallyLabel(r: LinkRequest): string {
   const halves = [r.thisSide.half, r.otherSide.half];
   const yes = halves.reduce((n, h) => n + (h?.yes ?? 0), 0);
   const no = halves.reduce((n, h) => n + (h?.no ?? 0), 0);
-  return yes + no === 0 ? 'No votes yet' : `${percent({ yes, no })}% · ${yes} yes / ${no} no`;
+  return yes + no === 0 ? t('No votes yet') : `${percent({ yes, no })}% · ${yes} yes / ${no} no`;
 }
 
 /** web's status labels ("Open", "Approved", "Rejected"; "Sever open" while a sever runs). */

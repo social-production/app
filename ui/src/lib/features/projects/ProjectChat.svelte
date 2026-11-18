@@ -41,9 +41,9 @@
     highlighted,
     onWrote,
     copy = {
-      title: '# project-chat',
-      placeholder: 'Message the project...',
-      empty: 'No project chat yet.',
+      title: t('# project-chat'),
+      placeholder: t('Message the project...'),
+      empty: t('No project chat yet.'),
     },
   }: Props = $props();
 

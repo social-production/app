@@ -90,8 +90,8 @@
   // Upcoming and Past as tabs (ADR 0102), in place of web's fold at the bottom.
   const hasPast = $derived(state.past.length + sw.history.length > 0);
   const views = [
-    { value: 'upcoming' as const, label: 'Upcoming' },
-    { value: 'past' as const, label: 'Past activity' },
+    { value: 'upcoming' as const, label: t('Upcoming') },
+    { value: 'past' as const, label: t('Past activity') },
   ];
 
   $effect(() => {

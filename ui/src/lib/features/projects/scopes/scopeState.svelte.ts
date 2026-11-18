@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { Contact } from '#lib/domain/messages.ts';
 import { displayName, type Person } from '#lib/domain/people.ts';
 import type { Project } from '#lib/domain/projects.ts';
@@ -123,7 +124,7 @@ export class ScopeState {
   /** A member's name for decisions that name them. */
   memberName = (agent: string): string => {
     const person = this.members.find((m) => m.agent === agent);
-    return person ? displayName(person) : 'a member';
+    return person ? displayName(person) : t('a member');
   };
 
   /** web's handleMembershipToggle: join, or leave. */

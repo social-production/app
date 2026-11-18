@@ -15,7 +15,9 @@
   let { form, steps, onEdit }: Props = $props();
 
   const has = (id: PlanStepType): boolean => steps.some((s) => s.id === id);
-  const placeLabel = $derived(has('distribution-location') ? 'Distribution location' : 'Location');
+  const placeLabel = $derived(
+    has('distribution-location') ? t('Distribution location') : t('Location'),
+  );
   const placeStep = $derived<PlanStepType>(
     has('distribution-location') ? 'distribution-location' : 'location',
   );

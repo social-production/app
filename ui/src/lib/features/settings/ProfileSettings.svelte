@@ -57,7 +57,7 @@
     try {
       await saveProfile({ name: name.trim(), bio, home_area: homeArea.trim(), avatar });
       viewer.name = name.trim();
-      status = 'Saved.';
+      status = t('Saved.');
     } catch (e) {
       error = explain(e);
     } finally {

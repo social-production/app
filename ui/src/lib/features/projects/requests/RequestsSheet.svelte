@@ -28,7 +28,7 @@
   const requests = $derived(state.shown);
   const chatHref = (seed: string): string =>
     `${resolve('/messages')}?conversation=${encodeURIComponent(seed)}`;
-  const title = $derived(reviewer ? 'Requests' : 'Your requests');
+  const title = $derived(reviewer ? t('Requests') : t('Your requests'));
 </script>
 
 <OverlaySheet

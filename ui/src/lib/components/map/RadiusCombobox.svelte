@@ -30,7 +30,7 @@
   let open = $state(false);
 
   const display = $derived.by(() => {
-    if (value === 'global') return 'Global';
+    if (value === 'global') return t('Global');
     const parsed = Number(value);
     return Number.isFinite(parsed) ? `${Math.round(parsed)} km` : value;
   });

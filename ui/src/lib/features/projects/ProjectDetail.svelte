@@ -38,9 +38,9 @@
 
   // web's EventChatTab wording.
   const EVENT_CHAT = {
-    title: 'Event chat',
-    placeholder: 'Message members...',
-    empty: 'No event chat yet.',
+    title: t('Event chat'),
+    placeholder: t('Message members...'),
+    empty: t('No event chat yet.'),
   };
 
   // The route re-creates this page per id ({#key}), so reading `id` once is intended.
@@ -144,8 +144,8 @@
 
   /** web's sheet title and button: organizer-run events save; others propose. */
   function editLabel(p: Project, submit: boolean): string {
-    if (p.governance === 'organizer_controlled') return submit ? 'Save' : 'Edit event';
-    return 'Propose Edit';
+    if (p.governance === 'organizer_controlled') return submit ? t('Save') : t('Edit event');
+    return t('Propose Edit');
   }
 
   /** web: after leaving a private event it can't be opened again, so go home. */

@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { FeedbackInput, FeedbackItem, FeedbackVote } from '#lib/domain/feedback.ts';
 import { withVote } from '#lib/domain/feedback.ts';
 import { explain } from '#lib/services/errors.ts';
@@ -23,7 +24,7 @@ export class FeedbackState {
       this.error = '';
       void this.learnNames();
     } catch {
-      this.error = 'Could not load feedback right now.';
+      this.error = t('Could not load feedback right now.');
     } finally {
       this.loading = false;
     }

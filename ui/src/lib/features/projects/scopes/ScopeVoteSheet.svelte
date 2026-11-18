@@ -50,7 +50,7 @@
     }
     voted = choice;
     const stillOpen = gov.open.some((p) => p.id === item.id);
-    notice = stillOpen ? 'Vote recorded' : 'Vote recorded. That decision is now settled.';
+    notice = stillOpen ? t('Vote recorded') : t('Vote recorded. That decision is now settled.');
     // Leave "You voted…" on screen for a moment before moving on.
     await new Promise((resolve) => setTimeout(resolve, 1200));
     shown = null;

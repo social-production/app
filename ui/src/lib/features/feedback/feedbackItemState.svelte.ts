@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { FeedbackComment, FeedbackItem, FeedbackVote } from '#lib/domain/feedback.ts';
 import { explain } from '#lib/services/errors.ts';
 import {
@@ -28,7 +29,7 @@ export class FeedbackItemState {
       this.item = item;
       this.comments = comments;
       await this.learnNames();
-      this.error = item ? '' : 'This feedback was not found.';
+      this.error = item ? '' : t('This feedback was not found.');
     } catch (e) {
       this.error = explain(e) || 'Could not load this feedback.';
     } finally {

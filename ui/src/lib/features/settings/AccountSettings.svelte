@@ -33,7 +33,7 @@
     error = message = undefined;
     try {
       await addPasskey(viewer.name || 'Social Production');
-      message = 'Passkey saved on this device.';
+      message = t('Passkey saved on this device.');
     } catch (e) {
       error = explain(e);
     } finally {

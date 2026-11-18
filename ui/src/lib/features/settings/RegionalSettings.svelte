@@ -55,8 +55,9 @@
     try {
       const [hint] = await ipPlaceHint();
       if (!hint || hint.latitude == null || hint.longitude == null) {
-        message =
-          'IP location is unavailable. On localhost use search or device location; on a deployed site this uses your public IP.';
+        message = t(
+          'IP location is unavailable. On localhost use search or device location; on a deployed site this uses your public IP.',
+        );
         return;
       }
       save({ ...hint, mode: 'physical', isOnline: false });

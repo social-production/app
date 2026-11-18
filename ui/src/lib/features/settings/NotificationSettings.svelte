@@ -11,38 +11,38 @@
   const options: { id: NotificationCategory; title: string; description: string }[] = [
     {
       id: 'follows',
-      title: 'Follows',
-      description: 'Follow requests, new followers, and accepted requests.',
+      title: t('Follows'),
+      description: t('Follow requests, new followers, and accepted requests.'),
     },
     {
       id: 'comments',
-      title: 'Comments',
-      description: 'Replies and mentions on your posts and activity.',
+      title: t('Comments'),
+      description: t('Replies and mentions on your posts and activity.'),
     },
     {
       id: 'shares_invites',
-      title: 'Shares and invites',
-      description: 'Shared projects or events, and invites to join.',
+      title: t('Shares and invites'),
+      description: t('Shared projects or events, and invites to join.'),
     },
     {
       id: 'roles',
-      title: 'Roles',
-      description: 'Role sign-ups and suggested roles on your work.',
+      title: t('Roles'),
+      description: t('Role sign-ups and suggested roles on your work.'),
     },
     {
       id: 'votes_needed',
-      title: 'Votes needed',
-      description: 'Phase votes and approvals that need your input.',
+      title: t('Votes needed'),
+      description: t('Phase votes and approvals that need your input.'),
     },
     {
       id: 'phase_done',
-      title: 'Phase finished',
-      description: 'When a project or event phase is completed.',
+      title: t('Phase finished'),
+      description: t('When a project or event phase is completed.'),
     },
     {
       id: 'plan_leading',
-      title: 'Plan became leading',
-      description: 'When a plan becomes the leading option. Off by default.',
+      title: t('Plan became leading'),
+      description: t('When a plan becomes the leading option. Off by default.'),
     },
   ];
   const on = (id: NotificationCategory): boolean => !notificationsOff.categories.includes(id);

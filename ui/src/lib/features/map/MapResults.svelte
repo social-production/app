@@ -30,8 +30,8 @@
   const nothingText = $derived.by(() => {
     const where = s.radiusKm === 'global' ? 'anywhere' : `within ${s.radiusKm} km`;
     const when = WHEN[s.windowFilter] ?? '';
-    const wider = s.radiusKm === 'global' ? '' : 'a wider distance';
-    const longer = when ? 'a longer time' : '';
+    const wider = s.radiusKm === 'global' ? '' : t('a wider distance');
+    const longer = when ? t('a longer time') : '';
     const tryThis = [wider, longer].filter(Boolean).join(' or ');
     return `Nothing on the map ${where}${when}.${tryThis ? ` Try ${tryThis}.` : ''}`;
   });

@@ -30,21 +30,23 @@
   } = $props();
 
   const allScopes: { value: FeedScope; label: string }[] = [
-    { value: 'home', label: 'Home' },
-    { value: 'global', label: 'Global' },
-    { value: 'region', label: 'Region' },
+    { value: 'home', label: t('Home') },
+    { value: 'global', label: t('Global') },
+    { value: 'region', label: t('Region') },
   ];
   // Home is the feed of who you follow: someone signed out has none, so it isn't offered.
   const scopes = $derived(guest ? allScopes.filter((s) => s.value !== 'home') : allScopes);
   const audiences: { value: HomeAudience; label: string }[] = [
-    { value: 'following', label: 'Following only' },
-    { value: 'popular', label: 'Following + popular' },
+    { value: 'following', label: t('Following only') },
+    { value: 'popular', label: t('Following + popular') },
   ];
   const radiusLabel = $derived(
     radiusPresetOptions.find((o) => o.value === feed.region.radius)?.label ??
       `${feed.region.radius} km`,
   );
-  const scopeLabel = $derived(scopes.find((s) => s.value === feed.shownScope)?.label ?? 'Global');
+  const scopeLabel = $derived(
+    scopes.find((s) => s.value === feed.shownScope)?.label ?? t('Global'),
+  );
   // The dot: something narrower than the feed's widest view is on.
   const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
 </script>

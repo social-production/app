@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { Proposal, VoteChoice } from '#lib/domain/governance.ts';
 import { displayName } from '#lib/domain/people.ts';
 import { explain } from '#lib/services/errors.ts';
@@ -40,7 +41,7 @@ export class ScopeGovernance {
       const named = await Promise.all(
         proposals.map(async (p) => ({
           ...p,
-          proposer: await getPerson(p.author).then(displayName, () => 'Someone'),
+          proposer: await getPerson(p.author).then(displayName, () => t('Someone')),
         })),
       );
       this.open = named.filter((p) => p.status === 'Open');
@@ -106,10 +107,10 @@ export function describeDecision(p: Proposal, memberName: (agent: string) => str
   if ('RemoveMember' in p.kind) return `Remove ${memberName(p.kind.RemoveMember.agent)}`;
   if ('Edit' in p.kind) {
     const e = p.kind.Edit;
-    if (e.description !== null) return 'New description';
-    if (e.cover && !e.picture) return 'New cover';
-    if (e.picture && !e.cover) return 'New picture';
-    return e.picture ? 'New picture and cover' : 'New settings';
+    if (e.description !== null) return t('New description');
+    if (e.cover && !e.picture) return t('New cover');
+    if (e.picture && !e.cover) return t('New picture');
+    return e.picture ? t('New picture and cover') : t('New settings');
   }
-  return 'New settings';
+  return t('New settings');
 }

@@ -23,8 +23,8 @@
   let { open, pending, message, onSubmit, onClose }: Props = $props();
 
   const kinds: { value: FeedbackKind; label: string; icon: string }[] = [
-    { value: 'bug', label: 'Bug', icon: 'bug' },
-    { value: 'suggestion', label: 'Suggestion', icon: 'lightbulb' },
+    { value: 'bug', label: t('Bug'), icon: 'bug' },
+    { value: 'suggestion', label: t('Suggestion'), icon: 'lightbulb' },
   ];
   let kind = $state<FeedbackKind>('bug');
   let title = $state('');

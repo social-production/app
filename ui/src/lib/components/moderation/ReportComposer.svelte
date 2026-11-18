@@ -38,13 +38,13 @@
   const REASONS: { value: ReportReason; label: string; examples: string }[] = [
     {
       value: 'spam',
-      label: 'Spam',
+      label: t('Spam'),
       examples:
         'Adverts, scams, the same thing posted again and again, or an account run by a bot.',
     },
     {
       value: 'serious-harm',
-      label: 'Serious harm',
+      label: t('Serious harm'),
       examples:
         "Threats, harassment, hate, sharing someone's private details, or anything that puts someone in danger.",
     },

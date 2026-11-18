@@ -57,7 +57,7 @@
   const joined = $derived(!!s.project?.amMember);
   const count = $derived(s.project?.members.length ?? scope?.members ?? 0);
   const pending = $derived(s.joining || (!s.project && !!scope?.id));
-  const typeName = $derived(kind === 'channel' ? 'Channel' : 'Community');
+  const typeName = $derived(kind === 'channel' ? t('Channel') : t('Community'));
   const organized = $derived(s.project?.governance === 'organizer_controlled');
   // The Platform counts people active last week (what its votes are sized from), not members
   // (Platform and Moderators mockups §1).
@@ -67,8 +67,8 @@
       return organized ? `${members} · organizers decide` : members;
     }
     const n = board?.weeklyActive;
-    if (n === undefined) return 'The whole network';
-    return n === 0 ? 'Nobody active last week' : `${n.toLocaleString()} active last week`;
+    if (n === undefined) return t('The whole network');
+    return n === 0 ? t('Nobody active last week') : `${n.toLocaleString()} active last week`;
   });
   let networkOpen = $state(false);
   const faces = $derived((board?.moderators ?? []).slice(0, 3));

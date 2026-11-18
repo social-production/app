@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { RailItem } from './activityRail.ts';
 import type { ServiceRequest } from './serviceRequests.ts';
 
@@ -26,7 +27,7 @@ export function requestRailItems(
       query: `?request=${encodeURIComponent(r.id)}`,
       meta: r.service,
       createdAt: r.createdAt,
-      countLabel: `Requested by ${names[r.requester] ?? 'Unknown requester'}`,
+      countLabel: `Requested by ${names[r.requester] ?? t('Unknown requester')}`,
       projectMode: 'personal-service',
     }));
 }

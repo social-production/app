@@ -53,23 +53,23 @@
   let audience = $state<ProfileAudience>('all');
   let name = $state('');
   const audiences: { value: ProfileAudience; label: string }[] = [
-    { value: 'all', label: 'Everything' },
-    { value: 'public', label: 'Public only' },
+    { value: 'all', label: t('Everything') },
+    { value: 'public', label: t('Public only') },
   ];
   // svelte-ignore state_referenced_locally
   const own = agent === undefined; // re-created per person, as `who` above
-  const sheetTitle = $derived(name ? `Show on ${name}'s profile` : 'Show on this profile');
+  const sheetTitle = $derived(name ? `Show on ${name}'s profile` : t('Show on this profile'));
 
   const tabs: { value: ProfileTab; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'posts', label: 'Posts' },
-    { value: 'comments', label: 'Comments' },
-    { value: 'projects', label: 'Projects' },
+    { value: 'all', label: t('All') },
+    { value: 'posts', label: t('Posts') },
+    { value: 'comments', label: t('Comments') },
+    { value: 'projects', label: t('Projects') },
   ];
   const sorts: { value: FeedSort; label: string }[] = [
-    { value: 'recent', label: 'Newest' },
-    { value: 'top', label: 'Top' },
-    { value: 'oldest', label: 'Oldest' },
+    { value: 'recent', label: t('Newest') },
+    { value: 'top', label: t('Top') },
+    { value: 'oldest', label: t('Oldest') },
   ];
   // Each tab's empty line (Scope Filters mockups §2), naming the person.
   const empty = $derived.by(() => {

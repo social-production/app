@@ -18,8 +18,8 @@
       list.push({
         id: 'replace-repository',
         glyph: '⇄',
-        label: 'Replace repository',
-        detail: 'Members vote to move the project to a different repository.',
+        label: t('Replace repository'),
+        detail: t('Members vote to move the project to a different repository.'),
         onSelect: onReplace,
       });
     }
@@ -27,8 +27,8 @@
       list.push({
         id: 'merge-capability',
         glyph: '⑂',
-        label: 'Grant or revoke merge capability',
-        detail: 'Members vote on who can merge approved pull requests.',
+        label: t('Grant or revoke merge capability'),
+        detail: t('Members vote on who can merge approved pull requests.'),
         onSelect: onChangeMerge,
       });
     }

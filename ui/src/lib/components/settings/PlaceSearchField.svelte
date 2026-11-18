@@ -42,7 +42,7 @@
       const found = await search(text, 6);
       if (mine !== asked) return;
       results = found;
-      message = found.length ? '' : 'No places match yet.';
+      message = found.length ? '' : t('No places match yet.');
     } catch (e) {
       if (mine === asked) message = failure(e);
     }

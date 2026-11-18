@@ -23,7 +23,7 @@
   async function create(): Promise<void> {
     if (creating) return;
     if (!title.trim()) {
-      error = 'Give the group a name.';
+      error = t('Give the group a name.');
       return;
     }
     creating = true;
@@ -31,7 +31,7 @@
     try {
       await onCreate(members, title.trim());
     } catch (e) {
-      error = e instanceof Error ? e.message : 'The group could not be created.';
+      error = e instanceof Error ? e.message : t('The group could not be created.');
     } finally {
       creating = false;
     }

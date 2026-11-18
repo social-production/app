@@ -28,7 +28,7 @@
     try {
       await onFirst(body.trim(), files);
     } catch (e) {
-      error = e instanceof Error ? e.message : 'The message could not be sent.';
+      error = e instanceof Error ? e.message : t('The message could not be sent.');
       throw e;
     } finally {
       sending = false;

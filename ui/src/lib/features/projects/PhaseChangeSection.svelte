@@ -35,7 +35,7 @@
   const event = $derived(project?.charter?.mode === 'event');
   const how = $derived(
     project?.governance === 'organizer_controlled'
-      ? 'Organizers decide; members are notified.'
+      ? t('Organizers decide; members are notified.')
       : 'Members vote. Proposing counts as your Yes.',
   );
 
@@ -47,8 +47,8 @@
   });
 
   function lockReason(): string {
-    if (phaseVoteOpen) return 'A phase vote is already open. Vote on it in Pending votes first.';
-    if (!signalGatePasses) return 'Unlocks after this project gets a Support signal.';
+    if (phaseVoteOpen) return t('A phase vote is already open. Vote on it in Pending votes first.');
+    if (!signalGatePasses) return t('Unlocks after this project gets a Support signal.');
     return planGate;
   }
 
@@ -72,7 +72,11 @@
     if (next)
       moves.push({
         id: 'advance',
-        label: closing ? (event ? 'Close event' : 'Close project') : `Advance to ${next.label}`,
+        label: closing
+          ? event
+            ? t('Close event')
+            : t('Close project')
+          : `Advance to ${next.label}`,
         detail:
           locked ||
           (closing
@@ -89,7 +93,7 @@
     if (!event && project.phase !== 'phase-1' && project.phase !== 'phase-7')
       moves.push({
         id: 'convert',
-        label: 'Convert to a new proposal',
+        label: t('Convert to a new proposal'),
         detail: phaseVoteOpen
           ? lockReason()
           : 'Closes this and continues its work as a new proposal with the same title, place and tags. Members vote on it.',
@@ -117,7 +121,9 @@
     moving = true;
   };
   const items = $derived<PhaseMenuItem[]>(
-    moves.length ? [{ id: 'moves', glyph: '›', label: 'Phase', detail: '', onSelect: open }] : [],
+    moves.length
+      ? [{ id: 'moves', glyph: '›', label: t('Phase'), detail: '', onSelect: open }]
+      : [],
   );
 </script>
 

@@ -25,7 +25,7 @@
   let results = $state<{ agent: string; name: string }[]>([]);
   let timer: ReturnType<typeof setTimeout> | undefined;
 
-  const nameOf = (agent: string): string => p.names[agent] ?? 'Unnamed';
+  const nameOf = (agent: string): string => p.names[agent] ?? t('Unnamed');
 
   function search(value: string): void {
     query = value;

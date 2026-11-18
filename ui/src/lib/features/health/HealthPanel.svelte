@@ -21,7 +21,7 @@
     connection.current.status === 'connected'
       ? `Connected to ${connection.current.node}`
       : connection.current.status === 'connecting'
-        ? 'Connecting…'
+        ? t('Connecting…')
         : 'Offline',
   );
 

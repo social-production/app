@@ -46,7 +46,7 @@
         const small = await compressChatPhoto(file);
         photos = [...photos, { file: small, url: URL.createObjectURL(small) }];
       } catch (e) {
-        statusMessage = e instanceof Error ? e.message : 'Could not process image.';
+        statusMessage = e instanceof Error ? e.message : t('Could not process image.');
       }
     }
   }

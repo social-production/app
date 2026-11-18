@@ -32,7 +32,9 @@
 
   const organizerHelp = $derived(
     s.upfrontPlan
-      ? 'You keep full organizer authority. Chosen organizers can invite people, create activities, and manage event decisions; other invitees can only attend and sign up.'
+      ? t(
+          'You keep full organizer authority. Chosen organizers can invite people, create activities, and manage event decisions; other invitees can only attend and sign up.',
+        )
       : 'You keep full organizer authority. Chosen organizers can invite people; other invitees can create activities, plans, and proposals, but only organizers can invite.',
   );
   const missing = $derived(
@@ -40,8 +42,8 @@
   );
 
   function blocker(step: string, audience: EventAudience): string {
-    if (step === 'plan') return 'Plan details';
-    return audience === 'private_community' ? 'Private community' : 'Invites';
+    if (step === 'plan') return t('Plan details');
+    return audience === 'private_community' ? t('Private community') : t('Invites');
   }
 
   async function publish(): Promise<void> {

@@ -86,7 +86,7 @@
     direct
       ? 'Organizers decide: saved at once'
       : organized
-        ? 'Organizers decide: read only for you'
+        ? t('Organizers decide: read only for you')
         : `Members vote: ${APPROVAL_PERCENT}% yes`,
   );
 
@@ -98,7 +98,7 @@
     };
     if (await gov.proposeEdit(change)) {
       art.clearStaged();
-      notice = direct ? 'Saved' : 'Vote started';
+      notice = direct ? t('Saved') : t('Vote started');
       if (direct) onChanged();
       else tab = 'decisions';
     }

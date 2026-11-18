@@ -131,7 +131,7 @@
   async function send(): Promise<void> {
     if (!project) return;
     const sent = await requests.send({
-      title: project.charter?.title ?? 'Service',
+      title: project.charter?.title ?? t('Service'),
       creator: project.creator,
       settings,
       members: project.members,

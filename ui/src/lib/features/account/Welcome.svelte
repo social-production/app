@@ -22,13 +22,13 @@
   const modes = [
     {
       value: 'signup',
-      label: 'Sign up',
-      description: 'New here? You get 24 words that are your account.',
+      label: t('Sign up'),
+      description: t('New here? You get 24 words that are your account.'),
     },
     {
       value: 'login',
-      label: 'Log in',
-      description: 'Type your 24 words, or use a passkey saved on this device.',
+      label: t('Log in'),
+      description: t('Type your 24 words, or use a passkey saved on this device.'),
     },
   ] as const;
   const active = $derived(modes.find((m) => m.value === mode));

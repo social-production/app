@@ -2,6 +2,7 @@
  * The map panel's state (web's `MapPanel.svelte` variables): the anchor place, filters, the
  * results, and the layout flags. `MapView` drives the map from it, `MarkerLoader` fills it.
  */
+import { t } from '#lib/i18n/index.ts';
 import { emptyPlaceValue, type PlaceValue } from '#lib/domain/places.ts';
 import type { MapMarkerItem } from '#lib/domain/mapMarkers.ts';
 import { writeMapPreferences } from '#lib/stores/mapPreferences.svelte.ts';
@@ -13,17 +14,17 @@ export const WORLD_ZOOM = 2;
 export const LOCAL_ZOOM = 11;
 
 export const windowOptions = [
-  { value: 'today', label: 'Today' },
-  { value: 'week', label: 'This week' },
-  { value: 'month', label: 'This month' },
-  { value: 'all', label: 'All time' },
-  { value: 'custom', label: 'Custom range' },
+  { value: 'today', label: t('Today') },
+  { value: 'week', label: t('This week') },
+  { value: 'month', label: t('This month') },
+  { value: 'all', label: t('All time') },
+  { value: 'custom', label: t('Custom range') },
 ];
 export const filterOptions = [
-  { value: 'all', label: 'All' },
-  { value: 'events', label: 'Events' },
-  { value: 'projects', label: 'Projects' },
-  { value: 'help_requests', label: 'Help requests' },
+  { value: 'all', label: t('All') },
+  { value: 'events', label: t('Events') },
+  { value: 'projects', label: t('Projects') },
+  { value: 'help_requests', label: t('Help requests') },
 ];
 
 export class MapPanelState {

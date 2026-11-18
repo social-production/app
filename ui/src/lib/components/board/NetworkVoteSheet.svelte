@@ -15,7 +15,7 @@
 
   const sized = $derived(
     !weeklyActive
-      ? 'the people active last week'
+      ? t('the people active last week')
       : `the ${weeklyActive.toLocaleString()} ${weeklyActive === 1 ? 'person' : 'people'} active last week`,
   );
 </script>

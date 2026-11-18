@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { inZone } from './zone.ts';
 import { committedOf, minimumOf, type Activity } from './activities.ts';
 
@@ -27,7 +28,7 @@ export function requesterSide(a: Activity): Side | null {
 
 /** web's side `statusLabel` / counts line. */
 function sideText(c: Side): string {
-  if (c.eligible === 0) return 'No eligible people are assigned on this side yet.';
+  if (c.eligible === 0) return t('No eligible people are assigned on this side yet.');
   const pending = Math.max(0, c.eligible - c.completed - c.uncompleted);
   const parts = [`${c.completed}/${c.eligible} completed`, `${c.uncompleted} uncompleted`];
   if (pending > 0) parts.push(`${pending} pending`);
@@ -36,7 +37,7 @@ function sideText(c: Side): string {
 
 /** The participants' line. */
 export function completionText(a: Activity): string {
-  if (staffingFailed(a)) return 'Marked uncompleted — no participants signed up';
+  if (staffingFailed(a)) return t('Marked uncompleted — no participants signed up');
   return sideText(a.completion);
 }
 
@@ -60,31 +61,31 @@ export function aggregate(a: Activity): { label: string; tone: CompletionTone } 
     ...(requester ? states(requester) : []),
     ...(staffingFailed(a) ? ['uncompleted'] : states(a.completion)),
   ];
-  if (all.every((s) => s === 'pending')) return { label: 'Completion pending', tone: 'mixed' };
+  if (all.every((s) => s === 'pending')) return { label: t('Completion pending'), tone: 'mixed' };
   const done = all.includes('completed');
   const notDone = all.includes('uncompleted');
-  if (notDone && !done) return { label: 'Marked uncompleted', tone: 'uncompleted' };
+  if (notDone && !done) return { label: t('Marked uncompleted'), tone: 'uncompleted' };
   if (done && !notDone && !all.includes('pending'))
-    return { label: 'Marked completed', tone: 'complete' };
-  return { label: 'Mixed completion', tone: 'mixed' };
+    return { label: t('Marked completed'), tone: 'complete' };
+  return { label: t('Mixed completion'), tone: 'mixed' };
 }
 
 /** web-backend `_history_labels`: what kind of past activity this was. */
 export function historyContext(a: Activity): { label: string; description: string } {
   if (!a.booking)
     return {
-      label: 'Self-planned activity',
-      description: 'This activity was scheduled directly on the project calendar.',
+      label: t('Self-planned activity'),
+      description: t('This activity was scheduled directly on the project calendar.'),
     };
   const minimum = minimumOf(a);
   if (committedOf(a) >= minimum && minimum > 0)
     return {
-      label: 'Committed activity',
-      description: 'Enough participants were assigned before this activity ended.',
+      label: t('Committed activity'),
+      description: t('Enough participants were assigned before this activity ended.'),
     };
   return {
-    label: 'Planned activity',
-    description: 'This request-linked activity ended before minimum staffing was met.',
+    label: t('Planned activity'),
+    description: t('This request-linked activity ended before minimum staffing was met.'),
   };
 }
 

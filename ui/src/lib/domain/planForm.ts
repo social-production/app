@@ -3,6 +3,7 @@
  * for project plans and event plans (ADR 0057).
  */
 
+import { t } from '#lib/i18n/index.ts';
 import {
   emptyScheduleForm,
   scheduleFromForm,
@@ -82,22 +83,24 @@ export function emptyPlanForm(subtype: ProjectSubtype): PlanForm {
 
 const REVIEW: PlanStep = {
   id: 'review',
-  question: 'Review your plan before submitting',
-  helper: 'Check each section, then submit when you are ready.',
+  question: t('Review your plan before submitting'),
+  helper: t('Check each section, then submit when you are ready.'),
 };
 
 const DEMAND_NOTE: PlanStep = {
   id: 'demand-note',
-  question: 'How does this plan respond to current support?',
-  helper:
+  question: t('How does this plan respond to current support?'),
+  helper: t(
     'Support signals show how many people want this to exist right now. Assessors compare every plan against that need, so say whether your plan meets it and what gap remains.',
+  ),
 };
 
 const STAGES: PlanStep = {
   id: 'stages',
-  question: 'What are the stages of this plan?',
-  helper:
+  question: t('What are the stages of this plan?'),
+  helper: t(
     'Break the work into stages. Each stage needs a title and details. You can add, remove, and reorder stages.',
+  ),
 };
 
 /** web's `buildEventPlanCreationSteps`, with only the date step its schedule mode shows. */
@@ -105,24 +108,27 @@ function eventPlanSteps(f: ScheduleForm): PlanStep[] {
   return [
     {
       id: 'plan-overview',
-      question: 'What is this plan called, and what does it do?',
-      helper:
+      question: t('What is this plan called, and what does it do?'),
+      helper: t(
         'Use a clear title and explain what will happen and why this plan is worth considering.',
+      ),
     },
     {
       id: 'schedule-mode',
-      question: 'How should the event be scheduled?',
-      helper: 'Choose a single date or a date range.',
+      question: t('How should the event be scheduled?'),
+      helper: t('Choose a single date or a date range.'),
     },
     f.scheduleMode === 'range'
-      ? { id: 'schedule-range', question: 'What date range should the event cover?' }
-      : { id: 'schedule-date', question: 'Which date should the event use?' },
+      ? { id: 'schedule-range', question: t('What date range should the event cover?') }
+      : { id: 'schedule-date', question: t('Which date should the event use?') },
     {
       id: 'schedule-time',
-      question: 'What are the start and finish times?',
-      helper: 'Marked plan days become the days where activity can be scheduled from the calendar.',
+      question: t('What are the start and finish times?'),
+      helper: t(
+        'Marked plan days become the days where activity can be scheduled from the calendar.',
+      ),
     },
-    { id: 'location', question: 'Where will this event happen?' },
+    { id: 'location', question: t('Where will this event happen?') },
     DEMAND_NOTE,
     STAGES,
     REVIEW,
@@ -138,39 +144,43 @@ export function planSteps(kind: PlanKind, f: PlanForm): PlanStep[] {
   const steps: PlanStep[] = [
     {
       id: 'plan-overview',
-      question: 'What is this plan called, and what does it deliver?',
+      question: t('What is this plan called, and what does it deliver?'),
       helper: producing
-        ? 'Use a clear title and explain what will be produced and why this approach makes sense.'
+        ? t(
+            'Use a clear title and explain what will be produced and why this approach makes sense.',
+          )
         : 'Use a clear title and explain how people will access or receive what is produced.',
     },
   ];
   if (producing) {
-    steps.push({ id: 'subtype', question: 'What type of production plan is this?' });
+    steps.push({ id: 'subtype', question: t('What type of production plan is this?') });
     if (subtype === 'software')
       steps.push({
         id: 'repository',
-        question: 'What is the official repository URL?',
-        helper:
+        question: t('What is the official repository URL?'),
+        helper: t(
           'Link a public repository under AGPL v3. Assessors need a place they can verify, and the license keeps the software in the commons.',
+        ),
       });
     else
       steps.push({
         id: 'location',
-        question: 'Where will production or operations happen?',
-        helper: 'Choose the primary project or production site.',
+        question: t('Where will production or operations happen?'),
+        helper: t('Choose the primary project or production site.'),
       });
     if (kind === 'Organisation')
       steps.push({
         id: 'requests',
-        question: 'Will this service take requests?',
-        helper:
+        question: t('Will this service take requests?'),
+        helper: t(
           'People outside the service can ask it for something. Members can change this later by a vote.',
+        ),
       });
   } else {
     steps.push({
       id: 'distribution-location',
-      question: 'Where will distribution or access happen?',
-      helper: 'This can be the same address as the production plan location.',
+      question: t('Where will distribution or access happen?'),
+      helper: t('This can be the same address as the production plan location.'),
     });
   }
   steps.push(DEMAND_NOTE, STAGES, REVIEW);

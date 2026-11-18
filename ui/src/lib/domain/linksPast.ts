@@ -3,6 +3,7 @@
  * ended, and one per vote that failed, saying who said no. A passed vote isn't listed apart:
  * its link is the row (active above, or ended here).
  */
+import { t } from '#lib/i18n/index.ts';
 import { shortDate } from './botReview.ts';
 import type { LinkRequest, LinkSide, ProjectLink } from './links.ts';
 
@@ -35,7 +36,7 @@ export function pastRows(links: ProjectLink[], votes: LinkRequest[]): PastRow[] 
       key: link.id,
       title: link.create.target.title,
       targetId: link.create.target.id,
-      meta: sever ? `Link ended · ${day(at)} · both sides voted` : 'Link ended',
+      meta: sever ? `Link ended · ${day(at)} · both sides voted` : t('Link ended'),
       tag: 'Ended',
       link,
       request: null,
@@ -49,8 +50,8 @@ export function pastRows(links: ProjectLink[], votes: LinkRequest[]): PastRow[] 
       key: v.id,
       title: v.target.title,
       targetId: v.target.id,
-      meta: `${v.sever ? 'Vote to end the link' : 'Link vote'} · ${day(v.createdAt)} · ${saidNo(v)}`,
-      tag: v.sever ? 'Kept' : 'Not linked',
+      meta: `${v.sever ? t('Vote to end the link') : t('Link vote')} · ${day(v.createdAt)} · ${saidNo(v)}`,
+      tag: v.sever ? 'Kept' : t('Not linked'),
       link: null,
       request: v,
       at: v.createdAt,

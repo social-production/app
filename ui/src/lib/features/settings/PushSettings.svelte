@@ -12,7 +12,7 @@
     push.where === 'browser'
       ? 'Get the categories above on this device, even when the app is closed.'
       : push.where === 'desktop'
-        ? 'Your computer shows the categories above while the app runs in the background.'
+        ? t('Your computer shows the categories above while the app runs in the background.')
         : 'This browser can’t get notifications. On an iPhone or iPad, add Social Production to your Home Screen and open it from there.',
   );
 </script>

@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /**
  * web's call signalling envelope (web/src/lib/calls/types.ts). Audio never travels in it;
  * here it goes from node to node as a direct signal (ADR 0050).
@@ -76,15 +77,15 @@ export function callStatusLine(view: CallView, elapsed: string): string {
     case 'calling':
       return 'Ringing…';
     case 'ringing':
-      return 'Incoming voice call';
+      return t('Incoming voice call');
     case 'active':
       return elapsed;
     case 'unavailable':
-      return 'Not available right now';
+      return t('Not available right now');
     case 'busy':
-      return 'On another call';
+      return t('On another call');
     case 'declined':
-      return 'Call declined';
+      return t('Call declined');
     default:
       if (view.notice) return view.notice;
       return view.lastDurationMs

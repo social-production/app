@@ -37,12 +37,12 @@
   let openComments = $state<Record<string, boolean>>({});
 
   const badgeTone = { complete: 'open', mixed: 'need', uncompleted: 'locked' } as const;
-  const nameOf = (agent: string): string => p.names[agent] ?? 'Unnamed';
+  const nameOf = (agent: string): string => p.names[agent] ?? t('Unnamed');
   const none = async (): Promise<{ agent: string; name: string }[]> => [];
 
   function summary(a: Activity): string {
     const average = ratingAverage(a);
-    return average === null ? 'No ratings yet' : `${average}★`;
+    return average === null ? t('No ratings yet') : `${average}★`;
   }
 </script>
 

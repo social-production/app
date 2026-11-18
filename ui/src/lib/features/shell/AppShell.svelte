@@ -73,7 +73,9 @@
   const immersive = $derived(compact && chatChrome.immersive);
   // Sign-up has its own logo, so the top bar goes as it does for an open chat.
   const shellTopbarHeight = $derived(immersive || authSurface ? 0 : topbarHeight);
-  const frameMaxWidth = $derived(!compact && !leftOpen && !rightOpen ? 'min(80%, 1200px)' : 'none');
+  const frameMaxWidth = $derived(
+    !compact && !leftOpen && !rightOpen ? t('min(80%, 1200px)') : 'none',
+  );
   const bottomNav = $derived(compact && !immersive ? 'var(--shell-bottom-nav-height)' : '0px');
   // Known to be signed out (not still connecting): no Notifications or Messages to offer.
   const guest = $derived(connection.current.status === 'signed-out');
@@ -140,7 +142,7 @@
     const current = connection.current;
     if (current.status !== 'connected') return;
     void getPerson(current.agent).then((person) => {
-      viewer.name = person.profile?.name ?? 'Profile';
+      viewer.name = person.profile?.name ?? t('Profile');
     });
     void refuseIfDeactivated(current.agent);
   });

@@ -20,7 +20,7 @@
   let { kind }: { kind: ScopeKind } = $props();
 
   const channel = $derived(kind === 'channel');
-  const noun = $derived(channel ? 'Channel' : 'Community');
+  const noun = $derived(channel ? t('Channel') : t('Community'));
   let name = $state('');
   let description = $state('');
   let openness = $state<'open' | 'invite_only'>('open');

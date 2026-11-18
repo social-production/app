@@ -44,7 +44,7 @@
     h && h.yes + h.no > 0 ? Math.round((h.yes / (h.yes + h.no)) * 100) : 0;
   // The mockup's "1 of 1 · 100%": who has voted of the members, and the share saying yes.
   const tally = (h: LinkHalf | null): string =>
-    h ? `${h.yes + h.no} of ${h.population} · ${percent(h)}%` : 'Not received yet';
+    h ? `${h.yes + h.no} of ${h.population} · ${percent(h)}%` : t('Not received yet');
   // One Approve / Oppose pair for the side the viewer belongs to (Polish Pass mockups §6).
   const mine = $derived(
     [request.thisSide, request.otherSide].find((s) => s.canVote || s.half?.myVote),

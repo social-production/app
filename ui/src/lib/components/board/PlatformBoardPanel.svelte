@@ -60,7 +60,7 @@
 
   const name = (m: BoardMember) => {
     const p = people[m.agent];
-    return p ? displayName(p) : 'Unnamed';
+    return p ? displayName(p) : t('Unnamed');
   };
   const quorum = $derived(board?.quorum ?? 0);
   const seated = $derived(boardOrder(board?.moderators ?? [], me, name));
@@ -86,10 +86,10 @@
     try {
       await onVolunteer(kind === 'volunteer');
       ask = null;
-      if (kind === 'withdraw') notice = 'You withdrew. You can volunteer again any time.';
-      else if (kind === 'step-down') notice = 'You stepped down.';
-      else if (board?.viewerState === 'member') notice = "You're seated.";
-      else notice = "You're a candidate. Members can vote on you now.";
+      if (kind === 'withdraw') notice = t('You withdrew. You can volunteer again any time.');
+      else if (kind === 'step-down') notice = t('You stepped down.');
+      else if (board?.viewerState === 'member') notice = t("You're seated.");
+      else notice = t("You're a candidate. Members can vote on you now.");
     } catch (e) {
       ask = null;
       problem = failed(e, "That didn't go through. Try again.");

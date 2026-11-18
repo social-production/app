@@ -106,7 +106,7 @@
     {:else if !item.lead && !social && item.body}
       <p class="body">{item.body}</p>
     {/if}
-    {#if !social && item.actor}<p class="note-by">{subject} · {actorName}</p>{/if}
+    {#if !social && item.actor}<p class="note-by">{t(subject)} · {actorName}</p>{/if}
     {#if item.kind === 'follow-request' && item.isUnread && onDecide}
       <div class="note-actions">
         <button

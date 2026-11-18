@@ -43,9 +43,12 @@
   });
 
   const GROUPS: { label: string; kinds: SearchResultKind[] }[] = [
-    { label: 'Channels and communities', kinds: ['channel', 'community'] },
-    { label: 'People', kinds: ['profile'] },
-    { label: 'Posts and projects', kinds: ['project', 'thread', 'event', 'help-request', 'post'] },
+    { label: t('Channels and communities'), kinds: ['channel', 'community'] },
+    { label: t('People'), kinds: ['profile'] },
+    {
+      label: t('Posts and projects'),
+      kinds: ['project', 'thread', 'event', 'help-request', 'post'],
+    },
   ];
   const groups = $derived(
     GROUPS.map((g) => ({

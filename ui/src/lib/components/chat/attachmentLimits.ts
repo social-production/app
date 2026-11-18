@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /** web's features/messages/attachmentLimits.ts (web-backend's limits, sp_attachment). */
 export const MAX_PHOTO_INPUT_BYTES = 10 * 1024 * 1024;
 export const MAX_FILE_BYTES = 10 * 1024 * 1024;
@@ -14,23 +15,23 @@ export function rejectOutgoingAttachment(file: {
   const type = file.type.toLowerCase();
 
   if (type.startsWith('video/') || (file.name && VIDEO_EXTENSION.test(file.name))) {
-    return 'Videos are not supported yet.';
+    return t('Videos are not supported yet.');
   }
 
   if (type.startsWith('image/')) {
     if (!PHOTO_TYPES.has(type)) {
-      return 'Use a JPEG, PNG, or WebP photo.';
+      return t('Use a JPEG, PNG, or WebP photo.');
     }
 
     if (file.size > MAX_PHOTO_INPUT_BYTES) {
-      return 'Photos must be 10MB or smaller.';
+      return t('Photos must be 10MB or smaller.');
     }
 
     return null;
   }
 
   if (file.size > MAX_FILE_BYTES) {
-    return 'Files must be 10MB or smaller.';
+    return t('Files must be 10MB or smaller.');
   }
 
   return null;

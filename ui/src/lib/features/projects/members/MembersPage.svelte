@@ -91,8 +91,8 @@
   function manage(agent: string, organizer: boolean) {
     if (!canManage || agent === project?.creator) return [];
     return organizer
-      ? [{ label: 'Remove', icon: 'x', danger: true, run: () => void actions.demote(agent) }]
-      : [{ label: 'Make organiser', icon: 'shield', run: () => void actions.promote(agent) }];
+      ? [{ label: t('Remove'), icon: 'x', danger: true, run: () => void actions.demote(agent) }]
+      : [{ label: t('Make organiser'), icon: 'shield', run: () => void actions.promote(agent) }];
   }
 </script>
 

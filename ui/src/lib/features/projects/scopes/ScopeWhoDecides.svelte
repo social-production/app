@@ -54,7 +54,7 @@
   async function remove(): Promise<void> {
     if (!removeTarget) return;
     if (await gov.removeMember(removeTarget.agent)) {
-      onChanged(direct ? 'Member removed' : 'Vote started');
+      onChanged(direct ? t('Member removed') : t('Vote started'));
     }
     removeDraft = '';
   }

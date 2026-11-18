@@ -63,7 +63,7 @@
   const triggerLabel = $derived(
     `${status ? `${status} · ` : ''}${report || status ? `View ${itemLabel} report` : `Report ${itemLabel}`}`,
   );
-  const title = $derived(report ? resolutionLabel(report.resolution) : 'Options');
+  const title = $derived(report ? resolutionLabel(report.resolution) : t('Options'));
 
   $effect(() => {
     if (!open) copyLabel = 'Copy link';
@@ -71,7 +71,7 @@
 
   /** web shows a "Link copied" toast; the app has no toasts, so the item says it. */
   async function copy(): Promise<void> {
-    copyLabel = (await onCopy()) ? 'Link copied' : 'Could not copy the link';
+    copyLabel = (await onCopy()) ? t('Link copied') : t('Could not copy the link');
     setTimeout(onClose, 800);
   }
 

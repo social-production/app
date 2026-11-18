@@ -25,9 +25,9 @@
   let { kind, title, sortMode = $bindable(), only }: Props = $props();
 
   const sortOptions: { value: CommentSort; label: string }[] = [
-    { value: 'oldest', label: 'Oldest first' },
-    { value: 'newest', label: 'Newest first' },
-    { value: 'top', label: 'Top voted' },
+    { value: 'oldest', label: t('Oldest first') },
+    { value: 'newest', label: t('Newest first') },
+    { value: 'top', label: t('Top voted') },
   ];
   const signedIn = $derived(connection.current.status === 'connected');
   const url = $derived(`${location.origin}${location.pathname}`);

@@ -36,9 +36,9 @@
   type DiscoverFilter = 'all' | ScopeKind;
 
   const filters: { value: DiscoverFilter; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'channel', label: 'Channels' },
-    { value: 'community', label: 'Communities' },
+    { value: 'all', label: t('All') },
+    { value: 'channel', label: t('Channels') },
+    { value: 'community', label: t('Communities') },
   ];
 
   let query = $state('');

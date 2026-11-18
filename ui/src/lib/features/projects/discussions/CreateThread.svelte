@@ -12,8 +12,8 @@
 
   /** web's CreateThreadPage: Basics (title, opening post) → Tags (ADR 0070). */
   const steps = [
-    { id: 'basics', title: 'Basics', question: 'Start a conversation' },
-    { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
+    { id: 'basics', title: t('Basics'), question: t('Start a conversation') },
+    { id: 'scope', title: t('Tags'), question: t('Where should people find it?') },
   ];
 
   let step = $state(0);

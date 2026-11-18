@@ -3,6 +3,7 @@
  * plan an organizer-controlled private event starts with (web's `validatePrivatePlan`).
  */
 
+import { t } from '#lib/i18n/index.ts';
 import { scheduleBounds, scheduleFromForm } from './eventSchedule.ts';
 import type { PlanForm } from './planForm.ts';
 
@@ -19,23 +20,23 @@ export interface EventStep {
 export function eventSteps(isPrivate: boolean, upfrontPlan: boolean): EventStep[] {
   if (!isPrivate) {
     return [
-      { id: 'basics', title: 'Basics', question: 'What is happening?' },
-      { id: 'audience', title: 'Audience', question: 'Who is it for?' },
-      { id: 'scope', title: 'Tags', question: 'Where should people find it?' },
-      { id: 'location', title: 'Location', question: 'Where does it happen?' },
-      { id: 'overview', title: 'Overview', question: 'Check and publish' },
+      { id: 'basics', title: 'Basics', question: t('What is happening?') },
+      { id: 'audience', title: 'Audience', question: t('Who is it for?') },
+      { id: 'scope', title: 'Tags', question: t('Where should people find it?') },
+      { id: 'location', title: 'Location', question: t('Where does it happen?') },
+      { id: 'overview', title: 'Overview', question: t('Check and publish') },
     ];
   }
   return [
-    { id: 'basics', title: 'Basics', question: 'What is happening?' },
-    { id: 'audience', title: 'Audience', question: 'Who can find it?' },
-    { id: 'scope', title: 'Who', question: 'Who is invited?' },
-    { id: 'control', title: 'Control', question: 'Who runs it?' },
-    { id: 'location', title: 'Location', question: 'Where does it happen?' },
+    { id: 'basics', title: 'Basics', question: t('What is happening?') },
+    { id: 'audience', title: 'Audience', question: t('Who can find it?') },
+    { id: 'scope', title: 'Who', question: t('Who is invited?') },
+    { id: 'control', title: 'Control', question: t('Who runs it?') },
+    { id: 'location', title: 'Location', question: t('Where does it happen?') },
     ...(upfrontPlan
-      ? [{ id: 'plan', title: 'Plan', question: 'When is it, and what happens?' } as EventStep]
+      ? [{ id: 'plan', title: 'Plan', question: t('When is it, and what happens?') } as EventStep]
       : []),
-    { id: 'overview', title: 'Overview', question: 'Check and publish' },
+    { id: 'overview', title: 'Overview', question: t('Check and publish') },
   ];
 }
 

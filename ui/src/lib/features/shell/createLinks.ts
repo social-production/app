@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { CreateLink } from '#lib/components/shell/CreateFab.svelte';
 
 import { resolve } from '$app/paths';
@@ -7,33 +8,33 @@ import { resolve } from '$app/paths';
 export const createLinks: CreateLink[] = [
   {
     href: resolve('/create/post'),
-    label: 'Post',
-    description: 'Share to your personal feed',
+    label: t('Post'),
+    description: t('Share to your personal feed'),
     icon: 'post',
   },
   {
     href: resolve('/create/thread'),
-    label: 'Thread',
-    description: 'Start a discussion thread',
+    label: t('Thread'),
+    description: t('Start a discussion thread'),
     icon: 'thread',
   },
   {
     href: resolve('/create/help-request'),
-    label: 'Request',
-    description: 'Ask for help with roles and schedule',
+    label: t('Request'),
+    description: t('Ask for help with roles and schedule'),
     icon: 'help-request',
   },
   {
     href: resolve('/create/project'),
-    label: 'Proposal',
-    description: 'Propose a project, a service or a public event',
+    label: t('Proposal'),
+    description: t('Propose a project, a service or a public event'),
     icon: 'proposal',
     badge: 'NEW',
   },
   {
     href: resolve('/create/event'),
-    label: 'Private event',
-    description: 'Invite people to a gathering',
+    label: t('Private event'),
+    description: t('Invite people to a gathering'),
     icon: 'event',
   },
 ];
@@ -42,14 +43,14 @@ export const createLinks: CreateLink[] = [
 export const surfaceLinks: CreateLink[] = [
   {
     href: resolve('/create/community'),
-    label: 'Community',
-    description: 'Coordination space around shared activity',
+    label: t('Community'),
+    description: t('Coordination space around shared activity'),
     icon: 'community',
   },
   {
     href: resolve('/create/channel'),
-    label: 'Channel',
-    description: 'Topic-based discovery surface',
+    label: t('Channel'),
+    description: t('Topic-based discovery surface'),
     icon: 'channel',
   },
 ];

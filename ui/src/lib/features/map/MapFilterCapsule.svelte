@@ -41,22 +41,22 @@
   );
   const where = $derived(shortPlace(s.place.displayLabel.trim()).split(',')[0] || 'Pick a place');
   const events = [
-    { value: 'upcoming', label: 'Upcoming' },
-    { value: 'past', label: 'Include past' },
+    { value: 'upcoming', label: t('Upcoming') },
+    { value: 'past', label: t('Include past') },
   ];
   // Pills wrap whole words, so the range's own pill sits with the rest ("Pick dates").
   const windows = windowOptions.map((o) =>
     o.value === 'all'
-      ? { ...o, label: 'Any time' }
+      ? { ...o, label: t('Any time') }
       : o.value === 'custom'
-        ? { ...o, label: 'Pick dates' }
+        ? { ...o, label: t('Pick dates') }
         : o,
   );
   const types = filterOptions.map((o) =>
     o.value === 'help_requests'
-      ? { ...o, label: 'Requests' }
+      ? { ...o, label: t('Requests') }
       : o.value === 'all'
-        ? { ...o, label: 'Everything' }
+        ? { ...o, label: t('Everything') }
         : o,
   );
   const shown = $derived(s.listItems.length);

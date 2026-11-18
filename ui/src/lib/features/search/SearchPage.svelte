@@ -27,15 +27,15 @@
   // web's options, in its order, for the kinds the app has (no activities yet; PARITY.md),
   // as a row of chips (Remaining Screens, 5).
   const typeOptions: { value: SearchType; label: string }[] = [
-    { value: 'all', label: 'All' },
-    { value: 'project', label: 'Projects' },
-    { value: 'thread', label: 'Threads' },
-    { value: 'event', label: 'Events' },
-    { value: 'help_request', label: 'Help requests' },
-    { value: 'post', label: 'Posts' },
-    { value: 'channel', label: 'Channels' },
-    { value: 'community', label: 'Communities' },
-    { value: 'user', label: 'People' },
+    { value: 'all', label: t('All') },
+    { value: 'project', label: t('Projects') },
+    { value: 'thread', label: t('Threads') },
+    { value: 'event', label: t('Events') },
+    { value: 'help_request', label: t('Help requests') },
+    { value: 'post', label: t('Posts') },
+    { value: 'channel', label: t('Channels') },
+    { value: 'community', label: t('Communities') },
+    { value: 'user', label: t('People') },
   ];
 
   let draft = $state(untrack(() => query));

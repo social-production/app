@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { HomeFeedRow } from './homeFeed.ts';
 import type { CharterMode, FeedSort, FeedWindow, ProjectCard } from './projects.ts';
 
@@ -17,14 +18,14 @@ export const FEED_TYPES: { value: FeedType; label: string }[] = [
 
 export const FEED_SORTS: { value: FeedSort; label: string }[] = [
   { value: 'trending', label: 'Trending' },
-  { value: 'recent', label: 'Most recent' },
+  { value: 'recent', label: t('Most recent') },
 ];
 
 export const FEED_WINDOWS: { value: FeedWindow; label: string }[] = [
   { value: 'today', label: 'Today' },
   { value: 'week', label: 'Week' },
   { value: 'month', label: 'Month' },
-  { value: 'all', label: 'All time' },
+  { value: 'all', label: t('All time') },
 ];
 
 /** Which Type a card's mode falls under: events, help requests, threads and posts each
@@ -52,7 +53,7 @@ export function keepRow(row: HomeFeedRow, type: FeedType): boolean {
 export function feedSummary(sort: FeedSort, window: FeedWindow, type: FeedType): string {
   const parts = [
     FEED_SORTS.find((s) => s.value === sort)?.label ?? 'Trending',
-    FEED_WINDOWS.find((w) => w.value === window)?.label ?? 'All time',
+    FEED_WINDOWS.find((w) => w.value === window)?.label ?? t('All time'),
   ];
   if (type !== 'all') parts.unshift(FEED_TYPES.find((t) => t.value === type)?.label ?? '');
   return parts.join(' · ');

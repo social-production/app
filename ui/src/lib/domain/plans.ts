@@ -3,6 +3,7 @@
  * steps are web's (web/src/lib/utils/planRubric.ts, ProjectLifecyclePlanPhaseContent.svelte).
  */
 
+import { t } from '#lib/i18n/index.ts';
 import type { EventSchedule } from './eventSchedule.ts';
 import type { Place } from './places.ts';
 import type { ProposalStatus, VoteChoice } from './governance.ts';
@@ -129,22 +130,22 @@ export const PLAN_MAKES: {
   {
     value: 'Production',
     mode: 'productive',
-    label: 'Production plan',
-    summary: 'Build or produce something new. Makes this a project.',
+    label: t('Production plan'),
+    summary: t('Build or produce something new. Makes this a project.'),
     makes: 'a project',
   },
   {
     value: 'Organisation',
     mode: 'collective-service',
-    label: 'Operations plan',
-    summary: 'Run or maintain something in use. Makes this a service.',
+    label: t('Operations plan'),
+    summary: t('Run or maintain something in use. Makes this a service.'),
     makes: 'a service',
   },
   {
     value: 'Event',
     mode: 'event',
-    label: 'Event plan',
-    summary: 'A dated occasion with a place. Makes this a public event.',
+    label: t('Event plan'),
+    summary: t('A dated occasion with a place. Makes this a public event.'),
     makes: 'a public event',
   },
 ];
@@ -172,15 +173,15 @@ export const planPhaseOf = (kind: PlanKind): string =>
   kind === 'Production' || kind === 'Organisation' || kind === 'Event' ? 'phase-2' : 'phase-3';
 
 export const PLAN_RATING_OPTIONS: { value: PlanRating; label: string }[] = [
-  { value: 1, label: 'Strongly oppose' },
+  { value: 1, label: t('Strongly oppose') },
   { value: 2, label: 'Oppose' },
   { value: 3, label: 'Neutral' },
   { value: 4, label: 'Support' },
-  { value: 5, label: 'Strongly support' },
+  { value: 5, label: t('Strongly support') },
 ];
 
 export function ratingLabel(rating: PlanRating | null): string {
-  return PLAN_RATING_OPTIONS.find((o) => o.value === rating)?.label ?? 'Not rated';
+  return PLAN_RATING_OPTIONS.find((o) => o.value === rating)?.label ?? t('Not rated');
 }
 
 export function allCriteriaRated(criteria: PlanCriterion[]): boolean {

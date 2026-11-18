@@ -2,6 +2,7 @@
  * web's activity creation form and steps (utils/activityCreationSteps.ts). Times are the
  * browser's `datetime-local` values; the place comes from web's LocationPicker (ADR 0080).
  */
+import { t } from '#lib/i18n/index.ts';
 import {
   dedupeQuickPicks,
   emptyPlaceValue,
@@ -151,7 +152,7 @@ export function activityQuickPicks(
     quickPick({ id: 'project-initial', sourceLabel: 'Project location', ...own }),
     pick(
       'production-plan',
-      mode === 'productive' ? 'Production plan' : 'Plan location',
+      mode === 'productive' ? t('Production plan') : t('Plan location'),
       leading(['Production', 'Organisation', 'Access']),
     ),
     pick('distribution-plan', 'Distribution plan', leading(['Distribution'])),
@@ -163,9 +164,9 @@ export function scheduleProblem(form: ActivityForm, now = Date.now()): string | 
   if (!form.scheduledAt.trim() || !form.endsAt.trim()) return null;
   const start = wallMicros(form.scheduledAt) / 1000;
   const end = wallMicros(form.endsAt) / 1000;
-  if (Number.isNaN(start) || Number.isNaN(end)) return 'Choose valid start and finish times.';
-  if (end <= start) return 'Finish must be after the start time.';
-  if (start < now) return 'Start time must be in the future.';
+  if (Number.isNaN(start) || Number.isNaN(end)) return t('Choose valid start and finish times.');
+  if (end <= start) return t('Finish must be after the start time.');
+  if (start < now) return t('Start time must be in the future.');
   return null;
 }
 

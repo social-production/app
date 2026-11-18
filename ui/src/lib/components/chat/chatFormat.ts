@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { MENTION, type ChatLine } from '#lib/domain/chat.ts';
 
 /** Display helpers ported from web's LiveChatPanel and utils/linkifyMessageBody. */
@@ -16,8 +17,8 @@ export function messageDayLabel(ms: number): string {
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
-  if (date.toDateString() === today.toDateString()) return 'Today';
-  if (date.toDateString() === yesterday.toDateString()) return 'Yesterday';
+  if (date.toDateString() === today.toDateString()) return t('Today');
+  if (date.toDateString() === yesterday.toDateString()) return t('Yesterday');
   const sameYear = date.getFullYear() === today.getFullYear();
   return date.toLocaleDateString(undefined, {
     weekday: 'short',
@@ -51,8 +52,8 @@ export function callLineText(line: ChatLine): string {
         : `${minutes}:${seconds}`;
     return `Voice call · ${length}`;
   }
-  if (line.call?.outcome === 'declined') return 'Call declined';
-  return line.own ? 'No answer' : 'Missed call';
+  if (line.call?.outcome === 'declined') return t('Call declined');
+  return line.own ? t('No answer') : t('Missed call');
 }
 
 /** Name once per run of messages from the same person, like a group chat elsewhere. */

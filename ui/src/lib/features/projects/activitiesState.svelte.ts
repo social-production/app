@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { roleSuggestedNotice, roleTakenNotice } from '#lib/services/pushNotices.ts';
 import { wallMicros } from '#lib/domain/zone.ts';
 import type { Activity } from '#lib/domain/activities.ts';
@@ -134,7 +135,7 @@ export class ActivitiesState {
         : defaultTimes(null, this.activities)),
       title: r.title,
       note: r.body,
-      roles: [{ ...emptyRole(), label: 'Service lead' }],
+      roles: [{ ...emptyRole(), label: t('Service lead') }],
     };
     this.planning = { request: r.id, requester: r.requester };
     this.error = '';
@@ -221,11 +222,11 @@ export function stageOptions(board: PlanBoard | undefined, mode: string): StageO
   const service = mode === 'collective-service';
   const kinds: { kind: PlanKind; key: string; label: string }[] = [
     service
-      ? { kind: 'Organisation', key: 'production', label: 'Operations' }
-      : { kind: 'Production', key: 'production', label: 'Production' },
+      ? { kind: 'Organisation', key: 'production', label: t('Operations') }
+      : { kind: 'Production', key: 'production', label: t('Production') },
     service
-      ? { kind: 'Access', key: 'distribution', label: 'Access' }
-      : { kind: 'Distribution', key: 'distribution', label: 'Distribution' },
+      ? { kind: 'Access', key: 'distribution', label: t('Access') }
+      : { kind: 'Distribution', key: 'distribution', label: t('Distribution') },
   ];
   return kinds.flatMap(({ kind, key, label }) => {
     const plan = board?.plans.find(
