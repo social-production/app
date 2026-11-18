@@ -114,7 +114,7 @@
 
 <section class="directory-page">
   {#if !s.loaded}
-    <LoadingLine /><SkeletonDetail />
+    <LoadingLine /><SkeletonDetail tabs={false} dock={false} />
   {:else if !s.scope}
     <section class="info-card">
       <p>{s.error ?? `No ${noun} has the handle "${slug}" yet.`}</p>

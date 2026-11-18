@@ -66,7 +66,7 @@
     {:else if state.moderation.value.state === 'removed'}
       <p class="tab-loading">{t(removedLabel(state.moderation.value.report?.reason))}</p>
     {:else if !state.project?.charter}
-      <LoadingLine /><SkeletonDetail />
+      <LoadingLine /><SkeletonDetail tabs={false} dock={false} />
     {:else}
       <FeedSurface
         tone={kind === 'post' ? 'personal' : 'public'}

@@ -163,7 +163,7 @@
     {#if fb.loaded}
       <p class="feedback-note">{fb.error}</p>
     {:else}
-      <LoadingLine /><SkeletonDetail />
+      <LoadingLine /><SkeletonDetail tabs={false} dock={false} />
     {/if}
   {/if}
   {#if fb.item && fb.error}<p class="feedback-note warning" role="alert">{fb.error}</p>{/if}
