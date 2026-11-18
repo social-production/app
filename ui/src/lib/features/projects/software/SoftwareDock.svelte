@@ -18,7 +18,7 @@
   />
   <RepositoryMenu
     canReplace={can}
-    canChangeMerge={can}
+    canChangeMerge={can && !sw.governance?.platform}
     onReplace={() => sw.open('repository-replacement')}
     onChangeMerge={() => sw.open('merge-capability')}
   />

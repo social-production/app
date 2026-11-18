@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Requests, push and #platform merges (PRs #219–#221 and this one, 2026-11-18 evening
+  Melbourne):** collective requests stay open until planned and read Not met after their time;
+  personal services are gone; decided votes send push (phases, plan leads, approved pull
+  requests and awaiting merge, bot reviews, removals); on #platform software projects only
+  platform moderators record merges.
 - **Feeds, notifications and requests (PRs #213–#218, 2026-11-18 afternoon Melbourne):** Global
   names the people you follow (with their picture) and leans towards your channels and
   communities; notification icons match the map pins; push for follows, shares, invites, roles,

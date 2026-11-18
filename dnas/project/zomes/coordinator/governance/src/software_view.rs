@@ -83,6 +83,8 @@ pub struct SoftwareView {
     pub repository_requests: Vec<RepositoryView>,
     /// Members file pull requests, merge capability changes and replacements.
     pub can_propose: bool,
+    /// A #platform project: platform moderators merge, and capability isn't granted.
+    pub platform: bool,
 }
 
 /// What every request's view needs.
@@ -91,6 +93,10 @@ struct Ctx<'a> {
     me: AgentPubKey,
     roll: &'a Roll,
     member: bool,
+    /// May record merges: holds the capability, or on a #platform project moderates the
+    /// platform (ADR 0095).
+    merger: bool,
+    platform: bool,
 }
 
 pub fn view() -> ExternResult<SoftwareView> {
@@ -102,11 +108,21 @@ pub fn view() -> ExternResult<SoftwareView> {
         .into_keys()
         .filter(|a| !sw.can_merge(a))
         .collect();
+    let me = agent_info()?.agent_initial_pubkey;
+    // #platform: platform moderators merge, members or not (ADR 0095; the app joins them first).
+    let merger = if roll.platform() {
+        calls::moderator_at(&me, sys_time()?)?
+    } else {
+        sw.can_merge(&me)
+    };
+    let member = calls::my_membership()?.is_some();
     let ctx = Ctx {
         ledger: &ledger,
-        me: agent_info()?.agent_initial_pubkey,
+        me,
         roll: &roll,
-        member: calls::my_membership()?.is_some(),
+        member,
+        merger,
+        platform: roll.platform(),
     };
     let mut out = SoftwareView {
         repository_url: sw.repository.clone(),
@@ -116,6 +132,7 @@ pub fn view() -> ExternResult<SoftwareView> {
         capability_requests: Vec::new(),
         repository_requests: Vec::new(),
         can_propose: ctx.member,
+        platform: ctx.platform,
     };
     for r in ledger.requests.iter().rev() {
         add(&mut out, &ctx, r)?;
@@ -202,9 +219,9 @@ fn pull_request(ctx: &Ctx, r: &Request) -> ExternResult<Option<PullRequestView>>
         }),
         tally: tally_view(voted, &ctx.me, ctx.roll)?,
         approved: approved(ctx, r)?,
-        can_record_merge: ctx.member
+        can_record_merge: (ctx.member || ctx.platform)
             && pr.stage == Stage::AwaitingMerge
-            && ctx.ledger.software.can_merge(&ctx.me),
+            && ctx.merger,
     }))
 }
 

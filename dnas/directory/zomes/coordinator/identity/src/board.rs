@@ -154,7 +154,11 @@ pub fn view() -> ExternResult<BoardView> {
 
 /// Whether `agent` moderates now (a moderator in grace still does), for merge capability.
 pub fn is_moderator(agent: &AgentPubKey) -> ExternResult<bool> {
-    let (states, _) = states(now()?)?;
+    moderator_at(agent, sys_time()?)
+}
+
+pub fn moderator_at(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
+    let (states, _) = states(at.as_micros())?;
     Ok(states
         .get(agent)
         .is_some_and(|s| matches!(s.standing, Standing::Moderator | Standing::Grace { .. })))

@@ -50,7 +50,22 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
             decided,
         });
     }
-    let software = replay(events(&state, &requests));
+    // On a #platform project only platform moderators merge (ADR 0095, owner 2026-11-18): no
+    // one holds the capability, and each moderator's merge carries it for that moment only.
+    let mut moderated = Vec::new();
+    if roll.platform() {
+        for r in &requests {
+            let merge = matches!(r.kind, SoftwareRequest::Merge { .. });
+            if merge && crate::calls::moderator_at(&r.found.author, r.found.at)? {
+                moderated.push(r.found.hash.clone());
+            }
+        }
+    }
+    let software = replay(events(
+        &state,
+        &requests,
+        roll.platform().then_some(&moderated[..]),
+    ));
     Ok(Ledger {
         state,
         software,
@@ -58,7 +73,12 @@ pub fn ledger(roll: &Roll) -> ExternResult<Ledger> {
     })
 }
 
-fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPubKey>> {
+/// `platform`: a #platform project's moderators' merges, the only ones that count there.
+fn events(
+    state: &State,
+    requests: &[Request],
+    platform: Option<&[ActionHash]>,
+) -> Vec<Event<ActionHash, AgentPubKey>> {
     let mut timed = Vec::new();
     for lead in plan_lead::replay(&state.approved, state.born()) {
         if !matches!(lead.kind, PlanKind::Production | PlanKind::Organisation) {
@@ -66,19 +86,26 @@ fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPub
         }
         let plan = state.approved.iter().find(|a| a.hash == lead.plan);
         let repository = plan.and_then(|a| a.repository.clone()).unwrap_or_default();
+        let author = lead.author;
         timed.push((
             lead.at,
             Event::Lead {
-                author: lead.author,
+                author: author.clone(),
                 repository,
             },
         ));
+        // The plan's author merges nowhere on #platform: moderators do.
+        if platform.is_some() {
+            let revoke = Event::Capability {
+                target: author,
+                grant: false,
+            };
+            timed.push((lead.at, revoke));
+        }
     }
     for r in requests {
         let hash = r.found.hash.clone();
-        if let Some(filed) = filed(r) {
-            timed.push((r.found.at, filed));
-        }
+        push_filed(&mut timed, r, platform.is_some_and(|m| m.contains(&hash)));
         let Some((passed, at)) = r.decided else {
             continue;
         };
@@ -91,6 +118,8 @@ fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPub
                 proposal: hash,
                 passed,
             }),
+            // Capability votes don't apply on #platform: only moderators merge there.
+            SoftwareRequest::MergeCapability { .. } if platform.is_some() => None,
             SoftwareRequest::MergeCapability { agent, grant } => {
                 passed.then(|| Event::Capability {
                     target: agent.clone(),
@@ -112,6 +141,29 @@ fn events(state: &State, requests: &[Request]) -> Vec<Event<ActionHash, AgentPub
     }
     timed.sort_by_key(|(at, _)| *at);
     timed.into_iter().map(|(_, e)| e).collect()
+}
+
+/// What filing `r` does, at its time. A moderator's merge on a #platform project is wrapped in
+/// a grant and a revoke of the capability at the same moment (the sort below is stable).
+fn push_filed(
+    timed: &mut Vec<(Timestamp, Event<ActionHash, AgentPubKey>)>,
+    r: &Request,
+    by_moderator: bool,
+) {
+    let Some(event) = filed(r) else {
+        return;
+    };
+    let grant = |grant| Event::Capability {
+        target: r.found.author.clone(),
+        grant,
+    };
+    if by_moderator {
+        timed.push((r.found.at, grant(true)));
+    }
+    timed.push((r.found.at, event));
+    if by_moderator {
+        timed.push((r.found.at, grant(false)));
+    }
 }
 
 /// What filing `r` does by itself: a pull request opens, a merge is recorded.
@@ -149,7 +201,17 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
     match request {
         SoftwareRequest::PullRequest { .. } => Ok(()),
         SoftwareRequest::Merge { pull_request, .. } => {
-            if !ledger.software.can_merge(&me) {
+            let may = if roll.platform() {
+                crate::calls::moderator_at(&me, sys_time()?)?
+            } else {
+                ledger.software.can_merge(&me)
+            };
+            if !may && roll.platform() {
+                return Err(guest(
+                    "Only platform moderators record merges on #platform projects",
+                ));
+            }
+            if !may {
                 return Err(guest(
                     "Only members with merge capability can record merges",
                 ));
@@ -161,6 +223,9 @@ pub fn check(request: &SoftwareRequest) -> ExternResult<()> {
             }
             Ok(())
         }
+        SoftwareRequest::MergeCapability { .. } if roll.platform() => Err(guest(
+            "On #platform projects platform moderators merge; there is no capability to grant",
+        )),
         SoftwareRequest::MergeCapability { agent, .. } => {
             if !roll.members_at(sys_time()?).contains_key(agent) {
                 return Err(guest("Only project members can perform this action"));

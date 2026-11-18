@@ -222,6 +222,22 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
+### Where things stand (6:50 pm Melbourne, 2026-11-18, UX session)
+- **Live:** #219 (ADR 0113: collective requests stay open, Not met after their time, planners'
+  chat), #220 (personal services deleted, owner: "Yeah delete them"; `bookings.mjs` gone),
+  #221 (push for decided votes: phase changes, plans taking the lead, approved pull requests
+  plus "awaiting merge" to whoever can merge, bot reviews opened/closed, projects removed by a
+  report). Live smoke signed out after each: 15 cards, 0 errors.
+- **Open: `claude/moderators-merge` (owner: "for platform tagged software merge can only be
+  platform moderators"):** on #platform software projects only platform moderators record
+  merges (directory `moderator_at(agent, at)`, replayed at each merge's time); the plan's author
+  holds no capability there and MergeCapability is refused; the UI shows Mergers "Platform
+  moderators", hides the capability vote, joins a moderator to the project before they record,
+  and sends the awaiting-merge push to the moderators. Coordinator-only (no reset). ADR 0095
+  amended. Scenarios `software` and `board` pass; new `software_platform`.
+- **Next:** desktop OS notifications; compare the remaining signed-in screens with web; live
+  audits; Russian (ADR first).
+
 ### Where things stand (3:30 pm Melbourne, 2026-11-18, UX session)
 - **Live:** #213 (push for follows, shares, invites, roles, phase votes), #215 (Global names the
   people you follow over their cards and mixes in your channels' and communities' items; owner:

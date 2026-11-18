@@ -74,3 +74,12 @@ events, and governance.", Follow, and the projects and events tagged with it. we
   grow for a while after it ends: proposals snapshot the last complete week.
 - "Execution receipts" (GOVERNANCE.md) stay future work; web has none either.
 - Asset management (the board's asset receipts, `?board=1`'s asset frames) stays out of parity.
+
+## Amendment (2026-11-18, owner): only moderators merge #platform software
+On a #platform software project **only platform moderators record merges**, members or not:
+the people the whole platform chose guard the network's own code. Built coordinator-only, no
+reset: the project's software replay drops the plan author's capability and any capability
+votes there, and wraps each merge whose author was a moderator then (the directory's new
+`moderator_at`) in a capability for that moment only. The network takes proposals from members
+only, so the app joins a moderator to the project before recording their merge. The merge
+capability sheet is hidden there, and the panel's Mergers reads "Platform moderators".

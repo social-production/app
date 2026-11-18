@@ -93,7 +93,9 @@
         {/if}
         <span class="repo-copy">
           <small class="repo-title">Mergers</small>
-          {#if g.mergers.length > 0}
+          {#if g.platform}
+            <b class="merger-names">Platform moderators</b>
+          {:else if g.mergers.length > 0}
             <b class="merger-names">
               {#each g.mergers as member, index (member.agent)}
                 <a href={resolve('/profile/[agent]', { agent: member.agent })}

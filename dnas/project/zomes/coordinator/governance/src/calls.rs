@@ -100,6 +100,23 @@ pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
     decode(response, "identity/full_standing_before")
 }
 
+/// Whether `agent` was a platform moderator at `at`, from the caller's directory cell
+/// (ADR 0095): a #platform software project's merges count from moderators too.
+pub fn moderator_at(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
+    let query = StandingAt {
+        agent: agent.clone(),
+        at,
+    };
+    let response = call(
+        CallTargetCell::OtherRole("directory".into()),
+        ZomeName::from("identity"),
+        "moderator_at".into(),
+        None,
+        query,
+    )?;
+    decode(response, "identity/moderator_at")
+}
+
 #[derive(Deserialize, Debug)]
 struct WeeklyActive {
     count: u32,

@@ -3,6 +3,7 @@ import type { Proposal } from '#lib/domain/governance.ts';
 import type { Moderation } from '#lib/domain/moderation.ts';
 import { isProjectMode, type Project } from '#lib/domain/projects.ts';
 import type { SoftwareGovernance } from '#lib/domain/software.ts';
+import { getBoard } from '#lib/services/board.ts';
 import { planLeadChanges } from '#lib/services/governance.ts';
 import { myAgent } from '#lib/services/people.ts';
 import {
@@ -62,7 +63,10 @@ export async function tellApprovals(project: string, g: SoftwareGovernance): Pro
     if (!a || a.by !== me || !recent(a.at) || !once(`pr:${pr.id}`)) continue;
     void prApprovedNotice(pr.author, project, pr.id);
     // Whoever can merge is asked to (ADR 0086): the merge happens on the repository by hand.
-    const mergers = g.mergers.map((m) => m.agent).filter((m) => m !== pr.author);
+    // On #platform that is the platform moderators (ADR 0095).
+    const mergers = g.platform
+      ? (await getBoard()).moderators.map((m) => m.agent)
+      : g.mergers.map((m) => m.agent).filter((m) => m !== pr.author);
     void awaitingMergeNotice(mergers, project, pr.id, pr.title);
   }
 }
