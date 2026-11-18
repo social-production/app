@@ -177,10 +177,17 @@
     right: 0;
     width: fit-content;
     margin: 0 auto;
+    background: var(--panel);
   }
 
   .mobile-bottom-nav.guest .bottom-nav-item {
     flex: 0 0 56px;
+  }
+
+  /* The capsule's round end eats into the last segment: More gets room so ⋯ stays clear. */
+  .mobile-bottom-nav.guest .bottom-nav-item:last-child {
+    flex-basis: 66px;
+    padding-right: 10px;
   }
 
   .mobile-bottom-nav.guest .bottom-nav-item.active-link {
