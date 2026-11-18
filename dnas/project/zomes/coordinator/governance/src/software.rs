@@ -98,21 +98,7 @@ fn events(
     }
     for r in requests {
         let hash = r.found.hash.clone();
-        if let Some(filed) = filed(r) {
-            let by_moderator = moderated.contains(&hash);
-            let grant = |grant| Event::Capability {
-                target: r.found.author.clone(),
-                grant,
-            };
-            // Same time, kept in this order by the stable sort below.
-            if by_moderator {
-                timed.push((r.found.at, grant(true)));
-            }
-            timed.push((r.found.at, filed));
-            if by_moderator {
-                timed.push((r.found.at, grant(false)));
-            }
-        }
+        push_filed(&mut timed, r, moderated.contains(&hash));
         let Some((passed, at)) = r.decided else {
             continue;
         };
@@ -146,6 +132,29 @@ fn events(
     }
     timed.sort_by_key(|(at, _)| *at);
     timed.into_iter().map(|(_, e)| e).collect()
+}
+
+/// What filing `r` does, at its time. A moderator's merge on a #platform project is wrapped in
+/// a grant and a revoke of the capability at the same moment (the sort below is stable).
+fn push_filed(
+    timed: &mut Vec<(Timestamp, Event<ActionHash, AgentPubKey>)>,
+    r: &Request,
+    by_moderator: bool,
+) {
+    let Some(event) = filed(r) else {
+        return;
+    };
+    let grant = |grant| Event::Capability {
+        target: r.found.author.clone(),
+        grant,
+    };
+    if by_moderator {
+        timed.push((r.found.at, grant(true)));
+    }
+    timed.push((r.found.at, event));
+    if by_moderator {
+        timed.push((r.found.at, grant(false)));
+    }
 }
 
 /// What filing `r` does by itself: a pull request opens, a merge is recorded.
