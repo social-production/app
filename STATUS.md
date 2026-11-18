@@ -225,7 +225,10 @@ nav and Topbar, and removes `SignedOutIntro`.
 ### Where things stand (10:00 pm Melbourne, 2026-11-18, UX session)
 - **Live: #225** (the Platform's moderator board loads for guests: `get_board` on the gateway's
   guest list; a board that can't load says so with Try again).
-- **Open: `claude/russian` (ADR 0114, owner checks tonight with a native speaker):**
+- **Live: #226 (ADR 0114, owner checks tonight with a native speaker), and #227 (a general
+  language picker in Settings, the More menu and the sign-in page; the first open follows only
+  the device's main language, after the owner's English phone that also lists Russian opened
+  in Russian):**
   Settings › Appearance › Language (English / Русский; first open follows the browser), every
   screen's fixed text through `t()` (`ui/src/lib/i18n`), ~1,450 Russian entries in
   `i18n/ru/part*.ts`, counts with Russian plural forms (`plural()`), relative times. Still
