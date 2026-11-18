@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import { emptyRole, type RoleDraft } from '#lib/domain/activityForm.ts';
 
@@ -58,9 +59,11 @@
 <div class="role-editor-shell">
   <div class="role-editor-header">
     <div>
-      <span class="field-inline-label">Roles needed</span>
+      <span class="field-inline-label">{t('Roles needed')}</span>
       <p class="role-editor-note">
-        Add one row per role. Set the minimum needed, and leave max blank if that role has no cap.
+        {t(
+          'Add one row per role. Set the minimum needed, and leave max blank if that role has no cap.',
+        )}
       </p>
     </div>
   </div>
@@ -69,17 +72,17 @@
     {#each roles as role, index (index)}
       <div class="role-row">
         <label class="role-field role-name-field">
-          <span class="field-inline-label">Role</span>
+          <span class="field-inline-label">{t('Role')}</span>
           <input
             maxlength="80"
-            placeholder="For example: Intake desk"
+            placeholder={t('For example: Intake desk')}
             type="text"
             value={role.label}
             oninput={(e) => patch(index, { label: e.currentTarget.value })}
           />
         </label>
         <label class="role-field role-count-field">
-          <span class="field-inline-label">Minimum</span>
+          <span class="field-inline-label">{t('Minimum')}</span>
           <input
             min="1"
             type="number"
@@ -88,10 +91,10 @@
           />
         </label>
         <label class="role-field role-count-field">
-          <span class="field-inline-label">Maximum</span>
+          <span class="field-inline-label">{t('Maximum')}</span>
           <input
             min={role.required}
-            placeholder="No cap"
+            placeholder={t('No cap')}
             type="number"
             value={role.maximum ?? ''}
             oninput={(e) => setMaximum(index, e.currentTarget.value)}
@@ -100,25 +103,25 @@
         <div class="role-remove-cell">
           {#if roles.length > 1}
             <button class="secondary-button" type="button" onclick={() => remove(index)}
-              >Remove</button
+              >{t('Remove')}</button
             >
           {/if}
         </div>
       </div>
       <label class="role-field role-suggest-field">
-        <span class="field-inline-label">Suggest someone (optional)</span>
+        <span class="field-inline-label">{t('Suggest someone (optional)')}</span>
         {#if role.suggest}
           <div class="suggested-chip-row">
             <span class="suggested-chip">Suggested · {role.suggest.name}</span>
             <button
               class="text-button"
               type="button"
-              onclick={() => patch(index, { suggest: null })}>Clear</button
+              onclick={() => patch(index, { suggest: null })}>{t('Clear')}</button
             >
           </div>
         {:else}
           <input
-            placeholder="Search username"
+            placeholder={t('Search username')}
             type="text"
             value={queries[index] ?? ''}
             oninput={(e) => search(index, e.currentTarget.value)}
@@ -137,6 +140,6 @@
     {/each}
   </div>
   <div class="role-add-row">
-    <RoundPlusButton label="Add role" onclick={() => (roles = [...roles, emptyRole()])} />
+    <RoundPlusButton label={t('Add role')} onclick={() => (roles = [...roles, emptyRole()])} />
   </div>
 </div>

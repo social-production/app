@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
@@ -175,7 +176,7 @@
         <DetailTopTabs
           active={tab}
           available={['context', 'participation', 'chat', 'links', 'history']}
-          ariaLabel={event ? 'Event detail tabs' : 'Project detail tabs'}
+          ariaLabel={event ? t('Event detail tabs') : t('Project detail tabs')}
           onSelect={(t) => (tab = t)}
         />
         <div
@@ -286,9 +287,9 @@
         open={detail.confirmingLeave}
         title={`Leave ${charter.title}?`}
         body={isPrivateSeed(id)
-          ? "It's private, so you'll need a new invite to come back."
-          : 'You can join again any time.'}
-        confirmLabel="Leave"
+          ? t("It's private, so you'll need a new invite to come back.")
+          : t('You can join again any time.')}
+        confirmLabel={t('Leave')}
         danger
         onSettle={(ok) => void leave(ok)}
       />

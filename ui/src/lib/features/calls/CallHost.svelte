@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CallControls from '#lib/components/calls/CallControls.svelte';
   import { callStatusLine, formatElapsed } from '#lib/domain/calls.ts';
   import { canSelectAudioOutput } from '#lib/services/callMedia.ts';
@@ -91,7 +92,7 @@
         <strong>{view.peerName || 'Call'}</strong>
         <span>{view.phase === 'active' ? elapsed : status}</span>
       </span>
-      <span class="pill-return">Tap to return</span>
+      <span class="pill-return">{t('Tap to return')}</span>
     </button>
   {:else if visible}
     <div class="call-screen" role="dialog" aria-modal="true" aria-labelledby="call-title">
@@ -100,8 +101,8 @@
           <button
             class="icon-plain"
             type="button"
-            aria-label="Back to the app"
-            title="Back to the app"
+            aria-label={t('Back to the app')}
+            title={t('Back to the app')}
             onclick={() => (minimized = true)}
           >
             <svg aria-hidden="true" viewBox="0 0 24 24" width="26" height="26">
@@ -118,7 +119,7 @@
         {:else}
           <span></span>
         {/if}
-        <span class="call-kind">Voice call</span>
+        <span class="call-kind">{t('Voice call')}</span>
         <span></span>
       </div>
 

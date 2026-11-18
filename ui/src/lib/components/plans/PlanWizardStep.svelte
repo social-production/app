@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
   import {
     SOFTWARE_LICENSE_BODY,
@@ -57,22 +58,23 @@
 {#if step.id === 'plan-overview'}
   <div class="overview-stack">
     <label>
-      <span class="field-inline-label">Title</span>
-      <input bind:value={form.title} maxlength="120" placeholder="Plan title" />
+      <span class="field-inline-label">{t('Title')}</span>
+      <input bind:value={form.title} maxlength="120" placeholder={t('Plan title')} />
     </label>
     <label>
-      <span class="field-inline-label">Description</span>
-      <textarea bind:value={form.description} rows="5" placeholder="Describe the plan"></textarea>
+      <span class="field-inline-label">{t('Description')}</span>
+      <textarea bind:value={form.description} rows="5" placeholder={t('Describe the plan')}
+      ></textarea>
     </label>
   </div>
 {:else if step.id === 'subtype'}
-  <select bind:value={form.subtype} aria-label="Plan type">
+  <select bind:value={form.subtype} aria-label={t('Plan type')}>
     {#each subtypes as option (option.value)}
       <option value={option.value}>{option.label}</option>
     {/each}
   </select>
 {:else if step.id === 'repository'}
-  <aside class="license-notice" aria-label="Software license guidance">
+  <aside class="license-notice" aria-label={t('Software license guidance')}>
     <strong>License: {SOFTWARE_LICENSE_LABEL}</strong>
     <p>{SOFTWARE_LICENSE_TITLE}</p>
     <p>{SOFTWARE_LICENSE_BODY}</p>
@@ -82,7 +84,7 @@
   </aside>
   <input
     bind:value={form.repositoryUrl}
-    aria-label="Repository URL"
+    aria-label={t('Repository URL')}
     placeholder="https://github.com/org/repo"
   />
 {:else if step.id === 'location'}
@@ -122,17 +124,17 @@
       />
     {/if}
     <label class="recipients-field">
-      <span>Recipients</span>
+      <span>{t('Recipients')}</span>
       <textarea
         bind:value={form.recipients}
         rows="2"
         maxlength="500"
-        placeholder="Who receives what this project makes?"></textarea>
+        placeholder={t('Who receives what this project makes?')}></textarea>
     </label>
   </div>
 {:else if step.id === 'requests'}
-  <select bind:value={form.requests} aria-label="Requests">
-    <option value="">No requests for now</option>
+  <select bind:value={form.requests} aria-label={t('Requests')}>
+    <option value="">{t('No requests for now')}</option>
     {#each REQUEST_MODES as option (option.value)}
       <option value={option.value}>{option.label}</option>
     {/each}
@@ -141,8 +143,8 @@
     <p class="helper-copy">{REQUEST_MODES.find((m) => m.value === form.requests)?.summary}</p>
   {/if}
 {:else if step.id === 'demand-note'}
-  <div class="signal-card" aria-label="Current support signals">
-    <span class="signal-label">Current support signals</span>
+  <div class="signal-card" aria-label={t('Current support signals')}>
+    <span class="signal-label">{t('Current support signals')}</span>
     <strong>{demand} support · {opposition} opposition ({total} total)</strong>
     <p class="helper-copy">
       Support share: {total === 0 ? 0 : Math.round((demand / total) * 100)}%
@@ -155,33 +157,33 @@
   <textarea
     bind:value={form.demandNote}
     rows="5"
-    placeholder="Explain how this plan responds to support"></textarea>
+    placeholder={t('Explain how this plan responds to support')}></textarea>
 {:else if step.id === 'schedule-mode'}
-  <select bind:value={form.scheduleMode} aria-label="Schedule">
-    <option value="date">Single date</option>
-    <option value="range">Date range</option>
+  <select bind:value={form.scheduleMode} aria-label={t('Schedule')}>
+    <option value="date">{t('Single date')}</option>
+    <option value="range">{t('Date range')}</option>
   </select>
 {:else if step.id === 'schedule-date'}
-  <input type="date" bind:value={form.scheduledDate} aria-label="Date" />
+  <input type="date" bind:value={form.scheduledDate} aria-label={t('Date')} />
 {:else if step.id === 'schedule-range'}
   <div class="field-grid">
     <label>
-      <span>Start date</span>
+      <span>{t('Start date')}</span>
       <input type="date" bind:value={form.rangeStartDate} />
     </label>
     <label>
-      <span>End date</span>
+      <span>{t('End date')}</span>
       <input type="date" bind:value={form.rangeEndDate} />
     </label>
   </div>
 {:else if step.id === 'schedule-time'}
   <div class="field-grid">
     <label>
-      <span>Start time</span>
+      <span>{t('Start time')}</span>
       <input type="time" bind:value={form.startTime} />
     </label>
     <label>
-      <span>Finish time</span>
+      <span>{t('Finish time')}</span>
       <input type="time" bind:value={form.finishTime} />
     </label>
   </div>

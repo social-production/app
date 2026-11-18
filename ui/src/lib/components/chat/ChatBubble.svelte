@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
   import { removedLabel } from '#lib/domain/moderation.ts';
@@ -85,15 +86,15 @@
 
 {#snippet stamp()}
   <span class="message-time"
-    >{message.pending ? 'Sending…' : formatMessageTime(message.createdAt)}</span
+    >{message.pending ? t('Sending…') : formatMessageTime(message.createdAt)}</span
   >
   {#if message.receipt}
     {@const read = message.receipt === 'read'}
-    <span class="receipt" class:read aria-label={read ? 'Read' : 'Delivered'}
+    <span class="receipt" class:read aria-label={read ? t('Read') : t('Delivered')}
       >{read ? '✓✓' : '✓'}</span
     >
   {/if}
-  {#if message.edited}<span class="edited-mark">edited</span>{/if}
+  {#if message.edited}<span class="edited-mark">{t('edited')}</span>{/if}
 {/snippet}
 
 <!-- web's bubble opens its menu on click or right-click; the menu's items are buttons. -->
@@ -127,7 +128,7 @@
       <button
         class="reply-quote"
         type="button"
-        title="Show the original message"
+        title={t('Show the original message')}
         disabled={!message.replyToId}
         onclick={(event) => {
           event.stopPropagation();
@@ -149,7 +150,9 @@
         }}
       >
         <span class="hidden-plus">{revealed ? '−' : '+'}</span>
-        <span>{revealed ? 'Hide again' : 'Hidden for serious harm report — reveal to read'}</span>
+        <span
+          >{revealed ? t('Hide again') : t('Hidden for serious harm report — reveal to read')}</span
+        >
       </button>
     {/if}
     {#if removed}
@@ -226,8 +229,8 @@
       <button
         class="hover-reply"
         type="button"
-        aria-label="Reply"
-        title="Reply"
+        aria-label={t('Reply')}
+        title={t('Reply')}
         onclick={(event) => {
           event.stopPropagation();
           onReply(message);

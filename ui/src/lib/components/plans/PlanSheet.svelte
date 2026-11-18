@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
   import { allCriteriaRated, planChip, type PlanRating, type PlanView } from '#lib/domain/plans.ts';
@@ -63,7 +64,7 @@
 
 <OverlaySheet
   {open}
-  title={reviewing ? 'Your review' : plan.plan.title}
+  title={reviewing ? t('Your review') : plan.plan.title}
   labelledById={`plan-sheet-${plan.id}`}
   rootClass="plan-scope"
   wide
@@ -80,7 +81,9 @@
   {/snippet}
   {#snippet headerActions()}
     {#if reviewing}
-      <button class="sheet-back" type="button" onclick={() => (reviewing = false)}>Back</button>
+      <button class="sheet-back" type="button" onclick={() => (reviewing = false)}
+        >{t('Back')}</button
+      >
     {:else if chip}
       <span class="sheet-chip" class:leading={chip !== 'Rejected'}>{chip}</span>
     {/if}
@@ -96,10 +99,10 @@
     <div class="plan-sheet-foot">
       {#if reviewing}
         <p class="plan-final">
-          <strong>Does this plan meet the need?</strong>
-          {#if !voteOpen}This vote has closed.
-          {:else if !complete}Answer every question first.
-          {:else}Your vote is final once cast.{/if}
+          <strong>{t('Does this plan meet the need?')}</strong>
+          {#if !voteOpen}{t('This vote has closed.')}
+          {:else if !complete}{t('Answer every question first.')}
+          {:else}{t('Your vote is final once cast.')}{/if}
         </p>
         <div class="plan-yes-no">
           {#each ['No', 'Yes'] as const as choice (choice)}
@@ -108,7 +111,7 @@
               class:yes={choice === 'Yes'}
               disabled={!canVote || !complete || !voteOpen || !!myVote}
               type="button"
-              onclick={() => vote(choice)}>{choice === 'Yes' ? 'Yes, approve' : 'No'}</button
+              onclick={() => vote(choice)}>{choice === 'Yes' ? t('Yes, approve') : t('No')}</button
             >
           {/each}
         </div>
@@ -125,7 +128,7 @@
           </p>
         {:else if canVote && voteOpen}
           <button class="plan-review-button" type="button" onclick={() => (reviewing = true)}
-            >Review this plan</button
+            >{t('Review this plan')}</button
           >
         {/if}
       {/if}

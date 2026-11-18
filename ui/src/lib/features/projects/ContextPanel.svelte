@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import DetailFacts from '#lib/components/detail/DetailFacts.svelte';
   import FactRow from '#lib/components/detail/FactRow.svelte';
@@ -81,8 +82,8 @@
     {#if project.lineage.continues}
       <FactRow
         icon="lineage"
-        title="A converted project"
-        sub="Continues the work of"
+        title={t('A converted project')}
+        sub={t('Continues the work of')}
         href={resolve('/projects/[id]', { id: project.lineage.continues })}
       />
     {/if}
@@ -132,7 +133,7 @@
       <p class="detail-by">
         <AvatarBadge size="sm" name={author} />
         <span>
-          {event ? 'Organised by' : 'Started by'}
+          {event ? t('Organised by') : t('Started by')}
           <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>
           · {started}
         </span>

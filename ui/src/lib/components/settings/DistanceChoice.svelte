@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import '#lib/components/styles/ux/regionsettings.css';
 
   /** Owner's fix 3d (2026-11-17): preset distances you tap, and a box below them you can type
@@ -15,7 +16,7 @@
 </script>
 
 <div class="distance-choice">
-  <p class="distance-label">Show what's within</p>
+  <p class="distance-label">{t("Show what's within")}</p>
   <div class="distance-chips">
     {#each presets as preset (preset.value)}
       <button
@@ -27,10 +28,10 @@
     {/each}
   </div>
   <label class="distance-typed">
-    <span>Or type a distance</span>
+    <span>{t('Or type a distance')}</span>
     <span class="distance-box">
       <input
-        aria-label="Distance in km"
+        aria-label={t('Distance in km')}
         inputmode="numeric"
         min="1"
         type="number"
@@ -40,7 +41,7 @@
           if (n >= 1) onChange(String(n));
         }}
       />
-      <em>km</em>
+      <em>{t('km')}</em>
     </span>
   </label>
 </div>

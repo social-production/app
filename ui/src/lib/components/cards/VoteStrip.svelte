@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Stance } from '#lib/domain/projects.ts';
 
   import '#lib/components/styles/cards.css';
@@ -49,7 +50,7 @@
 
 <div class={bare ? 'feed-vote' : 'vote-strip'} class:docked class:corner={corner && !bare}>
   <button
-    aria-label="Vote up"
+    aria-label={t('Vote up')}
     aria-pressed={shown.mine === 'Demand'}
     class:active-up={shown.mine === 'Demand'}
     class="vote-button"
@@ -71,7 +72,7 @@
     class="vote-count">{shown.count}</span
   >
   <button
-    aria-label="Vote down"
+    aria-label={t('Vote down')}
     aria-pressed={shown.mine === 'Oppose'}
     class:active-down={shown.mine === 'Oppose'}
     class="vote-button"

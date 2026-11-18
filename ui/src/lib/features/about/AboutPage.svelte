@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { goto } from '$app/navigation';
   import { resolve } from '$app/paths';
   import { page } from '$app/state';
@@ -65,12 +66,12 @@
 <div class="about-page">
   <section class="page">
     <header class="hero">
-      <p class="eyebrow">About Social Production</p>
-      <h1>Organising useful work together, for use rather than sale.</h1>
+      <p class="eyebrow">{t('About Social Production')}</p>
+      <h1>{t('Organising useful work together, for use rather than sale.')}</h1>
     </header>
 
     <div class="reader">
-      <div class="tab-row" role="tablist" aria-label="About">
+      <div class="tab-row" role="tablist" aria-label={t('About')}>
         {#each ABOUT_SECTIONS as tab (tab.id)}
           <button
             aria-selected={active === tab.id}
@@ -97,7 +98,7 @@
         {/if}
         {@render section(blocks)}
         {#if active === 'why'}
-          <h3>Further reading</h3>
+          <h3>{t('Further reading')}</h3>
           {#each aboutReading as link (link.href)}
             <p>
               <a href={link.href} rel="external noreferrer" target="_blank">{link.label}</a>
@@ -113,7 +114,7 @@
           </p>
         {/if}
 
-        <a class="discover" href={resolve('/')}>Get involved!</a>
+        <a class="discover" href={resolve('/')}>{t('Get involved!')}</a>
       </article>
     </div>
   </section>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
@@ -33,7 +34,7 @@
 
 <section class="scope-sheet-art">
   <div class="scope-cover" style={cover ? `background-image: url(${cover})` : undefined}>
-    {#if art.newCover}<span class="art-new">New</span>{/if}
+    {#if art.newCover}<span class="art-new">{t('New')}</span>{/if}
     {#if canEdit}
       <button
         class="art-change"
@@ -41,7 +42,8 @@
         disabled={art.busy}
         onclick={() => coverInput?.click()}
       >
-        <ToolbarIcon name="image" /> Change cover
+        <ToolbarIcon name="image" />
+        {t('Change cover')}
       </button>
     {/if}
   </div>
@@ -50,13 +52,13 @@
         icon={kind}
         size="md"
       />{/if}
-    {#if art.newPicture}<span class="art-new">New</span>{/if}
+    {#if art.newPicture}<span class="art-new">{t('New')}</span>{/if}
   </span>
   {#if canEdit}
     <button
       class="art-camera"
       type="button"
-      aria-label="Change picture"
+      aria-label={t('Change picture')}
       disabled={art.busy}
       onclick={() => pictureInput?.click()}
     >
@@ -68,7 +70,7 @@
     class="art-file"
     type="file"
     accept="image/jpeg,image/png,image/webp"
-    aria-label="Cover image"
+    aria-label={t('Cover image')}
     onchange={() => pick('cover', coverInput)}
   />
   <input
@@ -76,7 +78,7 @@
     class="art-file"
     type="file"
     accept="image/jpeg,image/png,image/webp"
-    aria-label="Picture image"
+    aria-label={t('Picture image')}
     onchange={() => pick('picture', pictureInput)}
   />
 </section>

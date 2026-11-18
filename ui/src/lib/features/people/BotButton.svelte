@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   /** web's "Bot" action button (profile action row, ADR 0074). */
   interface Props {
     name: string;
@@ -18,10 +19,10 @@
   class:on={marked}
   disabled={busy || (!marked && !canMark)}
   title={marked
-    ? 'Clear bot mark'
+    ? t('Clear bot mark')
     : canMark
-      ? 'Mark as bot'
-      : 'Marking as a bot opens once your own votes count fully.'}
+      ? t('Mark as bot')
+      : t('Marking as a bot opens once your own votes count fully.')}
   type="button"
   onclick={onToggle}
 >
@@ -43,5 +44,5 @@
       stroke-linecap="round"
     /><circle cx="12" cy="3.5" r="1" fill="currentColor" /></svg
   >
-  <span class="action-text">{marked ? 'Marked bot' : 'Bot'}</span>
+  <span class="action-text">{marked ? t('Marked bot') : t('Bot')}</span>
 </button>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Stance } from '#lib/domain/projects.ts';
 
   /**
@@ -84,7 +85,7 @@
           stroke-linejoin="round"
         /></svg
       >{:else}▲{/if}
-    {#if labeled}<span class="signal-label">Support</span><span class="signal-count"
+    {#if labeled}<span class="signal-label">{t('Support')}</span><span class="signal-count"
         >{shown.support}</span
       >{/if}
   </button>
@@ -98,7 +99,7 @@
     type="button"
     onclick={(e) => click('Oppose', e)}
   >
-    {#if labeled}<span class="signal-label">Oppose</span><span class="signal-count"
+    {#if labeled}<span class="signal-label">{t('Oppose')}</span><span class="signal-count"
         >{shown.oppose}</span
       >{/if}
     {#if bare}<svg aria-hidden="true" viewBox="0 0 24 24" class="feed-vote-icon"

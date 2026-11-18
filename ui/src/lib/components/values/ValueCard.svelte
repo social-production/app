@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { IMPORTANCE_OPTIONS, type Importance, type ProjectValue } from '#lib/domain/values.ts';
 
@@ -41,7 +42,7 @@
     {#if localVote > 0}
       <span class="value-chip mine">You: {localVote}</span>
     {:else if canVote}
-      <span class="value-chip need">Rate this</span>
+      <span class="value-chip need">{t('Rate this')}</span>
     {/if}
     <button
       class="value-more"
@@ -61,24 +62,24 @@
 
   <DiscreteScale
     disabled={!canVote}
-    leftLabel="Unnecessary"
+    leftLabel={t('Unnecessary')}
     onSelect={(selected) => {
       heldVote = selected as Importance;
       onVote(selected as Importance);
     }}
     options={IMPORTANCE_OPTIONS}
-    rightLabel="Required"
+    rightLabel={t('Required')}
     selectedValue={localVote}
   />
 
   <div
     class="value-average"
-    aria-label={value.voteCount ? `Community average: ${average}/10` : 'No community rating yet'}
+    aria-label={value.voteCount ? `Community average: ${average}/10` : t('No community rating yet')}
   >
-    <span>Everyone</span>
+    <span>{t('Everyone')}</span>
     <i style={`--share: ${value.voteCount ? value.importanceScore * 10 : 0}%`}></i>
     <span
-      >{#if value.voteCount}<b>{average}</b> · {ratings}{:else}No ratings yet{/if}</span
+      >{#if value.voteCount}<b>{average}</b> · {ratings}{:else}{t('No ratings yet')}{/if}</span
     >
   </div>
 </article>
@@ -91,6 +92,8 @@
   onClose={() => (about = false)}
 >
   <p class="value-about">
-    Added by <strong>{authorName}</strong> · {new Date(value.createdAt / 1000).toLocaleDateString()}
+    {t('Added by')} <strong>{authorName}</strong> · {new Date(
+      value.createdAt / 1000,
+    ).toLocaleDateString()}
   </p>
 </OverlaySheet>

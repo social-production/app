@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import { checkHandle, type ScopeKind } from '#lib/domain/scopes.ts';
@@ -63,8 +64,12 @@
 <CreateSheet
   title={`Create ${channel ? 'channel' : 'community'}`}
   description={channel
-    ? 'A channel is a topic surface. It gathers related threads and project activity without defining who belongs together.'
-    : 'A community is a social space that connects people to projects and discussion, without forcing every topic into one channel.'}
+    ? t(
+        'A channel is a topic surface. It gathers related threads and project activity without defining who belongs together.',
+      )
+    : t(
+        'A community is a social space that connects people to projects and discussion, without forcing every topic into one channel.',
+      )}
   steps={[{ id: 'basics', title: 'Basics' }]}
   stepIndex={0}
   {missing}
@@ -88,41 +93,45 @@
       </span>
     </label>
     {#if !name.trim()}
-      <p class="helper-text">Lowercase, with dashes. This is its address.</p>
+      <p class="helper-text">{t('Lowercase, with dashes. This is its address.')}</p>
     {:else}
       {#if !check.ok}
         <p class="status-note">{check.error}</p>
       {:else}
-        <p class="helper-text">Its address: <code>{path(check.slug)}</code></p>
+        <p class="helper-text">{t('Its address:')} <code>{path(check.slug)}</code></p>
       {/if}
     {/if}
     {#if !channel}
       <label>
-        <span class="field-label">Openness</span>
+        <span class="field-label">{t('Openness')}</span>
         <select bind:value={openness}>
-          <option value="open">Open</option>
-          <option value="invite_only">Private</option>
+          <option value="open">{t('Open')}</option>
+          <option value="invite_only">{t('Private')}</option>
         </select>
       </label>
 
       {#if openness === 'invite_only'}
         <label>
-          <span class="field-label">Who decides</span>
+          <span class="field-label">{t('Who decides')}</span>
           <select bind:value={governance}>
-            <option value="collaborative">Collaborative: all members vote on changes</option>
-            <option value="organizer">Organizer controlled: you and organizers you choose</option>
+            <option value="collaborative">{t('Collaborative: all members vote on changes')}</option>
+            <option value="organizer"
+              >{t('Organizer controlled: you and organizers you choose')}</option
+            >
           </select>
           <span class="helper-text">
             <!-- web's copy, less what isn't ported (renames, switching; ADR 0068). -->
             {governance === 'organizer'
-              ? 'Organizers edit settings and remove members directly. This stays as it is.'
-              : 'Members vote on the description, picture and cover, and on removing members. This stays as it is.'}
+              ? t('Organizers edit settings and remove members directly. This stays as it is.')
+              : t(
+                  'Members vote on the description, picture and cover, and on removing members. This stays as it is.',
+                )}
           </span>
         </label>
       {/if}
     {/if}
     <label>
-      <RequiredLabel>Description</RequiredLabel>
+      <RequiredLabel>{t('Description')}</RequiredLabel>
       <textarea bind:value={description} rows="4" aria-required="true"></textarea>
     </label>
     {#if message}<p class="status-note">{message}</p>{/if}

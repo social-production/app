@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { FollowStatus } from '#lib/domain/follows.ts';
 
@@ -34,6 +35,10 @@
 >
   <ToolbarIcon name={status === 'accepted' ? 'person-check' : 'person-plus'} />
   <span class="action-text"
-    >{status === 'pending' ? 'Requested' : status === 'accepted' ? 'Following' : 'Follow'}</span
+    >{status === 'pending'
+      ? t('Requested')
+      : status === 'accepted'
+        ? t('Following')
+        : t('Follow')}</span
   >
 </button>

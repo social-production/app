@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
   import { explain } from '#lib/services/errors.ts';
@@ -37,8 +38,8 @@
 
 <ShareUserMenu
   menuTitle={`Share ${name}'s profile`}
-  submitLabel="Send"
-  recipientHint="They get the link as a message."
+  submitLabel={t('Send')}
+  recipientHint={t('They get the link as a message.')}
   copyLinkUrl={url}
   shareTitle={name}
   searchContacts={search}

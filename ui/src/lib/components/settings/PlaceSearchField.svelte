@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { PlaceSearch, PlaceValue } from '#lib/domain/places.ts';
 
@@ -55,8 +56,8 @@
   <label class="place-search-field">
     <ToolbarIcon name="search" />
     <input
-      aria-label="Search a place"
-      placeholder="Search a place"
+      aria-label={t('Search a place')}
+      placeholder={t('Search a place')}
       value={query}
       oninput={(e) => onInput(e.currentTarget.value)}
     />
@@ -65,7 +66,9 @@
     <li>
       <button type="button" onclick={onLocate}>
         <ToolbarIcon name="locate" />
-        <span><strong>Use my location</strong><small>Ask this device once</small></span>
+        <span
+          ><strong>{t('Use my location')}</strong><small>{t('Ask this device once')}</small></span
+        >
       </button>
     </li>
     {#each results as place, i (i)}

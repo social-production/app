@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { feedSummary, type FeedType } from '#lib/domain/feedTypes.ts';
   import type { FeedWindow } from '#lib/domain/projects.ts';
@@ -32,10 +33,10 @@
     type="button"
     class="feed-tune"
     class:narrowed
-    aria-label="Feed filters"
+    aria-label={t('Feed filters')}
     aria-haspopup="dialog"
     aria-expanded={open}
-    title="Feed filters"
+    title={t('Feed filters')}
     onclick={() => (open = true)}
   >
     <ToolbarIcon name="filter" />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import FactIcon, { type FactIconName } from './FactIcon.svelte';
@@ -41,7 +42,7 @@
     class="fact-row"
     {href}
     aria-label={label}
-    rel={external ? 'noopener noreferrer' : undefined}
+    rel={external ? t('noopener noreferrer') : undefined}
     {onclick}>{@render body()}</a
   >
   <!-- eslint-enable svelte/no-navigation-without-resolve -->

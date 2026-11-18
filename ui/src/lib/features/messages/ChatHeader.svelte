@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import ChatMarks from '#lib/components/messages/ChatMarks.svelte';
@@ -43,8 +44,8 @@
   <button
     class="back-button"
     type="button"
-    aria-label="Back to chats"
-    title="Back to chats"
+    aria-label={t('Back to chats')}
+    title={t('Back to chats')}
     onclick={p.onBack}
   >
     <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
@@ -92,8 +93,8 @@
     <button
       class="menu-button"
       type="button"
-      aria-label="Chat menu"
-      title="Chat menu"
+      aria-label={t('Chat menu')}
+      title={t('Chat menu')}
       onclick={(event) => {
         const box = event.currentTarget.getBoundingClientRect();
         p.onMenu(box.right - 220, box.bottom + 6);

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -97,8 +98,12 @@
   onClose={close}
 >
   {#snippet headerActions()}
-    <button class="create-close" type="button" aria-label="Close" title="Close" onclick={close}
-      >×</button
+    <button
+      class="create-close"
+      type="button"
+      aria-label={t('Close')}
+      title={t('Close')}
+      onclick={close}>×</button
     >
     {#if p.composer}
       <button
@@ -108,7 +113,8 @@
         aria-label={p.submitLabel}
         aria-disabled={blocked}
         disabled={p.submitting}
-        onclick={advance}>{p.submitting ? (p.submittingLabel ?? 'Posting...') : 'Post'}</button
+        onclick={advance}
+        >{p.submitting ? (p.submittingLabel ?? t('Posting...')) : t('Post')}</button
       >
     {/if}
   {/snippet}
@@ -144,7 +150,7 @@
     <div class="sheet-actions" class:composer-dock={p.composer}>
       {#if p.stepIndex > 0}
         <button class="sheet-cancel create-back" type="button" onclick={() => go(p.stepIndex - 1)}
-          >Back</button
+          >{t('Back')}</button
         >
       {/if}
       <button
@@ -156,9 +162,9 @@
         onclick={advance}
         >{last
           ? p.submitting
-            ? (p.submittingLabel ?? 'Creating...')
+            ? (p.submittingLabel ?? t('Creating...'))
             : p.submitLabel
-          : 'Continue'}</button
+          : t('Continue')}</button
       >
     </div>
   {/snippet}
@@ -166,19 +172,19 @@
 
 <OverlaySheet
   open={confirming}
-  title="Discard this draft?"
+  title={t('Discard this draft?')}
   labelledById="discard-draft"
   rootClass="create-sheet"
   onClose={() => (confirming = false)}
 >
-  <p class="sheet-description">What you've written here will be lost.</p>
+  <p class="sheet-description">{t("What you've written here will be lost.")}</p>
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-cancel" type="button" onclick={() => (confirming = false)}
-        >Keep editing</button
+        >{t('Keep editing')}</button
       >
       <button class="sheet-submit" type="button" onclick={() => ((confirming = false), p.onClose())}
-        >Discard</button
+        >{t('Discard')}</button
       >
     </div>
   {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import type { NotificationCategory } from '#lib/domain/notificationCategories.ts';
   import { notificationsOff, setNotificationCategory } from '#lib/stores/notifications.svelte.ts';
@@ -48,8 +49,8 @@
 </script>
 
 <section class="settings-section" id="settings-notifications">
-  <h2>Notifications</h2>
-  <p class="section-intro">Choose which activity shows up in your notifications.</p>
+  <h2>{t('Notifications')}</h2>
+  <p class="section-intro">{t('Choose which activity shows up in your notifications.')}</p>
   <div class="card stack flush">
     {#each options as option (option.id)}
       {@const enabled = on(option.id)}

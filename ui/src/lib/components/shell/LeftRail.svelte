@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
 
   import { resolve } from '$app/paths';
@@ -51,8 +52,8 @@
     <input
       bind:value={find}
       type="search"
-      aria-label="Find channels and communities"
-      placeholder="Find channels and communities"
+      aria-label={t('Find channels and communities')}
+      placeholder={t('Find channels and communities')}
     />
   </form>
 
@@ -60,21 +61,21 @@
     <RailLinkRow
       href={resolve('/platform')}
       icon="platform"
-      label="Platform"
+      label={t('Platform')}
       active={here('/platform')}
       onclick={closePanels}
     />
     <RailLinkRow
       href={resolve('/platform?board=1')}
       icon="shield"
-      label="Moderators"
+      label={t('Moderators')}
       onclick={closePanels}
     />
   </div>
 
   <details class="rail-section" bind:open={channelsOpen}>
     <summary class="rail-section-summary">
-      <span>Channels</span>
+      <span>{t('Channels')}</span>
       <span class="chevron" aria-hidden="true"></span>
     </summary>
     <div class="stack-links">
@@ -88,14 +89,14 @@
           onclick={closePanels}
         />
       {:else}
-        <p class="empty-hint">Join channels to see them here.</p>
+        <p class="empty-hint">{t('Join channels to see them here.')}</p>
       {/each}
     </div>
   </details>
 
   <details class="rail-section" bind:open={communitiesOpen}>
     <summary class="rail-section-summary">
-      <span>Communities</span>
+      <span>{t('Communities')}</span>
       <span class="chevron" aria-hidden="true"></span>
     </summary>
     <div class="stack-links">
@@ -104,7 +105,7 @@
         <RailLinkRow
           href={resolve('/invites')}
           icon="community"
-          label="Invites"
+          label={t('Invites')}
           active={here('/invites')}
           onclick={closePanels}
         >
@@ -121,7 +122,7 @@
           onclick={closePanels}
         />
       {:else}
-        <p class="empty-hint">Join communities to see them here.</p>
+        <p class="empty-hint">{t('Join communities to see them here.')}</p>
       {/each}
     </div>
   </details>
@@ -129,11 +130,11 @@
   <div class="action-stack">
     <button class="rail-action discover-button" type="button" onclick={() => onDiscover?.('')}>
       <ToolbarIcon name="plus" />
-      <span>Discover</span>
+      <span>{t('Discover')}</span>
     </button>
     <a class="rail-action feedback-button" href={resolve('/feedback')} onclick={closePanels}>
       <ToolbarIcon name="pencil" />
-      <span>Feedback</span>
+      <span>{t('Feedback')}</span>
     </a>
   </div>
 </div>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { PlaceValue } from '#lib/domain/places.ts';
@@ -47,7 +48,7 @@
 <div class="location-intent">
   <SegmentedChoice
     value={intent}
-    ariaLabel="Location intent"
+    ariaLabel={t('Location intent')}
     options={shown.map((c) => ({ value: c.value, label: c.label }))}
     onChange={onIntent}
   />
@@ -55,7 +56,7 @@
     <LocationPicker
       value={place}
       modes={['physical']}
-      placeholder="Search a place"
+      placeholder={t('Search a place')}
       onChange={onPlace}
       {search}
       {failure}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SuggestionList from '#lib/components/messages/SuggestionList.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
 
@@ -49,26 +50,26 @@
     <svg aria-hidden="true" viewBox="0 0 24 24"
       ><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></svg
     >
-    <input bind:value={query} placeholder="Add people" aria-label="Invite people" />
+    <input bind:value={query} placeholder={t('Add people')} aria-label={t('Invite people')} />
   </label>
-  <SuggestionList {items} {query} emptyCopy="No matching people." onSelect={add} />
+  <SuggestionList {items} {query} emptyCopy={t('No matching people.')} onSelect={add} />
 
   {#if invitees.length > 0}
-    <ul class="invite-rows" aria-label="Invited">
+    <ul class="invite-rows" aria-label={t('Invited')}>
       {#each invitees as person (person.agent)}
         {@const on = isOrganizer(person.agent)}
         <li class="invite-row">
           <span class="invite-avatar" aria-hidden="true">{initials(person.name)}</span>
           <span class="invite-copy">
             <strong>{person.name}</strong>
-            <small>{on ? 'Organiser' : 'Invited'}</small>
+            <small>{on ? t('Organiser') : t('Invited')}</small>
           </span>
           <button
             type="button"
             class="invite-organiser"
             class:on
             aria-pressed={on}
-            onclick={() => onOrganizer(person, !on)}>Organiser</button
+            onclick={() => onOrganizer(person, !on)}>{t('Organiser')}</button
           >
           <button
             type="button"
@@ -80,5 +81,5 @@
       {/each}
     </ul>
   {/if}
-  <p class="tag-hint">Organisers can invite people and plan activities with you.</p>
+  <p class="tag-hint">{t('Organisers can invite people and plan activities with you.')}</p>
 </div>

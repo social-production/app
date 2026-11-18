@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
@@ -147,15 +148,15 @@
   {#if canRequest}
     <RoundPlusButton
       standout
-      label="Request service"
-      ariaLabel="Request service"
+      label={t('Request service')}
+      ariaLabel={t('Request service')}
       onclick={openRequest}
     />
   {/if}
   {#if member ? settings.enabled || requests.shown.length > 0 : requests.shown.length > 0}
     <RoundPlusButton
-      label={member ? 'Requests' : 'Your requests'}
-      ariaLabel="Show service requests"
+      label={member ? t('Requests') : t('Your requests')}
+      ariaLabel={t('Show service requests')}
       onclick={() => {
         requests.listOpen = true;
         void requests.load();
@@ -164,8 +165,8 @@
   {/if}
   {#if member}
     <RoundPlusButton
-      label="Settings ▾"
-      ariaLabel="Service settings"
+      label={t('Settings ▾')}
+      ariaLabel={t('Service settings')}
       onclick={() => (menuOpen = true)}
     />
   {/if}
@@ -187,7 +188,7 @@
 {#if member}
   <OverlaySheet
     open={menuOpen}
-    title="Settings"
+    title={t('Settings')}
     labelledById="service-settings-menu"
     rootClass="collective-service"
     onClose={() => (menuOpen = false)}
@@ -201,8 +202,8 @@
           requests.openSettings(settings);
         }}
       >
-        <strong>Request settings</strong>
-        <span>Turn requests on or off, and change how people ask for this service.</span>
+        <strong>{t('Request settings')}</strong>
+        <span>{t('Turn requests on or off, and change how people ask for this service.')}</span>
       </button>
     </div>
   </OverlaySheet>

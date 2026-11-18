@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CardFacts from '#lib/components/cards/CardFacts.svelte';
   import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
   import type { CharterMode } from '#lib/domain/projects.ts';
@@ -21,7 +22,7 @@
 </script>
 
 <figure class="create-preview">
-  <figcaption>This is how it will look in the feed.</figcaption>
+  <figcaption>{t('This is how it will look in the feed.')}</figcaption>
   <!-- `shell` so the feed row's own styles reach it inside the portaled sheet. -->
   <div class="shell create-preview-card">
     <div class="feed-card-top feed-lead">
@@ -32,7 +33,7 @@
           </div>{/if}
         <div class="feed-lead-meta" class:alone={!scope}>
           <SurfaceTypeLabel projectMode={mode} />
-          <span class="feed-card-time">now</span>
+          <span class="feed-card-time">{t('now')}</span>
         </div>
       </div>
     </div>

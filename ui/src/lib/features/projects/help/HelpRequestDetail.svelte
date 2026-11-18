@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import FoldedText from '#lib/components/cards/FoldedText.svelte';
@@ -90,7 +91,7 @@
         <DetailTopTabs
           active={tab}
           available={['context', 'chat']}
-          ariaLabel="Help request detail tabs"
+          ariaLabel={t('Help request detail tabs')}
           onSelect={(t) => (tab = t)}
         />
         {#if tab === 'context'}
@@ -104,7 +105,7 @@
               >
                 <ReportControl
                   id={help.id}
-                  itemLabel="help request"
+                  itemLabel={t('help request')}
                   moderation={help.moderation.value}
                   owner={project.creator}
                   copyUrl={`${location.origin}${location.pathname}`}
@@ -118,7 +119,7 @@
                 <p class="detail-by">
                   <AvatarBadge size="sm" name={author} />
                   <span>
-                    Asked by
+                    {t('Asked by')}
                     <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>
                     · {started}
                   </span>

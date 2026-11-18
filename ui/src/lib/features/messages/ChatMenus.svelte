@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import ChatMenu, { type ChatMenuItem } from '#lib/components/messages/ChatMenu.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
@@ -129,11 +130,13 @@
 
 <ConfirmDialog
   open={leaving !== null}
-  title="Leave this group?"
+  title={t('Leave this group?')}
   body={leaving?.started
-    ? "You'll stop getting its messages. You started it, so the longest-standing member takes over managing it. Someone in the group can add you back."
-    : "You'll stop getting its messages. Someone in the group can add you back."}
-  confirmLabel="Leave"
+    ? t(
+        "You'll stop getting its messages. You started it, so the longest-standing member takes over managing it. Someone in the group can add you back.",
+      )
+    : t("You'll stop getting its messages. Someone in the group can add you back.")}
+  confirmLabel={t('Leave')}
   danger
   onSettle={settle}
 />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
   import { setContext, untrack, type Snippet } from 'svelte';
 
@@ -215,8 +216,8 @@
 
   {#if compact && (leftOpen || rightOpen)}
     <button
-      aria-label="Close side panels"
-      title="Close side panels"
+      aria-label={t('Close side panels')}
+      title={t('Close side panels')}
       class="rail-backdrop"
       onclick={closeCompact}
     ></button>

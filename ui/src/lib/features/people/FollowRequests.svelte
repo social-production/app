@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { FollowRow } from '#lib/domain/follows.ts';
   import type { Person } from '#lib/domain/people.ts';
   import { displayName } from '#lib/domain/people.ts';
@@ -18,16 +19,16 @@
 
 {#if requests.length > 0}
   <section id="follow-requests" class="requests-card">
-    <h2>Follow requests</h2>
+    <h2>{t('Follow requests')}</h2>
     <p class="requests-copy">
-      Approve followers who need your permission before they can see personal content.
+      {t('Approve followers who need your permission before they can see personal content.')}
     </p>
     <div class="people-list">
       {#each requests as request (request.agent)}
         {@const person = people[request.agent]}
         <div class="person-row">
           <a class="person-link" href={resolve('/profile/[agent]', { agent: request.agent })}>
-            <strong>{person ? displayName(person) : 'Unnamed'}</strong>
+            <strong>{person ? displayName(person) : t('Unnamed')}</strong>
             {#if person?.profile?.bio}<span>{person.profile.bio}</span>{/if}
           </a>
           <div class="request-actions">
@@ -37,7 +38,7 @@
               type="button"
               onclick={() => onDecide(request.agent, true)}
             >
-              Accept
+              {t('Accept')}
             </button>
             <button
               class="reject-button"
@@ -45,7 +46,7 @@
               type="button"
               onclick={() => onDecide(request.agent, false)}
             >
-              Decline
+              {t('Decline')}
             </button>
           </div>
         </div>

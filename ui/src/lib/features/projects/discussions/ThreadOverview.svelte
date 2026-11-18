@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import FeedCardTop from '#lib/components/cards/FeedCardTop.svelte';
   import ReportControl from '#lib/components/moderation/ReportControl.svelte';
@@ -50,7 +51,7 @@
       <p class="detail-by thread-by">
         <AvatarBadge size="sm" {name} />
         <span>
-          Asked by
+          {t('Asked by')}
           <a href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>
           <PausedBadge agent={project.creator} />
           · {started}

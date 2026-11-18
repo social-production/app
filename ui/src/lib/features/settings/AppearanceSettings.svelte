@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingChoice from '#lib/components/settings/SettingChoice.svelte';
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import {
@@ -42,25 +43,25 @@
 </script>
 
 <section class="settings-section" id="settings-appearance">
-  <h2>Appearance</h2>
+  <h2>{t('Appearance')}</h2>
   <div class="card stack flush">
     <SettingChoice
-      label="Theme"
-      hint="System follows your device's light or dark setting."
+      label={t('Theme')}
+      hint={t("System follows your device's light or dark setting.")}
       value={appearance.theme}
       options={themes}
       onChange={(theme) => setAppearance({ theme })}
     />
     <SettingChoice
-      label="Type size"
-      hint="Medium is the usual size. Small and Large change body text across the app."
+      label={t('Type size')}
+      hint={t('Medium is the usual size. Small and Large change body text across the app.')}
       value={appearance.textSize}
       options={sizes}
       onChange={(textSize) => setAppearance({ textSize })}
     />
     <SettingChoice
-      label="Accent"
-      hint="Buttons, links and highlights. Each one stays readable in light and dark."
+      label={t('Accent')}
+      hint={t('Buttons, links and highlights. Each one stays readable in light and dark.')}
       value={appearance.accent}
       options={ACCENT_COLORS.map((a) => ({
         value: a,
@@ -70,15 +71,15 @@
       onChange={(accent) => setAppearance({ accent })}
     />
     <SettingChoice
-      label="Font"
-      hint="Readable is Atkinson Hyperlegible, designed for low vision."
+      label={t('Font')}
+      hint={t('Readable is Atkinson Hyperlegible, designed for low vision.')}
       value={appearance.font}
       options={fonts}
       onChange={(font) => setAppearance({ font })}
     />
     <SettingSwitch
-      label="Show back buttons"
-      note="On this device. Turn off if your phone has its own back gesture."
+      label={t('Show back buttons')}
+      note={t('On this device. Turn off if your phone has its own back gesture.')}
       checked={backButtons.shown}
       onToggle={() => setBackButtons(!backButtons.shown)}
     />

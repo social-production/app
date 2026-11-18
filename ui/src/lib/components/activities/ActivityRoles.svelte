@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { roleButton, roleLine, type Activity } from '#lib/domain/activities.ts';
 
   /** An opened activity's roles (Feed Headers and Activity Phase §3): one row each with who is
@@ -48,7 +49,7 @@
   }
 </script>
 
-<section class="sheet-section role-group" aria-label="Roles">
+<section class="sheet-section role-group" aria-label={t('Roles')}>
   <div class="role-list">
     {#each p.activity.roles as role (role.index)}
       {@const mine = p.activity.myRole === role.index}
@@ -64,13 +65,13 @@
             {#if role.suggestion.person === p.me}
               {@const id = role.suggestion.id}
               <button class="text-button" type="button" onclick={() => p.onDecline(id)}>
-                Decline
+                {t('Decline')}
               </button>
             {/if}
           {/if}
           {#if suggestable && suggesting === role.index}
             <input
-              placeholder="Search username"
+              placeholder={t('Search username')}
               type="text"
               value={query}
               oninput={(e) => search(e.currentTarget.value)}
@@ -87,9 +88,9 @@
           {/if}
         </div>
         {#if !p.readOnly && !p.activity.rolesOpen}
-          <span class="roles-locked-copy">Locked</span>
+          <span class="roles-locked-copy">{t('Locked')}</span>
         {:else if label === 'Full'}
-          <span class="role-full">Full</span>
+          <span class="role-full">{t('Full')}</span>
         {:else if !p.readOnly}
           {#if suggestable}
             <button
@@ -97,7 +98,7 @@
               type="button"
               aria-expanded={suggesting === role.index}
               onclick={() => (suggesting = suggesting === role.index ? null : role.index)}
-              >Suggest</button
+              >{t('Suggest')}</button
             >
           {/if}
           <!-- One button: Join, then the same spot becomes Leave. -->

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import PersonChip from '#lib/components/PersonChip.svelte';
@@ -47,14 +48,14 @@
 <div class="profile-page">
   <section class="page">
     <header class="people-head">
-      <h1>People</h1>
-      <p>Open someone's profile to vouch for them.</p>
+      <h1>{t('People')}</h1>
+      <p>{t("Open someone's profile to vouch for them.")}</p>
       <input
         id="people-search"
         class="people-search"
         type="search"
-        placeholder="Search people"
-        aria-label="Search people"
+        placeholder={t('Search people')}
+        aria-label={t('Search people')}
         bind:value={query}
       />
     </header>
@@ -67,7 +68,9 @@
           <PersonChip person={row.person} devices={row.devices} />
         {:else}
           <p class="end-copy">
-            {query.trim() ? `Nobody called "${query.trim()}".` : 'Nobody has set up a profile yet.'}
+            {query.trim()
+              ? `Nobody called "${query.trim()}".`
+              : t('Nobody has set up a profile yet.')}
           </p>
         {/each}
       </div>

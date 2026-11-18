@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -75,7 +76,7 @@
         <button
           class="avatar-picker"
           type="button"
-          aria-label="Change profile photo"
+          aria-label={t('Change profile photo')}
           onclick={() => photoInput?.click()}
         >
           <AvatarBadge size="md" {name} {avatar} />
@@ -84,7 +85,7 @@
           <button
             class="avatar-remove"
             type="button"
-            aria-label="Remove photo"
+            aria-label={t('Remove photo')}
             onclick={() => {
               avatar = null;
               void save();
@@ -98,18 +99,22 @@
         <span>
           {#if homeArea}{homeArea} ·{/if}
           <button class="text-link" type="button" onclick={() => photoInput?.click()}
-            >Change photo</button
+            >{t('Change photo')}</button
           >
         </span>
       </div>
     </div>
-    <h2>Profile</h2>
+    <h2>{t('Profile')}</h2>
     <div class="card stack flush">
-      <SettingRow label="Username" value={name} onOpen={() => (editing = 'name')} />
-      <SettingRow label="Home area" value={homeArea || 'Add'} onOpen={() => (editing = 'area')} />
+      <SettingRow label={t('Username')} value={name} onOpen={() => (editing = 'name')} />
       <SettingRow
-        label="About you"
-        value={bio ? `${bio.slice(0, 24)}${bio.length > 24 ? '…' : ''}` : 'Add'}
+        label={t('Home area')}
+        value={homeArea || 'Add'}
+        onOpen={() => (editing = 'area')}
+      />
+      <SettingRow
+        label={t('About you')}
+        value={bio ? `${bio.slice(0, 24)}${bio.length > 24 ? '…' : ''}` : t('Add')}
         onOpen={() => (editing = 'bio')}
       />
     </div>
@@ -122,7 +127,7 @@
 
 <OverlaySheet
   open={editing !== null}
-  title={editing === 'name' ? 'Username' : editing === 'area' ? 'Home area' : 'About you'}
+  title={editing === 'name' ? t('Username') : editing === 'area' ? t('Home area') : t('About you')}
   labelledById="setting-profile-field"
   rootClass="setting-sheet"
   onClose={() => (editing = null)}
@@ -132,8 +137,8 @@
       <input
         bind:value={name}
         maxlength={HANDLE_MAX}
-        aria-label="Username"
-        placeholder="Username"
+        aria-label={t('Username')}
+        placeholder={t('Username')}
         autocomplete="name"
       />
       {#if problem}<p class="setting-hint">{problem}</p>{/if}
@@ -141,16 +146,16 @@
       <input
         bind:value={homeArea}
         maxlength={HOME_AREA_MAX}
-        aria-label="Home area"
-        placeholder="Home area, e.g. Brisbane, QLD"
+        aria-label={t('Home area')}
+        placeholder={t('Home area, e.g. Brisbane, QLD')}
       />
     {:else if editing === 'bio'}
       <textarea
         bind:value={bio}
         maxlength={BIO_MAX}
         rows="5"
-        aria-label="About you"
-        placeholder="About you"></textarea>
+        aria-label={t('About you')}
+        placeholder={t('About you')}></textarea>
       <span class="bio-counter">{bio.length}/{BIO_MAX}</span>
     {/if}
   </div>
@@ -162,7 +167,7 @@
         type="button"
         onclick={() => void save().then(() => (editing = null))}
       >
-        {saving ? 'Saving…' : 'Save profile'}
+        {saving ? t('Saving…') : t('Save profile')}
       </button>
     </div>
   {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import { formatCompactCount } from '#lib/domain/count.ts';
   import { countComments } from '#lib/domain/discussions.ts';
@@ -41,7 +42,7 @@
     <DiscussionTools only="share" {kind} {title} bind:sortMode={state.sortMode} />
   </div>
   <div class="comments-head">
-    <h2>Comments</h2>
+    <h2>{t('Comments')}</h2>
     <DiscussionTools only="sort" {kind} {title} bind:sortMode={state.sortMode} />
   </div>
 {/if}

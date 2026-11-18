@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -59,7 +60,13 @@
   }
 </script>
 
-<OverlaySheet {open} title="Vote" labelledById="scope-vote-title" rootClass="scope-vote" {onClose}>
+<OverlaySheet
+  {open}
+  title={t('Vote')}
+  labelledById="scope-vote-title"
+  rootClass="scope-vote"
+  {onClose}
+>
   <div class="vote-body">
     {#if gov.message}<p class="meta">{gov.message}</p>{/if}
     {#if current}
@@ -75,7 +82,7 @@
       {#if voted}<p class="voted">You voted {voted}. {notice}</p>{/if}
       {#if votable.length > 1 && !shown}
         <button class="next" type="button" onclick={() => (index = (index + 1) % votable.length)}
-          >Next</button
+          >{t('Next')}</button
         >
       {/if}
     {:else if !gov.loaded}
@@ -83,8 +90,8 @@
     {:else}
       <EmptyState
         icon="check"
-        title="No open votes"
-        text="New proposals for this space show up here."
+        title={t('No open votes')}
+        text={t('New proposals for this space show up here.')}
       />
     {/if}
   </div>

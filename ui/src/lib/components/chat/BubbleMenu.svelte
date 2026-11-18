@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import type { ChatLine } from '#lib/domain/chat.ts';
@@ -50,7 +51,7 @@
     )}{/if}
   {#if !m.own}
     <a role="menuitem" href={resolve('/profile/[agent]', { agent: m.author })} onclick={p.onClose}
-      ><ToolbarIcon name="user" />View profile</a
+      ><ToolbarIcon name="user" />{t('View profile')}</a
     >
   {/if}
   {#if report && p.onVote}

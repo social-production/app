@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
   import PeopleSheet from '#lib/components/overlay/PeopleSheet.svelte';
   import { standingHint, standingLabel } from '#lib/components/people/standing.ts';
@@ -20,14 +21,16 @@
     { title: 'Vouchers', emptyCopy: 'No vouches yet.', people: trust.vouchers },
     { title: 'Bot marks', emptyCopy: 'No bot marks yet.', people: trust.markers },
   ]}
-  title="Trust"
+  title={t('Trust')}
   onClose={() => (trust.open = false)}
 />
 <ConfirmDialog
   open={trust.confirming}
   title={`Mark ${name} as a possible bot?`}
-  body="One mark only flags the account. When three full members mark it, a public review opens and full members vote on whether it is a bot. You can clear your mark any time."
-  confirmLabel="Mark as bot"
+  body={t(
+    'One mark only flags the account. When three full members mark it, a public review opens and full members vote on whether it is a bot. You can clear your mark any time.',
+  )}
+  confirmLabel={t('Mark as bot')}
   danger
   onSettle={(ok) => (ok ? void trust.setMark(true) : (trust.confirming = false))}
 />

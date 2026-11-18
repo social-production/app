@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { getContext } from 'svelte';
 
   import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
@@ -115,7 +116,7 @@
         <SurfaceTypeLabel projectMode={mode} />
         <!-- A proposal in its Proposal phase would read "Proposal · Proposal". -->
         {#if network}
-          <span class="feed-card-stage network-vote">Network vote</span>
+          <span class="feed-card-stage network-vote">{t('Network vote')}</span>
         {:else if stage && !(mode === 'proposal' && stage === 'Proposal')}
           <span class="feed-card-stage">{stage}</span>
         {/if}

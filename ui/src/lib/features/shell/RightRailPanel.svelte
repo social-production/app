@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { goto } from '$app/navigation';
   import { page } from '$app/state';
 
@@ -73,8 +74,8 @@
 </script>
 
 <section class="rail-panel rail-tabs-panel">
-  <h2 class="rail-title">Your activity</h2>
-  <div class="rail-tabs" role="tablist" aria-label="Your activity">
+  <h2 class="rail-title">{t('Your activity')}</h2>
+  <div class="rail-tabs" role="tablist" aria-label={t('Your activity')}>
     {#each tabs as t (t.id)}
       <button
         type="button"
@@ -95,7 +96,7 @@
           {item}
           unseen={unseen(item)}
           rowClass=""
-          dismissLabel="Dismiss activity card"
+          dismissLabel={t('Dismiss activity card')}
           time={railTime(item.createdAt)}
           onOpen={() => openItem(item)}
           onDismiss={() => dismissRailItem(item.id)}
@@ -103,8 +104,8 @@
       {:else}
         <EmptyState
           icon="calendar"
-          title="No activity yet"
-          text="Activities and events you join show up here."
+          title={t('No activity yet')}
+          text={t('Activities and events you join show up here.')}
         />
       {/each}
     </div>
@@ -115,7 +116,7 @@
           {item}
           unseen={false}
           rowClass="vote-row"
-          dismissLabel="Dismiss vote card"
+          dismissLabel={t('Dismiss vote card')}
           time={railTime(item.createdAt)}
           onOpen={() => openItem(item)}
           onDismiss={() => dismissRailItem(item.id)}
@@ -127,7 +128,7 @@
                 type="button"
                 onclick={() => openItem(item)}
               >
-                {item.voteKindLabel === 'pull_request_merge' ? 'Record merge' : 'Assess'}
+                {item.voteKindLabel === 'pull_request_merge' ? t('Record merge') : t('Assess')}
               </button>
             </div>
           {/snippet}
@@ -135,8 +136,10 @@
       {:else}
         <EmptyState
           icon="check"
-          title="No votes waiting"
-          text="Decisions that need your vote show up here. Once you vote, they move to History."
+          title={t('No votes waiting')}
+          text={t(
+            'Decisions that need your vote show up here. Once you vote, they move to History.',
+          )}
         />
       {/each}
     </div>
@@ -148,7 +151,7 @@
             {item}
             unseen={unseen(item)}
             rowClass="help-request-row"
-            dismissLabel="Dismiss help request card"
+            dismissLabel={t('Dismiss help request card')}
             time={railTime(item.createdAt)}
             onOpen={() => openItem(item)}
             onDismiss={() => dismissRailItem(item.id)}
@@ -161,7 +164,7 @@
             {item}
             unseen={unseen(item)}
             rowClass=""
-            dismissLabel="Dismiss request card"
+            dismissLabel={t('Dismiss request card')}
             time={railTime(item.createdAt)}
             onOpen={() => openItem(item)}
             onDismiss={() => dismissRailItem(item.id)}
@@ -171,8 +174,8 @@
       {#if help.length + requests.length === 0}
         <EmptyState
           icon="message"
-          title="No requests to answer"
-          text="Help and service requests in your projects and channels show up here."
+          title={t('No requests to answer')}
+          text={t('Help and service requests in your projects and channels show up here.')}
         />
       {/if}
     </div>

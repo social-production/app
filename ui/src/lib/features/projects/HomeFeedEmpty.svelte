@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import type { FeedScope } from '#lib/domain/homeFeed.ts';
@@ -22,51 +23,54 @@
 </script>
 
 {#if error}
-  <EmptyState icon="info" title="The feed didn't load" text={error} />
+  <EmptyState icon="info" title={t("The feed didn't load")} text={error} />
 {:else if scope === 'region' && !hasPlace}
   <EmptyState
     icon="map-pin"
-    title="Pick a place"
-    text="Choose a place or use your location to see what's near."
+    title={t('Pick a place')}
+    text={t("Choose a place or use your location to see what's near.")}
   >
-    <button class="empty-action" type="button" onclick={onChoosePlace}>Choose a place</button>
+    <button class="empty-action" type="button" onclick={onChoosePlace}>{t('Choose a place')}</button
+    >
   </EmptyState>
 {:else if narrowed}
   <EmptyState
     icon="filter"
-    title="Nothing matches these filters"
-    text="Try a longer time or another type."
+    title={t('Nothing matches these filters')}
+    text={t('Try a longer time or another type.')}
   >
-    <button class="empty-action" type="button" onclick={onClear}>Clear filters</button>
+    <button class="empty-action" type="button" onclick={onClear}>{t('Clear filters')}</button>
   </EmptyState>
 {:else if search}
   <EmptyState
     icon="search"
     title={`No results for "${search}"`}
-    text="Check the spelling or try fewer words."
+    text={t('Check the spelling or try fewer words.')}
   />
 {:else if scope === 'home'}
   <EmptyState
     icon="home"
-    title="Your Home is quiet"
-    text="Join channels or follow people to fill it."
+    title={t('Your Home is quiet')}
+    text={t('Join channels or follow people to fill it.')}
   >
-    <a class="empty-action" href={resolve('/search')}>Find channels</a>
+    <a class="empty-action" href={resolve('/search')}>{t('Find channels')}</a>
   </EmptyState>
 {:else if scope === 'region'}
   <EmptyState
     icon="map-pin"
-    title="Nothing near here yet"
-    text="Try a wider distance, or start something nearby."
+    title={t('Nothing near here yet')}
+    text={t('Try a wider distance, or start something nearby.')}
   >
-    <button class="empty-action" type="button" onclick={onChoosePlace}>Change distance</button>
+    <button class="empty-action" type="button" onclick={onChoosePlace}
+      >{t('Change distance')}</button
+    >
   </EmptyState>
 {:else}
   <EmptyState
     icon="globe"
-    title="Nothing here yet"
-    text="Start a project, event or thread and it shows up here."
+    title={t('Nothing here yet')}
+    text={t('Start a project, event or thread and it shows up here.')}
   >
-    <a class="empty-action primary" href={resolve('/create/thread')}>Start a thread</a>
+    <a class="empty-action primary" href={resolve('/create/thread')}>{t('Start a thread')}</a>
   </EmptyState>
 {/if}

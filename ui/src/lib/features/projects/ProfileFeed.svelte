@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { untrack } from 'svelte';
 
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
@@ -130,7 +131,7 @@
 
 <header class="feed-header profile-feed-header">
   <div class="feed-tabs">
-    <div class="feed-tablist" role="tablist" aria-label="Show on this profile">
+    <div class="feed-tablist" role="tablist" aria-label={t('Show on this profile')}>
       {#each tabs as t (t.value)}
         <button
           type="button"
@@ -145,9 +146,9 @@
       type="button"
       class="feed-tune"
       class:narrowed={feed.sort !== 'recent' || feed.window !== 'all'}
-      aria-label="Profile filters"
+      aria-label={t('Profile filters')}
       aria-haspopup="dialog"
-      title="Profile filters"
+      title={t('Profile filters')}
       onclick={() => (open = true)}
     >
       <ToolbarIcon name="filter" />
@@ -157,15 +158,15 @@
 
 <section class="feed-stack">
   {#if feed.error}
-    <EmptyState icon="info" title="This profile didn't load" text={feed.error} />
+    <EmptyState icon="info" title={t("This profile didn't load")} text={feed.error} />
   {:else if feed.loading && rows.length === 0}
     <SkeletonRows count={2} />
   {:else if rows.length === 0 && feed.window !== 'all'}
-    <EmptyState icon="filter" title="Nothing in this time" text="Try a longer time.">
+    <EmptyState icon="filter" title={t('Nothing in this time')} text={t('Try a longer time.')}>
       <button
         class="empty-action"
         type="button"
-        onclick={() => ((feed.window = 'all'), void feed.reload())}>Show all time</button
+        onclick={() => ((feed.window = 'all'), void feed.reload())}>{t('Show all time')}</button
       >
     </EmptyState>
   {:else if rows.length === 0}
@@ -198,29 +199,29 @@
 >
   <div class="feed-filter-groups">
     <section>
-      <h3>Sort</h3>
+      <h3>{t('Sort')}</h3>
       <SegmentedChoice
         value={feed.sort}
-        ariaLabel="Sort profile feed"
+        ariaLabel={t('Sort profile feed')}
         options={sorts}
         onChange={(v) => ((feed.sort = v), void feed.reload())}
       />
     </section>
     <section>
-      <h3>When</h3>
+      <h3>{t('When')}</h3>
       <SegmentedChoice
         value={feed.window}
-        ariaLabel="Profile time window"
+        ariaLabel={t('Profile time window')}
         options={FEED_WINDOWS}
         onChange={(v) => ((feed.window = v), void feed.reload())}
       />
     </section>
     {#if own}
       <section>
-        <h3>Who can see</h3>
+        <h3>{t('Who can see')}</h3>
         <SegmentedChoice
           value={audience}
-          ariaLabel="Who can see"
+          ariaLabel={t('Who can see')}
           options={audiences}
           onChange={(v) => (audience = v)}
         />
@@ -229,7 +230,8 @@
   </div>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-submit" type="button" onclick={() => (open = false)}>Show results</button
+      <button class="sheet-submit" type="button" onclick={() => (open = false)}
+        >{t('Show results')}</button
       >
     </div>
   {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import {
     sortComments,
     type CommentSort,
@@ -83,15 +84,17 @@
   <div class="composer-card" class:replying={!!replying}>
     {#if replying}
       <div class="reply-bar">
-        <span>Replying to <b>{replyName}</b></span>
-        <button type="button" aria-label="Cancel reply" onclick={() => (replying = null)}>×</button>
+        <span>{t('Replying to')} <b>{replyName}</b></span>
+        <button type="button" aria-label={t('Cancel reply')} onclick={() => (replying = null)}
+          >×</button
+        >
       </div>
     {/if}
     <BackButton />
     <CommentComposer
       bind:value={draft}
-      placeholder={replying ? `Reply to ${replyName}` : 'Add a comment'}
-      submitLabel={replying ? 'Post reply' : 'Post comment'}
+      placeholder={replying ? `Reply to ${replyName}` : t('Add a comment')}
+      submitLabel={replying ? t('Post reply') : t('Post comment')}
       {focus}
       {signedIn}
       {onSignIn}

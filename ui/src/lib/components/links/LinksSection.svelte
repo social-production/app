@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import { shortDate } from '#lib/domain/botReview.ts';
@@ -53,21 +54,21 @@
 <section class="network-stack">
   <div class="links-head">
     <h2 class="links-heading">
-      Linked{#if items.length > 0}<span class="links-count">{items.length}</span>{/if}
+      {t('Linked')}{#if items.length > 0}<span class="links-count">{items.length}</span>{/if}
     </h2>
     {@render action?.()}
   </div>
   {#if items.length === 0}
-    <p class="links-quiet">Not linked to anything yet.</p>
+    <p class="links-quiet">{t('Not linked to anything yet.')}</p>
   {:else}
     <div class="link-list">
       {#each items as item (item.id)}
         {@const target = item.create.target}
         <LinkCard
           title={target.title}
-          metaLine={`${target.mode === 'event' ? 'Event' : 'Project'} · linked ${shortDate(item.create.createdAt / 1000)}`}
+          metaLine={`${target.mode === 'event' ? t('Event') : t('Project')} · linked ${shortDate(item.create.createdAt / 1000)}`}
           icon={target.mode === 'event' ? 'event' : 'cube'}
-          voteLine={item.sever ? 'A vote to end this link is open' : null}
+          voteLine={item.sever ? t('A vote to end this link is open') : null}
           projectId={target.id}
           expanded={!!expanded[item.id]}
           domId={item.sever ? `link-request-${item.sever.id}` : `link-${item.id}`}
@@ -79,8 +80,8 @@
             <LinkVoteCard
               request={sever}
               proposer={names[sever.proposedBy] ?? '…'}
-              yesLabel="Remove link"
-              noLabel="Keep link"
+              yesLabel={t('Remove link')}
+              noLabel={t('Keep link')}
               danger
               pending={pendingId === sever.id}
               onVote={(side, choice) => onVote(sever.id, side, choice)}
@@ -90,7 +91,7 @@
               class="danger-button end-link"
               disabled={pendingId === item.id}
               type="button"
-              onclick={() => onSever(item)}>End this link</button
+              onclick={() => onSever(item)}>{t('End this link')}</button
             >
           {/if}
         </LinkCard>

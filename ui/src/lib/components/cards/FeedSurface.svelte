@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { FeedContext } from '#lib/domain/homeFeed.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { Snippet } from 'svelte';
@@ -49,11 +50,11 @@
 >
   {#if href}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- href arrives resolved (ResolvedPathname) -->
-    <a aria-label="Open item" class="surface-link" {href}></a>
+    <a aria-label={t('Open item')} class="surface-link" {href}></a>
   {/if}
   {#if contentRestricted}
     <div class="restriction-banner">
-      <span>Serious harm report — content blurred until you choose to reveal it.</span>
+      <span>{t('Serious harm report — content blurred until you choose to reveal it.')}</span>
       <button
         class="reveal-btn"
         type="button"
@@ -62,7 +63,7 @@
           revealed = !revealed;
         }}
       >
-        {revealed ? 'Hide again' : 'Reveal'}
+        {revealed ? t('Hide again') : t('Reveal')}
       </button>
     </div>
   {/if}

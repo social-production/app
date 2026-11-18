@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
@@ -39,8 +40,8 @@
   <button
     class="back-button"
     type="button"
-    aria-label="Back to chats"
-    title="Back to chats"
+    aria-label={t('Back to chats')}
+    title={t('Back to chats')}
     onclick={onBack}
   >
     <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22">
@@ -65,9 +66,9 @@
 <ChatPanel
   lines={[]}
   title={person.name}
-  placeholder="Write a message..."
-  submitLabel="Send"
-  emptyCopy={sending ? 'Sending…' : 'No messages here yet.'}
+  placeholder={t('Write a message...')}
+  submitLabel={t('Send')}
+  emptyCopy={sending ? t('Sending…') : t('No messages here yet.')}
   embedded={true}
   fitViewport={false}
   showHeader={false}

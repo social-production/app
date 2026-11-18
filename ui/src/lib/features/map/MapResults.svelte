@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -38,25 +39,25 @@
   const isPast = (iso: string | null): boolean => !!iso && new Date(iso).getTime() < Date.now();
 </script>
 
-<section class="list-panel" aria-label="Map results list">
+<section class="list-panel" aria-label={t('Map results list')}>
   {#if s.loading && s.listItems.length === 0}
     <SkeletonRows count={3} kind="row" />
   {:else if s.errorMessage}
-    <EmptyState icon="map-pin" title="The map couldn't load" text={s.errorMessage} />
+    <EmptyState icon="map-pin" title={t("The map couldn't load")} text={s.errorMessage} />
   {:else if !s.hasCenter}
     <EmptyState
       icon="map-pin"
-      title="Choose a place"
-      text="Search a place or use your location to see what's near it."
+      title={t('Choose a place')}
+      text={t("Search a place or use your location to see what's near it.")}
     />
   {:else if s.listItems.length === 0}
-    <EmptyState icon="map-pin" title="Nothing here yet" text={nothingText} />
+    <EmptyState icon="map-pin" title={t('Nothing here yet')} text={nothingText} />
   {:else}
     {#if s.overlayFilters}
       <header class="results-head">
         <strong>{s.listItems.length} near here</strong>
-        <button aria-label="Open as list" class="results-list" type="button" onclick={onList}>
-          <ToolbarIcon name="list" /><span>List</span>
+        <button aria-label={t('Open as list')} class="results-list" type="button" onclick={onList}>
+          <ToolbarIcon name="list" /><span>{t('List')}</span>
         </button>
       </header>
     {/if}

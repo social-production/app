@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import ActivityAgenda from '#lib/components/activities/ActivityAgenda.svelte';
   import ActivityCalendar from '#lib/components/activities/ActivityCalendar.svelte';
@@ -111,9 +112,11 @@
       <SoftwareWizard {sw} />
     {:else}
       <div class="software-governance-placeholder">
-        <h3>Software governance</h3>
+        <h3>{t('Software governance')}</h3>
         <p>
-          Pull request tools appear here once a leading software plan is approved for this project.
+          {t(
+            'Pull request tools appear here once a leading software plan is approved for this project.',
+          )}
         </p>
       </div>
     {/if}
@@ -122,7 +125,7 @@
     {#if hasPast}
       <SegmentedChoice
         value={state.showing}
-        ariaLabel="Activities shown"
+        ariaLabel={t('Activities shown')}
         options={views}
         onChange={(v) => (state.showing = v)}
       />
@@ -151,8 +154,8 @@
         {:else if state.live.length === 0}
           <div class="empty-card">
             {planDays.length > 0
-              ? 'No activity scheduled yet. Click a marked plan day to add the first activity.'
-              : 'No activities scheduled yet.'}
+              ? t('No activity scheduled yet. Click a marked plan day to add the first activity.')
+              : t('No activities scheduled yet.')}
           </div>
         {:else}
           <ActivityAgenda
@@ -171,7 +174,7 @@
         {/if}
       </section>
     {:else}
-      <section class="history-section past-tab" aria-label="Past activity">
+      <section class="history-section past-tab" aria-label={t('Past activity')}>
         {#if sw.history.length === 0}
           {@render past(state.past)}
         {:else}

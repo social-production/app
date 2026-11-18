@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import type { FeedType } from '#lib/domain/feedTypes.ts';
@@ -50,7 +51,7 @@
 
 <header class="feed-header">
   <div class="feed-tabs">
-    <div class="feed-tablist" role="tablist" aria-label="Choose public feed scope">
+    <div class="feed-tablist" role="tablist" aria-label={t('Choose public feed scope')}>
       {#each scopes as scope (scope.value)}
         <button
           type="button"
@@ -65,10 +66,10 @@
       type="button"
       class="feed-tune"
       class:narrowed
-      aria-label="Feed filters"
+      aria-label={t('Feed filters')}
       aria-haspopup="dialog"
       aria-expanded={open}
-      title="Feed filters"
+      title={t('Feed filters')}
       onclick={() => (open = true)}
     >
       <ToolbarIcon name="filter" />
@@ -79,9 +80,9 @@
     <button type="button" class="region-near" aria-haspopup="dialog" onclick={() => (open = true)}>
       <ToolbarIcon name="map-pin" />
       {#if feed.region.placeQuery}
-        <span>Near <b>{feed.region.placeQuery}</b> · {radiusLabel}</span>
+        <span>{t('Near')} <b>{feed.region.placeQuery}</b> · {radiusLabel}</span>
       {:else}
-        <span>Choose a place to see what is near it</span>
+        <span>{t('Choose a place to see what is near it')}</span>
       {/if}
     </button>
   {/if}
@@ -104,10 +105,10 @@
     {/if}
     {#if signedIn}
       <section>
-        <h3>From</h3>
+        <h3>{t('From')}</h3>
         <SegmentedChoice
           value={feed.audience}
-          ariaLabel="Choose personal audience"
+          ariaLabel={t('Choose personal audience')}
           options={audiences}
           onChange={(v) => void feed.setAudience(v)}
         />

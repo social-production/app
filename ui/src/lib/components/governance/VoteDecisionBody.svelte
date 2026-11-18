@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resultSentence } from '#lib/domain/decided.ts';
   import { APPROVAL_PERCENT, type Proposal } from '#lib/domain/governance.ts';
   import { relativeTime } from '#lib/domain/time.ts';
@@ -33,24 +34,24 @@
        chip, what it does or did, then one bar towards the 66% mark. -->
   <div class="vote-status-row">
     <span class={`vote-status ${state}`}
-      >{state === 'open' ? 'Open' : state === 'passed' ? 'Passed' : "Didn't pass"}</span
+      >{state === 'open' ? t('Open') : state === 'passed' ? t('Passed') : t("Didn't pass")}</span
     >
     <span class="proposer">{authorName} · {relativeTime(proposal.createdAt)}</span>
   </div>
   <p class="outcome">{resultSentence(proposal, stage, phaseLabel)}</p>
   {#if isNetworkVote(charter.tags)}
-    <p class="network-vote-line">Network vote: any Full member can vote</p>
+    <p class="network-vote-line">{t('Network vote: any Full member can vote')}</p>
   {/if}
 
   {#if 'Update' in kind}
     <section class="change-card">
-      <h3>Proposed update</h3>
+      <h3>{t('Proposed update')}</h3>
       <p class="proposed-copy">{kind.Update.body}</p>
     </section>
   {:else if 'Return' in kind || 'Phase' in kind || 'Convert' in kind}
     <!-- web shows a phase change's reason as "Why". -->
     <section class="change-card">
-      <h3>Why</h3>
+      <h3>{t('Why')}</h3>
       <p>
         {'Return' in kind
           ? kind.Return.reason
@@ -69,7 +70,7 @@
     {/if}
     {#if kind.Software.reason}
       <section class="change-card">
-        <h3>Why</h3>
+        <h3>{t('Why')}</h3>
         <p>{kind.Software.reason}</p>
       </section>
     {/if}
@@ -86,7 +87,7 @@
     </section>
     {#if kind.RequestSettings.reason}
       <section class="change-card">
-        <h3>Why</h3>
+        <h3>{t('Why')}</h3>
         <p>{kind.RequestSettings.reason}</p>
       </section>
     {/if}
@@ -97,11 +98,11 @@
           <h3>{field.name}</h3>
           <div class="pair">
             <div>
-              <p class="field-kicker">Now</p>
+              <p class="field-kicker">{t('Now')}</p>
               <p>{field.now || '—'}</p>
             </div>
             <div class="proposed">
-              <p class="field-kicker">Proposed</p>
+              <p class="field-kicker">{t('Proposed')}</p>
               <p>{field.next}</p>
             </div>
           </div>
@@ -110,7 +111,7 @@
     {/each}
     {#if kind.Edit.location !== null}
       <section class="change-card">
-        <h3>Location</h3>
+        <h3>{t('Location')}</h3>
         <p class="proposed-copy">{kind.Edit.location || '—'}</p>
       </section>
     {/if}
@@ -118,7 +119,7 @@
 
   <section class="tally">
     <div class="tally-line">
-      <b>{total === 0 ? 'No votes yet' : `${proposal.yes} yes · ${proposal.no} no`}</b>
+      <b>{total === 0 ? t('No votes yet') : `${proposal.yes} yes · ${proposal.no} no`}</b>
       <span>{total > 0 ? `${percent}% yes · ` : ''}needs {APPROVAL_PERCENT}%</span>
     </div>
     <div class="tally-bar" class:failed={state === 'failed'}>
@@ -136,7 +137,7 @@
     {#if proposal.canChallenge}
       <p class="tally-note">
         {proposal.missing}
-        {proposal.missing === 1 ? 'member who joined' : 'members who joined'} before this was proposed
+        {proposal.missing === 1 ? t('member who joined') : t('members who joined')} before this was proposed
         {proposal.missing === 1 ? "isn't" : "aren't"} counted. Challenge the count in the Participation
         tab.
       </p>

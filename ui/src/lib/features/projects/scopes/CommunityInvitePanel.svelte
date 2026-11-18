@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PeoplePicker from '#lib/components/create/PeoplePicker.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
   import { inviteLink, parseInvite } from '#lib/domain/scopes.ts';
@@ -62,10 +63,10 @@
 {#if scope}
   <section class="invite-card popover">
     {#if isMember}
-      <p class="invite-kicker">Invite people</p>
+      <p class="invite-kicker">{t('Invite people')}</p>
 
       <div class="invite-section">
-        <label class="field-label" for={`invite-link-${scope.slug}`}>Invite link</label>
+        <label class="field-label" for={`invite-link-${scope.slug}`}>{t('Invite link')}</label>
         <div class="invite-actions">
           <input
             id={`invite-link-${scope.slug}`}
@@ -78,13 +79,13 @@
             class="action-chip"
             disabled={!link}
             type="button"
-            onclick={() => void copy(link, 'Invite link copied.')}>Copy</button
+            onclick={() => void copy(link, 'Invite link copied.')}>{t('Copy')}</button
           >
         </div>
       </div>
 
       <div class="invite-section">
-        <label class="field-label" for={`invite-code-${scope.slug}`}>Invite code</label>
+        <label class="field-label" for={`invite-code-${scope.slug}`}>{t('Invite code')}</label>
         <div class="invite-actions">
           <input
             id={`invite-code-${scope.slug}`}
@@ -96,16 +97,16 @@
           <button
             class="action-chip"
             type="button"
-            onclick={() => void copy(scope.id, 'Invite code copied.')}>Copy</button
+            onclick={() => void copy(scope.id, 'Invite code copied.')}>{t('Copy')}</button
           >
         </div>
       </div>
 
       <div class="invite-section">
         <PeoplePicker
-          label="Invite by username"
-          placeholder="Type a username"
-          helperText="Search by username and send a direct invite."
+          label={t('Invite by username')}
+          placeholder={t('Type a username')}
+          helperText={t('Search by username and send a direct invite.')}
           selected={[]}
           {search}
           onAdd={onInvite}
@@ -113,21 +114,21 @@
         />
       </div>
     {:else}
-      <p class="invite-kicker">Join with invite</p>
-      <p class="invite-copy">Paste an invite link or invite code from a community member.</p>
+      <p class="invite-kicker">{t('Join with invite')}</p>
+      <p class="invite-copy">{t('Paste an invite link or invite code from a community member.')}</p>
 
       <div class="invite-actions">
         <input
           aria-label={`${scope.handle} invite input`}
           bind:value={s.inviteDraft}
-          placeholder="Paste invite link or invite code"
+          placeholder={t('Paste invite link or invite code')}
           type="text"
         />
         <button
           class="action-chip"
           disabled={!parseInvite(s.inviteDraft) || s.invitePending}
           type="button"
-          onclick={onRedeem}>Join</button
+          onclick={onRedeem}>{t('Join')}</button
         >
       </div>
     {/if}

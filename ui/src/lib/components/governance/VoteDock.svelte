@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import { proposalLabel, type Proposal, type VoteChoice } from '#lib/domain/governance.ts';
@@ -81,14 +82,14 @@
 {#if proposals.length > 0}
   <div class="vote-dock-root" style="display: contents">
     <div class="vote-dock">
-      <RoundPlusButton standout label="Vote" ariaLabel="Vote" onclick={openVotes} />
+      <RoundPlusButton standout label={t('Vote')} ariaLabel={t('Vote')} onclick={openVotes} />
     </div>
   </div>
 {/if}
 
 <OverlaySheet
   {open}
-  title={current ? proposalLabel(current.kind, phaseLabel) : 'Vote'}
+  title={current ? proposalLabel(current.kind, phaseLabel) : t('Vote')}
   labelledById="project-votes"
   rootClass="vote-dock-root"
   onClose={close}
@@ -115,7 +116,7 @@
             type="button"
             onclick={() => (index = (index + 1) % proposals.length)}
           >
-            <span>Next</span>
+            <span>{t('Next')}</span>
             <span class="vote-progress">· {remaining} left</span>
             <svg aria-hidden="true" viewBox="0 0 24 24"
               ><path

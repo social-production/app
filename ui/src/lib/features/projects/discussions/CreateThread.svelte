@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import { createThread } from '#lib/services/discussions.ts';
@@ -50,12 +51,14 @@
 </script>
 
 <CreateSheet
-  title="Create thread"
-  description="A thread is a discussion people can follow and reply to. Tag it to a channel or community so it shows up where that topic already lives."
+  title={t('Create thread')}
+  description={t(
+    'A thread is a discussion people can follow and reply to. Tag it to a channel or community so it shows up where that topic already lives.',
+  )}
   {steps}
   stepIndex={step}
   {missing}
-  submitLabel="Publish thread"
+  submitLabel={t('Publish thread')}
   {submitting}
   onStep={(i) => (step = i)}
   onSubmit={() => void publish()}
@@ -64,11 +67,11 @@
   {#if step === 0}
     <div class="form-stack">
       <label>
-        <RequiredLabel>Thread title</RequiredLabel>
+        <RequiredLabel>{t('Thread title')}</RequiredLabel>
         <input bind:value={title} maxlength="200" aria-required="true" />
       </label>
       <label>
-        <RequiredLabel>Opening post</RequiredLabel>
+        <RequiredLabel>{t('Opening post')}</RequiredLabel>
         <textarea bind:value={body} rows="5" aria-required="true"></textarea>
       </label>
     </div>
@@ -76,7 +79,7 @@
     <div class="form-stack">
       <ScopeTagsStep {tags} onChange={(t) => (tags = t)} variant="thread" />
       {#if tags.length === 0}
-        <p class="status-note">Add one primary channel or community tag.</p>
+        <p class="status-note">{t('Add one primary channel or community tag.')}</p>
       {/if}
       {#if statusMessage}<p class="status-note">{statusMessage}</p>{/if}
     </div>

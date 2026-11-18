@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { proposalLabel, type Proposal, type VoteChoice } from '#lib/domain/governance.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -76,7 +77,7 @@
         >
       </span>
       {#if entry.status !== 'open'}
-        <span class="history-tag">{entry.status === 'approved' ? 'Passed' : 'Failed'}</span>
+        <span class="history-tag">{entry.status === 'approved' ? t('Passed') : t('Failed')}</span>
       {/if}
     </button>
     {#if entry.status === 'open'}
@@ -88,7 +89,7 @@
         {@const proposal = entry.proposal}
         <VoteChoiceBar mine={proposal.myVote} onChoose={(c) => cast(proposal, c)} />
       {:else if entry.plan}
-        <button class="history-review" type="button" onclick={open}>Review this plan</button>
+        <button class="history-review" type="button" onclick={open}>{t('Review this plan')}</button>
       {/if}
     {/if}
   </article>
@@ -96,7 +97,7 @@
 
 <OverlaySheet
   open={sheet !== null}
-  title={sheet ? proposalLabel(sheet.kind, phaseLabel) : 'Vote'}
+  title={sheet ? proposalLabel(sheet.kind, phaseLabel) : t('Vote')}
   labelledById={`history-vote-${entry.id}`}
   rootClass="vote-dock-root"
   onClose={() => (showing = false)}

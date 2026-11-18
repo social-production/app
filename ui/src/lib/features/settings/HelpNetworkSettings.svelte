@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingPanel from '#lib/components/settings/SettingPanel.svelte';
   import { explain } from '#lib/services/errors.ts';
   import { helpNetworkState, setHelpNetwork, type HelpState } from '#lib/services/network.ts';
@@ -42,9 +43,11 @@
 
 {#if help}
   <SettingPanel
-    label="Help the network"
-    value={help.running ? 'On' : help.settings.enabled ? 'Not running' : 'Off'}
-    hint="Run a bootstrap server on this computer, so new people can find the network even if the built-in servers stop. Others must be able to reach it: forward the port on your router (or use a server with its own address), and keep the app open."
+    label={t('Help the network')}
+    value={help.running ? t('On') : help.settings.enabled ? t('Not running') : t('Off')}
+    hint={t(
+      'Run a bootstrap server on this computer, so new people can find the network even if the built-in servers stop. Others must be able to reach it: forward the port on your router (or use a server with its own address), and keep the app open.',
+    )}
   >
     {#if help.running && help.announce}
       <p class="setting-line server-url">Running and announced at {help.announce.bootstrap}</p>
@@ -53,20 +56,20 @@
     {/if}
     <label class="help-toggle">
       <input type="checkbox" bind:checked={enabled} />
-      Help the network
+      {t('Help the network')}
     </label>
     {#if enabled}
       <input
         bind:value={port}
-        aria-label="Port on this computer"
-        placeholder="Port on this computer"
+        aria-label={t('Port on this computer')}
+        placeholder={t('Port on this computer')}
         inputmode="numeric"
         spellcheck="false"
       />
       <input
         bind:value={publicUrl}
-        aria-label="Address other people use"
-        placeholder="Address other people use, e.g. http://203.0.113.5:8787"
+        aria-label={t('Address other people use')}
+        placeholder={t('Address other people use, e.g. http://203.0.113.5:8787')}
         spellcheck="false"
         inputmode="url"
       />
@@ -75,7 +78,7 @@
     {#snippet footer()}
       <div class="sheet-actions">
         <button class="sheet-submit" disabled={!canSave} type="button" onclick={() => void save()}>
-          {busy ? 'Restarting…' : 'Save and restart'}
+          {busy ? t('Restarting…') : t('Save and restart')}
         </button>
       </div>
     {/snippet}

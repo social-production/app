@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
 
@@ -33,7 +34,7 @@
 <div class="member-row" class:you>
   <AvatarBadge size="md" {name} />
   <a class="member-copy" href={resolve('/profile/[agent]', { agent })}>
-    <strong>{you ? 'You' : name}</strong>
+    <strong>{you ? t('You') : name}</strong>
     {#if line}<small>{line}</small>{/if}
   </a>
   {#if badge}<span class="member-badge">{badge}</span>{/if}
@@ -52,17 +53,17 @@
         <button
           class="member-backdrop"
           type="button"
-          aria-label="Close menu"
+          aria-label={t('Close menu')}
           onclick={() => (open = false)}
         ></button>
         <div class="member-menu" role="menu">
           <a role="menuitem" href={resolve('/profile/[agent]', { agent })}
-            ><ToolbarIcon name="user" />View profile</a
+            ><ToolbarIcon name="user" />{t('View profile')}</a
           >
           <a
             role="menuitem"
             href={resolve(`/messages?to=${encodeURIComponent(agent)}` as '/messages')}
-            ><ToolbarIcon name="send" />Message</a
+            ><ToolbarIcon name="send" />{t('Message')}</a
           >
           {#each actions as action (action.label)}
             <button

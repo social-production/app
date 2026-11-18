@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import {
     compressChatPhoto,
@@ -75,14 +76,14 @@
 </script>
 
 <CreateSheet
-  title="New post"
-  description="A post is a short public note on your personal feed."
+  title={t('New post')}
+  description={t('A post is a short public note on your personal feed.')}
   steps={[{ id: 'post', title: 'Post' }]}
   stepIndex={0}
   missing={[]}
   canSubmit={body.trim().length > 0}
-  submitLabel="Publish post"
-  submittingLabel="Posting..."
+  submitLabel={t('Publish post')}
+  submittingLabel={t('Posting...')}
   composer
   {submitting}
   onStep={() => undefined}
@@ -95,8 +96,8 @@
       <textarea
         bind:value={body}
         rows="6"
-        aria-label="What's on your mind?"
-        placeholder="What's on your mind?"
+        aria-label={t("What's on your mind?")}
+        placeholder={t("What's on your mind?")}
         aria-required="true"></textarea>
     </div>
     {#if photos.length > 0}
@@ -117,7 +118,7 @@
       accept="image/jpeg,image/png,image/webp"
       multiple
       hidden
-      aria-label="Photos for this post"
+      aria-label={t('Photos for this post')}
       onchange={() => void pick()}
     />
     <div class="composer-tools">
@@ -145,9 +146,9 @@
             stroke-linejoin="round"
           /></svg
         >
-        Add photos
+        {t('Add photos')}
       </button>
-      <span class="composer-audience">Public · your feed</span>
+      <span class="composer-audience">{t('Public · your feed')}</span>
     </div>
     {#if statusMessage}<p class="status-note">{statusMessage}</p>{/if}
   </div>

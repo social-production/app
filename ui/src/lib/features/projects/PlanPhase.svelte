@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { canVoteOn } from '#lib/domain/board.ts';
   import PlanCard from '#lib/components/plans/PlanCard.svelte';
   import PlanWizard from '#lib/components/plans/PlanWizard.svelte';
@@ -95,17 +96,17 @@
     <!-- Creating Through Plans mockup: "Add a plan" is a small sheet asking the kind first. -->
     <OverlaySheet
       open={choosing}
-      title="Add a plan"
+      title={t('Add a plan')}
       labelledById="plan-kind-title"
       rootClass="setting-sheet plan-kind-sheet"
       onClose={() => (choosing = false)}
     >
       {#snippet subtitle()}
-        <p class="setting-hint">What kind of thing should this become?</p>
+        <p class="setting-hint">{t('What kind of thing should this become?')}</p>
       {/snippet}
       <div class="plan-kind-choice">
         <TypeSelector
-          label="Plan kind"
+          label={t('Plan kind')}
           name="plan-kind"
           selected={chosen}
           options={PLAN_MAKES}
@@ -117,7 +118,7 @@
           onclick={() => {
             choosing = false;
             composing = true;
-          }}>Continue</button
+          }}>{t('Continue')}</button
         >
       </div>
     </OverlaySheet>
@@ -125,8 +126,8 @@
     <div id="participation-plans">
       {#if plans.length === 0}
         <div class="phase-empty">
-          <strong>No plans yet</strong>
-          <p>Add a plan when you are ready to propose how this should work.</p>
+          <strong>{t('No plans yet')}</strong>
+          <p>{t('Add a plan when you are ready to propose how this should work.')}</p>
         </div>
       {:else}
         <div class="plan-stack">
@@ -148,7 +149,12 @@
 
     <PhaseWorkToolbar>
       {#if canSubmit}
-        <RoundPlusButton standout active={composing || choosing} label="Add plan" onclick={add} />
+        <RoundPlusButton
+          standout
+          active={composing || choosing}
+          label={t('Add plan')}
+          onclick={add}
+        />
       {/if}
     </PhaseWorkToolbar>
   </section>

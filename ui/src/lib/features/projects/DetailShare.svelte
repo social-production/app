@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
   import { isEvent } from '#lib/domain/projects.ts';
@@ -63,11 +64,11 @@
 
 {#if shown}
   <ShareUserMenu
-    menuTitle={isPrivate ? 'Invite to event' : event ? 'Share event' : 'Share project'}
-    submitLabel={isPrivate ? 'Invite' : 'Send'}
+    menuTitle={isPrivate ? t('Invite to event') : event ? t('Share event') : t('Share project')}
+    submitLabel={isPrivate ? t('Invite') : t('Send')}
     recipientHint={isPrivate
-      ? "It's a private event, so they get an invite to accept under Invites."
-      : 'They get it as a message and a notification.'}
+      ? t("It's a private event, so they get an invite to accept under Invites.")
+      : t('They get it as a message and a notification.')}
     buttonLabel={label}
     copyLinkUrl={url}
     shareTitle={title}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
 
   /** web's RepositoryMenu: the rarely used repository votes, kept behind one button like Phase ▾. */
@@ -37,7 +38,7 @@
 
 <PhaseMenu
   {items}
-  label="Repository"
-  sheetTitle="Repository"
+  label={t('Repository')}
+  sheetTitle={t('Repository')}
   labelledById="repository-menu-title"
 />

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
@@ -71,17 +72,23 @@
 {:else}
   <div class="new-message">
     <header class="new-message-head">
-      <button class="round-back" type="button" aria-label="Back" title="Back" onclick={onBack}>
+      <button
+        class="round-back"
+        type="button"
+        aria-label={t('Back')}
+        title={t('Back')}
+        onclick={onBack}
+      >
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7" /></svg>
       </button>
       <div class="new-message-title">
-        <h1>{group ? 'New group' : 'New message'}</h1>
+        <h1>{group ? t('New group') : t('New message')}</h1>
         {#if group}<p>{chosen.length} selected</p>{/if}
       </div>
     </header>
 
     {#if group && chosen.length > 0}
-      <div class="new-message-chips" aria-label="Selected people">
+      <div class="new-message-chips" aria-label={t('Selected people')}>
         {#each chosen as member (member.agent)}
           <button
             class="person-chip"
@@ -103,8 +110,8 @@
       <input
         bind:value={query}
         type="search"
-        aria-label="Search people"
-        placeholder={group ? 'Who would you like to add?' : 'Search'}
+        aria-label={t('Search people')}
+        placeholder={group ? t('Who would you like to add?') : t('Search')}
       />
     </label>
 
@@ -112,17 +119,20 @@
       {#if !group && !query.trim()}
         <button class="person-row group-row" type="button" onclick={onGroup}>
           <span class="group-glyph"><GroupsIcon /></span>
-          <span class="person-copy"><strong>New group</strong></span>
+          <span class="person-copy"><strong>{t('New group')}</strong></span>
         </button>
       {/if}
       {#if failed}
         <p class="new-message-note">
-          People could not be loaded. <button type="button" onclick={load}>Try again</button>
+          {t('People could not be loaded.')}
+          <button type="button" onclick={load}>{t('Try again')}</button>
         </p>
       {:else if everyone === null}
         <SkeletonRows count={4} kind="row" />
       {:else if shown.length === 0}
-        <p class="new-message-note">{query.trim() ? 'No matches.' : 'Nobody else is here yet.'}</p>
+        <p class="new-message-note">
+          {query.trim() ? t('No matches.') : t('Nobody else is here yet.')}
+        </p>
       {:else}
         {#each shown as person (person.agent)}
           {@const ticked = group && isChosen(person)}
@@ -153,8 +163,8 @@
       <button
         class="message-fab"
         type="button"
-        aria-label="Next"
-        title="Next"
+        aria-label={t('Next')}
+        title={t('Next')}
         disabled={chosen.length === 0}
         onclick={() => (naming = true)}
       >

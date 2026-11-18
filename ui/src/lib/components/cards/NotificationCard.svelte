@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { NotificationItem } from '#lib/domain/notifications.ts';
@@ -112,13 +113,13 @@
           class="accept-button"
           disabled={deciding}
           type="button"
-          onclick={() => onDecide(true)}>Accept follower</button
+          onclick={() => onDecide(true)}>{t('Accept follower')}</button
         >
         <button
           class="decline-button"
           disabled={deciding}
           type="button"
-          onclick={() => onDecide(false)}>Decline</button
+          onclick={() => onDecide(false)}>{t('Decline')}</button
         >
       </div>
     {/if}
@@ -129,8 +130,8 @@
       <button
         class="unread-dot"
         type="button"
-        aria-label="Mark read"
-        title="Mark read"
+        aria-label={t('Mark read')}
+        title={t('Mark read')}
         onclick={onRead}
       ></button>
     {/if}

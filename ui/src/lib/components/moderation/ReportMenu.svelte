@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { portal } from '#lib/components/actions/portal.ts';
   import {
     moderationStatusLabel,
@@ -159,17 +160,17 @@
                     stroke-linejoin="round"
                   /></svg
                 >
-                <span>Share</span>
+                <span>{t('Share')}</span>
               </button>
             {/if}
           {/if}
           {#if report}
             <div class="review-field">
-              <span class="field-label">Reason</span>
+              <span class="field-label">{t('Reason')}</span>
               <p class="review-value">{reasonLabel(report.reason)}</p>
             </div>
             <div class="review-field">
-              <span class="field-label">Description</span>
+              <span class="field-label">{t('Description')}</span>
               <p class="report-message">
                 {report.description.trim() || 'No additional message was provided.'}
               </p>
@@ -179,7 +180,7 @@
               <p>{voteCountLine(report)}</p>
             </div>
           {:else if loading}
-            <p class="menu-label">Loading…</p>
+            <p class="menu-label">{t('Loading…')}</p>
           {:else if !blocked}
             <button class="menu-item menu-danger" role="menuitem" type="button" onclick={onCompose}>
               <svg aria-hidden="true" viewBox="0 0 24 24"
@@ -197,21 +198,23 @@
           {/if}
         </div>
         <footer class="menu-actions" class:votes={canVote}>
-          <button aria-label="Close" class="menu-dismiss" type="button" onclick={onClose}>×</button>
+          <button aria-label={t('Close')} class="menu-dismiss" type="button" onclick={onClose}
+            >×</button
+          >
           {#if canVote && report}
             <button
               class="vote-chip"
               class:active-vote={report.activeVote === 'no'}
               disabled={pending}
               type="button"
-              onclick={() => onVote(false)}>No</button
+              onclick={() => onVote(false)}>{t('No')}</button
             >
             <button
               class="vote-chip yes"
               class:active-vote={report.activeVote === 'yes'}
               disabled={pending}
               type="button"
-              onclick={() => onVote(true)}>Yes</button
+              onclick={() => onVote(true)}>{t('Yes')}</button
             >
           {/if}
         </footer>

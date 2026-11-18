@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import {
     PLAN_RATING_OPTIONS,
     ratingLabel,
@@ -41,7 +42,7 @@
       >
     {/each}
   </div>
-  <div class="ends"><span>Strongly oppose</span><span>Strongly support</span></div>
+  <div class="ends"><span>{t('Strongly oppose')}</span><span>{t('Strongly support')}</span></div>
   <span class="criterion-meta">
     Your rating: {ratingLabel(criterion.mine)}
     {#if criterion.count > 0}

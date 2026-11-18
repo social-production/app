@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import AddValueSheet from '#lib/components/values/AddValueSheet.svelte';
@@ -39,8 +40,8 @@
     <div id="participation-values" class="surface-stack compact-stack">
       {#if rankedValues.length === 0}
         <div class="phase-empty">
-          <strong>No values yet</strong>
-          <p>Add the first value this phase should be judged against.</p>
+          <strong>{t('No values yet')}</strong>
+          <p>{t('Add the first value this phase should be judged against.')}</p>
         </div>
       {/if}
       {#each rankedValues as value (value.id)}
@@ -59,8 +60,8 @@
         <RoundPlusButton
           standout
           active={composing}
-          label="Add value"
-          ariaLabel="Add value proposal"
+          label={t('Add value')}
+          ariaLabel={t('Add value proposal')}
           onclick={() => (composing = true)}
         />
       {/if}

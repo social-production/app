@@ -14,6 +14,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import '#lib/components/styles/fab.css';
 
@@ -50,7 +51,7 @@
 <div class="create-fab">
   {#if !signedIn}
     <div class="create-fab-shell">
-      <a class="fab-button" href={signInHref} aria-label="Sign in to create">
+      <a class="fab-button" href={signInHref} aria-label={t('Sign in to create')}>
         <svg aria-hidden="true" viewBox="0 0 24 24" class="fab-icon"
           ><path
             d="M12 5v14M5 12h14"
@@ -65,8 +66,8 @@
   {:else}
     {#if open}
       <button
-        aria-label="Close create menu"
-        title="Close create menu"
+        aria-label={t('Close create menu')}
+        title={t('Close create menu')}
         class="fab-backdrop"
         type="button"
         onclick={() => (open = false)}
@@ -93,17 +94,17 @@
     {/snippet}
     <div class="create-fab-shell" class:menu-open={open}>
       {#if open}
-        <div class="create-menu" role="menu" aria-label="Create">
+        <div class="create-menu" role="menu" aria-label={t('Create')}>
           <div class="create-menu-body">
-            <p class="menu-kicker">Content</p>
+            <p class="menu-kicker">{t('Content')}</p>
             {#each links as link (link.href)}{@render item(link)}{/each}
             {#if surfaces.length > 0}
-              <p class="menu-kicker menu-kicker-separated">Surfaces</p>
+              <p class="menu-kicker menu-kicker-separated">{t('Surfaces')}</p>
               {#each surfaces as link (link.href)}{@render item(link)}{/each}
             {/if}
           </div>
           <button
-            aria-label="Close"
+            aria-label={t('Close')}
             class="menu-close sheet-close"
             type="button"
             onclick={() => (open = false)}>×</button
@@ -113,8 +114,8 @@
       <button
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label={open ? 'Close create menu' : 'Create'}
-        title={open ? 'Close create menu' : 'Create'}
+        aria-label={open ? t('Close create menu') : t('Create')}
+        title={open ? t('Close create menu') : t('Create')}
         class="fab-button"
         class:fab-button-open={open}
         type="button"

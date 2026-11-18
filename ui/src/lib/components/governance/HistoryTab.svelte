@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Proposal, VoteChoice } from '#lib/domain/governance.ts';
   import { historyEntries, stageBefore, type HistoryEntry } from '#lib/domain/history.ts';
   import type { PlanView } from '#lib/domain/plans.ts';
@@ -70,10 +71,10 @@
 <section class="history-shell">
   <section class="history-group">
     <h2 class="links-heading">
-      Open{#if active.length > 0}<span class="links-count">{active.length}</span>{/if}
+      {t('Open')}{#if active.length > 0}<span class="links-count">{active.length}</span>{/if}
     </h2>
     {#if active.length === 0}
-      <p class="links-quiet">Nothing to vote on right now.</p>
+      <p class="links-quiet">{t('Nothing to vote on right now.')}</p>
     {:else}
       <div class="history-list">
         {#each active as entry (entry.id)}{@render card(entry)}{/each}
@@ -83,7 +84,7 @@
 
   <section class="history-group">
     <h2 class="links-heading">
-      Decided{#if resolved.length > 0}<span class="links-count">{resolved.length}</span>{/if}
+      {t('Decided')}{#if resolved.length > 0}<span class="links-count">{resolved.length}</span>{/if}
     </h2>
     {#if resolved.length === 0}
       <p class="links-quiet">

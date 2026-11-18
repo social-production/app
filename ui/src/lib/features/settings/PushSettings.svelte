@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import { loadPush, push, setPushDetails, setPushOn } from '#lib/stores/push.svelte.ts';
 
@@ -16,18 +17,18 @@
   );
 </script>
 
-<h3 class="settings-subhead">On this device</h3>
+<h3 class="settings-subhead">{t('On this device')}</h3>
 <div class="card stack flush">
   <SettingSwitch
-    label="Push notifications"
+    label={t('Push notifications')}
     note={pushNote}
     checked={push.on}
     disabled={push.busy || push.where === 'none'}
     onToggle={() => void setPushOn(!push.on)}
   />
   <SettingSwitch
-    label="Show what it’s about"
-    note="Off: a notification only says something is new, so your lock screen stays private."
+    label={t('Show what it’s about')}
+    note={t('Off: a notification only says something is new, so your lock screen stays private.')}
     checked={push.details}
     disabled={push.busy || !push.on}
     onToggle={() => void setPushDetails(!push.details)}

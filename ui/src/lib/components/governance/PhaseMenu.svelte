@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   import '#lib/components/styles/governance.css';
@@ -71,7 +72,7 @@
   >
     <div class="phase-menu-body">
       {#if currentPhaseLabel}
-        <p class="phase-menu-current">Now in <strong>{currentPhaseLabel}</strong></p>
+        <p class="phase-menu-current">{t('Now in')} <strong>{currentPhaseLabel}</strong></p>
       {/if}
       <ul class="phase-menu-list">
         {#each items as item (item.id)}

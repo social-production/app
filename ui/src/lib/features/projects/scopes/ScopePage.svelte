@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import LoadingLine from '#lib/components/loading/LoadingLine.svelte';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
@@ -143,20 +144,22 @@
       {:else if items.length === 0 && narrowed}
         <EmptyState
           icon="filter"
-          title="Nothing matches these filters"
-          text="Try a longer time or another type."
+          title={t('Nothing matches these filters')}
+          text={t('Try a longer time or another type.')}
         >
-          <button class="empty-action" type="button" onclick={clearFilters}>Clear filters</button>
+          <button class="empty-action" type="button" onclick={clearFilters}
+            >{t('Clear filters')}</button
+          >
         </EmptyState>
       {:else if items.length === 0 && s.platform}
         <EmptyState
           icon="globe"
-          title="Nothing for the whole network yet"
-          text="Projects and events tagged #platform show here."
+          title={t('Nothing for the whole network yet')}
+          text={t('Projects and events tagged #platform show here.')}
         >
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
           <a class="empty-action primary" href={`${resolve('/create/project')}?tag=platform`}
-            >Start a platform project</a
+            >{t('Start a platform project')}</a
           >
         </EmptyState>
       {:else if items.length === 0}
@@ -166,7 +169,7 @@
           text={`Posts, events and projects tagged with this ${noun} show up here.`}
         >
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
-          <a class="empty-action primary" href={threadHref}>Start a thread</a>
+          <a class="empty-action primary" href={threadHref}>{t('Start a thread')}</a>
         </EmptyState>
       {:else}
         {#each items as card (card.id)}
@@ -182,8 +185,8 @@
 
     <PeopleSheet
       open={membersOpen}
-      title="Members"
-      emptyCopy="No members yet."
+      title={t('Members')}
+      emptyCopy={t('No members yet.')}
       people={s.members}
       onClose={() => (membersOpen = false)}
     />

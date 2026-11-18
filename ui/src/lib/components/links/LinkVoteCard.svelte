@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { APPROVAL_PERCENT, type VoteChoice } from '#lib/domain/governance.ts';
   import { resultNote, type LinkHalf, type LinkRequest, type LinkSide } from '#lib/domain/links.ts';
 
@@ -58,7 +59,7 @@
     {@const half = side.half}
     <div class="link-vote-side">
       <div class="link-vote-line">
-        <b>{side === request.thisSide ? 'This project' : side.projectTitle}</b>
+        <b>{side === request.thisSide ? t('This project') : side.projectTitle}</b>
         <span>{tally(half)}</span>
       </div>
       <div class="link-vote-bar" class:done={half?.status === 'Approved'}>

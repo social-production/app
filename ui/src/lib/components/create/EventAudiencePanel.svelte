@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { EventAudience, EventGovernance } from '#lib/domain/projects.ts';
 
   /**
@@ -29,8 +30,8 @@
 
 {#if mode === 'audience'}
   <section class="panel">
-    <h2>Audience</h2>
-    <p class="description">Who can discover and access this event.</p>
+    <h2>{t('Audience')}</h2>
+    <p class="description">{t('Who can discover and access this event.')}</p>
     <div class="body">
       <label class="control-option">
         <input
@@ -41,9 +42,9 @@
           onchange={() => onAudience('private_community')}
         />
         <span>
-          <strong>Private community</strong>
+          <strong>{t('Private community')}</strong>
           <span class="hint"
-            >Only members of one private community can find it on feeds and the map.</span
+            >{t('Only members of one private community can find it on feeds and the map.')}</span
           >
         </span>
       </label>
@@ -56,9 +57,9 @@
           onchange={() => onAudience('invite_only')}
         />
         <span>
-          <strong>Invite only</strong>
+          <strong>{t('Invite only')}</strong>
           <span class="hint"
-            >Only invited people and organizers can find it, including on the map.</span
+            >{t('Only invited people and organizers can find it, including on the map.')}</span
           >
         </span>
       </label>
@@ -66,27 +67,28 @@
   </section>
 {:else if audience === 'public'}
   <section class="panel">
-    <h2>Control</h2>
-    <p class="description">Public events stay collaborative.</p>
+    <h2>{t('Control')}</h2>
+    <p class="description">{t('Public events stay collaborative.')}</p>
     <div class="body">
       <p class="helper-text">
-        Current mode: <strong>Collaborative</strong>. Members shape the plan through signals,
-        values, and votes.
+        {t('Current mode:')} <strong>{t('Collaborative')}</strong>{t(
+          '. Members shape the plan through signals, values, and votes.',
+        )}
       </p>
     </div>
   </section>
 {:else}
   <section class="panel">
-    <h2>Control</h2>
-    <p class="description">How this private event is run.</p>
+    <h2>{t('Control')}</h2>
+    <p class="description">{t('How this private event is run.')}</p>
     <div class="body">
       <p class="helper-text">
         {#if audience === 'private_community' && communityLabel}
-          Private community: <strong>{communityLabel}</strong>.
+          {t('Private community:')} <strong>{communityLabel}</strong>.
         {:else if audience === 'invite_only'}
           Invite-only ({inviteeCount} invited).
         {:else}
-          Private audience selected.
+          {t('Private audience selected.')}
         {/if}
       </p>
       <label class="control-option">
@@ -98,10 +100,11 @@
           onchange={() => onGovernance('collaborative')}
         />
         <span>
-          <strong>Collaborative</strong>
+          <strong>{t('Collaborative')}</strong>
           <span class="hint"
-            >Same flow as public events: signals → values → plans → activity, just inside this
-            private audience. Members can propose, vote, and sign up for roles.</span
+            >{t(
+              'Same flow as public events: signals → values → plans → activity, just inside this private audience. Members can propose, vote, and sign up for roles.',
+            )}</span
           >
         </span>
       </label>
@@ -114,16 +117,18 @@
           onchange={() => onGovernance('organizer_controlled')}
         />
         <span>
-          <strong>Organizer-controlled</strong>
+          <strong>{t('Organizer-controlled')}</strong>
           <span class="hint"
-            >Skip signals, values, and proposal votes. Set the plan up front and start in Activity.
-            Creators and co-organizers manage changes; members can still join and sign up for roles.</span
+            >{t(
+              'Skip signals, values, and proposal votes. Set the plan up front and start in Activity. Creators and co-organizers manage changes; members can still join and sign up for roles.',
+            )}</span
           >
         </span>
       </label>
       <p class="helper-text">
-        Current selection: <strong
-          >{governance === 'collaborative' ? 'Collaborative' : 'Organizer-controlled'}</strong
+        {t('Current selection:')}
+        <strong
+          >{governance === 'collaborative' ? t('Collaborative') : t('Organizer-controlled')}</strong
         >
       </p>
     </div>

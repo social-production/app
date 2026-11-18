@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { isEvent } from '#lib/domain/projects.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
@@ -22,7 +23,7 @@
 </script>
 
 {#if guest}
-  <a class="dock-labelled primary" href={resolve('/onboarding')}>Sign up to join</a>
+  <a class="dock-labelled primary" href={resolve('/onboarding')}>{t('Sign up to join')}</a>
   {#if share}<GuestShare {title} />{/if}
 {:else}
   <button
@@ -33,7 +34,7 @@
     disabled={detail.joining}
     onclick={() => detail.requestToggleJoin()}
   >
-    <ToolbarIcon name="person-plus" />Join
+    <ToolbarIcon name="person-plus" />{t('Join')}
   </button>
   {#if share}<DetailShare {detail} />{/if}
 {/if}

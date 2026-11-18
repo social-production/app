@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { scheduleSummary } from '#lib/domain/eventSchedule.ts';
   import { SOFTWARE_LICENSE_LABEL } from '#lib/domain/policy.ts';
   import type { PlanForm, PlanStep, PlanStepType } from '#lib/domain/planForm.ts';
@@ -26,7 +27,7 @@
       <strong>{label}</strong>
       <span>{value}</span>
     </div>
-    <button class="text-button" type="button" onclick={() => onEdit(step)}>Edit</button>
+    <button class="text-button" type="button" onclick={() => onEdit(step)}>{t('Edit')}</button>
   </div>
 {/snippet}
 
@@ -36,7 +37,9 @@
       <strong>Title & description</strong>
       <span><strong>{form.title}</strong> — {form.description}</span>
     </div>
-    <button class="text-button" type="button" onclick={() => onEdit('plan-overview')}>Edit</button>
+    <button class="text-button" type="button" onclick={() => onEdit('plan-overview')}
+      >{t('Edit')}</button
+    >
   </div>
   {#if has('schedule-mode')}
     {@render row('Schedule', scheduleSummary(form), 'schedule-mode')}

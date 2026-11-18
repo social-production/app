@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import RadiusChips from '#lib/components/map/RadiusChips.svelte';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
@@ -25,13 +26,13 @@
 </script>
 
 <section>
-  <h3>Place</h3>
+  <h3>{t('Place')}</h3>
   <div class="region-place" class:focused>
     <ToolbarIcon name="map-pin" />
     <input
-      aria-label="Place"
+      aria-label={t('Place')}
       value={region.placeQuery}
-      placeholder="Search a place"
+      placeholder={t('Search a place')}
       onfocus={() => {
         if (blurTimer) clearTimeout(blurTimer);
         focused = true;
@@ -49,10 +50,10 @@
       enterkeyhint="search"
     />
     {#if region.searching}
-      <span class="region-spinner" aria-label="Searching"></span>
+      <span class="region-spinner" aria-label={t('Searching')}></span>
     {:else if focused && region.placeQuery}
       <button
-        aria-label="Clear place"
+        aria-label={t('Clear place')}
         class="region-clear"
         type="button"
         onmousedown={(e) => e.preventDefault()}
@@ -62,8 +63,8 @@
       </button>
     {/if}
     <button
-      aria-label="Use my location"
-      title="Use my location"
+      aria-label={t('Use my location')}
+      title={t('Use my location')}
       class="region-locate"
       type="button"
       onclick={() => void region.useDevice()}
@@ -92,23 +93,23 @@
 </section>
 
 <section>
-  <h3>Distance</h3>
+  <h3>{t('Distance')}</h3>
   <RadiusChips
     value={region.radius}
     onChange={(v) => {
       region.radius = v;
       void region.reload();
     }}
-    ariaLabel="Region radius"
+    ariaLabel={t('Region radius')}
     options={radiusPresetOptions}
   />
 </section>
 
 <div class="region-online">
-  <span>Include online events</span>
+  <span>{t('Include online events')}</span>
   <button
     aria-checked={region.includeOnline}
-    aria-label="Include online events"
+    aria-label={t('Include online events')}
     class="soft-switch"
     class:on={region.includeOnline}
     role="switch"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import ServiceRequestCard from '#lib/components/requests/ServiceRequestCard.svelte';
@@ -43,11 +44,11 @@
     {:else if requests.length === 0}
       <div class="empty-card">
         {#if requestsOff}
-          Not taking requests.
+          {t('Not taking requests.')}
         {:else if reviewer}
-          No requests yet.
+          {t('No requests yet.')}
         {:else}
-          You have not requested this service yet.
+          {t('You have not requested this service yet.')}
         {/if}
       </div>
     {:else}
@@ -56,14 +57,14 @@
           <div id={`request-card-${request.id}`} class="rail-card">
             <ServiceRequestCard
               {request}
-              requester={state.names[request.requester] ?? 'Someone'}
+              requester={state.names[request.requester] ?? t('Someone')}
               highlighted={highlighted === request.id}
             >
               {#if reviewer}
                 {#if isPending(request.status) && !notMet(request) && onPlan}
                   <div class="binary-row review-actions">
                     <button class="vote-chip" type="button" onclick={() => onPlan(request)}>
-                      Plan request
+                      {t('Plan request')}
                     </button>
                   </div>
                 {/if}
@@ -75,14 +76,14 @@
                     disabled={state.busy}
                     onclick={() => void state.decide(request, 'cancelled')}
                   >
-                    Cancel request
+                    {t('Cancel request')}
                   </button>
                 </div>
               {/if}
               {@const seed = chatOf(request)}
               {#if seed}
                 <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved here -->
-                <a class="conversation-link" href={chatHref(seed)}>Open conversation</a>
+                <a class="conversation-link" href={chatHref(seed)}>{t('Open conversation')}</a>
               {/if}
             </ServiceRequestCard>
           </div>

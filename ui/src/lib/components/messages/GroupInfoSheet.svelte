@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { GROUP_TITLE_MAX, type Contact } from '#lib/domain/messages.ts';
@@ -77,15 +78,15 @@
 </script>
 
 <!-- The sheet leaves the page (portal): rootClass keeps web's MessagesPage styles on it. -->
-<OverlaySheet open={p.open} title="Chat info" rootClass="messages-page" onClose={p.onClose}>
+<OverlaySheet open={p.open} title={t('Chat info')} rootClass="messages-page" onClose={p.onClose}>
   <section class="group-settings-card">
     <label class="composer-field">
-      <span>Group name</span>
+      <span>{t('Group name')}</span>
       <div class="inline-field">
         <input
           bind:value={draft}
           maxlength={GROUP_TITLE_MAX}
-          placeholder="Rename group chat"
+          placeholder={t('Rename group chat')}
           type="text"
         />
         <button
@@ -96,18 +97,18 @@
               () => p.onRename(draft),
               'Group name updated.',
               'The group name could not be updated.',
-            )}>Save</button
+            )}>{t('Save')}</button
         >
       </div>
     </label>
 
     <div class="composer-field">
-      <span>Members</span>
+      <span>{t('Members')}</span>
       <div class="member-links">
         {#each p.members as member (member.agent)}
           <a class="member-link" href={resolve('/profile/[agent]', { agent: member.agent })}
-            >{member.name}{member.agent === p.me ? ' (you)' : ''}{member.agent === p.manager
-              ? ' · manages the group'
+            >{member.name}{member.agent === p.me ? t(' (you)') : ''}{member.agent === p.manager
+              ? t(' · manages the group')
               : ''}</a
           >
         {/each}
@@ -119,22 +120,22 @@
         class:active={mode === 'add'}
         class="contact-chip"
         type="button"
-        onclick={() => toggle('add')}>Add member</button
+        onclick={() => toggle('add')}>{t('Add member')}</button
       >
       <button
         class:active={mode === 'remove'}
         class="contact-chip"
         type="button"
-        onclick={() => toggle('remove')}>Remove member</button
+        onclick={() => toggle('remove')}>{t('Remove member')}</button
       >
     </div>
 
     {#if mode === 'add'}
       <div class="composer-field">
-        <span>Add someone</span>
+        <span>{t('Add someone')}</span>
         <input
           bind:value={query}
-          placeholder="Type a username"
+          placeholder={t('Type a username')}
           type="text"
           onkeydown={(event) => {
             const first = addable[0];
@@ -158,7 +159,7 @@
 
     {#if mode === 'remove'}
       <div class="composer-field">
-        <span>Remove someone</span>
+        <span>{t('Remove someone')}</span>
         <div class="contact-list">
           {#each removable as member (member.agent)}
             <button

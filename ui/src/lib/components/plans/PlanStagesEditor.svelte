@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { PlanForm } from '#lib/domain/planForm.ts';
 
   /** web's plan wizard stages step: add, remove and reorder stages, each with optional dates. */
@@ -46,24 +47,24 @@
             class="text-button danger"
             disabled={stages.length <= 1}
             type="button"
-            onclick={() => remove(index)}>Remove</button
+            onclick={() => remove(index)}>{t('Remove')}</button
           >
         </div>
       </div>
-      <input bind:value={stage.title} maxlength="120" placeholder="Stage title" />
-      <textarea bind:value={stage.details} rows="3" placeholder="What happens in this stage?"
+      <input bind:value={stage.title} maxlength="120" placeholder={t('Stage title')} />
+      <textarea bind:value={stage.details} rows="3" placeholder={t('What happens in this stage?')}
       ></textarea>
       <div class="stage-dates">
         <label>
-          <span>Start date</span>
+          <span>{t('Start date')}</span>
           <input bind:value={stage.startDate} type="date" />
         </label>
         <label>
-          <span>End date</span>
+          <span>{t('End date')}</span>
           <input bind:value={stage.endDate} min={stage.startDate || undefined} type="date" />
         </label>
       </div>
     </div>
   {/each}
-  <button class="secondary-button" type="button" onclick={add}>Add stage</button>
+  <button class="secondary-button" type="button" onclick={add}>{t('Add stage')}</button>
 </div>

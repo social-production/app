@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import { boardChip, boardLine, boardProgress, type BoardMember } from '#lib/domain/board.ts';
   import { displayName, type Person } from '#lib/domain/people.ts';
@@ -42,7 +43,7 @@
   <div class="board-copy">
     <div class="board-name">
       <a href={resolve('/profile/[agent]', { agent: m.agent })}>{name}</a>
-      {#if you}<span class="board-chip you-chip">You</span>{/if}
+      {#if you}<span class="board-chip you-chip">{t('You')}</span>{/if}
       <span class="board-chip {tone}">{boardChip(m)}</span>
     </div>
     {#if !m.moderator}

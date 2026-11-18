@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import PillChoice from '#lib/components/PillChoice.svelte';
@@ -61,10 +62,10 @@
   const shown = $derived(s.listItems.length);
 </script>
 
-<div class="map-filter-top filter-panel-overlay" aria-label="Map filters">
+<div class="map-filter-top filter-panel-overlay" aria-label={t('Map filters')}>
   <button
-    aria-label="Use my location"
-    title="Use my location"
+    aria-label={t('Use my location')}
+    title={t('Use my location')}
     class="map-locate-button"
     type="button"
     onclick={onLocate}
@@ -90,11 +91,11 @@
       type="button"
       onclick={() => (sheetOpen = true)}
     >
-      <ToolbarIcon name="filter" /><span>Filters</span>
+      <ToolbarIcon name="filter" /><span>{t('Filters')}</span>
     </button>
     <button
-      aria-label="Open as list"
-      title="Open as list"
+      aria-label={t('Open as list')}
+      title={t('Open as list')}
       class="capsule-icon"
       disabled={!s.hasCenter}
       type="button"
@@ -117,17 +118,17 @@
 
 <OverlaySheet
   open={sheetOpen}
-  title="Map filters"
+  title={t('Map filters')}
   labelledById="map-filter-title"
   rootClass="shell feed-filter-sheet map-filter-sheet"
   onClose={() => (sheetOpen = false)}
 >
   <div class="feed-filter-groups">
     <section>
-      <h3>Events</h3>
+      <h3>{t('Events')}</h3>
       <PillChoice
         value={s.upcomingOnly ? 'upcoming' : 'past'}
-        ariaLabel="Map events"
+        ariaLabel={t('Map events')}
         options={events}
         onChange={(v) => {
           if ((v === 'upcoming') !== s.upcomingOnly) onUpcoming();
@@ -135,10 +136,10 @@
       />
     </section>
     <section>
-      <h3>When</h3>
+      <h3>{t('When')}</h3>
       <PillChoice
         value={s.windowFilter}
-        ariaLabel="Map time window"
+        ariaLabel={t('Map time window')}
         options={windows}
         onChange={(v) => {
           s.windowFilter = v;
@@ -146,23 +147,23 @@
         }}
       />
       {#if s.showCustomDates}
-        <div class="custom-dates" role="group" aria-label="Custom date range">
+        <div class="custom-dates" role="group" aria-label={t('Custom date range')}>
           <label>
-            <span>From</span>
+            <span>{t('From')}</span>
             <input class="date-input" type="date" bind:value={s.dateFrom} onchange={onFilters} />
           </label>
           <label>
-            <span>To</span>
+            <span>{t('To')}</span>
             <input class="date-input" type="date" bind:value={s.dateTo} onchange={onFilters} />
           </label>
         </div>
       {/if}
     </section>
     <section>
-      <h3>Show</h3>
+      <h3>{t('Show')}</h3>
       <PillChoice
         value={s.entityFilter}
-        ariaLabel="Map entity filter"
+        ariaLabel={t('Map entity filter')}
         options={types}
         onChange={(v) => {
           s.entityFilter = v;
@@ -174,7 +175,7 @@
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-submit" type="button" onclick={() => (sheetOpen = false)}
-        >{shown === 1 ? 'Show 1 place' : `Show ${shown} places`}</button
+        >{shown === 1 ? t('Show 1 place') : `Show ${shown} places`}</button
       >
     </div>
   {/snippet}

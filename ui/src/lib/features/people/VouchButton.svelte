@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { Person } from '#lib/domain/people.ts';
 
   /** web's "Vouch" action button (profile action row). */
@@ -56,5 +57,5 @@
       stroke-linejoin="round"
     /></svg
   >
-  <span class="action-text">{vouched ? 'Vouched' : 'Vouch'}</span>
+  <span class="action-text">{vouched ? t('Vouched') : t('Vouch')}</span>
 </button>

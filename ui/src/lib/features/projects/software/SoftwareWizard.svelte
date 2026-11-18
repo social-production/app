@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PlanWizardShell from '#lib/components/plans/PlanWizardShell.svelte';
 
   import PullRequestReview from './PullRequestReview.svelte';
@@ -62,7 +63,7 @@
     title={wizardTitle(mode, pr)}
     stepIndex={step}
     stepCount={count}
-    nextLabel={step >= count - 1 ? submitLabel(mode) : 'Next'}
+    nextLabel={step >= count - 1 ? submitLabel(mode) : t('Next')}
     canGoBack={step > 0}
     {canGoNext}
     showFooter={mode !== 'vote-pr'}
@@ -75,37 +76,37 @@
       <div class="question-block">
         {#if mode === 'create-pr'}
           {#if step === 0}
-            <h2>What should we call this pull request?</h2>
+            <h2>{t('What should we call this pull request?')}</h2>
             <p class="helper-copy">
-              Use a short title that matches the change people will vote on.
+              {t('Use a short title that matches the change people will vote on.')}
             </p>
-            <input bind:value={forms.title} maxlength="120" placeholder="Pull request title" />
+            <input bind:value={forms.title} maxlength="120" placeholder={t('Pull request title')} />
           {:else if step === 1}
-            <h2>Where is the pull request?</h2>
-            <p class="helper-copy">Link the external PR so voters can inspect the change.</p>
+            <h2>{t('Where is the pull request?')}</h2>
+            <p class="helper-copy">{t('Link the external PR so voters can inspect the change.')}</p>
             <div class="field-grid">
               <input
                 bind:value={forms.pullRequestId}
                 maxlength="40"
-                placeholder="PR number or ID"
+                placeholder={t('PR number or ID')}
               />
               <input
                 bind:value={forms.pullRequestUrl}
                 maxlength="240"
-                placeholder="Pull request URL"
+                placeholder={t('Pull request URL')}
               />
             </div>
           {:else if step === 2}
-            <h2>What does this change?</h2>
+            <h2>{t('What does this change?')}</h2>
             <p class="helper-copy">
-              Summarise the effect in plain language for non-specialist voters.
+              {t('Summarise the effect in plain language for non-specialist voters.')}
             </p>
             <textarea
               bind:value={forms.summary}
               rows="5"
-              placeholder="What does this pull request change?"></textarea>
+              placeholder={t('What does this pull request change?')}></textarea>
           {:else}
-            <h2>Ready to submit?</h2>
+            <h2>{t('Ready to submit?')}</h2>
             <div class="review-card">
               <strong>{forms.title}</strong>
               <span>{forms.pullRequestId} · {forms.pullRequestUrl}</span>
@@ -115,68 +116,69 @@
         {:else if (mode === 'vote-pr' || mode === 'record-merge') && pr}
           <PullRequestReview {pr} {mode} author={name(pr.author)} onVote={(c) => void vote(c)}>
             <div class="field-stack">
-              <label class="field-label" for="merge-id-input">Merge ID</label>
+              <label class="field-label" for="merge-id-input">{t('Merge ID')}</label>
               <input
                 id="merge-id-input"
                 bind:value={forms.mergeId}
                 maxlength="120"
-                placeholder="Merge commit or release ID"
+                placeholder={t('Merge commit or release ID')}
               />
-              <label class="field-label" for="merge-url-input">Merge link</label>
+              <label class="field-label" for="merge-url-input">{t('Merge link')}</label>
               <input
                 id="merge-url-input"
                 bind:value={forms.mergeUrl}
                 maxlength="240"
-                placeholder="Merge commit or release URL"
+                placeholder={t('Merge commit or release URL')}
               />
             </div>
           </PullRequestReview>
         {:else if mode === 'merge-capability'}
           {#if step === 0}
-            <h2>Which member?</h2>
+            <h2>{t('Which member?')}</h2>
             <select bind:value={forms.targetAgent}>
-              <option value="" disabled>Select project member</option>
+              <option value="" disabled>{t('Select project member')}</option>
               {#each g.candidates as candidate (candidate)}
                 <option value={candidate}>{name(candidate)}</option>
               {/each}
             </select>
           {:else if step === 1}
-            <h2>Grant or revoke merge capability?</h2>
+            <h2>{t('Grant or revoke merge capability?')}</h2>
             <select bind:value={forms.action}>
-              <option value="grant">Grant merge capability</option>
-              <option value="revoke">Revoke merge capability</option>
+              <option value="grant">{t('Grant merge capability')}</option>
+              <option value="revoke">{t('Revoke merge capability')}</option>
             </select>
           {:else}
-            <h2>Submit this change for a vote</h2>
+            <h2>{t('Submit this change for a vote')}</h2>
             <div class="review-card">
-              <strong>{forms.action === 'grant' ? 'Grant' : 'Revoke'} merge capability</strong>
-              <span>{forms.targetAgent ? name(forms.targetAgent) : 'Selected member'}</span>
+              <strong>{forms.action === 'grant' ? t('Grant') : t('Revoke')} merge capability</strong
+              >
+              <span>{forms.targetAgent ? name(forms.targetAgent) : t('Selected member')}</span>
             </div>
           {/if}
         {:else if mode === 'repository-replacement'}
           {#if step === 0}
-            <h2>Which blocked pull request triggered this?</h2>
+            <h2>{t('Which blocked pull request triggered this?')}</h2>
             <select bind:value={forms.relatedPullRequest}>
-              <option value="" disabled>Select blocked pull request</option>
+              <option value="" disabled>{t('Select blocked pull request')}</option>
               {#each replaceable as blocked (blocked.id)}
                 <option value={blocked.id}>{blocked.pullRequestId} · {blocked.stageLabel}</option>
               {/each}
             </select>
           {:else if step === 1}
-            <h2>What is the replacement repository URL?</h2>
+            <h2>{t('What is the replacement repository URL?')}</h2>
             <input
               bind:value={forms.repositoryUrl}
               maxlength="240"
-              placeholder="Replacement repository URL"
+              placeholder={t('Replacement repository URL')}
             />
           {:else if step === 2}
-            <h2>Why does the repository need replacing?</h2>
+            <h2>{t('Why does the repository need replacing?')}</h2>
             <textarea
               bind:value={forms.reason}
               rows="5"
-              placeholder="Explain why the official repository must change"></textarea>
+              placeholder={t('Explain why the official repository must change')}></textarea>
           {:else}
-            <h2>Submit repository replacement for a vote</h2>
+            <h2>{t('Submit repository replacement for a vote')}</h2>
             <div class="review-card">
               <strong>{forms.repositoryUrl}</strong>
               <span>

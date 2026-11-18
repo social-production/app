@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import PlanWizardShell from '#lib/components/plans/PlanWizardShell.svelte';
   import {
     activitySteps,
@@ -88,10 +89,10 @@
 
 <PlanWizardShell
   {open}
-  title="Create activity"
+  title={t('Create activity')}
   stepIndex={index}
   stepCount={steps.length}
-  nextLabel={review ? (busy ? 'Creating…' : 'Create activity') : 'Next'}
+  nextLabel={review ? (busy ? t('Creating…') : t('Create activity')) : t('Next')}
   canGoBack={index > 0}
   canGoNext={!busy && !!step && stepReady(step.type, form)}
   onClose={close}
@@ -105,11 +106,11 @@
         <h2>{step.question}</h2>
         <p class="helper-copy">{step.helper}</p>
         {#if step.type === 'title'}
-          <input bind:value={form.title} maxlength="120" placeholder="Activity title" />
+          <input bind:value={form.title} maxlength="120" placeholder={t('Activity title')} />
         {:else if step.type === 'schedule'}
           <div class="field-grid">
             <label>
-              <span>Start time</span>
+              <span>{t('Start time')}</span>
               <input
                 bind:value={form.scheduledAt}
                 type="datetime-local"
@@ -118,7 +119,7 @@
               />
             </label>
             <label>
-              <span>Finish time</span>
+              <span>{t('Finish time')}</span>
               <input
                 bind:value={form.endsAt}
                 type="datetime-local"
@@ -140,7 +141,7 @@
           />
           {#if form.online}
             <label>
-              <span>Meeting link</span>
+              <span>{t('Meeting link')}</span>
               <input
                 bind:value={form.meetingUrl}
                 type="url"
@@ -149,11 +150,11 @@
                 placeholder="https://"
               />
             </label>
-            <p class="helper-copy">Members use this link to join.</p>
+            <p class="helper-copy">{t('Members use this link to join.')}</p>
           {/if}
         {:else if step.type === 'plan-stage'}
           <select bind:value={form.planStage}>
-            <option value={null} disabled>Choose stage</option>
+            <option value={null} disabled>{t('Choose stage')}</option>
             {#each groups as group (group.label)}
               <optgroup label={group.label}>
                 {#each group.stages as stage (stage.id)}
@@ -165,35 +166,43 @@
         {:else if step.type === 'roles'}
           <RolesEditor bind:roles={form.roles} {searchPeople} />
           <div class="count-readout">
-            <span>Minimum people needed:</span>
+            <span>{t('Minimum people needed:')}</span>
             <strong>{minimumPeople(form.roles)}</strong>
           </div>
         {:else if step.type === 'note'}
           <textarea
             bind:value={form.note}
             rows="5"
-            placeholder="What should happen in this activity?"></textarea>
+            placeholder={t('What should happen in this activity?')}></textarea>
         {:else}
           <div class="review-stack">
-            <div class="review-row"><span>Title</span><strong>{form.title || '—'}</strong></div>
             <div class="review-row">
-              <span>Schedule</span><strong>{when(form.scheduledAt)} – {when(form.endsAt)}</strong>
+              <span>{t('Title')}</span><strong>{form.title || '—'}</strong>
             </div>
             <div class="review-row">
-              <span>Location</span><strong>{placeSummary(form) || '—'}</strong>
+              <span>{t('Schedule')}</span><strong
+                >{when(form.scheduledAt)} – {when(form.endsAt)}</strong
+              >
+            </div>
+            <div class="review-row">
+              <span>{t('Location')}</span><strong>{placeSummary(form) || '—'}</strong>
             </div>
             {#if planStages.length > 0}
-              <div class="review-row"><span>Linked stage</span><strong>{stageLabel}</strong></div>
+              <div class="review-row">
+                <span>{t('Linked stage')}</span><strong>{stageLabel}</strong>
+              </div>
             {/if}
             <div class="review-row">
-              <span>Roles</span>
+              <span>{t('Roles')}</span>
               <strong>
                 {namedRoles(form.roles)
                   .map((r) => `${r.label} (${r.required}${r.maximum ? `–${r.maximum}` : '+'})`)
                   .join(', ') || '—'}
               </strong>
             </div>
-            <div class="review-row"><span>Note</span><strong>{form.note || '—'}</strong></div>
+            <div class="review-row">
+              <span>{t('Note')}</span><strong>{form.note || '—'}</strong>
+            </div>
           </div>
           {#if error}<p class="validation-copy" role="alert">{error}</p>{/if}
         {/if}

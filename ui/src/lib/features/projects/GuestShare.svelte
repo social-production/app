@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   /** Share for someone browsing signed out: the device's share sheet, or the link copied. */
   let { title }: { title: string } = $props();
 
@@ -19,8 +20,8 @@
 <button
   type="button"
   class="share-button"
-  aria-label={copied ? 'Link copied' : 'Share'}
-  title={copied ? 'Link copied' : 'Share'}
+  aria-label={copied ? t('Link copied') : t('Share')}
+  title={copied ? t('Link copied') : t('Share')}
   onclick={() => void share()}
 >
   <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18"

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import VoteStrip from '#lib/components/cards/VoteStrip.svelte';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
@@ -57,7 +58,7 @@
 {#if help.activity && help.activity.roles.length > 0}
   <div class="help-roles help-roles-page">
     <div class="detail-section-head">
-      <h2>Roles</h2>
+      <h2>{t('Roles')}</h2>
       <span>{filled} of {roles.length} filled</span>
     </div>
     <div class="role-stack">
@@ -71,7 +72,7 @@
               {slotsOf(role.maximum) > 0 ? `${slotsOf(role.maximum)} needed · ` : ''}{role.people
                 .length
                 ? role.people.map((a) => help.names[a] ?? '…').join(', ')
-                : 'nobody yet'}
+                : t('nobody yet')}
             </span>
           </div>
           <button
@@ -102,7 +103,7 @@
     {#if signedIn}
       <ShareUserMenu
         copyLinkUrl={url}
-        menuTitle="Share help request"
+        menuTitle={t('Share help request')}
         compact
         shareTitle={help.project.charter?.title ?? null}
         searchContacts={search}

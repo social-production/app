@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -42,16 +43,16 @@
       <b>{item.title}</b>
       <small>{line}</small>
     </div>
-    <button class="map-peek-close" type="button" aria-label="Close" onclick={onClose}>
+    <button class="map-peek-close" type="button" aria-label={t('Close')} onclick={onClose}>
       <ToolbarIcon name="x" />
     </button>
   </div>
   <div class="map-peek-actions">
     <button class="map-peek-secondary" type="button" onclick={() => (directionsOpen = true)}
-      >Directions</button
+      >{t('Directions')}</button
     >
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
-    <a class="map-peek-primary" {href} onclick={onOpen}>Open</a>
+    <a class="map-peek-primary" {href} onclick={onOpen}>{t('Open')}</a>
   </div>
 </div>
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
   import CountBadge from '#lib/components/icons/CountBadge.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -33,7 +34,7 @@
 </script>
 
 <nav
-  aria-label="Primary mobile"
+  aria-label={t('Primary mobile')}
   class="mobile-bottom-nav"
   class:chrome-collapsed={collapsed}
   aria-hidden={collapsed}
@@ -60,12 +61,12 @@
   {/each}
   {#if signUpHref}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the shell -->
-    <a class="bottom-nav-signup" href={signUpHref} onclick={onNavigate}>Sign up</a>
+    <a class="bottom-nav-signup" href={signUpHref} onclick={onNavigate}>{t('Sign up')}</a>
   {/if}
 
   <button
-    aria-label="More"
-    title="More"
+    aria-label={t('More')}
+    title={t('More')}
     class="bottom-nav-item"
     class:active-link={moreActive}
     aria-expanded={moreActive}
@@ -76,7 +77,7 @@
     <span class="bottom-nav-icon" aria-hidden="true">
       <ToolbarIcon name="more" />
     </span>
-    {#if moreActive}<span class="bottom-nav-label" aria-hidden="true">More</span>{/if}
+    {#if moreActive}<span class="bottom-nav-label" aria-hidden="true">{t('More')}</span>{/if}
   </button>
 </nav>
 

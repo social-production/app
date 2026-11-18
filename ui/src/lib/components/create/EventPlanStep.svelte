@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
   import RequiredLabel from './RequiredLabel.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
@@ -28,54 +29,54 @@
 
 <div class="form-stack plan-step">
   <p class="helper-text">
-    Organizer-controlled private events skip signals, values, and proposal votes. Set the plan now
-    so the event can start in Activity. Members can still join and sign up for roles once activities
-    exist.
+    {t(
+      'Organizer-controlled private events skip signals, values, and proposal votes. Set the plan now so the event can start in Activity. Members can still join and sign up for roles once activities exist.',
+    )}
   </p>
   <label>
-    <RequiredLabel>Plan title</RequiredLabel>
+    <RequiredLabel>{t('Plan title')}</RequiredLabel>
     <input bind:value={plan.title} aria-required="true" />
   </label>
   <label>
-    <RequiredLabel>Plan description</RequiredLabel>
+    <RequiredLabel>{t('Plan description')}</RequiredLabel>
     <textarea bind:value={plan.description} rows="3" aria-required="true"></textarea>
   </label>
   <fieldset class="schedule-fieldset">
-    <legend>Schedule</legend>
-    <div class="schedule-mode-row" role="radiogroup" aria-label="Schedule mode">
+    <legend>{t('Schedule')}</legend>
+    <div class="schedule-mode-row" role="radiogroup" aria-label={t('Schedule mode')}>
       <label class="schedule-mode-option" class:active={plan.scheduleMode === 'date'}>
         <input type="radio" bind:group={plan.scheduleMode} value="date" />
-        Single date
+        {t('Single date')}
       </label>
       <label class="schedule-mode-option" class:active={plan.scheduleMode === 'range'}>
         <input type="radio" bind:group={plan.scheduleMode} value="range" />
-        Date range
+        {t('Date range')}
       </label>
     </div>
     <div class="schedule-fields" class:is-range={plan.scheduleMode === 'range'}>
       {#if plan.scheduleMode === 'date'}
         <label>
-          <RequiredLabel>Date</RequiredLabel>
+          <RequiredLabel>{t('Date')}</RequiredLabel>
           <input type="date" bind:value={plan.scheduledDate} />
         </label>
       {:else}
         <label>
-          <RequiredLabel>Start date</RequiredLabel>
+          <RequiredLabel>{t('Start date')}</RequiredLabel>
           <input type="date" bind:value={plan.rangeStartDate} />
         </label>
         <label>
-          <RequiredLabel>End date</RequiredLabel>
+          <RequiredLabel>{t('End date')}</RequiredLabel>
           <input type="date" bind:value={plan.rangeEndDate} />
         </label>
       {/if}
     </div>
     <div class="schedule-fields is-range">
       <label>
-        <RequiredLabel>Start time</RequiredLabel>
+        <RequiredLabel>{t('Start time')}</RequiredLabel>
         <input type="time" bind:value={plan.startTime} />
       </label>
       <label>
-        <RequiredLabel>Finish time</RequiredLabel>
+        <RequiredLabel>{t('Finish time')}</RequiredLabel>
         <input type="time" bind:value={plan.finishTime} />
       </label>
     </div>
@@ -87,10 +88,10 @@
   <div class="stages">
     <div class="stages-header">
       <div>
-        <strong>Plan stages</strong>
-        <p class="stages-helper">Break the plan into ordered stages people can follow.</p>
+        <strong>{t('Plan stages')}</strong>
+        <p class="stages-helper">{t('Break the plan into ordered stages people can follow.')}</p>
       </div>
-      <button type="button" class="secondary-button" onclick={addStage}>Add stage</button>
+      <button type="button" class="secondary-button" onclick={addStage}>{t('Add stage')}</button>
     </div>
     {#each plan.stages as stage, index (index)}
       <div class="stage-card">
@@ -98,16 +99,16 @@
           <strong>Stage {index + 1}</strong>
           {#if plan.stages.length > 1}
             <button type="button" class="remove-stage" onclick={() => removeStage(index)}>
-              Remove
+              {t('Remove')}
             </button>
           {/if}
         </div>
         <label>
-          <RequiredLabel>Title</RequiredLabel>
+          <RequiredLabel>{t('Title')}</RequiredLabel>
           <input bind:value={stage.title} />
         </label>
         <label>
-          <RequiredLabel>Details</RequiredLabel>
+          <RequiredLabel>{t('Details')}</RequiredLabel>
           <textarea bind:value={stage.details} rows="2"></textarea>
         </label>
       </div>

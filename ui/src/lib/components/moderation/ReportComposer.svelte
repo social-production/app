@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import type { ReportReason } from '#lib/domain/moderation.ts';
   import '#lib/components/styles/report.css';
@@ -52,7 +53,7 @@
 
 <OverlaySheet
   {open}
-  title={sent ? 'Report sent' : `Report ${itemLabel}`}
+  title={sent ? t('Report sent') : `Report ${itemLabel}`}
   labelledById="report-composer-title"
   rootClass="report-composer"
   elevated
@@ -72,17 +73,18 @@
           /></svg
         ></span
       >
-      <h3>Thanks, it's under review</h3>
+      <h3>{t("Thanks, it's under review")}</h3>
       <p>
-        Members now review it. If they agree, it's hidden for everyone and the author is told why.
-        Until then it carries an "Under review" label.
+        {t(
+          'Members now review it. If they agree, it\'s hidden for everyone and the author is told why. Until then it carries an "Under review" label.',
+        )}
       </p>
     </div>
   {:else}
     <div class="report-body">
       {#if error}<div class="warning-card" role="alert">{error}</div>{/if}
-      <div class="report-reasons" role="radiogroup" aria-label="Reason">
-        <p class="report-question">Why are you reporting it?</p>
+      <div class="report-reasons" role="radiogroup" aria-label={t('Reason')}>
+        <p class="report-question">{t('Why are you reporting it?')}</p>
         {#each REASONS as r (r.value)}
           <label class="report-reason" class:on={reason === r.value}>
             <input type="radio" name="report-reason" value={r.value} bind:group={reason} />
@@ -91,15 +93,17 @@
         {/each}
       </div>
       <label class="field-stack">
-        <span class="field-label">What's wrong?</span>
-        <textarea bind:value={description} placeholder="Say what you saw..." rows="3"></textarea>
+        <span class="field-label">{t("What's wrong?")}</span>
+        <textarea bind:value={description} placeholder={t('Say what you saw...')} rows="3"
+        ></textarea>
       </label>
     </div>
   {/if}
   {#snippet footer()}
     <div class="sheet-actions">
       {#if sent}
-        <button class="sheet-submit report-done" type="button" onclick={onClose}>Done</button>
+        <button class="sheet-submit report-done" type="button" onclick={onClose}>{t('Done')}</button
+        >
       {:else}
         <button
           class="sheet-submit"
@@ -107,7 +111,7 @@
           type="button"
           onclick={onSubmit}
         >
-          {pending ? 'Sending…' : 'Send report'}
+          {pending ? t('Sending…') : t('Send report')}
         </button>
       {/if}
     </div>

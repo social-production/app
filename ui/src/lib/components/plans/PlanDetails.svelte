@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import FactLine from '#lib/components/cards/FactLine.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
@@ -65,7 +66,8 @@
       rel="noopener noreferrer"
       onclick={showPlace}
     >
-      <FactLine icon="where"><strong>{place}<small>Show on the map</small></strong></FactLine>
+      <FactLine icon="where"><strong>{place}<small>{t('Show on the map')}</small></strong></FactLine
+      >
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M9.5 6.5 15 12l-5.5 5.5" /></svg>
     </a>
   {:else if place}
@@ -88,7 +90,7 @@
   {/if}
 
   <div class="plan-note">
-    <small>How it answers support</small>
+    <small>{t('How it answers support')}</small>
     {plan.demand_note}
   </div>
 
@@ -102,7 +104,7 @@
       {/each}
       {#if plan.repository_url}
         <div class="fact">
-          <dt>Repository</dt>
+          <dt>{t('Repository')}</dt>
           <dd>
             <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- external link -->
             <a href={external(plan.repository_url)} rel="noreferrer" target="_blank"

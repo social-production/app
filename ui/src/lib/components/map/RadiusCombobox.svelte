@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RadiusChips from './RadiusChips.svelte';
   import '#lib/components/styles/map.css';
@@ -55,19 +56,19 @@
 
 <OverlaySheet
   {open}
-  title="Distance"
+  title={t('Distance')}
   labelledById="radius-sheet-title"
   rootClass="shell feed-filter-sheet radius-sheet"
   onClose={() => (open = false)}
 >
   <div class="feed-filter-groups">
     <section>
-      <RadiusChips {value} {options} ariaLabel="Distance" {onChange} />
+      <RadiusChips {value} {options} ariaLabel={t('Distance')} {onChange} />
     </section>
   </div>
   {#snippet footer()}
     <div class="sheet-actions">
-      <button class="sheet-submit" type="button" onclick={() => (open = false)}>Done</button>
+      <button class="sheet-submit" type="button" onclick={() => (open = false)}>{t('Done')}</button>
     </div>
   {/snippet}
 </OverlaySheet>

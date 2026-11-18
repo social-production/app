@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
@@ -52,17 +53,17 @@
     preserveCoordsWhileEditing
     portaled
     modes={['physical']}
-    placeholder="Place"
+    placeholder={t('Place')}
   />
 {/snippet}
 
 {#if overlay}
   <MapFilterCapsule {s} {onPlace} {onLocate} {onRadius} {onFilters} {onUpcoming} {onList} />
 {:else}
-  <div class="filter-bar filter-bar-desktop" aria-label="Map filters">
+  <div class="filter-bar filter-bar-desktop" aria-label={t('Map filters')}>
     <div class="place-field place-field-desktop">{@render picker()}</div>
     <button
-      aria-label="Use my location"
+      aria-label={t('Use my location')}
       class="icon-button locate-desktop"
       type="button"
       onclick={onLocate}
@@ -72,14 +73,14 @@
     <RadiusCombobox
       value={s.radiusKm}
       onChange={onRadius}
-      ariaLabel="Snap map to radius"
+      ariaLabel={t('Snap map to radius')}
       options={radiusPresetOptions}
       portaled
       preferAbove
     />
     <button
-      aria-label="Upcoming only"
-      title="Upcoming only"
+      aria-label={t('Upcoming only')}
+      title={t('Upcoming only')}
       aria-pressed={s.upcomingOnly}
       class="icon-button filter-icon-button"
       class:active={s.upcomingOnly}
@@ -90,7 +91,7 @@
     </button>
     <IconMenuButton
       value={s.windowFilter}
-      ariaLabel="Map time window"
+      ariaLabel={t('Map time window')}
       defaultValue="today"
       options={windowOptions}
       onChange={(v) => {
@@ -105,7 +106,7 @@
         <button
           bind:this={dateButton}
           aria-expanded={customDateOpen}
-          aria-label="Custom date range"
+          aria-label={t('Custom date range')}
           class="icon-button filter-icon-button"
           class:active={customDateOpen}
           type="button"
@@ -120,7 +121,7 @@
     {/if}
     <IconMenuButton
       value={s.entityFilter}
-      ariaLabel="Map entity filter"
+      ariaLabel={t('Map entity filter')}
       defaultValue="all"
       options={filterOptions}
       onChange={(v) => {
@@ -131,8 +132,8 @@
       <ToolbarIcon name="filter" />
     </IconMenuButton>
     <button
-      aria-label="Open as list"
-      title="Open as list"
+      aria-label={t('Open as list')}
+      title={t('Open as list')}
       class="icon-button filter-icon-button"
       disabled={!s.hasCenter}
       type="button"

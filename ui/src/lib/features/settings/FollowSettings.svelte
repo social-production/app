@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import SettingSwitch from '#lib/components/settings/SettingSwitch.svelte';
   import type { FollowRow } from '#lib/domain/follows.ts';
   import { explain } from '#lib/services/errors.ts';
@@ -57,11 +58,11 @@
 
 {#if requests.length > 0}
   <section class="settings-section" id="settings-follow-requests">
-    <h2>Follow requests</h2>
+    <h2>{t('Follow requests')}</h2>
     <div class="card stack">
       {#each requests as request (request.agent)}
         <div class="follow-request-row">
-          <div><strong>@{names[request.agent] ?? 'Unnamed'}</strong></div>
+          <div><strong>@{names[request.agent] ?? t('Unnamed')}</strong></div>
           <div class="follow-request-actions">
             <button
               class="button-primary"
@@ -69,7 +70,7 @@
               type="button"
               onclick={() => run(request.agent, () => decideFollow(request.agent, true))}
             >
-              Accept
+              {t('Accept')}
             </button>
             <button
               class="button-ghost"
@@ -77,7 +78,7 @@
               type="button"
               onclick={() => run(request.agent, () => decideFollow(request.agent, false))}
             >
-              Decline
+              {t('Decline')}
             </button>
           </div>
         </div>
@@ -87,16 +88,16 @@
 {/if}
 
 <section class="settings-section" id="settings-privacy">
-  <h2>Privacy</h2>
+  <h2>{t('Privacy')}</h2>
   <p class="section-intro">
-    Your profile and follows are public to everyone on the network. Approval decides whose follow
-    counts; the hide switches decide what the app shows to whom. Everyone on the network can still
-    reach it; the app just doesn't show it.
+    {t(
+      "Your profile and follows are public to everyone on the network. Approval decides whose follow counts; the hide switches decide what the app shows to whom. Everyone on the network can still reach it; the app just doesn't show it.",
+    )}
   </p>
   <div class="card stack flush">
     <SettingSwitch
-      label="Require approval to follow you"
-      note="New followers must be approved before they see follower-only content."
+      label={t('Require approval to follow you')}
+      note={t('New followers must be approved before they see follower-only content.')}
       checked={approval}
       disabled={pending === 'approval'}
       onToggle={() => void run('approval', () => setFollowApproval(!approval))}

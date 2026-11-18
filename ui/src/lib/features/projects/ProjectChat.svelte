@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import ChatPanel from '#lib/components/chat/ChatPanel.svelte';
   import { ChatModeration } from '#lib/components/chat/chatModeration.svelte.ts';
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
@@ -140,7 +141,7 @@
     {lines}
     title={copy.title}
     placeholder={copy.placeholder}
-    submitLabel="Send"
+    submitLabel={t('Send')}
     emptyCopy={chat.loaded ? copy.empty : ''}
     {embedded}
     fitViewport={embedded}

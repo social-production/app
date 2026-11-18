@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   /** The distance as one-tap chips, for sheets with room for them (the Region filter sheet;
    * owner, 2026-11-17), and a "km" box under them for any other distance. */
   interface Props {
@@ -44,12 +45,12 @@
     (e.currentTarget.querySelector('input') as HTMLInputElement | null)?.blur();
   }}
 >
-  <span>Other distance</span>
+  <span>{t('Other distance')}</span>
   <input
     type="text"
     inputmode="numeric"
     enterkeyhint="done"
-    aria-label="Other distance in km"
+    aria-label={t('Other distance in km')}
     placeholder="—"
     value={shown}
     onfocus={() => {
@@ -59,5 +60,5 @@
     oninput={(e) => (draft = e.currentTarget.value)}
     onblur={commit}
   />
-  <span>km</span>
+  <span>{t('km')}</span>
 </form>

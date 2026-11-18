@@ -3,6 +3,7 @@
 </script>
 
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
 
   /**
@@ -63,7 +64,7 @@
         class="sheet-submit"
         type="button"
         disabled={working}
-        onclick={() => ask && onConfirm(ask)}>{working ? 'Working…' : copy.yes}</button
+        onclick={() => ask && onConfirm(ask)}>{working ? t('Working…') : copy.yes}</button
       >
     </div>
   {/snippet}

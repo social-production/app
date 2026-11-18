@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { tick } from 'svelte';
 
   import { portal } from '#lib/components/actions/portal.ts';
@@ -124,7 +125,9 @@
   <div id="participation-phase-change" class="phase-change-stack">
     {#if project.nextPhase && detail.canPropose && !gatePasses}
       <p class="phase-gate-note">
-        {signalGatePasses ? planGate : 'Advance unlocks after this project gets a Support signal.'}
+        {signalGatePasses
+          ? planGate
+          : t('Advance unlocks after this project gets a Support signal.')}
       </p>
     {/if}
     {#if detail.sheetMessage && !moving}

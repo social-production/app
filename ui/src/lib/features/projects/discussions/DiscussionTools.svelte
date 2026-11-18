@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import IconMenuButton from '#lib/components/IconMenuButton.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
@@ -55,7 +56,7 @@
     <span class="detail-tool">
       <ShareUserMenu
         copyLinkUrl={url}
-        menuTitle={kind === 'thread' ? 'Share thread' : 'Share post'}
+        menuTitle={kind === 'thread' ? t('Share thread') : t('Share post')}
         shareTitle={title}
         searchContacts={search}
         submitShare={send}
@@ -67,7 +68,7 @@
       <IconMenuButton
         showTriggerLabel
         value={sortMode}
-        ariaLabel="Sort comments"
+        ariaLabel={t('Sort comments')}
         defaultValue="oldest"
         options={sortOptions}
         onChange={(v) => (sortMode = v)}

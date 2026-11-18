@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { FeedbackVote } from '#lib/domain/feedback.ts';
 
   /** web's FeedbackVoteStrip: ▲ support · approval % · ▼ oppose; your vote again clears it. */
@@ -45,7 +46,7 @@
     >
       ▲
       {#if docked}
-        <span class="signal-label">Support</span>
+        <span class="signal-label">{t('Support')}</span>
         <span class="signal-count">{upvotes}</span>
       {/if}
     </button>
@@ -60,7 +61,7 @@
       onclick={(e) => vote('down', e)}
     >
       {#if docked}
-        <span class="signal-label">Oppose</span>
+        <span class="signal-label">{t('Oppose')}</span>
         <span class="signal-count">{downvotes}</span>
       {/if}
       ▼

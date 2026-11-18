@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import VoteChoiceBar from '#lib/components/governance/VoteChoiceBar.svelte';
   import {
     canVote,
@@ -36,42 +37,42 @@
   <b>{['Approval', 'Merge', 'Confirmation'][stageFilled(pr.stage) - 1]}</b>, then {stageFilled(
     pr.stage,
   ) === 1
-    ? 'a merge is recorded, then members confirm it'
+    ? t('a merge is recorded, then members confirm it')
     : stageFilled(pr.stage) === 2
-      ? 'members confirm it'
-      : 'it is done'}
+      ? t('members confirm it')
+      : t('it is done')}
 </p>
 {#if mode === 'vote-pr'}
   <h2>{pr.title}</h2>
   <p class="helper-copy">
     {#if pr.stage === 'confirmation'}
-      Confirm that the recorded merge actually happened and matches this pull request.
+      {t('Confirm that the recorded merge actually happened and matches this pull request.')}
     {:else}
-      Approve or reject this pull request before anyone records a merge.
+      {t('Approve or reject this pull request before anyone records a merge.')}
     {/if}
   </p>
 {:else}
   <h2>Record merge for {pr.title}</h2>
   <p class="helper-copy">
-    This pull request already passed approval. Enter the merge ID and a link others can open to
-    verify it. After you submit, members will still need to confirm that the merge was completed
-    correctly.
+    {t(
+      'This pull request already passed approval. Enter the merge ID and a link others can open to verify it. After you submit, members will still need to confirm that the merge was completed correctly.',
+    )}
   </p>
 {/if}
 
 <div class="review-card metadata-card">
   {#if pr.summary}
     <div class="meta-row">
-      <span class="meta-label">Summary</span>
+      <span class="meta-label">{t('Summary')}</span>
       <p class="meta-value summary-value">{pr.summary}</p>
     </div>
   {/if}
   <div class="meta-row">
-    <span class="meta-label">PR ID</span>
+    <span class="meta-label">{t('PR ID')}</span>
     <span class="meta-value">{pr.pullRequestId}</span>
   </div>
   <div class="meta-row">
-    <span class="meta-label">PR link</span>
+    <span class="meta-label">{t('PR link')}</span>
     <a
       class="meta-value meta-link"
       href={externalUrl(pr.pullRequestUrl)}
@@ -82,11 +83,11 @@
   {#if mode === 'vote-pr'}
     {#if pr.merge}
       <div class="meta-row">
-        <span class="meta-label">Merge ID</span>
+        <span class="meta-label">{t('Merge ID')}</span>
         <span class="meta-value">{pr.merge.mergeId}</span>
       </div>
       <div class="meta-row">
-        <span class="meta-label">Merge link</span>
+        <span class="meta-label">{t('Merge link')}</span>
         <a
           class="meta-value meta-link"
           href={externalUrl(pr.merge.mergeUrl)}
@@ -96,7 +97,7 @@
       </div>
     {/if}
     <div class="meta-row">
-      <span class="meta-label">Submitted by</span>
+      <span class="meta-label">{t('Submitted by')}</span>
       <span class="meta-value">{author}</span>
     </div>
   {/if}
