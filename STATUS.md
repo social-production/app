@@ -222,22 +222,37 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
+### Where things stand (12:10 pm Melbourne, 2026-11-18, UX session)
+- **Live:** #210 (rail test rewritten around an event activity; `withinWindow` no longer moves a
+  late default start into the past; `rail.mjs`/`governance.mjs` open Edit from the dock's ⋯),
+  #211 (Display timezone: `domain/zone.ts` `wall`/`fromWall`/`wallMicros`/`inZone`,
+  `stores/displayZone.svelte.ts`, `features/settings/TimezoneSetting.svelte`), #212 (ADR 0112
+  privacy switches: tagged `RequiresFollowApproval` self-links, `set_privacy`/`privacy_of`,
+  `domain/privacy.ts`, `services/privacy.ts`, `tests/e2e/privacy.mjs`; directory DNA hash
+  unchanged). Seed restarted ~11:56 am; live smoke signed out: feed, Feedback, Search, 0 errors.
+- **Open: #213 `claude/push-every-notice`:** push for follows, accepted requests, shares,
+  invites, role taken/suggested and phase votes (`services/pushNotices.ts`); Home-only "proposed
+  this" line (Global showed it). `follows.mjs` needs one full local pass before merging.
+- **Known:** `governance.mjs` passes the edit step but its plan step didn't finish locally while
+  the seed was overloaded; recheck. The cloud container restarted twice; restart the seed with
+  `bash scripts/cloud-seed.sh` and give it ~4 minutes before sign-ups work.
+
 ### Work left until modernisation and parity (updated 10:35 am Melbourne, 2026-11-18, UX session)
 The UX session now also owns the parity queue. In the order it builds them:
 
 **Modernisation (every screen has an approved mockup and is built; what remains is checking):**
-1. `tests/e2e/rail.mjs` rewritten around an event activity (it used the removed personal service).
+1. ~~`tests/e2e/rail.mjs` rewritten~~ (#210).
 2. Capture with real data, at 390px light and dark, the screens the Screen Review could not:
    Notifications with a full list, Settings > Devices and Account, a collective service's
    availability and booking sheets. Fix what looks old; a mockup first if it needs a redesign.
 3. Owner's call: Invites always reachable (a More row) or only when one waits (today).
 
 **Parity (before Railway's FastAPI site shuts down):**
-1. **Settings rows (PARITY.md item 2):** a display timezone (and web's timezone selects in service
-   bookings), separate Public and Personal feeds, Privacy's three "hide … from non-followers /
-   personal feeds" switches.
+1. ~~**Settings rows**~~: Display timezone (#211), privacy switches (#212); the feed split isn't
+   needed (Home / Global / Region already separate them).
 2. **Push for every notice kind (ADR 0108):** today only chat replies and @mentions call
-   `services/notices.ts` `notify()`. Still to wire at their write sites: phase votes and results,
+   `services/notices.ts` `notify()`; #213 adds follows, shares, invites, roles and phase votes.
+   Still to wire at their write sites: phase votes and results,
    follows and follow requests, invites and shares, roles and role suggestions, service
    requests, bot reviews, plan leading, removed projects, approved pull requests. Then the
    desktop's OS notifications (Tauri plugin) and one real Web Push on a phone (needs the owner).
