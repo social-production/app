@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts): labels from lookup tables, counts and times. */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part16: Record<string, Entry> = {
   Service: 'Услуга',

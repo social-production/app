@@ -1,0 +1,49 @@
+/* The language picker (ADR 0114): a row or link that opens the list of languages. */
+.language-row,
+.language-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.language-row {
+  width: 100%;
+  text-align: left;
+}
+
+/* In the More menu it sits with the other menu rows (menus.css .float-panel-item). */
+.language-row.float-panel-item {
+  gap: 14px;
+}
+
+.language-row.float-panel-item svg {
+  width: 22px;
+  height: 22px;
+}
+
+.language-row .language-current {
+  margin-left: auto;
+  color: var(--text-soft);
+}
+
+.language-link {
+  margin: 4px auto 0;
+  padding: 6px 10px;
+  color: var(--brand);
+  font-weight: 600;
+}
+
+.language-link .language-name {
+  display: none;
+}
+
+.language-link svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}

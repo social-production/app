@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part13: Record<string, Entry> = {
   'The app’s own words. What people write stays as they wrote it.':

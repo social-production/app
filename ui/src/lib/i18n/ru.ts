@@ -17,17 +17,10 @@ import { part16 } from './ru/part16.ts';
 
 /**
  * Russian (ADR 0114): English text → Russian, split into parts to keep files short. A plural
- * entry has one, few and many forms. Drafted by Claude; the owner reads it before it counts as
+ * entry has one, few and many forms (`languages.ts` `Forms`). Drafted by Claude; the owner reads it before it counts as
  * reviewed. Add new text to the last part.
  */
-export interface Forms {
-  one: string;
-  few: string;
-  many: string;
-  other?: string;
-}
-
-export type Entry = string | Forms;
+import type { Entry } from './languages.ts';
 
 export const ru: Record<string, Entry> = {
   ...part1,

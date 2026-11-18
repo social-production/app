@@ -28,9 +28,12 @@ What people write (posts, titles, chats) is never translated.
   {# участников}}`). No library: the whole thing is a few dozen lines and adds nothing to
   load. Dates, times and numbers go through `Intl` with the chosen locale (the Display
   timezone stays as it is).
-- **Choosing the language:** Settings › Appearance › Language (web's "coming soon" row
-  becomes real): English or Русский. The first time, the browser's language decides (`ru*` →
-  Russian). Kept per device, like the other appearance choices.
+- **Choosing the language:** a general picker (owner: "we will add more over time"): a row
+  with the current language opening a list of every language in its own words, in Settings ›
+  Appearance › Language and, for people not signed in, the More menu and the sign-in page
+  (`components/language/LanguagePicker.svelte`). **Adding a language:** a catalogue like
+  `i18n/ru.ts`, then one line in `i18n/languages.ts` (code, own name, locale); the picker,
+  the first-open guess, plural forms (Intl.PluralRules) and dates follow. The first time, the browser's or device's main (first) language decides. Kept per device, like the other appearance choices.
 - **Push and notices in the recipient's language:** a notice carries its `kind` and the
   values the card needs (names, titles), not finished text. The recipient's device words it
   (as the bell already does from the chains). For Web Push the seed words it: the push

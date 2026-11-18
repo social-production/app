@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part9: Record<string, Entry> = {
   'Paste invite link or invite code': 'Вставьте ссылку-приглашение или код',

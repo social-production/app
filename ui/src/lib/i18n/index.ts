@@ -1,24 +1,22 @@
-import { ru, type Forms } from './ru.ts';
+import { LANGUAGES, type LanguageInfo } from './languages.ts';
+
+export { LANGUAGES, type LanguageInfo } from './languages.ts';
 
 /**
  * The app's words in the reader's language (ADR 0114). The English text is the key:
- * `t('Home')` is "Home" in English and the catalogue's entry in Russian; anything missing
- * stays English. `{name}` slots are filled from `vars`. People's own words are never passed
- * through here.
+ * `t('Home')` is "Home" in English and the catalogue's entry in another language; anything
+ * missing stays English. `{name}` slots are filled from `vars`. People's own words are never
+ * passed through here.
  */
-export type Language = 'en' | 'ru';
-
-export const LANGUAGES: { value: Language; label: string }[] = [
-  { value: 'en', label: 'English' },
-  { value: 'ru', label: 'Русский' },
-];
+export type Language = string;
 
 const KEY = 'sp_language';
+const known = (code: string | null | undefined): LanguageInfo | undefined =>
+  LANGUAGES.find((l) => l.value === code);
 
-function stored(): Language | null {
+function stored(): string | null {
   try {
-    const v = localStorage.getItem(KEY);
-    return v === 'en' || v === 'ru' ? v : null;
+    return known(localStorage.getItem(KEY))?.value ?? null;
   } catch {
     return null;
   }
@@ -28,20 +26,22 @@ function stored(): Language | null {
  * The first time, the browser's (or the device's) main language decides (owner, 2026-11-18):
  * only the first one, so a phone set to English that also lists Russian stays English.
  */
-function detect(): Language {
+function detect(): string {
   const s = stored();
   if (s) return s;
   const main =
     typeof navigator === 'undefined' ? '' : (navigator.languages?.[0] ?? navigator.language);
-  return main?.toLowerCase().startsWith('ru') ? 'ru' : 'en';
+  return known(main?.toLowerCase().split('-')[0])?.value ?? 'en';
 }
 
 export const language: Language = detect();
+const current: LanguageInfo = known(language) ?? (LANGUAGES[0] as LanguageInfo);
 
 if (typeof document !== 'undefined') document.documentElement.lang = language;
 
 /** Switch language: kept on this device, and the app reloads in it. */
 export function setLanguage(next: Language): void {
+  if (next === language || !known(next)) return;
   try {
     localStorage.setItem(KEY, next);
   } catch {
@@ -51,24 +51,21 @@ export function setLanguage(next: Language): void {
 }
 
 /** The locale for dates and numbers. */
-export const locale = (): string => (language === 'ru' ? 'ru-RU' : 'en-AU');
+export const locale = (): string => current.locale;
 
 const fill = (text: string, vars?: Record<string, string | number>): string =>
   vars ? text.replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m)) : text;
 
 export function t(text: string, vars?: Record<string, string | number>): string {
-  if (language === 'ru') {
-    const hit = ru[text];
-    if (typeof hit === 'string') return fill(hit, vars);
-  }
-  return fill(text, vars);
+  const hit = current.catalogue?.[text];
+  return fill(typeof hit === 'string' ? hit : text, vars);
 }
 
-const rules = new Intl.PluralRules('ru-RU');
+const rules = new Intl.PluralRules(current.locale);
 
 /**
- * A count and its noun: `plural(n, '{n} member', '{n} members')`. Russian keys on the
- * English plural and has one, few and many forms.
+ * A count and its noun: `plural(n, '{n} member', '{n} members')`. Other languages key on the
+ * English plural, with a form for each of their plural categories (Russian: one, few, many).
  */
 export function plural(
   n: number,
@@ -76,13 +73,11 @@ export function plural(
   other: string,
   vars?: Record<string, string | number>,
 ): string {
-  const all = { n: n.toLocaleString(locale()), ...vars };
-  if (language === 'ru') {
-    const hit = ru[other];
-    if (hit && typeof hit === 'object') {
-      const form = rules.select(n) as keyof Forms;
-      return fill(hit[form] ?? hit.many, all);
-    }
+  const all = { n: n.toLocaleString(current.locale), ...vars };
+  const hit = current.catalogue?.[other];
+  if (hit && typeof hit === 'object') {
+    const form = hit[rules.select(n)] ?? hit.other ?? hit.many;
+    if (form) return fill(form, all);
   }
   return fill(n === 1 ? one : other, all);
 }

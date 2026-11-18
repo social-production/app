@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { language, LANGUAGES, setLanguage, t } from '#lib/i18n/index.ts';
+  import { t } from '#lib/i18n/index.ts';
   import { devicePasskeysAvailable, signInWithPasskey } from '#lib/services/account.ts';
   import { explain } from '#lib/services/errors.ts';
 
@@ -7,6 +7,7 @@
   import brandIcon from '#lib/assets/brand/app-icon-no-background-full-white.png';
 
   import BackButton from '#lib/components/BackButton.svelte';
+  import LanguagePicker from '#lib/components/language/LanguagePicker.svelte';
 
   import PhraseSignIn from './PhraseSignIn.svelte';
   import SignupFlow from './SignupFlow.svelte';
@@ -93,34 +94,6 @@
       {t('Just looking?')} <a href={resolve('/')}>{t('Keep browsing without an account')}</a>
     </p>
     <!-- ADR 0114: the language can be changed before signing in. -->
-    <div class="keep-browsing ob-language" role="radiogroup" aria-label={t('Language')}>
-      {#each LANGUAGES as option, index (option.value)}
-        {#if index > 0}<span aria-hidden="true"> · </span>{/if}
-        <button
-          type="button"
-          role="radio"
-          lang={option.value}
-          aria-checked={language === option.value}
-          class:on={language === option.value}
-          onclick={() => option.value !== language && setLanguage(option.value)}
-          >{option.label}</button
-        >
-      {/each}
-    </div>
+    <LanguagePicker variant="link" />
   </section>
 </div>
-
-<style>
-  .ob-language button {
-    border: 0;
-    background: none;
-    padding: 4px 2px;
-    font: inherit;
-    color: var(--brand);
-    cursor: pointer;
-  }
-  .ob-language button.on {
-    color: var(--text-main);
-    font-weight: 600;
-  }
-</style>

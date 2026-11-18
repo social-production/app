@@ -1,5 +1,5 @@
 /** Russian, part of the catalogue (ADR 0114; see ../ru.ts). */
-import type { Entry } from '../ru.ts';
+import type { Entry } from '../languages.ts';
 
 export const part11: Record<string, Entry> = {
   'Same flow as public events: signals → values → plans → activity, just inside this private audience. Members can propose, vote, and sign up for roles.':
