@@ -25,7 +25,19 @@
     return window.innerWidth - width('--left-width') - width('--right-width');
   }
 
+  /** Too many actions for the width (a narrow phone, a long word in another language): the
+   * labelled ones drop their words, keeping their icons, so nothing is cut off (owner,
+   * 2026-11-19: "make sure buttons arent cut off"). */
+  function fit(dock: HTMLDivElement): void {
+    const capsule = dock.querySelector<HTMLElement>('.dock-capsule');
+    if (!capsule) return;
+    capsule.classList.remove('tight');
+    // A couple of pixels is rounding (the capsule's own border), not a hidden button.
+    if (capsule.scrollWidth > capsule.clientWidth + 3) capsule.classList.add('tight');
+  }
+
   function sync(dock: HTMLDivElement): void {
+    fit(dock);
     const floating = window.matchMedia('(min-width: 1081px)').matches && columnSpan() > 720;
     dock.classList.toggle('is-pad', floating);
     if (!active) return;
@@ -47,10 +59,14 @@
     sync(dock);
     const observer = new ResizeObserver(() => sync(dock));
     observer.observe(dock);
+    // Actions come and go (joining, a vote opening): fit again when the capsule's content does.
+    const changes = new MutationObserver(() => fit(dock));
+    changes.observe(dock, { childList: true, subtree: true, characterData: true });
     const onResize = (): void => sync(dock);
     window.addEventListener('resize', onResize);
     return () => {
       observer.disconnect();
+      changes.disconnect();
       window.removeEventListener('resize', onResize);
       if (marker.isConnected) marker.replaceWith(dock);
       else dock.remove();
