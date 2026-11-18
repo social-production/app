@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   railItems,
   type RailItem,
@@ -150,7 +151,7 @@ async function railProject(seed: string): Promise<RailProject | null> {
     mode: project.charter.mode,
     amMember: project.am_member,
     phase: project.phase,
-    phaseLabel: (id) => labels.get(id) ?? id,
+    phaseLabel: (id) => t(labels.get(id) ?? id),
     activities,
     proposals,
     plans: board?.plans ?? [],

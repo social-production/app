@@ -136,4 +136,16 @@ export const part18: Record<string, Entry> = {
   'No timezone matches “{query}”.': 'Нет часового пояса, подходящего под «{query}».',
   'No groups with {name} yet.': 'Пока нет общих групп с {name}.',
   'You voted {choice}.': 'Ваш голос: {choice}.',
+  'No moderators yet': 'Модераторов пока нет',
+  'Volunteer and you’re seated straight away.': 'Вызовитесь — и сразу займёте место.',
+  'Full members can volunteer. The first ones are seated straight away.':
+    'Вызваться могут полноправные участники. Первые сразу занимают места.',
+  'Volunteer, and a seat needs votes from {n} people and 66% yes.':
+    'Вызовитесь: для места нужны голоса {n} чел. и 66% «за».',
+  'Full members can volunteer. A seat needs votes from {n} people and 66% yes.':
+    'Вызваться могут полноправные участники. Для места нужны голоса {n} чел. и 66% «за».',
+  candidate: 'кандидат',
+  candidates: 'кандидатов',
+  seated: 'на местах',
+  '{n} votes': { one: '{n} голос', few: '{n} голоса', many: '{n} голосов' },
 };

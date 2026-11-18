@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { plural, t } from '#lib/i18n/index.ts';
+  import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { boardOrder, type Board, type BoardMember } from '#lib/domain/board.ts';
@@ -66,6 +67,19 @@
   const seated = $derived(boardOrder(board?.moderators ?? [], me, name));
   const candidates = $derived(boardOrder(board?.candidates ?? [], me, name));
   const viewerState = $derived(board?.viewerState ?? null);
+  const empty = $derived(seated.length === 0 && candidates.length === 0);
+  // An empty board says it once, like an empty feed: what's missing and how a seat is won.
+  const emptyText = $derived(
+    quorum === 0
+      ? canVolunteer
+        ? t('Volunteer and you’re seated straight away.')
+        : t('Full members can volunteer. The first ones are seated straight away.')
+      : canVolunteer
+        ? t('Volunteer, and a seat needs votes from {n} people and 66% yes.', { n: quorum })
+        : t('Full members can volunteer. A seat needs votes from {n} people and 66% yes.', {
+            n: quorum,
+          }),
+  );
 
   const failed = (e: unknown, fallback: string) =>
     e instanceof Error && e.message ? e.message : fallback;
@@ -126,7 +140,9 @@
     >
   {/snippet}
   <div class="board-body">
-    {#if board}
+    {#if board && empty}
+      <EmptyState icon="shield" title={t('No moderators yet')} text={emptyText} />
+    {:else if board}
       {#if quorum === 0}
         <p class="board-summary board-note">
           {t(
@@ -138,14 +154,11 @@
           <span><b>{board.moderators.length}</b>{t('seated')}</span>
           <span
             ><b>{board.candidates.length}</b>{board.candidates.length === 1
-              ? 'candidate'
-              : 'candidates'}</span
+              ? t('candidate')
+              : t('candidates')}</span
           >
-          <span><b>{quorum} votes</b>{t('and 66% yes for a seat')}</span>
+          <span><b>{plural(quorum, '{n} vote', '{n} votes')}</b>{t('and 66% yes for a seat')}</span>
         </p>
-      {/if}
-      {#if seated.length === 0 && candidates.length === 0}
-        <p class="board-empty">{t('Nobody has volunteered yet.')}</p>
       {/if}
       {@render section('Seated', seated)}
       {@render section('Candidates', candidates)}
@@ -159,27 +172,28 @@
     {:else}
       <SkeletonRows count={3} kind="row" />
     {/if}
+    {#if board && !empty && !canVolunteer && !viewerState}
+      <p class="board-empty">{t('Full members can volunteer.')}</p>
+    {/if}
     {#if notice}<p class="board-notice" role="status">{notice}</p>{/if}
     {#if problem}<p class="board-problem" role="alert">{problem}</p>{/if}
   </div>
   {#snippet footer()}
-    <div class="sheet-actions board-actions">
-      {#if viewerState === 'member'}
-        <button class="sheet-cancel" type="button" onclick={() => (ask = 'step-down')}
-          >{t('Step down')}</button
-        >
-      {:else if viewerState === 'candidate'}
-        <button class="sheet-cancel" type="button" onclick={() => (ask = 'withdraw')}
-          >{t('Withdraw')}</button
-        >
-      {:else if canVolunteer}
-        <button class="sheet-submit" type="button" onclick={() => (ask = 'volunteer')}
-          >{t('Volunteer as moderator')}</button
-        >
-      {:else}
-        <p class="board-hint">{t('Full members can volunteer.')}</p>
-      {/if}
-    </div>
+    {#if viewerState || canVolunteer}<div class="sheet-actions board-actions">
+        {#if viewerState === 'member'}
+          <button class="sheet-cancel" type="button" onclick={() => (ask = 'step-down')}
+            >{t('Step down')}</button
+          >
+        {:else if viewerState === 'candidate'}
+          <button class="sheet-cancel" type="button" onclick={() => (ask = 'withdraw')}
+            >{t('Withdraw')}</button
+          >
+        {:else if canVolunteer}
+          <button class="sheet-submit" type="button" onclick={() => (ask = 'volunteer')}
+            >{t('Volunteer as moderator')}</button
+          >
+        {/if}
+      </div>{/if}
   {/snippet}
 </OverlaySheet>
 

@@ -36,6 +36,7 @@
 <nav
   aria-label={t('Primary mobile')}
   class="mobile-bottom-nav"
+  class:guest={!!signUpHref}
   class:chrome-collapsed={collapsed}
   aria-hidden={collapsed}
 >
@@ -169,6 +170,30 @@
     text-decoration: none;
   }
 
+  /* Signed out there are only three buttons (owner, 2026-11-19: "unsigned in, the feed dock is
+     still huge"): a compact capsule in the middle, not one spanning the screen. */
+  .mobile-bottom-nav.guest {
+    left: 0;
+    right: 0;
+    width: fit-content;
+    margin: 0 auto;
+  }
+
+  .mobile-bottom-nav.guest .bottom-nav-item {
+    flex: 0 0 56px;
+  }
+
+  .mobile-bottom-nav.guest .bottom-nav-item.active-link {
+    flex: 0 0 auto;
+    padding: 0 16px;
+  }
+
+  .mobile-bottom-nav.guest .bottom-nav-signup {
+    flex: none;
+    padding: 0 24px;
+    font-size: 14.5px;
+  }
+
   .bottom-nav-signup:active,
   .bottom-nav-item:active {
     filter: brightness(0.94);
@@ -187,8 +212,8 @@
   }
 
   .bottom-nav-icon :global(.toolbar-icon) {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .bottom-nav-item.active-link {
