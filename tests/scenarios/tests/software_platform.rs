@@ -79,13 +79,21 @@ async fn propose(net: &Net, i: usize, kind: Kind) -> ActionHash {
     id
 }
 
+/// Everyone votes Yes. A proposer's phase vote is already cast, and two of three Yes votes
+/// can close a vote before the third, so refusals are skipped; the stages checked after show
+/// each vote passed.
 async fn all_vote_yes(net: &Net, proposal: &ActionHash) {
     for i in 0..MEMBERS {
         let input = VoteInput {
             proposal: proposal.clone(),
             choice: "Yes",
         };
-        let _: ActionHash = net.call(i, "governance", "vote", input).await;
+        let voted = net
+            .try_call::<_, ActionHash>(i, "governance", "vote", input)
+            .await;
+        if let Err(e) = voted {
+            eprintln!("agent {i}'s vote skipped: {e}");
+        }
         net.settle().await;
     }
 }
