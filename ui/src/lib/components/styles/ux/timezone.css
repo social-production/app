@@ -1,0 +1,67 @@
+/* Settings > Display timezone: a filter box and one row per zone with its offset. */
+.overlay-root.timezone-sheet .timezone-search {
+  width: 100%;
+  height: 42px;
+  margin: 8px 0 6px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+}
+
+.overlay-root.timezone-sheet .timezone-list {
+  display: grid;
+  gap: 2px;
+  max-height: min(52vh, 420px);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.overlay-root.timezone-sheet .timezone-row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+  text-align: left;
+}
+
+.overlay-root.timezone-sheet .timezone-row:hover {
+  background: var(--panel-hover);
+}
+
+.overlay-root.timezone-sheet .timezone-row.chosen {
+  background: var(--brand-soft);
+  font-weight: 600;
+}
+
+.overlay-root.timezone-sheet .timezone-row span {
+  display: grid;
+  min-width: 0;
+}
+
+.overlay-root.timezone-sheet .timezone-row small {
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.overlay-root.timezone-sheet .timezone-row em {
+  flex: none;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-style: normal;
+}

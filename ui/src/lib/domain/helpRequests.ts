@@ -1,5 +1,6 @@
 /** Help requests (ADR 0067): commons spaces with mode `help-request` and one activity. */
 
+import { displayZone, fromWall, wall } from './zone.ts';
 import { zoneOf } from './activityTime.ts';
 
 export const HELP_MODE = 'help-request';
@@ -29,23 +30,26 @@ export function signupSummary(signups: number | null, needed: number | null): st
   return signups ? `${signups} signed up` : '';
 }
 
-/** `datetime-local` value for a date, in the browser's zone (web's `toLocalDateTimeInput`). */
-export function toLocalInput(date: Date): string {
+/** A wall-clock Date (built from a typed value) as a `datetime-local` value. */
+function wallInput(date: Date): string {
   const pad = (n: number) => String(n).padStart(2, '0');
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
+/** `datetime-local` value for an instant, in the Display timezone (web's `toLocalDateTimeInput`). */
+export const toLocalInput = (instant: Date): string => wallInput(wall(instant.getTime()));
+
 /** web's defaultNeededAt (`null`: now, on the hour) and defaultEndsAt: `hours` later. */
 export function hoursAfter(value: string | null, hours: number): string {
-  const at = value === null ? new Date() : new Date(value);
+  const at = value === null ? wall(Date.now()) : new Date(value);
   if (Number.isNaN(at.getTime())) return '';
   if (value === null) at.setMinutes(0, 0, 0);
   at.setHours(at.getHours() + hours);
-  return toLocalInput(at);
+  return wallInput(at);
 }
 
 /** A `datetime-local` value as Holochain microseconds. */
-export const inputMicros = (value: string): number => new Date(value).getTime() * 1000;
+export const inputMicros = (value: string): number => fromWall(new Date(value)).getTime() * 1000;
 
 export const endsAfter = (start: string, end: string): boolean =>
   new Date(end).getTime() > new Date(start).getTime();
@@ -85,6 +89,7 @@ export function localDateTime(micros: number | null): string {
     year: 'numeric',
     hour: 'numeric',
     minute: '2-digit',
+    timeZone: displayZone(),
   });
   return `${formatted} ${zoneOf(date)}`.trim();
 }

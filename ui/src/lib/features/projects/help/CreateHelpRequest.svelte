@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { displayZone } from '#lib/domain/zone.ts';
   import CreatePreview from '#lib/components/create/CreatePreview.svelte';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
@@ -20,7 +21,7 @@
    * (ADR 0067). Scope is the app's tags until channels and communities exist (M5d).
    */
   const s = new HelpCreateState();
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const zone = displayZone();
 
   async function publish(): Promise<void> {
     const id = await s.submit();

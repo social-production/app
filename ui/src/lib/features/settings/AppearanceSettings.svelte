@@ -11,8 +11,10 @@
   } from '#lib/stores/appearance.svelte.ts';
   import { backButtons, setBackButtons } from '#lib/stores/backButtons.svelte.ts';
 
+  import TimezoneSetting from './TimezoneSetting.svelte';
+
   /** web's Appearance section: type size, theme, accent colour and font, kept on this device.
-   * web's language (coming soon), feed split and timezone rows wait for those features. */
+   * and the Display timezone. web's language (coming soon) and feed split rows wait. */
   const ACCENT_SWATCHES: Record<string, string> = {
     green: '#2f8a57',
     blue: '#2563eb',
@@ -80,5 +82,6 @@
       checked={backButtons.shown}
       onToggle={() => setBackButtons(!backButtons.shown)}
     />
+    <TimezoneSetting />
   </div>
 </section>

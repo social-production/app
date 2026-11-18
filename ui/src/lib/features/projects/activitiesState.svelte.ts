@@ -1,3 +1,4 @@
+import { wallMicros } from '#lib/domain/zone.ts';
 import type { Activity } from '#lib/domain/activities.ts';
 import { defaultTimes } from '#lib/domain/activityCalendar.ts';
 import { withinWindow } from '#lib/domain/eventSchedule.ts';
@@ -145,8 +146,8 @@ export class ActivitiesState {
     try {
       await createActivity(this.projectId, {
         title: f.title.trim(),
-        startsAt: Date.parse(f.scheduledAt) * 1000,
-        endsAt: Date.parse(f.endsAt) * 1000,
+        startsAt: wallMicros(f.scheduledAt),
+        endsAt: wallMicros(f.endsAt),
         online: f.online,
         place,
         location: placeRecord(f.online ? onlinePlaceValue(place) : f.location, place),

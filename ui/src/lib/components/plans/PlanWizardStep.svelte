@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { displayZone } from '#lib/domain/zone.ts';
   import {
     SOFTWARE_LICENSE_BODY,
     SOFTWARE_LICENSE_LABEL,
@@ -50,7 +51,7 @@
   }: Props = $props();
 
   const total = $derived(demand + opposition);
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const zone = displayZone();
 </script>
 
 {#if step.id === 'plan-overview'}

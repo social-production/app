@@ -1,8 +1,10 @@
 /**
  * Event plan schedules (ADR 0057), as web's `eventSchedule.ts` and web-backend
  * `utils/plan_schedule.py` keep them: typed in local time, stored as UTC dates and times,
- * shown in each reader's local time (the app has no display time zone setting yet, PARITY).
+ * shown in each reader's Display timezone (`zone.ts`).
  */
+
+import { fromWall, inZone, wall } from './zone.ts';
 
 /** project_integrity::EventSchedule. */
 export interface EventSchedule {
@@ -39,8 +41,8 @@ const utcTime = (d: Date): string => `${pad(d.getUTCHours())}:${pad(d.getUTCMinu
 const localDay = (d: Date): string =>
   `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 
-/** A local date and time as a Date (`new Date('YYYY-MM-DDTHH:MM')` is local time). */
-const local = (day: string, time: string): Date => new Date(`${day}T${time}`);
+/** A typed date and time, read in the Display timezone, as its instant. */
+const local = (day: string, time: string): Date => fromWall(new Date(`${day}T${time}`));
 
 /** web's `schedule_to_utc`: the form's local dates and times as UTC. */
 export function scheduleFromForm(f: ScheduleForm): EventSchedule {
@@ -89,9 +91,10 @@ export function scheduleDays(s: EventSchedule): string[] {
   const bounds = scheduleBounds(s);
   if (!bounds) return [];
   const days: string[] = [];
-  const cursor = new Date(bounds.start);
+  const cursor = wall(bounds.start);
   cursor.setHours(0, 0, 0, 0);
-  while (cursor.getTime() <= bounds.end && days.length < 400) {
+  const last = wall(bounds.end).getTime();
+  while (cursor.getTime() <= last && days.length < 400) {
     days.push(localDay(cursor));
     cursor.setDate(cursor.getDate() + 1);
   }
@@ -112,7 +115,7 @@ export function planOpen(s: EventSchedule, now = Date.now()): boolean {
 export function dayWindow(s: EventSchedule, iso: string): { min: string; max: string } | null {
   const bounds = scheduleBounds(s);
   if (!bounds || !iso) return null;
-  const [start, end] = [new Date(bounds.start), new Date(bounds.end)];
+  const [start, end] = [wall(bounds.start), wall(bounds.end)];
   if (iso < localDay(start) || iso > localDay(end)) return null;
   return {
     min: iso === localDay(start) ? localStamp(start) : `${iso}T00:00`,
@@ -152,11 +155,12 @@ export function scheduleLine(s: EventSchedule, zone: (d: Date) => string): strin
   const end = new Date(bounds.end);
   const suffix = (d: Date): string => (zone(d) ? ` ${zone(d)}` : '');
   const full = (d: Date): string =>
-    `${d.toLocaleString(undefined, { ...dateOptions, ...timeOptions })}${suffix(d)}`;
-  if (localDay(start) !== localDay(end)) return `${full(start)} – ${full(end)}`;
-  const day = start.toLocaleDateString(undefined, dateOptions);
-  const from = start.toLocaleTimeString(undefined, timeOptions);
-  const to = end.toLocaleTimeString(undefined, timeOptions);
+    `${d.toLocaleString(undefined, inZone({ ...dateOptions, ...timeOptions }))}${suffix(d)}`;
+  if (localDay(wall(bounds.start)) !== localDay(wall(bounds.end)))
+    return `${full(start)} – ${full(end)}`;
+  const day = start.toLocaleDateString(undefined, inZone(dateOptions));
+  const from = start.toLocaleTimeString(undefined, inZone(timeOptions));
+  const to = end.toLocaleTimeString(undefined, inZone(timeOptions));
   return `${day}, ${from} – ${to}${suffix(end)}`;
 }
 

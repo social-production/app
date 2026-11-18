@@ -15,6 +15,7 @@
   import { getPerson } from '#lib/services/people.ts';
   import { applyAppearance, appearance, setAppearance } from '#lib/stores/appearance.svelte.ts';
   import { applyBackButtons } from '#lib/stores/backButtons.svelte.ts';
+  import '#lib/stores/displayZone.svelte.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
   import { settleBootSplash } from './bootSplash.ts';

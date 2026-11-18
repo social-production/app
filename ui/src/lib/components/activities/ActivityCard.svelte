@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { inZone } from '#lib/domain/zone.ts';
   import type { Snippet } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -61,7 +62,10 @@
   const zone = $derived(zoneOf(new Date(a.startsAt / 1000)));
   const until = $derived(multiDayEnd(a.startsAt, a.endsAt));
   const shortDay = $derived(
-    new Date(a.startsAt / 1000).toLocaleDateString(undefined, { day: 'numeric', month: 'short' }),
+    new Date(a.startsAt / 1000).toLocaleDateString(
+      undefined,
+      inZone({ day: 'numeric', month: 'short' }),
+    ),
   );
   const mapHref = $derived(
     `https://www.openstreetmap.org/search?query=${encodeURIComponent(a.place)}`,

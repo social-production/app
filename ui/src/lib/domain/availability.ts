@@ -1,3 +1,4 @@
+import { wallMicros } from './zone.ts';
 import type { Activity } from './activities.ts';
 
 /**
@@ -180,7 +181,7 @@ export const fitsOpenSlot = (slots: Slot[], startsAt: number, endsAt: number): b
 
 /** The first open slot on the local day `iso` (web's `firstAvailabilityForDay`). */
 export function firstSlotOn(slots: Slot[], iso: string): Slot | undefined {
-  const dayStart = new Date(`${iso}T00:00:00`).getTime() * 1000;
-  const dayEnd = new Date(`${iso}T23:59:59`).getTime() * 1000;
+  const dayStart = wallMicros(`${iso}T00:00:00`);
+  const dayEnd = wallMicros(`${iso}T23:59:59`);
   return slots.find((s) => !s.held && s.startsAt <= dayEnd && s.endsAt >= dayStart);
 }

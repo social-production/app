@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { displayZone } from '#lib/domain/zone.ts';
   import RequiredLabel from './RequiredLabel.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import type { PlanForm } from '#lib/domain/planForm.ts';
@@ -14,7 +15,7 @@
 
   let { plan = $bindable(), problems }: Props = $props();
 
-  const zone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const zone = displayZone();
 
   function addStage(): void {
     plan.stages = [...plan.stages, { title: '', details: '', startDate: '', endDate: '' }];
