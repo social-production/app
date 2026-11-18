@@ -184,8 +184,8 @@ const guest = await device({ viewport: phone });
 await until(guest, `${BASE}/feedback`, () => guest.getByText(`Dark tiles ${stamp}`).isVisible(), 'guest feedback');
 await guest.screenshot({ path: `${out}/phone390-feedback-guest.png` });
 await guest.getByRole('button', { name: 'Add feedback' }).click();
-await guest.getByText('Sign in to share feedback.').waitFor();
-log('guests read feedback; adding asks them to sign in');
+await guest.waitForURL('**/onboarding');
+log('guests read feedback; adding takes them to sign up');
 
 assert.deepEqual(errors, [], 'no page errors');
 log('all follows and feedback checks passed');
