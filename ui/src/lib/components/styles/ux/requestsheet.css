@@ -1,0 +1,26 @@
+/* Request service and availability sheets: fields sit straight on the sheet, as soft
+   borderless fields like the other modern sheets, not inside a bordered card. */
+.service-ui .composer-card {
+  padding: 4px 0 0;
+  border: none;
+  background: none;
+}
+
+.service-ui .composer-card .request-header-row p {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.service-ui .composer-card input:not([type='checkbox'], [type='radio']),
+.service-ui .composer-card textarea,
+.service-ui .composer-card select {
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+.service-ui .composer-card .add-time {
+  justify-self: start;
+}
