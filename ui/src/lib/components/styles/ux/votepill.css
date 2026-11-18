@@ -1,0 +1,69 @@
+/* ↑ | count | ↓ (owner, 2026-11-19, after the dock's Support | % | Oppose: "same for others
+   with just like and like count"): on feed cards, threads, posts and comments the vote is one
+   small outlined pill of three joined segments, the count between two hairlines. The dock's
+   own capsule keeps its look (dockjoin.css). Loaded after itemplain.css. */
+.shell :is(.feed-actions, .item-actions, .comment-card .actions-row) .feed-vote.feed-vote {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 0;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: transparent;
+}
+
+.shell :is(.feed-actions, .item-actions, .comment-card .actions-row) .feed-vote.feed-vote button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  min-width: 32px;
+  height: 100%;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell
+  :is(.feed-actions, .item-actions, .comment-card .actions-row)
+  .feed-vote.feed-vote
+  :is(.signal-percent, .vote-count) {
+  display: grid;
+  place-items: center;
+  min-width: 30px;
+  padding: 0 8px;
+  box-shadow:
+    inset 1px 0 0 var(--panel-border),
+    inset -1px 0 0 var(--panel-border);
+  font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell
+  :is(.feed-actions, .item-actions, .comment-card .actions-row)
+  .feed-vote.feed-vote
+  .active-up,
+.shell
+  :is(.feed-actions, .item-actions, .comment-card .actions-row)
+  .feed-vote.feed-vote
+  .active-support {
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.shell
+  :is(.feed-actions, .item-actions, .comment-card .actions-row)
+  .feed-vote.feed-vote
+  .active-down,
+.shell
+  :is(.feed-actions, .item-actions, .comment-card .actions-row)
+  .feed-vote.feed-vote
+  .active-oppose {
+  background: color-mix(in srgb, var(--danger) 14%, transparent);
+  color: var(--danger);
+}
