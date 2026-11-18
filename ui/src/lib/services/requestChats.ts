@@ -33,9 +33,10 @@ export function openPlannersChat(r: ServiceRequest): Promise<string> {
 async function openOnce(r: ServiceRequest): Promise<string> {
   const me = await myAgent();
   const seed = plannersSeed(me, r.id);
-  // Reading a chat nobody started answers with no members rather than failing.
+  // Reading a chat nobody started doesn't fail: it answers with its creator (from the seed)
+  // and no title. A started planners' chat always has its title.
   const there = await chatSummary(seed, 0).then(
-    (c) => c.members.length > 0,
+    (c) => !!c.title,
     () => false,
   );
   if (!there) await startChat('group', [r.requester], r.title.slice(0, 60), opening(r), seed);
@@ -48,7 +49,7 @@ export async function syncPlannersChat(r: ServiceRequest, a: Activity): Promise<
   if (a.author !== me) return;
   const seed = plannersSeed(me, r.id);
   const summary = await chatSummary(seed, 0).catch(() => null);
-  if (!summary?.members.length) {
+  if (!summary?.title) {
     // Just opened: its roles are synced on the next load, once the chat reads back.
     await openPlannersChat(r);
     return;
