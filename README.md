@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Smaller docks, Russian sentences, demo moderators (PRs #233–#235, 2026-11-19 morning
+  Melbourne):** docks and the bottom bar are a size smaller (signed out, a compact capsule);
+  the map's capsule is joined like every dock; notifications and history read fully in
+  Russian; the Moderators board has three demo moderators seated.
 - **One look for votes and docks (PRs #228–#231, 2026-11-19 Melbourne):** every dock, the
   bottom bar included, is joined segments that never cut a button off; every vote sheet (phase,
   edit, update, plan, pull request, merge, merge rights) reads the same: kind, what's decided,
