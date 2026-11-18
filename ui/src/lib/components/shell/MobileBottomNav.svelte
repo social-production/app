@@ -187,8 +187,8 @@
   }
 
   .bottom-nav-icon :global(.toolbar-icon) {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
   }
 
   .bottom-nav-item.active-link {

@@ -166,3 +166,44 @@
     animation: none;
   }
 }
+
+/* Joined like every dock (owner, 2026-11-19: "the map panel dock style hasn't been updated"):
+   Place · distance, Filters and the list are segments of one capsule, flat where they meet
+   with a hairline; only the capsule's ends are round. */
+.shell .map-panel .map-filter-top .map-filter-capsule.map-filter-capsule {
+  gap: 0;
+  min-height: 46px;
+  padding: 0;
+  overflow: hidden;
+}
+
+.shell
+  .map-panel
+  .map-filter-capsule.map-filter-capsule
+  > :is(.capsule-place, .capsule-chip, .capsule-icon) {
+  height: 46px;
+  border-radius: 0;
+}
+
+.shell .map-panel .map-filter-capsule.map-filter-capsule > .capsule-place {
+  padding: 0 14px 0 16px;
+}
+
+.shell .map-panel .map-filter-capsule.map-filter-capsule > :is(.capsule-chip, .capsule-icon) {
+  background: transparent;
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
+
+.shell .map-panel .map-filter-capsule.map-filter-capsule > .capsule-chip {
+  padding: 0 14px;
+}
+
+.shell .map-panel .map-filter-capsule.map-filter-capsule > .capsule-icon {
+  width: 50px;
+  padding-right: 4px;
+}
+
+.shell .map-panel .map-filter-capsule.map-filter-capsule > .capsule-chip.narrowed::after {
+  top: 9px;
+  right: 7px;
+}
