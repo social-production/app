@@ -10,7 +10,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync } from 'node:fs';
 
 import { BASE, browser, device, errors, log, rail, railButton, railShows, railTab, railTabs, signUp, continueSteps } from './lib.mjs';
-import { advanceTo, approvePlan, createEvent, daysFromNow, filePlan, signInFounders } from './event-flow.mjs';
+import { advanceTo, approvePlan, createEvent, daysFromNow, filePlan, signInFounders, until } from './event-flow.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -72,29 +72,37 @@ await ann.getByRole('button', { name: 'Create activity' }).click();
 await ann.locator('.agenda-row', { hasText: activity }).waitFor({ timeout: 60_000 });
 log('ann added an activity');
 
-const row = () => rail(ann).locator('.activity-row', { hasText: activity });
-await railShows(ann, row, 'the activity');
+// The rail lists the four soonest activities, and the founders keep earlier runs' ones, so
+// Bob (new, nothing else coming up) joins the event and watches his rail.
+await bob.goto(eventUrl);
+await bob.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
+await bob.getByRole('button', { name: 'Join event' }).click();
+await bob.getByRole('button', { name: '3 members' }).waitFor({ timeout: 60_000 });
+log('bob joined the event');
+
+const row = () => rail(bob).locator('.activity-row', { hasText: activity });
+await railShows(bob, row, 'the activity');
 assert.match(await row().innerText(), /The shed/);
 assert.match(await row().innerText(), /0 signed up · 1 needed/);
-await ann.locator('.panel-toggle-right .count-badge').waitFor();
-await ann.waitForTimeout(1000); // the rail slides in
-await ann.screenshot({ path: `${out}/phone390-rail-activity.png` });
+await bob.locator('.panel-toggle-right .count-badge').waitFor();
+await bob.waitForTimeout(1000); // the rail slides in
+await bob.screenshot({ path: `${out}/phone390-rail-activity.png` });
 log('the rail lists it with its signups, and the button has a badge');
 
 await row().getByRole('button', { name: 'Dismiss activity card' }).click();
-await row().waitFor({ state: 'hidden' });
-await rail(ann).getByText('Cleared').click();
-await rail(ann).locator('.cleared-row', { hasText: activity }).waitFor();
-await rail(ann).getByRole('button', { name: 'Restore all' }).click();
-await railTab(ann, 'Coming up');
+await rail(bob).getByText('No activity yet').waitFor({ state: 'attached' });
+await rail(bob).getByText('Cleared').click();
+await rail(bob).locator('.cleared-row', { hasText: activity }).waitFor();
+await rail(bob).getByRole('button', { name: 'Restore all' }).click();
+await railTab(bob, 'Coming up');
 await row().waitFor();
 log('clearing moves it to Cleared; Restore all brings it back');
 
 await row().locator('.activity-open-button').click();
-await ann.getByRole('dialog', { name: activity }).waitFor({ timeout: 120_000 });
-assert.equal(ann.url().split('?')[0], eventUrl);
-await ann.keyboard.press('Escape');
-assert.equal(await ann.locator('.panel-toggle-right .count-badge').count(), 0);
+await bob.getByRole('dialog', { name: activity }).waitFor({ timeout: 120_000 });
+assert.equal(bob.url().split('?')[0].split('/').pop(), eventUrl.split('/').pop());
+await bob.keyboard.press('Escape');
+assert.equal(await bob.locator('.panel-toggle-right .count-badge').count(), 0);
 log('opening it shows the activity sheet and clears the badge');
 
 const coopUrl = await create(ann, coop);
@@ -105,7 +113,9 @@ await bob.getByRole('button', { name: '2 members' }).waitFor({ timeout: 60_000 }
 log('bob joined the co-op');
 
 await ann.goto(coopUrl);
-await ann.getByRole('button', { name: 'Edit', exact: true }).click();
+await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'bob joining');
+await ann.getByRole('button', { name: 'More actions' }).click();
+await ann.getByRole('menuitem', { name: 'Edit' }).click();
 await ann.locator('.edit-sheet').getByLabel('Title').fill(`${coop} co-op`);
 await ann.getByRole('button', { name: 'Propose edit' }).click();
 await ann.locator('.edit-sheet').waitFor({ state: 'hidden', timeout: 60_000 });
