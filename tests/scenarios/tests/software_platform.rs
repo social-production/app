@@ -56,14 +56,10 @@ struct PullRequestView {
 }
 
 #[derive(Deserialize, Debug)]
-struct Merger {
-    agent: AgentPubKey,
-}
-
-#[derive(Deserialize, Debug)]
 struct SoftwareView {
     platform: bool,
-    mergers: Vec<Merger>,
+    /// Only counted: nobody holds the capability on #platform.
+    mergers: Vec<serde::de::IgnoredAny>,
     pull_requests: Vec<PullRequestView>,
 }
 
