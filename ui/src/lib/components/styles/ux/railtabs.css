@@ -14,11 +14,15 @@
   font-weight: 700;
 }
 
+/* Joined segments like the docks (owner, 2026-11-18): flat where they meet with a hairline,
+   rounded only at the ends, the chosen one tinted. */
 .right-rail .rail-tabs-panel .rail-tabs {
   display: flex;
-  padding: 4px;
+  overflow: hidden;
+  padding: 0;
+  border: 1px solid var(--float-border);
   border-radius: 999px;
-  background: var(--panel-hover);
+  background: var(--float-background);
 }
 
 .right-rail .rail-tabs-panel .rail-tabs button {
@@ -27,11 +31,12 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  min-height: 34px;
+  min-height: 42px;
   padding: 0 6px;
   border: none;
-  border-radius: 999px;
+  border-radius: 0;
   background: transparent;
+  box-shadow: inset 1px 0 0 var(--float-border);
   color: var(--text-soft);
   font: inherit;
   font-size: 13px;
@@ -40,10 +45,13 @@
   cursor: pointer;
 }
 
+.right-rail .rail-tabs-panel .rail-tabs button:first-child {
+  box-shadow: none;
+}
+
 .right-rail .rail-tabs-panel .rail-tabs button.on {
-  background: var(--panel);
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
 }
 
 .right-rail .rail-tabs-panel .rail-tab-count {

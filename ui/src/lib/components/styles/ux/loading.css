@@ -113,15 +113,142 @@
   gap: 8px;
 }
 
+/* A detail page while it loads (SkeletonDetail): each shape where its content lands. */
 .skeleton-detail {
   display: grid;
-  gap: 12px;
-  padding: 16px 0;
+  padding: 0 16px;
 }
 
-.skeleton-facts {
-  margin-top: 8px;
-  gap: 16px;
+.skeleton-detail .skd-tabs {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 48px;
+  margin: 0 -16px;
+  padding: 0 16px;
+  border-bottom: 1px solid color-mix(in srgb, var(--panel-border) 60%, transparent);
+}
+
+.skeleton-detail .skd-tabs .sk {
+  height: 12px;
+}
+
+.skeleton-detail .skd-head,
+.skeleton-detail .skd-author,
+.skeleton-detail .skd-row {
+  display: flex;
+  align-items: center;
+}
+
+.skeleton-detail .skd-head {
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.skeleton-detail .skd-lines {
+  display: grid;
+  flex: 1;
+  gap: 7px;
+}
+
+.skeleton-detail .skd-h {
+  height: 12px;
+}
+
+.skeleton-detail .skd-h.small {
+  height: 10px;
+}
+
+.skeleton-detail .skd-tile {
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+}
+
+.skeleton-detail .skd-title {
+  height: 24px;
+  margin-top: 20px;
+}
+
+.skeleton-detail .skd-author {
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.skeleton-detail .skd-dot {
+  flex: none;
+  width: 24px;
+  height: 24px;
+}
+
+.skeleton-detail .skd-card {
+  display: grid;
+  margin-top: 16px;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.skeleton-detail .skd-card .sk {
+  background: color-mix(in srgb, var(--text-main) 9%, transparent);
+}
+
+.skeleton-detail .skd-row {
+  gap: 14px;
+  padding: 14px 16px;
+}
+
+.skeleton-detail .skd-row + .skd-row {
+  border-top: 1px solid var(--panel-border);
+}
+
+.skeleton-detail .skd-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+}
+
+.skeleton-detail .skd-text {
+  display: grid;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+/* The back button and dock, where the page's will be; the nav makes way as it does for them. */
+.skd-dock {
+  position: fixed;
+  right: 16px;
+  bottom: calc(12px + var(--shell-safe-bottom, 0px));
+  left: 16px;
+  display: grid;
+  grid-template-columns: 54px 1fr 54px;
+  align-items: center;
+  gap: 10px;
+  pointer-events: none;
+}
+
+.skd-dock .skd-back {
+  width: 52px;
+  height: 52px;
+}
+
+.skd-dock .skd-capsule {
+  justify-self: center;
+  width: 190px;
+  height: 52px;
+}
+
+@media (max-width: 1080px) {
+  .shell:has(.skd-dock) .mobile-bottom-nav {
+    display: none;
+  }
+}
+
+@media (min-width: 1081px) {
+  .skd-dock {
+    display: none;
+  }
 }
 
 /* The opening screen. */
