@@ -204,6 +204,18 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (10:10 am Melbourne, 2026-11-19, UX session)
+- **Live: #235** (map capsule joined, bar 48px, empty board once), **#237** (signed out, the
+  bottom bar is a compact solid capsule; More has room past the round end), **#238**
+  (Moderators sheet from the approved mockup: content-height bottom sheet like the settings
+  sheets, `VoteKicker`, one lede line, sections as `.board-card` rows, joined ↑ | ↓, chips only
+  for You / Grace / Has the votes; `domain/board.ts` `boardLine`/`boardBar`) and **#239**
+  (`AccountGate` sends signed-out visitors to `/onboarding?next=…` instead of an inline
+  sign-up inside the shell; `OnboardingPage` returns to `next`, same-site paths only).
+  Checked: platform.mjs and shell.mjs locally; live smoke of the sheet and `/settings`.
+- **Open question to the owner:** a Sign up that "doesn't go circular on the right edge" on a
+  channel; not reproduced at 390–1300px (asked for a screenshot).
+
 ### Where things stand (9:25 am Melbourne, 2026-11-19, UX session)
 - **Live: #233** (8:41 am): docks, the bottom bar and sheet footers are a size smaller; a feed
   card's place is a rounded rectangle like the detail page's facts. **#234** (8:58 am):
