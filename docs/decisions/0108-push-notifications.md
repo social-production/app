@@ -66,6 +66,16 @@ recipient's cells running. A desktop account's cells run on the desktop, only wh
 - In the app, a notice arriving refreshes the bell at once. First sender: a reply to your
   comment in a project chat. The rest of the card kinds follow, one PR at a time.
 
+## Built (2026-11-18): the desktop app's notifications
+`tauri-plugin-notification` (=2.7.0, `notification:default` in `native/capabilities`). A notice
+that reaches the desktop app (`holo/osNotify.ts`, `stores/push.svelte.ts` `showOnDesktop`) is
+shown by the OS when the window isn't in front, its category is on and Settings › Notifications
+› Push notifications is on (on by default; the OS may still refuse, which Settings says).
+"Show what it's about" off shows only "Something new is waiting for you." On desktop the
+plugin has no click actions, so clicking a notification brings the app forward rather than
+opening the item; the bell lists it. A quit app shows nothing until it runs again (its
+conductor is the recipient).
+
 ## Consequences
 - Every notifying write gains one `send_remote_signal` call. The recipients are the people a card
   goes to anyway, so the cost is one small message each.

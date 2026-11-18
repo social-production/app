@@ -222,6 +222,16 @@ nav and Topbar, and removes `SignedOutIntro`.
 - **Open question to the owner:** Invites is reachable only when one waits (left rail row under
   Communities, or the notice). Offered an always-there row in More; waiting for an answer.
 
+### Where things stand (8:10 pm Melbourne, 2026-11-18, UX session)
+- **Live:** #222 (only platform moderators record merges on #platform software projects; the
+  awaiting-merge push goes to them). Live smoke after: 15 cards, 0 errors.
+- **Open: `claude/desktop-notifications` (ADR 0108's desktop half):** the desktop app shows
+  the OS's own notifications for notices that arrive while its window isn't in front
+  (`tauri-plugin-notification` =2.7.0), with the same switch, categories and "Show what it's
+  about" as browsers. Checked: UI check, lint, boundaries, sizes, `cargo clippy -p native`.
+  Not checked: a real desktop build (nightly builds the installers) and how a notification looks
+  on each OS.
+
 ### Where things stand (6:50 pm Melbourne, 2026-11-18, UX session)
 - **Live:** #219 (ADR 0113: collective requests stay open, Not met after their time, planners'
   chat), #220 (personal services deleted, owner: "Yeah delete them"; `bookings.mjs` gone),

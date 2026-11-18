@@ -33,6 +33,7 @@ pub fn run() {
                 .level_for("native_lib", log::LevelFilter::Info)
                 .build(),
         )
+        .plugin(tauri_plugin_notification::init())
         .invoke_handler(tauri::generate_handler![
             account::account_state,
             account::open_account,
