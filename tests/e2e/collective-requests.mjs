@@ -173,7 +173,14 @@ log("cleo's request reads Accepted");
 
 // The planners' chat (ADR 0113): Bob opened it with Cleo; the holder chat stays out of Messages.
 const cleoCard = cleo.locator('.request-card-shell', { hasText: ask });
-await cleoCard.getByRole('link', { name: 'Open conversation' }).click();
+const talk = cleoCard.getByRole('link', { name: 'Open conversation' });
+for (let i = 0; i < 10 && !(await talk.count()); i++) {
+  await press(cleo, 'Your requests');
+  await cleoCard.locator('summary').click();
+  await talk.waitFor({ state: 'attached', timeout: 10_000 }).catch(() => {});
+}
+if (!(await talk.isVisible())) await cleoCard.locator('summary').click();
+await talk.click();
 await cleo.locator('.chat-log').getByText(ask).first().waitFor({ timeout: 120_000 });
 log("cleo's conversation is the planners' chat, opened with her request");
 await cleo.goto(`${BASE}/messages`);
