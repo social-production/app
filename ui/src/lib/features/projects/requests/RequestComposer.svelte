@@ -30,11 +30,11 @@
       <div class="request-header-row">
         <div>
           <p>
-            Sending a request opens a one-to-one chat with the creator in Messages.
+            Sending a request opens a chat with the service’s members in Messages.
             {#if showSchedule}
-              Start from the selected available time and add the details for the creator.
+              Start from the selected available time and add the details for the members.
             {:else}
-              Describe what you need so the creator can review the request and reply.
+              Describe what you need so they can review the request and reply.
             {/if}
           </p>
         </div>
@@ -69,7 +69,7 @@
         rows="3"
         placeholder={showSchedule
           ? 'What do you need help with? (required)'
-          : 'What do you need, and what should the creator expect? (required)'}></textarea>
+          : 'What do you need, and what should they expect? (required)'}></textarea>
       {#if state.error}<p class="validation-copy" role="alert">{state.error}</p>{/if}
     </div>
   </div>

@@ -1,6 +1,6 @@
-/* Request service and availability sheets: fields sit straight on the sheet, as soft
-   borderless fields like the other modern sheets, not inside a bordered card. */
-.service-ui .composer-card {
+/* The Request service sheet: fields sit straight on the sheet, as soft borderless fields
+   like the other modern sheets, not inside a bordered card. */
+.overlay-body .service-ui .composer-card {
   padding: 4px 0 0;
   border: none;
   background: none;
