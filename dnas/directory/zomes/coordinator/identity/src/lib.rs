@@ -14,6 +14,7 @@ mod follow_links;
 mod follows;
 mod listings;
 mod notes;
+mod privacy;
 mod profile;
 mod records;
 mod scope_images;

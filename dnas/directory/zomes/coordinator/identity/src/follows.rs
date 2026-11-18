@@ -21,11 +21,16 @@ pub struct FollowRow {
     pub since: Timestamp,
     /// When an approval-gated follow was accepted (for the follower's notification).
     pub accepted_at: Option<Timestamp>,
+    /// The followed person's privacy switches, on `following` rows (ADR 0112).
+    #[serde(default)]
+    pub privacy: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FollowView {
     pub requires_approval: bool,
+    /// This person's privacy switches (ADR 0112).
+    pub privacy: Vec<String>,
     /// People following this person (pending ones too; the UI shows those only to them).
     pub followers: Vec<FollowRow>,
     /// People this person follows.
@@ -51,6 +56,7 @@ fn row(edge: &Edge, status: sp_follow::Status, accepted_at: Option<i64>) -> Opti
         accepted_at: accepted_at
             .filter(|&at| status == FollowStatus::Accepted && at >= edge.at)
             .map(Timestamp::from_micros),
+        privacy: Vec::new(),
     })
 }
 
@@ -109,7 +115,10 @@ pub fn decide(follower: AgentPubKey, accept: bool) -> ExternResult<ActionHash> {
 
 pub fn set_approval(on: bool) -> ExternResult<bool> {
     let me = agent_info()?.agent_initial_pubkey;
-    let current = own_edges(LinkTypes::RequiresFollowApproval)?;
+    let current: Vec<Edge> = own_edges(LinkTypes::RequiresFollowApproval)?
+        .into_iter()
+        .filter(|e| e.tag.is_empty())
+        .collect();
     if on && current.is_empty() {
         create_link(me.clone(), me, LinkTypes::RequiresFollowApproval, ())?;
     }
@@ -140,7 +149,12 @@ fn following(person: &AgentPubKey) -> ExternResult<Vec<FollowRow>> {
     for edge in newest_per_person(edges(person, LinkTypes::Follows)?) {
         let policy = Policy::of(&edge.other)?;
         let status = policy.status(person, edge.at);
-        rows.extend(row(&edge, status, policy.accepted_at(person)));
+        rows.extend(
+            row(&edge, status, policy.accepted_at(person)).map(|r| FollowRow {
+                privacy: policy.privacy.clone(),
+                ..r
+            }),
+        );
     }
     Ok(rows)
 }
@@ -149,6 +163,7 @@ pub fn view(person: AgentPubKey) -> ExternResult<FollowView> {
     let policy = Policy::of(&person)?;
     Ok(FollowView {
         requires_approval: policy.approval_since.is_some(),
+        privacy: policy.privacy.clone(),
         followers: followers(&person, &policy)?,
         following: following(&person)?,
         my_status: my_status(&person)?,

@@ -7,7 +7,9 @@
     followRequests,
     followView,
     setFollowApproval,
+    setPrivacy,
   } from '#lib/services/follows.ts';
+  import { PRIVACY_SWITCHES, type PrivacySwitch } from '#lib/domain/privacy.ts';
   import { namesOf } from '#lib/services/people.ts';
 
   /** web's "Follow requests" and "Privacy" settings. The directory is public to its network,
@@ -18,6 +20,7 @@
   let requests = $state<FollowRow[]>([]);
   let names = $state<Record<string, string>>({});
   let approval = $state(false);
+  let privacy = $state<PrivacySwitch[]>([]);
   let pending = $state<string | null>(null);
   let error = $state<string>();
 
@@ -25,6 +28,7 @@
     try {
       const [view, waiting] = await Promise.all([followView(me), followRequests()]);
       approval = view.requiresApproval;
+      privacy = view.privacy;
       requests = waiting;
       onRequests(waiting.length);
       names = await namesOf(waiting.map((r) => r.agent));
@@ -86,7 +90,8 @@
   <h2>Privacy</h2>
   <p class="section-intro">
     Your profile and follows are public to everyone on the network. Approval decides whose follow
-    counts and who appears as your follower.
+    counts; the hide switches decide what the app shows to whom. Everyone on the network can still
+    reach it; the app just doesn't show it.
   </p>
   <div class="card stack flush">
     <SettingSwitch
@@ -96,6 +101,16 @@
       disabled={pending === 'approval'}
       onToggle={() => void run('approval', () => setFollowApproval(!approval))}
     />
+    {#each PRIVACY_SWITCHES as item (item.name)}
+      {@const on = privacy.includes(item.name)}
+      <SettingSwitch
+        label={item.label}
+        note={item.note}
+        checked={on}
+        disabled={pending === item.name}
+        onToggle={() => void run(item.name, () => setPrivacy(item.name, !on).then(() => undefined))}
+      />
+    {/each}
   </div>
   {#if error}<p class="warning-card" role="alert">{error}</p>{/if}
 </section>

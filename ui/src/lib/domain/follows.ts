@@ -1,3 +1,4 @@
+import type { PrivacySwitch } from './privacy.ts';
 /** Mirrors the identity zome's follows (ADR 0054). Rejected follows read as no follow. */
 
 export type FollowStatus = 'accepted' | 'pending';
@@ -9,10 +10,14 @@ export interface FollowRow {
   since: number;
   /** When an approval-gated follow was accepted (micros). */
   acceptedAt: number | null;
+  /** The followed person's privacy switches, on `following` rows (ADR 0112). */
+  privacy: PrivacySwitch[];
 }
 
 export interface FollowView {
   requiresApproval: boolean;
+  /** This person's privacy switches (ADR 0112). */
+  privacy: PrivacySwitch[];
   followers: FollowRow[];
   following: FollowRow[];
   myStatus: FollowStatus | null;

@@ -1,3 +1,4 @@
+import { visiblePosts } from './privacy.ts';
 import type { CharterMode, ProjectCard } from '#lib/domain/projects.ts';
 import type { Scope } from '#lib/domain/scopes.ts';
 import {
@@ -88,7 +89,7 @@ async function itemMatches(q: string, type: SearchType): Promise<SearchResultIte
     offset: '0',
     limit: String(only ? WIDE : LIMIT),
   });
-  return page.items
+  return (await visiblePosts(page.items))
     .filter((c) => !only || itemKind(c.mode) === only)
     .map((c) => {
       const kind = itemKind(c.mode);

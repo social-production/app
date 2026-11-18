@@ -185,8 +185,11 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   switches exist; their remaining kinds come with their features.
 - [x] Follows notifications switch (M5a).
 - [x] Follow requests and Privacy's "Require approval to follow you" (M5a). Privacy's three
-  "hide … from non-followers / personal feeds" switches wait for personal posts and the
-  personal feed.
+  "hide … from non-followers / personal feeds" switches (ADR 0112, 2026-11-18): display rules
+  on tagged approval self-links, no reset; `tests/e2e/privacy.mjs`.
+- [x] Display timezone (2026-11-18, `domain/zone.ts`): scheduled times show and are typed in it.
+- Not needed: web's "Separate Public and Personal feeds" (the app's Home / Global / Region tabs
+  already separate them).
 
 ## Create flows (compared with web's `features/create/**` source, 2026-11-12)
 - [x] Each flow's scope step has web's own layout: a project's primary channel then "Add more
