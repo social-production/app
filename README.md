@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Display timezone and privacy switches (PRs #210–#212, 2026-11-18 ~12 pm Melbourne):**
+  Settings › Appearance has a Display timezone (activity, event and request times show and are
+  typed in it); Privacy has web's three hide switches (profile activity and posts for
+  followers only, and out of followers' Home feeds; display rules, ADR 0112, no reset). Adding
+  an activity late on a plan's day no longer starts it in the past.
 - **Your activity, People and empty pages (PR #208, 2026-11-18 10:16 am Melbourne):** the right
   rail is "Your activity" with Coming up, Votes and Requests tabs and counts; People rows open
   the person with place and standing and a search box; empty Invites and Feedback use the app's
