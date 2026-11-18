@@ -204,6 +204,22 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (9:25 am Melbourne, 2026-11-19, UX session)
+- **Live: #233** (8:41 am): docks, the bottom bar and sheet footers are a size smaller; a feed
+  card's place is a rounded rectangle like the detail page's facts. **#234** (8:58 am):
+  sentences built from data (notifications, rail, history, "Needs 2 more yes", "Reply to
+  maya_k", errors) go through `t()` with slots; `i18n/ru/part18.ts`. Pushes are still worded
+  by the sender (`services/pushNotices.ts`). Checked: governance.mjs and software.mjs locally.
+- **#235** (`claude/dock-more`): the map capsule is joined segments; the bottom bar is 48px
+  and, signed out, a compact centred capsule; an empty Moderators sheet is one `EmptyState`
+  and its Close floats (the footer hint line is gone); notifications translate phase names and
+  "Replied to your…". Usernames are never passed through `t()`.
+- **Demo moderators are live** (owner approved 2026-11-19): the dev founders are now
+  `ann_founder` / `bob_founder` on live (they showed as "Unnamed" on demo items), vouched for
+  maya_k, tomas_b and priya_r, who claimed Full and volunteered; all three are seated (quorum
+  0). Script: the session scratchpad's `founders.cjs` (not in the repo).
+- **Next:** Russian fixes from the owner and their wife; pushes in the reader's language.
+
 ### Where things stand (2:20 am Melbourne, 2026-11-19, UX session)
 - **Live: #228–#229** (the Update form option A, the joined rail switch, a page-shaped
   `SkeletonDetail`) and **#230** (live 1:31 am): every dock is joined segments, the bottom bar
