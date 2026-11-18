@@ -140,10 +140,10 @@
     if (await ok) sheet = null;
   }
 
-  /** web's sheet title and button: organizer-run events save; personal services save details. */
+  /** web's sheet title and button: organizer-run events save; others propose. */
   function editLabel(p: Project, submit: boolean): string {
     if (p.governance === 'organizer_controlled') return submit ? 'Save' : 'Edit event';
-    return p.charter?.mode === 'personal-service' ? 'Save details' : 'Propose Edit';
+    return 'Propose Edit';
   }
 
   /** web: after leaving a private event it can't be opened again, so go home. */

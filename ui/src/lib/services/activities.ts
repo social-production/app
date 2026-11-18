@@ -1,5 +1,4 @@
 import type { Activity } from '#lib/domain/activities.ts';
-import type { AvailabilityRule } from '#lib/domain/availability.ts';
 import type { Place } from '#lib/domain/places.ts';
 import {
   callCell,
@@ -218,32 +217,6 @@ export async function checkIn(
   done: boolean | null,
 ): Promise<void> {
   await activities<ActionHash>(project, 'check_in', { activity: stringToHash(activity), done });
-}
-
-interface RuleWire {
-  id: ActionHash;
-  weekday: number;
-  start: number;
-  end: number;
-  zone: string;
-  note: string;
-}
-
-export async function listAvailabilityRules(project: ProjectRef): Promise<AvailabilityRule[]> {
-  const wire = await activities<RuleWire[]>(project, 'list_availability_rules');
-  return wire.map((r) => ({ ...r, id: hashToString(r.id) }));
-}
-
-/** web's "Add weekly hours". */
-export async function addAvailabilityRule(
-  project: ProjectRef,
-  rule: Omit<AvailabilityRule, 'id'>,
-): Promise<void> {
-  await activities<ActionHash>(project, 'add_availability_rule', rule);
-}
-
-export async function removeAvailabilityRule(project: ProjectRef, rule: string): Promise<void> {
-  await activities<null>(project, 'remove_availability_rule', stringToHash(rule));
 }
 
 /** An accepted timed request becomes a booking (web's `update_service_request_status`). */

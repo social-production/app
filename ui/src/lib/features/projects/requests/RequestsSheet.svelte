@@ -17,14 +17,12 @@
     requestsOff: boolean;
     highlighted: string | null;
     onPlan?: ((request: ServiceRequest) => void) | undefined;
-    /** A collective service's (ADR 0113): no Accept or Decline, a request stays open until
-     * planned, and its conversation is the planners' chat (null until you are in one). */
-    chatOf?: ((request: ServiceRequest) => string | null) | undefined;
+    /** ADR 0113: a request stays open until planned, and its conversation is the planners'
+     * chat (null until you are in one). */
+    chatOf: (request: ServiceRequest) => string | null;
   }
 
   let { state, reviewer, requestsOff, highlighted, onPlan, chatOf }: Props = $props();
-  const collective = $derived(!!chatOf);
-  const conversation = (r: ServiceRequest): string | null => (chatOf ? chatOf(r) : r.chat);
 
   const requests = $derived(state.shown);
   const chatHref = (seed: string): string =>
@@ -61,59 +59,11 @@
               requester={state.names[request.requester] ?? 'Someone'}
               highlighted={highlighted === request.id}
             >
-              {#if collective && reviewer}
+              {#if reviewer}
                 {#if isPending(request.status) && !notMet(request) && onPlan}
                   <div class="binary-row review-actions">
                     <button class="vote-chip" type="button" onclick={() => onPlan(request)}>
                       Plan request
-                    </button>
-                  </div>
-                {/if}
-              {:else if isPending(request.status) && reviewer}
-                {#if state.declining === request.id}
-                  <textarea
-                    bind:value={state.declineReason}
-                    rows="2"
-                    maxlength="500"
-                    placeholder="Reason (optional)"></textarea>
-                  <div class="binary-row review-actions">
-                    <button class="vote-chip" type="button" onclick={() => (state.declining = '')}>
-                      Back
-                    </button>
-                    <button
-                      class="vote-chip negative"
-                      type="button"
-                      disabled={state.busy}
-                      onclick={() => void state.decide(request, 'declined', state.declineReason)}
-                    >
-                      Decline request
-                    </button>
-                  </div>
-                {:else}
-                  <div class="binary-row review-actions">
-                    {#if onPlan}
-                      <button class="vote-chip" type="button" onclick={() => onPlan(request)}>
-                        Plan request
-                      </button>
-                    {:else}
-                      <button
-                        class="vote-chip"
-                        type="button"
-                        disabled={state.busy}
-                        onclick={() => void state.decide(request, 'accepted')}
-                      >
-                        Accept
-                      </button>
-                    {/if}
-                    <button
-                      class="vote-chip negative"
-                      type="button"
-                      onclick={() => {
-                        state.declining = request.id;
-                        state.declineReason = '';
-                      }}
-                    >
-                      Decline
                     </button>
                   </div>
                 {/if}
@@ -129,7 +79,7 @@
                   </button>
                 </div>
               {/if}
-              {@const seed = conversation(request)}
+              {@const seed = chatOf(request)}
               {#if seed}
                 <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved here -->
                 <a class="conversation-link" href={chatHref(seed)}>Open conversation</a>

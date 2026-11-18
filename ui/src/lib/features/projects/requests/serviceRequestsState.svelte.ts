@@ -1,6 +1,4 @@
 import { wallMicros } from '#lib/domain/zone.ts';
-import { fitsOpenSlot, type Slot } from '#lib/domain/availability.ts';
-import { toLocalInput } from '#lib/domain/helpRequests.ts';
 import type { RequestMode, RequestSettings } from '#lib/domain/projects.ts';
 import {
   preferredTime,
@@ -35,8 +33,6 @@ const emptyForm = (): RequestForm => ({
   slot: '',
 });
 
-const local = (micros: number): string => toLocalInput(new Date(micros / 1000));
-
 const micros = (local: string): number | null => (local ? wallMicros(local) : null);
 
 /**
@@ -57,9 +53,6 @@ export class ServiceRequestsState {
   settingsForm = $state<RequestSettings>({ enabled: true, mode: 'both', offSchedule: true });
   /** A collective service's settings change is voted on, with web's required reason. */
   settingsReason = $state('');
-  /** The request whose decline reason is being written (web's `decliningRequestId`). */
-  declining = $state('');
-  declineReason = $state('');
 
   constructor(
     private readonly project: string,
@@ -104,18 +97,6 @@ export class ServiceRequestsState {
     this.composing = true;
   }
 
-  /** web's `prefillRequestFromSlot`: the slot's times, locked. */
-  openForSlot(slot: Slot): void {
-    this.form = {
-      ...emptyForm(),
-      scheduledAt: local(slot.startsAt),
-      endsAt: local(slot.endsAt),
-      slot: slot.id,
-    };
-    this.error = '';
-    this.composing = true;
-  }
-
   /** web's `openRequestForDay` without an open slot: that day 18:00–19:00. */
   openForDay(iso: string): void {
     this.form = { ...emptyForm(), scheduledAt: `${iso}T18:00`, endsAt: `${iso}T19:00` };
@@ -132,7 +113,6 @@ export class ServiceRequestsState {
     title: string;
     creator: string;
     settings: RequestSettings;
-    slots: Slot[];
     members?: string[];
   }): Promise<boolean> {
     const f = this.form;
@@ -147,12 +127,7 @@ export class ServiceRequestsState {
     const start = micros(f.scheduledAt);
     const end = micros(f.endsAt);
     // A collective service lists no slots: its times are its activities' (web's calendar).
-    const fits =
-      !!service.members ||
-      start === null ||
-      end === null ||
-      fitsOpenSlot(service.slots, start, end);
-    const refused = refusal(service.settings, !!f.scheduledAt, fits);
+    const refused = refusal(service.settings, !!f.scheduledAt, true);
     if (refused) {
       this.error = refused;
       return false;
@@ -179,8 +154,6 @@ export class ServiceRequestsState {
   ): Promise<boolean> {
     return this.run(async () => {
       await decideServiceRequest(request, status, reason);
-      this.declining = '';
-      this.declineReason = '';
       if (status === 'accepted') await this.bookOnce(request);
     });
   }

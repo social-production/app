@@ -38,9 +38,8 @@
   const project = $derived(detail.project);
   const shown = $derived(selected || project?.phase || 'phase-1');
   const planKind = $derived(project?.charter ? planKindFor(project.charter.mode, shown) : null);
-  // web's activity phase: phase-5, or phase-1 for a personal service.
-  const personal = $derived(project?.charter?.mode === 'personal-service');
-  const activityPhase = $derived(personal ? shown === 'phase-1' : shown === 'phase-5');
+  // web's activity phase.
+  const activityPhase = $derived(shown === 'phase-5');
 </script>
 
 {#if project}
@@ -64,7 +63,7 @@
         <PlanPhase {detail} kind={planKind} {revealPlan} {onRevealDone} />
       {:else if activityPhase}
         <ActivityPhase {detail} current={project.phase === shown} />
-      {:else if shown === 'phase-1' && project.charter?.mode !== 'personal-service'}
+      {:else if shown === 'phase-1'}
         <ValuePhase {detail} />
       {:else}
         {#if shown === 'phase-7' && project.phase === 'phase-7'}
