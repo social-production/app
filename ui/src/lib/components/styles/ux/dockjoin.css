@@ -84,3 +84,50 @@
   border-radius: 0;
   box-shadow: inset 1px 0 0 var(--float-border);
 }
+
+/* Support | % | Oppose (owner, 2026-11-19: "the percentage should be within two dividers"):
+   three segments, the two choices the same width and the share between them with a hairline
+   on each side. */
+.shell .dock-vote > #participation-signals .feed-vote {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button {
+  display: inline-flex;
+  flex: 1 1 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-width: 0;
+  padding: 0 16px;
+  white-space: nowrap;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button:first-child {
+  box-shadow: none;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > .signal-percent {
+  display: grid;
+  flex: none;
+  place-items: center;
+  min-width: 64px;
+  padding: 0 12px;
+  box-shadow:
+    inset 1px 0 0 var(--float-border),
+    inset -1px 0 0 var(--float-border);
+  color: var(--text-soft);
+  font-size: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > button .signal-count {
+  color: var(--text-soft);
+  font-weight: 600;
+}
+
+.shell .dock-vote > #participation-signals .feed-vote > .signal-percent + button {
+  box-shadow: none;
+}
