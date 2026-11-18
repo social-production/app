@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   markRead,
   chatMentionNotifications,
@@ -116,7 +117,7 @@ async function fromProject(seed: string, me: string, myName: string, reads: Read
     mode: project.charter.mode,
     creator: hashToString(project.creator),
     amMember: project.am_member,
-    phaseLabel: (id: string) => labels.get(id) ?? id,
+    phaseLabel: (id: string) => t(labels.get(id) ?? id),
     proposals,
     messages,
   };

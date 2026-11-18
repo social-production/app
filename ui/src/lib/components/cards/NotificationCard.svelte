@@ -96,7 +96,7 @@
   {/if}
   <div class="note-copy">
     <p class="title-text">
-      {#if item.lead}{item.lead}{:else if social}<a
+      {#if item.lead}{t(item.lead)}{:else if social}<a
           href={resolve('/profile/[agent]', { agent: item.actor })}>{actorName}</a
         >
         {item.body}{:else}{item.title}{/if}
