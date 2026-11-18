@@ -1,3 +1,4 @@
+import { inviteNotice } from './pushNotices.ts';
 import type { EventSchedule } from '#lib/domain/eventSchedule.ts';
 import type { Plan } from '#lib/domain/plans.ts';
 import type { EventAudience } from '#lib/domain/projects.ts';
@@ -38,9 +39,11 @@ const READY = 'The organizers are ready.';
 
 /** Tell `to` about a private event through their inbox (ADR 0061, as chats do, ADR 0043),
  * and note it on the event so its organizers see who is invited (ADR 0111). */
-export async function sendEventInvite(to: string, seed: string): Promise<void> {
+export async function sendEventInvite(to: string, seed: string, community = false): Promise<void> {
   await callZome<null>('conversation', 'messages', 'send_invite', { to: stringToHash(to), seed });
-  if (to !== (await myAgent())) await recordInvite(seed, to).catch(() => {});
+  if (to === (await myAgent())) return;
+  await recordInvite(seed, to).catch(() => {});
+  void inviteNotice(to, community);
 }
 
 /**

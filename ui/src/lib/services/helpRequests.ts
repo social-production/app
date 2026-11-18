@@ -1,3 +1,4 @@
+import { shareNotice } from './pushNotices.ts';
 import type { Activity } from '#lib/domain/activities.ts';
 import { HELP_MODE, roleCounts, type HelpRoleDraft } from '#lib/domain/helpRequests.ts';
 import type { Contact } from '#lib/domain/messages.ts';
@@ -94,4 +95,5 @@ export async function shareHelpRequest(to: Contact, title: string, url: string):
     title: '',
     body: shareMessage('help request', title, url),
   });
+  void shareNotice(to.agent, 'help request', title, url);
 }
