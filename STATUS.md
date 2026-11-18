@@ -204,6 +204,26 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
+### Where things stand (1:40 am Melbourne, 2026-11-19, UX session)
+- **Live: #228–#229** (the Update form option A, the joined rail switch, a page-shaped
+  `SkeletonDetail`) and **#230** (live 1:31 am): every dock is joined segments, the bottom bar
+  too (`MobileBottomNav`); `DetailActionDock` adds `tight` to the capsule when its actions
+  don't fit, so labelled actions drop their words instead of clipping Share or ⋯; Take part's
+  Phase ▾ was squeezed into a 21px `.phase-nav-side` and clipped (now `display: contents`);
+  Support | % | Oppose and a request's ↑ | n | ↓ are three segments with the middle between two
+  hairlines (`ux/dockjoin.css`); the opening screen follows the chosen language (`app.html`).
+  Feed/thread/comment votes stay plain icons (owner's 17 Nov mockups).
+- **In flight: `claude/vote-sheets`** (approved mockup): one vote sheet for every vote.
+  `OverlaySheet` takes a `kicker` snippet above the title; `VoteKicker` (green kind · who ·
+  when), `VoteTally` (thin bar, "1 yes · 0 no · 1 of 3 voted", needs 66%), `VoteChoiceBar
+  docked` (No | Yes in the joined dock; cast votes read "✓ You voted Yes"); headlines from
+  `domain/voteSheet.ts` (Move to Plan, New title, Let maya merge?); no "If this passes…" on open
+  votes (decided ones keep their past-tense `.outcome`). Pull request vote / Record the merge /
+  "Was X merged?" are `software/PullRequestSheet.svelte` (the wizard keeps only create, merge
+  capability and repository flows). The plan sheet asks one question per screen
+  (`Review · N questions`, then No | Yes); tests use `reviewPlan()` in `tests/e2e/lib.mjs`.
+  The Update form is "What's new?" with "Send to vote". Russian in `i18n/ru/part17.ts`.
+
 ### Where things stand (9:40 am Melbourne, 2026-11-18, UX session)
 - **Live: #205** (Directions sheet `features/map/DirectionsSheet.svelte` + `domain/directions.ts`;
   a place opens the map with its pin selected: `openPlaceOnMap(label, coords, select)` and

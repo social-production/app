@@ -8,12 +8,16 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-18)
+## Status (2026-11-19)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **One look for votes and docks (PRs #228–#231, 2026-11-19 Melbourne):** every dock, the
+  bottom bar included, is joined segments that never cut a button off; every vote sheet (phase,
+  edit, update, plan, pull request, merge, merge rights) reads the same: kind, what's decided,
+  the proposal, one count, No | Yes in the dock.
 - **Russian (PRs #226–#227, 2026-11-18 night Melbourne, ADR 0114):** a general language picker
   (Settings › Appearance, the More menu and the sign-in page, so guests can switch too); the
   first open follows the device's main language; every screen's own words are in Russian
