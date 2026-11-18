@@ -48,7 +48,7 @@
         />
       {/if}
     {/snippet}
-    {#if charter.mode !== 'personal-service' && !project.amMember}
+    {#if !project.amMember}
       <JoinActions {detail} />
     {/if}
     <div id="detail-participation-actions"></div>

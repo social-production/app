@@ -53,7 +53,7 @@ export class DetailState {
     const p = this.project;
     // Organizer-controlled events take changes from organizers only (ADR 0061).
     const organized = p?.governance === 'organizer_controlled';
-    return !!p?.amMember && p.charter?.mode !== 'personal-service' && (!organized || p.amOrganizer);
+    return !!p?.amMember && (!organized || p.amOrganizer);
   }
 
   /** Join at once; leaving an event waits for the confirm dialog. */

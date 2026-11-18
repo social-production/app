@@ -133,7 +133,6 @@
       title: project.charter?.title ?? 'Service',
       creator: project.creator,
       settings,
-      slots: [],
       members: project.members,
     });
     if (sent) requests.listOpen = true;
