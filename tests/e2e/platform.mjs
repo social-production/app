@@ -59,7 +59,7 @@ await volunteer.click();
 await confirm("Volunteer as moderator?", "Volunteer");
 // Nobody was active last week on a fresh node, so the quorum is 0 and they are seated.
 await sheet.getByText("You're seated.").waitFor({ timeout: 60_000 });
-await sheet.getByRole("heading", { name: /^Seated\d+$/ }).waitFor({ timeout: 60_000 });
+await sheet.getByRole("heading", { name: /^Seated\s*\d+$/ }).waitFor({ timeout: 60_000 });
 // Your own row is marked; dev founders have no profile on a local node, so it reads "Unnamed".
 await sheet.locator(".board-row.you").waitFor();
 if (shots) await ann.screenshot({ path: `${shots}/moderators.png` });
