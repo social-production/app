@@ -1,4 +1,5 @@
 import type { CommentActivity } from './commentNotes.ts';
+import type { Avatar } from './people.ts';
 import type { ProjectCard } from './projects.ts';
 import { isActivity, type RegionActivity, type RegionItem } from './regionFeed.ts';
 
@@ -72,4 +73,11 @@ export function madeContext(name: string, mode: string): string {
   if (mode === 'help-request') return `${name} asked for help`;
   if (mode === 'event') return `${name} proposed this event`;
   return `${name} proposed this`;
+}
+
+/** The line over a followed person's card: what they did, with their picture. */
+export interface FeedContext {
+  text: string;
+  name: string;
+  avatar: Avatar | null;
 }

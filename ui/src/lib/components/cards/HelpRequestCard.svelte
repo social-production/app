@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { FeedContext } from '#lib/domain/homeFeed.ts';
   import CardReport from '#lib/components/moderation/CardReport.svelte';
   import { localDateTime, signupSummary } from '#lib/domain/helpRequests.ts';
   import { modeAccent, type ProjectCard, type Stance } from '#lib/domain/projects.ts';
@@ -19,10 +20,10 @@
     card: ProjectCard;
     onSignal: (next: Stance | null) => Promise<void>;
     /** Home's \"Maya Kim proposed this\" line. */
-    context?: string;
+    context?: FeedContext | null;
   }
 
-  let { card, onSignal, context = '' }: Props = $props();
+  let { card, onSignal, context = null }: Props = $props();
 
   const href = $derived(resolve('/help-requests/[id]', { id: card.id }));
   const when = $derived(localDateTime(card.help?.neededAt ?? null));

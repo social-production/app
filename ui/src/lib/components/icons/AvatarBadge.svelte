@@ -5,7 +5,7 @@
   interface Props {
     name: string;
     avatar?: Avatar | null;
-    size?: 'sm' | 'md';
+    size?: 'xs' | 'sm' | 'md';
   }
 
   let { name, avatar = null, size = 'md' }: Props = $props();
@@ -24,7 +24,12 @@
   });
 </script>
 
-<span class:size-sm={size === 'sm'} class:size-md={size === 'md'} class="avatar-badge">
+<span
+  class:size-xs={size === 'xs'}
+  class:size-sm={size === 'sm'}
+  class:size-md={size === 'md'}
+  class="avatar-badge"
+>
   {#if url}
     <img alt="" class="avatar-image" src={url} />
   {:else}
@@ -43,6 +48,13 @@
     font-weight: 800;
     letter-spacing: 0.04em;
     flex-shrink: 0;
+  }
+
+  .size-xs {
+    width: 18px;
+    height: 18px;
+    font-size: 7px;
+    letter-spacing: 0;
   }
 
   .size-sm {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { FeedContext } from '#lib/domain/homeFeed.ts';
+  import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { Snippet } from 'svelte';
 
   import type { ResolvedPathname } from '$app/types';
@@ -20,7 +22,7 @@
     /** web's serious-harm restriction (ADR 0071): blurred behind a warning until revealed. */
     contentRestricted?: boolean;
     /** Who made it, on Home for someone you follow: "Maya Kim proposed this" (ADR 0107). */
-    context?: string;
+    context?: FeedContext | null;
     children: Snippet;
   }
 
@@ -31,7 +33,7 @@
     compact = false,
     clampExcerpts = true,
     contentRestricted = false,
-    context = '',
+    context = null,
     children,
   }: Props = $props();
 
@@ -72,11 +74,9 @@
   >
     {#if context}
       <p class="feed-context">
-        <svg aria-hidden="true" viewBox="0 0 24 24"
-          ><circle cx="9" cy="8" r="3" /><path d="M3 19a6 6 0 0 1 12 0" /><path
-            d="M16 11h5M18.5 8.5v5"
-          /></svg
-        ><span>{context}</span>
+        <AvatarBadge size="xs" name={context.name} avatar={context.avatar} /><span
+          >{context.text}</span
+        >
       </p>
     {/if}
     {@render children()}
