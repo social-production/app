@@ -16,6 +16,7 @@ export class BoardState {
   error = $state<string>();
 
   async load(): Promise<void> {
+    this.error = undefined;
     try {
       const board = await getBoard();
       const agents = [...board.moderators, ...board.candidates].map((m) => m.agent);

@@ -22,12 +22,26 @@
     people: Record<string, Person>;
     me: string;
     canVolunteer: boolean;
+    /** Why the board couldn't load; the sheet offers to try again instead of loading forever. */
+    error?: string | undefined;
+    onRetry?: () => void;
     onVolunteer: (on: boolean) => Promise<void>;
     onVote: (member: BoardMember, vote: 1 | -1 | 0) => Promise<void>;
     onClose: () => void;
   }
 
-  let { open, board, people, me, canVolunteer, onVolunteer, onVote, onClose }: Props = $props();
+  let {
+    open,
+    board,
+    people,
+    me,
+    canVolunteer,
+    error,
+    onRetry,
+    onVolunteer,
+    onVote,
+    onClose,
+  }: Props = $props();
 
   let ask = $state<BoardAsk | null>(null);
   let working = $state(false);
@@ -133,6 +147,13 @@
       {/if}
       {@render section('Seated', seated)}
       {@render section('Candidates', candidates)}
+    {:else if error}
+      <div class="board-empty board-failed" role="alert">
+        <p>The moderators couldn’t load. {error}</p>
+        {#if onRetry}<button class="board-how-link" type="button" onclick={onRetry}
+            >Try again</button
+          >{/if}
+      </div>
     {:else}
       <SkeletonRows count={3} kind="row" />
     {/if}

@@ -194,6 +194,8 @@
         people={boardState.people}
         me={boardState.me}
         canVolunteer={boardState.canVolunteer}
+        error={boardState.error}
+        onRetry={() => void boardState.load()}
         onVolunteer={boardState.volunteer}
         onVote={boardState.vote}
         onClose={() => (boardOpen = false)}
