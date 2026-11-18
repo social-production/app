@@ -1,4 +1,4 @@
-import { t } from '#lib/i18n/index.ts';
+import { plural, t } from '#lib/i18n/index.ts';
 /** web's platform board (ADR 0095): moderators and candidates, replayed in the directory. */
 
 /** web's `confidenceStandingState`: a moderator is `active` or in `grace`; a candidate is
@@ -34,39 +34,40 @@ export const qualifies = (yes: number, no: number, quorum: number): boolean =>
   yes + no >= quorum && (yes + no === 0 || yes * 100 >= 66 * (yes + no));
 
 const DAY_MS = 24 * 60 * 60 * 1000;
-const percent = (m: BoardMember) => (m.ratio === null ? null : Math.round(m.ratio * 100));
 const votesOf = (m: BoardMember) => m.yes + m.no;
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
-/** A row's state chip (Platform and Moderators mockups §2): Seated, Grace · N days, Candidate. */
-export function boardChip(m: BoardMember, now = Date.now()): string {
-  if (m.standing === 'active') return 'Seated';
+/** A row's chip, only when the section heading doesn't already say it: Grace · N days for a
+ * moderator short of votes, Ready (Has the votes) for a candidate who has them. */
+export function boardChip(m: BoardMember, now = Date.now()): string | null {
   if (m.standing === 'grace') {
     const days =
       m.graceEndsAt === null ? 7 : Math.max(1, Math.ceil((m.graceEndsAt - now) / DAY_MS));
-    return `${t('Grace')} · ${plural(days, 'day')}`;
+    return `${t('Grace')} · ${plural(days, '{n} day', '{n} days')}`;
   }
-  return m.standing === 'qualifying' ? 'Ready' : 'Candidate';
+  return m.standing === 'qualifying' ? t('Has the votes') : null;
 }
 
-/** A row's one line: how the person stands against this week's quorum. */
+/** A row's one line, in words: "8 of 9 yes", "2 votes · needs 3 more", "Seated straight away". */
 export function boardLine(m: BoardMember, quorum: number): string {
   const votes = votesOf(m);
-  const pct = percent(m);
-  if (m.standing === 'active') {
-    if (votes === 0) return quorum === 0 ? t('Seated straight away') : t('No votes yet');
-    return `${pct}% yes from ${plural(votes, 'vote')}`;
-  }
-  if (m.standing === 'grace') {
-    return `${pct ?? 0}% yes, but ${votes} of ${quorum} votes this week`;
-  }
-  if (m.standing === 'qualifying') return t('Has the votes; seated at the next count');
-  return votes ? `${votes} of ${quorum} votes · ${pct}% yes` : `0 of ${quorum} votes`;
+  if (m.standing === 'active' && votes === 0)
+    return quorum === 0 ? t('Seated straight away') : t('No votes yet');
+  if (m.standing === 'qualifying') return t('Seated at the next count');
+  const tally = t('{yes} of {n} yes', { yes: m.yes, n: votes });
+  if (m.moderator && m.standing !== 'grace') return tally;
+  const short = Math.max(0, quorum - votes);
+  if (short === 0) return tally;
+  const more = plural(short, 'needs {n} more vote', 'needs {n} more votes');
+  return votes ? `${tally} · ${more}` : more;
 }
 
-/** How far a candidate is towards the votes a seat needs, 0 to 100. */
-export const boardProgress = (m: BoardMember, quorum: number): number =>
-  quorum === 0 ? 100 : Math.min(100, Math.round((100 * votesOf(m)) / quorum));
+/** The row's bar, 0 to 100: a moderator's share of yes, a candidate's way to the votes a seat
+ * needs; none before anyone has voted on a moderator. */
+export function boardBar(m: BoardMember, quorum: number): number | null {
+  const votes = votesOf(m);
+  if (m.moderator) return votes ? Math.round((100 * m.yes) / votes) : null;
+  return quorum === 0 ? 100 : Math.min(100, Math.round((100 * votes) / quorum));
+}
 
 /** The viewer first, then by name. */
 export function boardOrder(

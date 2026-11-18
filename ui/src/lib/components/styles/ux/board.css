@@ -1,68 +1,78 @@
-/* The Moderators sheet and its steps and confirm sheets (Platform and Moderators mockups §2,
-   §3). Portaled outside `.shell`: rules double a class to win over the shared sheet styles. */
+/* The Moderators sheet and its steps and confirm sheets (mockup approved 2026-11-19): a green
+   kicker over the title, one plain line on where the board stands, each section one rounded
+   card of rows like a detail page's facts, and a joined ↑ | ↓ vote on each row. Portaled
+   outside `.shell`: rules double a class to win over the shared sheet styles. */
 .overlay-root.platform-board .board-how-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 12px;
   border: none;
-  background: none;
-  color: var(--brand-strong);
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
   font: inherit;
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
+}
+
+.overlay-root.platform-board .board-how-link .toolbar-icon {
+  width: 15px;
+  height: 15px;
 }
 
 .overlay-root.platform-board .board-body {
   display: grid;
-  gap: 4px;
+  gap: 8px;
   padding: 0 18px 12px;
 }
 
-.overlay-root.platform-board .board-summary {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px 18px;
-  margin: 0 0 6px;
-  padding: 10px 12px;
-  border-radius: 14px;
-  background: var(--panel-hover);
+.overlay-root.platform-board .board-lede {
+  margin: 0 0 8px;
   color: var(--text-soft);
-  font-size: 12.5px;
-}
-
-.overlay-root.platform-board .board-summary span {
-  display: grid;
-}
-
-.overlay-root.platform-board .board-summary b {
-  color: var(--text-main);
-  font-size: 15px;
-}
-
-.overlay-root.platform-board .board-summary.board-note {
-  display: block;
-  color: var(--text-main);
-  font-size: 13.5px;
+  font-size: 14.5px;
   line-height: 1.45;
 }
 
 .overlay-root.platform-board .board-head {
-  margin: 10px 0 2px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin: 8px 2px 0;
+  color: var(--text-main);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.overlay-root.platform-board .board-head span {
   color: var(--text-soft);
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
+}
+
+.overlay-root.platform-board .board-card {
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+.overlay-root.platform-board .board-card .empty-block {
+  padding: 26px 14px 30px;
 }
 
 .overlay-root.platform-board .board-row {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 0;
+  gap: 12px;
+  min-height: 60px;
+  padding: 10px 12px;
 }
 
-.overlay-root.platform-board .board-row.you {
-  margin: 0 -8px;
-  padding: 8px;
-  border-radius: 14px;
-  background: var(--brand-soft);
+.overlay-root.platform-board .board-row + .board-row {
+  border-top: 1px solid var(--panel-border);
 }
 
 .overlay-root.platform-board .board-face {
@@ -72,7 +82,7 @@
 .overlay-root.platform-board .board-copy {
   display: grid;
   flex: 1;
-  gap: 3px;
+  gap: 2px;
   min-width: 0;
 }
 
@@ -81,7 +91,7 @@
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .overlay-root.platform-board .board-name a {
@@ -91,7 +101,7 @@
 }
 
 .overlay-root.platform-board .board-chip {
-  padding: 2px 8px;
+  padding: 1px 7px;
   border-radius: 999px;
   background: var(--brand-soft);
   color: var(--brand-strong);
@@ -99,11 +109,8 @@
   font-weight: 700;
 }
 
-.overlay-root.platform-board .board-row.you .board-chip {
+.overlay-root.platform-board .board-chip.you-chip {
   background: var(--panel);
-}
-
-.overlay-root.platform-board .board-row.you .board-chip.you-chip {
   color: var(--text-soft);
 }
 
@@ -112,51 +119,53 @@
   color: color-mix(in srgb, var(--warning, #c98a00) 70%, var(--text-main));
 }
 
-.overlay-root.platform-board .board-bar {
-  display: block;
-  height: 5px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: var(--panel-hover);
-}
-
-.overlay-root.platform-board .board-bar i {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--brand);
-}
-
 .overlay-root.platform-board .board-line {
   margin: 0;
   color: var(--text-soft);
   font-size: 12.5px;
 }
 
+.overlay-root.platform-board .board-bar {
+  display: block;
+  height: 4px;
+  margin-top: 4px;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--panel-border);
+}
+
+.overlay-root.platform-board .board-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--brand);
+}
+
+/* ↑ | ↓ joined, as every vote control now is. */
 .overlay-root.platform-board .board-vote {
   display: flex;
   flex: none;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
+  overflow: hidden;
   border: 1px solid var(--panel-border);
   border-radius: 999px;
-  font-size: 12.5px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
+  background: var(--panel);
 }
 
 .overlay-root.platform-board .board-vote button {
   display: grid;
   place-items: center;
-  width: 30px;
-  height: 30px;
+  width: 38px;
+  height: 34px;
   padding: 0;
   border: none;
-  border-radius: 50%;
+  border-radius: 0;
   background: transparent;
   color: var(--text-soft);
   cursor: pointer;
+}
+
+.overlay-root.platform-board .board-vote button + button {
+  box-shadow: inset 1px 0 0 var(--panel-border);
 }
 
 .overlay-root.platform-board .board-vote button.mine {
@@ -169,9 +178,26 @@
   height: 16px;
   fill: none;
   stroke: currentColor;
-  stroke-width: 2;
+  stroke-width: 2.2;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.overlay-root.platform-board .board-note {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 6px 2px 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.overlay-root.platform-board .board-note .toolbar-icon {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin-top: 1px;
 }
 
 .overlay-root.platform-board .board-empty,
