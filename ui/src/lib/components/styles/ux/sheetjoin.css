@@ -12,9 +12,9 @@
 .overlay-root.overlay-root:not(.create-main)
   .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
   .sheet-close {
-  width: 56px;
-  min-width: 56px;
-  height: 54px;
+  width: 50px;
+  min-width: 50px;
+  height: 48px;
   border-radius: 0;
   background: transparent;
 }
@@ -29,7 +29,7 @@
   .overlay-footer:not(.close-only):has(> .sheet-actions :is(button, a)):not(:has(> p))
   .sheet-actions
   > :is(button, a) {
-  min-height: 54px;
+  min-height: 48px;
   margin: 0;
   border-radius: 0;
   box-shadow: inset 1px 0 0 var(--float-border);

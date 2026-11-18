@@ -7,7 +7,7 @@
 .overlay-root.overlay-root .overlay-footer.inline-close,
 .overlay-root.overlay-root .overlay-footer:has(.sheet-actions) {
   display: grid;
-  grid-template-columns: minmax(54px, 1fr) minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(48px, 1fr) minmax(0, auto) minmax(0, 1fr);
   align-items: end;
   column-gap: 10px;
 }
@@ -16,8 +16,8 @@
 .overlay-root.overlay-root .overlay-footer.inline-close .sheet-close {
   grid-column: 1;
   justify-self: start;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   border: 1px solid var(--float-border);
   background: var(--float-background);
   -webkit-backdrop-filter: var(--float-blur);
@@ -43,10 +43,10 @@
   display: flex;
   gap: 4px;
   min-width: min(240px, 100%);
-  min-height: 54px;
+  min-height: 48px;
   padding: 5px;
   border: 1px solid var(--float-border);
-  border-radius: 27px;
+  border-radius: 24px;
   background: var(--float-background);
   -webkit-backdrop-filter: var(--float-blur);
   backdrop-filter: var(--float-blur);

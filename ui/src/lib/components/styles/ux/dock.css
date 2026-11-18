@@ -43,7 +43,7 @@
 }
 
 .shell .dock-row:has(> .dock-back) {
-  grid-template-columns: minmax(54px, 1fr) minmax(0, auto) minmax(0, 1fr);
+  grid-template-columns: minmax(48px, 1fr) minmax(0, auto) minmax(0, 1fr);
 }
 
 .shell .dock-row > .dock-back {
@@ -72,8 +72,8 @@
   display: grid;
   flex: none;
   place-items: center;
-  width: 54px;
-  height: 54px;
+  width: 48px;
+  height: 48px;
   padding: 0;
   border-radius: 999px;
   color: var(--text-main);
@@ -96,9 +96,9 @@
   align-items: stretch;
   gap: 2px;
   min-width: 0;
-  min-height: 54px;
+  min-height: 48px;
   padding: 5px;
-  border-radius: 27px;
+  border-radius: 24px;
 }
 
 .shell .dock-capsule:not(:has(button, a)) {
