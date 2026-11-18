@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /**
  * Link create and sever votes in the History tab (web-backend's
  * `build_link_decision_history_entries`). Each becomes a generic-shaped proposal, as software
@@ -67,7 +68,9 @@ export function linkHistory(frame: LinksFrame | undefined): HistoryEntry[] {
       id: p.id,
       proposal: p,
       plan: null,
-      kindLabel: r.sever ? `End the link with ${r.target.title}` : `Link with ${r.target.title}`,
+      kindLabel: r.sever
+        ? t('End the link with {title}', { title: r.target.title })
+        : t('Link with {title}', { title: r.target.title }),
       author: p.author,
       createdAt: p.createdAt,
       status: statusOf(r),

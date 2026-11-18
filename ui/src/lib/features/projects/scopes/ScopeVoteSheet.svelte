@@ -79,7 +79,7 @@
         chosen={voted}
         onVote={(choice) => current && void cast(current, choice)}
       />
-      {#if voted}<p class="voted">You voted {voted}. {notice}</p>{/if}
+      {#if voted}<p class="voted">{t('You voted {choice}.', { choice: t(voted) })} {notice}</p>{/if}
       {#if votable.length > 1 && !shown}
         <button class="next" type="button" onclick={() => (index = (index + 1) % votable.length)}
           >{t('Next')}</button

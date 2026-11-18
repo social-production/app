@@ -53,7 +53,7 @@
 
 <OverlaySheet
   {open}
-  title={sent ? t('Report sent') : `Report ${itemLabel}`}
+  title={sent ? t('Report sent') : t('Report {item}', { item: t(itemLabel) })}
   labelledById="report-composer-title"
   rootClass="report-composer"
   elevated

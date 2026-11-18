@@ -37,7 +37,7 @@
 </script>
 
 <ShareUserMenu
-  menuTitle={`Share ${name}'s profile`}
+  menuTitle={t("Share {name}'s profile", { name })}
   submitLabel={t('Send')}
   recipientHint={t('They get the link as a message.')}
   copyLinkUrl={url}

@@ -36,7 +36,7 @@ export function pastRows(links: ProjectLink[], votes: LinkRequest[]): PastRow[] 
       key: link.id,
       title: link.create.target.title,
       targetId: link.create.target.id,
-      meta: sever ? `Link ended · ${day(at)} · both sides voted` : t('Link ended'),
+      meta: sever ? `${t('Link ended')} · ${day(at)} · ${t('both sides voted')}` : t('Link ended'),
       tag: 'Ended',
       link,
       request: null,

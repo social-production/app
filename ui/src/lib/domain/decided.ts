@@ -8,16 +8,22 @@ function passedSentence(kind: ProposalKind, from: string, to: (id: string) => st
   if ('RemoveMember' in kind) return t('This member was removed.');
   if ('RequestSettings' in kind) return t('The request settings changed.');
   if ('Software' in kind) return t('This change was applied.');
-  if ('Phase' in kind) return `This moved from ${from} to ${to(kind.Phase.to)}.`;
-  if ('Return' in kind) return `This moved back from ${from} to ${to(kind.Return.to)}.`;
+  if ('Phase' in kind)
+    return t('This moved from {from} to {to}.', { from: t(from), to: to(kind.Phase.to) });
+  if ('Return' in kind)
+    return t('This moved back from {from} to {to}.', { from: t(from), to: to(kind.Return.to) });
   if ('Convert' in kind) return t('This closed and its work continued as a new proposal.');
   return t('The proposed changes were made.');
 }
 
 function failedSentence(kind: ProposalKind, from: string, to: (id: string) => string): string {
   if ('Phase' in kind)
-    return `This stayed in ${from}; the move to ${to(kind.Phase.to)} didn't pass.`;
-  if ('Return' in kind) return `This stayed in ${from}; going back didn't pass.`;
+    return t("This stayed in {from}; the move to {to} didn't pass.", {
+      from: t(from),
+      to: to(kind.Phase.to),
+    });
+  if ('Return' in kind)
+    return t("This stayed in {from}; going back didn't pass.", { from: t(from) });
   return t("This didn't pass, so nothing changed.");
 }
 

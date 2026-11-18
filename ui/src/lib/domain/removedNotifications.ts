@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { Moderation } from './moderation.ts';
 import type { NotificationItem } from './notifications.ts';
 import { isProjectMode, type CharterMode } from './projects.ts';
@@ -29,7 +30,7 @@ export function removedNotifications(
       projectMode: p.mode,
       actor: '',
       title: p.title,
-      body: `This project was removed after a ${reason} report.`,
+      body: t('This project was removed after a {reason} report.', { reason: t(reason) }),
       lead: null,
       target: { home: true },
       createdAt: report.createdAt,

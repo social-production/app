@@ -76,7 +76,7 @@
           ? event
             ? t('Close event')
             : t('Close project')
-          : `Advance to ${next.label}`,
+          : t('Advance to {phase}', { phase: t(next.label) }),
         detail:
           locked ||
           (closing
@@ -104,7 +104,7 @@
     for (const phase of project.returns)
       moves.push({
         id: `return-${phase.id}`,
-        label: `Return to ${phase.label}`,
+        label: t('Return to {phase}', { phase: t(phase.label) }),
         detail: phaseVoteOpen
           ? lockReason()
           : event

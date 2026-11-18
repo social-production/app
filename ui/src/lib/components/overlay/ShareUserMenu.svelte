@@ -232,9 +232,9 @@
   {:else if needle && searching}
     <p class="empty-row">{t('Searching…')}</p>
   {:else if needle}
-    <p class="empty-row">No one matches “{query.trim()}”.</p>
+    <p class="empty-row">{t('No one matches “{query}”.', { query: query.trim() })}</p>
   {:else if selected.length === 0}
-    <p class="empty-row">Search for people by username. {recipientHint}</p>
+    <p class="empty-row">{t('Search for people by username.')} {recipientHint}</p>
   {/if}
   {#if feedback}<p class="feedback">{feedback}</p>{/if}
   {#snippet footer()}

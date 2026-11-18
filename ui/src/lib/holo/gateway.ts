@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /** The seed node's HTTP API (services/gateway/src/routes). */
 
 export interface Ceremony {
@@ -45,7 +46,7 @@ async function post<T>(gateway: string, path: string, body: unknown = {}): Promi
     const fallback =
       response.status === 404
         ? 'The site is updating. Please try again in a minute.'
-        : `The server answered ${response.status}.`;
+        : t('The server answered {status}.', { status: response.status });
     const message = (json as { error?: string }).error ?? fallback;
     throw new GatewayError(message, response.status);
   }
@@ -72,7 +73,10 @@ async function get<T>(gateway: string, path: string, query: Record<string, strin
     // The place routes explain a refusal with web's error code (ADR 0079).
     const json: unknown = await response.json().catch(() => ({}));
     const code = (json as { error?: string }).error;
-    throw new GatewayError(code ?? `The server answered ${response.status}.`, response.status);
+    throw new GatewayError(
+      code ?? t('The server answered {status}.', { status: response.status }),
+      response.status,
+    );
   }
   return (await response.json()) as T;
 }

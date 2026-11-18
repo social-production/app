@@ -151,7 +151,7 @@
       {@render section('Candidates', candidates)}
     {:else if error}
       <div class="board-empty board-failed" role="alert">
-        <p>The moderators couldn’t load. {error}</p>
+        <p>{t('The moderators couldn’t load.')} {error}</p>
         {#if onRetry}<button class="board-how-link" type="button" onclick={onRetry}
             >{t('Try again')}</button
           >{/if}

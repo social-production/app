@@ -95,10 +95,14 @@
 
 <PlanWizardShell
   {open}
-  title={`Create ${name}`}
+  title={t('Create {name}', { name: t(name) })}
   stepIndex={Math.min(index, steps.length - 1)}
   stepCount={steps.length}
-  nextLabel={reviewing ? (pending ? t('Working...') : `Submit ${name}`) : t('Next')}
+  nextLabel={reviewing
+    ? pending
+      ? t('Working...')
+      : t('Submit {name}', { name: t(name) })
+    : t('Next')}
   canGoBack={index > 0}
   canGoNext={!!step && !pending && stepReady(step.id, form)}
   onClose={close}

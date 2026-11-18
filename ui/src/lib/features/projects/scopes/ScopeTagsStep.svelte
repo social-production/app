@@ -130,7 +130,7 @@
       </button>
     {:else}
       <p class="tag-empty">
-        {searching ? t('Searching…') : query ? `Nothing called "${query}" yet.` : ''}
+        {searching ? t('Searching…') : query ? t('Nothing called “{query}” yet.', { query }) : ''}
       </p>
     {/each}
   </div>

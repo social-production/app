@@ -286,7 +286,7 @@
       />
       <ConfirmDialog
         open={detail.confirmingLeave}
-        title={`Leave ${charter.title}?`}
+        title={t('Leave {title}?', { title: charter.title })}
         body={isPrivateSeed(id)
           ? t("It's private, so you'll need a new invite to come back.")
           : t('You can join again any time.')}

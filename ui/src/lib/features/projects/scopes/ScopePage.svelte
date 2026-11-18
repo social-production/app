@@ -117,7 +117,9 @@
     <LoadingLine /><SkeletonDetail tabs={false} dock={false} />
   {:else if !s.scope}
     <section class="info-card">
-      <p>{s.error ?? `No ${noun} has the handle "${slug}" yet.`}</p>
+      <p>
+        {s.error ?? t('No {noun} has the handle “{handle}” yet.', { noun: t(noun), handle: slug })}
+      </p>
     </section>
   {:else}
     {@const scope = s.scope}
@@ -165,8 +167,10 @@
       {:else if items.length === 0}
         <EmptyState
           icon={kind === 'channel' ? 'hash' : 'people'}
-          title={`Nothing in ${title} yet`}
-          text={`Posts, events and projects tagged with this ${noun} show up here.`}
+          title={t('Nothing in {title} yet', { title })}
+          text={t('Posts, events and projects tagged with this {noun} show up here.', {
+            noun: t(noun),
+          })}
         >
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved, plus a query -->
           <a class="empty-action primary" href={threadHref}>{t('Start a thread')}</a>

@@ -58,8 +58,8 @@ function roleNotifications(
       id: `suggest:${s.id}`,
       kind: 'prj-role-suggest',
       actor: s.by,
-      title: `Suggested for ${role.label}`,
-      body: `You've been suggested for ${role.label} on ${a.title}.`,
+      title: t('Suggested for {role}', { role: role.label }),
+      body: t("You've been suggested for {role} on {title}.", { role: role.label, title: a.title }),
       target,
       createdAt: s.at,
     });

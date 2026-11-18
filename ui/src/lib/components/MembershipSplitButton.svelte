@@ -26,7 +26,9 @@
     onOpenMembers,
   }: Props = $props();
 
-  const joinAria = $derived(joined ? `Leave ${noun}` : `Join ${noun}`);
+  const joinAria = $derived(
+    joined ? t('Leave {noun}', { noun: t(noun) }) : t('Join {noun}', { noun: t(noun) }),
+  );
 </script>
 
 <div class="membership-split" class:joined class:pending class:members-open={membersOpen}>

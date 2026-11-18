@@ -84,7 +84,7 @@
         class="call-button"
         type="button"
         aria-label={`Call ${p.title}`}
-        title={`Call ${p.title}`}
+        title={t('Call {name}', { name: p.title })}
         onclick={p.onCall}
       >
         <ToolbarIcon name="phone" />

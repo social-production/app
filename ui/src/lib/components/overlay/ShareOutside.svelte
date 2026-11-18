@@ -83,7 +83,7 @@
           href={target.href}
           target="_blank"
           rel="noopener noreferrer"
-          title={`Share on ${target.label}`}
+          title={t('Share on {app}', { app: target.label })}
           aria-label={`Share on ${target.label}`}
         >
           <span class={`tile-icon ${target.id}`} aria-hidden="true">

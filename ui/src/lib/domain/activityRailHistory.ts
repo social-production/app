@@ -71,7 +71,7 @@ function currentSignups(projects: RailProject[], now: number): RailItem[] {
       kind: 'project' as const,
       title: a.title,
       query: activityQuery(a.id),
-      meta: `You signed up · ${p.title}`,
+      meta: `${t('You signed up')} · ${p.title}`,
       createdAt: a.startsAt,
       projectMode: p.mode,
       activityId: a.id,
@@ -119,7 +119,12 @@ function proposalCast(p: RailProject, v: Proposal & { myVote: VoteChoice }): Cas
     meta,
   });
   if ('Phase' in v.kind) {
-    return cast('phase_change', 'phase', p.title, `Advance to ${p.phaseLabel(v.kind.Phase.to)}`);
+    return cast(
+      'phase_change',
+      'phase',
+      p.title,
+      t('Advance to {phase}', { phase: p.phaseLabel(v.kind.Phase.to) }),
+    );
   }
   if ('Update' in v.kind) {
     return cast('update', 'update', truncate(v.kind.Update.body, UPDATE_TITLE_MAX), p.title);
@@ -169,7 +174,7 @@ function castVotes(projects: RailProject[]): RailItem[] {
         kind: 'vote' as const,
         title: c.title,
         query: c.query,
-        meta: `You voted ${VOTE_LABELS[c.vote]} · ${c.meta}`,
+        meta: `${t('You voted {choice}', { choice: t(VOTE_LABELS[c.vote]) })} · ${c.meta}`,
         createdAt: c.createdAt,
         projectMode: c.p.mode,
         voteKindLabel: c.kind,

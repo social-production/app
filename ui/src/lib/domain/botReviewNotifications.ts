@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { shortDate } from './botReview.ts';
 import type { NotificationItem } from './notifications.ts';
 
@@ -54,7 +55,7 @@ export function ownCopy(n: BotNotice): [string, string] {
     const from = shortDate(Math.floor((n.reReviewFrom ?? n.at) / 1000));
     return [
       'A review found this account is a bot',
-      `The account is now read-only. You can ask for one re-review from ${from}.`,
+      t('The account is now read-only. You can ask for one re-review from {from}.', { from }),
     ];
   }
   return [
@@ -66,24 +67,30 @@ export function ownCopy(n: BotNotice): [string, string] {
 export function theirCopy(n: BotNotice, name: string): [string, string] {
   if (n.kind === 'vote') {
     return [
-      `Is ${name} a real person?`,
-      `${name} is in a bot review, and you share a space with them. If you know them, vote Real person or Bot on their profile.`,
+      t('Is {name} a real person?', { name }),
+      t(
+        '{name} is in a bot review, and you share a space with them. If you know them, vote Real person or Bot on their profile.',
+        { name },
+      ),
     ];
   }
   if (n.kind === 'opened') {
     return [
-      `A bot review of ${name} is open`,
-      `Three full members marked ${name}, so full members now vote Real person or Bot on their profile for up to 7 days.`,
+      t('A bot review of {name} is open', { name }),
+      t(
+        'Three full members marked {name}, so full members now vote Real person or Bot on their profile for up to 7 days.',
+        { name },
+      ),
     ];
   }
   if (n.kind === 'upheld') {
     return [
-      `The review found ${name} is a bot`,
-      `${name} is now read-only, and their votes no longer count.`,
+      t('The review found {name} is a bot', { name }),
+      t('{name} is now read-only, and their votes no longer count.', { name }),
     ];
   }
   return [
-    `The review cleared ${name}`,
-    `Members agreed ${name} is a real person. Bot marks on them were cleared.`,
+    t('The review cleared {name}', { name }),
+    t('Members agreed {name} is a real person. Bot marks on them were cleared.', { name }),
   ];
 }

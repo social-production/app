@@ -104,7 +104,8 @@ export class ScopeGovernance {
 
 /** web's describeScopeProposal: one line saying what a decision would change. */
 export function describeDecision(p: Proposal, memberName: (agent: string) => string): string {
-  if ('RemoveMember' in p.kind) return `Remove ${memberName(p.kind.RemoveMember.agent)}`;
+  if ('RemoveMember' in p.kind)
+    return t('Remove {name}', { name: memberName(p.kind.RemoveMember.agent) });
   if ('Edit' in p.kind) {
     const e = p.kind.Edit;
     if (e.description !== null) return t('New description');

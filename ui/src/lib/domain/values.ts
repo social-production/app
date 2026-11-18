@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /**
  * Project values (ADR 0041): web's Proposal-phase "Add value" and 1–10 importance votes.
  * Mirrors the governance zome's `ValueView`; wording is web's (ProjectValueCard.svelte).
@@ -28,7 +29,12 @@ export const IMPORTANCE_OPTIONS: { value: Importance; label: string }[] = Array.
     const value = (index + 1) as Importance;
     return {
       value,
-      label: value === 1 ? 'Unnecessary' : value === 10 ? 'Required' : `Importance ${value} of 10`,
+      label:
+        value === 1
+          ? t('Unnecessary')
+          : value === 10
+            ? t('Required')
+            : t('Importance {n} of 10', { n: value }),
     };
   },
 );

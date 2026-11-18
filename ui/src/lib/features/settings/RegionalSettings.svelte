@@ -106,7 +106,10 @@
             onclick={() => {
               if (picked) save(picked);
               placeOpen = false;
-            }}>{picked ? `Use ${picked.displayLabel.split(',')[0]}` : t('Pick a place')}</button
+            }}
+            >{picked
+              ? t('Use {place}', { place: picked.displayLabel.split(',')[0] ?? '' })
+              : t('Pick a place')}</button
           >
         </div>
       {/snippet}

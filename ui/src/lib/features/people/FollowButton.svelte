@@ -17,10 +17,10 @@
     busy
       ? 'Updating follow'
       : status === 'accepted'
-        ? `Unfollow ${name}`
+        ? t('Unfollow {name}', { name })
         : status === 'pending'
-          ? `Cancel follow request to ${name}`
-          : `Follow ${name}`,
+          ? t('Cancel follow request to {name}', { name })
+          : t('Follow {name}', { name }),
   );
 </script>
 

@@ -69,7 +69,7 @@
         {:else}
           <p class="end-copy">
             {query.trim()
-              ? `Nobody called "${query.trim()}".`
+              ? t('Nobody called “{query}”.', { query: query.trim() })
               : t('Nobody has set up a profile yet.')}
           </p>
         {/each}

@@ -188,7 +188,7 @@
         <path d="M10 8V4l-7 7 7 7v-4c5 0 8 1.5 11 6-1-6-4-11-11-12z" fill="currentColor" />
       </svg>
       <div class="composer-context-text">
-        <strong>Reply to {p.replyTarget.authorName}</strong>
+        <strong>{t('Reply to {name}', { name: p.replyTarget.authorName })}</strong>
         <p>{p.replyTarget.body}</p>
       </div>
       {@render cancel('Cancel reply', p.onCancelReply)}

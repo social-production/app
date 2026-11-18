@@ -147,7 +147,7 @@
       {/if}
       {#if update && latest !== null}
         <div class="overview-update">
-          <small>Latest update · {relativeTime(update.at)}</small>
+          <small>{t('Latest update')} · {relativeTime(update.at)}</small>
           {latest}
         </div>
       {/if}

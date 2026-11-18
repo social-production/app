@@ -16,7 +16,7 @@ export function handleProblem(value: string): string | null {
   if (!handle) return t('Username is required');
   if (/\s/.test(handle)) return t('Username cannot contain spaces');
   if (handle.length < HANDLE_MIN || handle.length > HANDLE_MAX) {
-    return `Username must be ${HANDLE_MIN}–${HANDLE_MAX} characters`;
+    return t('Username must be {min}–{max} characters', { min: HANDLE_MIN, max: HANDLE_MAX });
   }
   return PATTERN.test(handle) ? null : GENERIC;
 }

@@ -131,7 +131,7 @@ export class ScopeState {
   async toggleJoin(): Promise<void> {
     if (!this.scope || this.joining) return;
     if (!this.project && this.scope.id) return;
-    if (!requireViewer(`Sign in to join ${this.scope.handle}.`)) return;
+    if (!requireViewer(t('Sign in to join {handle}.', { handle: this.scope.handle }))) return;
     this.joining = true;
     try {
       if (!this.scope.id) {
@@ -192,7 +192,9 @@ export async function sendInvite(s: ScopeState, contact: Contact): Promise<void>
       return;
     }
     await inviteToCommunity(contact.agent, s.scope.id);
-    s.inviteFeedback = `Invite sent to ${contact.name}. They join once they accept.`;
+    s.inviteFeedback = t('Invite sent to {name}. They join once they accept.', {
+      name: contact.name,
+    });
   } catch {
     s.inviteFeedback = 'That user could not be invited. Check the username and try again.';
     s.inviteWarning = true;

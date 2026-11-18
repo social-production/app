@@ -110,7 +110,7 @@
         <BackButton />
         <CommentComposer
           bind:value={draft}
-          placeholder={replyTo ? `Reply to ${replyName}` : t('Add a comment')}
+          placeholder={replyTo ? t('Reply to {name}', { name: replyName }) : t('Add a comment')}
           {signedIn}
           onSignIn={(message) => requireViewer(message)}
           onSubmit={() => void send()}
@@ -133,7 +133,9 @@
               >
               · {relativeCompact(comment.createdAt)}
             </p>
-            {#if parent}<p class="replying-to">Replying to {name(parent.author)}</p>{/if}
+            {#if parent}<p class="replying-to">
+                {t('Replying to {name}', { name: name(parent.author) })}
+              </p>{/if}
             <p class="feedback-comment-body">{comment.body}</p>
             <div class="feedback-comment-actions">
               <button type="button" aria-label={t('Reply')} onclick={() => answer(comment.id)}>

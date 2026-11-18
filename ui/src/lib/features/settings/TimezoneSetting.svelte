@@ -83,7 +83,7 @@
         </button>
       </li>
     {:else}
-      <li class="setting-hint">No timezone matches "{query}".</li>
+      <li class="setting-hint">{t('No timezone matches “{query}”.', { query })}</li>
     {/each}
   </ul>
 </OverlaySheet>

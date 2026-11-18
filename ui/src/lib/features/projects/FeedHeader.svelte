@@ -92,7 +92,7 @@
 
 <FeedFilterSheet
   {open}
-  title={`Show in ${scopeLabel}`}
+  title={t('Show in {place}', { place: t(scopeLabel) })}
   type={filter}
   sort={feed.sort}
   window={feed.window}

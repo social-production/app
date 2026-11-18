@@ -175,7 +175,7 @@
   {#snippet footer()}
     <div class="sheet-actions">
       <button class="sheet-submit" type="button" onclick={() => (sheetOpen = false)}
-        >{shown === 1 ? t('Show 1 place') : `Show ${shown} places`}</button
+        >{shown === 1 ? t('Show 1 place') : t('Show {n} places', { n: shown })}</button
       >
     </div>
   {/snippet}

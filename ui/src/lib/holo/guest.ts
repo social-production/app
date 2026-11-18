@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { decode, encode } from '@msgpack/msgpack';
 import type { CellId } from '@holochain/client';
 
@@ -24,7 +25,9 @@ export async function guestRead<T>(
   });
   if (!response.ok) {
     const json: unknown = await response.json().catch(() => ({}));
-    const message = (json as { error?: string }).error ?? `The server answered ${response.status}.`;
+    const message =
+      (json as { error?: string }).error ??
+      t('The server answered {status}.', { status: response.status });
     throw new GatewayError(message, response.status);
   }
   return decode(new Uint8Array(await response.arrayBuffer())) as T;

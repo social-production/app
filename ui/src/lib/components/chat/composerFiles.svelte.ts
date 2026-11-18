@@ -24,7 +24,7 @@ export class ComposerFiles {
   private remember(file: File, previewUrl = ''): void {
     if (this.items.length >= ComposerFiles.MAX) {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
-      this.error = `You can attach up to ${ComposerFiles.MAX} files`;
+      this.error = t('You can attach up to {n} files', { n: ComposerFiles.MAX });
       return;
     }
     this.items = [...this.items, { id: crypto.randomUUID(), file, previewUrl }];

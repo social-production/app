@@ -67,7 +67,7 @@
   {#each form.stages as stage, index (index)}
     <div class="review-stage">
       {@render row(
-        `Stage ${index + 1}: ${stage.title || 'Untitled'}`,
+        `${t('Stage {n}', { n: index + 1 })}: ${stage.title || t('Untitled')}`,
         stage.details || 'No details yet',
         'stages',
       )}

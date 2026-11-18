@@ -44,7 +44,7 @@ export function boardChip(m: BoardMember, now = Date.now()): string {
   if (m.standing === 'grace') {
     const days =
       m.graceEndsAt === null ? 7 : Math.max(1, Math.ceil((m.graceEndsAt - now) / DAY_MS));
-    return `Grace · ${plural(days, 'day')}`;
+    return `${t('Grace')} · ${plural(days, 'day')}`;
   }
   return m.standing === 'qualifying' ? 'Ready' : 'Candidate';
 }
