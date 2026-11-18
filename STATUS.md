@@ -204,7 +204,7 @@ ask here before touching Settings files. `claude/ux-detail-pages` changes `displ
 only; `taggedName()` for Devices), one import in `DeviceSettings.svelte`, the signed-out bottom
 nav and Topbar, and removes `SignedOutIntro`.
 
-### Where things stand (1:40 am Melbourne, 2026-11-19, UX session)
+### Where things stand (2:20 am Melbourne, 2026-11-19, UX session)
 - **Live: #228–#229** (the Update form option A, the joined rail switch, a page-shaped
   `SkeletonDetail`) and **#230** (live 1:31 am): every dock is joined segments, the bottom bar
   too (`MobileBottomNav`); `DetailActionDock` adds `tight` to the capsule when its actions
@@ -213,7 +213,7 @@ nav and Topbar, and removes `SignedOutIntro`.
   Support | % | Oppose and a request's ↑ | n | ↓ are three segments with the middle between two
   hairlines (`ux/dockjoin.css`); the opening screen follows the chosen language (`app.html`).
   Feed/thread/comment votes stay plain icons (owner's 17 Nov mockups).
-- **In flight: `claude/vote-sheets`** (approved mockup): one vote sheet for every vote.
+- **Live: #231** (live 2:15 am; approved mockup): one vote sheet for every vote.
   `OverlaySheet` takes a `kicker` snippet above the title; `VoteKicker` (green kind · who ·
   when), `VoteTally` (thin bar, "1 yes · 0 no · 1 of 3 voted", needs 66%), `VoteChoiceBar
   docked` (No | Yes in the joined dock; cast votes read "✓ You voted Yes"); headlines from
@@ -223,6 +223,9 @@ nav and Topbar, and removes `SignedOutIntro`.
   capability and repository flows). The plan sheet asks one question per screen
   (`Review · N questions`, then No | Yes); tests use `reviewPlan()` in `tests/e2e/lib.mjs`.
   The Update form is "What's new?" with "Send to vote". Russian in `i18n/ru/part17.ts`.
+  Checked: governance.mjs and software.mjs pass locally; 390px light/dark shots; live smoke.
+- **Next:** Russian fixes from the owner and their wife; pushes in the reader's language; demo
+  moderators (waiting on the owner's vouches).
 
 ### Where things stand (9:40 am Melbourne, 2026-11-18, UX session)
 - **Live: #205** (Directions sheet `features/map/DirectionsSheet.svelte` + `domain/directions.ts`;
