@@ -60,7 +60,7 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
    "Still open"; the app's is better).
 9. **Settings waiting on features:** language, separate feeds, display timezone, Privacy's
    three personal-feed switches.
-10. **Not compared yet:** the remaining signed-in screens (compare each from web's source).
+10. **Routes compared** (2026-11-18, see "Routes compared" below); earlier screen notes:
    The right rail's Help Requests was compared and ported 2026-11-10; Settings and the profile
    page 2026-11-10 (the profile photo now opens in the PhotoViewer). Settings' Account lacks
    web's **Deactivate account** (signed out for good; content stays under the name): ADR 0088,
@@ -301,8 +301,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
   personal service can't use the tag. The app reserves the slug (`domain/scopes.ts`), shows a
   stub at `/platform`, and links `#platform` tags there. Needs an ADR (who may create the
   channel record; the population rule is a governance change).
-- [x] **Moderators** (built 2026-11-13 with the channel, ADR 0095; still open: platform-tagged
-  projects voted on by any Full member, moderators' merge capability, weekly-count populations) (owner, 2026-11-12: "we also don't have moderators"; this overrides the
+- [x] **Moderators** (built 2026-11-13 with the channel, ADR 0095; platform-tagged projects voted on
+  by any Full member with weekly-count populations, ADR 0109; on #platform software projects only
+  moderators record merges, PR #222, 2026-11-18) (owner, 2026-11-12: "we also don't have moderators"; this overrides the
   2026-10-31 note that filed the platform board under asset management): web's moderator board
   on the Platform page (`features/platform/board/*`: moderators and candidates, volunteer,
   `castModeratorVote`, "How moderator roles work": moderators execute approved platform
@@ -315,7 +316,9 @@ The open boxes below, grouped by size. Asset management is not part of parity (o
 - web's `personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem` are covered by the
   app's Home scope, onboarding and `/invites`; `profile/[username]` by `profile/[agent]`.
 
-## Not compared yet
-Signed-in screens other than Settings and Notifications (compare from web's source; don't create
-accounts on the FastAPI site). Everything left above waits on features: the personal feed, channels and
-communities (M5), places and moderation (M6).
+## Routes compared (2026-11-18)
+Every route in web's `src/routes` has an app counterpart or is listed above as covered
+(`personal`, `login`, `signup`, `welcome`, `scopes/invites/redeem`, `profile/[username]`) or as
+not for parity (`platform/assets/**`). The app's own extra routes: `/feedback/[id]`, `/health`,
+`/people`, `/profile`. What's left is checking on live (Platform and Moderators, reporting,
+profile photos, plan rating and vote errors) and Russian.
