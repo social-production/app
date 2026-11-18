@@ -144,7 +144,7 @@
 
   <div class="members-list">
     {#if side === 'invited' && invites}
-      <h2>Waiting to join · {waiting.length}</h2>
+      <h2>{t('Waiting to join')} · {waiting.length}</h2>
       {#each invited as i (i.agent)}
         <MemberRow agent={i.agent} name={nameOf(i.agent)} line={invitedLine(i)} />
       {:else}

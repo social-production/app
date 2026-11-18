@@ -87,7 +87,7 @@
       ? 'Organizers decide: saved at once'
       : organized
         ? t('Organizers decide: read only for you')
-        : `Members vote: ${APPROVAL_PERCENT}% yes`,
+        : t('Members vote: {percent}% yes', { percent: APPROVAL_PERCENT }),
   );
 
   async function save(): Promise<void> {

@@ -168,7 +168,7 @@
                   >
                     {openComments[a.id]
                       ? t('Hide comments')
-                      : `Show comments (${a.ratings.length})`}
+                      : t('Show comments ({n})', { n: a.ratings.length })}
                   </button>
                   {#if openComments[a.id]}
                     <div class="comments-list">

@@ -112,9 +112,9 @@ export function proposalLabel(kind: ProposalKind, phaseLabel: (id: string) => st
   if ('RequestSettings' in kind) return t('Request settings');
   if ('Software' in kind) return kind.Software.label;
   // web's phaseChangeDecisionTitle('return', …).
-  if ('Return' in kind) return `Return to ${phaseLabel(kind.Return.to)}`;
+  if ('Return' in kind) return t('Return to {phase}', { phase: phaseLabel(kind.Return.to) });
   if ('Convert' in kind) return t('Convert to a new proposal');
-  return `Move to ${phaseLabel(kind.Phase.to)}`;
+  return t('Move to {phase}', { phase: phaseLabel(kind.Phase.to) });
 }
 
 /** web's VoteDecisionBody outcome sentence. */

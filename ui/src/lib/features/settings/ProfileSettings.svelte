@@ -41,7 +41,9 @@
     error = undefined;
     try {
       avatar = await toAvatar(file);
-      const note = `Picture resized to 256×256 (${Math.ceil(avatar.bytes.length / 1024)} KB).`;
+      const note = t('Picture resized to 256×256 ({kb} KB).', {
+        kb: Math.ceil(avatar.bytes.length / 1024),
+      });
       status = note;
       await save();
       if (!error) status = `${note} Saved.`;

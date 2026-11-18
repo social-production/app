@@ -1,4 +1,4 @@
-import { t, plural } from '#lib/i18n/index.ts';
+import { t, t as tr, plural } from '#lib/i18n/index.ts';
 /** Software projects (ADR 0086): what web's software panel shows, in the app's shape. */
 
 export type SoftwareStage =
@@ -175,7 +175,7 @@ export function voteRequirementLine(t: SoftwareTally): string {
       }
     }
   }
-  const need = needed > 0 ? `Needs ${needed} more yes` : 'Enough yes votes so far';
+  const need = needed > 0 ? tr('Needs {n} more yes', { n: needed }) : tr('Enough yes votes so far');
   const waiting =
     left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;

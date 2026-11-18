@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import {
     VISIBLE,
     type Moderation,
@@ -78,7 +79,7 @@
   }
 
   function toggle(): void {
-    if (!actions.requireViewer(`Sign in to report this ${itemLabel}.`)) return;
+    if (!actions.requireViewer(t('Sign in to report this {item}.', { item: t(itemLabel) }))) return;
     menuOpen = !menuOpen;
     voteError = '';
     if (menuOpen) void load();

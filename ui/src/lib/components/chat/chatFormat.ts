@@ -50,7 +50,7 @@ export function callLineText(line: ChatLine): string {
       hours > 0
         ? `${hours}:${String(minutes).padStart(2, '0')}:${seconds}`
         : `${minutes}:${seconds}`;
-    return `Voice call · ${length}`;
+    return `${t('Voice call')} · ${length}`;
   }
   if (line.call?.outcome === 'declined') return t('Call declined');
   return line.own ? t('No answer') : t('Missed call');

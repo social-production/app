@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { NotificationItem } from './notifications.ts';
 
 type Unread = Omit<NotificationItem, 'isUnread'>;
@@ -20,8 +21,12 @@ export function inviteNotifications(
     title: i.title,
     body:
       i.kind === 'community'
-        ? `You were invited to join ${i.title}. Accept or decline it in Invites.`
-        : `You were invited to an event: ${i.title}. Accept or decline it in Invites.`,
+        ? t('You were invited to join {title}. Accept or decline it in Invites.', {
+            title: i.title,
+          })
+        : t('You were invited to an event: {title}. Accept or decline it in Invites.', {
+            title: i.title,
+          }),
     lead: null,
     target: null,
     createdAt: i.at,

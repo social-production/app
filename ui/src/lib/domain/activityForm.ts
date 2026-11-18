@@ -120,7 +120,7 @@ export const minimumPeople = (roles: RoleDraft[]): number =>
 /** web's place summary: "Online", "Online · Zoom" or the place. */
 export function placeSummary(form: ActivityForm): string {
   const place = form.place.trim();
-  if (form.online) return place && place !== 'Online' ? `Online · ${place}` : 'Online';
+  if (form.online) return place && place !== 'Online' ? `${t('Online')} · ${place}` : t('Online');
   return place;
 }
 

@@ -45,7 +45,7 @@
 
 <FeedFilterSheet
   {open}
-  title={`Show in ${name}`}
+  title={t('Show in {place}', { place: t(name) })}
   {type}
   sort={feed.sort}
   window={feed.window}

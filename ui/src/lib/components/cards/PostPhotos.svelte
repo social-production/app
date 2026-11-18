@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import { plural } from '#lib/i18n/index.ts';
   import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
   import type { ChatAttachment } from '#lib/domain/chat.ts';
@@ -74,7 +75,10 @@
     <div class="post-photos" class:open data-count={photos.length}>
       {#each photos as photo, i (i)}
         <button type="button" aria-label={`View photo ${i + 1}`} onclick={() => void view(i)}>
-          <img alt={`Photo ${i + 1} of ${photos.length}`} use:src={photo} />
+          <img
+            alt={t('Photo {n} of {total}', { n: i + 1, total: photos.length })}
+            use:src={photo}
+          />
         </button>
       {/each}
     </div>
@@ -96,6 +100,8 @@
   <p class="photo-caption">{caption}</p>
   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- postHref arrives resolved -->
   <a class="photo-open" href={postHref}
-    >Open post{commentCount ? ` · ${plural(commentCount, '{n} comment', '{n} comments')}` : ''} ›</a
+    >{t('Open post')}{commentCount
+      ? ` · ${plural(commentCount, '{n} comment', '{n} comments')}`
+      : ''} ›</a
   >
 {/snippet}

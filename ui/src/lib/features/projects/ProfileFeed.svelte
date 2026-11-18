@@ -58,7 +58,9 @@
   ];
   // svelte-ignore state_referenced_locally
   const own = agent === undefined; // re-created per person, as `who` above
-  const sheetTitle = $derived(name ? `Show on ${name}'s profile` : t('Show on this profile'));
+  const sheetTitle = $derived(
+    name ? t("Show on {name}'s profile", { name }) : t('Show on this profile'),
+  );
 
   const tabs: { value: ProfileTab; label: string }[] = [
     { value: 'all', label: t('All') },
@@ -82,7 +84,7 @@
     };
     const noun = kinds[tab];
     return {
-      title: `No ${noun} yet`,
+      title: t('No {noun} yet', { noun: t(noun) }),
       text: own
         ? `What you share shows up here.`
         : `When ${who} ${

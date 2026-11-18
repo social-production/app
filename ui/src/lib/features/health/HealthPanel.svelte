@@ -19,7 +19,7 @@
   );
   const label = $derived(
     connection.current.status === 'connected'
-      ? `Connected to ${connection.current.node}`
+      ? t('Connected to {node}', { node: connection.current.node })
       : connection.current.status === 'connecting'
         ? t('Connecting…')
         : 'Offline',

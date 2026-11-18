@@ -69,5 +69,5 @@ export function planGateMessage(gate: PlanKind, hasPlans: boolean): string {
       : 'distribution or access plan';
   return hasPlans
     ? `A ${kind} is waiting on quorum before this project can advance.`
-    : `This project needs an approved ${kind} before it can advance.`;
+    : t('This project needs an approved {kind} before it can advance.', { kind: t(kind) });
 }

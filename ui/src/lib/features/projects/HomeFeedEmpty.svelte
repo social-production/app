@@ -44,7 +44,7 @@
 {:else if search}
   <EmptyState
     icon="search"
-    title={`No results for "${search}"`}
+    title={t('No results for “{query}”', { query: search })}
     text={t('Check the spelling or try fewer words.')}
   />
 {:else if scope === 'home'}

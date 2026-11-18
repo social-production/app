@@ -113,8 +113,8 @@ export const SUBTYPE_LABELS: Record<ProjectSubtype, string> = {
 export function subtypeOptions(mode: ProjectMode): { value: ProjectSubtype; label: string }[] {
   const noun = mode === 'collective-service' ? 'service' : 'project';
   return [
-    { value: 'standard', label: `Standard ${noun}` },
-    { value: 'software', label: `Software ${noun}` },
+    { value: 'standard', label: t('Standard {noun}', { noun: t(noun) }) },
+    { value: 'software', label: t('Software {noun}', { noun: t(noun) }) },
   ];
 }
 

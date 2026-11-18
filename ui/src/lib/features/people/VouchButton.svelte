@@ -31,8 +31,8 @@
 
 <button
   aria-label={vouched
-    ? `You vouched for ${person.profile?.name ?? 'them'}`
-    : `Vouch for ${person.profile?.name ?? 'them'}`}
+    ? t('You vouched for {name}', { name: person.profile?.name ?? '' })
+    : t('Vouch for {name}', { name: person.profile?.name ?? '' })}
   aria-pressed={vouched}
   class="action vouch"
   class:on={vouched}

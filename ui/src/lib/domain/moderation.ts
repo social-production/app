@@ -79,7 +79,7 @@ export function thresholdLines(report: ContentReport): string[] {
   const note = (quorum: number) =>
     audience > quorum ? ` · sized from audience of ~${audience}` : '';
   const lines = [
-    `Delete at ${report.deleteQuorum} votes cast · ${Math.round(report.deleteYesShare * 100)}% yes${note(report.deleteQuorum)}`,
+    `${t('Delete at {n} votes cast', { n: report.deleteQuorum })} · ${t('{percent}% yes', { percent: Math.round(report.deleteYesShare * 100) })}${note(report.deleteQuorum)}`,
   ];
   if (report.reason === 'serious-harm' && report.resolution !== 'removed') {
     const prefix = report.resolution === 'hidden' ? t('Hidden at') : t('Hide at');
@@ -98,7 +98,7 @@ export function voteCountLine(report: ContentReport): string {
 
 /** web's `removed_placeholder`: what stands in for an item a report took down. */
 export function removedLabel(reason: ReportReason | undefined): string {
-  return `Removed for ${reason === 'serious-harm' ? 'serious harm' : 'spam'}`;
+  return reason === 'serious-harm' ? t('Removed for serious harm') : t('Removed for spam');
 }
 
 /** web's report `itemLabel` for a space's mode. */

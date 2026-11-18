@@ -15,6 +15,7 @@ import { part14 } from './ru/part14.ts';
 import { part15 } from './ru/part15.ts';
 import { part16 } from './ru/part16.ts';
 import { part17 } from './ru/part17.ts';
+import { part18 } from './ru/part18.ts';
 
 /**
  * Russian (ADR 0114): English text → Russian, split into parts to keep files short. A plural
@@ -41,4 +42,5 @@ export const ru: Record<string, Entry> = {
   ...part15,
   ...part16,
   ...part17,
+  ...part18,
 };

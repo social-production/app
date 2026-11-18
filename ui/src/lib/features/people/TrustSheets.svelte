@@ -26,7 +26,7 @@
 />
 <ConfirmDialog
   open={trust.confirming}
-  title={`Mark ${name} as a possible bot?`}
+  title={t('Mark {name} as a possible bot?', { name })}
   body={t(
     'One mark only flags the account. When three full members mark it, a public review opens and full members vote on whether it is a bot. You can clear your mark any time.',
   )}

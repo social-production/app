@@ -27,7 +27,7 @@ export function requestRailItems(
       query: `?request=${encodeURIComponent(r.id)}`,
       meta: r.service,
       createdAt: r.createdAt,
-      countLabel: `Requested by ${names[r.requester] ?? t('Unknown requester')}`,
+      countLabel: t('Requested by {name}', { name: names[r.requester] ?? t('Unknown requester') }),
       projectMode: 'personal-service',
     }));
 }

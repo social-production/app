@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import DetailPhaseContext from '#lib/components/governance/DetailPhaseContext.svelte';
   import PhaseStepper from '#lib/components/governance/PhaseStepper.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
@@ -51,7 +52,10 @@
       onSelect={(id) => (selected = id)}
     />
     <DetailPhaseContext
-      position={`Phase ${project.phases.findIndex((p) => p.id === shown) + 1} of ${project.phases.length}`}
+      position={t('Phase {n} of {total}', {
+        n: project.phases.findIndex((p) => p.id === shown) + 1,
+        total: project.phases.length,
+      })}
       kicker={shown === project.phase
         ? ''
         : phaseProgressLabel(project.phases, project.phase, shown)}

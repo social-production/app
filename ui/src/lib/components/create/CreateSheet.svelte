@@ -139,7 +139,9 @@
               </p>{/if}
             <div class="step-body">{@render p.children()}</div>
             {#if tried && hint}
-              <p class="missing-note" role="status">To continue, add: {hint}.</p>
+              <p class="missing-note" role="status">
+                {t('To continue, add: {what}.', { what: hint })}
+              </p>
             {/if}
           </div>
         </div>

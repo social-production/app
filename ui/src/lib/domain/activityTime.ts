@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { locale } from '#lib/i18n/index.ts';
 /**
  * Dates and times on activity cards, as web's CollapsibleActivityCard and ActivityAgendaList
@@ -52,7 +53,7 @@ export function dayHeading(micros: number, now = Date.now()): string {
     inZone({ weekday: 'short', day: 'numeric', month: 'short' }),
   );
   const day = dayKey(micros);
-  if (day === isoDay(wall(now))) return `Today · ${base}`;
-  if (day === isoDay(wall(now + 24 * 60 * 60 * 1000))) return `Tomorrow · ${base}`;
+  if (day === isoDay(wall(now))) return `${t('Today')} · ${base}`;
+  if (day === isoDay(wall(now + 24 * 60 * 60 * 1000))) return `${t('Tomorrow')} · ${base}`;
   return base;
 }

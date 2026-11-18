@@ -116,7 +116,7 @@
 
 <ConfirmDialog
   open={confirming}
-  title={`Remove ${removeTarget?.name ?? t('this member')}?`}
+  title={t('Remove {name}?', { name: removeTarget?.name ?? t('this member') })}
   body={t(
     'They stop being a member straight away, but anyone who still has the invite link can join again.',
   )}

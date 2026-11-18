@@ -89,7 +89,7 @@ export function callStatusLine(view: CallView, elapsed: string): string {
     default:
       if (view.notice) return view.notice;
       return view.lastDurationMs
-        ? `Call ended · ${formatElapsed(view.lastDurationMs)}`
+        ? `${t('Call ended')} · ${formatElapsed(view.lastDurationMs)}`
         : 'Call ended';
   }
 }

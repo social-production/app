@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { t } from '#lib/i18n/index.ts';
   import type { LinkRequest, ProjectLink } from '#lib/domain/links.ts';
   import { pastRows } from '#lib/domain/linksPast.ts';
 
@@ -35,7 +36,7 @@
       aria-expanded={open}
       onclick={() => (open = !open)}
     >
-      <span>Past links · {rows.length}</span>
+      <span>{t('Past links')} · {rows.length}</span>
       <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m7 10 5 5 5-5" /></svg>
     </button>
     {#if open}

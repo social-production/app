@@ -35,7 +35,7 @@
         cursor += 1;
       }}
     >
-      <strong>Pinned message{pins.length > 1 ? ` #${pins.length - index}` : ''}</strong>
+      <strong>{t('Pinned message')}{pins.length > 1 ? ` #${pins.length - index}` : ''}</strong>
       <span>{current.preview || 'Photo or file'}</span>
     </button>
     {#if canUnpin}

@@ -37,8 +37,8 @@
 
   const title = $derived(
     request.sever
-      ? `End the link with ${request.target.title}`
-      : `Link with ${request.target.title}`,
+      ? t('End the link with {title}', { title: request.target.title })
+      : t('Link with {title}', { title: request.target.title }),
   );
   const percent = (h: LinkHalf | null): number =>
     h && h.yes + h.no > 0 ? Math.round((h.yes / (h.yes + h.no)) * 100) : 0;
@@ -54,7 +54,7 @@
 
 <article id={domId} class={`link-vote ${cardClass}`}>
   <strong class="link-vote-title">{title}</strong>
-  <span class="link-vote-meta">Proposed by {proposer}</span>
+  <span class="link-vote-meta">{t('Proposed by {name}', { name: proposer })}</span>
   {#each [request.thisSide, request.otherSide] as side (side.projectId)}
     {@const half = side.half}
     <div class="link-vote-side">

@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { plural } from '#lib/i18n/index.ts';
 /**
  * Activities and roles (ADR 0056), shaped like web's `ProjectActivityItem` as far as the card
@@ -119,6 +120,7 @@ export function signupTone(a: Activity): 'empty' | 'partial' | 'met' {
 
 /** web's place line: "Online", "Online · Zoom" or the place. */
 export function placeLabel(a: Activity): string {
-  if (a.online) return a.place && a.place !== 'Online' ? `Online · ${a.place}` : 'Online';
+  if (a.online)
+    return a.place && a.place !== 'Online' ? `${t('Online')} · ${a.place}` : t('Online');
   return a.place;
 }

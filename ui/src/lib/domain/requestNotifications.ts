@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import {
   notMet,
   REQUEST_OPEN_DAYS,
@@ -25,7 +26,7 @@ export function requestNotifications(requests: ServiceRequest[], me: string): Un
       projectMode: 'personal-service',
       actor,
       title: r.service,
-      body: `Request ${STATUS_LABELS[status].toLowerCase()}: ${r.title}`,
+      body: `${t('Request {status}', { status: t(STATUS_LABELS[status]).toLowerCase() })}: ${r.title}`,
       lead: null,
       target: { request: { project: r.project, id: r.id } },
       createdAt: at,
@@ -38,7 +39,7 @@ export function requestNotifications(requests: ServiceRequest[], me: string): Un
       out.push({
         ...card('open', r.other, at),
         id: `svc-request:${r.id}:not-met`,
-        body: `Request not met: ${r.title}`,
+        body: `${t('Request not met')}: ${r.title}`,
       });
     }
     // Who decided: the person asking cancels; the creator accepts or declines.

@@ -62,7 +62,7 @@
 </script>
 
 <CreateSheet
-  title={`Create ${channel ? 'channel' : 'community'}`}
+  title={channel ? t('Create channel') : t('Create community')}
   description={channel
     ? t(
         'A channel is a topic surface. It gathers related threads and project activity without defining who belongs together.',
@@ -73,7 +73,7 @@
   steps={[{ id: 'basics', title: 'Basics' }]}
   stepIndex={0}
   {missing}
-  submitLabel={`Create ${channel ? 'channel' : 'community'}`}
+  submitLabel={channel ? t('Create channel') : t('Create community')}
   {submitting}
   onStep={() => {}}
   onSubmit={() => void create()}

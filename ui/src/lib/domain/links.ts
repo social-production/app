@@ -105,7 +105,7 @@ function yesNeeded(half: LinkHalf): number | null {
 export function voteRequirement(half: LinkHalf): string {
   const needed = yesNeeded(half) ?? 0;
   const left = Math.max(half.population - half.yes - half.no, 0);
-  const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
+  const need = needed > 0 ? t('Needs {n} more yes', { n: needed }) : t('Enough yes votes so far');
   const waiting =
     left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;

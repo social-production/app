@@ -124,7 +124,8 @@
   }
 
   // web shows an error toast; the app has no toast host, so the map's own toast says it.
-  const missing = (label: string): void => s.showToast(`Could not find ${label} on the map`);
+  const missing = (label: string): void =>
+    s.showToast(t('Could not find {place} on the map', { place: label }));
 
   async function start(): Promise<void> {
     const prefs = readMapPreferences(s.me);

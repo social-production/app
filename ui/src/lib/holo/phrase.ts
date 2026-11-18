@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import { entropyToMnemonic, mnemonicToEntropy, validateMnemonic } from '@scure/bip39';
 import { wordlist } from '@scure/bip39/wordlists/english.js';
 
@@ -23,7 +24,7 @@ export function phraseToSeed(words: string[]): Uint8Array {
 /** The first word that isn't in the word list, as "Word 7 'appel'" (for a helpful hint). */
 export function firstInvalidWord(words: string[]): string | undefined {
   const index = words.findIndex((w) => !wordlist.includes(w.trim().toLowerCase()));
-  return index < 0 ? undefined : `Word ${index + 1} “${words[index]}”`;
+  return index < 0 ? undefined : t('Word {n} “{word}”', { n: index + 1, word: words[index] ?? '' });
 }
 
 /** Three distinct random word positions (0-based) the person must re-enter. */

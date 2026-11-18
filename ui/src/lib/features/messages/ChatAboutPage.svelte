@@ -234,7 +234,9 @@
         </div>
       {/each}
     {:else}
-      {#if p.groups.length === 0}<p class="about-empty">No groups with {p.title} yet.</p>{/if}
+      {#if p.groups.length === 0}<p class="about-empty">
+          {t('No groups with {name} yet.', { name: p.title })}
+        </p>{/if}
       {#each p.groups as g (g.id)}
         <button class="about-row" type="button" onclick={() => p.onOpenChat(g.id)}>
           <AvatarBadge size="md" name={g.title} />

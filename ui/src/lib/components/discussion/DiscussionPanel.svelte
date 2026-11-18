@@ -93,7 +93,7 @@
     <BackButton />
     <CommentComposer
       bind:value={draft}
-      placeholder={replying ? `Reply to ${replyName}` : t('Add a comment')}
+      placeholder={replying ? t('Reply to {name}', { name: replyName }) : t('Add a comment')}
       submitLabel={replying ? t('Post reply') : t('Post comment')}
       {focus}
       {signedIn}

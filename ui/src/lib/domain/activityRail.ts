@@ -152,8 +152,10 @@ function votesToCast(projects: RailProject[]): RailItem[] {
   const pick = <T extends { createdAt: number }>(rows: T[]): T[] =>
     newestFirst(rows).slice(0, VOTE_LIMIT);
   const phases = pick(projects.flatMap((p) => open(p, 'Phase'))).map(({ p, v }) => {
-    const to = 'Phase' in v.kind ? v.kind.Phase.to : '';
-    return proposalItem(p, v, 'phase_change', p.title, `Advance to ${p.phaseLabel(to)}?`);
+    const ask = t('Advance to {phase}?', {
+      phase: p.phaseLabel('Phase' in v.kind ? v.kind.Phase.to : ''),
+    });
+    return proposalItem(p, v, 'phase_change', p.title, ask);
   });
   const plans = pick(
     projects.flatMap((p) =>
@@ -236,7 +238,9 @@ function planItem(p: RailProject, x: PlanView): RailItem {
     kind: 'vote',
     title: x.plan.title || p.title,
     query: voteQuery('plan', x.id, assessed),
-    meta: assessed ? `Approve “${x.plan.title}”?` : t('Assess and approve this plan'),
+    meta: assessed
+      ? t('Approve “{title}”?', { title: x.plan.title })
+      : t('Assess and approve this plan'),
     createdAt: x.createdAt,
     countLabel: tally(x.tally),
     projectMode: p.mode,
@@ -268,7 +272,8 @@ export function railKicker(item: RailItem): string {
   if (item.kind === 'vote') {
     const software = item.voteKindLabel && SOFTWARE_KICKERS[item.voteKindLabel];
     if (software) return software;
-    return item.voteKindLabel ? `Vote · ${item.voteKindLabel.replace('_', ' ')}` : 'Vote';
+    const kind = item.voteKindLabel ? ` · ${t(item.voteKindLabel.replace('_', ' '))}` : '';
+    return `${t('Vote')}${kind}`;
   }
   if (item.kind === 'request') return t('Service request');
   if (isHelpKind(item.kind)) return t('Help request');

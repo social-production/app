@@ -68,7 +68,9 @@
       <span class={`phase-badge ${tone}`}>{t(label)}</span>
     </div>
     <div class="request-footer">
-      <span class="request-meta">Requested by {requester} · {relativeTime(request.createdAt)}</span>
+      <span class="request-meta"
+        >{t('Requested by {name}', { name: requester })} · {relativeTime(request.createdAt)}</span
+      >
     </div>
   </summary>
 

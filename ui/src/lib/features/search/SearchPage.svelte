@@ -130,7 +130,7 @@
       {#if query.trim() && loaded && results.length === 0}
         <EmptyState
           icon="search"
-          title={`No results for "${query.trim()}"`}
+          title={t('No results for “{query}”', { query: query.trim() })}
           text={t('Try a channel name, community name, project title or username.')}
         />
       {:else if query.trim()}

@@ -105,7 +105,7 @@
 
   /** Join from the list (Plan, Phase and Feedback Screens, 6); the rail then lists it. */
   async function join(scope: Scope): Promise<void> {
-    if (!requireViewer(`Sign in to join ${scope.handle}.`)) return;
+    if (!requireViewer(t('Sign in to join {handle}.', { handle: scope.handle }))) return;
     joining = scope.id;
     joinError = '';
     try {

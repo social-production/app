@@ -50,9 +50,11 @@
     )}
   >
     {#if help.running && help.announce}
-      <p class="setting-line server-url">Running and announced at {help.announce.bootstrap}</p>
+      <p class="setting-line server-url">
+        {t('Running and announced at {url}', { url: help.announce.bootstrap })}
+      </p>
     {:else if help.error}
-      <p class="setting-hint error">Not running: {help.error}</p>
+      <p class="setting-hint error">{t('Not running')}: {help.error}</p>
     {/if}
     <label class="help-toggle">
       <input type="checkbox" bind:checked={enabled} />

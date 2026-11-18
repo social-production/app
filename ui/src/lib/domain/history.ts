@@ -36,20 +36,20 @@ function proposalKindLabel(p: Proposal, stageLabel: (id: string) => string): str
   const kind = p.kind;
   if ('Update' in kind) return t('Update decision');
   if ('Edit' in kind) return t('Edit decision');
-  if ('Return' in kind) return `Return to ${stageLabel(kind.Return.to)}`;
+  if ('Return' in kind) return t('Return to {phase}', { phase: stageLabel(kind.Return.to) });
   if ('Convert' in kind) return t('Convert to a new proposal');
   if ('Phase' in kind) {
     const to = stageLabel(kind.Phase.to);
-    return to === 'Closed' ? t('Close project') : `Advance to ${to}`;
+    return to === 'Closed' ? t('Close project') : t('Advance to {phase}', { phase: to });
   }
   return null;
 }
 
 /** web-backend's plan decision label. */
 function planKindLabel(kind: PlanKind, title: string): string {
-  if (kind === 'Distribution' || kind === 'Access') return `Distribution plan · ${title}`;
-  if (kind === 'Production' || kind === 'Organisation') return `Production plan · ${title}`;
-  return `Plan · ${title}`;
+  if (kind === 'Distribution' || kind === 'Access') return `${t('Distribution plan')} · ${title}`;
+  if (kind === 'Production' || kind === 'Organisation') return `${t('Production plan')} · ${title}`;
+  return `${t('Plan')} · ${title}`;
 }
 
 /** Every decision, newest first. Member removals (scopes) are not project history. */
@@ -116,7 +116,7 @@ export function requirementLabel(e: HistoryEntry): string {
   if (e.status !== 'open') return `${APPROVAL_PERCENT}% approval needed`;
   const needed = yesStillNeeded(e) ?? 0;
   const left = Math.max(e.population - e.yes - e.no, 0);
-  const need = needed > 0 ? `Needs ${needed} more yes` : t('Enough yes votes so far');
+  const need = needed > 0 ? t('Needs {n} more yes', { n: needed }) : t('Enough yes votes so far');
   const waiting =
     left > 0 ? ` · ${plural(left, '{n} person has', '{n} people have')} not voted` : '';
   return `${need} (${APPROVAL_PERCENT}% approval)${waiting}`;

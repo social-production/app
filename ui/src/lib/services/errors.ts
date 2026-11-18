@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 /**
  * A message fit to show a person, from any error a flow throws. Zome errors arrive wrapped
  * ("…Guest(\"New members can start…\")…"); the sentence the zome wrote is what people see.
@@ -12,7 +13,7 @@ export function explain(error: unknown): string {
   if (text.includes('No more actions are allowed after a chain close')) return DEACTIVATED;
   const guest = /Guest\("((?:[^"\\]|\\.)*)"\)/.exec(text)?.[1];
   const invalid = /InvalidCommit\(\s*"?((?:[^"\\]|\\.)*)"?\s*\)/.exec(text)?.[1];
-  return guest ?? (invalid ? `Not allowed: ${invalid}` : text);
+  return guest ?? (invalid ? `${t('Not allowed')}: ${t(invalid)}` : t(text));
 }
 
 export const DEACTIVATED = 'This account was deactivated, so it can no longer sign in.';
