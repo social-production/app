@@ -145,3 +145,59 @@ export function requestNotice(
     `/projects/${request.project}?request=${encodeURIComponent(request.id)}`,
   );
 }
+
+/** phase_requests.py: "The project phase changed to …" to the other members. */
+export function phaseDoneNotice(members: string[], project: string, to: string): Promise<void> {
+  return notify(
+    members,
+    'prj-phase-done',
+    () => 'Project phase change executed',
+    `The project phase changed to ${to}.`,
+    `/projects/${project}`,
+  );
+}
+
+/** projects_plans.py / events_plans.py: to the new leading plan's author. */
+export function planLeadNotice(author: string, project: string, event: boolean): Promise<void> {
+  return notify(
+    [author],
+    event ? 'evt-plan-lead' : 'prj-plan-lead',
+    () => 'Plan became leading',
+    event
+      ? 'A vote passed and your event plan is now leading.'
+      : 'A vote passed and your plan is now leading.',
+    `/projects/${project}`,
+  );
+}
+
+/** software/pull_requests.py: to the pull request's author once its vote passes. */
+export function prApprovedNotice(author: string, project: string, pr: string): Promise<void> {
+  return notify(
+    [author],
+    'pr-approved',
+    () => 'Pull request approved',
+    'Voting passed and your pull request is approved for merge.',
+    `/projects/${project}?open=vote&voteTarget=${encodeURIComponent(pr)}&voteKind=pull_request_merge`,
+  );
+}
+
+/** bot_reviews.py: a review opened or closed, to the account and to whoever marked it. */
+export function botReviewNotice(
+  to: string[],
+  kind: 'bot-review' | 'bot-review-result',
+  copy: [string, string],
+  account: string,
+): Promise<void> {
+  return notify(to, kind, () => copy[0], copy[1], `/profile/${account}`);
+}
+
+/** moderation/effects.py: a report removed the project; its members hear. */
+export function removedNotice(members: string[], title: string, reason: string): Promise<void> {
+  return notify(
+    members,
+    'prj-removed',
+    () => title,
+    `This project was removed after a ${reason} report.`,
+    '/',
+  );
+}

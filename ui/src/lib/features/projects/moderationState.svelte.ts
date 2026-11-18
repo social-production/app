@@ -18,7 +18,9 @@ export class ModerationLoader {
     }
   }
 
-  set(next: Moderation): void {
+  /** `removed`: told once when this device's vote removes the item (push, ADR 0108). */
+  set(next: Moderation, removed?: (m: Moderation) => void): void {
+    if (next.state === 'removed' && this.value.state !== 'removed') removed?.(next);
     this.value = next;
   }
 }

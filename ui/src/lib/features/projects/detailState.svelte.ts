@@ -23,6 +23,7 @@ import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
+import { tellDecisions } from './outcomeNotices.ts';
 import { tellMembers } from './phaseNotice.ts';
 import { SoftwareState } from './software/softwareState.svelte.ts';
 
@@ -139,6 +140,7 @@ export class DetailState {
     this.plans = plans;
     this.values = values;
     this.error = undefined;
+    tellDecisions(this, settled, settled.length > 0);
     if (isSoftwareProject(project.charter)) void this.software.load();
     const keys = [
       project.creator,
@@ -183,6 +185,7 @@ export class DetailState {
   async vote(proposal: Proposal, choice: VoteChoice): Promise<void> {
     await castVote(this.id, proposal.id, choice);
     await this.load();
+    tellDecisions(this, [proposal.id], false);
   }
 
   /** web's ProposeEditSheet: only fields that change are proposed. Returns true when filed. */
@@ -223,36 +226,10 @@ export class DetailState {
   }
 
   /** web's plan wizard submit. Returns true when filed. */
-  async submitPlan(plan: Plan): Promise<boolean> {
-    this.saving = true;
-    this.sheetMessage = undefined;
-    try {
-      await submit(this.id, plan);
-      await this.load();
-      return true;
-    } catch (e) {
-      this.sheetMessage = explain(e);
-      return false;
-    } finally {
-      this.saving = false;
-    }
-  }
+  submitPlan = (plan: Plan): Promise<boolean> => this.sheetWrite(() => submit(this.id, plan));
 
   /** web's AddValueSheet submit. Returns true when added. */
-  async addValue(label: string): Promise<boolean> {
-    this.saving = true;
-    this.sheetMessage = undefined;
-    try {
-      await addValue(this.id, label);
-      await this.load();
-      return true;
-    } catch (e) {
-      this.sheetMessage = explain(e);
-      return false;
-    } finally {
-      this.saving = false;
-    }
-  }
+  addValue = (label: string): Promise<boolean> => this.sheetWrite(() => addValue(this.id, label));
 
   rateValue(value: string, importance: Importance): Promise<void> {
     return this.inTurn(() => rateValue(this.id, value, importance));
@@ -264,7 +241,8 @@ export class DetailState {
   }
 
   votePlan(plan: string, choice: VoteChoice): Promise<void> {
-    return this.inTurn(() => castVote(this.id, plan, choice));
+    const voted = this.inTurn(() => castVote(this.id, plan, choice));
+    return voted.then(() => tellDecisions(this, [], true));
   }
 
   // Quick taps (three ratings, then Yes) must not write to the chain at the same time: the
@@ -283,11 +261,15 @@ export class DetailState {
     return this.writes;
   }
 
-  private async file(kind: ProposalKind): Promise<boolean> {
+  private file = (kind: ProposalKind): Promise<boolean> =>
+    this.sheetWrite(() => propose(this.id, kind).then(() => tellMembers(this, kind)));
+
+  /** A sheet's write: the page reloads after it; its error shows in the sheet. */
+  private async sheetWrite(write: () => Promise<unknown>): Promise<boolean> {
     this.saving = true;
     this.sheetMessage = undefined;
     try {
-      await propose(this.id, kind).then(() => tellMembers(this, kind));
+      await write();
       await this.load();
       return true;
     } catch (e) {

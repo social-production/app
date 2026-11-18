@@ -9,6 +9,8 @@ import {
 import { explain } from '#lib/services/errors.ts';
 import { getPerson } from '#lib/services/people.ts';
 
+import { tellReview } from './botReviewNotice.ts';
+
 /** web's ProfilePage trust state (ADR 0074): the bot review card, the Bot action and the
  * Trust sheet's Vouchers / Bot marks. `onChange` reloads the profile after a write. */
 export class ProfileTrust {
@@ -58,8 +60,10 @@ export class ProfileTrust {
     this.stancePending = true;
     this.stanceMessage = '';
     try {
+      const before = this.review;
       await setBotMark(this.agent, bot);
       await this.onChange();
+      void tellReview(this.agent, before).catch(() => {});
     } catch (e) {
       this.stanceMessage = explain(e) || 'Could not update that stance.';
     } finally {
@@ -72,8 +76,10 @@ export class ProfileTrust {
     this.reviewPending = true;
     this.reviewMessage = '';
     try {
+      const before = this.review;
       await voteBotReview(this.agent, vote);
       await this.onChange();
+      void tellReview(this.agent, before).catch(() => {});
     } catch (e) {
       this.reviewMessage = explain(e) || 'Could not record that vote.';
     } finally {
