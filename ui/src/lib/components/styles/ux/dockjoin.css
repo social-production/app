@@ -131,3 +131,56 @@
 .shell .dock-vote > #participation-signals .feed-vote > .signal-percent + button {
   box-shadow: none;
 }
+
+/* A request's like count in the dock (owner, 2026-11-19: "like count buttons on requests
+   which are not percentage based"): ↑ | count | ↓ as three segments, the count between two
+   hairlines like the Support | % | Oppose capsule. */
+.shell .dock-capsule .feed-vote.feed-vote {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  gap: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > button {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  min-width: 52px;
+  padding: 0;
+}
+
+.shell .dock-capsule > .feed-vote:first-child > button:first-child {
+  width: 58px;
+  padding-left: 6px;
+  box-shadow: none;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > .vote-count {
+  display: grid;
+  place-items: center;
+  min-width: 44px;
+  padding: 0 10px;
+  box-shadow:
+    inset 1px 0 0 var(--float-border),
+    inset -1px 0 0 var(--float-border);
+  font-size: 15px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.shell .dock-capsule .feed-vote.feed-vote > .vote-count + button {
+  box-shadow: none;
+}
+
+/* The capsule's last segment sits against its rounded end: a little more room on that side
+   so an icon there (Share, ⋯) isn't pinched by the curve. */
+.shell .dock-capsule > :is(button, a):last-child,
+.shell .dock-capsule > .share-sheet:last-child .share-button,
+.shell .dock-capsule > :last-child:not(button, a) > :is(button, a):last-child {
+  min-width: 58px;
+  padding-right: 6px;
+}
