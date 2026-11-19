@@ -1,0 +1,86 @@
+/* "Get the app" on the About page (ADR 0115). */
+.about-page .get-app {
+  display: grid;
+  gap: 10px;
+  margin-top: 28px;
+}
+
+.about-page .get-app h3 {
+  margin-top: 0;
+}
+
+.about-page .get-app ul {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-sm);
+  list-style: none;
+  overflow: hidden;
+}
+
+.about-page .get-app li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 56px;
+  padding: 10px 14px;
+  background: var(--panel);
+}
+
+.about-page .get-app li + li {
+  border-top: 1px solid var(--panel-border);
+}
+
+.about-page .get-app li.own {
+  background: color-mix(in srgb, var(--brand-soft) 58%, var(--panel));
+}
+
+.about-page .get-app li > div {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-width: 0;
+}
+
+.about-page .get-app strong {
+  color: var(--text-main);
+  font-size: 16px;
+}
+
+.about-page .get-app .get-app-tag {
+  color: var(--brand-strong);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.about-page .get-app .get-app-note {
+  flex-basis: 100%;
+  color: var(--text-soft);
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.about-page .get-app .get-app-download {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid var(--brand);
+  border-radius: var(--radius-sm);
+  color: var(--brand-strong);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.about-page .get-app .get-app-lead,
+.about-page .get-app .get-app-fine {
+  margin: 0;
+  color: var(--text-soft);
+  font-size: 14px;
+}

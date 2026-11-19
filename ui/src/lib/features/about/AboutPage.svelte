@@ -16,6 +16,8 @@
     type Block,
   } from './aboutContent.ts';
 
+  import GetTheApp from './GetTheApp.svelte';
+
   import '#lib/components/styles/about.css';
 
   /** The About page in web's tabbed reader, the open tab in `?section=` (owner's own copy,
@@ -113,6 +115,8 @@
             {/each}
           </p>
         {/if}
+
+        <GetTheApp />
 
         <a class="discover" href={resolve('/')}>{t('Get involved!')}</a>
       </article>
