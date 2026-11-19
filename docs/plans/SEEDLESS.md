@@ -106,6 +106,64 @@ community member can run a gateway later; it is the same seed-node image.
    upstream (ADR 0020); Android works. Not needed for the switch-off, but phones without desktops
    online see stale data.
 
+## Where it stands and what comes next (plan of 19 Nov 2026)
+
+Owner, 19 Nov: "time to work towards seed node not being necessary. Still only need to plan for
+this now as not much usage." The FastAPI site is gone, so this is now the main track after the
+last parity checks. Nothing here is urgent: build it in this order, one PR at a time.
+
+**Done:** 1 (desktop builds in CI for Linux, Windows and macOS, plus a smoke test), 2 (phrase sign-in and
+moving a hosted account), 3 (bootstrap list), 3b (Help the network, except its test), 5
+(geocoding on the device). Deactivation's directory part (ADR 0095).
+
+**Phase A: prove what is built (S).** The 3b test, as a scenario rather than three real
+machines. Three conductors, Railway's bootstrap off, and the third conductor runs
+`kitsune2_bootstrap_srv`. The other two find each other through it, then keep talking
+after it stops, using gossiped addresses. This is what makes Railway's `bootstrap` replaceable.
+
+**Phase B: the feed without the gateway (L, step 4). This is the biggest piece.**
+- B1 Move the gateway's `node/{archivist,index,cards,event_time,people,markers,region,spaces}.rs`
+  (about 2,000 lines) into `services/archive`, a crate that depends on `holochain` like
+  `services/geo`. Leave out axum and the account tables. The gateway uses the crate unchanged.
+  The same tests move with it. The `ci` check proves nothing changed.
+- B2 The desktop runs it in-process when Storage is "keep everything" or "share a slice"
+  (ADR 0037). Add Tauri commands for projects, people, scopes, paused, markers and region.
+  `holo/feed.ts` asks the device when `inNativeApp()`, as places already do (ADR 0093).
+  Measure memory on a desktop (the seed uses about 650 MB for this), and keep it optional.
+- B3 Decide, as a new ADR, how a **light** node gets a feed (phones, and desktops set to light)
+  with no gateway. There are two options:
+  - (a) Ask a full node over Holochain: the archivist agent answers a remote call or signal.
+    Full nodes are found from the directory's announced servers.
+  - (b) Build a small index on the device from the commons' recent time buckets (ADR 0065).
+
+  Recommendation: (a) first. It works with any one desktop online, and phones are light by
+  design (ADR 0037).
+
+**Phase C: updates and resets without the gateway (M, step 6).**
+- C1 Tauri's updater, fed from GitHub Releases. `desktop.yml` already builds the installers,
+  so this adds signing keys and a release step. macOS needs the owner's Apple developer
+  account (US$99 a year), and Windows wants a code-signing certificate.
+- C2 Write an ADR on resetting the networks once real data matters. Today an integrity change is a new
+  network, and `release.rs` on the seed swaps coordinator zomes and drops old networks. Options:
+  - Group integrity changes into rare planned resets, with an export and import of each person's own chain data.
+  - Make zome reads take both the old and the new entry shapes, so most changes stay coordinator-only.
+
+  Decide this before the seed goes and before real users arrive.
+
+**Phase D: the gauge and the leftovers (S each).**
+- D1 Readiness count (step 7): the `health` heartbeat carries the node type and app version, and a
+  page counts full nodes seen in the last day and how many hold each public space.
+- D2 Deactivation's reader rules (ADR 0088), with the next directory reset.
+- D3 Push without the gateway. Desktops already use OS notifications. Android needs its own
+  route (the app's notification while syncing, or a push service). Decide this when phones come.
+- D4 Android build in CI (step 9). iOS stays blocked upstream (ADR 0020).
+
+**Separate from seedless, before growth:** a second gateway, because `VITE_SP_GATEWAYS` already
+takes a list. Hosted agents' memory limits the seed first, well before cost does.
+
+**Rough size:** A about one session. B1 two to three, B2 two, B3 one for the ADR plus two to
+build. C1 one (plus the owner's accounts), C2 one for the ADR. D one or two each.
+
 ## When to switch off
 
 - At least ~5 desktop full nodes online most of the day, in different homes, each holding the
