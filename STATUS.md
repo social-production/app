@@ -363,7 +363,7 @@ Modernisation is done: every screen has an approved look and is built. Push cove
 notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a counterpart.
 
 **Next session (work resumes the week of 23 Nov).** The nightly `ci` run 708 passed (19 Nov).
-Firefox is checked, and the FastAPI site is deleted.
+Firefox is checked, and the FastAPI site is deleted. The opening screen is quieter (#249, live): a small logo mark, the name and a thin line, shown only after 0.4 s.
 
 **Last parity checks**
 1. **Russian fixes** from the owner and their wife, when they send them. Known leftovers:
