@@ -362,26 +362,39 @@ nav and Topbar, and removes `SignedOutIntro`.
 Modernisation is done: every screen has an approved look and is built. Push covers every
 notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a counterpart.
 
-**First thing next session**
-1. **Nightly `ci` run 708** (started 9:58 am Melbourne, 2026-11-19) was still running at
-   11:13 am: check it; a red nightly comes first.
-2. #241 is merged, and the owner confirmed Firefox on Android works (19 Nov).
-   The FastAPI site is deleted (owner, 19 Nov).
+**Next session (work resumes the week of 23 Nov).** The nightly `ci` run 708 passed (19 Nov).
+Firefox is checked, and the FastAPI site is deleted.
 
 **Last parity checks**
-3. **Russian fixes** from the owner and their wife, when they send them. Known leftovers: push
-   text is worded by the sender's device (`pushNotices.ts`), so a Russian reader gets English
-   pushes from English senders; the "Unnamed" fallback stays English.
-4. **Audits on live:** reporting a post or person, profile photos, plan rating and vote
-   errors reaching the user.
-5. **Notifications on the owner's devices:** the owner tests them with their wife on the
-   evening of 19 Nov (one real Web Push on a phone, and the desktop's OS notification).
-6. **Owner only:** roll the Railway environment variables.
+1. **Russian fixes** from the owner and their wife, when they send them. Known leftovers:
+   - Push text is worded by the sender's device, so English senders send English pushes.
+   - The "Unnamed" fallback is still English.
+2. **Audits on live:** reporting a post or person, profile photos, and whether plan rating and vote errors reach the user.
+3. **Notifications:** the owner and their wife test them on the evening of 19 Nov. Ask how it went.
+4. **Owner only:** roll the Railway environment variables.
 
-**Next track: running without the seed node.** The plan is in `docs/plans/SEEDLESS.md`, under "Where it
-stands and what comes next". Phases: A, test the desktop bootstrap. B, the feed index on
-desktops (`services/archive`), then an ADR on light nodes. C, the updater and an ADR on
-network resets. D, the readiness count and the leftovers. Usage is low, so there is no deadline.
+**Running without the seed node.** The details are in `docs/plans/SEEDLESS.md` under "Where it stands and what
+comes next". Railway's bootstrap stays on as a backup.
+5. **A:** a scenario where nodes find each other through a desktop's bootstrap, with Railway's off.
+6. **B1:** move the archivist and feed index into `services/archive`.
+7. **B2:** desktops run it, and `holo/feed.ts` asks the device.
+8. **B3:** phones ask desktops for the feed, and keep their own projects, chats and spaces.
+   - They work offline and ask desktops first, then members' open phones.
+   - They do nothing in the background.
+   - Write an ADR amending ADR 0037.
+9. **C1:** desktop auto-updates from GitHub Releases, with Tauri's free update signature. No Apple or Windows certificate yet.
+10. **C2:** data-format changes. Reads accept old and new shapes; integrity changes are grouped into rare, announced resets that copy each person's data across. ADR first.
+11. **D1:** a readiness page counting full nodes online and how many copies each space has.
+12. **D2:** deactivation's reader rules, with the next directory reset.
+13. **D5:** chats check the invitation when someone joins (a conversation reset), before real users.
+14. **D3 and D4:** phone notifications without the gateway, and an Android build in CI. iOS waits on the upstream keystore fix (ADR 0020), or ships as a thin client first.
+15. **App store checklist:** blocking a person, terms at sign-up, account deletion, the encryption declaration, a privacy label, and a reviewer able to use the app with no desktop of their own.
+16. **Code off GitHub (explore):** Radicle.
+    - Merge bots on separate desktops are the delegates (say 2 of 3). They fast-forward `main` when a PR's vote passes.
+    - Platform-tagged PRs also need a moderator's sign-off.
+    - Software projects choose either a bot-managed repo or a repo they link.
+    - Check how Radicle works on Windows, and whether its node can run inside the app.
+17. **Before growth:** a second gateway.
 
 **Also after parity:** files in
 project chats, code health (UX.md: one kind profile per type, split files near 300 lines, one
