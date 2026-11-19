@@ -43,80 +43,107 @@
         } catch (e) {}
       })();
     </script>
-    <!-- Before the app's code arrives (owner, 2026-11-19: "just use the same one we use for
-         loading"): the feed's breathing grey cards, drawn here because the app's own styles
-         aren't loaded yet. The shell removes it once it mounts and shows its own (OpeningScreen). -->
+    <!-- The opening screen before the app's code arrives (owner's fix 3c, option A of the
+         mockup): the breathing logo, the name, green dots and one line; the app removes it once the first connection settles. -->
     <style>
       #boot-splash {
         position: fixed;
         inset: 0;
         z-index: 2000;
         display: grid;
-        align-content: start;
-        gap: 12px;
-        padding: 72px 16px 16px;
-        overflow: hidden;
+        place-content: center;
+        justify-items: center;
+        gap: 10px;
         background: #ffffff;
-        color: #71717a;
+        color: #18181b;
         font:
-          13px/1.4 Inter,
+          15px/1.4 Inter,
           system-ui,
           -apple-system,
           sans-serif;
-        transition: opacity 0.2s ease;
-        --sk: rgb(24 24 27 / 0.09);
-        --card: #ffffff;
+        text-align: center;
+        transition: opacity 0.25s ease;
       }
       #boot-splash.gone {
         opacity: 0;
         pointer-events: none;
       }
-      #boot-splash p {
-        width: 100%;
-        max-width: 640px;
-        margin: 0 auto;
-        text-align: center;
-      }
-      #boot-splash .c {
+      #boot-splash .logo {
         display: grid;
-        gap: 10px;
-        width: 100%;
-        max-width: 640px;
-        margin: 0 auto;
-        padding: 16px;
-        border-radius: 16px;
-        background: var(--card);
+        place-items: center;
+        width: 76px;
+        height: 76px;
+        margin-bottom: 6px;
+        border-radius: 22px;
+        background: #2f8a57;
+        box-shadow: 0 10px 30px rgb(47 138 87 / 0.35);
+        animation: boot-breathe 2.4s ease-in-out infinite;
       }
-      #boot-splash .c i {
-        display: block;
-        height: 11px;
-        border-radius: 999px;
-        background: var(--sk);
-        animation: boot-pulse 1.6s ease-in-out infinite;
+      #boot-splash .logo i {
+        width: 72px;
+        height: 72px;
+        background: #ffffff;
+        -webkit-mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain
+          no-repeat;
+        mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain no-repeat;
       }
-      #boot-splash .c i:first-child {
-        width: 38%;
+      #boot-splash strong {
+        font-size: 19px;
       }
-      #boot-splash .c i:nth-child(2) {
-        width: 70%;
-        height: 16px;
+      #boot-splash p {
+        margin: 0;
+        color: #71717a;
+        font-size: 13px;
       }
-      #boot-splash .c i:last-child {
-        width: 64%;
+      #boot-splash .dots {
+        display: flex;
+        gap: 6px;
+        margin-top: 4px;
+      }
+      #boot-splash .dots i {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: #2f8a57;
+        opacity: 0.3;
+        animation: boot-dot 1.2s ease-in-out infinite;
+      }
+      #boot-splash .dots i:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      #boot-splash .dots i:nth-child(3) {
+        animation-delay: 0.4s;
       }
       [data-theme='dark'] #boot-splash {
         background: #181a1b;
-        color: #bbc0c9;
-        --sk: rgb(243 244 246 / 0.09);
-        --card: #1e1f22;
+        color: #f3f4f6;
       }
-      @keyframes boot-pulse {
+      [data-theme='dark'] #boot-splash .logo {
+        background: #5dd691;
+        box-shadow: 0 10px 30px rgb(93 214 145 / 0.3);
+      }
+      [data-theme='dark'] #boot-splash .dots i {
+        background: #5dd691;
+      }
+      [data-theme='dark'] #boot-splash .logo i {
+        background: #102017;
+      }
+      [data-theme='dark'] #boot-splash p {
+        color: #bbc0c9;
+      }
+      @keyframes boot-breathe {
         50% {
-          opacity: 0.55;
+          transform: scale(1.06);
+        }
+      }
+      @keyframes boot-dot {
+        30% {
+          opacity: 1;
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #boot-splash .c i {
+        #boot-splash .logo,
+        #boot-splash .dots i {
           animation: none;
         }
       }
@@ -126,18 +153,17 @@
   </head>
   <body data-sveltekit-preload-data="hover">
     <div id="boot-splash" role="status">
-      <p>Connecting to the network</p>
-      <div class="c"><i></i><i></i><i></i><i></i></div>
-      <div class="c"><i></i><i></i><i></i><i></i></div>
-      <div class="c"><i></i><i></i><i></i><i></i></div>
-      <div class="c"><i></i><i></i><i></i><i></i></div>
+      <span class="logo"><i></i></span>
+      <strong>Social Production</strong>
+      <span class="dots"><i></i><i></i><i></i></span>
+      <p>Connecting to the network…</p>
     </div>
     <!-- The opening screen in the chosen language (owner, 2026-11-19), worked out as the app
          does (i18n/index.ts): this device's choice, else the main language. The app's own
          catalogue isn't loaded yet, so the line is here for each language. -->
     <script>
       (function () {
-        var lines = { ru: 'Подключение к сети' };
+        var lines = { ru: 'Подключение к сети…' };
         var lang = '';
         try {
           lang = localStorage.getItem('sp_language') || '';

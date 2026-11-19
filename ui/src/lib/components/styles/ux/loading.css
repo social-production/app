@@ -251,26 +251,93 @@
   }
 }
 
-/* The opening screen: the feed's loading cards under one quiet line (2026-11-19). */
+/* The opening screen. */
 .opening-screen {
   display: grid;
-  gap: 12px;
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 16px;
+  place-content: center;
+  justify-items: center;
+  gap: 10px;
+  min-height: calc(100dvh - var(--topbar-height, 0px) - var(--shell-bottom-nav-offset, 0px));
+  padding: 24px;
+  color: var(--text-main);
+  text-align: center;
+}
+
+.opening-logo {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 6px;
+  border-radius: 22px;
+  background: var(--brand);
+  box-shadow: 0 10px 30px color-mix(in srgb, var(--brand) 35%, transparent);
+  animation: opening-breathe 2.4s ease-in-out infinite;
+}
+
+.opening-logo img {
+  width: 54px;
+  height: 54px;
+}
+
+@keyframes opening-breathe {
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 14px 40px color-mix(in srgb, var(--brand) 50%, transparent);
+  }
+}
+
+.opening-screen strong {
+  font-size: 19px;
+  font-weight: 700;
 }
 
 .opening-screen p {
   margin: 0;
   color: var(--text-soft);
+  font-size: 14.5px;
+}
+
+.opening-dots {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+
+.opening-dots i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--brand);
+  opacity: 0.3;
+  animation: opening-dot 1.2s ease-in-out infinite;
+}
+
+.opening-dots i:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.opening-dots i:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes opening-dot {
+  30% {
+    opacity: 1;
+  }
+}
+
+.opening-screen .opening-slow {
+  max-width: 260px;
+  margin-top: 8px;
   font-size: 13px;
-  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .loading-line::before,
-  .sk {
+  .sk,
+  .opening-logo,
+  .opening-dots i {
     animation: none;
   }
 }
