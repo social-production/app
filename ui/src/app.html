@@ -43,8 +43,10 @@
         } catch (e) {}
       })();
     </script>
-    <!-- The opening screen before the app's code arrives (owner's fix 3c): the breathing logo,
-         the name and one line; the app removes it once the first connection settles. -->
+    <!-- The opening screen before the app's code arrives (owner's fix 3c, quietened on
+         2026-11-19): the logo mark, the name and a thin moving line, on the page's own colour.
+         It fades in only after 0.4 s, so a quick open goes straight to the feed's skeletons;
+         the app removes it once the first connection settles. -->
     <style>
       #boot-splash {
         position: fixed;
@@ -53,7 +55,7 @@
         display: grid;
         place-content: center;
         justify-items: center;
-        gap: 10px;
+        gap: 14px;
         background: #ffffff;
         color: #18181b;
         font:
@@ -64,73 +66,80 @@
         text-align: center;
         transition: opacity 0.25s ease;
       }
+      #boot-splash > * {
+        animation: boot-in 0.35s ease-out 0.4s both;
+      }
       #boot-splash.gone {
         opacity: 0;
         pointer-events: none;
       }
       #boot-splash .logo {
-        display: grid;
-        place-items: center;
-        width: 76px;
-        height: 76px;
-        margin-bottom: 6px;
-        border-radius: 22px;
+        width: 40px;
+        height: 40px;
         background: #2f8a57;
-        box-shadow: 0 10px 30px rgb(47 138 87 / 0.35);
-        animation: boot-breathe 2.4s ease-in-out infinite;
-      }
-      #boot-splash .logo i {
-        width: 72px;
-        height: 72px;
-        background: #ffffff;
         -webkit-mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain
           no-repeat;
         mask: url('%sveltekit.assets%/icon-monochrome-512.v4.png') center / contain no-repeat;
       }
       #boot-splash strong {
-        font-size: 19px;
+        font-size: 16px;
+        font-weight: 650;
+        letter-spacing: -0.01em;
+      }
+      #boot-splash .track {
+        position: relative;
+        width: 112px;
+        height: 3px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: rgb(24 24 27 / 0.08);
+      }
+      #boot-splash .track::before {
+        position: absolute;
+        inset: 0 auto 0 0;
+        width: 40%;
+        border-radius: 999px;
+        background: #2f8a57;
+        animation: boot-slide 1.3s ease-in-out infinite;
+        content: '';
       }
       #boot-splash p {
+        max-width: 260px;
         margin: 0;
         color: #71717a;
-        font-size: 14.5px;
-      }
-      #boot-splash p span {
-        animation: boot-dot 1.2s ease-in-out infinite;
-      }
-      #boot-splash p span:nth-child(2) {
-        animation-delay: 0.2s;
-      }
-      #boot-splash p span:nth-child(3) {
-        animation-delay: 0.4s;
+        font-size: 13px;
       }
       [data-theme='dark'] #boot-splash {
         background: #181a1b;
         color: #f3f4f6;
       }
-      [data-theme='dark'] #boot-splash .logo {
+      [data-theme='dark'] #boot-splash .logo,
+      [data-theme='dark'] #boot-splash .track::before {
         background: #5dd691;
-        box-shadow: 0 10px 30px rgb(93 214 145 / 0.3);
       }
-      [data-theme='dark'] #boot-splash .logo i {
-        background: #102017;
+      [data-theme='dark'] #boot-splash .track {
+        background: rgb(243 244 246 / 0.1);
       }
       [data-theme='dark'] #boot-splash p {
         color: #bbc0c9;
       }
-      @keyframes boot-breathe {
-        50% {
-          transform: scale(1.06);
+      @keyframes boot-in {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
         }
       }
-      @keyframes boot-dot {
-        50% {
-          opacity: 0.25;
+      @keyframes boot-slide {
+        from {
+          transform: translateX(-100%);
+        }
+        to {
+          transform: translateX(250%);
         }
       }
       @media (prefers-reduced-motion: reduce) {
-        #boot-splash .logo,
-        #boot-splash p span {
+        #boot-splash > *,
+        #boot-splash .track::before {
           animation: none;
         }
       }
@@ -140,9 +149,10 @@
   </head>
   <body data-sveltekit-preload-data="hover">
     <div id="boot-splash" role="status">
-      <span class="logo"><i></i></span>
+      <span class="logo"></span>
       <strong>Social Production</strong>
-      <p>Connecting to the network<span>.</span><span>.</span><span>.</span></p>
+      <span class="track"></span>
+      <p>Connecting to the network</p>
     </div>
     <!-- The opening screen in the chosen language (owner, 2026-11-19), worked out as the app
          does (i18n/index.ts): this device's choice, else the main language. The app's own
