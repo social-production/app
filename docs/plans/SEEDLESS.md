@@ -183,6 +183,35 @@ check before building:
 - Whether a Radicle node can be embedded in the desktop app or has to run beside it.
 - How a PR's head on Radicle links to its vote record.
 
+**Software projects pick their repo (owner, 19 Nov).** When a plan makes a software project,
+it chooses one of two options:
+- **Bot-managed:** the merge bots create a Radicle repo and merge PRs by the project's votes.
+- **Linked:** the project enters a repo it already has, and the app links to it.
+
+Goal: in the end, everything runs autonomously.
+
+**Phones keep their own projects (owner, 19 Nov; amends ADR 0037).** A phone keeps a copy of
+everything in the projects, chats and spaces it is a member of, and it works offline. When it
+needs data, it asks in this order:
+1. An always-on desktop.
+2. Any other member's phone that is open and newer.
+
+Rules:
+- **Private spaces:** these are their own small networks, so a member's phone can hold the whole thing.
+- **Public spaces:** these live in the shared commons, so the phone keeps its own copy and answers fellow members directly.
+- **Only while the app is open.** Phones hold or serve nothing else and do nothing in the background, which is what the app stores and batteries need.
+
+Android can add "help while charging" later.
+
+**App store checklist.**
+- **Both stores:**
+  - User-generated content needs reporting (built), moderators (built), blocking a person (check), and terms people accept at sign-up (to add).
+  - Account deletion in the app (ADR 0088).
+  - An encryption declaration (standard encryption, so exempt, but it must be filed).
+  - A privacy label.
+- **Google Play:** a foreground service, declared as data sync, if syncing ever runs outside the app.
+- **Apple:** the app must work fully for the reviewer, including logging in and finding content, with no desktop of their own. While the seed or a community node is up, that is easy; after the switch-off, there must be at least one always-on desktop. iOS still needs ADR 0020's keystore fix, or ships as a thin client first.
+
 **Phase D: the gauge and the leftovers (S each).**
 - D1 Readiness count (step 7): the `health` heartbeat carries the node type and app version, and a
   page counts full nodes seen in the last day and how many hold each public space.
