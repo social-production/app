@@ -7,7 +7,7 @@ name: desktop
 on:
   workflow_dispatch:
   schedule:
-    - cron: '47 16 * * *' # ~3:30 am Melbourne, after ci's nightly run starts
+    - cron: "47 16 * * *" # ~3:30 am Melbourne, after ci's nightly run starts
   push:
     branches: [main]
     paths:
@@ -103,7 +103,7 @@ jobs:
       - name: Build the app
         shell: bash
         env:
-          CARGO_PROFILE_RELEASE_DEBUG: '0'
+          CARGO_PROFILE_RELEASE_DEBUG: "0"
         run: |
           # Vendored OpenSSL needs a full Perl; Git Bash's lacks Locale::Maketext::Simple.
           if [ "$RUNNER_OS" = Windows ]; then export OPENSSL_SRC_PERL=C:/Strawberry/perl/bin/perl.exe; fi
@@ -134,3 +134,36 @@ jobs:
             target/release/social-production.exe
           if-no-files-found: error
           retention-days: 7
+
+  # The About page's download links (ADR 0115) point at this rolling prerelease. Each
+  # platform that built replaces its file, so a red Linux smoke keeps the last good Linux.
+  publish:
+    needs: build
+    if: always() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: desktop-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: social-production-*
+      - name: Package and upload
+        run: |
+          gh release view "$TAG" -R "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||
+            gh release create "$TAG" -R "$GITHUB_REPOSITORY" --prerelease --target "$GITHUB_SHA" \
+              --title "Desktop preview" --notes "Unsigned preview builds of the desktop app, rebuilt from main."
+          mkdir out
+          [ -f social-production-Windows/social-production.exe ] &&
+            cp social-production-Windows/social-production.exe out/social-production-windows.exe
+          for os in Linux macOS; do
+            [ -f "social-production-$os/social-production" ] || continue
+            chmod +x "social-production-$os/social-production"
+            tar -czf "out/social-production-${os,,}.tar.gz" -C "social-production-$os" social-production
+          done
+          ls out
+          [ -n "$(ls out)" ] || exit 0
+          gh release upload "$TAG" out/* --clobber -R "$GITHUB_REPOSITORY"
+          gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --target "$GITHUB_SHA"

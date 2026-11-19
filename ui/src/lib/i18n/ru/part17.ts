@@ -34,4 +34,19 @@ export const part17: Record<string, Entry> = {
   'Twelve bikes fixed on Saturday…': 'В субботу починили двенадцать велосипедов…',
   'Send to vote': 'Отправить на голосование',
   'Connecting to the network': 'Подключение к сети',
+  'Get the app': 'Скачать приложение',
+  "You're using the installed app.": 'Вы пользуетесь установленным приложением.',
+  'This device': 'Это устройство',
+  Download: 'Скачать',
+  'Windows 10 or later.': 'Windows 10 или новее.',
+  Mac: 'Mac',
+  'Apple silicon (M1 or later).': 'Apple silicon (M1 или новее).',
+  'Needs WebKitGTK 4.1.': 'Нужен WebKitGTK 4.1.',
+  'In Chrome, open the ⋮ menu and tap Install app.':
+    'В Chrome откройте меню ⋮ и нажмите «Установить приложение».',
+  'iPhone and iPad': 'iPhone и iPad',
+  'In Safari, tap Share, then Add to Home Screen.':
+    'В Safari нажмите «Поделиться», затем «На экран „Домой“».',
+  'Desktop apps are unsigned previews, so your computer may warn before opening them.':
+    'Приложения для компьютера — неподписанные предварительные версии, поэтому компьютер может предупредить перед открытием.',
 };

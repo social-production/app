@@ -364,6 +364,7 @@ notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a coun
 
 **Next session (work resumes the week of 23 Nov).** The nightly `ci` run 708 passed (19 Nov).
 Firefox is checked, and the FastAPI site is deleted. The opening screen is option A of the 3c mockup again (breathing tile, green dots; #253, live), and the manifest's `any` icons are now a rounded tile with a margin (v5), but recent Android draws its launch screen from the maskable icon, so that is now the green tile on the dark page colour too (owner's choice, #255, live; the home-screen icon becomes a dark circle with the tile). Ask the owner whether opening the reinstalled app now flows into the breathing logo.
+The About page has a "Get the app" card on every tab (ADR 0115): Windows, Mac (Apple silicon) and Linux download from the rolling `desktop-latest` prerelease that `desktop.yml`'s new `publish` job fills on main (each platform that built replaces its file; the Linux smoke was red on 19 Nov, so Linux may lag), and Android and iPhone get the browser's install steps. The visitor's own device is listed first. Check that the release exists after the first main run.
 
 **Last parity checks**
 1. **Russian fixes** from the owner and their wife, when they send them. Known leftovers:
