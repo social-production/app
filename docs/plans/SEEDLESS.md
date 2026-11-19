@@ -116,12 +116,12 @@ last parity checks. Nothing here is urgent: build it in this order, one PR at a 
 moving a hosted account), 3 (bootstrap list), 3b (Help the network, except its test), 5
 (geocoding on the device). Deactivation's directory part (ADR 0095).
 
-**Phase A: prove what is built (S).** The 3b test, as a scenario rather than three real
+**Phase A: prove what is built (S).** Owner, 19 Nov: test it soon. Railway's bootstrap stays on as long as possible, as a backup, never the only way in. The 3b test, as a scenario rather than three real
 machines. Three conductors, Railway's bootstrap off, and the third conductor runs
 `kitsune2_bootstrap_srv`. The other two find each other through it, then keep talking
 after it stops, using gossiped addresses. This is what makes Railway's `bootstrap` replaceable.
 
-**Phase B: the feed without the gateway (L, step 4). This is the biggest piece.**
+**Phase B: the feed without the gateway (M, step 4).** Owner, 19 Nov: it shouldn't take long. Most of it is moving code that already works.
 - B1 Move the gateway's `node/{archivist,index,cards,event_time,people,markers,region,spaces}.rs`
   (about 2,000 lines) into `services/archive`, a crate that depends on `holochain` like
   `services/geo`. Leave out axum and the account tables. The gateway uses the crate unchanged.
@@ -136,8 +136,7 @@ after it stops, using gossiped addresses. This is what makes Railway's `bootstra
     Full nodes are found from the directory's announced servers.
   - (b) Build a small index on the device from the commons' recent time buckets (ADR 0065).
 
-  Recommendation: (a) first. It works with any one desktop online, and phones are light by
-  design (ADR 0037).
+  **Decided (owner, 19 Nov): (a).** Phones ask the desktops that hold the data.
 
 **Phase C: updates and resets without the gateway (M, step 6).**
 - C1 Tauri's updater, fed from GitHub Releases. `desktop.yml` already builds the installers,
@@ -148,7 +147,10 @@ after it stops, using gossiped addresses. This is what makes Railway's `bootstra
   - Group integrity changes into rare planned resets, with an export and import of each person's own chain data.
   - Make zome reads take both the old and the new entry shapes, so most changes stay coordinator-only.
 
-  Decide this before the seed goes and before real users arrive.
+  **Decided (owner, 19 Nov, on Claude's advice): both.**
+  - Day to day, reads accept old and new entry shapes, so most changes ship as coordinator updates.
+  - When integrity has to change, changes are grouped into a rare, announced reset. Each person's app exports their own data from the old network and writes it into the new one.
+  - The ADR is still to write when C2 is built.
 
 **Phase D: the gauge and the leftovers (S each).**
 - D1 Readiness count (step 7): the `health` heartbeat carries the node type and app version, and a
@@ -161,8 +163,7 @@ after it stops, using gossiped addresses. This is what makes Railway's `bootstra
 **Separate from seedless, before growth:** a second gateway, because `VITE_SP_GATEWAYS` already
 takes a list. Hosted agents' memory limits the seed first, well before cost does.
 
-**Rough size:** A about one session. B1 two to three, B2 two, B3 one for the ADR plus two to
-build. C1 one (plus the owner's accounts), C2 one for the ADR. D one or two each.
+**Rough size:** A about one session. B1 one to two, B2 one to two, B3 one to two. C1 one (plus the owner's accounts), C2 one for the ADR. D one or two each.
 
 ## When to switch off
 
