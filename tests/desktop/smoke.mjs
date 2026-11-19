@@ -112,7 +112,8 @@ async function waitForSeed(name, timeout) {
     const people = await fetch(`${SEED}/index/people?q=${name}`)
       .then((r) => r.json())
       .catch(() => []);
-    if (people.some((p) => p.name === name)) return true;
+    // The seed can answer with an error object (busy, rate limit): not listed yet, retry.
+    if (Array.isArray(people) && people.some((p) => p.name === name)) return true;
     if (Date.now() > end) return false;
     await new Promise((r) => setTimeout(r, 5000));
   }
