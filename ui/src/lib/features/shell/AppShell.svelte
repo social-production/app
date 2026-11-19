@@ -136,7 +136,7 @@
     }
   });
 
-  $effect(settleBootSplash);
+  $effect(() => settleBootSplash(connection.current.status));
   $effect(showDeactivatedReason);
   $effect(() => {
     const current = connection.current;
