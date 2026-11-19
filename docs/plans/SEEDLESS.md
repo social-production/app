@@ -220,6 +220,14 @@ Android can add "help while charging" later.
   route (the app's notification while syncing, or a push service). Decide this when phones come.
 - D4 Android build in CI (step 9). iOS stays blocked upstream (ADR 0020).
 
+- D5 Chat privacy before real users. Owner, 19 Nov: DMs and group chats live only on their
+  members' devices.
+  - **Already true:** each chat is its own network that only its members join. The archivist and the guest reader never hold chats (`public.rs`).
+  - **Gap 1, joining (to fix):** the membrane isn't checked when someone joins (ADR 0043). Anyone who learned a chat's secret seed could join and read it.
+  - **Fix for gap 1:** a membrane proof, the invitation, checked at genesis. This is a conversation integrity change, so it means a conversation reset.
+  - **Gap 2, hosted accounts:** browser accounts keep their keys and chats on the seed, so the operator could read them. Moving to a desktop or phone ends that.
+  - **Later:** invitations sent by remote call when the recipient is online, to hide who invited whom.
+
 **Separate from seedless, before growth:** a second gateway, because `VITE_SP_GATEWAYS` already
 takes a list. Hosted agents' memory limits the seed first, well before cost does.
 
