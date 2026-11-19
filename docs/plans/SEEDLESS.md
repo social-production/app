@@ -152,6 +152,37 @@ after it stops, using gossiped addresses. This is what makes Railway's `bootstra
   - When integrity has to change, changes are grouped into a rare, announced reset. Each person's app exports their own data from the old network and writes it into the new one.
   - The ADR is still to write when C2 is built.
 
+**Signing (owner, 19 Nov).** Every update carries Tauri's own update signature: a free key we
+hold, checked by every desktop before it installs. It matters even more once peers serve
+updates, because any peer could serve a tampered file.
+
+Apple's developer account and a Windows certificate only quiet the operating system's
+warning on a first install from a browser. The app's own updates don't get that warning.
+So ship without them, with a short note on opening the app the first time, and buy them
+when non-technical installs matter.
+
+**Code off GitHub (owner, 19 Nov: use an existing system).** The candidate is Radicle,
+which is peer-to-peer git. Desktops can optionally run a Radicle node holding the repo, and the updater fetches releases from
+them. A repo's identity document names its *delegates* (keys) and a *threshold*. The canonical
+`main` is the commit that the threshold of delegates have pushed.
+
+How merging follows votes:
+- **Merge bots are the delegates.** Each bot runs on a different desktop with its own key, for
+  example threshold 2 of 3.
+- **Each bot decides on its own.** It reads the PR's vote from our network, and if the PR
+  passed, it pushes the PR's head to `main`.
+- **Fast-forward only.** PRs must be brought up to date with `main` first, so every bot pushes
+  the identical commit and the threshold can agree.
+- **One bot can't merge alone.** A single compromised or buggy bot can't move `main` by itself.
+- **Platform-tagged PRs** also need a seated moderator's sign-off in our network (owner's choice,
+  until the bots have proven themselves). The bots wait for it.
+
+Radicle's canonical-reference rules can later hold a second rule per branch if needed. To
+check before building:
+- Radicle's maturity on Windows.
+- Whether a Radicle node can be embedded in the desktop app or has to run beside it.
+- How a PR's head on Radicle links to its vote record.
+
 **Phase D: the gauge and the leftovers (S each).**
 - D1 Readiness count (step 7): the `health` heartbeat carries the node type and app version, and a
   page counts full nodes seen in the last day and how many hold each public space.
