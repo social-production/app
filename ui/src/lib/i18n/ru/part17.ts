@@ -49,4 +49,9 @@ export const part17: Record<string, Entry> = {
     'В Safari нажмите «Поделиться», затем «На экран „Домой“».',
   'Desktop apps are unsigned previews, so your computer may warn before opening them.':
     'Приложения для компьютера — неподписанные предварительные версии, поэтому компьютер может предупредить перед открытием.',
+  'Next time, just use your fingerprint or face':
+    'В следующий раз просто используйте отпечаток или лицо',
+  "Save a passkey on this device and you won't need your 24 words to sign in. Your words still work.":
+    'Сохраните ключ доступа на этом устройстве, и для входа не понадобятся 24 слова. Слова по-прежнему работают.',
+  'Save passkey': 'Сохранить ключ доступа',
 };

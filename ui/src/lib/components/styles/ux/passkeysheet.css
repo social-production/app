@@ -1,0 +1,69 @@
+/* The passkey offer sheet (mockup option C): a centred badge, title and line. */
+.passkey-sheet .overlay-header {
+  padding: 0 16px;
+  border-bottom: 0;
+}
+
+.passkey-sheet .overlay-header-copy {
+  flex: 1;
+  justify-items: center;
+  gap: 12px;
+  padding: 22px 0 4px;
+  text-align: center;
+}
+
+.passkey-sheet .overlay-header h2 {
+  font-size: 20px;
+  line-height: 1.25;
+  text-wrap: balance;
+}
+
+.passkey-sheet .passkey-badge {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+}
+
+.passkey-sheet .passkey-badge svg {
+  width: 34px;
+  height: 34px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.passkey-sheet .passkey-lead {
+  max-width: 34ch;
+  margin: 0 auto;
+  color: var(--text-soft);
+  font-size: 15px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.passkey-sheet .warning-card {
+  margin: 12px 0 0;
+}
+
+/* Phones: a short sheet from the bottom over the feed (the mockup), not a full page. */
+@media (max-width: 1080px) {
+  .overlay-root.passkey-sheet .overlay-sheet,
+  .overlay-root.passkey-sheet .overlay-sheet:not(.activity) {
+    align-self: end;
+    height: auto;
+    max-height: 90dvh;
+    border-top: 1px solid var(--panel-border);
+    border-radius: 20px 20px 0 0;
+  }
+
+  .overlay-root.passkey-sheet .overlay-header-copy {
+    padding-top: 22px;
+  }
+}
+
+.overlay-root.passkey-sheet .overlay-sheet.has-footer .overlay-body {
+  padding-bottom: 18px;
+}
