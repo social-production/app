@@ -363,25 +363,27 @@ Modernisation is done: every screen has an approved look and is built. Push cove
 notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a counterpart.
 
 **First thing next session**
-1. **#241** (Firefox: the signed-out bar sized from `min-width`, not `flex-basis`): merge when
-   CI is green, then ask the owner to check Firefox on Android. Sweep other `fit-content`
-   capsules for the same Firefox sizing (sheet docks, map capsule) while there.
-2. **Nightly `ci` run 708** (started 9:58 am Melbourne, 2026-11-19) was still running: check it;
-   a red nightly comes first.
+1. **Nightly `ci` run 708** (started 9:58 am Melbourne, 2026-11-19) was still running at
+   11:13 am: check it; a red nightly comes first.
+2. #241 is merged, and the owner confirmed Firefox on Android works (19 Nov).
+   The FastAPI site is deleted (owner, 19 Nov).
 
-**Parity (before the FastAPI site shuts down)**
+**Last parity checks**
 3. **Russian fixes** from the owner and their wife, when they send them. Known leftovers: push
    text is worded by the sender's device (`pushNotices.ts`), so a Russian reader gets English
    pushes from English senders; the "Unnamed" fallback stays English.
 4. **Audits on live:** reporting a post or person, profile photos, plan rating and vote
-   errors reaching the user. Platform and Moderators were checked on 2026-11-19 (three demo
-   moderators seated).
-5. **One real Web Push on a phone** and the desktop's OS notification look (both need the
-   owner's devices).
-6. **Owner only:** roll the Railway environment variables, then switch off the FastAPI
-   services (nobody needs migrating).
+   errors reaching the user.
+5. **Notifications on the owner's devices:** the owner tests them with their wife on the
+   evening of 19 Nov (one real Web Push on a phone, and the desktop's OS notification).
+6. **Owner only:** roll the Railway environment variables.
 
-**After parity:** M7 cutover (seedless, docs/plans/SEEDLESS.md; Android/iOS builds), files in
+**Next track: running without the seed node.** The plan is in `docs/plans/SEEDLESS.md`, under "Where it
+stands and what comes next". Phases: A, test the desktop bootstrap. B, the feed index on
+desktops (`services/archive`), then an ADR on light nodes. C, the updater and an ADR on
+network resets. D, the readiness count and the leftovers. Usage is low, so there is no deadline.
+
+**Also after parity:** files in
 project chats, code health (UX.md: one kind profile per type, split files near 300 lines, one
 resolved-link helper).
 
