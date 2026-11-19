@@ -363,7 +363,7 @@ Modernisation is done: every screen has an approved look and is built. Push cove
 notice kind (`services/pushNotices.ts`, #213–#223). Every web route has a counterpart.
 
 **Next session (work resumes the week of 23 Nov).** The nightly `ci` run 708 passed (19 Nov).
-Firefox is checked, and the FastAPI site is deleted. The opening screen is option A of the 3c mockup again (breathing tile, green dots; #253, live), and the manifest's `any` icons are now a rounded tile with a margin (v5), so Android's own launch screen no longer shows a giant green square. Ask the owner whether the installed app on their phone now opens smoothly (Android caches the launch screen until the app updates or is reinstalled).
+Firefox is checked, and the FastAPI site is deleted. The opening screen is option A of the 3c mockup again (breathing tile, green dots; #253, live), and the manifest's `any` icons are now a rounded tile with a margin (v5), but recent Android draws its launch screen from the maskable icon, so that is now the green tile on the dark page colour too (owner's choice, #255, live; the home-screen icon becomes a dark circle with the tile). Ask the owner whether opening the reinstalled app now flows into the breathing logo.
 
 **Last parity checks**
 1. **Russian fixes** from the owner and their wife, when they send them. Known leftovers:
