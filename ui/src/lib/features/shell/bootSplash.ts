@@ -1,23 +1,11 @@
 /**
- * The static opening screen in app.html (owner's fix 3c, 2026-11-17: "I have never seen the
- * breathing loading screen"): it covers the page from the first paint. While the first
- * connection is still being made it stays, and after 8 s says a slow network can take a
- * minute; once the connection settles (connected, signed out or offline) it fades away.
+ * The static loading cards in app.html cover the page from the first paint until the app's code
+ * arrives. Once the shell mounts it shows the same cards itself (OpeningScreen) while the first
+ * connection is made, so the static ones fade away at once.
  */
-import { t } from '#lib/i18n/index.ts';
-
-export function settleBootSplash(status: string): (() => void) | undefined {
+export function settleBootSplash(): void {
   const splash = document.getElementById('boot-splash');
-  if (!splash) return undefined;
-  if (status === 'connecting') {
-    const timer = setTimeout(() => {
-      const note = document.createElement('p');
-      note.textContent = t('Still connecting. This can take a minute on a slow network.');
-      splash.append(note);
-    }, 8000);
-    return () => clearTimeout(timer);
-  }
+  if (!splash) return;
   splash.classList.add('gone');
-  setTimeout(() => splash.remove(), 300);
-  return undefined;
+  setTimeout(() => splash.remove(), 250);
 }

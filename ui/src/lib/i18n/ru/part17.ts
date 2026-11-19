@@ -33,4 +33,5 @@ export const part17: Record<string, Entry> = {
   'Members vote before it appears.': 'Участники голосуют, прежде чем оно появится.',
   'Twelve bikes fixed on Saturday…': 'В субботу починили двенадцать велосипедов…',
   'Send to vote': 'Отправить на голосование',
+  'Connecting to the network': 'Подключение к сети',
 };

@@ -251,73 +251,26 @@
   }
 }
 
-/* The opening screen (quietened 2026-11-19): it matches app.html's. */
+/* The opening screen: the feed's loading cards under one quiet line (2026-11-19). */
 .opening-screen {
   display: grid;
-  place-content: center;
-  justify-items: center;
-  gap: 14px;
-  min-height: calc(100dvh - var(--topbar-height, 0px) - var(--shell-bottom-nav-offset, 0px));
-  padding: 24px;
-  color: var(--text-main);
-  text-align: center;
-}
-
-.opening-screen > * {
-  animation: opening-in 0.35s ease-out 0.4s both;
-}
-
-@keyframes opening-in {
-  from {
-    opacity: 0;
-    transform: translateY(4px);
-  }
-}
-
-.opening-logo {
-  width: 40px;
-  height: 40px;
-  background: var(--brand);
-  mask: url('/icon-monochrome-512.v4.png') center / contain no-repeat;
-}
-
-.opening-screen strong {
-  font-size: 16px;
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
-.opening-track {
-  position: relative;
-  width: 112px;
-  height: 3px;
-  overflow: hidden;
-  border-radius: 999px;
-  background: color-mix(in srgb, var(--text-main) 8%, transparent);
-}
-
-.opening-track::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 40%;
-  border-radius: 999px;
-  background: var(--brand);
-  animation: loading-line 1.3s ease-in-out infinite;
-  content: '';
+  gap: 12px;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 16px;
 }
 
 .opening-screen p {
-  max-width: 260px;
   margin: 0;
   color: var(--text-soft);
   font-size: 13px;
+  text-align: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .loading-line::before,
-  .sk,
-  .opening-screen > *,
-  .opening-track::before {
+  .sk {
     animation: none;
   }
 }
