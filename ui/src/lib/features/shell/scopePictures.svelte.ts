@@ -24,4 +24,17 @@ export class ScopePictures {
     if (!scope?.picture) return;
     this.urls[slug] = await scopeImageUrl(scope.picture);
   }
+
+  private byHash = $state<Record<string, string | null>>({});
+  // eslint-disable-next-line svelte/prefer-svelte-reactivity
+  private hashesAsked = new Set<string>();
+
+  /** A project's or event's picture (ADR 0117), by its image hash. */
+  ofHash = (hash: string): string | null => {
+    if (!this.hashesAsked.has(hash)) {
+      this.hashesAsked.add(hash);
+      void scopeImageUrl(hash).then((url) => (this.byHash[hash] = url));
+    }
+    return this.byHash[hash] ?? null;
+  };
 }

@@ -18,6 +18,8 @@
 
   import { resolve } from '$app/paths';
 
+  import SpaceArtHeader from './SpaceArtHeader.svelte';
+
   /**
    * A project's or event's Details tab (Plan, Phase and Feedback Screens, 1): the channel
    * header, the title, who started it and when, the date (events), the place as a row that
@@ -117,6 +119,7 @@
 
 <div class="project-overview">
   <div class="context-panel">
+    <SpaceArtHeader picture={charter.picture} cover={charter.cover} />
     <FeedCardTop
       mode={charter.mode}
       tags={charter.tags}

@@ -23,6 +23,8 @@ import {
 
 import type { EventStepId } from '#lib/domain/eventCreate.ts';
 
+import { ScopeArt } from './scopes/scopeArt.svelte.ts';
+
 type Step = { id: EventStepId; title: string; question?: string };
 
 export const CREATE_STEPS: Step[] = [
@@ -51,6 +53,8 @@ export class CreateState {
   message = $state<string>();
   /** Projects left this week for a New member; `null`: no limit. */
   allowance = $state<number | null>(null);
+  /** A picture and cover from the start (ADR 0117), optional: the type's tile stays if none. */
+  readonly art = new ScopeArt();
 
   readonly stepId = $derived(this.steps[this.step]?.id ?? 'basics');
   readonly locationLabel = $derived(
@@ -122,6 +126,8 @@ export class CreateState {
       place: this.placeFor(label),
       phase: 'Proposal',
       tags: this.tags,
+      picture: this.art.newPicture?.hash ?? null,
+      cover: this.art.newCover?.hash ?? null,
     };
   }
 

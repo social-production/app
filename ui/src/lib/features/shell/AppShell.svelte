@@ -1,6 +1,11 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
-  import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
+  import {
+    SCOPE_PICTURES,
+    SPACE_PICTURES,
+    type ScopePictureOf,
+    type SpacePictureOf,
+  } from '#lib/domain/scopes.ts';
   import { setContext, untrack, type Snippet } from 'svelte';
 
   import { goto } from '$app/navigation';
@@ -49,7 +54,9 @@
   /** The app frame, ported from web/src/lib/app/shell/AppShell.svelte (same classes and layout). */
   let { children, mapPanel }: { children: Snippet; mapPanel?: Snippet<[() => void]> } = $props();
   // Tags show their channel's or community's picture (ADR 0109).
-  setContext<ScopePictureOf>(SCOPE_PICTURES, new ScopePictures().of);
+  const pictures = new ScopePictures();
+  setContext<ScopePictureOf>(SCOPE_PICTURES, pictures.of);
+  setContext<SpacePictureOf>(SPACE_PICTURES, pictures.ofHash);
   provideShellContexts();
 
   let compact = $state(true);

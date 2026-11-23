@@ -2,7 +2,12 @@
   import { t } from '#lib/i18n/index.ts';
   import { getContext } from 'svelte';
 
-  import { SCOPE_PICTURES, type ScopePictureOf } from '#lib/domain/scopes.ts';
+  import {
+    SCOPE_PICTURES,
+    SPACE_PICTURES,
+    type ScopePictureOf,
+    type SpacePictureOf,
+  } from '#lib/domain/scopes.ts';
   import type { Snippet } from 'svelte';
   import { MediaQuery } from 'svelte/reactivity';
 
@@ -34,6 +39,7 @@
     createdAt = null,
     updatedAt = null,
     distanceKm = null,
+    picture = null,
     children,
   }: {
     tags: string[];
@@ -44,8 +50,12 @@
     updatedAt?: number | null;
     /** km away, before the clock (Region cards). */
     distanceKm?: number | null;
+    /** A project's or event's picture hash (ADR 0117): the row's tile instead of the type. */
+    picture?: string | null;
     children?: Snippet;
   } = $props();
+  const spacePicture = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
+  const pictureUrl = $derived(picture ? (spacePicture?.(picture) ?? null) : null);
   // A #platform project takes a network vote (ADR 0095); threads and posts take none.
   const network = $derived(
     isNetworkVote(tags) && mode !== null && mode !== 'thread' && mode !== 'post',
@@ -112,7 +122,13 @@
 {#if lead && mode}
   <!-- A feed row (ADR 0102): the type's glyph, the channel in bold, then type · phase · clock. -->
   <div class="feed-card-top feed-lead">
-    <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} feedGlyph /></span>
+    <span class="feed-lead-glyph"
+      >{#if pictureUrl}<img
+          class="feed-lead-picture"
+          src={pictureUrl}
+          alt=""
+        />{:else}<SurfaceTypeLabel projectMode={mode} feedGlyph />{/if}</span
+    >
     <div class="feed-lead-copy">
       {#if tags.length > 0}
         <div class="feed-lead-tags">{@render tagList()}</div>

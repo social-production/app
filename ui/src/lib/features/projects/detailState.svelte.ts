@@ -205,7 +205,8 @@ export class DetailState {
     const c = this.project?.charter;
     if (!c) return Promise.resolve(false);
     const edit = charterEdit(draft, c);
-    if (edit.title === null && edit.description === null && edit.location === null) {
+    const same = !edit.title && !edit.description && !edit.location && !edit.picture;
+    if (same && !edit.cover) {
       this.sheetMessage = 'Nothing has changed.';
       return Promise.resolve(false);
     }

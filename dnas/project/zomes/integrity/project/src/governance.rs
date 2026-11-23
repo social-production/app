@@ -269,10 +269,11 @@ pub fn check_scope_kind(mode: &str, kind: &ProposalKind) -> Result<(), String> {
         ProposalKind::Edit { title: Some(_), .. } if scope => {
             Err("a channel's or community's name is its handle and stays".into())
         }
+        // The Platform's title never changes, so "" can't make it look like one here.
         ProposalKind::Edit { picture, cover, .. }
-            if !scope && (picture.is_some() || cover.is_some()) =>
+            if (picture.is_some() || cover.is_some()) && !crate::charter::takes_art(mode, "") =>
         {
-            Err("only a channel or community has a picture and cover".into())
+            Err("requests, threads and posts have no picture or cover".into())
         }
         ProposalKind::RequestSettings {
             mode: requests,
