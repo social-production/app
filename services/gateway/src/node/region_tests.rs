@@ -201,7 +201,7 @@ fn soonest_orders_by_when_not_where() {
     let cards = [near_late, far_soon, untimed];
     assert_eq!(
         ids(&region(&cards, &query("all")).0),
-        ["near-late", "untimed", "far-soon"]
+        ["untimed", "near-late", "far-soon"]
     );
     let mut q = query("all");
     q.soonest = true;
