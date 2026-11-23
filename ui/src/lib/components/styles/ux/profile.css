@@ -261,12 +261,25 @@
 }
 
 .shell .profile-page .profile-area {
-  display: flex;
+  display: inline-flex;
   align-items: center;
+  align-self: flex-start;
+  justify-self: start;
   gap: 5px;
+  width: fit-content;
+  max-width: 100%;
   margin: 0;
-  color: var(--text-soft);
+  padding: 5px 11px 5px 9px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
   font-size: 13.5px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.shell .profile-page .profile-area svg {
+  color: var(--brand-strong);
 }
 
 .shell .profile-page .profile-area svg {
