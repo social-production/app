@@ -178,6 +178,7 @@
             onBack={() => open(null)}
             onRead={() => publicChats.cleared(activeProject.id)}
             onMenu={(x, y) => openMenu('public', activeProject.id, x, y, true)}
+            onPrefs={(prefs) => void publicChats.setPrefs(activeProject.id, prefs)}
           />
         {/key}
       {:else}

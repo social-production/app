@@ -66,6 +66,16 @@
   font-size: 30px;
 }
 
+.shell .messages-page .chat-about .about-kind {
+  display: grid;
+  place-items: center;
+  width: 96px;
+  height: 96px;
+  border-radius: 28px;
+  background: var(--surface-accent);
+  color: var(--kind-on);
+}
+
 .shell .messages-page .chat-about h2 {
   margin: 8px 0 0;
   font-size: 22px;
@@ -149,13 +159,15 @@
   top: 0;
   z-index: 1;
   display: flex;
-  gap: 18px;
+  gap: 0;
   padding: 0 16px;
   border-bottom: 1px solid var(--panel-border);
   background: var(--panel);
 }
 
 .shell .messages-page .chat-about .about-tabs button {
+  /* Even tabs across the width (owner, 2026-11-23). */
+  flex: 1 1 0;
   height: 46px;
   padding: 0;
   border: none;

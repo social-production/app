@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { locale, t } from '#lib/i18n/index.ts';
+  import { locale, plural, t } from '#lib/i18n/index.ts';
   import { resolve } from '$app/paths';
   import { bodyParts, formatByteSize } from '#lib/components/chat/chatFormat.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -8,6 +8,10 @@
   import type { ChatAttachment, ChatLine } from '#lib/domain/chat.ts';
   import type { ChatSummary, ListPrefs } from '#lib/domain/messages.ts';
   import type { Person } from '#lib/domain/people.ts';
+  import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
+  import { spaceKind } from '#lib/domain/commentNotes.ts';
+  import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
+  import type { CharterMode } from '#lib/domain/projects.ts';
   import { getPerson } from '#lib/services/people.ts';
 
   /**
@@ -32,6 +36,8 @@
     onEditGroup: () => void;
     onJump: (id: string) => void;
     onOpenChat: (id: string) => void;
+    /** A project, event or request's chat (Owner Notes Mockups §7): its type tile, Page. */
+    space?: { mode: CharterMode; href: string | null } | null;
   }
 
   let p: Props = $props();
@@ -131,18 +137,33 @@
 
   <div class="about-scroll">
     <div class="about-head">
-      <span class="about-face"
-        ><AvatarBadge name={p.title} avatar={person?.profile?.avatar ?? null} /></span
-      >
+      {#if p.space}
+        <span
+          class="about-face about-kind"
+          style={`--surface-accent: ${kindColor(kindOf(p.space.mode))}`}
+          ><KindGlyph kind={kindOf(p.space.mode)} size={44} /></span
+        >
+      {:else}
+        <span class="about-face"
+          ><AvatarBadge name={p.title} avatar={person?.profile?.avatar ?? null} /></span
+        >
+      {/if}
       <h2>{p.title}</h2>
       <p class="about-sub">
-        {#if group}{p.chat.members.length} members{#if p.chat.manager === p.me}
+        {#if p.space}{t(spaceKind(p.space.mode))} ·
+          {plural(p.chat.members.length, '{n} member', '{n} members')}
+        {:else if group}{p.chat.members.length} members{#if p.chat.manager === p.me}
             {t('· you manage it')}{/if}
         {:else if person}{t(standingLabel(person))}{#if person.profile?.home_area}
             · {person.profile.home_area}{/if}{/if}
       </p>
       <div class="about-tiles">
-        {#if group}
+        {#if p.space}
+          {#if p.space.href}
+            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- spaceHref resolves it -->
+            <a class="about-tile" href={p.space.href}><ToolbarIcon name="doc" />{t('Page')}</a>
+          {/if}
+        {:else if group}
           {@render tile('pencil', p.chat.manager === p.me ? 'Edit' : 'Info', p.onEditGroup)}
         {:else}
           {@render tile('phone', 'Call', p.onCall)}
