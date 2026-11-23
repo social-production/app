@@ -18,6 +18,11 @@
   import { namesOf, viewer } from '#lib/services/people.ts';
   import { markProjectChatRead, projectChatMembers } from '#lib/services/publicChats.ts';
 
+  import { spaceHref } from '#lib/components/cards/spaceHref.ts';
+  import type { ChatSummary, ListPrefs } from '#lib/domain/messages.ts';
+  import { projectPageOf } from '#lib/services/notifications.ts';
+
+  import ChatAboutPage from './ChatAboutPage.svelte';
   import { inTurn } from './writes.ts';
 
   /** web's MessagesPage with a project chat open from the Public tab: its header ("Project
@@ -28,9 +33,11 @@
     onRead: () => void;
     /** web's header menu (Mute). */
     onMenu: (x: number, y: number) => void;
+    /** Pin or mute from the chat's page. */
+    onPrefs: (prefs: ListPrefs) => void;
   }
 
-  let { chat, onBack, onRead, onMenu }: Props = $props();
+  let { chat, onBack, onRead, onMenu, onPrefs }: Props = $props();
 
   // The page keys this view by chat, so the first id is the one to keep.
   // svelte-ignore state_referenced_locally
@@ -85,6 +92,39 @@
     }
   }
 
+  // The chat's page (Owner Notes Mockups §7): tap the name, as for a person.
+  let about = $state(false);
+  let pageHref = $state<string | null>(null);
+  let memberAgents = $state<string[]>([]);
+
+  async function openAbout(): Promise<void> {
+    about = true;
+    const [found, listing] = await Promise.all([
+      projectChatMembers(id).catch(() => [] as Person[]),
+      projectPageOf(id).catch(() => null),
+    ]);
+    memberAgents = found.map((person) => person.agent);
+    for (const person of found) talk.names[person.agent] ??= person.profile?.name ?? 'Unnamed';
+    pageHref = listing ? spaceHref(chat.mode, listing) : null;
+  }
+
+  const summary = $derived<ChatSummary>({
+    id,
+    kind: 'group',
+    creator: '',
+    manager: null,
+    members: memberAgents,
+    title: chat.title,
+    last: null,
+    unread: 0,
+    invitedAt: 0,
+    member: true,
+    canPin: true,
+    pinned: chat.pinned,
+    muted: chat.muted,
+    hidden: false,
+  });
+
   // untrack: starting reads chat state, which must not re-run (and so stop) this effect.
   $effect(() => {
     untrack(() => talk.start(() => true));
@@ -119,11 +159,7 @@
   <div class="chat-identity">
     <div class="identity-trigger">
       <div>
-        <button
-          class="title-hit"
-          type="button"
-          onclick={(event) => onMenu(event.clientX, event.clientY)}
-        >
+        <button class="title-hit" type="button" onclick={() => void openAbout()}>
           <h2>
             <span class="identity-title">{chat.title}</span>
             <ChatMarks muted={chat.muted} header />
@@ -178,3 +214,23 @@
   {people}
   onClose={() => (membersOpen = false)}
 />
+
+{#if about}
+  <ChatAboutPage
+    chat={summary}
+    title={chat.title}
+    me={talk.me}
+    names={talk.names}
+    lines={talk.lines}
+    groups={[]}
+    fileUrl={talk.fileUrl}
+    space={{ mode: chat.mode, href: pageHref }}
+    onBack={() => (about = false)}
+    {onMenu}
+    onCall={() => undefined}
+    {onPrefs}
+    onEditGroup={() => undefined}
+    onJump={() => (about = false)}
+    onOpenChat={() => undefined}
+  />
+{/if}

@@ -1,4 +1,5 @@
 import { t } from '#lib/i18n/index.ts';
+import { micReady } from './micPrimer.svelte.ts';
 import type { CallChannel, CallEnvelope, CallPhase, CallView } from '#lib/domain/calls.ts';
 import type { CallLine } from '#lib/domain/chat.ts';
 import { configuredIceServers, createCallMedia, type CallMedia } from '#lib/services/callMedia.ts';
@@ -146,6 +147,7 @@ export class CallSession {
     if (peer) rememberPeer(conversationId, peer);
     this.connect();
     if (isLive(this.view.phase)) return;
+    if (!(await micReady())) return;
     const callId = crypto.randomUUID();
     const attempt = this.attempt;
     this.role = 'caller';

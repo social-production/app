@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
   import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
@@ -60,6 +61,7 @@
   });
 
   import '#lib/components/styles/profile.css';
+  const map = placeOnMap();
 </script>
 
 {#snippet camera(label: string, onFile: (file: File) => void, cls: string)}
@@ -119,15 +121,26 @@
             <p class="profile-bio">{person.profile.bio}</p>
           {/if}
           {#if person.profile?.home_area}
-            <p class="profile-area">
+            {@const area = person.profile.home_area}
+            <!-- A place button that opens the map there (owner, 2026-11-23). -->
+            <a
+              class="profile-area"
+              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(area)}`}
+              rel="noopener noreferrer"
+              onclick={(e) => {
+                if (!map || e.metaKey || e.ctrlKey || e.shiftKey) return;
+                e.preventDefault();
+                map.show(area);
+              }}
+            >
               <svg aria-hidden="true" viewBox="0 0 24 24"
                 ><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z" /><circle
                   cx="12"
                   cy="10"
                   r="2.5"
                 /></svg
-              >{person.profile.home_area}
-            </p>
+              >{area}
+            </a>
           {/if}
           <!-- Followers and following only, as drawn; standing and vouches live in the chip's sheet. -->
           <div class="count-row">
