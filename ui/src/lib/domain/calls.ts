@@ -79,7 +79,7 @@ export function callStatusLine(view: CallView, elapsed: string): string {
     case 'ringing':
       return t('Incoming voice call');
     case 'active':
-      return elapsed;
+      return view.notice ?? elapsed;
     case 'unavailable':
       return t('Not available right now');
     case 'busy':

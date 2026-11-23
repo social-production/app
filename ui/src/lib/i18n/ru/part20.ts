@@ -13,4 +13,6 @@ export const part20: Record<string, Entry> = {
     'Присоединитесь к проекту, событию или запросу, и его чат появится здесь вместе со всеми участниками.',
   Nearest: 'Ближайшие',
   Soonest: 'Скоро',
+  "No audio: your networks can't reach each other":
+    'Нет звука: ваши сети не могут соединиться друг с другом',
 };
