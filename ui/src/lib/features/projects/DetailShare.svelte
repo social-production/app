@@ -3,11 +3,10 @@
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
   import { isEvent } from '#lib/domain/projects.ts';
+  import { searchShareContacts } from '#lib/services/shareContacts.ts';
   import { explain } from '#lib/services/errors.ts';
   import { sendEventInvite } from '#lib/services/events.ts';
-  import { contacts } from '#lib/services/messages.ts';
-  import { myAgent } from '#lib/services/people.ts';
-  import { sharePrefill, shareSpace } from '#lib/services/shares.ts';
+  import { quotePrefill, shareSpace } from '#lib/services/shares.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { goto } from '$app/navigation';
@@ -17,7 +16,7 @@
 
   /**
    * web's "Share +" on ProjectOverviewHeader / EventOverviewHeader. Detail Pages Cleanup §4:
-   * Share is always on the dock (members send; others copy or share the link). Private
+   * Share is always on the dock; anyone signed in may send it (owner, 2026-11-24). Private
    * events: organizers only, as "Invite to event" (an invite to accept, no Create post).
    */
   let { detail, label = 'Share' }: { detail: DetailState; label?: string } = $props();
@@ -30,22 +29,9 @@
   const url = $derived(`${location.origin}${location.pathname}`);
   const title = $derived(project?.charter?.title ?? '');
 
-  let people: Promise<Contact[]> | null = null;
-
-  async function search(query: string): Promise<Contact[]> {
-    people ??= Promise.all([contacts(), myAgent()]).then(([all, me]) =>
-      all.filter((c) => c.agent !== me),
-    );
-    const needle = query.trim().toLowerCase();
-    return (await people).filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 8);
-  }
+  const search = (query: string): Promise<Contact[]> => searchShareContacts(query);
 
   async function send(contact: Contact): Promise<string | null> {
-    if (!project?.amMember && !isPrivate) {
-      return event
-        ? t('Only event members can perform this action')
-        : 'Only project members can perform this action';
-    }
     try {
       if (isPrivate) await sendEventInvite(contact.agent, detail.id);
       else await shareSpace(contact, event ? 'event' : 'project', title, url);
@@ -56,7 +42,7 @@
   }
 
   function createPost(): void {
-    const prefill = encodeURIComponent(sharePrefill(title, url));
+    const prefill = encodeURIComponent(quotePrefill(url));
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved here
     void goto(`${resolve('/create/post')}?prefill=${prefill}`);
   }
@@ -72,6 +58,7 @@
     buttonLabel={label}
     copyLinkUrl={url}
     shareTitle={title}
+    kindLabel={event ? 'Event' : 'Project'}
     searchContacts={search}
     submitShare={send}
     createPost={isPrivate ? null : createPost}

@@ -24,9 +24,9 @@ export async function shareSpace(
   void shareNotice(to.agent, label, title, url);
 }
 
-/** web's `buildSharePrefill`: the body "Create post" starts from. */
-export function sharePrefill(title: string, url: string): string {
-  return `Check this out: ${title}\n${url}`;
+/** A quote post's start: a line for your words, then the link it quotes (§6). */
+export function quotePrefill(url: string): string {
+  return `\n${url}`;
 }
 
 /** Detail Pages Cleanup §5, "Share profile": a link to someone's profile instead of their key,
@@ -38,4 +38,17 @@ export async function shareProfile(to: Contact, name: string, url: string): Prom
     title: '',
     body: `${name}'s profile: ${url}`,
   });
+}
+
+/** Any shared thing into your direct chat with them: spaces as shares.py words them (their
+ * notice comes with them), a comment as its words and link. */
+export async function shareTo(
+  to: Contact,
+  kind: 'project' | 'event' | 'help request' | 'thread' | 'post' | 'comment',
+  title: string,
+  url: string,
+): Promise<void> {
+  const body = kind === 'comment' ? `${title}\n${url}` : shareMessage(kind, title, url);
+  await sendNewChat({ kind: 'direct', members: [to], title: '', body });
+  if (kind !== 'comment') void shareNotice(to.agent, kind, title, url);
 }

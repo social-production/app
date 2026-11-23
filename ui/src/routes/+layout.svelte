@@ -6,6 +6,7 @@
   import SearchOverlay from '#lib/features/search/SearchOverlay.svelte';
   import AppShell from '#lib/features/shell/AppShell.svelte';
   import PhotoCropHost from '#lib/features/shell/PhotoCropHost.svelte';
+  import ShareHost from '#lib/features/shell/ShareHost.svelte';
 
   import '../app.css';
 
@@ -19,4 +20,5 @@
 </AppShell>
 <CallHost />
 <PhotoCropHost />
+<ShareHost />
 <SearchOverlay />

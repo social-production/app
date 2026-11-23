@@ -1,4 +1,6 @@
 <script lang="ts">
+  import QuotedCard from '#lib/components/cards/QuotedCard.svelte';
+  import { quoteOf } from '#lib/domain/quote.ts';
   import { t } from '#lib/i18n/index.ts';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import {
@@ -20,7 +22,9 @@
    * photos (ADR 0101), each resized to fit 1 MB as chat photos are.
    */
   const initials = $derived(viewer.name.slice(0, 2).toUpperCase());
-  let body = $state(page.url.searchParams.get('prefill')?.trim() ?? '');
+  let body = $state(page.url.searchParams.get('prefill')?.trimEnd() ?? '');
+  // A quote post (Share › Quote in a post, §6): the quoted card shows under the words.
+  const quote = $derived(quoteOf(body, location.origin));
   let submitting = $state(false);
   let statusMessage = $state('');
   let photos = $state<{ file: File; url: string }[]>([]);
@@ -100,6 +104,7 @@
         placeholder={t("What's on your mind?")}
         aria-required="true"></textarea>
     </div>
+    {#if quote}<QuotedCard id={quote.id} href={quote.href} />{/if}
     {#if photos.length > 0}
       <div class="post-photo-picks">
         {#each photos as photo, i (photo.url)}

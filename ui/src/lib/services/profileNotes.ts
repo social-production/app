@@ -118,3 +118,13 @@ export async function commentsOf(agents: string[]): Promise<CommentActivity[]> {
   });
   return out.sort((a, b) => b.createdAt - a.createdAt);
 }
+
+/** A quoted space's title, type and first tag (quote posts, Owner Notes Mockups §6). */
+export async function quotedSpace(
+  id: string,
+): Promise<{ title: string; mode: CharterMode; tag: string | null } | null> {
+  const found = await listingOf(id);
+  if (!found) return null;
+  const { title, mode, tags } = found.listing;
+  return { title, mode: mode as CharterMode, tag: tags[0] ?? null };
+}
