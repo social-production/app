@@ -8,4 +8,9 @@ export const part20: Record<string, Entry> = {
   'Use-value, exchange-value and value': 'Потребительная стоимость, меновая стоимость и стоимость',
   'Production for profit': 'Производство ради прибыли',
   'A different mode of production': 'Другой способ производства',
+  'No public chats yet': 'Публичных чатов пока нет',
+  'Join a project, event or request and its chat shows here, next to everyone taking part.':
+    'Присоединитесь к проекту, событию или запросу, и его чат появится здесь вместе со всеми участниками.',
+  Nearest: 'Ближайшие',
+  Soonest: 'Скоро',
 };

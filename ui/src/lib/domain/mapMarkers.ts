@@ -160,3 +160,11 @@ export const bySchedule = (items: MapMarkerItem[]): MapMarkerItem[] =>
       i.scheduledAt ? new Date(i.scheduledAt).getTime() : Number.POSITIVE_INFINITY;
     return at(a) - at(b);
   });
+
+/** The list under the map, nearest first (owner, 2026-11-23); the same distance, soonest first. */
+export const byDistance = (items: MapMarkerItem[]): MapMarkerItem[] => {
+  const order = new Map(bySchedule(items).map((item, i) => [item.id, i]));
+  return [...items].sort(
+    (a, b) => a.distanceKm - b.distanceKm || (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0),
+  );
+};

@@ -214,6 +214,7 @@
             {#each inbox.chats as chat (chat.id)}
               <ChatRow
                 title={inbox.title(chat)}
+                agent={inbox.partner(chat)}
                 preview={inbox.preview(chat)}
                 time={relativeCompact(chat.last?.createdAt ?? chat.invitedAt)}
                 unread={chat.unread}
@@ -281,7 +282,13 @@
   {:else if !publicChats.loaded}
     <SkeletonRows count={4} kind="row" />
   {:else if publicChats.chats.length === 0}
-    <div class="empty-state">{t('No public chats yet.')}</div>
+    <EmptyState
+      icon="message"
+      title={t('No public chats yet')}
+      text={t(
+        'Join a project, event or request and its chat shows here, next to everyone taking part.',
+      )}
+    />
   {:else}
     {#each publicChats.chats as chat (chat.id)}
       <ChatRow
@@ -292,6 +299,7 @@
         pinned={chat.pinned}
         muted={chat.muted}
         kind="Project"
+        mode={chat.mode}
         onOpen={() => open(chat.id, 'project')}
         onMenu={(x, y) => openMenu('public', chat.id, x, y)}
       />

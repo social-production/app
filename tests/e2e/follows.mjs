@@ -133,16 +133,16 @@ await until(
   'ann\'s project on Home',
 );
 const homeCard = bob.locator('.project-card', { hasText: seedSwap });
-assert.equal((await homeCard.locator('.feed-context > span:not(.avatar-badge)').innerText()).trim(), `ann${stamp} proposed this`);
+// No "ann proposed this" line over it: the card names who started it (owner, 2026-11-23).
+assert.equal(await homeCard.locator('.feed-context').count(), 0);
 assert.equal(await bob.locator('.project-card').count(), 1, 'bob joined no channel or community, so Home has no public rows');
 await bob.screenshot({ path: `${out}/phone390-home-feed.png` });
 await feedScope(bob, 'Global');
 await bob.locator('.project-card', { hasText: seedSwap }).waitFor({ timeout: 60_000 });
 assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).count(), 1);
-const globalLine = bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context > span:not(.avatar-badge)');
-assert.equal((await globalLine.innerText()).trim(), `ann${stamp} proposed this`);
+assert.equal(await bob.locator('.project-card', { hasText: seedSwap }).locator('.feed-context').count(), 0);
 await bob.screenshot({ path: `${out}/phone390-global-feed.png` });
-log('bob\'s Home and Global both show ann\'s project once, with her name over it');
+log('bob\'s Home and Global both show ann\'s project once');
 
 // Feedback: Ann files a suggestion; Bob supports it; a guest reads it.
 await ann.goto(`${BASE}/feedback`);

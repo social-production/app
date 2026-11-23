@@ -1,14 +1,20 @@
 <script lang="ts">
   import type { Avatar } from '#lib/domain/people.ts';
+  import { avatarSource } from '#lib/components/people/avatarSource.ts';
 
   /** Ported from web's AvatarBadge: the picture, or initials when there is none. */
   interface Props {
     name: string;
     avatar?: Avatar | null;
+    /** Whose face it is: their photo is looked up when no `avatar` is given. */
+    agent?: string | null;
     size?: 'xs' | 'sm' | 'md';
   }
 
-  let { name, avatar = null, size = 'md' }: Props = $props();
+  let { name, avatar = null, agent = null, size = 'md' }: Props = $props();
+
+  const source = avatarSource();
+  const photo = $derived(avatar ?? (agent && source ? (source.of(agent) ?? null) : null));
 
   const initials = $derived(
     name
@@ -17,7 +23,7 @@
       .toUpperCase() || 'SP',
   );
   const url = $derived(
-    avatar ? URL.createObjectURL(new Blob([avatar.bytes.slice()], { type: avatar.mime })) : null,
+    photo ? URL.createObjectURL(new Blob([photo.bytes.slice()], { type: photo.mime })) : null,
   );
   $effect(() => () => {
     if (url) URL.revokeObjectURL(url);

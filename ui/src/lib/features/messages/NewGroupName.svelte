@@ -79,7 +79,9 @@
   <div class="new-message-list">
     {#each members as person (person.agent)}
       <div class="person-row">
-        <span class="person-face"><AvatarBadge size="md" name={person.name} /></span>
+        <span class="person-face"
+          ><AvatarBadge size="md" name={person.name} agent={person.agent} /></span
+        >
         <span class="person-copy">
           <strong>{pickerName(person, clashingNames(members))}</strong>
           <small><PlaceStanding agent={person.agent} load={cachedPerson} /></small>

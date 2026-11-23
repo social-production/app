@@ -76,6 +76,7 @@ fn query(filter: &str) -> RegionQuery<'_> {
         window: Window::All,
         filter,
         include_online: false,
+        soonest: false,
         utc_offset_minutes: 0,
         limit: 20,
         offset: 0,
@@ -188,6 +189,26 @@ fn same_distance_orders_by_time() {
     let mut b = card("b", "event", at(FITZROY));
     b.scheduled_at = Some(NOW + DAY);
     assert_eq!(ids(&region(&[a, b], &query("all")).0), ["b", "a"]);
+}
+
+#[test]
+fn soonest_orders_by_when_not_where() {
+    let mut near_late = card("near-late", "event", at(FITZROY));
+    near_late.scheduled_at = Some(NOW + 5 * DAY);
+    let mut far_soon = card("far-soon", "event", at((-37.77, 144.96)));
+    far_soon.scheduled_at = Some(NOW + DAY);
+    let untimed = card("untimed", "productive", at(FITZROY));
+    let cards = [near_late, far_soon, untimed];
+    assert_eq!(
+        ids(&region(&cards, &query("all")).0),
+        ["near-late", "untimed", "far-soon"]
+    );
+    let mut q = query("all");
+    q.soonest = true;
+    assert_eq!(
+        ids(&region(&cards, &q).0),
+        ["far-soon", "near-late", "untimed"]
+    );
 }
 
 #[test]

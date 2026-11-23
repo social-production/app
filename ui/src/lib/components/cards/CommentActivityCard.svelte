@@ -39,7 +39,7 @@
 <div class="comment-activity-card">
   <FeedSurface {href} tone="personal" accent={null}>
     <div class="post-row">
-      <AvatarBadge name={comment.authorName} />
+      <AvatarBadge name={comment.authorName} agent={comment.author} />
       <div class="post-main">
         <div class="post-head">
           <a

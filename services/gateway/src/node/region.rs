@@ -32,6 +32,8 @@ pub struct RegionQuery<'a> {
     /// `all`, `projects`, `events`, `help_requests` or `threads` (which is always empty).
     pub filter: &'a str,
     pub include_online: bool,
+    /// Order by when things happen (soonest first, unscheduled last) instead of distance.
+    pub soonest: bool,
     pub utc_offset_minutes: i32,
     pub limit: usize,
     pub offset: usize,
@@ -77,6 +79,18 @@ pub enum RegionItem {
 }
 
 impl RegionItem {
+    /// The `soonest` order: upcoming by start, then past and unscheduled by latest activity.
+    fn soon(&self, now: i64) -> (u8, i64) {
+        let at = match self {
+            RegionItem::Card(c) => scheduled(&c.card),
+            RegionItem::Activity(a) => Some(a.scheduled_at),
+        };
+        match at {
+            Some(t) if t >= now => (0, t),
+            _ => (1, -self.key().1),
+        }
+    }
+
     /// web's order: distance, then the item's time (`scheduled_at`, else `last_activity_at`).
     fn key(&self) -> (f64, i64) {
         match self {
@@ -239,7 +253,13 @@ pub fn region(all: &[ProjectCard], q: &RegionQuery) -> (Vec<RegionItem>, usize) 
     }
     near.sort_by(|a, b| {
         let (ka, kb) = (a.key(), b.key());
-        ka.0.total_cmp(&kb.0).then(ka.1.cmp(&kb.1))
+        if q.soonest {
+            a.soon(q.now)
+                .cmp(&b.soon(q.now))
+                .then(ka.0.total_cmp(&kb.0))
+        } else {
+            ka.0.total_cmp(&kb.0).then(ka.1.cmp(&kb.1))
+        }
     });
     let mut total = near.len();
     let mut page: Vec<RegionItem> = near.into_iter().skip(q.offset).take(q.limit).collect();

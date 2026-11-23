@@ -185,7 +185,7 @@
     {#if tab === 'Members'}
       {#each p.chat.members as agent (agent)}
         <a class="about-row" href={resolve('/profile/[agent]', { agent })}>
-          <AvatarBadge size="md" name={p.names[agent] ?? '…'} />
+          <AvatarBadge size="md" name={p.names[agent] ?? '…'} {agent} />
           <span class="about-row-copy"
             ><b>{agent === p.me ? t('You') : (p.names[agent] ?? '…')}</b></span
           >

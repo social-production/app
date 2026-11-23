@@ -81,7 +81,7 @@ log('the plan made it a collective service as it reached Activity');
 // No settings vote: the plan switched requests on.
 const cleo = await device({ viewport: phone });
 await signUp(cleo, `cleo${stamp}`);
-const request = cleo.getByRole('button', { name: 'Request service', exact: true });
+const request = cleo.getByRole('button', { name: 'Request', exact: true });
 for (let i = 0; i < 20; i++) {
   await cleo.goto(projectUrl);
   await cleo.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });

@@ -27,7 +27,7 @@
 {#if project && charter}
   <section class="item-head post-head-detail">
     <div class="item-author">
-      <AvatarBadge {name} />
+      <AvatarBadge {name} agent={project.creator} />
       <div class="item-author-text">
         <a
           class="name header-name"

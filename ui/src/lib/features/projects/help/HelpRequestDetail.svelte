@@ -117,7 +117,7 @@
                   <h1>{charter.title}</h1>
                 </RestrictionNotice>
                 <p class="detail-by">
-                  <AvatarBadge size="sm" name={author} />
+                  <AvatarBadge size="sm" name={author} agent={help.project?.creator} />
                   <span>
                     {t('Asked by')}
                     <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>

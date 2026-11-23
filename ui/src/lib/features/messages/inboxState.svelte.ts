@@ -90,6 +90,12 @@ export class InboxState {
     return t('Group chat');
   }
 
+  /** The other person in a direct chat (their face on the row); none for groups. */
+  partner(chat: ChatSummary): string | null {
+    if (chat.kind !== 'direct') return null;
+    return chat.members.find((m) => m !== this.me) ?? null;
+  }
+
   /** The list's preview line; a leave reads "<name> left the group." */
   preview(chat: ChatSummary): string {
     if (chat.last?.kind === 'system')

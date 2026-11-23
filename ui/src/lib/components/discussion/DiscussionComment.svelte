@@ -93,7 +93,7 @@
     class:reply-target={replyTarget === comment.id}
     class="comment-self"
   >
-    <span class="comment-avatar"><AvatarBadge size="sm" {name} /></span>
+    <span class="comment-avatar"><AvatarBadge size="sm" {name} agent={comment.author} /></span>
     <div class="topline">
       <a class="author-link" href={resolve('/profile/[agent]', { agent: comment.author })}>
         {name}

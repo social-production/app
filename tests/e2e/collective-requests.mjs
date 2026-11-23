@@ -89,7 +89,7 @@ async function press(page, name) {
 }
 
 // Requests start off (web's collective default); the members vote them on with a reason.
-await press(ann, 'Settings ▾');
+await press(ann, 'Settings');
 await ann.getByRole('dialog', { name: 'Settings' }).getByRole('button', { name: /Request settings/ }).click();
 const settings = ann.getByRole('dialog', { name: 'Request settings' });
 await settings.getByLabel('Enable requests').check();
@@ -103,7 +103,7 @@ log('ann started the request settings vote and bob voted yes from Take part');
 
 const cleo = await device({ viewport: phone });
 await signUp(cleo, `cleo${stamp}`);
-await press(cleo, 'Request service');
+await press(cleo, 'Request');
 const composer = cleo.getByRole('dialog');
 await composer.getByPlaceholder('Request title').waitFor({ timeout: 30_000 });
 await shots(cleo, `${out}/phone390-request-sheet`);

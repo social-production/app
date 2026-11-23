@@ -32,7 +32,7 @@
 </script>
 
 <div class="member-row" class:you>
-  <AvatarBadge size="md" {name} />
+  <AvatarBadge size="md" {name} {agent} />
   <a class="member-copy" href={resolve('/profile/[agent]', { agent })}>
     <strong>{you ? t('You') : name}</strong>
     {#if line}<small>{line}</small>{/if}

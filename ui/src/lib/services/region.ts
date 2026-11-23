@@ -11,6 +11,7 @@ export function regionFeed(q: RegionQuery): Promise<{ items: RegionItem[]; total
     window: q.window,
     filter: q.filter,
     include_online: String(q.includeOnline),
+    order: q.order,
     offset: String(q.offset),
     limit: '20',
     tzOffset: String(-new Date().getTimezoneOffset()),

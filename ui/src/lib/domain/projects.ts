@@ -41,6 +41,8 @@ export interface Charter {
 /** One feed card (gateway `ProjectCard`). */
 export interface ProjectCard {
   id: string;
+  /** km from the Region feed's centre (Region cards only; owner, 2026-11-23). */
+  distanceKm?: number | null;
   networkSeed: string;
   creator: string;
   /** The creator's username, from the node's index (empty if they have no profile yet). */

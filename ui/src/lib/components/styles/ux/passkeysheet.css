@@ -67,3 +67,12 @@
 .overlay-root.passkey-sheet .overlay-sheet.has-footer .overlay-body {
   padding-bottom: 18px;
 }
+
+/* A link as the sheet's action (Sign in to create) sits like the buttons do. */
+.overlay-root.passkey-sheet .sheet-actions > a.sheet-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--on-brand);
+  text-decoration: none;
+}

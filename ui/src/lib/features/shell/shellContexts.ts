@@ -3,6 +3,7 @@ import { providePlaceOnMap } from '#lib/components/map/placeOnMap.ts';
 import { postPhotoUrl, postPhotos } from '#lib/services/discussions.ts';
 import { openPlaceOnMap } from '#lib/stores/mapFocus.svelte.ts';
 
+import { provideAvatars } from './avatarProvider.svelte.ts';
 import { providePaused } from './pausedProvider.svelte.ts';
 import { provideReports } from './reportActionsProvider.ts';
 
@@ -10,6 +11,7 @@ import { provideReports } from './reportActionsProvider.ts';
 export function provideShellContexts(): void {
   provideReports();
   providePaused();
+  provideAvatars();
   providePlaceOnMap({ show: (label, select) => openPlaceOnMap(label, null, select ?? null) });
   providePostPhotoSource({ list: postPhotos, url: postPhotoUrl });
 }

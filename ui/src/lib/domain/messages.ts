@@ -1,6 +1,7 @@
 /** Mirrors the conversation DNA's messages zome (ADR 0043). Times are Holochain micros. */
 
 import type { ChatKindOfLine } from '#lib/domain/chat.ts';
+import type { CharterMode } from '#lib/domain/projects.ts';
 
 export type ChatKind = 'direct' | 'group';
 
@@ -66,6 +67,8 @@ export interface PublicChat {
   /** The project's network seed (the list knows the clones on this node, not their listings). */
   id: string;
   title: string;
+  /** The space's type (its kind tile on the row). */
+  mode: CharterMode;
   members: number;
   last: { author: string; preview: string; createdAt: number } | null;
   unread: number;

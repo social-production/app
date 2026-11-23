@@ -127,7 +127,7 @@
       {#if !p.history && people.length > 0}
         <span class="agenda-people" aria-hidden="true">
           {#each people.slice(0, 3) as person (person)}
-            <AvatarBadge size="sm" name={p.names[person] ?? '…'} />
+            <AvatarBadge size="sm" name={p.names[person] ?? '…'} agent={person} />
           {/each}
         </span>
       {/if}

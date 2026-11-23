@@ -6,7 +6,7 @@
 import { t } from '#lib/i18n/index.ts';
 import { tick } from 'svelte';
 import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
-import { bySchedule, pinOf } from '#lib/domain/mapMarkers.ts';
+import { byDistance, pinOf } from '#lib/domain/mapMarkers.ts';
 import { GLOBAL_RADIUS_VALUE, effectiveRadiusKm } from '#lib/domain/mapRadius.ts';
 import { emptyPlaceValue, type PlaceValue } from '#lib/domain/places.ts';
 import { ipPlaceHint, devicePlace, searchPlaces } from '#lib/services/locations.ts';
@@ -70,7 +70,7 @@ export class MarkerLoader {
       });
       if (token !== this.token) return;
       s.markers = items.map(pinOf);
-      s.listItems = bySchedule(items);
+      s.listItems = byDistance(items);
       await this.view.applyMarkers(true);
       this.view.syncRadiusOverlay();
     } catch (error) {
