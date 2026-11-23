@@ -28,6 +28,8 @@
     reveal?: string | null;
     /** The revealed sheet closed: the link is dropped, so it doesn't reopen. */
     onRevealDone?: (() => void) | undefined;
+    /** The viewer isn't a Full member yet, so their vote doesn't decide (ADR 0033). */
+    newVoter?: boolean;
   }
 
   let {
@@ -39,6 +41,7 @@
     onVote,
     reveal = null,
     onRevealDone,
+    newVoter = false,
   }: Props = $props();
 
   let open = $state(false);
@@ -114,7 +117,7 @@
   {#if current}
     <div class="vote-list">
       <article class="vote-block">
-        <VoteDecisionBody proposal={current} {charter} {stage} {phaseLabel} />
+        <VoteDecisionBody proposal={current} {charter} {stage} {phaseLabel} {newVoter} />
       </article>
     </div>
   {/if}

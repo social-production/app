@@ -68,6 +68,8 @@ export interface Proposal {
   settled: boolean;
   /** Members a challenge added to the count (ADR 0040). */
   added: number;
+  /** Its votes passed it, but too few came from Full members, so nothing changed (ADR 0033). */
+  uncounted?: boolean;
   /** Members from before the proposal its count still leaves out. */
   missing: number;
   /** Challenges count until then (48 h after it first closed); null while undecided. */

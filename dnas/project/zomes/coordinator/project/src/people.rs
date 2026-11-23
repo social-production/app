@@ -90,7 +90,6 @@ pub struct People {
     pub demand: u32,
     pub opposition: u32,
     pub my_signal: Option<Stance>,
-    pub last_at: Option<Timestamp>,
 }
 
 pub fn read() -> ExternResult<People> {
@@ -145,18 +144,12 @@ pub fn read_without(removed: &[(AgentPubKey, Timestamp)]) -> ExternResult<People
         let others = stances.values().filter(|(_, t)| *t == want).count();
         u32::try_from(others + usize::from(my_signal == Some(mine))).unwrap_or(u32::MAX)
     };
-    let last_at = member_links
-        .iter()
-        .chain(&signal_links)
-        .map(|l| l.timestamp)
-        .max();
     Ok(People {
         members,
         am_member,
         demand: count(DEMAND, Stance::Demand),
         opposition: count(OPPOSE, Stance::Oppose),
         my_signal,
-        last_at,
     })
 }
 

@@ -29,10 +29,14 @@ function failedSentence(kind: ProposalKind, from: string, to: (id: string) => st
 
 /** The sheet's lead line: what passing would do, or what it did. */
 export function resultSentence(
-  p: Pick<Proposal, 'kind' | 'status'>,
+  p: Pick<Proposal, 'kind' | 'status' | 'uncounted'>,
   from: string,
   to: (id: string) => string,
 ): string {
+  if (p.uncounted)
+    return t(
+      "Nothing changed: only votes from Full members count, and there weren't enough of them.",
+    );
   if (p.status === 'Passed') return passedSentence(p.kind, from, to);
   if (p.status === 'Rejected') return failedSentence(p.kind, from, to);
   return outcomeSentence(p.kind, from, to);

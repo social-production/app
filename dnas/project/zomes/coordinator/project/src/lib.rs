@@ -168,10 +168,10 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
 
     let organizers = organizers::list()?;
     let seen = audience()?;
-    let last_activity_at = [created_at, people.last_at, applied.last_decision_at]
-        .into_iter()
-        .flatten()
-        .max();
+    // Only the first post and its updates move it up the feed (owner, 2026-11-23: joining
+    // made an old project look new); joins, signals and other decisions don't.
+    let last_update_at = applied.updates.iter().map(|u| u.at).max();
+    let last_activity_at = [created_at, last_update_at].into_iter().flatten().max();
     Ok(Some(ProjectView {
         creator,
         charter,
@@ -185,6 +185,10 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         demand: people.demand,
         opposition: people.opposition,
         am_member: people.am_member,
+        my_joined_at: own::live_links_at(LinkTypes::Members)?
+            .into_iter()
+            .map(|(_, at)| at)
+            .min(),
         my_signal: people.my_signal,
         created_at,
         last_activity_at,
