@@ -14,6 +14,10 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **Create dock, permission sheets, chat pages, photo crop (PRs #265–#269, 2026-11-24 ~2 am
+  Melbourne):** create flows in the joined dock style; short sheets before the browser asks for
+  the microphone or notifications; a project chat's page from Messages; drag and zoom a photo
+  into its frame; a profile's home area opens the map.
 - **The owner's notes of 23 Nov (PRs #261–#264, 2026-11-24 overnight Melbourne):** a vote
   that passed only on votes without Full standing shows as not passed, and says why; joining
   or signalling no longer bumps a project up the feed; notifications start from when you
