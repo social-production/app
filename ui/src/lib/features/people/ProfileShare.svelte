@@ -2,9 +2,8 @@
   import { t } from '#lib/i18n/index.ts';
   import ShareUserMenu from '#lib/components/overlay/ShareUserMenu.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
+  import { searchShareContacts } from '#lib/services/shareContacts.ts';
   import { explain } from '#lib/services/errors.ts';
-  import { contacts } from '#lib/services/messages.ts';
-  import { myAgent } from '#lib/services/people.ts';
   import { shareProfile } from '#lib/services/shares.ts';
 
   import { resolve } from '$app/paths';
@@ -20,15 +19,8 @@
   }: { agent: string; name: string; compact?: boolean } = $props();
 
   const url = $derived(`${location.origin}${resolve('/profile/[agent]', { agent })}`);
-  let people: Promise<Contact[]> | null = null;
 
-  async function search(query: string): Promise<Contact[]> {
-    people ??= Promise.all([contacts(), myAgent()]).then(([all, me]) =>
-      all.filter((c) => c.agent !== me && c.agent !== agent),
-    );
-    const needle = query.trim().toLowerCase();
-    return (await people).filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 8);
-  }
+  const search = (query: string): Promise<Contact[]> => searchShareContacts(query, [agent]);
 
   async function send(contact: Contact): Promise<string | null> {
     try {

@@ -1,4 +1,6 @@
 <script lang="ts">
+  import QuotedCard from '#lib/components/cards/QuotedCard.svelte';
+  import { quoteOf } from '#lib/domain/quote.ts';
   import { t } from '#lib/i18n/index.ts';
   import CreateSheet from '#lib/components/create/CreateSheet.svelte';
   import {
@@ -21,6 +23,11 @@
    */
   const initials = $derived(viewer.name.slice(0, 2).toUpperCase());
   let body = $state(page.url.searchParams.get('prefill')?.trim() ?? '');
+  // A quote post (Share › Quote in a post, §6): the quoted card shows under your words, and
+  // its link is added after them on publish.
+  const quoted = page.url.searchParams.get('quote') ?? '';
+  const quote = quoted ? quoteOf(quoted, location.origin) : null;
+  const text = $derived(quote ? `${body.trim()}\n${quoted}`.trim() : body);
   let submitting = $state(false);
   let statusMessage = $state('');
   let photos = $state<{ file: File; url: string }[]>([]);
@@ -58,12 +65,12 @@
   }
 
   async function publish(): Promise<void> {
-    if (!body.trim() || submitting) return;
+    if (!text.trim() || submitting) return;
     submitting = true;
     statusMessage = '';
     try {
       const id = await createPost(
-        body,
+        text,
         photos.map((p) => p.file),
       );
       await goto(resolve('/posts/[id]', { id }));
@@ -81,7 +88,7 @@
   steps={[{ id: 'post', title: 'Post' }]}
   stepIndex={0}
   missing={[]}
-  canSubmit={body.trim().length > 0}
+  canSubmit={text.trim().length > 0}
   submitLabel={t('Publish post')}
   submittingLabel={t('Posting...')}
   composer
@@ -100,6 +107,7 @@
         placeholder={t("What's on your mind?")}
         aria-required="true"></textarea>
     </div>
+    {#if quote}<QuotedCard id={quote.id} href={quote.href} />{/if}
     {#if photos.length > 0}
       <div class="post-photo-picks">
         {#each photos as photo, i (photo.url)}

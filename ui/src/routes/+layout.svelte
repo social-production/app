@@ -6,6 +6,7 @@
   import SearchOverlay from '#lib/features/search/SearchOverlay.svelte';
   import AppShell from '#lib/features/shell/AppShell.svelte';
   import PhotoCropHost from '#lib/features/shell/PhotoCropHost.svelte';
+  import ShareHost from '#lib/features/shell/ShareHost.svelte';
   import { resumePlace } from '#lib/features/shell/resumePlace.ts';
   import { followViewportTop } from '#lib/features/shell/viewportTop.ts';
 
@@ -26,4 +27,5 @@
 </AppShell>
 <CallHost />
 <PhotoCropHost />
+<ShareHost />
 <SearchOverlay />

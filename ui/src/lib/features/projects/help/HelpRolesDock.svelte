@@ -6,10 +6,9 @@
   import type { ActivityRole } from '#lib/domain/activities.ts';
   import { slotsOf } from '#lib/domain/helpRequests.ts';
   import type { Contact } from '#lib/domain/messages.ts';
+  import { searchShareContacts } from '#lib/services/shareContacts.ts';
   import { explain } from '#lib/services/errors.ts';
   import { shareHelpRequest } from '#lib/services/helpRequests.ts';
-  import { contacts } from '#lib/services/messages.ts';
-  import { myAgent } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import type { HelpState } from './helpState.svelte.ts';
@@ -25,15 +24,8 @@
 
   const signedIn = $derived(connection.current.status === 'connected');
   const url = $derived(`${location.origin}${location.pathname}`);
-  let people: Promise<Contact[]> | null = null;
 
-  async function search(query: string): Promise<Contact[]> {
-    people ??= Promise.all([contacts(), myAgent()]).then(([all, me]) =>
-      all.filter((c) => c.agent !== me),
-    );
-    const needle = query.trim().toLowerCase();
-    return (await people).filter((c) => c.name.toLowerCase().includes(needle)).slice(0, 8);
-  }
+  const search = (query: string): Promise<Contact[]> => searchShareContacts(query);
 
   async function send(contact: Contact): Promise<string | null> {
     try {
