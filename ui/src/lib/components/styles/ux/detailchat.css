@@ -37,3 +37,12 @@
     overflow: hidden;
   }
 }
+
+/* iPhone home-screen app (owner, 2026-11-24): while the keyboard slides the page up, an open
+   chat's tabs follow the visible top instead of going under the status bar
+   (features/shell/viewportTop.ts sets --vv-top). */
+@media (max-width: 1080px) {
+  .shell .top-tab-row.top-tab-row.chat-immersive {
+    top: var(--vv-top, 0px);
+  }
+}

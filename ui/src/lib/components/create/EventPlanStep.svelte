@@ -52,38 +52,50 @@
         <input type="radio" bind:group={plan.scheduleMode} value="range" />
         {t('Date range')}
       </label>
-    </div>
-    <div class="schedule-fields" class:is-range={plan.scheduleMode === 'range'}>
-      {#if plan.scheduleMode === 'date'}
-        <label>
-          <RequiredLabel>{t('Date')}</RequiredLabel>
-          <input type="date" bind:value={plan.scheduledDate} />
-        </label>
-      {:else}
-        <label>
-          <RequiredLabel>{t('Start date')}</RequiredLabel>
-          <input type="date" bind:value={plan.rangeStartDate} />
-        </label>
-        <label>
-          <RequiredLabel>{t('End date')}</RequiredLabel>
-          <input type="date" bind:value={plan.rangeEndDate} />
-        </label>
-      {/if}
-    </div>
-    <div class="schedule-fields is-range">
-      <label>
-        <RequiredLabel>{t('Start time')}</RequiredLabel>
-        <input type="time" bind:value={plan.startTime} />
-      </label>
-      <label>
-        <RequiredLabel>{t('Finish time')}</RequiredLabel>
-        <input type="time" bind:value={plan.finishTime} />
+      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'any-day'}>
+        <input type="radio" bind:group={plan.scheduleMode} value="any-day" />
+        {t('No set date')}
       </label>
     </div>
-    <!-- web's TimeZoneNote, without its Settings link: the app has no display time zone yet. -->
-    <p class="helper-text">
-      Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
-    </p>
+    {#if plan.scheduleMode === 'any-day'}
+      <p class="helper-text">
+        {t(
+          'For something ongoing, like weekly games: add each session as an activity, and people sign up to the ones they come to.',
+        )}
+      </p>
+    {:else}
+      <div class="schedule-fields" class:is-range={plan.scheduleMode === 'range'}>
+        {#if plan.scheduleMode === 'date'}
+          <label>
+            <RequiredLabel>{t('Date')}</RequiredLabel>
+            <input type="date" bind:value={plan.scheduledDate} />
+          </label>
+        {:else}
+          <label>
+            <RequiredLabel>{t('Start date')}</RequiredLabel>
+            <input type="date" bind:value={plan.rangeStartDate} />
+          </label>
+          <label>
+            <RequiredLabel>{t('End date')}</RequiredLabel>
+            <input type="date" bind:value={plan.rangeEndDate} />
+          </label>
+        {/if}
+      </div>
+      <div class="schedule-fields is-range">
+        <label>
+          <RequiredLabel>{t('Start time')}</RequiredLabel>
+          <input type="time" bind:value={plan.startTime} />
+        </label>
+        <label>
+          <RequiredLabel>{t('Finish time')}</RequiredLabel>
+          <input type="time" bind:value={plan.finishTime} />
+        </label>
+      </div>
+      <!-- web's TimeZoneNote, without its Settings link: the app has no display time zone yet. -->
+      <p class="helper-text">
+        Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
+      </p>
+    {/if}
   </fieldset>
   <div class="stages">
     <div class="stages-header">
