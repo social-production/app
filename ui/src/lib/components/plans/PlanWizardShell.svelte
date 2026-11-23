@@ -7,7 +7,8 @@
 
   import '#lib/components/styles/wizard.css';
 
-  /** web's PlanWizardShell: a step-by-step dialog, full screen on phones, with a progress bar. */
+  /** web's PlanWizardShell: a step-by-step dialog, full screen on phones, in the create flows'
+   * look (Owner Notes Mockups §4): plain ×, step bars, and Back | Next joined in the dock. */
   interface Props {
     open: boolean;
     title: string;
@@ -45,8 +46,6 @@
   let compact = $state(false);
   let body = $state<HTMLDivElement>();
 
-  const progress = $derived(stepCount > 0 ? Math.round(((stepIndex + 1) / stepCount) * 100) : 0);
-
   $effect(() => {
     const media = window.matchMedia('(max-width: 760px)');
     const sync = (): void => {
@@ -78,33 +77,31 @@
     onkeydown={keydown}
   >
     <div class="wizard-shell" class:compact role="dialog" aria-modal="true" aria-label={title}>
-      <header class="wizard-header" class:compact>
-        <div class="wizard-header-main">
-          <span class="wizard-step-number">{stepIndex + 1}/{stepCount}</span>
+      <!-- The create flows' top bar (Owner Notes Mockups §4): a plain × on the left, the title
+           centred with its step under it, then one short bar per step. -->
+      <header class="wizard-header wizard-topbar" class:compact>
+        <button aria-label={t('Close')} class="wizard-x" type="button" onclick={onClose}>×</button>
+        <div class="wizard-heading">
           <span class="wizard-title" use:fitText={{ min: 11, text: title }}>{title}</span>
+          {#if stepCount > 1}
+            <span class="wizard-step-count"
+              >{t('Step {n} of {total}', { n: stepIndex + 1, total: stepCount })}</span
+            >
+          {/if}
         </div>
-        {#if !compact}
-          <button aria-label={t('Close')} class="cancel-button" type="button" onclick={onClose}
-            >×</button
-          >
+        {#if stepCount > 1}
+          <div class="wizard-step-bars" aria-hidden="true">
+            {#each Array.from({ length: stepCount }, (_, i) => i) as i (i)}<i
+                class:on={i <= stepIndex}
+              ></i>{/each}
+          </div>
         {/if}
-        <div class="progress-track" aria-hidden="true">
-          <span class="progress-fill" style={`width: ${progress}%`}></span>
-        </div>
       </header>
 
       <div class="wizard-body" bind:this={body}>{@render children()}</div>
 
-      {#if showFooter || compact}
+      {#if showFooter}
         <footer class="wizard-footer">
-          {#if compact}
-            <button
-              aria-label={t('Close')}
-              class="secondary-button wizard-close"
-              type="button"
-              onclick={onClose}>×</button
-            >
-          {/if}
           {#if showFooter && canGoBack}
             <button class="secondary-button" type="button" onclick={onBack}>{t('Back')}</button>
           {/if}
