@@ -21,6 +21,13 @@
 
   let open = $state(false);
   let copied = $state(false);
+  let root = $state<HTMLSpanElement>();
+
+  // A tap anywhere else on the page closes it. A fixed backdrop can't do this: the dock's
+  // blur makes it the backdrop's containing block, so it only covered the dock and shifted it.
+  function outside(event: PointerEvent): void {
+    if (open && root && !root.contains(event.target as Node)) open = false;
+  }
 
   function pick(action: () => void): void {
     open = false;
@@ -37,7 +44,10 @@
   }
 </script>
 
-<span class="dock-more">
+<svelte:document onpointerdown={outside} />
+<svelte:window onkeydown={(e) => open && e.key === 'Escape' && (open = false)} />
+
+<span class="dock-more" bind:this={root}>
   <button
     type="button"
     class="dock-icon"
@@ -50,12 +60,6 @@
     <ToolbarIcon name="more" />
   </button>
   {#if open}
-    <button
-      class="dock-more-backdrop"
-      type="button"
-      aria-label={t('Close menu')}
-      onclick={() => (open = false)}
-    ></button>
     <div class="dock-more-card" role="menu">
       {#if canEdit}
         <button type="button" role="menuitem" onclick={() => pick(onEdit)}>

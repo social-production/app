@@ -252,6 +252,7 @@
           links={createLinks}
           surfaces={surfaceLinks}
           signInHref={resolve('/onboarding')}
+          hidden={slid}
         />
       {/if}
     </main>

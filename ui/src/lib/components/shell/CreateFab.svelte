@@ -16,6 +16,7 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
+  import SignInToCreate from './SignInToCreate.svelte';
   import '#lib/components/styles/fab.css';
 
   /**
@@ -28,11 +29,14 @@
     /** web's "Surfaces" section: Community, Channel (ADR 0068). */
     surfaces?: CreateLink[];
     signInHref: ResolvedPathname;
+    /** The feed is scrolling down: the + slides away with the bars (owner, 2026-11-23). */
+    hidden?: boolean;
   }
 
-  let { signedIn, links, surfaces = [], signInHref }: Props = $props();
+  let { signedIn, links, surfaces = [], signInHref, hidden = false }: Props = $props();
 
   let open = $state(false);
+  let asking = $state(false);
 
   $effect(() => {
     if (!open) return;
@@ -48,10 +52,15 @@
 </script>
 
 <!-- eslint-disable svelte/no-navigation-without-resolve -- hrefs arrive resolved (ResolvedPathname) -->
-<div class="create-fab">
+<div class="create-fab" class:slid={hidden && !open}>
   {#if !signedIn}
     <div class="create-fab-shell">
-      <a class="fab-button" href={signInHref} aria-label={t('Sign in to create')}>
+      <button
+        class="fab-button"
+        type="button"
+        aria-label={t('Sign in to create')}
+        onclick={() => (asking = true)}
+      >
         <svg aria-hidden="true" viewBox="0 0 24 24" class="fab-icon"
           ><path
             d="M12 5v14M5 12h14"
@@ -61,8 +70,9 @@
             fill="none"
           /></svg
         >
-      </a>
+      </button>
     </div>
+    <SignInToCreate open={asking} {signInHref} onClose={() => (asking = false)} />
   {:else}
     {#if open}
       <button

@@ -23,21 +23,36 @@ export type ReadingLink = { label: string; href: string; blurb: string };
 export const aboutWhy: Block[] = [
   {
     paragraphs: [
-      'Most of what keeps people alive and well is already made without anyone selling it: meals cooked for a household, a neighbour driving someone to hospital, a mutual-aid kitchen, a Wikipedia article, the open-source software running most of the internet. Social Production is a tool for organising more of life that way, on purpose and at scale.',
+      'Almost everything people need reaches them as a commodity: something made to be sold. Social Production is a tool for making things the other way, because they are useful, and for organising that on purpose and at scale.',
     ],
   },
   {
-    title: t('Use, not exchange'),
+    title: t('Use-value, exchange-value and value'),
     paragraphs: [
-      'A thing’s use-value is what it is good for: bread feeds, a bike carries, a clinic heals. Its exchange-value is what it fetches on a market. Under capitalism things get made mainly because they can be sold, so a useful thing nobody can profit from goes unmade, and a harmful one that sells well gets made anyway.',
-      'Here the only reason to start anything is that it is useful to someone. There are no prices, wages, ads or data sales, and no one owns the platform.',
+      'Everything people make has a use-value: what it is good for. Bread feeds, a bike carries, a clinic heals. Made as a commodity, it also has an exchange-value: what it trades for on a market.',
+      'Behind exchange-value Marx found value: the share of society’s labour time a commodity counts for once it meets others in exchange. Value is not in the bread. It is a social relation between producers who are connected only by buying and selling.',
+    ],
+  },
+  {
+    title: t('Production for profit'),
+    paragraphs: [
+      'Capital is value set in motion to make more value. Owners of the means of production buy labour-power for a wage and sell what it makes for more than they paid; the difference is surplus value, and making it is the point of the whole exercise.',
+      'So production follows what sells at a profit, not what is needed. A useful thing nobody can profit from goes unmade, a harmful one that sells gets made, and work is organised for the owner rather than the people doing it or using it.',
+    ],
+  },
+  {
+    title: t('A different mode of production'),
+    paragraphs: [
+      'A mode of production is how a society organises its work: who holds the means of production, who decides, and how the results are shared. Ours rests on private ownership, wage labour and market exchange.',
+      'Mutual aid, volunteering and open-source software exist in its gaps, mostly unpaid and squeezed into spare time. They show that other relations are possible; they are not yet how things are made.',
+      'Social Production builds those relations directly rather than managing the market more fairly or handing it to new owners, an idea communization theory names: people propose what is needed, decide openly, share the work and share the result. Nothing made here is bought or sold. There are no prices, wages, ads or data sales, and no one owns the platform.',
     ],
   },
   {
     title: t('Commons-based peer production'),
     paragraphs: [
-      'Yochai Benkler gave a name to the way Wikipedia, Linux and OpenStreetMap get made: commons-based peer production. Many people contribute, each choosing what to work on; the result belongs to everyone; and coordination comes from the shared work itself rather than from managers or markets.',
-      'That has worked best for information, which costs almost nothing to copy. Social Production carries the same pattern into the physical world: workshops, food, repairs, care, events and services. Those need people in the same place at the same time, with tools and materials, so the tool adds what pure information projects never needed: plans, roles, schedules and places.',
+      'Yochai Benkler named the way Wikipedia, Linux and OpenStreetMap get made: commons-based peer production. Many people contribute, each choosing what to work on; the result belongs to everyone; and coordination comes from the shared work itself rather than from managers or prices.',
+      'That has worked best for information, which costs almost nothing to copy. Social Production carries the pattern into the physical world of workshops, food, repairs, care, events and services, adding what those need: plans, roles, schedules and places, and signals people leave for each other in place of prices (stigmergy, under How it works).',
     ],
   },
 ];

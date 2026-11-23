@@ -176,13 +176,33 @@
   color: var(--brand-strong);
 }
 
-.shell .profile-page .action.bot {
+.shell .profile-page .action.bot,
+.shell .profile-page .action.vouch {
   flex: 0 0 40px;
   padding: 0;
 }
 
-.shell .profile-page .action.bot .action-text {
+.shell .profile-page .action.bot .action-text,
+.shell .profile-page .action.vouch .action-text {
   display: none;
+}
+
+/* Follow and Message share the row; Share, Vouch and the bot mark are round icons, so no
+   word is cut short (owner, 2026-11-23: "all the buttons are truncated"). */
+.shell .profile-page .action-row .share-sheet {
+  flex: 0 0 40px;
+}
+
+.shell .profile-page .action-row .share-button {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
 }
 
 .shell .profile-page .action:disabled {
@@ -198,7 +218,7 @@
 
 /* On a phone the three words need the room the icons took. */
 @media (max-width: 480px) {
-  .shell .profile-page .action:not(.bot) svg {
+  .shell .profile-page .action:not(.bot, .vouch) svg {
     display: none;
   }
 }

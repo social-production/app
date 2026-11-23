@@ -289,7 +289,8 @@ body {
   font-family: var(--font-body, 'Inter', 'Segoe UI', sans-serif);
   font-size: var(--body-font-size);
   line-height: 1.45;
-  -webkit-tap-highlight-color: color-mix(in srgb, var(--brand) 24%, transparent);
+  /* No square flash on tap (owner, 2026-11-23): buttons are round and show their own press. */
+  -webkit-tap-highlight-color: transparent;
 }
 
 .shell-compact {
@@ -385,6 +386,19 @@ select:focus {
 
 textarea {
   resize: vertical;
+}
+
+/* A search box sits inside its own rounded field, so its focus ring or border showed as a green
+   sliver along part of the field's edge (owner, 2026-11-23). */
+input[type='search'] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type='search']:focus,
+input[type='search']:focus-visible {
+  outline: none;
+  box-shadow: none;
 }
 
 @media (max-width: 1080px) {

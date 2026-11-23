@@ -162,7 +162,7 @@
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
                 />
-                <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} />
+                <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} compact />
                 <VouchButton
                   person={shown}
                   viewer={me}

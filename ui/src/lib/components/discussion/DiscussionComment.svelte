@@ -73,7 +73,8 @@
   );
 
   $effect(() => {
-    if (isHighlighted) self?.scrollIntoView({ block: 'center' });
+    if (isHighlighted)
+      setTimeout(() => self?.scrollIntoView({ block: 'center', behavior: 'smooth' }), 150);
   });
 </script>
 

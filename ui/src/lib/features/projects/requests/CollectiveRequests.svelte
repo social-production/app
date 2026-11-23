@@ -148,13 +148,15 @@
   {#if canRequest}
     <RoundPlusButton
       standout
-      label={t('Request service')}
+      icon="send"
+      label={t('Request')}
       ariaLabel={t('Request service')}
       onclick={openRequest}
     />
   {/if}
   {#if member ? settings.enabled || requests.shown.length > 0 : requests.shown.length > 0}
     <RoundPlusButton
+      icon="list"
       label={member ? t('Requests') : t('Your requests')}
       ariaLabel={t('Show service requests')}
       onclick={() => {
@@ -165,7 +167,8 @@
   {/if}
   {#if member}
     <RoundPlusButton
-      label={t('Settings ▾')}
+      icon="gear"
+      label={t('Settings')}
       ariaLabel={t('Service settings')}
       onclick={() => (menuOpen = true)}
     />

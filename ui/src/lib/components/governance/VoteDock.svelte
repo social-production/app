@@ -85,7 +85,13 @@
 {#if proposals.length > 0}
   <div class="vote-dock-root" style="display: contents">
     <div class="vote-dock">
-      <RoundPlusButton standout label={t('Vote')} ariaLabel={t('Vote')} onclick={openVotes} />
+      <RoundPlusButton
+        standout
+        plus={false}
+        label={t('Vote')}
+        ariaLabel={t('Vote')}
+        onclick={openVotes}
+      />
     </div>
   </div>
 {/if}

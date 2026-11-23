@@ -10,6 +10,8 @@ export interface MapFocusRequest {
   longitude: number | null;
   /** The page whose pin to select once the map is there (`/projects/<id>`, …). */
   select: string | null;
+  /** Open the map full screen on it (a place tapped on a card or page; owner, 2026-11-23). */
+  full: boolean;
   token: number;
 }
 
@@ -22,6 +24,7 @@ export function openPlaceOnMap(
   label: string,
   coords: { latitude: number; longitude: number } | null = null,
   select: string | null = null,
+  full = true,
 ): void {
   const trimmed = label.trim();
   if (!trimmed) return;
@@ -30,6 +33,7 @@ export function openPlaceOnMap(
     latitude: coords?.latitude ?? null,
     longitude: coords?.longitude ?? null,
     select,
+    full,
     token: Date.now(),
   };
 }
