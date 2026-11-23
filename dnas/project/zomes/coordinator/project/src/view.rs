@@ -24,6 +24,9 @@ pub struct ProjectView {
     pub demand: u32,
     pub opposition: u32,
     pub am_member: bool,
+    /// When the viewer's live membership began: notifications start there (owner,
+    /// 2026-11-23: joining showed everything that happened before).
+    pub my_joined_at: Option<Timestamp>,
     pub my_signal: Option<Stance>,
     pub created_at: Option<Timestamp>,
     pub last_activity_at: Option<Timestamp>,

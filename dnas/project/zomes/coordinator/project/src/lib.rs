@@ -185,6 +185,10 @@ pub fn get_project(call: In<()>) -> ExternResult<Option<ProjectView>> {
         demand: people.demand,
         opposition: people.opposition,
         am_member: people.am_member,
+        my_joined_at: own::live_links_at(LinkTypes::Members)?
+            .into_iter()
+            .map(|(_, at)| at)
+            .min(),
         my_signal: people.my_signal,
         created_at,
         last_activity_at,

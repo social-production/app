@@ -40,6 +40,8 @@ interface GlanceWire {
   creator: AgentPubKey;
   charter: { title: string; mode: CharterMode; subtype: string } | null;
   am_member: boolean;
+  /** When this person joined (µs); older happenings aren't theirs to be told about. */
+  my_joined_at?: number | null;
   members: AgentPubKey[];
   phases: { id: string; label: string }[];
 }
@@ -128,13 +130,16 @@ async function fromProject(seed: string, me: string, myName: string, reads: Read
   const names = takers.length ? await namesOf([...new Set(takers)]) : {};
   const holdsRole = activities.some((a) => a.roles.some((r) => r.people.includes(me)));
   const involved = project.am_member || holdsRole;
+  // Joining doesn't bring in everything from before (owner, 2026-11-23): only what happened
+  // since. Someone holding a role without joining keeps every card about it.
+  const since = project.am_member ? (project.my_joined_at ?? 0) : 0;
   const items = [
     ...removedNotifications({ ...glance, involved }, moderation),
     ...projectNotifications(glance, me, myName),
     ...activityNotifications(glance, activities, me, names),
     ...planLeadNotifications(glance, leads, me),
     ...(software ? prApprovedNotifications(glance, software, me) : []),
-  ];
+  ].filter((item) => item.createdAt >= since);
   return { items, people: project.am_member ? project.members.map(hashToString) : [] };
 }
 
