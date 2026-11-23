@@ -125,7 +125,7 @@
   {/snippet}
   {#snippet toolbar()}
     {#if stepped}<div class="step-line" aria-hidden="true">
-        <i style={`width: ${((p.stepIndex + 1) / p.steps.length) * 100}%`}></i>
+        {#each p.steps.map((_, i) => i) as i (i)}<i class:on={i <= p.stepIndex}></i>{/each}
       </div>{/if}
   {/snippet}
   <div class="sheet-form">
