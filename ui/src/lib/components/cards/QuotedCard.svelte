@@ -5,6 +5,8 @@
 
   import { quoteSource, type QuotedSpace } from './quoteSource.ts';
 
+  import '#lib/components/styles/ux/quotecard.css';
+
   /**
    * The quoted card under a quote post's words (Owner Notes Mockups §6), drawn like the card
    * under a comment on a profile (`CommentActivityCard`).
@@ -24,13 +26,13 @@
   const scope = $derived(space?.tag ? tagRef(space.tag).label : '');
 </script>
 
-<span class="comment-activity-card quoted-card">
+<span class="quoted-card">
   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- a path written in the post -->
-  <a class="comment-quote" {href} onclick={(e) => e.stopPropagation()}>
-    <span class="comment-quote-glyph"
+  <a class="quoted-link" {href} onclick={(e) => e.stopPropagation()}>
+    <span class="quoted-glyph"
       ><SurfaceTypeLabel projectMode={space?.mode ?? 'productive'} feedGlyph /></span
     >
-    <span class="comment-quote-copy">
+    <span class="quoted-copy">
       <small>{scope ? `${scope} · ` : ''}{spaceKind(space?.mode ?? 'productive')}</small>
       <strong>{space?.title ?? '…'}</strong>
     </span>

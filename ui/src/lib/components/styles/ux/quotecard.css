@@ -1,0 +1,56 @@
+/* A quote post's quoted card (Owner Notes Mockups §6), drawn like the card under a comment on
+   a profile (commentrow.css), wherever it shows: feed, post page and the composer. */
+.quoted-card {
+  display: block;
+}
+
+.quoted-card .quoted-link {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0 4px;
+  padding: 10px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.quoted-card .quoted-glyph {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  overflow: hidden;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.quoted-card .quoted-glyph .label-copy {
+  display: none;
+}
+
+.quoted-card .quoted-glyph svg {
+  width: 16px;
+  height: 16px;
+}
+
+.quoted-card .quoted-copy {
+  display: grid;
+  min-width: 0;
+  line-height: 1.3;
+}
+
+.quoted-card .quoted-copy small {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.quoted-card .quoted-copy strong {
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}

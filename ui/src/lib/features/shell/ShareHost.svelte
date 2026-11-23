@@ -4,7 +4,7 @@
   import type { Contact } from '#lib/domain/messages.ts';
   import { explain } from '#lib/services/errors.ts';
   import { searchShareContacts } from '#lib/services/shareContacts.ts';
-  import { quotePrefill, shareTo } from '#lib/services/shares.ts';
+  import { shareTo } from '#lib/services/shares.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { goto } from '$app/navigation';
@@ -49,9 +49,9 @@
 
   function quote(): void {
     if (!subject) return;
-    const prefill = encodeURIComponent(quotePrefill(url));
+    const link = encodeURIComponent(url);
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- the path is resolved here
-    void goto(`${resolve('/create/post')}?prefill=${prefill}`);
+    void goto(`${resolve('/create/post')}?quote=${link}`);
   }
 </script>
 

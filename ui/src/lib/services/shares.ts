@@ -24,11 +24,6 @@ export async function shareSpace(
   void shareNotice(to.agent, label, title, url);
 }
 
-/** A quote post's start: a line for your words, then the link it quotes (§6). */
-export function quotePrefill(url: string): string {
-  return `\n${url}`;
-}
-
 /** Detail Pages Cleanup §5, "Share profile": a link to someone's profile instead of their key,
  * sent into your direct chat with the recipient. */
 export async function shareProfile(to: Contact, name: string, url: string): Promise<void> {

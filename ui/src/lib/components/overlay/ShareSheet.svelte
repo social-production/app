@@ -141,11 +141,11 @@
         stroke-linecap="round"
       /></svg
     >
-    <span class="sr-only">{t('Search people')}</span>
     <input
       bind:value={query}
       maxlength="64"
       placeholder={t('Search people')}
+      aria-label={t('Search people')}
       type="search"
       autocomplete="off"
       oninput={() => void onInput()}
@@ -195,7 +195,7 @@
     <ShareActions
       {url}
       title={subject || title}
-      onQuote={onQuote ? () => (close(), onQuote?.()) : null}
+      onQuote={onQuote ? () => (onQuote?.(), close()) : null}
     />
   {/if}
   {#snippet footer()}

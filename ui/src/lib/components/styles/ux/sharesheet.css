@@ -1,5 +1,9 @@
 /* One share sheet everywhere (Owner Notes Mockups §6): the shared thing, faces to send to,
    a search, then three round actions. */
+.overlay-root.share-panel .overlay-body {
+  padding: 4px 16px 16px;
+}
+
 .overlay-root.share-panel .share-subject-card {
   display: grid;
   gap: 2px;

@@ -22,9 +22,12 @@
    * photos (ADR 0101), each resized to fit 1 MB as chat photos are.
    */
   const initials = $derived(viewer.name.slice(0, 2).toUpperCase());
-  let body = $state(page.url.searchParams.get('prefill')?.trimEnd() ?? '');
-  // A quote post (Share › Quote in a post, §6): the quoted card shows under the words.
-  const quote = $derived(quoteOf(body, location.origin));
+  let body = $state(page.url.searchParams.get('prefill')?.trim() ?? '');
+  // A quote post (Share › Quote in a post, §6): the quoted card shows under your words, and
+  // its link is added after them on publish.
+  const quoted = page.url.searchParams.get('quote') ?? '';
+  const quote = quoted ? quoteOf(quoted, location.origin) : null;
+  const text = $derived(quote ? `${body.trim()}\n${quoted}`.trim() : body);
   let submitting = $state(false);
   let statusMessage = $state('');
   let photos = $state<{ file: File; url: string }[]>([]);
@@ -62,12 +65,12 @@
   }
 
   async function publish(): Promise<void> {
-    if (!body.trim() || submitting) return;
+    if (!text.trim() || submitting) return;
     submitting = true;
     statusMessage = '';
     try {
       const id = await createPost(
-        body,
+        text,
         photos.map((p) => p.file),
       );
       await goto(resolve('/posts/[id]', { id }));
@@ -85,7 +88,7 @@
   steps={[{ id: 'post', title: 'Post' }]}
   stepIndex={0}
   missing={[]}
-  canSubmit={body.trim().length > 0}
+  canSubmit={text.trim().length > 0}
   submitLabel={t('Publish post')}
   submittingLabel={t('Posting...')}
   composer
