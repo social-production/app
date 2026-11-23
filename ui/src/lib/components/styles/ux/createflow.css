@@ -39,9 +39,9 @@
   height: 40px;
   border: none;
   border-radius: 50%;
-  background: var(--panel-hover);
+  background: transparent;
   color: var(--text-main);
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1;
   cursor: pointer;
 }
@@ -51,19 +51,22 @@
 }
 
 .overlay-root.create-main .step-line {
-  height: 3px;
-  margin: 0 16px;
-  overflow: hidden;
-  border-radius: 3px;
-  background: var(--panel-hover);
+  display: flex;
+  gap: 4px;
+  margin: 2px 16px 0;
 }
 
+/* One short bar per step, the done ones green (Owner Notes Mockups §1). */
 .overlay-root.create-main .step-line i {
-  display: block;
-  height: 100%;
-  border-radius: 3px;
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--panel-hover);
+  transition: background-color 0.2s ease;
+}
+
+.overlay-root.create-main .step-line i.on {
   background: var(--brand);
-  transition: width 0.2s ease;
 }
 
 .overlay-root.create-main .step-question {
@@ -86,6 +89,29 @@
   margin: 12px 0 0;
   color: var(--danger);
   font-size: 13.5px;
+}
+
+/* The dock in the detail dock's joined style (Owner Notes Mockups §1): one capsule, flat
+   segments with a hairline between, Continue tinted. */
+.overlay-root.create-main.create-main .overlay-footer .sheet-actions {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.overlay-root.create-main.create-main .overlay-footer .sheet-actions > .sheet-cancel,
+.overlay-root.create-main.create-main .overlay-footer .sheet-actions > .sheet-submit {
+  min-height: 48px;
+  border-radius: 0;
+}
+
+.overlay-root.create-main.create-main
+  .overlay-footer
+  .sheet-actions
+  > .sheet-cancel
+  + .sheet-submit {
+  box-shadow: inset 1px 0 0 var(--float-border);
 }
 
 .overlay-root.create-main .overlay-footer .sheet-actions > .create-back {
