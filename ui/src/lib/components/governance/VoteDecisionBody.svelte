@@ -19,9 +19,11 @@
     charter: Charter;
     stage: string;
     phaseLabel: (id: string) => string;
+    /** The viewer isn't a Full member yet: say their vote won't decide this. */
+    newVoter?: boolean;
   }
 
-  let { proposal, charter, stage, phaseLabel }: Props = $props();
+  let { proposal, charter, stage, phaseLabel, newVoter = false }: Props = $props();
 
   const kind = $derived(proposal.kind);
   const move = $derived(phaseMove(kind, stage, phaseLabel));
@@ -43,6 +45,13 @@
 <div class="vote-sheet">
   {#if proposal.status !== 'Open'}
     <p class="outcome">{resultSentence(proposal, stage, phaseLabel)}</p>
+  {/if}
+  {#if newVoter && proposal.status === 'Open'}
+    <p class="network-vote-line">
+      {t(
+        "You're a new member, so your vote shows here but doesn't decide it yet. Votes count once two Full members vouch for you, or after steady activity.",
+      )}
+    </p>
   {/if}
   {#if isNetworkVote(charter.tags)}
     <p class="network-vote-line">{t('Network vote: any Full member can vote')}</p>

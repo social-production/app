@@ -32,6 +32,7 @@ interface ProposalWire {
   my_vote: VoteChoice | null;
   settled: boolean;
   added: number;
+  uncounted?: boolean;
   missing: number;
   challenge_until: number | null;
   can_challenge: boolean;
@@ -70,6 +71,7 @@ export async function listProposals(project: ProjectRef): Promise<Proposal[]> {
     myVote: p.my_vote,
     settled: p.settled,
     added: p.added,
+    uncounted: p.uncounted ?? false,
     missing: p.missing,
     challengeUntil: p.challenge_until,
     canChallenge: p.can_challenge,
