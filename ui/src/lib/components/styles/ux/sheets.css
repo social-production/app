@@ -8,7 +8,10 @@
   display: flex;
   align-items: center;
   gap: 9px;
-  padding: 10px 14px calc(12px + var(--shell-safe-bottom, 0px));
+  /* Clear of the phone's bottom edge everywhere (owner, 2026-11-23: close buttons sat on it):
+     Android's gesture bar reports its inset too, not only iPhone's home bar. */
+  padding: 10px 14px
+    calc(16px + max(var(--shell-safe-bottom, 0px), env(safe-area-inset-bottom, 0px)));
   border-top: none;
   background: transparent;
 }
