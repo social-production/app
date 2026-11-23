@@ -5,6 +5,9 @@
  */
 
 export type IceCandidateHandler = (candidate: RTCIceCandidateInit) => void;
+/** The audio path: `failed` once ICE gives up (no route between the two networks), `ok` once
+ * it is (re)connected. */
+export type AudioPathHandler = (state: 'ok' | 'failed') => void;
 
 export interface CallMedia {
   startLocalAudio(): Promise<void>;
@@ -64,10 +67,22 @@ class PeerAudio implements CallMedia {
   private readonly pendingCandidates: RTCIceCandidateInit[] = [];
   private stopped = false;
 
-  constructor(iceServers: RTCIceServer[], onIceCandidate: IceCandidateHandler) {
+  constructor(
+    iceServers: RTCIceServer[],
+    onIceCandidate: IceCandidateHandler,
+    onPath?: AudioPathHandler,
+  ) {
     this.peer = new RTCPeerConnection({ iceServers });
     this.remoteAudio.autoplay = true;
     this.remoteAudio.setAttribute('playsinline', '');
+    // In the page, not detached: some phone browsers only play an element that is.
+    this.remoteAudio.hidden = true;
+    document.body.append(this.remoteAudio);
+    this.peer.oniceconnectionstatechange = () => {
+      const state = this.peer.iceConnectionState;
+      if (state === 'failed') onPath?.('failed');
+      else if (state === 'connected' || state === 'completed') onPath?.('ok');
+    };
     this.peer.onicecandidate = (event) => {
       if (this.stopped || !event.candidate) return;
       onIceCandidate(event.candidate.toJSON());
@@ -155,11 +170,13 @@ class PeerAudio implements CallMedia {
     this.stopped = true;
     this.peer.onicecandidate = null;
     this.peer.ontrack = null;
+    this.peer.oniceconnectionstatechange = null;
     for (const track of this.localStream?.getTracks() ?? []) {
       track.stop();
     }
     this.localStream = null;
     this.remoteAudio.srcObject = null;
+    this.remoteAudio.remove();
     this.peer.close();
   }
 }
@@ -167,6 +184,7 @@ class PeerAudio implements CallMedia {
 export function createCallMedia(
   iceServers: RTCIceServer[],
   onIceCandidate: IceCandidateHandler,
+  onPath?: AudioPathHandler,
 ): CallMedia {
-  return new PeerAudio(iceServers, onIceCandidate);
+  return new PeerAudio(iceServers, onIceCandidate, onPath);
 }

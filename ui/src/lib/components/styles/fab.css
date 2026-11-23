@@ -230,3 +230,20 @@
 .create-fab .create-menu-icon-wrap .create-menu-icon {
   color: var(--brand-strong);
 }
+
+/* The + slides away with the bars while the feed scrolls down (owner, 2026-11-23). */
+.create-fab .create-fab-shell {
+  transition:
+    transform 0.22s ease,
+    opacity 0.18s ease;
+}
+
+.create-fab.slid .create-fab-shell {
+  transform: translateY(calc(100% + 24px));
+  opacity: 0;
+  pointer-events: none;
+}
+
+.create-fab.slid .create-fab-shell * {
+  pointer-events: none;
+}

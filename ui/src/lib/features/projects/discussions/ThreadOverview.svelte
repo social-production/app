@@ -49,7 +49,7 @@
     <RestrictionNotice active={isHidden(state.moderation.value)}>
       <h1>{charter.title}</h1>
       <p class="detail-by thread-by">
-        <AvatarBadge size="sm" {name} />
+        <AvatarBadge size="sm" {name} agent={project.creator} />
         <span>
           {t('Asked by')}
           <a href={resolve('/profile/[agent]', { agent: project.creator })}>{name}</a>

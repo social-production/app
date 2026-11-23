@@ -1,0 +1,49 @@
+/* The plan wizard's footer as the sheets' dock (ADR 0099; owner, 2026-11-23: its full-width
+   buttons sat on the phone's bottom edge). A round × on the left, then Back and Next joined
+   in one capsule, floating clear of the edge. Overrides the ported wizard.css. */
+.wizard-backdrop .wizard-footer.wizard-footer {
+  justify-content: center;
+  align-items: center;
+  gap: 0;
+  padding: 10px 14px
+    calc(16px + max(var(--shell-safe-bottom, 0px), env(safe-area-inset-bottom, 0px)));
+  border-top: none;
+  background: transparent;
+  filter: drop-shadow(0 6px 18px rgb(0 0 0 / 0.14));
+}
+
+.wizard-backdrop .wizard-footer .secondary-button,
+.wizard-backdrop .wizard-footer .primary-button {
+  flex: 0 1 auto;
+  min-height: 48px;
+  padding: 0 22px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 999px;
+}
+
+.wizard-backdrop .wizard-footer .secondary-button {
+  background: var(--float-background, var(--panel));
+  box-shadow: none;
+}
+
+.wizard-backdrop .wizard-footer .wizard-close {
+  flex: 0 0 48px;
+  width: 48px;
+  margin-right: auto;
+  padding: 0;
+  font-size: 22px;
+}
+
+.wizard-backdrop .wizard-footer .secondary-button:not(.wizard-close):has(+ .primary-button) {
+  border-radius: 999px 0 0 999px;
+  box-shadow: inset -1px 0 0 var(--panel-border);
+}
+
+.wizard-backdrop .wizard-footer .secondary-button:not(.wizard-close) + .primary-button {
+  border-radius: 0 999px 999px 0;
+}
+
+.wizard-backdrop .wizard-footer:has(.wizard-close) .primary-button {
+  margin-right: auto;
+}

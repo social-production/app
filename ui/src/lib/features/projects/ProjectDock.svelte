@@ -128,7 +128,7 @@
     {:else}
       {#if detail.canPropose}
         <button type="button" class="dock-labelled" onclick={onUpdate}>
-          <ToolbarIcon name="loudspeaker" />{t('Update')}
+          <ToolbarIcon name="news" />{t('Update')}
         </button>
       {/if}
       <DetailShare {detail} />

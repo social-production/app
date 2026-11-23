@@ -2,6 +2,7 @@
   import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import RadiusChips from '#lib/components/map/RadiusChips.svelte';
+  import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
 
   import type { RegionFeedState } from './regionState.svelte.ts';
@@ -102,6 +103,22 @@
     }}
     ariaLabel={t('Region radius')}
     options={radiusPresetOptions}
+  />
+</section>
+
+<section>
+  <h3>{t('Order')}</h3>
+  <SegmentedChoice
+    value={region.order}
+    ariaLabel={t('Order')}
+    options={[
+      { value: 'nearest', label: 'Nearest' },
+      { value: 'soonest', label: 'Soonest' },
+    ]}
+    onChange={(v) => {
+      region.order = v;
+      void region.reload();
+    }}
   />
 </section>
 

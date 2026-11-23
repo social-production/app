@@ -5,16 +5,6 @@
   display: flex;
 }
 
-.shell .dock-more-backdrop.dock-more-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  min-height: 0;
-  border-radius: 0;
-  background: transparent;
-  cursor: default;
-}
-
 .shell .dock-more-card {
   position: absolute;
   right: -5px;

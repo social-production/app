@@ -38,8 +38,12 @@ export interface RegionQuery {
   window: string;
   filter: string;
   includeOnline: boolean;
+  /** Nearest first, or by when things happen (owner, 2026-11-23). */
+  order: RegionOrder;
   offset: number;
 }
+
+export type RegionOrder = 'nearest' | 'soonest';
 
 /** web's `openRegionalFeed` link: `/?scope=region&lat=&lon=&place=&radius=&window=&filter=`. */
 export interface RegionLink {

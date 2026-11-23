@@ -118,7 +118,7 @@ await part('a proposal that becomes a service with requests', async () => {
   for (const p of [tomas, leo].filter(Boolean)) await s.joinAndSupport(p, bikes.url, bikes.title);
   if (!grace) return;
   const ask = grace.getByRole('button', {
-    name: 'Request service',
+    name: 'Request',
     exact: true,
   });
   for (let i = 0; i < 20; i++) {

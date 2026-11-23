@@ -38,7 +38,7 @@
     contentRestricted={card.moderation === 'hidden'}
   >
     <div class="post-row">
-      <AvatarBadge name={authorName} />
+      <AvatarBadge name={authorName} agent={card.creator} />
       <div class="post-main">
         <div class="post-head">
           <a

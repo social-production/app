@@ -214,9 +214,11 @@
             {#each g.items as r (r.id)}
               {@const [before, match, after] = parts(r.title)}
               <button class="so-main" type="button" onclick={() => go(r.href, q)}>
-                {#if r.kind === 'profile'}<AvatarBadge size="md" name={r.title} />{:else}<span
-                    class="so-glyph"><ToolbarIcon name={ICONS[r.kind]} /></span
-                  >{/if}
+                {#if r.kind === 'profile'}<AvatarBadge
+                    size="md"
+                    name={r.title}
+                    agent={r.id}
+                  />{:else}<span class="so-glyph"><ToolbarIcon name={ICONS[r.kind]} /></span>{/if}
                 <span class="so-text"
                   ><span>{before}<b>{match}</b>{after}</span><small>{LABELS[r.kind]}</small></span
                 >

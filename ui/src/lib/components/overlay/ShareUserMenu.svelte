@@ -192,7 +192,7 @@
     <div class="selected-row" aria-label={t('Selected recipients')}>
       {#each selected as person (person.agent)}
         <button class="selected-chip" type="button" onclick={() => toggle(person)}>
-          <AvatarBadge size="sm" name={person.name} />
+          <AvatarBadge size="sm" name={person.name} agent={person.agent} />
           <span>{person.name}</span>
           <span class="chip-remove" aria-label={`Remove ${person.name}`}>×</span>
         </button>
@@ -210,7 +210,7 @@
           aria-pressed={picked.has(contact.agent)}
           onclick={() => toggle(contact)}
         >
-          <AvatarBadge size="sm" name={contact.name} />
+          <AvatarBadge size="sm" name={contact.name} agent={contact.agent} />
           <span class="contact-name">{contact.name}</span>
           <span class="check" aria-hidden="true">
             {#if picked.has(contact.agent)}

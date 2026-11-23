@@ -28,39 +28,55 @@
 }
 
 .shell .about-page .tab-row {
+  /* A floating capsule in the dock's joined style (owner, 2026-11-23: "more floating", "new
+     style buttons within dock, not full circles"): sized to its words and centred, flat
+     segments with hairlines between them, the open one tinted. */
   position: sticky;
-  top: calc(var(--topbar-height, 53px) + 8px);
-  /* Paints the gap above it, so the text does not show between the bar and the tabs. */
-  box-shadow: 0 -10px 0 2px var(--page-bg);
+  top: calc(var(--topbar-height, 53px) + 10px);
   z-index: 2;
   display: flex;
   gap: 0;
-  padding: 4px;
-  border: none;
+  width: fit-content;
+  max-width: 100%;
+  margin-inline: auto;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--float-border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--panel-hover) 88%, transparent);
+  background: var(--float-background);
   -webkit-backdrop-filter: var(--float-blur);
   backdrop-filter: var(--float-blur);
+  box-shadow: var(--float-shadow);
 }
 
 .shell .about-page .tab.tab {
-  flex: 1 1 0;
+  flex: 0 1 auto;
   min-width: 0;
-  min-height: 36px;
-  padding: 0 6px;
+  min-height: 42px;
+  padding: 0 16px;
   border: none;
-  border-radius: 999px;
+  border-radius: 0;
   background: transparent;
   color: var(--text-soft);
-  font-size: 13.5px;
+  font-size: 14px;
   font-weight: 600;
   box-shadow: none;
 }
 
+.shell .about-page .tab.tab + .tab.tab {
+  box-shadow: inset 1px 0 0 var(--float-border);
+}
+
 .shell .about-page .tab.tab.active-tab {
-  background: var(--panel);
-  color: var(--text-main);
-  box-shadow: 0 1px 3px rgb(0 0 0 / 0.16);
+  background: var(--brand-soft);
+  color: var(--brand-strong);
+  font-weight: 700;
+}
+
+@media (max-width: 380px) {
+  .shell .about-page .tab.tab {
+    padding: 0 12px;
+  }
 }
 
 .shell .about-page .essay {

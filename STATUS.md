@@ -87,6 +87,8 @@ The owner's list of 2026-11-15. They are references, not gospel: the built scree
 on since, and later owner answers in this file win. Read them with the Artifact tool
 (`action: read`, `path: "index.html"`, then strip `data:` images; a Design canvas keeps its
 frames under `project/*.dc.html`).
+0. **Owner Notes Mockups (2026-11-24 overnight, waiting for answers)**:
+   https://claude.ai/artifact/Q2Ror2gkjt9TAqHcpNknmB (§1–11 of the 23 Nov notes).
 0. **Loading, Region and Sign-up Fixes (2026-11-17, approved 12:55 am: "Artifacts look
    amazing"; built in #182 and #183)**: https://claude.ai/artifact/Xk4u1Q4837qACCz5AudwUd,
    the owner's fixes 3b to 3f (loading line and skeletons, the opening screen, Settings'
@@ -180,6 +182,40 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-24, overnight cloud session): the owner's notes of 23 Nov
+The owner left ~40 notes before sleeping. Answers to the design ones are pending in
+**Owner Notes Mockups** (https://claude.ai/artifact/Q2Ror2gkjt9TAqHcpNknmB, §1–11).
+- **Merged and live (~1:00 am Melbourne):** #261 a pass decided only by votes without Full
+  standing shows as not passed (`TallyView.uncounted`; the owner's St Kilda basketball proposal
+  passed on their New account's lone vote, which the apply step never counts), with a note in
+  the vote sheet for New members; #262 only the first post and updates move a project up the
+  feed (`last_activity_at`); #263 notifications start from when you joined (`my_joined_at`).
+  All coordinator-only: no DNA hash change.
+- **#264 (`claude/owner-notes-quick`)**: the build-without-mockup notes. Tap flash, search
+  rings, Vote without "+", service dock icons, Update's news icon, ⋯ closes on any tap,
+  profile buttons, comment cards without the extra lines, the reply-style highlight for linked
+  comments, chats open at the end, the create "+" hides on scroll and explains sign-in, places
+  open the map full screen, faces show photos (`AvatarBadge agent=`, shell avatar lookup),
+  public chats' kind tiles and empty state, Telegram pin/mute, map list nearest first, Region
+  cards' distance and an Order (Nearest/Soonest, gateway `order=soonest`), `#platform`
+  taggable, About tabs and a rewritten Why, sheet footers clear of the bottom edge, the plan
+  wizard's footer as the dock, and a "No audio" line when a call's ICE fails.
+- **Owner decisions needed (mockup §1–11):** create dock; picture/cover at creation (project
+  reset); photo cropping; Create plan (no earlier design found); Create link; one share sheet
+  and quote posts; chat pages; microphone/notification primers; pick-up games (A open sessions
+  recommended, a project reset); detail dock table; whether a lone New founder may move their
+  own proposal (web: New can't vote, warm votes half).
+- **Not doable from a cloud session:** calls need a TURN relay (`VITE_CALL_TURN_*` on Railway's
+  ui service; only Google STUN is set); loudspeaker switching and calls while locked need the
+  native app; the iPhone project-chat tabs bug wasn't reproducible without an iPhone.
+- **Checked:** `notifications.mjs` passed against a local seed (cloud-seed) with #264's UI;
+  governance scenario `rejected_and_ineligible_proposals_change_nothing` passed (723 s);
+  `cargo test -p gateway region` (9); UI check/lint/boundaries/sizes. Screens at 390px light
+  and dark against the local seed: thread + comment with a photo, profile, Comments tab, linked
+  comment, About, the signed-out create sheet, empty Public chats, the plan wizard.
+- **Tests updated in #264:** `follows.mjs` (no "proposed this" line), `collective-requests.mjs`,
+  `service-requests.mjs`, `demo-content.mjs` (buttons "Request" and "Settings").
+
 ## START HERE (2026-11-17): two cloud sessions replace the owner's PC session for the day
 The owner is away from the PC on 2026-11-17. One cloud session does **UX**, one does **parity**.
 They message each other (ListAgents / SendMessage) when a PR opens or merges, before pushing to

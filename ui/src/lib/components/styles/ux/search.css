@@ -23,7 +23,7 @@
 }
 
 .shell .search-page .search-input-wrap:focus-within {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+  box-shadow: none;
 }
 
 .shell .search-page .search-glyph {

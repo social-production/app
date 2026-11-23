@@ -104,7 +104,7 @@
 }
 
 .shell .messages-page .new-message-search:focus-within {
-  box-shadow: 0 0 0 2px color-mix(in srgb, var(--brand) 55%, transparent);
+  box-shadow: none;
 }
 
 .shell .messages-page .new-message-list {

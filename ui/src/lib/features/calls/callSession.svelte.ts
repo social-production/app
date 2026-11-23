@@ -1,3 +1,4 @@
+import { t } from '#lib/i18n/index.ts';
 import type { CallChannel, CallEnvelope, CallPhase, CallView } from '#lib/domain/calls.ts';
 import type { CallLine } from '#lib/domain/chat.ts';
 import { configuredIceServers, createCallMedia, type CallMedia } from '#lib/services/callMedia.ts';
@@ -102,9 +103,19 @@ export class CallSession {
 
   async ensureMedia(): Promise<CallMedia> {
     if (this.media) return this.media;
-    const next = createCallMedia(configuredIceServers(), (candidate) => {
-      this.send('ice', { candidate });
-    });
+    const next = createCallMedia(
+      configuredIceServers(),
+      (candidate) => this.send('ice', { candidate }),
+      // Signalling got through but no audio route did (owner, 2026-11-23: "calls connecting
+      // but not actually allowing talking"): say so instead of a silent timer.
+      (state) => {
+        if (this.view.phase !== 'active') return;
+        this.view = {
+          ...this.view,
+          notice: state === 'failed' ? t("No audio: your networks can't reach each other") : null,
+        };
+      },
+    );
     this.media = next;
     await next.startLocalAudio();
     return next;

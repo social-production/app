@@ -57,7 +57,7 @@
   {/if}
   <span class="meta-chip activity-stamp" title={label} aria-label={label}>
     <span class="meta-icon-wrap" aria-hidden="true"
-      ><ToolbarIcon name={updated ? 'loudspeaker' : 'clock'} /></span
+      ><ToolbarIcon name={updated ? 'news' : 'clock'} /></span
     >
     <span>{relativeCompact(activityInstant(createdAt, updatedAt))}</span>
   </span>

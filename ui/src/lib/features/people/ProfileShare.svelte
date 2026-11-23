@@ -13,7 +13,11 @@
    * Detail Pages Cleanup §5, "Share profile": a link instead of a key (it carries the key, so
    * nobody has to read or type it). Copy it, share it to another app, or send it in a chat.
    */
-  let { agent, name }: { agent: string; name: string } = $props();
+  let {
+    agent,
+    name,
+    compact = false,
+  }: { agent: string; name: string; compact?: boolean } = $props();
 
   const url = $derived(`${location.origin}${resolve('/profile/[agent]', { agent })}`);
   let people: Promise<Contact[]> | null = null;
@@ -44,4 +48,5 @@
   shareTitle={name}
   searchContacts={search}
   submitShare={send}
+  {compact}
 />

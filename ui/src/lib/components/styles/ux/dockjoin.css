@@ -59,8 +59,16 @@
   font-size: 0;
 }
 
-.shell .dock-capsule.tight :is(.plus-label, .phase-action-group .label) {
+.shell
+  .dock-capsule.tight
+  :is(.round-plus-button:not(.no-plus) .plus-label, .phase-action-group .label) {
   display: none;
+}
+
+.shell .dock-capsule .round-plus-button .toolbar-icon {
+  flex: none;
+  width: 20px;
+  height: 20px;
 }
 
 .shell .dock-capsule.tight .dock-chip {

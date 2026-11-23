@@ -83,6 +83,17 @@
   font-size: 15px;
 }
 
+.shell .messages-page .conversation-row .chat-kind-tile {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: var(--surface-accent);
+  color: var(--kind-on);
+}
+
 .shell .messages-page .conversation-topline strong {
   font-size: 15.5px;
   font-weight: 600;
@@ -280,4 +291,64 @@
   border-radius: 50%;
   background: transparent;
   color: var(--text-soft);
+}
+
+/* Pin and mute, Telegram's way (owner, 2026-11-23): the mute mark rides after the name, small
+   and grey; the right edge holds the time and, under it, the unread count (grey when muted)
+   or a pin in a soft circle. */
+.shell .messages-page .conversation-copy {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.shell .messages-page .conversation-topline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.shell .messages-page .conversation-topline strong {
+  overflow: hidden;
+  min-width: 0;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell .messages-page .conversation-topline .muted-mark {
+  display: inline-grid;
+  flex: none;
+  width: 15px;
+  height: 15px;
+  color: var(--text-soft);
+  opacity: 0.8;
+}
+
+.shell .messages-page .conversation-meta {
+  display: grid;
+  flex: none;
+  justify-items: end;
+  align-content: space-between;
+  gap: 6px;
+  align-self: stretch;
+  padding: 3px 0;
+}
+
+.shell .messages-page .conversation-meta .unread-pill.muted {
+  background: color-mix(in srgb, var(--text-soft) 55%, transparent);
+}
+
+.shell .messages-page .conversation-meta .pin-mark {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+}
+
+.shell .messages-page .conversation-meta .pin-mark svg {
+  width: 13px;
+  height: 13px;
 }

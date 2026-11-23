@@ -137,7 +137,11 @@
         {#each results as result (result.id)}
           <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- the app's own paths -->
           <a class="result-card" class:person={result.kind === 'profile'} href={result.href}>
-            {#if result.kind === 'profile'}<AvatarBadge size="md" name={result.title} />{/if}
+            {#if result.kind === 'profile'}<AvatarBadge
+                size="md"
+                name={result.title}
+                agent={result.id}
+              />{/if}
             <div class="result-copy">
               <div class="topline">
                 <span class={`kind-chip kind-${result.kind}`}>{searchKindLabels[result.kind]}</span>

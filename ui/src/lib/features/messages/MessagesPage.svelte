@@ -9,6 +9,7 @@
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import CountBadge from '#lib/components/icons/CountBadge.svelte';
   import ChatRow from '#lib/components/messages/ChatRow.svelte';
+  import PublicChatList from './PublicChatList.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
   import { relativeCompact } from '#lib/domain/time.ts';
   import { chatChrome } from '#lib/stores/chatChrome.svelte.ts';
@@ -190,7 +191,12 @@
         {#if menuError}<p class="pin-error" role="alert">{menuError}</p>{/if}
         <div class="conversation-list">
           {#if tab === 'public'}
-            {@render publicList()}
+            <PublicChatList
+              {publicChats}
+              waiting={!!openProject}
+              onOpen={(id) => open(id, 'project')}
+              onMenu={(id, x, y) => openMenu('public', id, x, y)}
+            />
           {:else if (openId || toAgent) && !inbox.loaded}
             <SkeletonRows kind="row" count={5} />
           {:else if inbox.error && inbox.chats.length === 0}
@@ -214,6 +220,7 @@
             {#each inbox.chats as chat (chat.id)}
               <ChatRow
                 title={inbox.title(chat)}
+                agent={inbox.partner(chat)}
                 preview={inbox.preview(chat)}
                 time={relativeCompact(chat.last?.createdAt ?? chat.invitedAt)}
                 unread={chat.unread}
@@ -271,30 +278,4 @@
     <span class="surface-tab-label">{t(label)}</span>
     {#if unread > 0}<CountBadge count={unread} />{/if}
   </button>
-{/snippet}
-
-{#snippet publicList()}
-  {#if openProject && !publicChats.loaded}
-    <SkeletonRows kind="row" count={5} />
-  {:else if publicChats.error && publicChats.chats.length === 0}
-    <div class="empty-state">{publicChats.error}</div>
-  {:else if !publicChats.loaded}
-    <SkeletonRows count={4} kind="row" />
-  {:else if publicChats.chats.length === 0}
-    <div class="empty-state">{t('No public chats yet.')}</div>
-  {:else}
-    {#each publicChats.chats as chat (chat.id)}
-      <ChatRow
-        title={chat.title}
-        preview={chat.last?.preview ?? ''}
-        time={relativeCompact(chat.activeAt)}
-        unread={chat.unread}
-        pinned={chat.pinned}
-        muted={chat.muted}
-        kind="Project"
-        onOpen={() => open(chat.id, 'project')}
-        onMenu={(x, y) => openMenu('public', chat.id, x, y)}
-      />
-    {/each}
-  {/if}
 {/snippet}

@@ -1,6 +1,13 @@
 <script lang="ts">
   import { t, plural } from '#lib/i18n/index.ts';
-  import { scopeTag, tagScope, type Scope, type ScopeKind } from '#lib/domain/scopes.ts';
+  import {
+    PLATFORM_SLUG,
+    platformPlaceholder,
+    scopeTag,
+    tagScope,
+    type Scope,
+    type ScopeKind,
+  } from '#lib/domain/scopes.ts';
   import { listScopes } from '#lib/services/scopes.ts';
 
   /**
@@ -43,13 +50,22 @@
     const timer = setTimeout(() => {
       void listScopes(q, 12)
         .then((found) => {
-          if (mine === asked) results = found;
+          if (mine === asked) results = withPlatform(found, q);
         })
         .catch(() => mine === asked && (results = []))
         .finally(() => mine === asked && (searching = false));
     }, 250);
     return () => clearTimeout(timer);
   });
+
+  /** The Platform channel is built in (ADR 0095): it has no listing until someone follows it,
+   * so a search never found it (owner, 2026-11-23: "can't tag platform channel"). */
+  function withPlatform(found: Scope[], q: string): Scope[] {
+    const wanted = q.trim().replace(/^#/, '').toLowerCase();
+    if (!PLATFORM_SLUG.startsWith(wanted) || found.some((s) => s.slug === PLATFORM_SLUG))
+      return found;
+    return [...found, platformPlaceholder()];
+  }
 
   function toggle(scope: Scope): void {
     const tag = scopeTag(scope.kind, scope.slug);

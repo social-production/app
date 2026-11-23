@@ -8,12 +8,19 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-19)
+## Status (2026-11-24)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The owner's notes of 23 Nov (PRs #261–#264, 2026-11-24 overnight Melbourne):** a vote
+  that passed only on votes without Full standing shows as not passed, and says why; joining
+  or signalling no longer bumps a project up the feed; notifications start from when you
+  joined; faces show photos everywhere; Telegram-style pin/mute and public chat tiles; places
+  open the map full screen; Region sorts Nearest or Soonest with distances on cards; About's
+  Why is rewritten; many button and sheet fixes. Design questions wait in the Owner Notes
+  Mockups artifact.
 - **Moderators sheet and sign-up (PRs #237–#239, 2026-11-19 morning Melbourne):** the
   Moderators sheet is redesigned (rounded cards, plain-words progress, a floating dock);
   account pages open the real sign-up page and return you after.

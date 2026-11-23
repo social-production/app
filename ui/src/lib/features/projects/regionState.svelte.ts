@@ -2,7 +2,7 @@ import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
 import { effectiveRadiusKm, normalizeRadiusFromUrl } from '#lib/domain/mapRadius.ts';
 import { emptyPlaceValue, type PlaceValue } from '#lib/domain/places.ts';
 import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
-import type { RegionItem, RegionLink } from '#lib/domain/regionFeed.ts';
+import type { RegionItem, RegionLink, RegionOrder } from '#lib/domain/regionFeed.ts';
 import { explain } from '#lib/services/errors.ts';
 import { devicePlace, searchPlaces } from '#lib/services/locations.ts';
 import { regionFeed } from '#lib/services/region.ts';
@@ -19,6 +19,7 @@ export class RegionFeedState {
   placeQuery = $state('');
   radius = $state('25');
   includeOnline = $state(false);
+  order = $state<RegionOrder>('nearest');
   suggestions = $state<PlaceValue[]>([]);
   searching = $state(false);
   message = $state('');
@@ -77,6 +78,7 @@ export class RegionFeedState {
         window,
         filter: 'all',
         includeOnline: this.includeOnline,
+        order: this.order,
         offset: this.items.filter((i) => !('isOnline' in i && i.isOnline)).length,
       });
       // Online items ride along after every page (web); keep each once.

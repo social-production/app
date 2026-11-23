@@ -44,7 +44,8 @@
       stage={card.phase}
       mode={card.mode}
       createdAt={card.createdAt}
-      updatedAt={card.lastActivityAt}><CardReport {card} {href} /></FeedCardTop
+      updatedAt={card.lastActivityAt}
+      distanceKm={card.distanceKm ?? null}><CardReport {card} {href} /></FeedCardTop
     >
     <a class="title" href={resolve('/events/[id]', { id: card.id })}>{card.title}</a>
     <p class="body">{card.summary}</p>

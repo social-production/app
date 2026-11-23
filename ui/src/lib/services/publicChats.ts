@@ -2,6 +2,7 @@ import type { ChatMessage } from '#lib/domain/chat.ts';
 import { POST_MODE, THREAD_MODE } from '#lib/domain/discussions.ts';
 import type { ListPrefs, PublicChat } from '#lib/domain/messages.ts';
 import type { Person } from '#lib/domain/people.ts';
+import type { CharterMode } from '#lib/domain/projects.ts';
 import { callCell, hashToString, projectCell, type AgentPubKey } from '#lib/holo/index.ts';
 
 import { chatReadAt, listMessages, markChatRead } from './chat.ts';
@@ -49,6 +50,7 @@ async function projectChat(seed: string, me: string): Promise<PublicChat | null>
   return {
     id: seed,
     title: project.charter.title,
+    mode: project.charter.mode as CharterMode,
     members: project.members.length,
     last: last
       ? { author: last.author, preview: last.body.slice(0, PREVIEW_MAX), createdAt: last.createdAt }

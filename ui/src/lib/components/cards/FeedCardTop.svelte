@@ -33,6 +33,7 @@
     mode = null,
     createdAt = null,
     updatedAt = null,
+    distanceKm = null,
     children,
   }: {
     tags: string[];
@@ -41,6 +42,8 @@
     mode?: CharterMode | null;
     createdAt?: number | null;
     updatedAt?: number | null;
+    /** km away, before the clock (Region cards). */
+    distanceKm?: number | null;
     children?: Snippet;
   } = $props();
   // A #platform project takes a network vote (ADR 0095); threads and posts take none.
@@ -99,7 +102,9 @@
 {#snippet clock()}
   {#if createdAt !== null}
     <span class="feed-card-time" title={describeUpdate(createdAt, updatedAt)}
-      >{relativeCompact(activityInstant(createdAt, updatedAt))}</span
+      >{distanceKm !== null && distanceKm !== undefined
+        ? `${distanceKm.toFixed(1)} km · `
+        : ''}{relativeCompact(activityInstant(createdAt, updatedAt))}</span
     >
   {/if}
 {/snippet}

@@ -87,6 +87,25 @@ export function scrollToEnd(log: HTMLElement | undefined): void {
   };
   apply();
   requestAnimationFrame(apply);
+  stickToEnd(log, apply);
+}
+
+/** Photos and the panel's own sizing land after the first jump, which left a chat opened
+ * part-way up (owner, 2026-11-23). For a moment the log stays at its end while it grows,
+ * unless the reader touches or scrolls it themselves. */
+function stickToEnd(log: HTMLElement, apply: () => void): void {
+  if (typeof ResizeObserver === 'undefined') return;
+  const observer = new ResizeObserver(apply);
+  const stop = (): void => {
+    observer.disconnect();
+    for (const event of ['wheel', 'touchstart', 'keydown'] as const)
+      log.removeEventListener(event, stop);
+  };
+  observer.observe(log);
+  for (const child of Array.from(log.children)) observer.observe(child);
+  for (const event of ['wheel', 'touchstart', 'keydown'] as const)
+    log.addEventListener(event, stop, { passive: true });
+  setTimeout(stop, 2500);
 }
 
 /** Where web's bubble menu opens: below the pointer, above it near the bottom, inside the

@@ -137,6 +137,7 @@
     }
     const pending = mapFocus.request;
     clearMapFocusRequest();
+    if (pending?.full && !s.mapFullscreen) void toggleFullscreen(false);
     await loader.boot(pending, missing);
     if (!s.hasCenter) s.loading = false;
     s.updateStageHeight();
@@ -189,6 +190,7 @@
     if (!initialLoadDone || !request) return;
     untrack(() => {
       clearMapFocusRequest();
+      if (request.full && !s.mapFullscreen) void toggleFullscreen(false);
       void loader.focus(request, missing);
     });
   });

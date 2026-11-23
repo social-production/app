@@ -88,7 +88,7 @@
         {#if g.mergers.length > 0}
           <span class="repo-faces" aria-hidden="true">
             {#each g.mergers.slice(0, 3) as member (member.agent)}
-              <AvatarBadge size="sm" name={name(member.agent)} />
+              <AvatarBadge size="sm" name={name(member.agent)} agent={member.agent} />
             {/each}
           </span>
         {/if}

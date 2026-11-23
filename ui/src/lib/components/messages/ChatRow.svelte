@@ -1,6 +1,9 @@
 <script lang="ts">
   import { withoutRawPaths } from '#lib/components/chat/chatFormat.ts';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
+  import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
+  import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
+  import type { CharterMode } from '#lib/domain/projects.ts';
 
   import ChatMarks from './ChatMarks.svelte';
 
@@ -10,6 +13,10 @@
    */
   interface Props {
     title: string;
+    /** A direct chat's other person: their photo. */
+    agent?: string | null;
+    /** A public chat's space type: its kind tile, as on feed cards, in place of initials. */
+    mode?: CharterMode | null;
     preview: string;
     time: string;
     unread: number;
@@ -21,7 +28,19 @@
     onMenu: (x: number, y: number) => void;
   }
 
-  let { title, preview, time, unread, pinned, muted, kind, onOpen, onMenu }: Props = $props();
+  let {
+    title,
+    agent = null,
+    mode = null,
+    preview,
+    time,
+    unread,
+    pinned,
+    muted,
+    kind,
+    onOpen,
+    onMenu,
+  }: Props = $props();
 
   let timer: ReturnType<typeof setTimeout> | undefined;
   let origin = { x: 0, y: 0 };
@@ -75,16 +94,31 @@
   onpointerup={end}
   onpointercancel={end}
 >
-  <AvatarBadge size="sm" name={title} />
+  {#if mode}
+    <span
+      class="chat-kind-tile"
+      style={`--surface-accent: ${kindColor(kindOf(mode))}`}
+      aria-hidden="true"><KindGlyph kind={kindOf(mode)} size={20} /></span
+    >
+  {:else}
+    <AvatarBadge size="sm" name={title} {agent} />
+  {/if}
   <div class="conversation-copy">
     <div class="conversation-topline">
-      <ChatMarks {pinned} />
       <strong>{title}</strong>
       <ChatMarks {muted} />
-      {#if kind}<span class="chat-kind">{kind}</span>{/if}
-      <span class="conversation-time">{time}</span>
+      {#if kind && !mode}<span class="chat-kind">{kind}</span>{/if}
     </div>
     <p class="conversation-preview">{withoutRawPaths(preview)}</p>
   </div>
-  {#if unread > 0}<span class="unread-pill">{unread}</span>{/if}
+  <!-- Telegram's right edge (owner, 2026-11-23): the time on top; under it the unread count,
+       grey while muted, or else the pin. -->
+  <span class="conversation-meta">
+    <span class="conversation-time">{time}</span>
+    {#if unread > 0}
+      <span class="unread-pill" class:muted>{unread}</span>
+    {:else if pinned}
+      <ChatMarks {pinned} />
+    {/if}
+  </span>
 </button>

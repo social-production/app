@@ -96,7 +96,11 @@
         onclick={() => onMembers?.()}
       >
         {#snippet aside()}
-          {#each going as agent (agent)}<AvatarBadge size="sm" name={names[agent] ?? ''} />{/each}
+          {#each going as agent (agent)}<AvatarBadge
+              size="sm"
+              name={names[agent] ?? ''}
+              {agent}
+            />{/each}
         {/snippet}
       </FactRow>
     {/if}
@@ -134,7 +138,7 @@
         <h1>{charter.title}</h1>
       </RestrictionNotice>
       <p class="detail-by">
-        <AvatarBadge size="sm" name={author} />
+        <AvatarBadge size="sm" name={author} agent={project.creator} />
         <span>
           {event ? t('Organised by') : t('Started by')}
           <a href={resolve('/profile/[agent]', { agent: project.creator })}>{author}</a>

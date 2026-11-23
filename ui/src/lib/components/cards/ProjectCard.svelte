@@ -38,7 +38,8 @@
       stage={card.phase}
       mode={card.mode}
       createdAt={card.createdAt}
-      updatedAt={card.lastActivityAt}><CardReport {card} {href} /></FeedCardTop
+      updatedAt={card.lastActivityAt}
+      distanceKm={card.distanceKm ?? null}><CardReport {card} {href} /></FeedCardTop
     >
     <a class="title" href={resolve('/projects/[id]', { id: card.id })}>{card.title}</a>
     <p class="summary">{card.summary}</p>

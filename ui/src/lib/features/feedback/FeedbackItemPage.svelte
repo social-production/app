@@ -125,7 +125,7 @@
       {#each fb.comments as comment (comment.id)}
         {@const parent = fb.comments.find((c) => c.id === comment.replyTo)}
         <article class="feedback-comment">
-          <AvatarBadge size="sm" name={name(comment.author)} />
+          <AvatarBadge size="sm" name={name(comment.author)} agent={comment.author} />
           <div class="feedback-comment-copy">
             <p class="feedback-comment-head">
               <a href={resolve('/profile/[agent]', { agent: comment.author })}
