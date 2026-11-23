@@ -6,7 +6,7 @@
 use std::collections::BTreeMap;
 
 use hdk::prelude::*;
-use project_integrity::{Proposal, ProposalKind, VoteChoice};
+use project_integrity::{Proposal, ProposalKind, Vote, VoteChoice};
 use sp_governance::Verdict;
 
 use crate::calls;
@@ -38,6 +38,25 @@ impl Standing {
         self.0.insert(key, full);
         Ok(full)
     }
+}
+
+/// The votes cast before `until` by people with Full standing from before the proposal: the
+/// only ones a decision is applied on (ADR 0033).
+pub fn eligible_votes(
+    proposal: &Found<Proposal>,
+    until: Timestamp,
+    standing: &mut Standing,
+) -> ExternResult<Vec<Found<Vote>>> {
+    let mut eligible = Vec::new();
+    for vote in reads::votes(&proposal.hash)?
+        .into_iter()
+        .filter(|v| v.at <= until)
+    {
+        if standing.full(&vote.author, proposal.at)? {
+            eligible.push(vote);
+        }
+    }
+    Ok(eligible)
 }
 
 /// Passed proposals whose recount passes too, in the order they were decided.
@@ -72,15 +91,7 @@ pub fn passed(standing: &mut Standing, roll: &Roll) -> ExternResult<Vec<Decision
             });
             continue;
         }
-        let mut eligible = Vec::new();
-        for vote in reads::votes(&proposal.hash)?
-            .into_iter()
-            .filter(|v| v.at <= outcome.at)
-        {
-            if standing.full(&vote.author, proposal.at)? {
-                eligible.push(vote);
-            }
-        }
+        let eligible = eligible_votes(&proposal, outcome.at, standing)?;
         if count.tally(&eligible).verdict() == Verdict::Passed {
             let tally = |c: VoteChoice| {
                 u32::try_from(eligible.iter().filter(|v| v.entry.choice == c).count()).unwrap_or(0)

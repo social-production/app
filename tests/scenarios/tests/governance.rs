@@ -152,11 +152,12 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
         .call(0, "governance", "close_proposal", sneaky.clone())
         .await;
     net.settle().await;
-    // 3 Yes votes close it as passed, but only 2 come from Full members; N = 3 needs 3.
+    // 3 Yes votes close it as passed, but only 2 come from Full members; N = 3 needs 3, so
+    // the list shows it as not passed rather than a pass that changed nothing.
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
     assert_eq!(
         list.iter().find(|p| p.id == sneaky).map(|p| &p.status),
-        Some(&Verdict::Passed)
+        Some(&Verdict::Rejected)
     );
     assert_eq!(
         project(&net, 1).await.charter.map(|c| c.title),

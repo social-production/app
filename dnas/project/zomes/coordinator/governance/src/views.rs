@@ -6,6 +6,7 @@ use project_integrity::{Proposal, ProposalKind, VoteChoice};
 use sp_governance::Verdict;
 
 use crate::count::count;
+use crate::decide::{eligible_votes, Standing};
 use crate::reads::{self, Found};
 use crate::roll::Roll;
 
@@ -26,6 +27,9 @@ pub struct TallyView {
     pub settled: bool,
     /// Members challenges added to the count.
     pub added: u32,
+    /// The votes passed it, but not enough of them came from people with Full standing, so
+    /// nothing was applied (ADR 0033); shown as not passed.
+    pub uncounted: bool,
     /// Members from before the proposal the count still leaves out, as this node sees them.
     pub missing: u32,
     /// Challenges count until then (48 h after the first Outcome); `None` while undecided.
@@ -42,19 +46,26 @@ pub fn tally_view(p: &Found<Proposal>, me: &AgentPubKey, roll: &Roll) -> ExternR
         u32::try_from(votes.iter().filter(|v| v.entry.choice == c).count()).unwrap_or(0)
     };
     let missing = u32::try_from(count.missing.len()).unwrap_or(u32::MAX);
+    let uncounted = match count.decided.as_ref() {
+        Some(o) if o.entry.passed && !o.entry.votes.is_empty() => {
+            let eligible = eligible_votes(p, o.at, &mut Standing::default())?;
+            count.tally(&eligible).verdict() != Verdict::Passed
+        }
+        _ => false,
+    };
+    let status = match count.decided.as_ref() {
+        None => Verdict::Open,
+        Some(o) if o.entry.passed && !uncounted => Verdict::Passed,
+        Some(_) => Verdict::Rejected,
+    };
     Ok(TallyView {
+        uncounted,
         yes: tallied(VoteChoice::Yes),
         no: tallied(VoteChoice::No),
         neutral: tallied(VoteChoice::Neutral),
         population: tally.population,
         required: tally.required,
-        status: count.decided.as_ref().map_or(Verdict::Open, |o| {
-            if o.entry.passed {
-                Verdict::Passed
-            } else {
-                Verdict::Rejected
-            }
-        }),
+        status,
         settled: count.decided.is_none() && tally.verdict() != Verdict::Open,
         closed_at: count.decided.as_ref().map(|o| o.at),
         my_vote: votes
@@ -85,6 +96,7 @@ pub struct ProposalView {
     pub my_vote: Option<VoteChoice>,
     pub settled: bool,
     pub added: u32,
+    pub uncounted: bool,
     pub missing: u32,
     pub challenge_until: Option<Timestamp>,
     pub can_challenge: bool,
@@ -119,6 +131,7 @@ pub fn list_proposals() -> ExternResult<Vec<ProposalView>> {
             my_vote: t.my_vote,
             settled: t.settled,
             added: t.added,
+            uncounted: t.uncounted,
             missing: t.missing,
             challenge_until: t.challenge_until,
             can_challenge: t.can_challenge,

@@ -17,7 +17,7 @@ import {
   listProposals,
   propose,
 } from '#lib/services/governance.ts';
-import { getPerson } from '#lib/services/people.ts';
+import { getPerson, myAgent } from '#lib/services/people.ts';
 import { listPlans, ratePlan as rate, submitPlan as submit } from '#lib/services/plans.ts';
 import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
@@ -36,6 +36,8 @@ export class DetailState {
   values = $state<ProjectValue[]>([]);
   /** Display names by agent key (creator, members, proposers, update authors). */
   names = $state<Record<string, string>>({});
+  /** Whether the viewer has Full standing: only Full members' votes decide (ADR 0033). */
+  viewerFull = $state<boolean | null>(null);
   error = $state<string>();
   joining = $state(false);
   saving = $state(false);
@@ -135,6 +137,7 @@ export class DetailState {
       [project, proposals, plans, values] = await this.read();
     }
     const members = await Promise.all(project.members.map(getPerson));
+    if (this.viewerFull === null && project.amMember) void this.loadViewer();
     this.project = project;
     this.members = members;
     this.proposals = proposals;
@@ -151,6 +154,14 @@ export class DetailState {
       ...project.updates.map((u) => u.author),
     ];
     await this.loadNames([...members.map((m) => m.agent), ...keys], members);
+  }
+
+  private async loadViewer(): Promise<void> {
+    try {
+      this.viewerFull = (await getPerson(await myAgent())).standing.level === 'Full';
+    } catch {
+      // Unknown standing shows no note.
+    }
   }
 
   private async loadNames(agents: string[], known: Person[]): Promise<void> {
