@@ -8,6 +8,7 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import { calls, isLive } from './callSession.svelte.ts';
+  import MicPrimer from './MicPrimer.svelte';
 
   import '#lib/components/styles/calls.css';
 
@@ -149,3 +150,5 @@
     </div>
   {/if}
 </div>
+
+<MicPrimer />
