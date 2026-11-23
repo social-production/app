@@ -2,16 +2,19 @@
 //! integrity (or the apply-time rules, ADR 0033) would not accept the result.
 
 use hdk::prelude::*;
-use project_integrity::{
-    Challenge, EntryTypes, LinkTypes, Outcome, Proposal, ProposalKind, Vote, VoteChoice,
-};
+use project_integrity::{EntryTypes, LinkTypes, Outcome, Proposal, ProposalKind, Vote, VoteChoice};
 use sp_governance::Verdict;
 
-use crate::apply::{self, Standing};
+use crate::apply;
 use crate::count::count;
+use crate::decide::Standing;
 use crate::reads::{self, Found};
 use crate::roll::Roll;
 use crate::{calls, link_write, moves, plan_write, software};
+
+/// Why someone without Full standing can't propose or vote (ADR 0116).
+pub const NOT_FULL: &str =
+    "Only Full members vote. You get Full standing from two vouches by Full members, or steady activity.";
 
 pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
@@ -55,6 +58,12 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
             None
         };
     let roll = Roll::load()?;
+    let now = sys_time()?;
+    let votes = !(organized || saved);
+    let mut standing = Standing::default();
+    if votes && !standing.full(&agent_info()?.agent_initial_pubkey, now)? {
+        return Err(guest(NOT_FULL));
+    }
     let kind = prepare(kind, &roll)?;
     // The proposer's own Yes comes with the proposal (web's proposer vote). Plans are assessed
     // first; returns and software requests are opened without one, as on web (`revert.py`,
@@ -63,7 +72,17 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         kind,
         ProposalKind::Plan(_) | ProposalKind::Return { .. } | ProposalKind::Software(_)
     );
-    let members = calls::member_snapshot()?;
+    // The count is of Full members only, since only they vote (ADR 0116).
+    let mut members = Vec::new();
+    for hash in calls::member_snapshot()? {
+        let full = match roll.agent(&hash)? {
+            Some(agent) => hash == membership || standing.full(&agent, now)?,
+            None => false,
+        };
+        if full || !votes {
+            members.push(hash);
+        }
+    }
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         space: space_scope::current()?,
         kind,
@@ -165,6 +184,10 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
     }
     let found = reads::proposal(&proposal)?
         .ok_or_else(|| guest("This proposal hasn't reached your node yet."))?;
+    // Only Full members vote (ADR 0116): a New member's vote would never count (ADR 0033).
+    if membership.is_some() && !calls::full_before(&me, found.at)? {
+        return Err(guest(NOT_FULL));
+    }
     if count(&found, &Roll::load()?)?.decided.is_some() {
         return Err(guest("This vote has closed."));
     }
@@ -252,29 +275,4 @@ pub fn close(
         (),
     )?;
     Ok(Some(hash))
-}
-
-/// Cite every member the proposal's count leaves out (docs/GOVERNANCE.md, ADR 0040). The
-/// proposal reopens with the larger population; it closes again once its votes decide it.
-pub fn challenge(proposal: ActionHash) -> ExternResult<ActionHash> {
-    let membership = calls::my_membership()?
-        .ok_or_else(|| guest("Join the project to challenge a decision."))?;
-    let found = reads::proposal(&proposal)?
-        .ok_or_else(|| guest("This proposal hasn't reached your node yet."))?;
-    let count = count(&found, &Roll::load()?)?;
-    if !count.open_to_challenge(sys_time()?) {
-        return Err(guest("The time to challenge this decision has passed."));
-    }
-    if count.missing.is_empty() {
-        return Err(guest(
-            "Everyone who was a member when this was proposed is already counted.",
-        ));
-    }
-    let hash = create_entry(EntryTypes::Challenge(Challenge {
-        proposal: proposal.clone(),
-        membership,
-        omitted: count.missing,
-    }))?;
-    create_link(proposal, hash.clone(), LinkTypes::ProposalToChallenges, ())?;
-    Ok(hash)
 }

@@ -4,6 +4,7 @@
 
   import { portal } from '#lib/components/actions/portal.ts';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
+  import FullOnlySheet from '#lib/components/governance/FullOnlySheet.svelte';
   import PhaseMoveSheet, { type PhaseMove } from '#lib/components/governance/PhaseMoveSheet.svelte';
   import { planGateMessage, signalGateMet } from '#lib/domain/phaseCopy.ts';
 
@@ -20,6 +21,10 @@
   const currentVisible = $derived(shown === project?.phase);
   const phaseVoteOpen = $derived(detail.phaseVoteOpen);
   let moving = $state(false);
+  // A New member can't start a vote (ADR 0116): Phase explains instead of opening the moves.
+  let explaining = $state(false);
+  const votes = $derived(project?.governance !== 'organizer_controlled');
+  const fullMembers = $derived(detail.members.filter((m) => m.standing.level === 'Full').length);
   const signalGatePasses = $derived(
     project?.phase !== 'phase-1' || signalGateMet(project.demand, project.opposition),
   );
@@ -117,6 +122,10 @@
   });
 
   const open = (): void => {
+    if (votes && detail.viewerFull === false) {
+      explaining = true;
+      return;
+    }
     detail.sheetMessage = undefined;
     moving = true;
   };
@@ -159,4 +168,5 @@
     onSubmit={(move, reason) => void file(move, reason)}
     onClose={() => (moving = false)}
   />
+  <FullOnlySheet open={explaining} {fullMembers} onClose={() => (explaining = false)} />
 {/if}

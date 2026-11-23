@@ -49,7 +49,7 @@
   {#if newVoter && proposal.status === 'Open'}
     <p class="network-vote-line">
       {t(
-        "You're a new member, so your vote shows here but doesn't decide it yet. Votes count once two Full members vouch for you, or after steady activity.",
+        'Only Full members vote. You get Full standing from two vouches by Full members, or after steady activity.',
       )}
     </p>
   {/if}

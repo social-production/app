@@ -28,7 +28,7 @@
     reveal?: string | null;
     /** The revealed sheet closed: the link is dropped, so it doesn't reopen. */
     onRevealDone?: (() => void) | undefined;
-    /** The viewer isn't a Full member yet, so their vote doesn't decide (ADR 0033). */
+    /** The viewer isn't a Full member yet, so they read the votes but can't vote (ADR 0116). */
     newVoter?: boolean;
   }
 
@@ -122,7 +122,7 @@
     </div>
   {/if}
   {#snippet footer()}
-    {#if current}
+    {#if current && !newVoter}
       <VoteChoiceBar docked mine={current.myVote} onChoose={(c) => cast(current, c)}>
         {#snippet lead()}
           {#if proposals.length > 1}

@@ -52,6 +52,8 @@ struct ProposalView {
     no: u32,
     required: u32,
     status: Verdict,
+    population: u32,
+    missing: u32,
 }
 
 #[derive(Deserialize, Debug)]
@@ -129,9 +131,6 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
     vote(&net, 1, &rejected, VoteChoice::No)
         .await
         .expect("vote");
-    vote(&net, 2, &rejected, VoteChoice::No)
-        .await
-        .expect("vote");
     net.settle().await;
     // The last voter may not have seen every vote; anyone closes a settled proposal.
     let _: Option<ActionHash> = net
@@ -140,24 +139,26 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
     net.settle().await;
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
     let closed = list.iter().find(|p| p.id == rejected).expect("listed");
-    assert_eq!((closed.no, &closed.status), (2, &Verdict::Rejected));
+    assert_eq!((closed.no, &closed.status), (1, &Verdict::Rejected));
 
-    // Integrity counts the New member's Yes; applying it doesn't (standing filter, ADR 0033).
-    let sneaky: ActionHash = net.call(2, "governance", "propose", rename("Sneaky")).await;
-    net.settle().await;
-    vote(&net, 0, &sneaky, VoteChoice::Yes).await.expect("vote");
-    vote(&net, 1, &sneaky, VoteChoice::Yes).await.ok();
-    net.settle().await;
-    let _: Option<ActionHash> = net
-        .call(0, "governance", "close_proposal", sneaky.clone())
+    // A New member neither proposes nor votes (ADR 0116): only Full members' votes count.
+    let sneaky: Result<ActionHash, String> = net
+        .try_call(2, "governance", "propose", rename("Sneaky"))
         .await;
+    assert!(sneaky.is_err(), "a New member can't propose a vote");
+    let fair: ActionHash = net.call(0, "governance", "propose", rename("Fair")).await;
     net.settle().await;
-    // 3 Yes votes close it as passed, but only 2 come from Full members; N = 3 needs 3, so
-    // the list shows it as not passed rather than a pass that changed nothing.
+    assert!(
+        vote(&net, 2, &fair, VoteChoice::No).await.is_err(),
+        "a New member can't vote"
+    );
+    // The count is of the two Full members only, so it needs both their votes.
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
+    let open = list.iter().find(|p| p.id == fair).expect("listed");
     assert_eq!(
-        list.iter().find(|p| p.id == sneaky).map(|p| &p.status),
-        Some(&Verdict::Rejected)
+        (open.population, open.missing),
+        (2, 0),
+        "New members aren't counted"
     );
     assert_eq!(
         project(&net, 1).await.charter.map(|c| c.title),

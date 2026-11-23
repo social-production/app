@@ -64,8 +64,8 @@ async fn members(net: &Net, i: usize) -> Vec<AgentPubKey> {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn members_vote_someone_out_of_a_channel() {
-    // Agents 0–2 are founders (Full); agent 3 is New. Agent 0 creates #food. With 4 members
-    // a decision needs 3 votes (sp_governance quorum).
+    // Agents 0–2 are founders (Full); agent 3 is New. Agent 0 creates #food. Only the 3 Full
+    // members are counted (ADR 0116), so a decision needs 2 votes (sp_governance quorum).
     let net = Net::with_charter(4, 3, "scopes", scope("channel", "Food", "open")).await;
     assert_eq!(members(&net, 0).await.len(), 4);
 
@@ -93,7 +93,7 @@ async fn members_vote_someone_out_of_a_channel() {
     };
     let proposal: ActionHash = net.call(0, "governance", "propose", out).await;
     net.settle().await;
-    for voter in [1, 2] {
+    for voter in [1] {
         let vote = VoteInput {
             proposal: proposal.clone(),
             choice: VoteChoice::Yes,
