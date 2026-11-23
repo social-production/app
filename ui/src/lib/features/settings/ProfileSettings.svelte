@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cropPhoto } from '#lib/stores/photoCrop.svelte.ts';
   import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
@@ -36,7 +37,12 @@
   });
 
   async function pick(event: Event): Promise<void> {
-    const file = (event.currentTarget as HTMLInputElement).files?.[0];
+    const input = event.currentTarget as HTMLInputElement;
+    const chosen = input.files?.[0];
+    input.value = '';
+    if (!chosen) return;
+    // Placed in its round frame first (Owner Notes Mockups §3).
+    const file = await cropPhoto(chosen, 'round');
     if (!file) return;
     error = undefined;
     try {
