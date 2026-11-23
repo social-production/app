@@ -5,7 +5,8 @@
   import '#lib/components/styles/ux/dockmore.css';
 
   /**
-   * The joined dock's ⋯ (Detail Pages Cleanup §4): Edit (when you may propose), Members,
+   * The joined dock's ⋯ (Detail Pages Cleanup §4): Post an update and Edit (when you may
+   * propose; Owner Notes Mockups §10 keeps the dock to three things), Members,
    * Copy link and Leave, in the same menu card as chats. Leaving asks first (the page's
    * own confirmation).
    */
@@ -13,11 +14,23 @@
     noun: string;
     canEdit: boolean;
     onEdit: () => void;
+    /** Post an update (Owner Notes Mockups §10: it moved here from the dock). */
+    onUpdate?: (() => void) | null;
     onMembers: () => void;
+    /** A collective service's request settings (§10). */
+    onSettings?: (() => void) | null;
     onLeave: () => void;
   }
 
-  let { noun, canEdit, onEdit, onMembers, onLeave }: Props = $props();
+  let {
+    noun,
+    canEdit,
+    onEdit,
+    onUpdate = null,
+    onMembers,
+    onSettings = null,
+    onLeave,
+  }: Props = $props();
 
   let open = $state(false);
   let copied = $state(false);
@@ -61,9 +74,19 @@
   </button>
   {#if open}
     <div class="dock-more-card" role="menu">
+      {#if canEdit && onUpdate}
+        <button type="button" role="menuitem" onclick={() => pick(onUpdate)}>
+          <ToolbarIcon name="news" />{t('Post an update')}
+        </button>
+      {/if}
       {#if canEdit}
         <button type="button" role="menuitem" onclick={() => pick(onEdit)}>
           <ToolbarIcon name="pencil" />{t('Edit')}
+        </button>
+      {/if}
+      {#if onSettings}
+        <button type="button" role="menuitem" onclick={() => pick(onSettings)}>
+          <ToolbarIcon name="gear" />{t('Service settings')}
         </button>
       {/if}
       <button type="button" role="menuitem" onclick={() => pick(onMembers)}>

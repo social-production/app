@@ -4,7 +4,6 @@
   import SignalStrip from '#lib/components/cards/SignalStrip.svelte';
   import DetailActionDock from '#lib/components/DetailActionDock.svelte';
   import VoteDock from '#lib/components/governance/VoteDock.svelte';
-  import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { isPhaseChange } from '#lib/domain/governance.ts';
   import { isEvent, takesSignals, type Stance } from '#lib/domain/projects.ts';
 
@@ -12,13 +11,14 @@
   import type { DetailState } from './detailState.svelte.ts';
   import DockMore from './DockMore.svelte';
   import JoinActions from './JoinActions.svelte';
+  import { serviceMenu } from './requests/serviceMenu.svelte.ts';
 
   /** web's Details dock: signals, Vote on edits and updates, Join, Share, and Update for
    * members. ADR 0099: Support and Oppose are a capsule above the actions until the person
    * has a stance; then they fold into a chip that opens them again. An open vote on an edit or
    * update floats up there too. Detail Pages Cleanup §4: before you join, Join (or "Sign up to
-   * join") and Share; once joined, the stance chip, Update, Share and ⋯ (Edit, Members, Copy
-   * link, Leave). The member count lives in Details. */
+   * join") and Share; once joined, the stance chip, Share and ⋯ (Post an update, Edit, Members,
+   * Copy link, Leave; Owner Notes Mockups §10). The member count lives in Details. */
   interface Props {
     detail: DetailState;
     onOpenMembers: () => void;
@@ -126,16 +126,13 @@
     {#if !project.amMember}
       <JoinActions {detail} />
     {:else}
-      {#if detail.canPropose}
-        <button type="button" class="dock-labelled" onclick={onUpdate}>
-          <ToolbarIcon name="news" />{t('Update')}
-        </button>
-      {/if}
       <DetailShare {detail} />
       <DockMore
         noun={isEvent(charter.mode) ? 'event' : 'project'}
         canEdit={detail.canPropose}
         {onEdit}
+        {onUpdate}
+        onSettings={charter.mode === 'collective-service' ? () => (serviceMenu.open = true) : null}
         onMembers={onOpenMembers}
         onLeave={() => detail.requestToggleJoin()}
       />
