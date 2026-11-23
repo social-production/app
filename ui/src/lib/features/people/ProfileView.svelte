@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { cropPhoto, type CropShape } from '#lib/stores/photoCrop.svelte.ts';
   import { t } from '#lib/i18n/index.ts';
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import type { Snippet } from 'svelte';
@@ -101,6 +102,16 @@
   $effect(() => {
     void editor.loadCover();
   });
+
+  /** A chosen photo is placed in its frame first (Owner Notes Mockups §3). */
+  async function placed(
+    file: File,
+    shape: CropShape,
+    save: (file: File) => Promise<void>,
+  ): Promise<void> {
+    const ready = await cropPhoto(file, shape);
+    if (ready) await save(ready);
+  }
 </script>
 
 <div class="profile-page">
@@ -112,8 +123,12 @@
         {devices}
         trustOpen={trust.open}
         cover={editor.cover}
-        onCoverFile={own ? (file) => void editor.pickCover(file) : undefined}
-        onPhotoFile={own ? (file) => void editor.pickPhoto(shown, file) : undefined}
+        onCoverFile={own
+          ? (file) => void placed(file, 'wide', (f) => editor.pickCover(f))
+          : undefined}
+        onPhotoFile={own
+          ? (file) => void placed(file, 'round', (f) => editor.pickPhoto(shown, f))
+          : undefined}
         onStanding={() => {
           trust.open = !trust.open;
           if (trust.open) follows.list = null;

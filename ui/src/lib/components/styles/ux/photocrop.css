@@ -1,0 +1,72 @@
+/* The photo crop sheet (Owner Notes Mockups §3): the photo on a dark stage, the frame clear and
+   what falls outside it dimmed; a zoom slider under it. */
+.overlay-root.photo-crop-sheet .overlay-body {
+  padding: 0;
+}
+
+.photo-crop-sheet .crop-stage {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  padding: 28px 16px 20px;
+  background: #111;
+  color: #fff;
+}
+
+.photo-crop-sheet .crop-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 2px rgb(255 255 255 / 0.9),
+    0 0 0 999px rgb(0 0 0 / 0.55);
+  touch-action: none;
+  cursor: grab;
+}
+
+.photo-crop-sheet .crop-frame.round {
+  border-radius: 50%;
+}
+
+.photo-crop-sheet .crop-frame img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  max-width: none;
+  transform-origin: 0 0;
+  user-select: none;
+  pointer-events: none;
+}
+
+.photo-crop-sheet .crop-hint {
+  margin: 0;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 13.5px;
+  font-weight: 600;
+}
+
+.photo-crop-sheet .crop-zoom {
+  width: min(280px, 100%);
+  accent-color: #fff;
+}
+
+/* The whole sheet is the dark stage, header included. */
+.overlay-root.photo-crop-sheet .overlay-sheet,
+.overlay-root.photo-crop-sheet .overlay-body {
+  background: #111;
+}
+
+.overlay-root.photo-crop-sheet .overlay-header {
+  border-bottom: none;
+  background: #111;
+  color: #fff;
+}
+
+.overlay-root.photo-crop-sheet .overlay-header h2 {
+  color: #fff;
+}
+
+.overlay-root.photo-crop-sheet .overlay-body {
+  display: grid;
+  align-content: center;
+}

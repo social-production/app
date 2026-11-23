@@ -5,6 +5,7 @@
   import MapHost from '#lib/features/map/MapHost.svelte';
   import SearchOverlay from '#lib/features/search/SearchOverlay.svelte';
   import AppShell from '#lib/features/shell/AppShell.svelte';
+  import PhotoCropHost from '#lib/features/shell/PhotoCropHost.svelte';
 
   import '../app.css';
 
@@ -17,4 +18,5 @@
   {#snippet mapPanel(close: () => void)}<MapHost onClose={close} />{/snippet}
 </AppShell>
 <CallHost />
+<PhotoCropHost />
 <SearchOverlay />
