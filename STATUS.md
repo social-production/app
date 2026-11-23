@@ -191,7 +191,7 @@ The owner left ~40 notes before sleeping. Answers to the design ones are pending
   the vote sheet for New members; #262 only the first post and updates move a project up the
   feed (`last_activity_at`); #263 notifications start from when you joined (`my_joined_at`).
   All coordinator-only: no DNA hash change.
-- **#264 (`claude/owner-notes-quick`)**: the build-without-mockup notes. Tap flash, search
+- **#264 (merged ~1:25 am, live)**: the build-without-mockup notes. Tap flash, search
   rings, Vote without "+", service dock icons, Update's news icon, ⋯ closes on any tap,
   profile buttons, comment cards without the extra lines, the reply-style highlight for linked
   comments, chats open at the end, the create "+" hides on scroll and explains sign-in, places
@@ -200,7 +200,13 @@ The owner left ~40 notes before sleeping. Answers to the design ones are pending
   cards' distance and an Order (Nearest/Soonest, gateway `order=soonest`), `#platform`
   taggable, About tabs and a rewritten Why, sheet footers clear of the bottom edge, the plan
   wizard's footer as the dock, and a "No audio" line when a call's ICE fails.
-- **Owner decisions needed (mockup §1–11):** create dock; picture/cover at creation (project
+- **Built after the mockups, merged ~2:10 am (the owner gave room to build; review live):**
+  #265 create flows' joined dock, plain × and step bars (§1); #266 microphone and notification
+  sheets before the browser asks (§8; skipped under `navigator.webdriver`); #267 a project chat's
+  page from Messages › Public and even tabs on chat pages (§7); #268 the photo crop sheet for
+  Settings' photo and the profile's photo and cover (§3, `stores/photoCrop.svelte.ts`); #269 the
+  profile's home area opens the map.
+- **Owner decisions still needed (mockup §2, 4, 5, 6, 9, 10, 11):** create dock; picture/cover at creation (project
   reset); photo cropping; Create plan (no earlier design found); Create link; one share sheet
   and quote posts; chat pages; microphone/notification primers; pick-up games (A open sessions
   recommended, a project reset); detail dock table; whether a lone New founder may move their
