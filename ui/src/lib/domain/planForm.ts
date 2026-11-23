@@ -103,7 +103,24 @@ const STAGES: PlanStep = {
   ),
 };
 
-/** web's `buildEventPlanCreationSteps`, with only the date step its schedule mode shows. */
+/** The date and time steps of a dated schedule. */
+function datedSteps(f: ScheduleForm): PlanStep[] {
+  return [
+    f.scheduleMode === 'range'
+      ? { id: 'schedule-range', question: t('What date range should the event cover?') }
+      : { id: 'schedule-date', question: t('Which date should the event use?') },
+    {
+      id: 'schedule-time',
+      question: t('What are the start and finish times?'),
+      helper: t(
+        'Marked plan days become the days where activity can be scheduled from the calendar.',
+      ),
+    },
+  ];
+}
+
+/** web's `buildEventPlanCreationSteps`, with only the date step its schedule mode shows; no
+ * set date skips the dates and times (sessions are the activities). */
 function eventPlanSteps(f: ScheduleForm): PlanStep[] {
   return [
     {
@@ -116,18 +133,9 @@ function eventPlanSteps(f: ScheduleForm): PlanStep[] {
     {
       id: 'schedule-mode',
       question: t('How should the event be scheduled?'),
-      helper: t('Choose a single date or a date range.'),
+      helper: t('Choose a single date, a date range, or no set date for something ongoing.'),
     },
-    f.scheduleMode === 'range'
-      ? { id: 'schedule-range', question: t('What date range should the event cover?') }
-      : { id: 'schedule-date', question: t('Which date should the event use?') },
-    {
-      id: 'schedule-time',
-      question: t('What are the start and finish times?'),
-      helper: t(
-        'Marked plan days become the days where activity can be scheduled from the calendar.',
-      ),
-    },
+    ...(f.scheduleMode === 'any-day' ? [] : datedSteps(f)),
     { id: 'location', question: t('Where will this event happen?') },
     DEMAND_NOTE,
     STAGES,
