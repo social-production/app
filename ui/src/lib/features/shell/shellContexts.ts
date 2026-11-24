@@ -1,8 +1,9 @@
 import { providePostPhotoSource } from '#lib/components/cards/postPhotoSource.ts';
+import { provideCommentLike } from '#lib/components/cards/commentLike.ts';
 import { provideQuoteSource } from '#lib/components/cards/quoteSource.ts';
 import { providePlaceOnMap } from '#lib/components/map/placeOnMap.ts';
 import { provideShareLink } from '#lib/components/overlay/shareLink.ts';
-import { postPhotoUrl, postPhotos } from '#lib/services/discussions.ts';
+import { postPhotoUrl, postPhotos, voteComment } from '#lib/services/discussions.ts';
 import { quotedSpace } from '#lib/services/profileNotes.ts';
 import {
   SCOPE_PICTURES,
@@ -31,5 +32,6 @@ export function provideShellContexts(): void {
   providePlaceOnMap({ show: (label, select) => openPlaceOnMap(label, null, select ?? null) });
   providePostPhotoSource({ list: postPhotos, url: postPhotoUrl });
   provideQuoteSource({ summary: quotedSpace });
+  provideCommentLike({ like: (space, message, on) => voteComment(space, message, on ? 1 : 0) });
   provideShareLink({ open: (subject) => (shareHost.subject = subject) });
 }

@@ -17,6 +17,14 @@ export interface CommentActivity {
   /** Whom a reply answers, by name. */
   replyToName: string | null;
   space: { id: string; title: string; mode: CharterMode; tag: string };
+  /** A thread's or post's comment: its likes, replies and your like (owner, 2026-11-24). */
+  counts?: CommentCounts;
+}
+
+export interface CommentCounts {
+  likes: number;
+  replies: number;
+  liked: boolean;
 }
 
 /** The opening words a note keeps: one line of whitespace, cut on a word if it is long. */

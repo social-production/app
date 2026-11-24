@@ -11,6 +11,7 @@ import {
 } from '#lib/holo/index.ts';
 
 import { queued } from './chat.ts';
+import { withCounts } from './commentCounts.ts';
 import { namesOf } from './people.ts';
 
 /** Profile covers and comment notes in the directory (ADR 0107). */
@@ -116,7 +117,7 @@ export async function commentsOf(agents: string[]): Promise<CommentActivity[]> {
       },
     });
   });
-  return out.sort((a, b) => b.createdAt - a.createdAt);
+  return withCounts(out.sort((a, b) => b.createdAt - a.createdAt));
 }
 
 /** A quoted space's title, type and first tag (quote posts, Owner Notes Mockups §6). */
