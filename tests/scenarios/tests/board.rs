@@ -1,5 +1,5 @@
-//! Platform moderators, the weekly active count and deactivation (ADRs 0095, 0088). Full
-//! members volunteer and vote; the replay seats and removes moderators; one `Active` link per
+//! Platform moderators, the weekly active count and deactivation (ADRs 0095, 0088). Anyone
+//! volunteers and votes (ADR 0118); the replay seats and removes moderators; one `Active` link per
 //! person per week; a deactivated account's chain is closed.
 
 use holochain::prelude::*;
@@ -38,7 +38,8 @@ struct WeeklyActive {
     count: u32,
 }
 
-/// ann, bob, cat and dan are founders (Full); eve is New. Ann stands for the board.
+/// ann, bob, cat and dan are founders (Full); eve is New, which carries no weight. Ann stands
+/// for the board.
 struct Net {
     conductors: SweetConductorBatch,
     cells: Vec<SweetCell>,
@@ -98,25 +99,10 @@ async fn moderators_active_weeks_and_deactivation() {
 }
 
 async fn volunteers_are_seated_and_removed(net: &Net) {
-    assert!(
-        net.refused(4, "volunteer_board", true).await,
-        "a New member can't volunteer"
-    );
     let _: ActionHash = net.call(0, "volunteer_board", true).await;
     assert!(
         net.refused(
             0,
-            "vote_board",
-            BoardVote {
-                account: net.agent(0),
-                vote: "yes".into()
-            }
-        )
-        .await
-    );
-    assert!(
-        net.refused(
-            4,
             "vote_board",
             BoardVote {
                 account: net.agent(0),
@@ -182,14 +168,14 @@ async fn one_active_link_a_week(net: &Net) {
     );
     net.settle().await;
     assert_eq!(week.count, 0, "the current week isn't counted yet");
-    // Counted from next week: the four founders, not eve (New).
+    // Counted from next week: the four founders and eve, New or not (ADR 0118).
     let later = Timestamp::from_micros(Timestamp::now().as_micros() + WEEK_US);
     let next: WeeklyActive = net.call(4, "weekly_active", Some(later)).await;
     assert_eq!(
         next,
         WeeklyActive {
             week: week.week + 1,
-            count: 4
+            count: 5
         }
     );
 }

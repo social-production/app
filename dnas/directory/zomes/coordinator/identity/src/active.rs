@@ -7,8 +7,8 @@ use hdk::prelude::*;
 use identity_integrity::{active_path, LinkTypes};
 use sp_active::{counted_week, week_of, week_start, weekly_active};
 
+use crate::bot_review;
 use crate::records::links;
-use crate::standing::full_since;
 
 #[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct WeeklyActive {
@@ -45,15 +45,16 @@ fn wrote_this_week(now: i64) -> ExternResult<bool> {
     }))
 }
 
-/// Counts weeks, remembering who had Full standing since when (one read per person).
+/// Counts weeks, remembering each person's bot review (one read per person).
 #[derive(Default)]
 pub struct Counter {
-    since: BTreeMap<AgentPubKey, Option<i64>>,
+    reviews: BTreeMap<AgentPubKey, Option<sp_bot_review::State<AgentPubKey>>>,
     weeks: BTreeMap<i64, u32>,
 }
 
 impl Counter {
-    /// Distinct Full members active in `week`.
+    /// Distinct people active in `week`, leaving out accounts found to be bots then
+    /// (ADR 0118: everyone votes, so everyone counts).
     pub fn week(&mut self, week: i64) -> ExternResult<u32> {
         if let Some(n) = self.weeks.get(&week) {
             return Ok(*n);
@@ -67,13 +68,16 @@ impl Counter {
                 })
                 .collect();
         for (who, _) in &found {
-            if !self.since.contains_key(who) {
-                self.since.insert(who.clone(), full_since(who)?);
+            if !self.reviews.contains_key(who) {
+                self.reviews.insert(who.clone(), bot_review::state(who)?);
             }
         }
-        let since = &self.since;
+        let reviews = &self.reviews;
         let n = weekly_active(week, found, |who, at| {
-            since.get(who).copied().flatten().is_some_and(|f| f < at)
+            !reviews
+                .get(who)
+                .and_then(Option::as_ref)
+                .is_some_and(|s| s.paused_at(at))
         });
         self.weeks.insert(week, n);
         Ok(n)

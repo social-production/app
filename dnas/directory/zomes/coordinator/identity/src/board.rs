@@ -15,7 +15,7 @@ use sp_governance::quorum::required_votes;
 use crate::active::Counter;
 use crate::guest_error;
 use crate::records::links;
-use crate::standing::full_before;
+use crate::standing::votes_at;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct BoardRow {
@@ -52,7 +52,7 @@ fn now() -> ExternResult<i64> {
     Ok(sys_time()?.as_micros())
 }
 
-/// Every Full member's act at the time they acted, by account (web's `ensure_established_voter`).
+/// Every act by someone not found to be a bot when they acted (ADR 0118), by account (web's `ensure_established_voter`).
 fn counted(
     acts: Vec<Link>,
     kind: impl Fn(u8) -> Option<Kind>,
@@ -65,7 +65,7 @@ fn counted(
         if l.target.into_agent_pub_key().as_ref() != Some(&l.author) {
             continue;
         }
-        if full_before(&l.author, l.timestamp)? {
+        if votes_at(&l.author, l.timestamp)? {
             out.push(Act {
                 who: l.author,
                 at: l.timestamp.as_micros(),
@@ -166,9 +166,9 @@ pub fn moderator_at(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
 
 fn ensure_full(what: &str) -> ExternResult<AgentPubKey> {
     let me = agent_info()?.agent_initial_pubkey;
-    if !full_before(&me, sys_time()?)? {
+    if !votes_at(&me, sys_time()?)? {
         return Err(guest_error(format!(
-            "{what} opens once your own votes count fully."
+            "{what} is closed: a community review found this account is a bot."
         )));
     }
     Ok(me)

@@ -84,7 +84,8 @@ struct StandingAt {
     at: Timestamp,
 }
 
-/// Whether `agent` held Full standing before `at`, from the caller's own directory cell.
+/// Whether `agent`'s votes count at `at` (not found to be a bot then; ADR 0118), from the
+/// caller's own directory cell.
 pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
     let query = StandingAt {
         agent: agent.clone(),
@@ -122,7 +123,7 @@ struct WeeklyActive {
     count: u32,
 }
 
-/// Full members active in the last complete week before `at`, from the caller's directory
+/// People (not bots; ADR 0118) active in the last complete week before `at`, from the caller's directory
 /// cell (ADR 0095): a #platform project's population (ADR 0109).
 pub fn weekly_active(at: Timestamp) -> ExternResult<u32> {
     let response = call(

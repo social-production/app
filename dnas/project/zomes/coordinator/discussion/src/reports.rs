@@ -1,6 +1,6 @@
 //! Reports (ADR 0071): web's ⋮ Report on a space (project, event, help request, thread, post)
 //! or on one of its chat messages and comments (`message_reports.rs`). The state is replayed
-//! from the votes (`sp_moderation::replay`); only voters with Full standing at the time of
+//! from the votes (`sp_moderation::replay`); only voters not found to be bots at the time of
 //! their vote count, as for proposals (ADR 0033).
 
 use std::collections::{BTreeMap, BTreeSet};

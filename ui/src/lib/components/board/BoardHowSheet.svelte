@@ -9,7 +9,7 @@
   let { open, onClose }: { open: boolean; onClose: () => void } = $props();
 
   const steps = [
-    ['Volunteer', 'Any Full member can put themselves forward.'],
+    ['Volunteer', 'Anyone can put themselves forward.'],
     [
       'Members vote',
       'Every Full member can vote yes or no on each person, and change it any time.',

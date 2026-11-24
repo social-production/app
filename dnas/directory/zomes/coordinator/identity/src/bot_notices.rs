@@ -9,7 +9,6 @@ use identity_integrity::LinkTypes;
 use sp_bot_review::{Logged, APPEAL_AFTER_US};
 
 use crate::bot_review::state;
-use crate::standing::own_proof;
 
 /// web's `MAX_REVIEW_NOTICES`: the most accounts one call looks at.
 const MAX_ACCOUNTS: usize = 100;
@@ -89,13 +88,10 @@ pub fn mine() -> ExternResult<Vec<BotNotice>> {
 }
 
 /// web's `bot-review-vote`: the openings (not re-reviews) of reviews of `accounts`, the
-/// people the caller shares a project or chat with. Only full members are asked, and never
+/// people the caller shares a project or chat with. Everyone is asked (ADR 0118), but never
 /// about an account whose bot mark of theirs is live (they know already).
 pub fn asked_to_vote(accounts: Vec<AgentPubKey>) -> ExternResult<Vec<BotNotice>> {
     let me = agent_info()?.agent_initial_pubkey;
-    if own_proof()?.is_none() {
-        return Ok(Vec::new());
-    }
     let mut out = Vec::new();
     let mut seen = std::collections::BTreeSet::new();
     for account in accounts {

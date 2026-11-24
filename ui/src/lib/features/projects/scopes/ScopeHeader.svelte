@@ -193,7 +193,7 @@
       {#if s.platform}
         <button class="scope-rule" type="button" onclick={() => (networkOpen = true)}>
           <ToolbarIcon name="people" />
-          <span>{t('Any Full member can vote on #platform projects')}</span>
+          <span>{t('Anyone can vote on #platform projects')}</span>
           <b>{t('How')}</b>
         </button>
       {/if}

@@ -1,5 +1,5 @@
-//! Who counts on reports (ADR 0071): people with Full standing at the time of their vote, as
-//! the directory says (the same rule as proposals, ADR 0033).
+//! Who counts on reports (ADR 0071): everyone not found to be a bot at the time of their vote,
+//! as the directory says (the same rule as proposals, ADR 0033, 0118).
 
 use hdk::prelude::*;
 

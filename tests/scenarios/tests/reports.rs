@@ -1,6 +1,6 @@
 //! Reports (ADR 0071): web's ⋮ Report on a space, and (part b) on one of its chat messages or
-//! comments. One open report per item; the reporter's yes comes with it; only Full members
-//! vote, never the item's author; three yes votes in a small audience remove a spam report's
+//! comments. One open report per item; the reporter's yes comes with it; everyone votes
+//! (ADR 0118), never the item's author; three yes votes in a small audience remove a spam report's
 //! item for every reader.
 
 use holochain::prelude::*;
@@ -89,7 +89,8 @@ async fn vote(
 
 #[tokio::test(flavor = "multi_thread")]
 async fn three_yes_votes_remove_a_spam_report_s_item() {
-    // Agents 0–3 are Full; 4 is new. Agent 0 created the project; everyone joined.
+    // Agents 0–3 are Full; 4 is New, and votes the same (ADR 0118). Agent 0 created the
+    // project; everyone joined.
     let net = Net::new(5, 4, "reports").await;
     assert_eq!(moderation(&net, 4).await.state, "visible");
 
@@ -112,21 +113,21 @@ async fn three_yes_votes_remove_a_spam_report_s_item() {
         .try_call(2, "discussion", "report_space", spam("Again"))
         .await;
     assert!(second.is_err(), "one open report per item");
-    assert!(
-        vote(&net, 4, &report.id, true).await.is_err(),
-        "only Full members vote"
+    // A New member's vote counts like anyone's (ADR 0118): here the second yes.
+    let new = vote(&net, 4, &report.id, true)
+        .await
+        .expect("a New member votes too");
+    assert_eq!(
+        (new.state.as_str(), new.report.map(|r| r.yes)),
+        ("under_review", Some(2))
     );
     assert!(
         vote(&net, 0, &report.id, false).await.is_err(),
         "not on your own item"
     );
-
-    let two = vote(&net, 2, &report.id, true)
-        .await
-        .expect("a Full member's vote");
-    assert_eq!(two.state, "under_review");
     net.settle().await;
-    let three = vote(&net, 3, &report.id, true)
+
+    let three = vote(&net, 2, &report.id, true)
         .await
         .expect("the deciding vote");
     assert_eq!(three.state, "removed");
@@ -202,19 +203,17 @@ async fn message_reports(net: &Net) {
         .try_call(2, "discussion", "report_message", report_of(&spam, "Again"))
         .await;
     assert!(again.is_err(), "one open report per message");
-    assert!(
-        vote(net, 4, &report.id, true).await.is_err(),
-        "only Full members vote"
-    );
+    let new = vote(net, 4, &report.id, true)
+        .await
+        .expect("a New member votes too");
+    assert_eq!(new.state, "under_review");
     assert!(
         vote(net, 3, &report.id, false).await.is_err(),
         "not on your own message"
     );
-
-    let two = vote(net, 2, &report.id, true).await.expect("a Full vote");
-    assert_eq!(two.state, "under_review");
     net.settle().await;
-    let three = vote(net, 0, &report.id, true)
+
+    let three = vote(net, 2, &report.id, true)
         .await
         .expect("the deciding vote");
     assert_eq!(three.state, "removed");

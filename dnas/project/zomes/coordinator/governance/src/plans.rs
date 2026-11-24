@@ -117,7 +117,7 @@ pub fn live_subtype(approved: &[Approved], born: &str) -> Option<String> {
 }
 
 /// Every rated criterion's ratings (rubric or value; integrity checked the criterion) from
-/// members with Full standing before the plan, latest rating per member (ADR 0039, 0041).
+/// members not found to be bots when the plan was made (ADR 0118), latest rating per member (ADR 0039, 0041).
 pub fn rated(
     proposal: &ActionHash,
     proposed_at: Timestamp,

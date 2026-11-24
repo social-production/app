@@ -4,7 +4,7 @@
 
   /**
    * What a network vote is (Platform and Moderators mockups §1, §4; ADR 0095): on a project
-   * tagged #platform, any Full member can vote, not only its members, and the votes needed
+   * tagged #platform, anyone can vote, not only its members, and the votes needed
    * are sized from the people active last week.
    */
   let {
@@ -31,7 +31,7 @@
   <div class="board-confirm">
     <p>
       {t(
-        'A project tagged #platform changes the whole network, so any Full member can vote on its plans, phase moves, edits and updates, not only its members. Nobody has to vote.',
+        'A project tagged #platform changes the whole network, so anyone can vote on its plans, phase moves, edits and updates, not only its members. Nobody has to vote.',
       )}
     </p>
     <p class="soft">

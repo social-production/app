@@ -28,9 +28,9 @@
       <p>
         {own
           ? t(
-              'Full members are voting on whether this account belongs to a real person. You can keep using the site meanwhile.',
+              'People are voting on whether this account belongs to a real person. You can keep using the site meanwhile.',
             )
-          : t('Full members are voting on whether this account belongs to a real person.')}
+          : t('People are voting on whether this account belongs to a real person.')}
       </p>
       <p class="bot-review-tally">
         {review.realVotes} real · {review.botVotes} bot · needs {review.votesRequired} votes, 66% bot

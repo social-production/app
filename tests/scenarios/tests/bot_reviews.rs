@@ -1,6 +1,7 @@
-//! Public bot reviews (ADR 0074): three full members' marks open a review, full members vote,
-//! and an upheld review pauses the account (its standing reads Paused and its later votes stop
-//! counting). New members can't mark, nobody marks themselves, and marks are never deleted.
+//! Public bot reviews (ADR 0074): three marks open a review, people vote, and an upheld review
+//! pauses the account (its standing reads Paused and its later votes stop counting). Anyone
+//! votes, New members too, but only full members mark (ADR 0118); nobody marks themselves, and
+//! marks are never deleted.
 
 use holochain::prelude::*;
 use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
@@ -43,7 +44,7 @@ struct StandingAt {
 
 /// Six directory agents: ann, bob, cat, dan and fay are founders (Full); eve is New. Dan is
 /// the account under review; fay shares a space with him and never marks.
-/// The New member.
+/// The New member, who votes like anyone but can't mark (ADR 0118).
 const EVE: usize = 5;
 
 struct Net {
@@ -129,10 +130,6 @@ async fn marks_open_the_review(net: &Net) {
         net.refused(3, "request_bot_re_review", ()).await,
         "no re-review while not paused"
     );
-    assert!(
-        net.refused(EVE, "vote_bot_review", net.choice(true)).await,
-        "only full members vote"
-    );
 }
 
 async fn votes_uphold_it(net: &Net) {
@@ -184,10 +181,11 @@ async fn notices_follow_the_review(net: &Net) {
     assert_eq!(
         kinds,
         ["vote"],
-        "a full member who shares a space is asked to vote"
+        "someone who shares a space is asked to vote"
     );
     let marker: Vec<BotNotice> = net.call(0, "bot_review_vote_notices", dan.clone()).await;
     assert!(marker.is_empty(), "whoever marked knows already");
     let eve: Vec<BotNotice> = net.call(EVE, "bot_review_vote_notices", dan).await;
-    assert!(eve.is_empty(), "only full members are asked");
+    let kinds: Vec<&str> = eve.iter().map(|n| n.kind.as_str()).collect();
+    assert_eq!(kinds, ["vote"], "a New member is asked too");
 }

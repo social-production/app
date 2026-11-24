@@ -91,10 +91,10 @@
     quorum === 0
       ? canVolunteer
         ? t('Volunteer and you’re seated straight away.')
-        : t('Full members can volunteer. The first ones are seated straight away.')
+        : t('Anyone can volunteer. The first ones are seated straight away.')
       : canVolunteer
         ? t('Volunteer, and a seat needs votes from {n} people and 66% yes.', { n: quorum })
-        : t('Full members can volunteer. A seat needs votes from {n} people and 66% yes.', {
+        : t('Anyone can volunteer. A seat needs votes from {n} people and 66% yes.', {
             n: quorum,
           }),
   );
@@ -187,7 +187,7 @@
       <SkeletonRows count={3} kind="row" />
     {/if}
     {#if board && !empty && !canVolunteer && !viewerState}
-      <p class="board-empty">{t('Full members can volunteer.')}</p>
+      <p class="board-empty">{t('Anyone can volunteer.')}</p>
     {/if}
     {#if notice}<p class="board-notice" role="status">{notice}</p>{/if}
     {#if problem}<p class="board-problem" role="alert">{problem}</p>{/if}

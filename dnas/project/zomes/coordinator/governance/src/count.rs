@@ -41,8 +41,8 @@ impl Count {
         tally(&choices, self.population, Threshold::DEFAULT)
     }
 
-    /// The left-out members who had Full standing before the proposal: only they vote, so only
-    /// they are worth a challenge (ADR 0116).
+    /// The left-out members whose votes count (everyone but accounts found to be bots; ADR
+    /// 0116, 0118): only they are worth a challenge.
     pub fn full_missing(
         &self,
         p: &Found<Proposal>,

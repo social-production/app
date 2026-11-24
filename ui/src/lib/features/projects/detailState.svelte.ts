@@ -36,8 +36,8 @@ export class DetailState {
   values = $state<ProjectValue[]>([]);
   /** Display names by agent key (creator, members, proposers, update authors). */
   names = $state<Record<string, string>>({});
-  /** Whether the viewer has Full standing: only Full members' votes decide (ADR 0033). */
-  viewerFull = $state<boolean | null>(null);
+  /** Whether the viewer's votes count: everyone's do unless found to be a bot (ADR 0118). */
+  viewerVotes = $state<boolean | null>(null);
   error = $state<string>();
   joining = $state(false);
   saving = $state(false);
@@ -137,7 +137,7 @@ export class DetailState {
       [project, proposals, plans, values] = await this.read();
     }
     const members = await Promise.all(project.members.map(getPerson));
-    if (this.viewerFull === null && project.amMember) void this.loadViewer();
+    if (this.viewerVotes === null && project.amMember) void this.loadViewer();
     this.project = project;
     this.members = members;
     this.proposals = proposals;
@@ -158,7 +158,7 @@ export class DetailState {
 
   private async loadViewer(): Promise<void> {
     try {
-      this.viewerFull = (await getPerson(await myAgent())).standing.level === 'Full';
+      this.viewerVotes = (await getPerson(await myAgent())).standing.level !== 'Paused';
     } catch {
       // Unknown standing shows no note.
     }
