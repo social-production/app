@@ -59,6 +59,7 @@
       memberCount={card.members}
       shareHref={href}
       shareTitle={card.title}
+      shareKind="event"
     >
       <SignalStrip
         bare
