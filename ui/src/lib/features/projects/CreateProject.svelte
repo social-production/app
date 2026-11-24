@@ -7,6 +7,7 @@
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
   import { tagCounts } from '#lib/domain/scopes.ts';
+  import ScopeSheetArt from './scopes/ScopeSheetArt.svelte';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
 
   import { goto } from '$app/navigation';
@@ -51,6 +52,7 @@
 >
   {#if s.stepId === 'basics'}
     <div class="form-stack">
+      <ScopeSheetArt kind="space" icon="proposal" art={s.art} canEdit />
       <label>
         <RequiredLabel>{t('Title')}</RequiredLabel>
         <input

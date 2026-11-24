@@ -202,6 +202,9 @@ export interface CharterDraft {
   description: string;
   /** web's ProposeEditSheet location picker (ADR 0080). */
   location: PlaceValue;
+  /** A new picture or cover (a `ScopeImage` hash; ADR 0117), when one was chosen. */
+  picture?: string | null;
+  cover?: string | null;
 }
 
 export interface ProjectTypeOption {
@@ -271,6 +274,8 @@ export function charterEdit(draft: CharterDraft, c: Charter) {
     description: changed(draft.description, c.description),
     location: moved ? label : null,
     place: moved ? place : null,
+    picture: draft.picture ? { Set: draft.picture } : null,
+    cover: draft.cover ? { Set: draft.cover } : null,
   };
 }
 

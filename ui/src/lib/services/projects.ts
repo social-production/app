@@ -228,6 +228,7 @@ export async function setSignal(id: string, stance: Stance | null): Promise<void
 }
 
 function listingOf(seed: string, c: Charter) {
+  const scopeArt = c.mode === 'channel' || c.mode === 'community';
   return {
     network_seed: seed,
     title: c.title,
@@ -237,7 +238,9 @@ function listingOf(seed: string, c: Charter) {
     location_label: c.location_label,
     phase: c.phase,
     tags: c.tags,
-    picture: c.picture ? stringToHash(c.picture) : null,
-    cover: c.cover ? stringToHash(c.cover) : null,
+    // Only a channel's or community's listing names its art (ADR 0109); a project's cards
+    // read it from the charter (ADR 0117).
+    picture: scopeArt && c.picture ? stringToHash(c.picture) : null,
+    cover: scopeArt && c.cover ? stringToHash(c.cover) : null,
   };
 }

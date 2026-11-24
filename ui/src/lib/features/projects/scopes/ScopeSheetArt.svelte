@@ -2,6 +2,7 @@
   import { t } from '#lib/i18n/index.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
+  import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import type { ScopeKind } from '#lib/domain/scopes.ts';
 
   import type { ScopeArt } from './scopeArt.svelte.ts';
@@ -12,12 +13,14 @@
    * or voted on (ADR 0109).
    */
   interface Props {
-    kind: ScopeKind;
+    kind: ScopeKind | 'space';
+    /** A project's or event's tile while it has no picture (ADR 0117). */
+    icon?: SurfaceIconId;
     art: ScopeArt;
     canEdit: boolean;
   }
 
-  let { kind, art, canEdit }: Props = $props();
+  let { kind, icon = 'project', art, canEdit }: Props = $props();
 
   let coverInput = $state<HTMLInputElement>();
   let pictureInput = $state<HTMLInputElement>();
@@ -49,7 +52,7 @@
   </div>
   <span class="scope-avatar">
     {#if picture}<img src={picture} alt="" />{:else if kind === 'channel'}#{:else}<SurfaceIcon
-        icon={kind}
+        icon={kind === 'space' ? icon : kind}
         size="md"
       />{/if}
     {#if art.newPicture}<span class="art-new">{t('New')}</span>{/if}

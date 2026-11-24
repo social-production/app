@@ -40,6 +40,7 @@
     contentRestricted={card.moderation === 'hidden'}
   >
     <FeedCardTop
+      picture={card.picture ?? null}
       tags={card.tags}
       stage={card.phase}
       mode={card.mode}

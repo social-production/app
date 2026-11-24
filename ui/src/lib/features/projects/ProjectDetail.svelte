@@ -4,7 +4,6 @@
   import SkeletonDetail from '#lib/components/loading/SkeletonDetail.svelte';
   import DetailTopTabs from '#lib/components/DetailTopTabs.svelte';
   import ConfirmDialog from '#lib/components/overlay/ConfirmDialog.svelte';
-  import EditSheet from '#lib/components/overlay/EditSheet.svelte';
   import UpdateSheet from '#lib/components/overlay/UpdateSheet.svelte';
   import { removedLabel } from '#lib/domain/moderation.ts';
   import { tellRemoved } from './outcomeNotices.ts';
@@ -27,6 +26,7 @@
   import ProjectChat from './ProjectChat.svelte';
   import ProjectDock from './ProjectDock.svelte';
   import ProjectHistory from './ProjectHistory.svelte';
+  import ProposeEditSheet from './ProposeEditSheet.svelte';
 
   import '#lib/components/styles/detail.css';
 
@@ -264,7 +264,7 @@
       {#if sheet === 'members'}
         <MembersPage {detail} invites={event ? invites : null} onClose={() => (sheet = null)} />
       {/if}
-      <EditSheet
+      <ProposeEditSheet
         open={sheet === 'edit'}
         sheetTitle={editLabel(project, false)}
         submitLabel={editLabel(project, true)}

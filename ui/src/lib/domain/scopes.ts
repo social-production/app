@@ -133,3 +133,6 @@ export const platformPlaceholder = (): Scope => ({
  * read it; `null` while unknown or when the scope has none. */
 export const SCOPE_PICTURES = Symbol('scope-pictures');
 export type ScopePictureOf = (slug: string) => string | null;
+/** A project's or event's picture by its `ScopeImage` hash (ADR 0117), from the shell. */
+export const SPACE_PICTURES = Symbol('space-pictures');
+export type SpacePictureOf = (hash: string) => string | null;

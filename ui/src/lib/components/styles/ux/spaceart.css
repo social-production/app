@@ -1,0 +1,43 @@
+/* A space's cover and picture at the top of its page (ADR 0117): the cover as a 3:1 band, the
+   picture as a rounded tile over its lower-left corner, as on a channel's page. */
+.space-art {
+  position: relative;
+  margin: 0 0 34px;
+}
+
+.space-art.no-cover {
+  margin-bottom: 12px;
+}
+
+.space-art-cover {
+  aspect-ratio: 3 / 1;
+  border-radius: 16px;
+  background: var(--panel-hover) center / cover no-repeat;
+}
+
+.space-art-picture {
+  position: absolute;
+  bottom: -26px;
+  left: 14px;
+  width: 68px;
+  height: 68px;
+  border: 3px solid var(--page-bg);
+  border-radius: 18px;
+  background: var(--panel);
+  object-fit: cover;
+}
+
+.space-art.no-cover .space-art-picture {
+  position: static;
+  display: block;
+  border: none;
+}
+
+/* A feed row's tile is the project's or event's picture when it has one (ADR 0117). */
+.feed-lead-glyph .feed-lead-picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  object-fit: cover;
+}

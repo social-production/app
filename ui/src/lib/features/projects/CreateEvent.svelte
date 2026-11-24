@@ -10,6 +10,7 @@
   import PeoplePicker from '#lib/components/create/PeoplePicker.svelte';
   import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
+  import ScopeSheetArt from './scopes/ScopeSheetArt.svelte';
   import ScopeTagsStep from './scopes/ScopeTagsStep.svelte';
   import { EventCreateState } from './eventCreateState.svelte.ts';
   import type { EventAudience } from '#lib/domain/projects.ts';
@@ -68,6 +69,7 @@
 >
   {#if s.stepId === 'basics'}
     <div class="form-stack">
+      <ScopeSheetArt kind="space" icon="event" art={s.art} canEdit />
       <label>
         <RequiredLabel>{t('Event title')}</RequiredLabel>
         <input bind:value={s.title} maxlength="200" aria-required="true" />

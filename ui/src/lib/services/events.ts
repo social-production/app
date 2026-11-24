@@ -16,6 +16,7 @@ import {
 
 import { propose } from './governance.ts';
 import { recordInvite } from './eventInvites.ts';
+import { charterOut } from './scopeImages.ts';
 import { inboxInvitations } from './messages.ts';
 import { myAgent, namesOf } from './people.ts';
 import { listPlans, submitPlan } from './plans.ts';
@@ -62,7 +63,7 @@ export async function createEvent(d: EventDraft): Promise<string> {
     throw new Error('Choose one private community.');
   }
   const tags = community ? [scopeTag('community', community.slug)] : d.charter.tags;
-  await callCell<ActionHash>(cell, 'project', 'create_charter', { ...d.charter, tags });
+  await callCell<ActionHash>(cell, 'project', 'create_charter', charterOut({ ...d.charter, tags }));
   for (const agent of d.organizers) {
     await callCell<ActionHash>(cell, 'project', 'add_organizer', stringToHash(agent));
   }

@@ -34,12 +34,20 @@ pub fn validate_anchor(
     }
 }
 
+/// Which spaces have a picture and cover: channels and communities (ADR 0109; the Platform
+/// keeps its globe), and since ADR 0117 projects, services, proposals and events. Help
+/// requests, threads and posts don't.
+pub fn takes_art(mode: &str, title: &str) -> bool {
+    if sp_scope::is_scope(mode) {
+        return !sp_scope::is_platform(mode, title);
+    }
+    mode != sp_help::MODE && !sp_discussion::is_discussion(mode)
+}
+
 fn check_charter(c: &Charter) -> Result<(), String> {
-    // ADR 0109: only channels and communities have a picture and cover; the Platform keeps its
-    // globe.
     let art = c.picture.is_some() || c.cover.is_some();
-    if art && (!sp_scope::is_scope(&c.mode) || sp_scope::is_platform(&c.mode, &c.title)) {
-        return Err("only a channel or community has a picture and cover".into());
+    if art && !takes_art(&c.mode, &c.title) {
+        return Err("requests, threads and posts have no picture or cover".into());
     }
     if c.description.trim().is_empty() || c.description.chars().count() > DESCRIPTION_MAX {
         return Err(format!(
@@ -99,5 +107,30 @@ fn check_scope_charter(c: &Charter) -> Result<(), String> {
         (true, true) | (false, false) => Ok(()),
         (true, false) => Err("a closed community has its own private network".into()),
         (false, true) => Err("only a closed community lives in a private network".into()),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::takes_art;
+
+    #[test]
+    fn projects_and_events_have_art_but_requests_threads_and_posts_dont() {
+        for mode in [
+            "productive",
+            "proposal",
+            "collective-service",
+            "event",
+            "channel",
+        ] {
+            assert!(takes_art(mode, "seeds"), "{mode}");
+        }
+        for mode in ["help-request", "thread", "post"] {
+            assert!(!takes_art(mode, "seeds"), "{mode}");
+        }
+        assert!(
+            !takes_art("channel", "platform"),
+            "the Platform keeps its globe"
+        );
     }
 }

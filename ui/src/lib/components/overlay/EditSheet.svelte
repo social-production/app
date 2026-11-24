@@ -4,6 +4,8 @@
   import { emptyPlaceValue, type PlaceSearch, type PlaceValue } from '#lib/domain/places.ts';
   import { charterDraft, type Charter, type CharterDraft } from '#lib/domain/projects.ts';
 
+  import type { Snippet } from 'svelte';
+
   import OverlaySheet from './OverlaySheet.svelte';
 
   /**
@@ -22,6 +24,8 @@
     onSubmit: (draft: CharterDraft) => void;
     onClose: () => void;
     places: PlaceSearch;
+    /** The cover and picture with camera buttons, above the fields (ADR 0117). */
+    art?: Snippet | undefined;
   }
 
   let {
@@ -35,6 +39,7 @@
     onSubmit,
     onClose,
     places,
+    art,
   }: Props = $props();
 
   let title = $state('');
@@ -61,7 +66,9 @@
 >
   {#snippet subtitle()}
     <p class="sheet-lead">
-      Change the title, description, or location.
+      {art
+        ? t('Change the picture, cover, title, description, or location.')
+        : t('Change the title, description, or location.')}
       {appliesDirectly
         ? t('It applies as soon as you save.')
         : t(
@@ -71,6 +78,7 @@
   {/snippet}
   <form id="project-edit-sheet-form" class="edit-form" onsubmit={submit}>
     {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
+    {@render art?.()}
     <label class="field">
       <span class="field-label">{t('Title')}</span>
       <input bind:value={title} maxlength="120" placeholder={t('Project title')} />

@@ -118,11 +118,8 @@ async fn a_channel_takes_a_picture_and_votes_on_a_new_cover() {
     };
     let net = Net::with_charter(3, 3, "pictures", seeds).await;
     assert_eq!(charter_of(&net, 1).await.picture, Some(picture.clone()));
-    let productive = with_art(charter("productive"), Some(picture));
-    let refused: Result<ActionHash, String> = net
-        .try_call(0, "project", "create_charter", productive)
-        .await;
-    assert!(refused.is_err(), "only scopes have pictures: {refused:?}");
+    // Which other spaces take a picture is `charter::takes_art` (ADR 0117), unit-tested there.
+    let _ = picture;
 
     let cover = put_image(&net, 1, 2).await;
     let proposal: ActionHash = net
