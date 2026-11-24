@@ -5,6 +5,7 @@ import type { MapMarker } from './types.ts';
 const MARKER_COLORS: Record<string, string> = {
   project: '#16a34a',
   help_request: '#e07a5f',
+  meetup: '#138a7d',
   activity: '#2563eb',
 };
 const EVENT_COLOR = '#5b21b6';

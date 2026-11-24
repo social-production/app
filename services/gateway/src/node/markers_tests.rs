@@ -205,3 +205,21 @@ fn a_span_keeps_timed_items_inside_it_and_every_project() {
         .collect();
     assert_eq!(ids, ["early", "garden"]);
 }
+
+#[test]
+fn a_meetup_keeps_its_pin_without_a_date() {
+    let mut meetup = card("hoops", "event", Some((-37.79, 144.98)));
+    meetup.subtype = "meetup".into();
+    let dated = card("swap", "event", Some((-37.80, 144.97)));
+    let cards = [meetup, dated];
+    let all = markers(&cards, &query("all"));
+    assert_eq!(
+        all.len(),
+        1,
+        "an event waits for its date; a meetup doesn't"
+    );
+    assert_eq!(all[0].entity_type, "meetup");
+    assert_eq!(all[0].href, "/events/hoops");
+    assert_eq!(markers(&cards, &query("meetups")).len(), 1);
+    assert!(markers(&cards, &query("events")).is_empty());
+}

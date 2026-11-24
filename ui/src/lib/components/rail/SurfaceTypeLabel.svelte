@@ -1,14 +1,21 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
-  import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
+  import { kindColor, kindOfSpace } from '#lib/domain/kindGlyphs.ts';
   import SurfaceIcon from '#lib/components/icons/SurfaceIcon.svelte';
   import type { SurfaceIconId } from '#lib/components/icons/surface.ts';
   import { modeAccent, type CharterMode } from '#lib/domain/projects.ts';
 
   /** web's SurfaceTypeLabel for a project, an event or a help request. */
-  let { projectMode, feedGlyph = false }: { projectMode: CharterMode; feedGlyph?: boolean } =
-    $props();
+  let {
+    projectMode,
+    feedGlyph = false,
+    meetup = false,
+  }: { projectMode: CharterMode; feedGlyph?: boolean; meetup?: boolean } = $props();
+
+  // A meetup is an event with no single date (ADR 0119).
+  const kind = $derived(kindOfSpace(projectMode, meetup ? 'meetup' : null));
+  const label = $derived(meetup && projectMode === 'event' ? 'Meetup' : null);
 
   // web's projectSubjectLabel, and `surfaceTypeLabel('event')`.
   const LABELS: Record<CharterMode, string> = {
@@ -50,16 +57,13 @@
 
 {#if feedGlyph && projectMode !== 'channel' && projectMode !== 'community'}
   <!-- A feed row's icon: the map pins' symbol on its kind's colour (Map Redesign, 2026-11-17). -->
-  <span
-    class="surface-type-label kind-tile"
-    style={`--surface-accent: ${kindColor(kindOf(projectMode))}`}
-  >
-    <KindGlyph kind={kindOf(projectMode)} size={18} />
-    <span class="label-copy">{t(LABELS[projectMode] ?? projectMode)}</span>
+  <span class="surface-type-label kind-tile" style={`--surface-accent: ${kindColor(kind)}`}>
+    <KindGlyph {kind} size={18} />
+    <span class="label-copy">{t(label ?? LABELS[projectMode] ?? projectMode)}</span>
   </span>
 {:else}
   <span class="surface-type-label" style={`--surface-accent: ${modeAccent(projectMode)}`}>
     <SurfaceIcon {icon} size="sm" />
-    <span class="label-copy">{t(LABELS[projectMode] ?? projectMode)}</span>
+    <span class="label-copy">{t(label ?? LABELS[projectMode] ?? projectMode)}</span>
   </span>
 {/if}

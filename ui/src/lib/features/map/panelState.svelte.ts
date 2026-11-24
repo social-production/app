@@ -23,6 +23,7 @@ export const windowOptions = [
 export const filterOptions = [
   { value: 'all', label: t('All') },
   { value: 'events', label: t('Events') },
+  { value: 'meetups', label: t('Meetups') },
   { value: 'projects', label: t('Projects') },
   { value: 'help_requests', label: t('Help requests') },
 ];

@@ -62,7 +62,7 @@ pub async fn region(
     let radius_km = checked_area(p.lat, p.lon, p.radius_km)?;
     // web's `normalize_filter`.
     let filter = match p.filter.trim().to_lowercase().as_str() {
-        f @ ("projects" | "events" | "help_requests" | "threads") => f.to_owned(),
+        f @ ("projects" | "events" | "meetups" | "help_requests" | "threads") => f.to_owned(),
         _ => "all".to_owned(),
     };
     let (sort, window) = (Sort::parse(&p.sort), Window::parse(&p.window));

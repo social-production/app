@@ -145,6 +145,7 @@
         picture={charter.picture ?? null}
         onPicture={art.pictureUrl ? () => openShot(art.pictureUrl) : undefined}
         mode={charter.mode}
+        meetup={charter.subtype === 'meetup'}
         tags={charter.tags}
         stage={project.stage}
         isPrivate={project.audience !== 'public'}

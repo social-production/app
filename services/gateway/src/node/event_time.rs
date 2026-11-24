@@ -30,6 +30,9 @@ pub struct Plan {
 /// Mirrors `project_integrity::EventSchedule` (UTC dates and times, ADR 0057).
 #[derive(Debug, Deserialize)]
 pub struct Schedule {
+    /// `weekly` (a meetup's usual day, ADR 0119) has a first date but no single start.
+    #[serde(default)]
+    pub mode: String,
     pub start_date: Option<String>,
     pub start_time: Option<String>,
 }
@@ -71,6 +74,9 @@ pub fn event_facts(board: &PlanBoard) -> EventFacts {
         return EventFacts::default();
     };
     let start = plan.schedule.as_ref().and_then(|s| {
+        if s.mode == "weekly" {
+            return None;
+        }
         utc_micros(
             s.start_date.as_deref()?,
             s.start_time.as_deref().unwrap_or("00:00"),

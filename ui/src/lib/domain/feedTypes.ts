@@ -3,13 +3,13 @@ import type { HomeFeedRow } from './homeFeed.ts';
 import type { CharterMode, FeedSort, FeedWindow, ProjectCard } from './projects.ts';
 
 /** The feed filter's Type pills (Scope Filters mockups §1), for Home, scopes and profiles. */
-export type FeedType = 'all' | 'projects' | 'events' | 'requests' | 'threads' | 'posts';
+export type FeedType = 'all' | 'projects' | 'events' | 'meetups' | 'requests' | 'threads' | 'posts';
 export type FeedKind = Exclude<FeedType, 'all'>;
 /** The kinds a feed shows; empty is All (owner, 2026-11-24: "should be able to select
  * multiple types, with all obviously only all"). */
 export type FeedTypes = FeedKind[];
 
-const KINDS: FeedKind[] = ['projects', 'events', 'requests', 'threads', 'posts'];
+const KINDS: FeedKind[] = ['projects', 'events', 'meetups', 'requests', 'threads', 'posts'];
 
 /** A tap on a Type pill: All clears the rest; a kind toggles, and picking every kind is All. */
 export function toggleFeedType(types: FeedTypes, value: FeedType): FeedTypes {
@@ -31,6 +31,7 @@ export const FEED_TYPES: { value: FeedType; label: string }[] = [
   { value: 'all', label: 'All' },
   { value: 'projects', label: 'Projects' },
   { value: 'events', label: 'Events' },
+  { value: 'meetups', label: 'Meetups' },
   { value: 'requests', label: 'Requests' },
   { value: 'threads', label: 'Threads' },
   { value: 'posts', label: 'Posts' },
@@ -50,8 +51,8 @@ export const FEED_WINDOWS: { value: FeedWindow; label: string }[] = [
 
 /** Which Type a card's mode falls under: events, help requests, threads and posts each
  * their own, and everything else (projects, services, proposals) Projects. */
-export function typeOfMode(mode: CharterMode | string): FeedKind {
-  if (mode === 'event') return 'events';
+export function typeOfMode(mode: CharterMode | string, subtype?: string | null): FeedKind {
+  if (mode === 'event') return subtype === 'meetup' ? 'meetups' : 'events';
   if (mode === 'help-request') return 'requests';
   if (mode === 'thread') return 'threads';
   if (mode === 'post') return 'posts';
@@ -59,7 +60,7 @@ export function typeOfMode(mode: CharterMode | string): FeedKind {
 }
 
 export const keepCard = (card: ProjectCard, types: FeedTypes): boolean =>
-  types.length === 0 || types.includes(typeOfMode(card.mode));
+  types.length === 0 || types.includes(typeOfMode(card.mode, card.subtype));
 
 /** A Home row under the Types: a project's activity counts as Projects; comments only show in All. */
 export function keepRow(row: HomeFeedRow, types: FeedTypes): boolean {

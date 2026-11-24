@@ -21,7 +21,7 @@ export interface MapMarker {
   longitude: number;
   label: string;
   href?: string;
-  entityType?: 'event' | 'project' | 'help_request' | 'activity';
+  entityType?: 'event' | 'meetup' | 'project' | 'help_request' | 'activity';
   activitySource?: 'event' | 'project' | null;
   projectMode?: ProjectMode | null;
   parentId?: string | null;

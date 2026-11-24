@@ -17,7 +17,7 @@ const shots = process.env.E2E_OUT ?? 'screens';
 mkdirSync(shots, { recursive: true });
 await phraseSignIn(ann, one.phrase.split(' '));
 await ann.goto(`${BASE}/create/project`);
-await ann.getByLabel('Title').fill(title);
+await ann.getByLabel(/^Title/).first().fill(title);
 await ann.getByLabel('What do you propose?').fill('Fix bikes together on Saturdays.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
@@ -91,7 +91,7 @@ await ann.reload();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
 await ann.getByRole('button', { name: 'More actions' }).click();
 await ann.getByRole('menuitem', { name: 'Edit' }).click();
-await ann.locator('.create-sheet').getByLabel('Title').fill(`${title} co-op`);
+await ann.locator('.create-sheet').getByLabel(/^Title/).first().fill(`${title} co-op`);
 await ann.getByRole('button', { name: 'Propose edit' }).click();
 await voteYes(bob);
 await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'the edit to apply');
@@ -164,8 +164,8 @@ await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await addPlan(ann, 'Production plan');
 const wizard = ann.getByRole('dialog', { name: 'Production plan' });
-await wizard.getByLabel('Title').fill(planTitle);
-await wizard.getByLabel('Description').fill('Open the workshop every Saturday morning.');
+await wizard.getByLabel(/^Title/).first().fill(planTitle);
+await wizard.getByLabel(/^Description/).first().fill('Open the workshop every Saturday morning.');
 await wizard.getByRole('button', { name: 'Continue' }).click(); // overview → plan type
 await wizard.getByRole('button', { name: 'Continue' }).click(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('Community hall');

@@ -66,7 +66,7 @@ pub struct CardActivity {
 pub struct MarkerQuery<'a> {
     pub center: (f64, f64),
     pub radius_km: f64,
-    /// `all`, `projects`, `events` or `help_requests`.
+    /// `all`, `projects`, `events`, `meetups` or `help_requests`.
     pub filter: &'a str,
     pub upcoming_only: bool,
     pub limit: usize,
@@ -123,6 +123,8 @@ const PROJECT_MODES: [&str; 4] = [
 /// What a card is on the map, or `None` when web shows no pin for it.
 fn kind_of(card: &ProjectCard, filter: &str) -> Option<&'static str> {
     let kind = match card.mode.as_str() {
+        // A meetup has no single date (ADR 0119): its pin stays, like a project's.
+        "event" if card.subtype == "meetup" => "meetup",
         "event" => "event",
         "help-request" => "help_request",
         // web's `_project_pin_eligible`; a personal service's requests are on by default in
@@ -133,6 +135,7 @@ fn kind_of(card: &ProjectCard, filter: &str) -> Option<&'static str> {
     let wanted = match filter {
         "projects" => kind == "project",
         "events" => kind == "event",
+        "meetups" => kind == "meetup",
         "help_requests" => kind == "help_request",
         _ => true,
     };
@@ -157,7 +160,7 @@ fn subtitle(card: &ProjectCard, q: &MarkerQuery) -> String {
 
 fn path_of(kind: &str) -> &'static str {
     match kind {
-        "event" => "events",
+        "event" | "meetup" => "events",
         "help_request" => "help-requests",
         _ => "projects",
     }
@@ -191,7 +194,7 @@ fn card_marker(card: &ProjectCard, kind: &'static str, q: &MarkerQuery) -> Optio
         title: card.title.clone(),
         parent_id: None,
         parent_title: None,
-        subtitle: (kind == "project").then(|| subtitle(card, q)),
+        subtitle: matches!(kind, "project" | "meetup").then(|| subtitle(card, q)),
         href: format!("/{}/{}", path_of(kind), card.id),
         latitude: place.latitude,
         longitude: place.longitude,
@@ -210,7 +213,7 @@ fn card_marker(card: &ProjectCard, kind: &'static str, q: &MarkerQuery) -> Optio
 /// web's event and project activity markers; a full activity of a service has none.
 fn activity_markers(card: &ProjectCard, kind: &'static str, q: &MarkerQuery) -> Vec<Marker> {
     let source = match kind {
-        "event" => "event",
+        "event" | "meetup" => "event",
         "project" => "project",
         _ => return Vec::new(), // a help request's one activity is its own pin
     };

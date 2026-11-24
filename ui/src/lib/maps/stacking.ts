@@ -15,6 +15,7 @@ function scheduleSortKey(item: MapMarker): number {
 function isParentEntity(item: MapMarker): boolean {
   return (
     item.entityType === 'event' ||
+    item.entityType === 'meetup' ||
     item.entityType === 'project' ||
     item.entityType === 'help_request'
   );

@@ -43,7 +43,7 @@ export function eventSteps(isPrivate: boolean, upfrontPlan: boolean): EventStep[
 /** web's `validatePrivatePlan` messages, in its order (an empty list means ready). */
 export function upfrontPlanProblems(f: PlanForm, physical: boolean, now = Date.now()): string[] {
   const out: string[] = [];
-  const undated = f.scheduleMode === 'any-day';
+  const undated = f.scheduleMode === 'any-day' || f.scheduleMode === 'weekly';
   const range = f.scheduleMode === 'range';
   const hasDates = range ? !!f.rangeStartDate && !!f.rangeEndDate : !!f.scheduledDate;
   if (!f.title.trim()) out.push('Add a plan title.');

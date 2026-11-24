@@ -1,13 +1,19 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
-  import RequiredLabel from './RequiredLabel.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import type { PlanForm } from '#lib/domain/planForm.ts';
+  import PlanStagesEditor from '#lib/components/plans/PlanStagesEditor.svelte';
+
+  import ChoiceRows from './ChoiceRows.svelte';
+  import RequiredLabel from './RequiredLabel.svelte';
+
+  import '#lib/components/styles/ux/planstages.css';
 
   /**
    * web's create-event Plan step for organizer-controlled private events: the plan, its
-   * schedule and its stages, set up front so the event starts in Activity (ADR 0061).
+   * schedule and its stages, set up front so the event starts in Activity (ADR 0061), in the
+   * plan wizard's look (choice rows and stage cards, owner 2026-11-24).
    */
   interface Props {
     plan: PlanForm;
@@ -17,14 +23,6 @@
   let { plan = $bindable(), problems }: Props = $props();
 
   const zone = displayZone();
-
-  function addStage(): void {
-    plan.stages = [...plan.stages, { title: '', details: '', startDate: '', endDate: '' }];
-  }
-
-  function removeStage(index: number): void {
-    if (plan.stages.length > 1) plan.stages = plan.stages.filter((_, i) => i !== index);
-  }
 </script>
 
 <div class="form-stack plan-step">
@@ -34,98 +32,67 @@
     )}
   </p>
   <label>
-    <RequiredLabel>{t('Plan title')}</RequiredLabel>
+    <span class="field-inline-label"><RequiredLabel>{t('Plan title')}</RequiredLabel></span>
     <input bind:value={plan.title} aria-required="true" />
   </label>
   <label>
-    <RequiredLabel>{t('Plan description')}</RequiredLabel>
+    <span class="field-inline-label"><RequiredLabel>{t('Plan description')}</RequiredLabel></span>
     <textarea bind:value={plan.description} rows="3" aria-required="true"></textarea>
   </label>
-  <fieldset class="schedule-fieldset">
-    <legend>{t('Schedule')}</legend>
-    <div class="schedule-mode-row" role="radiogroup" aria-label={t('Schedule mode')}>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'date'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="date" />
-        {t('Single date')}
-      </label>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'range'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="range" />
-        {t('Date range')}
-      </label>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'any-day'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="any-day" />
-        {t('No set date')}
-      </label>
-    </div>
-    {#if plan.scheduleMode === 'any-day'}
-      <p class="helper-text">
-        {t(
-          'For something ongoing, like weekly games: add each session as an activity, and people sign up to the ones they come to.',
-        )}
-      </p>
-    {:else}
-      <div class="schedule-fields" class:is-range={plan.scheduleMode === 'range'}>
-        {#if plan.scheduleMode === 'date'}
+  <span class="field-inline-label">{t('When is it?')}</span>
+  <ChoiceRows
+    value={plan.scheduleMode}
+    ariaLabel={t('Schedule')}
+    options={[
+      {
+        value: 'date',
+        label: t('Single date'),
+        hint: t('One day, with a start and finish time.'),
+        icon: 'M5 5h14v15H5zM5 10h14M9 3v4M15 3v4',
+      },
+      {
+        value: 'range',
+        label: t('Date range'),
+        hint: t('Several days in a row, like a festival.'),
+        icon: 'M4 6h11v13H4zM4 10h11M8 4v3M18 9h2v12H9v-2',
+      },
+    ]}
+    onChange={(value) => (plan.scheduleMode = value)}
+  >
+    {#snippet under(mode)}
+      <div class="schedule-fields is-range">
+        {#if mode === 'date'}
           <label>
-            <RequiredLabel>{t('Date')}</RequiredLabel>
+            <span class="field-inline-label"><RequiredLabel>{t('Date')}</RequiredLabel></span>
             <input type="date" bind:value={plan.scheduledDate} />
           </label>
+          <span></span>
         {:else}
           <label>
-            <RequiredLabel>{t('Start date')}</RequiredLabel>
+            <span class="field-inline-label"><RequiredLabel>{t('Start date')}</RequiredLabel></span>
             <input type="date" bind:value={plan.rangeStartDate} />
           </label>
           <label>
-            <RequiredLabel>{t('End date')}</RequiredLabel>
+            <span class="field-inline-label"><RequiredLabel>{t('End date')}</RequiredLabel></span>
             <input type="date" bind:value={plan.rangeEndDate} />
           </label>
         {/if}
-      </div>
-      <div class="schedule-fields is-range">
         <label>
-          <RequiredLabel>{t('Start time')}</RequiredLabel>
+          <span class="field-inline-label"><RequiredLabel>{t('Start time')}</RequiredLabel></span>
           <input type="time" bind:value={plan.startTime} />
         </label>
         <label>
-          <RequiredLabel>{t('Finish time')}</RequiredLabel>
+          <span class="field-inline-label"><RequiredLabel>{t('Finish time')}</RequiredLabel></span>
           <input type="time" bind:value={plan.finishTime} />
         </label>
       </div>
-      <!-- web's TimeZoneNote, without its Settings link: the app has no display time zone yet. -->
       <p class="helper-text">
         Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
       </p>
-    {/if}
-  </fieldset>
-  <div class="stages">
-    <div class="stages-header">
-      <div>
-        <strong>{t('Plan stages')}</strong>
-        <p class="stages-helper">{t('Break the plan into ordered stages people can follow.')}</p>
-      </div>
-      <button type="button" class="secondary-button" onclick={addStage}>{t('Add stage')}</button>
-    </div>
-    {#each plan.stages as stage, index (index)}
-      <div class="stage-card">
-        <div class="stage-card-header">
-          <strong>Stage {index + 1}</strong>
-          {#if plan.stages.length > 1}
-            <button type="button" class="remove-stage" onclick={() => removeStage(index)}>
-              {t('Remove')}
-            </button>
-          {/if}
-        </div>
-        <label>
-          <RequiredLabel>{t('Title')}</RequiredLabel>
-          <input bind:value={stage.title} />
-        </label>
-        <label>
-          <RequiredLabel>{t('Details')}</RequiredLabel>
-          <textarea bind:value={stage.details} rows="2"></textarea>
-        </label>
-      </div>
-    {/each}
-  </div>
+    {/snippet}
+  </ChoiceRows>
+  <span class="field-inline-label">{t('Stages')}</span>
+  <PlanStagesEditor bind:stages={plan.stages} dated />
   {#if problems.length > 0}
     <ul class="validation-list">
       {#each problems as message (message)}

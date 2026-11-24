@@ -9,11 +9,17 @@
   } from '#lib/domain/policy.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleProblem } from '#lib/domain/eventSchedule.ts';
-  import { type PlanForm, type PlanStep, type ProductionLocation } from '#lib/domain/planForm.ts';
+  import {
+    isMeetupForm,
+    type PlanForm,
+    type PlanStep,
+    type ProductionLocation,
+  } from '#lib/domain/planForm.ts';
   import type { PlaceSearch } from '#lib/domain/places.ts';
   import ChoiceRows from '#lib/components/create/ChoiceRows.svelte';
   import { REQUEST_MODES, type ProjectSubtype } from '#lib/domain/projects.ts';
 
+  import MeetupSchedule from '#lib/components/create/MeetupSchedule.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
 
   import PlanPlace from './PlanPlace.svelte';
@@ -164,6 +170,8 @@
       members: plural(members, '{n} member', '{n} members'),
     })}
   </p>
+{:else if step.id === 'schedule-mode' && isMeetupForm(form)}
+  <MeetupSchedule bind:form />
 {:else if step.id === 'schedule-mode'}
   <ChoiceRows
     value={form.scheduleMode}

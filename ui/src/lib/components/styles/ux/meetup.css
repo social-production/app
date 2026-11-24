@@ -1,0 +1,30 @@
+/* A meetup's "How do you meet?" (Edit, Plan and Meetup mockups §C, ADR 0119): choice rows,
+   with the usual day and times under the first. Doubled classes beat the ported form styles
+   inside portaled create sheets. */
+.meetup-how {
+  display: grid;
+  gap: 8px;
+}
+
+.meetup-how .meetup-when {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 8px;
+}
+
+.meetup-how.meetup-how .meetup-when label {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.meetup-how .meetup-when span {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.meetup-how.meetup-how .meetup-when :is(select, input) {
+  width: 100%;
+  min-width: 0;
+}

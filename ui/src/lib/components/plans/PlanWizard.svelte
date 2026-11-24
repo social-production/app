@@ -4,6 +4,7 @@
   import type { ProductionLocation } from '#lib/domain/planForm.ts';
   import {
     emptyPlanForm,
+    isMeetupForm,
     planFromForm,
     planSteps,
     stepReady,
@@ -30,6 +31,8 @@
   interface Props {
     open: boolean;
     kind: PlanKind;
+    /** An event plan with a usual day or none: makes a meetup (ADR 0119). */
+    meetup?: boolean;
     mode: CharterMode;
     subtype: ProjectSubtype;
     productionLocation: ProductionLocation | null;
@@ -48,6 +51,7 @@
   let {
     open,
     kind,
+    meetup = false,
     mode,
     subtype,
     productionLocation,
@@ -70,7 +74,13 @@
   const steps = $derived(planSteps(kind, form));
   const step = $derived(steps[Math.min(index, steps.length - 1)]);
   const reviewing = $derived(step?.id === 'review');
-  const name = $derived(PLAN_KIND_NAMES[kind]);
+  const name = $derived(meetup && kind === 'Event' ? 'meetup plan' : PLAN_KIND_NAMES[kind]);
+
+  // A meetup plan starts on a usual day; an event plan on a date.
+  $effect(() => {
+    const undated = meetup && kind === 'Event';
+    if (undated !== isMeetupForm(form)) form.scheduleMode = undated ? 'weekly' : 'date';
+  });
   // "Distribution plan" at the top of the sheet.
   const title = $derived.by(() => {
     const words = t(name);

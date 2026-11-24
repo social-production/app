@@ -7,7 +7,13 @@
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import ChoiceRows from '#lib/components/create/ChoiceRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import { PLAN_MAKES, planMakesLine, type PlanKind, type Plan } from '#lib/domain/plans.ts';
+  import {
+    PLAN_MAKES,
+    planMakesLine,
+    type Plan,
+    type PlanChoice,
+    type PlanKind,
+  } from '#lib/domain/plans.ts';
   import { projectSubtype } from '#lib/domain/projects.ts';
   import { placeSearch } from '#lib/services/locations.ts';
 
@@ -43,18 +49,19 @@
   const board = $derived(detail.plans);
   // A proposal's Plan phase takes every type-giving kind side by side (ADR 0059).
   const typeless = $derived(project?.charter?.mode === 'proposal');
-  const kinds = $derived<PlanKind[]>(typeless ? PLAN_MAKES.map((m) => m.value) : [kind]);
+  const kinds = $derived<PlanKind[]>(typeless ? PLAN_MAKES.map((m) => m.kind) : [kind]);
   const plans = $derived(board?.plans.filter((p) => kinds.includes(p.plan.kind)) ?? []);
   const canSubmit = $derived(
     !!project?.amMember && !!board?.openKinds.some((open) => kinds.includes(open)),
   );
   /** The kind of the plan being written: the phase's own, or the one picked on a proposal. */
-  let chosen = $state<PlanKind>('Production');
+  let chosen = $state<PlanChoice>('Production');
   let choosing = $state(false);
-  const writing = $derived(typeless ? chosen : kind);
-  const writingMode = $derived(
-    typeless ? (PLAN_MAKES.find((m) => m.value === chosen)?.mode ?? 'productive') : null,
-  );
+  const choice = $derived(PLAN_MAKES.find((m) => m.value === chosen));
+  const writing = $derived<PlanKind>(typeless ? (choice?.kind ?? 'Production') : kind);
+  // A meetup plan: picked on a proposal, or any event plan of a meetup (ADR 0119).
+  const meetup = $derived(typeless ? chosen === 'Meetup' : project?.charter?.subtype === 'meetup');
+  const writingMode = $derived(typeless ? (choice?.mode ?? 'productive') : null);
 
   function add(): void {
     if (composing || choosing) {
@@ -86,6 +93,7 @@
       <PlanWizard
         open={composing}
         kind={writing}
+        {meetup}
         mode={writingMode ?? project.charter.mode}
         subtype={projectSubtype(project.charter.subtype)}
         {productionLocation}
@@ -147,7 +155,12 @@
             <PlanCard
               {plan}
               authorName={detail.names[plan.author] ?? '…'}
-              makes={typeless ? planMakesLine(plan.plan.kind) : null}
+              makes={typeless
+                ? planMakesLine(
+                    plan.plan.kind,
+                    ['weekly', 'any-day'].includes(plan.plan.schedule?.mode ?? ''),
+                  )
+                : null}
               canVote={canVoteOn(project)}
               reveal={revealPlan === plan.id}
               {onRevealDone}
