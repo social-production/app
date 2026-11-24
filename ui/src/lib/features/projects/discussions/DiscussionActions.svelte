@@ -11,8 +11,12 @@
    * A post or thread page's actions (ADR 0100): soft pills for the votes, the comment count
    * and Share, then a "Comments" heading with Sort at its right.
    */
-  let { state, kind, title }: { state: DiscussionState; kind: 'thread' | 'post'; title: string } =
-    $props();
+  let {
+    state,
+    kind,
+    title,
+    head = true,
+  }: { state: DiscussionState; kind: 'thread' | 'post'; title: string; head?: boolean } = $props();
 
   const count = $derived(countComments(state.comments));
   const label = $derived(`${plural(count, '{n} comment', '{n} comments')}`);
@@ -41,8 +45,10 @@
     </span>
     <DiscussionTools only="share" {kind} {title} bind:sortMode={state.sortMode} />
   </div>
-  <div class="comments-head">
-    <h2>{t('Comments')}</h2>
-    <DiscussionTools only="sort" {kind} {title} bind:sortMode={state.sortMode} />
-  </div>
+  {#if head}
+    <div class="comments-head">
+      <h2>{t('Comments')}</h2>
+      <DiscussionTools only="sort" {kind} {title} bind:sortMode={state.sortMode} />
+    </div>
+  {/if}
 {/if}

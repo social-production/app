@@ -62,6 +62,7 @@
       <DiscussionComment comment={opened} {...common} hideReplies onReply={focusComposer} />
     </div>
   </div>
+  <h2 class="post-comment-replies">{t('Replies')}</h2>
   <DiscussionPanel
     comments={opened.replies}
     {space}

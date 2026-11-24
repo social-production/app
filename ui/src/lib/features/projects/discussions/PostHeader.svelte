@@ -17,7 +17,9 @@
    * author and when they posted, with web's ⋮ report menu (ADR 0071), the body, and the soft
    * action pills (votes, comments, Share) above the comments' heading and Sort.
    */
-  let { state }: { state: DiscussionState } = $props();
+  // `above`: a comment of this post is open below it, so the post leads into it on a line
+  // and the post's own comments heading gives way (owner, 2026-11-24).
+  let { state, above = false }: { state: DiscussionState; above?: boolean } = $props();
 
   const project = $derived(state.project);
   const charter = $derived(state.project?.charter);
@@ -25,7 +27,7 @@
 </script>
 
 {#if project && charter}
-  <section class="item-head post-head-detail">
+  <section class="item-head post-head-detail" class:post-above={above}>
     <div class="item-author">
       <AvatarBadge {name} agent={project.creator} />
       <div class="item-author-text">
@@ -51,6 +53,6 @@
       <PostPhotos post={state.id} open />
     </RestrictionNotice>
 
-    <DiscussionActions {state} kind="post" title={`${name}'s post`} />
+    <DiscussionActions {state} kind="post" title={`${name}'s post`} head={!above} />
   </section>
 {/if}

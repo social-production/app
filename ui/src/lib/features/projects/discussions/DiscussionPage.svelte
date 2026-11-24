@@ -93,7 +93,7 @@
         {#if kind === 'thread'}
           <ThreadOverview {state} />
         {:else}
-          <PostHeader {state} />
+          <PostHeader {state} above={!!opened} />
         {/if}
         {#if state.message}<p class="status-note" role="alert">{state.message}</p>{/if}
         {#if opened}
