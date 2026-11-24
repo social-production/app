@@ -249,7 +249,8 @@
             />
           </div>
         {/if}
-        {#if tab === 'context'}
+        <!-- Details, Links and History share the dock (owner, 2026-11-24). -->
+        {#if tab === 'context' || tab === 'links' || tab === 'history'}
           <ProjectDock
             {detail}
             onOpenMembers={() => (sheet = 'members')}

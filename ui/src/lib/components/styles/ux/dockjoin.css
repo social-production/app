@@ -210,3 +210,69 @@
   min-width: 48px;
   padding-right: 4px;
 }
+
+/* A phase's work actions (Add plan, Add value, Add activity) and Phase read like the other
+   docks' labelled segments, Join and Update: the same words, size and icon (owner,
+   2026-11-24). The "+" is an icon in the dock; elsewhere the round button keeps its glyph. */
+.shell .dock-capsule .round-plus-button.round-plus-button.round-plus-button,
+.shell .dock-capsule .phase-shift-button.phase-shift-button.phase-shift-button,
+.shell .dock-capsule .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
+  gap: 7px;
+  padding: 0 18px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.shell .dock-capsule .adds .round-plus-button.round-plus-button.round-plus-button {
+  padding: 0 22px 0 18px;
+}
+
+.shell .dock-capsule .round-plus-button .plus-label,
+.shell .dock-capsule .phase-action-group .label {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.shell .round-plus-button .plus-icon,
+.shell .dock-capsule .round-plus-button .plus-glyph {
+  display: none;
+}
+
+.shell .dock-capsule .round-plus-button .plus-icon {
+  display: contents;
+}
+
+.shell .dock-capsule .phase-menu-trigger .caret {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+/* Take part's toolbar sits a few wrappers deep, so every button there was both a first and a
+   last child and the end-rounding above made each its own pill (owner, 2026-11-24). Its
+   buttons are flat segments; only the add button's left and Phase's right follow the capsule's
+   round ends. */
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  :is(button, a) {
+  border-radius: 0;
+}
+
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  .adds
+  > :first-child {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  .phase-menu-trigger:last-child {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}

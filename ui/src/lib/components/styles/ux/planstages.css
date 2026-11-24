@@ -1,0 +1,283 @@
+/* The plan wizard's stage cards, review card and option rows (Edit, Plan and Meetup mockups
+   §B, owner 2026-11-24). Plan sheets are portaled outside the shell, so rules double a class
+   to win over the ported wizard styles. */
+.create-sheet.create-sheet .stage-cards {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.create-sheet.create-sheet .stage-cards > li {
+  border-radius: 14px;
+  background: var(--panel-hover);
+  transition: box-shadow 0.15s;
+}
+
+.create-sheet.create-sheet .stage-cards > li.dragging {
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.18);
+}
+
+.create-sheet .stage-card {
+  display: flex;
+  align-items: stretch;
+}
+
+.create-sheet.create-sheet .stage-face {
+  display: grid;
+  flex: 1;
+  grid-template-columns: 24px 1fr;
+  gap: 2px 10px;
+  align-items: start;
+  min-width: 0;
+  padding: 10px 0 10px 12px;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-sheet .stage-n {
+  display: grid;
+  grid-row: span 2;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.create-sheet .stage-face b {
+  overflow: hidden;
+  font-size: 14px;
+  font-weight: 600;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.create-sheet .stage-face small {
+  grid-column: 2;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.create-sheet .stage-handle {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  color: var(--text-soft);
+  font-size: 16px;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.create-sheet .stage-fields {
+  display: grid;
+  gap: 10px;
+  padding: 2px 12px 12px;
+}
+
+.create-sheet.create-sheet .stage-fields input,
+.create-sheet.create-sheet .stage-fields textarea {
+  width: 100%;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--panel-bg, var(--page-bg));
+}
+
+.create-sheet .stage-lab {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.create-sheet .stage-dates {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.create-sheet .stage-tools {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.create-sheet.create-sheet .stage-tools button {
+  min-width: 36px;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel-bg, var(--page-bg));
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.create-sheet.create-sheet .stage-tools button:disabled {
+  opacity: 0.4;
+}
+
+.create-sheet.create-sheet .stage-tools .stage-remove {
+  color: var(--danger);
+}
+
+.create-sheet.create-sheet .stage-tools .stage-done {
+  margin-left: auto;
+  border-color: var(--brand);
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+}
+
+.create-sheet.create-sheet .stage-add {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 8px;
+  border: 1.5px dashed var(--panel-border);
+  border-radius: 14px;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* Review: one card, a small label over each answer, Edit on the right. */
+.create-sheet .plan-rev {
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+.create-sheet.create-sheet .plan-rev > button {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1px 8px;
+  width: 100%;
+  padding: 11px 13px;
+  border: none;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.create-sheet .plan-rev > button + button {
+  border-top: 1px solid var(--panel-border);
+}
+
+.create-sheet .plan-rev small {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.create-sheet .plan-rev b {
+  grid-column: 1;
+  font-size: 14px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.create-sheet .plan-rev u {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.create-sheet .plan-rev-note {
+  margin: 12px 0 0;
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+/* Support so far: three small figures in one filled row. */
+.create-sheet .plan-signals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.create-sheet .plan-signals span {
+  display: grid;
+  padding: 9px 8px;
+  border-radius: 12px;
+  background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+.create-sheet .plan-signals b {
+  color: var(--text-main);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The software license as one line that opens its reasons. */
+.create-sheet .plan-license {
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.create-sheet .plan-license summary {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 10px 13px;
+  list-style: none;
+  cursor: pointer;
+}
+
+.create-sheet .plan-license summary::-webkit-details-marker {
+  display: none;
+}
+
+.create-sheet .plan-license summary b {
+  color: var(--brand-strong);
+  white-space: nowrap;
+}
+
+.create-sheet .plan-license summary span {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-soft);
+}
+
+.create-sheet .plan-license summary u {
+  color: var(--brand-strong);
+  font-weight: 600;
+}
+
+.create-sheet .plan-license[open] summary u {
+  display: none;
+}
+
+.create-sheet .plan-license p,
+.create-sheet .plan-license ul {
+  margin: 0;
+  padding: 0 13px 10px;
+  color: var(--text-soft);
+}
+
+.create-sheet .plan-license ul {
+  padding-left: 30px;
+}

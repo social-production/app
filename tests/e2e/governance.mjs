@@ -91,7 +91,7 @@ await ann.reload();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
 await ann.getByRole('button', { name: 'More actions' }).click();
 await ann.getByRole('menuitem', { name: 'Edit' }).click();
-await ann.locator('.edit-sheet').getByLabel('Title').fill(`${title} co-op`);
+await ann.locator('.create-sheet').getByLabel('Title').fill(`${title} co-op`);
 await ann.getByRole('button', { name: 'Propose edit' }).click();
 await voteYes(bob);
 await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'the edit to apply');
@@ -163,19 +163,19 @@ const planTitle = `Saturday workshop ${stamp}`;
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await addPlan(ann, 'Production plan');
-const wizard = ann.getByRole('dialog', { name: 'Create Production Plan' });
-await wizard.getByPlaceholder('Plan title').fill(planTitle);
-await wizard.getByPlaceholder('Describe the plan').fill('Open the workshop every Saturday morning.');
-await wizard.getByRole('button', { name: 'Next' }).click(); // overview → plan type
-await wizard.getByRole('button', { name: 'Next' }).click(); // → location
+const wizard = ann.getByRole('dialog', { name: 'Production plan' });
+await wizard.getByLabel('Title').fill(planTitle);
+await wizard.getByLabel('Description').fill('Open the workshop every Saturday morning.');
+await wizard.getByRole('button', { name: 'Continue' }).click(); // overview → plan type
+await wizard.getByRole('button', { name: 'Continue' }).click(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('Community hall');
-await wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both supporters can come.');
-await wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Stage title').fill('Set up benches');
+await wizard.getByRole('button', { name: 'Continue' }).click();
+await wizard.getByLabel('Support it answers').fill('Both supporters can come.');
+await wizard.getByRole('button', { name: 'Continue' }).click();
+await wizard.getByPlaceholder('Harvest Friday').fill('Set up benches');
 await wizard.getByPlaceholder('What happens in this stage?').fill('Borrow tools and benches.');
-await wizard.getByRole('button', { name: 'Next' }).click(); // → review
-await wizard.getByRole('button', { name: 'Submit Production Plan' }).click();
+await wizard.getByRole('button', { name: 'Continue' }).click(); // → review
+await wizard.getByRole('button', { name: 'Propose plan' }).click();
 await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
 // ADR 0099: the phase strip is a progress line named underneath; a plan's approval is a bar.
 // A proposal shows the shortest path every type has (sp_governance visible_phases).

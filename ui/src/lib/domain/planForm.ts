@@ -83,24 +83,19 @@ export function emptyPlanForm(subtype: ProjectSubtype): PlanForm {
 
 const REVIEW: PlanStep = {
   id: 'review',
-  question: t('Review your plan before submitting'),
-  helper: t('Check each section, then submit when you are ready.'),
+  question: t('Check it, then send it to a vote'),
 };
 
 const DEMAND_NOTE: PlanStep = {
   id: 'demand-note',
-  question: t('How does this plan respond to current support?'),
-  helper: t(
-    'Support signals show how many people want this to exist right now. Assessors compare every plan against that need, so say whether your plan meets it and what gap remains.',
-  ),
+  question: t('What support does it answer?'),
+  helper: t('Say how this plan meets the support people have shown, and what gap remains.'),
 };
 
 const STAGES: PlanStep = {
   id: 'stages',
-  question: t('What are the stages of this plan?'),
-  helper: t(
-    'Break the work into stages. Each stage needs a title and details. You can add, remove, and reorder stages.',
-  ),
+  question: t('What are the stages?'),
+  helper: t('Each stage gets a title and what happens in it. Hold ⠿ to reorder.'),
 };
 
 /** The date and time steps of a dated schedule. */
@@ -126,9 +121,7 @@ function eventPlanSteps(f: ScheduleForm): PlanStep[] {
     {
       id: 'plan-overview',
       question: t('What is this plan called, and what does it do?'),
-      helper: t(
-        'Use a clear title and explain what will happen and why this plan is worth considering.',
-      ),
+      helper: t('A clear title, and what will happen.'),
     },
     {
       id: 'schedule-mode',
@@ -154,10 +147,8 @@ export function planSteps(kind: PlanKind, f: PlanForm): PlanStep[] {
       id: 'plan-overview',
       question: t('What is this plan called, and what does it deliver?'),
       helper: producing
-        ? t(
-            'Use a clear title and explain what will be produced and why this approach makes sense.',
-          )
-        : 'Use a clear title and explain how people will access or receive what is produced.',
+        ? t('A clear title, and what will be made and how.')
+        : t('A clear title, and how people will get what is made.'),
     },
   ];
   if (producing) {

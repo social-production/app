@@ -23,6 +23,7 @@ import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
+import { overHeld, withSignal, type HeldSignal } from './heldSignal.ts';
 import { tellDecisions } from './outcomeNotices.ts';
 import { tellMembers } from './phaseNotice.ts';
 import { SoftwareState } from './software/softwareState.svelte.ts';
@@ -30,6 +31,7 @@ import { SoftwareState } from './software/softwareState.svelte.ts';
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
 export class DetailState {
   project = $state<Project>();
+  #held: HeldSignal | null = null;
   members = $state<Person[]>([]);
   proposals = $state<Proposal[]>([]);
   plans = $state<PlanBoard>();
@@ -136,6 +138,7 @@ export class DetailState {
       await Promise.all(settled.map((id) => closeProposal(this.id, id)));
       [project, proposals, plans, values] = await this.read();
     }
+    [project, this.#held] = overHeld(project, this.#held);
     const members = await Promise.all(project.members.map(getPerson));
     if (this.viewerVotes === null && project.amMember) void this.loadViewer();
     this.project = project;
@@ -187,11 +190,12 @@ export class DetailState {
   }
 
   /** Guests see web's sign-in notice; the strip rolls back. */
-  signal(next: Stance | null): Promise<void> {
+  async signal(next: Stance | null): Promise<void> {
     if (!requireViewer('Sign in to support this project.')) {
-      return Promise.reject(new Error('Sign in to support this project.'));
+      throw new Error('Sign in to support this project.');
     }
-    return setSignal(this.id, next);
+    await setSignal(this.id, next);
+    if (this.project) [this.project, this.#held] = withSignal(this.project, next);
   }
 
   async vote(proposal: Proposal, choice: VoteChoice): Promise<void> {

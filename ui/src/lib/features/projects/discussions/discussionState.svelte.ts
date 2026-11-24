@@ -8,6 +8,7 @@ import { getPerson, myAgent } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
 import { noteComment } from '#lib/services/profileNotes.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+import { overHeld, withSignal, type HeldSignal } from '../heldSignal.ts';
 import { ModerationLoader } from '../moderationState.svelte.ts';
 
 /** Every comment in the tree with `id` changed by `change`. */
@@ -38,6 +39,7 @@ function authors(list: DiscussionComment[]): string[] {
 /** One thread or post page (web's ThreadPageData / PostPageData, ADR 0070). */
 export class DiscussionState {
   project = $state<Project>();
+  #held: HeldSignal | null = null;
   comments = $state<DiscussionComment[]>([]);
   names = $state<Record<string, string>>({});
   sortMode = $state<CommentSort>('oldest');
@@ -70,7 +72,7 @@ export class DiscussionState {
 
   async fetch(): Promise<void> {
     const [project, comments] = await Promise.all([getProject(this.id), listComments(this.id)]);
-    this.project = project;
+    [this.project, this.#held] = overHeld(project, this.#held);
     this.comments = comments;
     this.error = undefined;
     const agents = [project.creator, ...authors(comments)];
@@ -87,6 +89,7 @@ export class DiscussionState {
     if (!requireViewer('Sign in to vote.')) throw new Error('signed out');
     // One write at a time per chain: comments and comment votes share this queue.
     await queued(() => setSignal(this.id, next));
+    if (this.project) [this.project, this.#held] = withSignal(this.project, next);
     void this.fetch().catch(() => undefined);
   }
 

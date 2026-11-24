@@ -101,16 +101,6 @@
   letter-spacing: -0.015em;
 }
 
-.shell .profile-page .standing-chip {
-  padding: 2px 10px;
-  border: none;
-  border-radius: 999px;
-  background: var(--panel-hover);
-  color: var(--text-soft);
-  font-size: 12px;
-  font-weight: 600;
-}
-
 .shell .profile-page .count-row {
   justify-content: flex-start;
   gap: 6px 18px;
@@ -170,39 +160,9 @@
   color: var(--on-brand);
 }
 
-.shell .profile-page .action.primary.on,
-.shell .profile-page .action.vouch.on {
+.shell .profile-page .action.primary.on {
   background: var(--brand-soft);
   color: var(--brand-strong);
-}
-
-.shell .profile-page .action.bot,
-.shell .profile-page .action.vouch {
-  flex: 0 0 40px;
-  padding: 0;
-}
-
-.shell .profile-page .action.bot .action-text,
-.shell .profile-page .action.vouch .action-text {
-  display: none;
-}
-
-/* Follow and Message share the row; Share, Vouch and the bot mark are round icons, so no
-   word is cut short (owner, 2026-11-23: "all the buttons are truncated"). */
-.shell .profile-page .action-row .share-sheet {
-  flex: 0 0 40px;
-}
-
-.shell .profile-page .action-row .share-button {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  padding: 0;
-  border: none;
-  border-radius: 999px;
-  background: var(--panel-hover);
-  color: var(--text-main);
 }
 
 .shell .profile-page .action:disabled {
@@ -218,7 +178,7 @@
 
 /* On a phone the three words need the room the icons took. */
 @media (max-width: 480px) {
-  .shell .profile-page .action:not(.bot, .vouch) svg {
+  .shell .profile-page .action svg {
     display: none;
   }
 }
@@ -230,6 +190,27 @@
   position: absolute;
   top: 54px;
   right: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* The ⋮ (owner, 2026-11-24): a bare icon, no ring. */
+.shell .profile-page .profile-more {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--text-main);
+}
+
+.shell .profile-page .profile-more .toolbar-icon {
+  width: 22px;
+  height: 22px;
 }
 
 .shell .profile-page .edit-profile {

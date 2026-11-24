@@ -2,7 +2,6 @@
   import { t } from '#lib/i18n/index.ts';
   import type { PlaceSearch } from '#lib/domain/places.ts';
   import type { ProductionLocation } from '#lib/domain/planForm.ts';
-  import { DIRECT_USE_CORE, DIRECT_USE_PLAN } from '#lib/domain/policy.ts';
   import {
     emptyPlanForm,
     planFromForm,
@@ -13,14 +12,20 @@
   import { PLAN_KIND_NAMES, subtypeOptions, type Plan, type PlanKind } from '#lib/domain/plans.ts';
   import { isProjectMode, type CharterMode, type ProjectSubtype } from '#lib/domain/projects.ts';
 
+  import CreateSheet from '#lib/components/create/CreateSheet.svelte';
+  import PolicyNotice from '#lib/components/create/PolicyNotice.svelte';
+
   import PlanReview from './PlanReview.svelte';
-  import PlanWizardShell from './PlanWizardShell.svelte';
   import PlanWizardStep from './PlanWizardStep.svelte';
+
+  import '#lib/components/styles/ux/planstages.css';
 
   /**
    * web's PlanCreationWizard for project plans (overview, subtype, repository or location,
    * support response, stages, review) and event plans (overview, schedule, place, support
-   * response, stages, review). Dismissing keeps the draft; closing starts over.
+   * response, stages, review), in the create flows' sheet (Edit, Plan and Meetup mockups §B,
+   * owner 2026-11-24): one question per step, the direct-use rule as a chip, Back | Continue in
+   * the dock. Closing with something typed asks first, then starts over.
    */
   interface Props {
     open: boolean;
@@ -66,6 +71,11 @@
   const step = $derived(steps[Math.min(index, steps.length - 1)]);
   const reviewing = $derived(step?.id === 'review');
   const name = $derived(PLAN_KIND_NAMES[kind]);
+  // "Distribution plan" at the top of the sheet.
+  const title = $derived.by(() => {
+    const words = t(name);
+    return words.charAt(0).toUpperCase() + words.slice(1);
+  });
 
   function reset(): void {
     form = emptyPlanForm(subtype);
@@ -84,52 +94,34 @@
     );
   }
 
-  async function next(): Promise<void> {
-    if (!reviewing) {
-      index = Math.min(index + 1, steps.length - 1);
-      return;
-    }
+  async function submit(): Promise<void> {
     if (await onSubmit(planFromForm(kind, form))) reset();
   }
 </script>
 
-<PlanWizardShell
-  {open}
-  title={t('Create {name}', { name: t(name) })}
-  stepIndex={Math.min(index, steps.length - 1)}
-  stepCount={steps.length}
-  nextLabel={reviewing
-    ? pending
-      ? t('Working...')
-      : t('Submit {name}', { name: t(name) })
-    : t('Next')}
-  canGoBack={index > 0}
-  canGoNext={!!step && !pending && stepReady(step.id, form)}
-  onClose={close}
-  {onDismiss}
-  onBack={() => (index = Math.max(index - 1, 0))}
-  onNext={() => void next()}
->
-  <div class="plan-wizard">
-    {#if index === 0}
-      <div class="policy-notice-wrap">
-        <aside class="policy-notice" aria-label={t('Direct-use policy')}>
-          <strong>{t('Direct use only — no commercial activity')}</strong>
-          <p>{DIRECT_USE_PLAN}</p>
-          <p class="policy-core">{DIRECT_USE_CORE}</p>
-        </aside>
-      </div>
-    {/if}
-    {#if message && reviewing}
-      <div class="warning-card" role="alert">
-        <strong>{t('Plan could not be submitted')}</strong>
-        <ul class="warning-list"><li>{message}</li></ul>
-      </div>
-    {/if}
-    {#if step}
-      <div class="question-block">
-        <h2>{step.question}</h2>
-        {#if step.helper}<p class="helper-copy">{step.helper}</p>{/if}
+{#if open}
+  <CreateSheet
+    {title}
+    description=""
+    steps={steps.map((s) => ({ id: s.id, title: s.question, question: s.question }))}
+    stepIndex={Math.min(index, steps.length - 1)}
+    missing={step && stepReady(step.id, form) ? [] : [t('the required fields')]}
+    submitLabel={t('Propose plan')}
+    submittingLabel={t('Working...')}
+    submitting={pending}
+    onStep={(i) => (index = i)}
+    onSubmit={() => void submit()}
+    onClose={close}
+  >
+    <div class="form-stack plan-wizard">
+      {#if message && reviewing}
+        <div class="warning-card" role="alert">
+          <strong>{t('Plan could not be submitted')}</strong>
+          <ul class="warning-list"><li>{message}</li></ul>
+        </div>
+      {/if}
+      {#if step}
+        {#if step.helper}<p class="helper-text">{step.helper}</p>{/if}
         {#if reviewing}
           <PlanReview {form} {steps} onEdit={goTo} />
         {:else}
@@ -143,9 +135,11 @@
             {opposition}
             {required}
             {members}
+            dated={kind === 'Event'}
           />
         {/if}
-      </div>
-    {/if}
-  </div>
-</PlanWizardShell>
+      {/if}
+      {#if index === 0}<PolicyNotice />{/if}
+    </div>
+  </CreateSheet>
+{/if}

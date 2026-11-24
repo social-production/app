@@ -10,8 +10,10 @@ export function standingLabel(person: Person): string {
 }
 
 export function standingHint(person: Person): string {
-  if (person.standing.level === 'Full')
-    return t('Vouched for by full members, and can vouch for others.');
+  // Everyone votes (ADR 0118); vouching and bot marks are what full standing adds.
+  if (person.standing.level === 'Full') return t('Can vouch for people and mark bots.');
   if (person.standing.level === 'Paused') return t('Paused after a bot review.');
-  return `${person.standing.vouchers.length}/2 vouches from full members`;
+  return t('{n} of 2 vouches; then they can vouch and mark bots.', {
+    n: person.standing.vouchers.length,
+  });
 }

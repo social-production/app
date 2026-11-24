@@ -32,6 +32,8 @@
     onStep: (index: number) => void;
     onSubmit: () => void;
     onClose: () => void;
+    /** A form that starts filled (Propose edit) closes without asking. */
+    askBeforeClose?: boolean;
     children: Snippet;
   }
 
@@ -78,7 +80,7 @@
 
   function close(): void {
     // Don't throw away what someone typed without asking.
-    if (hasTypedText()) confirming = true;
+    if (p.askBeforeClose !== false && hasTypedText()) confirming = true;
     else p.onClose();
   }
 

@@ -39,10 +39,11 @@ export async function shareProfile(to: Contact, name: string, url: string): Prom
  * notice comes with them), a comment as its words and link. */
 export async function shareTo(
   to: Contact,
-  kind: 'project' | 'event' | 'help request' | 'thread' | 'post' | 'comment',
+  kind: 'project' | 'event' | 'help request' | 'thread' | 'post' | 'comment' | 'profile',
   title: string,
   url: string,
 ): Promise<void> {
+  if (kind === 'profile') return shareProfile(to, title, url);
   const body = kind === 'comment' ? `${title}\n${url}` : shareMessage(kind, title, url);
   await sendNewChat({ kind: 'direct', members: [to], title: '', body });
   if (kind !== 'comment') void shareNotice(to.agent, kind, title, url);
