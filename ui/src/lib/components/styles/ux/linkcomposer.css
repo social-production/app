@@ -1,5 +1,9 @@
 /* Link a project in the create flows' look (Owner Notes Mockups §5): a search, results as rows
    with a radio, then the chosen one over a reason. The top bar and dock are createflow.css's. */
+.overlay-root.link-composer-sheet .overlay-body {
+  padding: 0 16px 16px;
+}
+
 .link-composer-sheet .link-find {
   display: flex;
   align-items: center;
@@ -11,11 +15,16 @@
   color: var(--text-soft);
 }
 
-.link-composer-sheet .link-find input {
+.link-composer-sheet.link-composer-sheet .link-find input {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  padding: 0;
   border: 0;
+  border-radius: 0;
   outline: none;
+  box-shadow: none;
+  appearance: none;
   background: transparent;
   color: var(--text-main);
   font: inherit;
