@@ -248,3 +248,31 @@
   height: 16px;
   opacity: 0.7;
 }
+
+/* Take part's toolbar sits a few wrappers deep, so every button there was both a first and a
+   last child and the end-rounding above made each its own pill (owner, 2026-11-24). Its
+   buttons are flat segments; only the add button's left and Phase's right follow the capsule's
+   round ends. */
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  :is(button, a) {
+  border-radius: 0;
+}
+
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  .adds
+  > :first-child {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.shell.shell
+  .dock-capsule.dock-capsule
+  .phase-action-group.phase-action-group.phase-action-group
+  .phase-menu-trigger:last-child {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
