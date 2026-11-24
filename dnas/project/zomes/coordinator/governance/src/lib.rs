@@ -5,6 +5,7 @@
 
 mod apply;
 mod calls;
+mod challenge_write;
 mod count;
 mod decide;
 mod link_view;
@@ -82,7 +83,7 @@ pub fn close_proposal(call: In<ActionHash>) -> ExternResult<Option<ActionHash>> 
 #[hdk_extern]
 pub fn challenge(call: In<ActionHash>) -> ExternResult<ActionHash> {
     let proposal = enter(call)?;
-    let out = write::challenge(proposal)?;
+    let out = challenge_write::challenge(proposal)?;
     touch()?;
     Ok(out)
 }

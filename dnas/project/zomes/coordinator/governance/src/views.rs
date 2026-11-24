@@ -45,10 +45,12 @@ pub fn tally_view(p: &Found<Proposal>, me: &AgentPubKey, roll: &Roll) -> ExternR
     let tallied = |c: VoteChoice| {
         u32::try_from(votes.iter().filter(|v| v.entry.choice == c).count()).unwrap_or(0)
     };
-    let missing = u32::try_from(count.missing.len()).unwrap_or(u32::MAX);
+    let mut standing = Standing::default();
+    let missing =
+        u32::try_from(count.full_missing(p, roll, &mut standing)?.len()).unwrap_or(u32::MAX);
     let uncounted = match count.decided.as_ref() {
         Some(o) if o.entry.passed && !o.entry.votes.is_empty() => {
-            let eligible = eligible_votes(p, o.at, &mut Standing::default())?;
+            let eligible = eligible_votes(p, o.at, &mut standing)?;
             count.tally(&eligible).verdict() != Verdict::Passed
         }
         _ => false,
