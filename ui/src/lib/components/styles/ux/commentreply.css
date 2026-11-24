@@ -110,7 +110,29 @@
 @media (max-width: 760px) {
   .shell .discussion-shell .composer-card.replying {
     flex-wrap: wrap;
+    row-gap: 8px;
   }
+
+  /* While replying, the back button sits on its own line above the note, and the note and
+     the field run the full width under it (owner, 2026-11-24). */
+  .shell .discussion-shell .composer-card.replying > .dock-back {
+    order: -1;
+    margin-right: 100%;
+  }
+
+  .shell .discussion-shell .composer-card.replying > .composer-field {
+    flex-basis: 100%;
+  }
+}
+
+/* Room under the comments while replying, so even the last one can reach the top. */
+.shell .discussion-shell:has(.composer-card.replying) > .stack {
+  padding-bottom: 60vh;
+}
+
+/* A comment brought to the top (Reply) clears the page's top bar. */
+.shell .discussion-shell .comment-card {
+  scroll-margin-top: 72px;
 }
 
 /* A linked comment (from a notification or a profile) looks like the comment being replied to:
@@ -154,32 +176,27 @@
 
 /* Like, Reply and Share with their counts, as a tweet's reply row (owner, 2026-11-24). The ⋮
    report menu stays at the end. */
-.shell .comment-card .actions-row .comment-act {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 36px;
+.shell .comment-pills.item-actions {
+  gap: 6px;
+  margin: 6px 0 0;
+}
+
+.shell .comment-pills.item-actions .feed-vote,
+.shell .comment-pills .item-pill,
+.shell .comment-pills.item-actions .share-button {
   height: 32px;
-  padding: 0 8px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-soft);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
+  min-height: 32px;
+  padding: 0 12px;
+  color: var(--text-main);
+  text-decoration: none;
 }
 
-.shell .comment-card .actions-row .comment-act svg {
-  width: 17px;
-  height: 17px;
+.shell .comment-pills.item-actions .feed-vote {
+  padding: 0 2px;
 }
 
-.shell .comment-card .actions-row .comment-act.like.on {
-  color: var(--danger, #e0245e);
-}
-
-.shell .comment-card .actions-row .comment-act:active {
-  background: color-mix(in srgb, var(--text-soft) 12%, transparent);
+.shell .comment-pills .feed-action-icon,
+.shell .comment-pills.item-actions .share-button svg {
+  width: 16px;
+  height: 16px;
 }

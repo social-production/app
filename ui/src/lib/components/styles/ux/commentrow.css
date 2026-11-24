@@ -158,42 +158,9 @@
   stroke-linejoin: round;
 }
 
-/* A thread's or post's comment row: its likes and replies, as in the thread (owner, 2026-11-24). */
+/* A thread's or post's comment row carries the feed rows' action row (owner, 2026-11-24). */
 .shell .comment-activity-card .comment-activity-acts {
   position: relative;
   z-index: 1;
-  display: flex;
-  gap: 4px;
-  margin: 6px 0 -4px -8px;
-}
-
-.shell .comment-activity-card .comment-act {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  min-width: 36px;
-  height: 32px;
-  padding: 0 8px;
-  border: none;
-  border-radius: 999px;
-  background: transparent;
-  color: var(--text-soft);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-}
-
-.shell .comment-activity-card .comment-act svg {
-  width: 17px;
-  height: 17px;
-}
-
-.shell .comment-activity-card .comment-act.like.on {
-  color: var(--danger, #e0245e);
-}
-
-.shell .comment-activity-card .comment-act:active {
-  background: color-mix(in srgb, var(--text-soft) 12%, transparent);
+  margin-top: 4px;
 }

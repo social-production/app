@@ -1,3 +1,4 @@
+import type { VoteDirection } from './discussions.ts';
 import type { CharterMode } from './projects.ts';
 
 /** `NOTE_MAX`: a comment note keeps the comment's first 280 characters (ADR 0107). */
@@ -17,14 +18,15 @@ export interface CommentActivity {
   /** Whom a reply answers, by name. */
   replyToName: string | null;
   space: { id: string; title: string; mode: CharterMode; tag: string };
-  /** A thread's or post's comment: its likes, replies and your like (owner, 2026-11-24). */
+  /** A thread's or post's comment: its votes, replies and your vote (owner, 2026-11-24). */
   counts?: CommentCounts;
 }
 
 export interface CommentCounts {
-  likes: number;
+  /** Up votes minus down votes. */
+  score: number;
   replies: number;
-  liked: boolean;
+  mine: VoteDirection;
 }
 
 /** The opening words a note keeps: one line of whitespace, cut on a word if it is long. */
