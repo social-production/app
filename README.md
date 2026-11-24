@@ -18,7 +18,8 @@ What works today:
   vote (and count); events with no set date; the home-screen app reopens where you were; one
   share sheet with quote posts; liked comments; docks of three; Create plan and Link a project
   in the create look; pictures and covers for projects and events (a project network reset;
-  the demo content was reseeded with art).
+  the demo content was reseeded with art); the details header with a full-width cover and the
+  picture beside the channel; likes and replies on profile comments; Home area from the place picker.
 - **Create dock, permission sheets, chat pages, photo crop (PRs #265–#269, 2026-11-24 ~2 am
   Melbourne):** create flows in the joined dock style; short sheets before the browser asks for
   the microphone or notifications; a project chat's page from Messages; drag and zoom a photo

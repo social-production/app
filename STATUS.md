@@ -218,11 +218,15 @@ today, each its own PR, all merged after green CI unless marked:
   `direct messages` part. **Real people's accounts (the owner's and their wife's) lost their
   names and standing too**: they must set their username again and get vouched. After every
   reset: re-run demo-content, demo-melbourne and founders.cjs, and tell the owner.
-- **Details header (pending the owner's pick):** the owner wants the type tile gone, the
-  picture in its place (the type tile when none is set) and "a bit of styling". Mockups:
-  **Details Header Mockups** https://claude.ai/artifact/LHSTp9KX47meaMV2QF2GfF (A rounded
-  cover + picture over its corner, B full-width cover + picture beside the channel, C the
-  no-cover case). UI only, no reset.
+- **#279 Details header, option B (the owner's pick):** the cover edge to edge on phones
+  (a 200 px rounded band on desktop), the picture as an 84 px tile lifted over its edge beside
+  the channel and "Type · Phase · time"; the type's own tile when no picture is set; a plain
+  64 px tile with no cover (option C). `SpaceArtHeader` (cover only) + `.space-head` in
+  `ux/spaceart.css`. Threads and posts keep the small type tile (they take no art).
+- **#280:** a profile's thread and post comments show a working like heart and the reply count
+  (`services/commentCounts.ts` reads each thread once; `commentLike.ts` context).
+- **#281:** Settings › Home area uses the place picker ("Fitzroy, Victoria") instead of a text box.
+  All three smoked live at 390 px at 2:05 pm Melbourne.
 - **Calls work** (the owner's wife's microphone was off); loudspeaker and locked-phone calls
   wait for the native apps (roadmap).
 - **Open:** the owner said one create flow still has separate buttons ("such as
