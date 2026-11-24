@@ -96,3 +96,13 @@ export const stanceOf = (v: VoteDirection): Stance | null =>
 /** VoteStrip's choice as the comment vote it writes. */
 export const directionOf = (s: Stance | null): VoteDirection =>
   s === 'Demand' ? 1 : s === 'Oppose' ? -1 : 0;
+
+/** The comments from a top-level one down to `id` (the opened comment last), or null. */
+export function commentPath(tree: DiscussionComment[], id: string): DiscussionComment[] | null {
+  for (const c of tree) {
+    if (c.id === id) return [c];
+    const below = commentPath(c.replies, id);
+    if (below) return [c, ...below];
+  }
+  return null;
+}
