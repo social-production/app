@@ -37,12 +37,6 @@ export const createLinks: CreateLink[] = [
     description: t('Invite people to a gathering'),
     icon: 'event',
   },
-  {
-    href: resolve('/create/meetup'),
-    label: t('Meetup'),
-    description: t('Meet regularly or whenever, like pickup games'),
-    icon: 'event',
-  },
 ];
 
 /** web's createSurfaceLinks. */

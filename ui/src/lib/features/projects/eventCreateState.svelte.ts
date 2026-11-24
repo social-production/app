@@ -8,7 +8,7 @@ import {
 import type { Contact } from '#lib/domain/messages.ts';
 import type { Plan } from '#lib/domain/plans.ts';
 import { emptyPlanForm, planFromForm, type PlanForm } from '#lib/domain/planForm.ts';
-import type { Charter, EventAudience, EventGovernance } from '#lib/domain/projects.ts';
+import type { EventAudience, EventGovernance } from '#lib/domain/projects.ts';
 import type { Scope } from '#lib/domain/scopes.ts';
 import { myClosedCommunities } from '#lib/services/closedCommunities.ts';
 import { explain } from '#lib/services/errors.ts';
@@ -38,29 +38,14 @@ export class EventCreateState extends CreateState {
     this.isPrivate ? this.chosenGovernance : 'collaborative',
   );
   readonly upfrontPlan = $derived(this.governance === 'organizer_controlled');
-  // A meetup is public (owner, 2026-11-24: "Its specifically not private"): no audience step.
-  override readonly steps = $derived(
-    eventSteps(this.isPrivate, this.upfrontPlan).filter((s) => !this.meetup || s.id !== 'audience'),
-  );
+  override readonly steps = $derived(eventSteps(this.isPrivate, this.upfrontPlan));
   readonly planProblems = $derived(
     this.upfrontPlan ? upfrontPlanProblems(this.planWithPlace(), this.intent === 'physical') : [],
   );
   readonly canContinue = $derived(this.stepReady(this.stepId));
 
-  /** A meetup (ADR 0119): no single date, a usual day or whenever members set a session. */
-  readonly meetup: boolean;
-
-  constructor(meetup = false) {
+  constructor() {
     super('event');
-    this.meetup = meetup;
-    if (meetup) {
-      this.plan.scheduleMode = 'weekly';
-      this.audience = 'public';
-    }
-  }
-
-  override charter(): Charter {
-    return { ...super.charter(), subtype: this.meetup ? 'meetup' : 'standard' };
   }
 
   /** web's per-step gates (basics and location come from the project draft's `missing`). */

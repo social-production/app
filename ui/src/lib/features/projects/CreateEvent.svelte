@@ -24,11 +24,7 @@
    * location → plan (organizer-controlled) → overview. A public event starts as a proposal;
    * an organizer-controlled one starts in Activity with its plan (ADR 0057, 0061).
    */
-  /** `/create/meetup`: the same flow for a meetup (ADR 0119). */
-  let { meetup = false }: { meetup?: boolean } = $props();
-
-  // svelte-ignore state_referenced_locally
-  const s = new EventCreateState(meetup);
+  const s = new EventCreateState();
   const AUDIENCE_LABELS: Record<EventAudience, string> = {
     public: 'Public',
     private_community: 'Private community',
@@ -58,18 +54,14 @@
 </script>
 
 <CreateSheet
-  title={meetup ? t('Meetup') : t('Private event')}
-  description={meetup
-    ? t(
-        'For things people do regularly or whenever: pickup games, run clubs, game nights. Anyone can find it and join, and members add each session.',
-      )
-    : t(
-        'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
-      )}
+  title={t('Private event')}
+  description={t(
+    'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
+  )}
   steps={s.steps}
   stepIndex={s.step}
   {missing}
-  submitLabel={meetup ? t('Publish meetup') : t('Publish event')}
+  submitLabel={t('Publish event')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
@@ -79,7 +71,7 @@
     <div class="form-stack">
       <ScopeSheetArt kind="space" icon="event" art={s.art} canEdit />
       <label>
-        <RequiredLabel>{meetup ? t('Meetup title') : t('Event title')}</RequiredLabel>
+        <RequiredLabel>{t('Event title')}</RequiredLabel>
         <input bind:value={s.title} maxlength="200" aria-required="true" />
       </label>
       <label>
@@ -154,7 +146,7 @@
       onPlace={(p) => s.setPlace(p)}
     />
   {:else if s.stepId === 'plan'}
-    <EventPlanStep bind:plan={s.plan} problems={s.planProblems} {meetup} />
+    <EventPlanStep bind:plan={s.plan} problems={s.planProblems} />
   {:else}
     <div class="form-stack overview">
       <CreatePreview
