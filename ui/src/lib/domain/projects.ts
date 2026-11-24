@@ -2,6 +2,7 @@
 
 import { t } from '#lib/i18n/index.ts';
 import type { ProjectUpdate } from './governance.ts';
+import type { NextActivity } from './nextSession.ts';
 import {
   fitLabel,
   fromPlace,
@@ -72,6 +73,8 @@ export interface ProjectCard {
   };
   /** An event's start from its leading plan (web's `scheduledAt`; Holochain micros). */
   scheduledAt?: number;
+  /** The soonest activity not over yet (gateway `next_activity`; owner, 2026-11-24). */
+  nextActivity?: NextActivity | null;
   /** web's moderationState while a report is open: `under_review` or `hidden` (ADR 0071). */
   moderation?: string;
   /** A channel's or community's picture and cover hashes (ADR 0109). */

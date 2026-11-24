@@ -51,6 +51,9 @@ pub struct ProjectCard {
     /// not sent with feed cards.
     #[serde(skip)]
     pub activities: Vec<super::markers::CardActivity>,
+    /// The soonest activity not over yet, set when a page is served (`next::next_of`).
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub next_activity: Option<super::next::NextActivity>,
     /// Its place is online (the Region feed's online list, ADR 0084); not sent.
     #[serde(skip)]
     pub online: bool,
@@ -157,7 +160,7 @@ impl ProjectIndex {
             .into_iter()
             .skip(offset)
             .take(limit)
-            .map(|c| (*c).clone())
+            .map(|c| super::next::served(c, q.now))
             .collect();
         (page, total)
     }
