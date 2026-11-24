@@ -239,6 +239,19 @@ today, each its own PR, all merged after green CI unless marked:
   — Links tab › Download QR card sheet; square 1080², story 1080×1920, round 60 mm sticker
   (PDF, cut line), A6 flyer (four-up on A4). The QR is high error correction with the logo in
   the middle.
+- **#288** quiet action pills (no bubbles). **#289** QR share cards built (`features/projects/qrcard/`:
+  canvas drawing, `qrcode-generator@1.4.4` level H with the logo, a hand-written one-image PDF for
+  the sticker and A4 flyer sheet; Links tab row + sheet; every format decoded back to the live
+  link with OpenCV). **#290** dock end segments round themselves while a menu is open; item and
+  dock menus use vertical ⋮. **#291** feed Type is a set (`FeedTypes`, empty = All; old saved
+  strings still load). **#292** tapping a cover or picture opens `PhotoViewer` (zoom, pan, steps
+  between them; it now loads `ux/photos.css` itself). **#293** post comments open as their own view
+  (`?reply=<id>`, `PostCommentView`): the post beside its photo on a line down to the opened
+  comment, its replies under Replies; links to a reply open its parent. All smoked live by 4:51 pm.
+- **Next (owner, 24 Nov):** Propose edit modernised, with the picture and cover placed/cropped
+  there (task 46). Demo data added on live: a 3-comment chain on maya_k's tomato post.
+- **Lesson:** `npm install` in a worktree whose `node_modules` is a symlink replaces the link with
+  its own folder; copy new packages into `/home/user/app/node_modules` for other worktrees.
 - **Calls work** (the owner's wife's microphone was off); loudspeaker and locked-phone calls
   wait for the native apps (roadmap).
 - **Open:** the owner said one create flow still has separate buttons ("such as
