@@ -47,3 +47,74 @@
 .wizard-backdrop .wizard-footer:has(.wizard-close) .primary-button {
   margin-right: auto;
 }
+
+/* The top bar in the create flows' look (Owner Notes Mockups §4): a plain × on the left, the
+   title centred with "Step n of m" under it, then one short bar per step, done ones green. */
+.wizard-backdrop .wizard-header.wizard-topbar {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  gap: 0;
+  padding: calc(10px + var(--shell-safe-top, 0px)) 12px 10px;
+  border-bottom: none;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-x {
+  display: grid;
+  grid-column: 1;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-main);
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-heading {
+  display: grid;
+  grid-column: 2;
+  justify-items: center;
+  min-width: 0;
+  text-align: center;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-title {
+  max-width: 100%;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-step-count {
+  margin-top: 1px;
+  color: var(--text-soft);
+  font-size: 12.5px;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-step-bars {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 4px;
+  margin: 10px 4px 0;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-step-bars i {
+  flex: 1;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--panel-hover);
+  transition: background-color 0.2s ease;
+}
+
+.wizard-backdrop .wizard-topbar .wizard-step-bars i.on {
+  background: var(--brand);
+}
+
+/* The dock is Back | Next alone now: centred, no × beside it. */
+.wizard-backdrop .wizard-footer .secondary-button:only-child,
+.wizard-backdrop .wizard-footer .primary-button:only-child {
+  min-width: 160px;
+}

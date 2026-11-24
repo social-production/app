@@ -87,10 +87,10 @@ log('each founder created a project');
 await linksUntil(ann, urlA, () => ann.getByRole('button', { name: /Propose a link/ }), 'the Links tab');
 await ann.screenshot({ path: `${shots}/links-empty-390.png` });
 await ann.getByRole('button', { name: /Propose a link/ }).click();
-const composer = ann.getByRole('dialog', { name: 'Propose a new link' });
+const composer = ann.getByRole('dialog', { name: 'Link a project' });
 for (let i = 0; ; i++) {
   await composer.getByLabel('Search by name').fill(titles[1]);
-  const hit = composer.locator('.search-result', { hasText: titles[1] });
+  const hit = composer.locator('.link-result', { hasText: titles[1] });
   if (await hit.waitFor({ timeout: 5000 }).then(() => true, () => false)) {
     await hit.click();
     break;
@@ -98,8 +98,9 @@ for (let i = 0; ; i++) {
   if (i >= 30) throw new Error('the other project never showed in search');
   await composer.getByLabel('Search by name').fill('');
 }
+await composer.getByRole('button', { name: 'Continue' }).click();
 await composer.getByLabel('Why are these linked?').fill('The cafe borrows the shed tools.');
-await composer.getByRole('button', { name: 'Create link vote' }).click();
+await composer.getByRole('button', { name: 'Propose link' }).click();
 await composer.waitFor({ state: 'hidden', timeout: 120_000 });
 await ann.locator('.request-stack .link-card', { hasText: titles[1] }).waitFor({ timeout: 60_000 });
 await voteOn(ann, '.request-stack', titles[1], 'Approve');

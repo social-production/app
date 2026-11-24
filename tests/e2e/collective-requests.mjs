@@ -89,7 +89,8 @@ async function press(page, name) {
 }
 
 // Requests start off (web's collective default); the members vote them on with a reason.
-await press(ann, 'Settings');
+await ann.getByRole('button', { name: 'More actions' }).click();
+await ann.getByRole('menuitem', { name: 'Service settings' }).click();
 await ann.getByRole('dialog', { name: 'Settings' }).getByRole('button', { name: /Request settings/ }).click();
 const settings = ann.getByRole('dialog', { name: 'Request settings' });
 await settings.getByLabel('Enable requests').check();

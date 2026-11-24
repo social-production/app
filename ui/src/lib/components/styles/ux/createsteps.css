@@ -168,7 +168,9 @@
   grid-template-columns: 44px 1fr auto;
 }
 
-.overlay-root.create-main .overlay-footer:has(.composer-dock) {
+/* A post has one Post button, at the top (owner, 2026-11-24: "one has separate buttons");
+   doubled classes beat sheetdock.css's footer grid. */
+.overlay-root.overlay-root.create-main .overlay-footer.overlay-footer:has(.composer-dock) {
   display: none;
 }
 

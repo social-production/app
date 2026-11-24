@@ -98,7 +98,8 @@ await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'th
 log('an edit passed with both founders and applied');
 
 await ann.reload();
-await ann.getByRole('button', { name: 'Update', exact: true }).click();
+await ann.getByRole('button', { name: 'More actions' }).click();
+await ann.getByRole('menuitem', { name: 'Post an update' }).click();
 await ann.locator('.update-sheet textarea').fill('First repair night went well.');
 await ann.getByRole('button', { name: 'Send to vote' }).click();
 await voteYes(bob);
