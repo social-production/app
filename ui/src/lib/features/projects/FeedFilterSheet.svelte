@@ -3,9 +3,14 @@
   import type { Snippet } from 'svelte';
 
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
-  import PillChoice from '#lib/components/PillChoice.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
-  import { FEED_SORTS, FEED_TYPES, FEED_WINDOWS, type FeedType } from '#lib/domain/feedTypes.ts';
+  import {
+    FEED_SORTS,
+    FEED_TYPES,
+    FEED_WINDOWS,
+    type FeedType,
+    type FeedTypes,
+  } from '#lib/domain/feedTypes.ts';
   import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
 
   /**
@@ -16,7 +21,7 @@
   interface Props {
     open: boolean;
     title: string;
-    type: FeedType;
+    type: FeedTypes;
     sort: FeedSort;
     window: FeedWindow;
     sorts?: { value: FeedSort; label: string }[];
@@ -55,12 +60,15 @@
     {#if before}{@render before()}{/if}
     <section>
       <h3>{t('Type')}</h3>
-      <PillChoice
-        value={type}
-        ariaLabel={t('Filter public feed')}
-        options={FEED_TYPES}
-        onChange={onType}
-      />
+      <!-- Several kinds at once; All on its own (owner, 2026-11-24). -->
+      <div class="pill-choice" role="group" aria-label={t('Filter public feed')}>
+        {#each FEED_TYPES as option (option.value)}
+          {@const on = option.value === 'all' ? type.length === 0 : type.includes(option.value)}
+          <button type="button" aria-pressed={on} class:on onclick={() => onType(option.value)}
+            >{t(option.label)}</button
+          >
+        {/each}
+      </div>
     </section>
     <section>
       <h3>{t('Order')}</h3>
