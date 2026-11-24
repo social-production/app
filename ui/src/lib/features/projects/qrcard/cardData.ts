@@ -11,12 +11,11 @@ import type { CardData } from './cardParts.ts';
 import { qrMatrix } from './qr.ts';
 
 /** The card's facts: the charter's title, first channel, type, summary and place, its page's
- * link as a QR code, and its picture, cover and the app's logo as loaded images. */
+ * link as a QR code, and its picture and the app's logo as loaded images. */
 export async function cardData(id: string, charter: Charter): Promise<CardData> {
   const url = new URL(spaceHref(charter.mode, id), location.origin).href;
-  const [picture, cover, logo] = await Promise.all([
+  const [picture, logo] = await Promise.all([
     charter.picture ? scopeImageUrl(charter.picture).then(loadImage, () => null) : null,
-    charter.cover ? scopeImageUrl(charter.cover).then(loadImage, () => null) : null,
     loadImage(brandLogo),
     loadFonts(),
   ]);
@@ -31,7 +30,6 @@ export async function cardData(id: string, charter: Charter): Promise<CardData> 
     url,
     qr: qrMatrix(url),
     picture,
-    cover,
     logo,
   };
 }

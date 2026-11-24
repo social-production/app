@@ -1,86 +1,54 @@
 import { t } from '#lib/i18n/index.ts';
 
-import { BRAND, INK, SOFT_INK, canvasOf, drawLines, font, wrapLines } from './canvasKit.ts';
-import { scanLine, drawBand, drawBrandRow, drawPicture, type CardData } from './cardParts.ts';
+import { canvasOf, drawLines, font, wrapLines } from './canvasKit.ts';
+import { scanLine, drawBrandRow, drawPicture, type CardData, type Paper } from './cardParts.ts';
 import { drawQr, drawQrPanel } from './qr.ts';
 
 /** Print sizes at 300 dpi. */
 export const MM = 300 / 25.4;
 
-/** The round sticker: 60 mm across with 3 mm of bleed, the cut line dashed (66 mm page). */
-export function stickerCard(data: CardData): HTMLCanvasElement {
-  const side = Math.round(66 * MM);
-  const [canvas, ctx] = canvasOf(side, side);
-  const c = side / 2;
-  ctx.fillStyle = '#ffffff';
-  ctx.fillRect(0, 0, side, side);
-  ctx.beginPath();
-  ctx.arc(c, c, side / 2, 0, Math.PI * 2);
-  ctx.fillStyle = BRAND;
-  ctx.fill();
-  ctx.beginPath();
-  ctx.arc(c, c, 30 * MM, 0, Math.PI * 2);
-  ctx.setLineDash([12, 10]);
-  ctx.lineWidth = 2;
-  ctx.strokeStyle = 'rgba(255,255,255,0.7)';
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#ffffff';
-  ctx.font = font(800, 2.6 * MM);
-  ctx.fillText(t('Scan to join').toUpperCase(), c, c - 13.5 * MM);
-  const qr = 24 * MM;
-  drawQrPanel(ctx, data.qr, [c - qr / 2, c - 11.5 * MM, qr], data.logo, 1.9 * MM, 3 * MM);
-  ctx.fillStyle = '#ffffff';
-  ctx.font = font(800, 3.6 * MM);
-  drawLines(ctx, wrapLines(ctx, data.title, 34 * MM, 2), c, c + 17 * MM, 3.9 * MM);
-  ctx.textAlign = 'left';
-  ctx.font = font(700, 1.9 * MM);
-  const label = ctx.measureText('Social Production').width;
-  const size = 3 * MM;
-  drawBrandRow(ctx, data, [c - (size * 1.25 + label) / 2, c + 25.5 * MM], size, '#ffffff', true);
-  return canvas;
-}
-
 /** One A6 flyer, 105 × 148 mm. */
-export function flyerCard(data: CardData): HTMLCanvasElement {
+export function flyerCard(data: CardData, paper: Paper): HTMLCanvasElement {
   const [w, h] = [Math.round(105 * MM), Math.round(148 * MM)];
   const [canvas, ctx] = canvasOf(w, h);
   const k = w / 840;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = paper.bg;
   ctx.fillRect(0, 0, w, h);
-  drawBand(ctx, data, [0, 0, w, 280 * k]);
-  drawPicture(ctx, data, [64 * k, 220 * k, 140 * k], 8 * k, '#ffffff');
-  ctx.fillStyle = SOFT_INK;
+  drawPicture(ctx, data, [64 * k, 64 * k, 140 * k], 0, paper.bg);
+  ctx.fillStyle = paper.soft;
   ctx.font = font(600, 26 * k);
-  ctx.fillText(data.kind, 228 * k, 344 * k);
-  ctx.fillStyle = INK;
+  ctx.fillText(wrapLines(ctx, data.kind, 520 * k, 1)[0] ?? '', 232 * k, 144 * k);
+  ctx.fillStyle = paper.ink;
   ctx.font = font(800, 72 * k);
-  let y = drawLines(ctx, wrapLines(ctx, data.title, 712 * k, 2), 64 * k, 460 * k, 76 * k);
-  ctx.fillStyle = '#3a3d42';
+  let y = drawLines(ctx, wrapLines(ctx, data.title, 712 * k, 3), 64 * k, 320 * k, 78 * k);
+  ctx.fillStyle = paper.body;
   ctx.font = font(400, 30 * k);
-  y = drawLines(ctx, wrapLines(ctx, data.summary, 712 * k, 4), 64 * k, y + 58 * k, 42 * k);
+  y = drawLines(ctx, wrapLines(ctx, data.summary, 712 * k, 5), 64 * k, y + 64 * k, 42 * k);
   if (data.place) {
     ctx.font = font(600, 26 * k);
     ctx.fillText(wrapLines(ctx, data.place, 712 * k, 1)[0] ?? '', 64 * k, y + 50 * k);
   }
-  flyerBand(ctx, data, k, h);
+  flyerBand(ctx, data, paper, [k, h]);
   return canvas;
 }
 
-function flyerBand(ctx: CanvasRenderingContext2D, data: CardData, k: number, h: number): void {
+function flyerBand(
+  ctx: CanvasRenderingContext2D,
+  data: CardData,
+  paper: Paper,
+  [k, h]: [number, number],
+): void {
   const top = h - 56 * k - 344 * k;
   ctx.beginPath();
   ctx.roundRect(64 * k, top, 712 * k, 344 * k, 32 * k);
-  ctx.fillStyle = '#eef5f1';
+  ctx.fillStyle = paper.tint;
   ctx.fill();
   drawQrPanel(ctx, data.qr, [96 * k, top + 32 * k, 280 * k], data.logo, 20 * k, 24 * k);
   const x = 410 * k;
-  ctx.fillStyle = BRAND;
+  ctx.fillStyle = paper.accent;
   ctx.font = font(800, 38 * k);
   const y = drawLines(ctx, wrapLines(ctx, scanLine(), 340 * k, 2), x, top + 90 * k, 44 * k);
-  ctx.fillStyle = '#3a3d42';
+  ctx.fillStyle = paper.body;
   ctx.font = font(400, 23 * k);
   const lines = wrapLines(
     ctx,
@@ -89,16 +57,16 @@ function flyerBand(ctx: CanvasRenderingContext2D, data: CardData, k: number, h: 
     4,
   );
   drawLines(ctx, lines, x, y + 46 * k, 32 * k);
-  drawBrandRow(ctx, data, [x, top + 344 * k - 58 * k], 52 * k, INK);
+  drawBrandRow(ctx, data, [x, top + 344 * k - 58 * k], 52 * k, paper.ink);
 }
 
 /** Four A6 flyers on an A4 page with crop marks at their corners. */
-export function flyerSheet(data: CardData): HTMLCanvasElement {
+export function flyerSheet(data: CardData, paper: Paper): HTMLCanvasElement {
   const [w, h] = [Math.round(210 * MM), Math.round(297 * MM)];
   const [canvas, ctx] = canvasOf(w, h);
   ctx.fillStyle = '#ffffff';
   ctx.fillRect(0, 0, w, h);
-  const one = flyerCard(data);
+  const one = flyerCard(data, paper);
   const fw = Math.round(105 * MM);
   const fh = Math.round(148 * MM);
   const top = Math.round((h - fh * 2) / 2);
@@ -138,18 +106,19 @@ export function plainQr(data: CardData): HTMLCanvasElement {
 }
 
 /** The code with the title and the logo under it, 1200 × 1500. */
-export function labelQr(data: CardData): HTMLCanvasElement {
+export function labelQr(data: CardData, paper: Paper): HTMLCanvasElement {
   const [canvas, ctx] = canvasOf(1200, 1500);
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = paper.bg;
   ctx.fillRect(0, 0, 1200, 1500);
-  drawQr(ctx, data.qr, [100, 100, 1000], data.logo);
+  if (paper.edge) drawQr(ctx, data.qr, [100, 100, 1000], data.logo);
+  else drawQrPanel(ctx, data.qr, [70, 70, 1060], data.logo, 30, 48);
   ctx.textAlign = 'center';
-  ctx.fillStyle = INK;
+  ctx.fillStyle = paper.ink;
   ctx.font = font(800, 76);
   drawLines(ctx, wrapLines(ctx, data.title, 1040, 2), 600, 1230, 84);
   ctx.textAlign = 'left';
   ctx.font = font(700, 40);
   const label = ctx.measureText('Social Production').width;
-  drawBrandRow(ctx, data, [600 - (86 * 1.25 + label) / 2, 1420], 86, BRAND);
+  drawBrandRow(ctx, data, [600 - (86 * 1.25 + label) / 2, 1420], 86, paper.accent);
   return canvas;
 }

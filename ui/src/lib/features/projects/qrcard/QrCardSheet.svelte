@@ -5,18 +5,19 @@
 
   import { cardData, saveFile } from './cardData.ts';
   import type { CardData } from './cardParts.ts';
-  import { FORMATS, cardFile, drawFormat, type CardFormat } from './formats.ts';
+  import { FORMATS, cardFile, drawFormat, type CardFormat, type CardStyle } from './formats.ts';
 
   import '#lib/components/styles/ux/qrcard.css';
 
   /**
    * Download a QR card (QR Share Cards mockup, owner 2026-11-24): pick a format, see it as it
    * will be saved, then download it (on phones, the share sheet's Save Image). QR code only
-   * also saves as SVG.
+   * also saves as SVG. Stickers come round or square; the others on white or dark paper.
    */
   let { id, charter, onClose }: { id: string; charter: Charter; onClose: () => void } = $props();
 
   let format = $state<CardFormat>('square');
+  let style = $state<CardStyle>({ dark: false, shape: 'round' });
   let data = $state<CardData | null>(null);
   let preview = $state('');
   let busy = $state(false);
@@ -31,7 +32,7 @@
 
   $effect(() => {
     if (!data) return;
-    preview = drawFormat(format, data).toDataURL('image/png');
+    preview = drawFormat(format, data, style).toDataURL('image/png');
   });
 
   const info = $derived(FORMATS.find((f) => f.id === format) ?? FORMATS[0]);
@@ -41,7 +42,7 @@
     busy = true;
     error = '';
     try {
-      const { blob, name } = await cardFile(format, data, svg);
+      const { blob, name } = await cardFile(format, data, style, svg);
       await saveFile(blob, name);
     } catch {
       error = t('The card could not be saved. Try again.');
@@ -70,6 +71,30 @@
       </button>
     {/each}
   </div>
+  {#if format === 'sticker'}
+    <div class="qr-switch" role="group" aria-label={t('Shape')}>
+      {#each ['round', 'square'] as const as shape (shape)}
+        <button
+          type="button"
+          aria-pressed={style.shape === shape}
+          onclick={() => (style = { ...style, shape })}
+          >{shape === 'round' ? t('Round') : t('Square')}</button
+        >
+      {/each}
+    </div>
+  {:else if info?.papers}
+    <div class="qr-switch" role="group" aria-label={t('Background')}>
+      {#each [false, true] as dark (dark)}
+        <button
+          type="button"
+          aria-pressed={style.dark === dark}
+          onclick={() => (style = { ...style, dark })}
+        >
+          <span class="qr-swatch" class:dark></span>{dark ? t('Dark') : t('White')}</button
+        >
+      {/each}
+    </div>
+  {/if}
   {#if format === 'qr'}
     <button
       class="qr-svg-link"
