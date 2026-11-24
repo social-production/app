@@ -1,9 +1,7 @@
-/* Feed rows' actions as the detail pages' soft pills (owner, 2026-11-24), left-aligned under
-   the row's text; the pills themselves are item.css's. */
+/* Feed rows' actions as the detail pages' soft pills (owner, 2026-11-24), under the row's
+   text; the pills and their spread are item.css's. */
 .shell .feed-actions.feed-pills {
-  justify-content: flex-start;
   gap: 8px;
-  max-width: none;
   margin: 10px 0 0;
 }
 
