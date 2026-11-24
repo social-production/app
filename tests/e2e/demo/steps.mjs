@@ -2,6 +2,7 @@
 // kind, channels and a community, written with realistic words for looking at the screens.
 import { BASE, TAG_SEARCH, addPlan, pickScopeTag } from '../lib.mjs';
 import { advance, until, voteYes } from '../event-flow.mjs';
+import { addArt } from './art.mjs';
 
 /** Founder one makes a channel (a taken handle means an earlier run made it). */
 export async function channel(page, handle, about) {
@@ -36,8 +37,9 @@ export async function community(page, handle, about) {
 }
 
 /** A new proposal in `tag`'s channel; returns its URL. */
-export async function propose(page, { title, text, tag, place }) {
+export async function propose(page, { title, text, tag, place, art }) {
   await page.goto(`${BASE}/create/project`);
+  if (art) await addArt(page, ...art);
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('What do you propose?').fill(text);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Tags

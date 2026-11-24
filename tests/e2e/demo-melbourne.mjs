@@ -67,6 +67,7 @@ await part('event: Edinburgh Gardens picnic', async () => {
     place: 'Edinburgh Gardens, Fitzroy North',
   });
   await s.approve(ann, bob, 'Picnic on the lawn');
+  await s.advancePast(ann, bob, 'Plan');
 });
 
 await part('project: Abbotsford compost hub', async () => {

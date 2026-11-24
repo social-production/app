@@ -72,6 +72,7 @@ const garden = { title: 'Elm Street community garden' };
 await part('a proposal that becomes a project', async () => {
   garden.url = await s.propose(ann, {
     ...garden,
+    art: ['🥕', 100],
     tag: 'gardening',
     place: 'Vacant lot, 14 Elm Street',
     text: 'Turn the empty lot on Elm Street into shared vegetable beds, with a compost bay and a tap.',
@@ -98,6 +99,7 @@ const bikes = { title: 'Saturday bike repair co-op' };
 await part('a proposal that becomes a service with requests', async () => {
   bikes.url = await s.propose(ann, {
     ...bikes,
+    art: ['🔧', 210],
     tag: 'bikes',
     place: 'Scout hall, Hope Lane',
     text: 'Volunteers fix neighbours’ bikes for free every Saturday, and teach you to do it yourself.',
@@ -144,6 +146,7 @@ const picnic = { title: 'Spring harvest picnic' };
 await part('a proposal that becomes an event', async () => {
   picnic.url = await s.propose(ann, {
     ...picnic,
+    art: ['🧺', 40],
     tag: 'gardening',
     place: 'Elm Street park',
     text: 'Bring a plate and something you grew. Music, seed swap and games for the kids.',
@@ -167,6 +170,7 @@ await part('two proposals still gathering support', async () => {
   const tools = { title: 'Tool library in the old scout hall' };
   tools.url = await s.propose(priya ?? ann, {
     ...tools,
+    art: ['🔨', 25],
     tag: 'neighbourhood',
     text: 'Borrow a drill, a ladder or a pressure washer instead of buying one. Donations welcome.',
   });
@@ -174,6 +178,7 @@ await part('two proposals still gathering support', async () => {
   const mural = { title: 'Street mural on Hope Lane' };
   mural.url = await s.propose(priya ?? bob, {
     ...mural,
+    art: ['🎨', 290],
     tag: 'neighbourhood',
     text: 'Local kids and artists paint the long grey wall by the station: a river of native birds.',
   });
