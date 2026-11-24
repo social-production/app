@@ -1,3 +1,4 @@
+import type { Stance } from './projects.ts';
 import type { ChatMessage } from './chat.ts';
 import type { Moderation } from './moderation.ts';
 
@@ -87,3 +88,11 @@ export function postTitle(body: string): string {
   const line = body.trim().split('\n')[0]?.trim() ?? '';
   return [...line].slice(0, 80).join('') || 'Post';
 }
+
+/** A comment's vote as the feed rows' VoteStrip shows it (owner, 2026-11-24). */
+export const stanceOf = (v: VoteDirection): Stance | null =>
+  v === 1 ? 'Demand' : v === -1 ? 'Oppose' : null;
+
+/** VoteStrip's choice as the comment vote it writes. */
+export const directionOf = (s: Stance | null): VoteDirection =>
+  s === 'Demand' ? 1 : s === 'Oppose' ? -1 : 0;

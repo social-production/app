@@ -9,18 +9,18 @@ const repliesUnder = (c: DiscussionComment): number =>
 function index(tree: DiscussionComment[], into: Map<string, CommentCounts>): void {
   for (const c of tree) {
     into.set(c.id, {
-      likes: Math.max(0, c.voteCount),
+      score: c.voteCount,
       replies: repliesUnder(c),
-      liked: c.activeVote === 1,
+      mine: c.activeVote,
     });
     index(c.replies, into);
   }
 }
 
 /**
- * Comments on threads and posts with their likes and replies, as the thread shows them
+ * Comments on threads and posts with their votes and replies, as the thread shows them
  * (owner, 2026-11-24: a profile's comments had neither). One read per thread; a thread that
- * can't be read leaves its comments without counts. Chat comments have no likes.
+ * can't be read leaves its comments without counts. Chat comments have no votes.
  */
 export async function withCounts(comments: CommentActivity[]): Promise<CommentActivity[]> {
   const spaces = [...new Set(comments.filter((c) => !inChat(c.space.mode)).map((c) => c.space.id))];

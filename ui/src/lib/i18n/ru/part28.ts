@@ -4,4 +4,5 @@ import type { Entry } from '../languages.ts';
 
 export const part28: Record<string, Entry> = {
   Replies: 'Ответы',
+  '{n} replies': { one: '{n} ответ', few: '{n} ответа', many: '{n} ответов' },
 };

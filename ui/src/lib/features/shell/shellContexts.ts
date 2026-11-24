@@ -32,6 +32,6 @@ export function provideShellContexts(): void {
   providePlaceOnMap({ show: (label, select) => openPlaceOnMap(label, null, select ?? null) });
   providePostPhotoSource({ list: postPhotos, url: postPhotoUrl });
   provideQuoteSource({ summary: quotedSpace });
-  provideCommentLike({ like: (space, message, on) => voteComment(space, message, on ? 1 : 0) });
+  provideCommentLike({ vote: voteComment });
   provideShareLink({ open: (subject) => (shareHost.subject = subject) });
 }

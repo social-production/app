@@ -2,15 +2,14 @@
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import SurfaceTypeLabel from '#lib/components/rail/SurfaceTypeLabel.svelte';
   import { inChat, spaceKind, type CommentActivity } from '#lib/domain/commentNotes.ts';
-  import { formatCompactCount } from '#lib/domain/count.ts';
   import { tagRef } from '#lib/domain/scopes.ts';
-  import { t } from '#lib/i18n/index.ts';
   import { describeUpdate, relativeCompact } from '#lib/domain/time.ts';
 
   import { resolve } from '$app/paths';
   import type { ResolvedPathname } from '$app/types';
 
   import { commentLike } from './commentLike.ts';
+  import CommentPills from './CommentPills.svelte';
   import FeedSurface from './FeedSurface.svelte';
   import { spaceHref } from './spaceHref.ts';
 
@@ -38,22 +37,9 @@
   );
   const scope = $derived(comment.space.tag ? tagRef(comment.space.tag).label : '');
 
-  // A thread's or post's comment shows its likes and replies, as in the thread (owner,
-  // 2026-11-24). The heart likes it here; the count follows at once.
-  const liker = commentLike();
-  let mine = $state<boolean | null>(null);
-  const liked = $derived(mine ?? comment.counts?.liked ?? false);
-  const likes = $derived(
-    (comment.counts?.likes ?? 0) +
-      (mine === null ? 0 : (mine ? 1 : 0) - (comment.counts?.liked ? 1 : 0)),
-  );
-  function like(event: MouseEvent): void {
-    event.preventDefault();
-    event.stopPropagation();
-    const next = !liked;
-    mine = next;
-    liker?.like(comment.space.id, comment.message, next).catch(() => (mine = !next));
-  }
+  // A thread's or post's comment carries the feed rows' replies · votes · share row (owner,
+  // 2026-11-24).
+  const voter = commentLike();
 </script>
 
 <div class="comment-activity-card">
@@ -84,41 +70,18 @@
         </a>
         {#if comment.counts}
           <div class="comment-activity-acts">
-            <button
-              class="comment-act like"
-              class:on={liked}
-              type="button"
-              aria-pressed={liked}
-              aria-label={liked ? t('Unlike') : t('Like')}
-              disabled={!liker}
-              onclick={like}
-            >
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <path
-                  d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"
-                  fill={liked ? 'currentColor' : 'none'}
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              {#if likes > 0}<span>{formatCompactCount(likes)}</span>{/if}
-            </button>
-            <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- built from spaceHref -->
-            <a class="comment-act" {href} aria-label={t('Replies')}>
-              <svg aria-hidden="true" viewBox="0 0 24 24">
-                <path
-                  d="M6 5.5h12a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-8l-4 3v-3A1.5 1.5 0 0 1 4.5 15V7A1.5 1.5 0 0 1 6 5.5Z"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.8"
-                  stroke-linejoin="round"
-                />
-              </svg>
-              {#if comment.counts.replies > 0}<span
-                  >{formatCompactCount(comment.counts.replies)}</span
-                >{/if}
-            </a>
+            <CommentPills
+              score={comment.counts.score}
+              mine={comment.counts.mine}
+              onVote={(direction) =>
+                voter
+                  ? voter.vote(comment.space.id, comment.message, direction)
+                  : Promise.reject(new Error('no voter'))}
+              replies={comment.counts.replies}
+              replyHref={href}
+              sharePath={href}
+              shareTitle={`${comment.authorName}: ${comment.excerpt}`}
+            />
           </div>
         {/if}
       </div>

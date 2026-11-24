@@ -69,6 +69,15 @@
     if (!signedIn) return onSignIn('Sign in to reply.');
     replying = { id, author };
     focus++;
+    // The comment being answered goes to the top of the screen, once the keyboard is up
+    // (owner, 2026-11-24).
+    setTimeout(
+      () =>
+        document
+          .getElementById(`comment-${id}`)
+          ?.scrollIntoView({ block: 'start', behavior: 'smooth' }),
+      350,
+    );
   }
 
   async function submit(): Promise<void> {
