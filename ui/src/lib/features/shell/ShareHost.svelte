@@ -26,6 +26,7 @@
     thread: 'Thread',
     post: 'Post',
     comment: 'Comment',
+    profile: 'Profile',
   } as const;
   let faces = $state<Contact[]>([]);
 

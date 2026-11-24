@@ -1,13 +1,10 @@
 <script lang="ts">
   import { placeOnMap } from '#lib/components/map/placeOnMap.ts';
-  import { t } from '#lib/i18n/index.ts';
   import type { Snippet } from 'svelte';
 
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
   import { displayName, type Person } from '#lib/domain/people.ts';
-
-  import { standingHint, standingLabel } from './standing.ts';
 
   /** The header of web's ProfilePage (classes styled by styles/profile.css). */
   interface Props {
@@ -19,9 +16,6 @@
     aside?: Snippet;
     /** Leading items of the count row (web's follower / following buttons). */
     counts?: Snippet;
-    /** web's standing chip is a button that opens the Trust sheet. */
-    trustOpen?: boolean;
-    onStanding?: () => void;
     /** The cover photo's URL (ADR 0107). */
     cover?: string | null;
     /** Your own profile: the cover and the photo get camera buttons. */
@@ -29,17 +23,7 @@
     onPhotoFile?: ((file: File) => void) | undefined;
   }
 
-  let {
-    person,
-    actions,
-    aside,
-    counts,
-    trustOpen = false,
-    onStanding,
-    cover = null,
-    onCoverFile,
-    onPhotoFile,
-  }: Props = $props();
+  let { person, actions, aside, counts, cover = null, onCoverFile, onPhotoFile }: Props = $props();
 
   const picked = (event: Event, then?: (file: File) => void): void => {
     const input = event.currentTarget as HTMLInputElement;
@@ -99,23 +83,6 @@
         <div class="hero-copy">
           <div class="name-row">
             <h1>{displayName(person)}</h1>
-            {#if onStanding}
-              <button
-                aria-expanded={trustOpen}
-                aria-label={`Standing: ${standingLabel(person)}`}
-                class="standing-chip"
-                class:paused={person.standing.level === 'Paused'}
-                title={standingHint(person)}
-                type="button"
-                onclick={onStanding}>{t(standingLabel(person))}</button
-              >
-            {:else}
-              <span
-                class="standing-chip"
-                class:paused={person.standing.level === 'Paused'}
-                title={standingHint(person)}>{t(standingLabel(person))}</span
-              >
-            {/if}
           </div>
           {#if person.profile?.bio}
             <p class="profile-bio">{person.profile.bio}</p>
@@ -142,7 +109,7 @@
               >{area}
             </a>
           {/if}
-          <!-- Followers and following only, as drawn; standing and vouches live in the chip's sheet. -->
+          <!-- Followers and following only, as drawn; standing and vouches live in the ⋮ menu's Trust sheet (owner, 2026-11-24). -->
           <div class="count-row">
             {@render counts?.()}
           </div>

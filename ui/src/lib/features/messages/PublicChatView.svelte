@@ -31,13 +31,11 @@
     chat: PublicChat;
     onBack: () => void;
     onRead: () => void;
-    /** web's header menu (Mute). */
-    onMenu: (x: number, y: number) => void;
     /** Pin or mute from the chat's page. */
     onPrefs: (prefs: ListPrefs) => void;
   }
 
-  let { chat, onBack, onRead, onMenu, onPrefs }: Props = $props();
+  let { chat, onBack, onRead, onPrefs }: Props = $props();
 
   // The page keys this view by chat, so the first id is the one to keep.
   // svelte-ignore state_referenced_locally
@@ -178,9 +176,8 @@
       <button
         class="avatar-hit"
         type="button"
-        aria-label={t('Chat options')}
-        title={t('Chat options')}
-        onclick={(event) => onMenu(event.clientX, event.clientY)}
+        aria-label={`About ${chat.title}`}
+        onclick={() => void openAbout()}
       >
         <AvatarBadge size="md" name={chat.title} />
       </button>
@@ -226,7 +223,6 @@
     fileUrl={talk.fileUrl}
     space={{ mode: chat.mode, href: pageHref }}
     onBack={() => (about = false)}
-    {onMenu}
     onCall={() => undefined}
     {onPrefs}
     onEditGroup={() => undefined}

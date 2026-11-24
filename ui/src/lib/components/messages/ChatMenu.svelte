@@ -7,6 +7,9 @@
     href?: string;
     danger?: boolean;
     onSelect?: () => void;
+    /** Greyed: shown with `hint`, the reason it can't be used yet. */
+    disabled?: boolean;
+    hint?: string;
   }
 </script>
 
@@ -69,10 +72,14 @@
   {:else}
     <button
       class:menu-danger={item.danger}
+      class:menu-hinted={!!item.hint}
+      disabled={item.disabled}
       type="button"
       role="menuitem"
       onclick={() => select(item)}
-      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{t(item.label)}</button
+      >{#if item.icon}<ToolbarIcon name={item.icon} />{/if}{#if item.hint}<span class="menu-copy"
+          ><span>{t(item.label)}</span><small>{item.hint}</small></span
+        >{:else}{t(item.label)}{/if}</button
     >
   {/if}
 {/snippet}

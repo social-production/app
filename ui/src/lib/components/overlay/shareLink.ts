@@ -4,7 +4,8 @@ import { getContext, setContext } from 'svelte';
  * Share on cards and comments opens the app's one share sheet (Owner Notes Mockups §6).
  * Components stay presentational (CODE_RULES): the shell provides it.
  */
-export type ShareKind = 'project' | 'event' | 'help request' | 'thread' | 'post' | 'comment';
+export type ShareKind =
+  'project' | 'event' | 'help request' | 'thread' | 'post' | 'comment' | 'profile';
 
 export interface ShareSubject {
   kind: ShareKind;
