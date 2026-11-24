@@ -119,23 +119,26 @@
 
 <div class="project-overview">
   <div class="context-panel">
-    <SpaceArtHeader picture={charter.picture} cover={charter.cover} />
-    <FeedCardTop
-      mode={charter.mode}
-      tags={charter.tags}
-      stage={project.stage}
-      isPrivate={project.audience !== 'public'}
-      createdAt={project.createdAt}
-    >
-      <ReportControl
-        id={project.id}
-        itemLabel={event ? 'event' : 'project'}
-        {moderation}
-        owner={project.creator}
-        copyUrl={`${location.origin}${location.pathname}`}
-        onChange={onModeration}
-      />
-    </FeedCardTop>
+    <div class="space-head" class:has-cover={!!charter.cover}>
+      <SpaceArtHeader cover={charter.cover} />
+      <FeedCardTop
+        picture={charter.picture ?? null}
+        mode={charter.mode}
+        tags={charter.tags}
+        stage={project.stage}
+        isPrivate={project.audience !== 'public'}
+        createdAt={project.createdAt}
+      >
+        <ReportControl
+          id={project.id}
+          itemLabel={event ? 'event' : 'project'}
+          {moderation}
+          owner={project.creator}
+          copyUrl={`${location.origin}${location.pathname}`}
+          onChange={onModeration}
+        />
+      </FeedCardTop>
+    </div>
     <div class="heading overview-heading">
       <RestrictionNotice active={isHidden(moderation)}>
         <h1>{charter.title}</h1>
