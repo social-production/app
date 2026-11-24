@@ -118,6 +118,11 @@
   height: 18px;
 }
 
+/* Full screen means the page all but gone behind the photo (owner, 2026-11-24). */
+.photo-viewer .scrim {
+  background: rgba(0, 0, 0, 0.94);
+}
+
 /* The viewer with several photos and a footer (Profiles and Comments mockups §5). */
 .photo-viewer .photo-count {
   position: absolute;

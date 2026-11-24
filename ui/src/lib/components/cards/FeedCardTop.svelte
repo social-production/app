@@ -40,6 +40,7 @@
     updatedAt = null,
     distanceKm = null,
     picture = null,
+    onPicture,
     children,
   }: {
     tags: string[];
@@ -52,6 +53,8 @@
     distanceKm?: number | null;
     /** A project's or event's picture hash (ADR 0117): the row's tile instead of the type. */
     picture?: string | null;
+    /** A detail page's header: the picture opens full screen. */
+    onPicture?: (() => void) | undefined;
     children?: Snippet;
   } = $props();
   const spacePicture = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
@@ -122,13 +125,22 @@
 {#if lead && mode}
   <!-- A feed row (ADR 0102): the type's glyph, the channel in bold, then type · phase · clock. -->
   <div class="feed-card-top feed-lead">
-    <span class="feed-lead-glyph"
-      >{#if pictureUrl}<img
-          class="feed-lead-picture"
-          src={pictureUrl}
-          alt=""
-        />{:else}<SurfaceTypeLabel projectMode={mode} feedGlyph />{/if}</span
-    >
+    {#if pictureUrl && onPicture}
+      <button
+        class="feed-lead-glyph"
+        type="button"
+        aria-label={t('View picture')}
+        onclick={onPicture}><img class="feed-lead-picture" src={pictureUrl} alt="" /></button
+      >
+    {:else}
+      <span class="feed-lead-glyph"
+        >{#if pictureUrl}<img
+            class="feed-lead-picture"
+            src={pictureUrl}
+            alt=""
+          />{:else}<SurfaceTypeLabel projectMode={mode} feedGlyph />{/if}</span
+      >
+    {/if}
     <div class="feed-lead-copy">
       {#if tags.length > 0}
         <div class="feed-lead-tags">{@render tagList()}</div>
