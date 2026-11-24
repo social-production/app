@@ -25,7 +25,7 @@ export async function pickPlace(page, field, query) {
 export async function placedProposal(page, { title, text, tag, place, art }) {
   await page.goto(`${BASE}/create/project`);
   if (art) await addArt(page, ...art);
-  await page.getByLabel('Title').fill(title);
+  await page.getByLabel(/^Title/).first().fill(title);
   await page.getByLabel('What do you propose?').fill(text);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Tags
   await pickScopeTag(page, TAG_SEARCH, tag);
@@ -69,10 +69,10 @@ export async function placedEventPlan(page, { title, date, start, finish, place 
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
   await addPlan(page, 'Event plan');
-  const wizard = page.getByRole('dialog', { name: /^Create event plan$/i });
-  const next = () => wizard.getByRole('button', { name: 'Next' }).click();
-  await wizard.getByPlaceholder('Plan title').fill(title);
-  await wizard.getByPlaceholder('Describe the plan').fill('Bring a rug and something to share.');
+  const wizard = page.getByRole('dialog', { name: /^Event plan$/i });
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel(/^Title/).first().fill(title);
+  await wizard.getByLabel(/^Description/).first().fill('Bring a rug and something to share.');
   await next(); // → schedule mode
   await next(); // → date
   await wizard.getByLabel('Date').fill(date);
@@ -82,11 +82,34 @@ export async function placedEventPlan(page, { title, date, start, finish, place 
   await next(); // → place
   await pickPlace(page, wizard.getByRole('textbox', { name: 'Place' }), place);
   await next();
-  await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Everyone is welcome.');
+  await wizard.getByLabel('Support it answers').fill('Everyone is welcome.');
   await next();
-  await wizard.getByPlaceholder('Stage title').fill('Lunch');
+  await wizard.getByPlaceholder('Harvest Friday').fill('Lunch');
   await wizard.getByPlaceholder('What happens in this stage?').fill('Share food on the lawn.');
   await next(); // → review
-  await wizard.getByRole('button', { name: /^Submit event plan$/i }).click();
+  await wizard.getByRole('button', { name: 'Propose plan' }).click();
+  await page.locator('.plan-card', { hasText: title }).waitFor({ timeout: 60_000 });
+}
+
+/** A meetup plan (ADR 0119): Thursdays at `start`, at a picked place. */
+export async function placedMeetupPlan(page, { title, about, start, place }) {
+  await page.reload();
+  await page.getByRole('tab', { name: 'Participation' }).click();
+  await addPlan(page, 'Meetup plan');
+  const wizard = page.getByRole('dialog', { name: /^Meetup plan$/i });
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel(/^Title/).first().fill(title);
+  await wizard.getByLabel(/^Description/).first().fill(about);
+  await next(); // → how do you meet (On a regular day, Thursdays)
+  await wizard.getByLabel('From').fill(start);
+  await next(); // → place
+  await pickPlace(page, wizard.getByRole('textbox', { name: 'Place' }), place);
+  await next();
+  await wizard.getByLabel('Support it answers').fill('Everyone who plays is welcome.');
+  await next();
+  await wizard.getByPlaceholder('Harvest Friday').fill('Warm up and pick teams');
+  await wizard.getByPlaceholder('What happens in this stage?').fill('Shoot around, then split into teams of five.');
+  await next(); // → review
+  await wizard.getByRole('button', { name: 'Propose plan' }).click();
   await page.locator('.plan-card', { hasText: title }).waitFor({ timeout: 60_000 });
 }

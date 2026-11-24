@@ -7,7 +7,7 @@
 import { log } from './lib.mjs';
 import { advanceTo, createEvent, daysFromNow, signInFounders } from './event-flow.mjs';
 import * as s from './demo/steps.mjs';
-import { placedEventPlan, placedHelpRequest, placedProposal } from './demo/places.mjs';
+import { placedEventPlan, placedHelpRequest, placedMeetupPlan, placedProposal } from './demo/places.mjs';
 
 const failed = [];
 // DEMO_SKIP: comma-separated words; parts whose names contain one are skipped (what a first
@@ -67,6 +67,20 @@ await part('event: Edinburgh Gardens picnic', async () => {
     place: 'Edinburgh Gardens, Fitzroy North',
   });
   await s.approve(ann, bob, 'Picnic on the lawn');
+  await s.advancePast(ann, bob, 'Plan');
+});
+
+await part('meetup: Thursday pickup basketball', async () => {
+  const title = 'Thursday pickup basketball';
+  await createEvent(ann, bob, title, ['🏀', 20]);
+  await advanceTo(ann, bob, 'Plan');
+  await placedMeetupPlan(ann, {
+    title: 'Pickup at the Edinburgh Gardens courts',
+    about: 'Turn up, shoot around, play to 21. All levels; bring water.',
+    start: '18:00',
+    place: 'Edinburgh Gardens, Fitzroy North',
+  });
+  await s.approve(ann, bob, 'Pickup at the Edinburgh Gardens courts');
   await s.advancePast(ann, bob, 'Plan');
 });
 

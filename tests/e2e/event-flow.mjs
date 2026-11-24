@@ -27,7 +27,7 @@ export async function createEvent(ann, bob, title, art) {
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
   await ann.getByRole('menuitem', { name: /Proposal/ }).click();
   if (art) await addArt(ann, ...art);
-  await ann.getByLabel('Title').fill(title);
+  await ann.getByLabel(/^Title/).first().fill(title);
   await ann.getByLabel('What do you propose?').fill('Weed, mulch and share lunch.');
   await continueSteps(ann, 3);
   await ann.getByRole('button', { name: 'Publish proposal' }).click();
@@ -106,8 +106,8 @@ export async function filePlan(page, { title, date, range, start, finish, place 
   await addPlan(page, 'Event plan');
   const wizard = page.getByRole('dialog', { name: /^Event plan$/i });
   const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
-  await wizard.getByLabel('Title').fill(title);
-  await wizard.getByLabel('Description').fill('Tools out at nine, lunch at noon.');
+  await wizard.getByLabel(/^Title/).first().fill(title);
+  await wizard.getByLabel(/^Description/).first().fill('Tools out at nine, lunch at noon.');
   await next(); // → schedule mode
   if (range) await wizard.getByLabel('Date range').check();
   await next(); // → date(s)

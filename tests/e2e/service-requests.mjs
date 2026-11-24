@@ -22,7 +22,7 @@ const ask = `Fix my flat ${stamp}`;
 
 const { ann, bob } = await signInFounders(phone);
 await ann.goto(`${BASE}/create/project`);
-await ann.getByLabel('Title').fill(title);
+await ann.getByLabel(/^Title/).first().fill(title);
 await ann.getByLabel('What do you propose?').fill('We fix bikes on weekends.');
 await continueSteps(ann, 3);
 await ann.getByRole('button', { name: 'Publish proposal' }).click();
@@ -43,8 +43,8 @@ await ann.getByRole('tab', { name: 'Participation' }).click();
 await addPlan(ann, 'Operations plan');
 const wizard = ann.getByRole('dialog', { name: 'Operations plan' });
 const nextPlan = () => wizard.getByRole('button', { name: 'Continue' }).click();
-await wizard.getByLabel('Title').fill(planTitle);
-await wizard.getByLabel('Description').fill('Open the shed on weekends.');
+await wizard.getByLabel(/^Title/).first().fill(planTitle);
+await wizard.getByLabel(/^Description/).first().fill('Open the shed on weekends.');
 await nextPlan(); // → plan type
 await nextPlan(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('The shed');

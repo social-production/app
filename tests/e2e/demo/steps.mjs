@@ -40,7 +40,7 @@ export async function community(page, handle, about) {
 export async function propose(page, { title, text, tag, place, art }) {
   await page.goto(`${BASE}/create/project`);
   if (art) await addArt(page, ...art);
-  await page.getByLabel('Title').fill(title);
+  await page.getByLabel(/^Title/).first().fill(title);
   await page.getByLabel('What do you propose?').fill(text);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Tags
   await pickScopeTag(page, TAG_SEARCH, tag);
@@ -82,13 +82,13 @@ export async function advancePast(ann, bob, from) {
 
 /** Plan wizard steps every kind shares after its own: support, one stage, review, submit. */
 async function finishPlan(page, wizard, kind, { why, step, detail }) {
-  const next = () => wizard.getByRole('button', { name: 'Next' }).click();
-  await wizard.getByPlaceholder('Explain how this plan responds to support').fill(why);
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel('Support it answers').fill(why);
   await next();
-  await wizard.getByPlaceholder('Stage title').fill(step);
+  await wizard.getByPlaceholder('Harvest Friday').fill(step);
   await wizard.getByPlaceholder('What happens in this stage?').fill(detail);
   await next(); // → review
-  await wizard.getByRole('button', { name: new RegExp(`^Submit ${kind}$`, 'i') }).click();
+  await wizard.getByRole('button', { name: 'Propose plan' }).click();
 }
 
 /** A production plan (makes the proposal a project). */
@@ -96,10 +96,10 @@ export async function productionPlan(page, plan) {
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
   await addPlan(page, 'Production plan');
-  const wizard = page.getByRole('dialog', { name: 'Create Production Plan' });
-  const next = () => wizard.getByRole('button', { name: 'Next' }).click();
-  await wizard.getByPlaceholder('Plan title').fill(plan.title);
-  await wizard.getByPlaceholder('Describe the plan').fill(plan.about);
+  const wizard = page.getByRole('dialog', { name: 'Production plan' });
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel(/^Title/).first().fill(plan.title);
+  await wizard.getByLabel(/^Description/).first().fill(plan.about);
   await next(); // → plan type
   await next(); // → location
   await wizard.getByRole('textbox', { name: 'Place' }).fill(plan.place);
@@ -113,15 +113,15 @@ export async function operationsPlan(page, plan) {
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
   await addPlan(page, 'Operations plan');
-  const wizard = page.getByRole('dialog', { name: 'Create Operations Plan' });
-  const next = () => wizard.getByRole('button', { name: 'Next' }).click();
-  await wizard.getByPlaceholder('Plan title').fill(plan.title);
-  await wizard.getByPlaceholder('Describe the plan').fill(plan.about);
+  const wizard = page.getByRole('dialog', { name: 'Operations plan' });
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel(/^Title/).first().fill(plan.title);
+  await wizard.getByLabel(/^Description/).first().fill(plan.about);
   await next(); // → plan type
   await next(); // → location
   await wizard.getByRole('textbox', { name: 'Place' }).fill(plan.place);
   await next(); // → requests
-  await wizard.getByLabel('Requests').selectOption({ index: 1 });
+  await wizard.getByRole('radiogroup', { name: 'Requests' }).locator('label').nth(1).locator('input').check();
   await next();
   await finishPlan(page, wizard, 'Operations Plan', plan);
   await page.locator('.plan-card', { hasText: plan.title }).waitFor({ timeout: 60_000 });
