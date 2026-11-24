@@ -1,0 +1,147 @@
+/* The crop screen (Edit, Plan and Meetup mockups §A, owner 2026-11-24): dark, full screen
+   above every sheet, the frame in the middle with the rest dimmed, a zoom slider and Done.
+   Portaled to <body>, so its rules don't start with `.shell`. */
+.cropper {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+    env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+  background: #0c0d0c;
+  color: #ffffff;
+  font-family: inherit;
+}
+
+.cropper-top {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  padding: 8px 8px 0;
+  text-align: center;
+  font-size: 16px;
+}
+
+.cropper-close {
+  width: 44px;
+  height: 44px;
+  border: none;
+  background: none;
+  color: #ffffff;
+  font-size: 26px;
+  cursor: pointer;
+}
+
+.cropper-stage {
+  position: relative;
+  align-self: center;
+  width: min(88vw, 520px);
+  margin: auto 0;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.62);
+  outline: 2px solid #ffffff;
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.cropper-stage.wide {
+  aspect-ratio: 3 / 1;
+}
+
+.cropper-stage.round {
+  width: min(70vw, 340px);
+  aspect-ratio: 1;
+  border-radius: 24%;
+}
+
+.cropper-stage img {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  max-width: none;
+  height: auto;
+  pointer-events: none;
+}
+
+.cropper-grid {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      90deg,
+      transparent calc(33.33% - 0.5px),
+      rgba(255, 255, 255, 0.35) 0 calc(33.33% + 0.5px),
+      transparent 0 calc(66.66% - 0.5px),
+      rgba(255, 255, 255, 0.35) 0 calc(66.66% + 0.5px),
+      transparent 0
+    ),
+    linear-gradient(
+      transparent calc(33.33% - 0.5px),
+      rgba(255, 255, 255, 0.35) 0 calc(33.33% + 0.5px),
+      transparent 0 calc(66.66% - 0.5px),
+      rgba(255, 255, 255, 0.35) 0 calc(66.66% + 0.5px),
+      transparent 0
+    );
+  pointer-events: none;
+}
+
+.cropper-hint {
+  position: relative;
+  margin: 0 0 6px;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 13px;
+  text-align: center;
+}
+
+.cropper-zoom {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 28px;
+  font-size: 18px;
+}
+
+.cropper-zoom input {
+  flex: 1;
+  accent-color: #5cc290;
+}
+
+.cropper-actions {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 20px;
+}
+
+.cropper-actions button {
+  min-height: 44px;
+  border: none;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.cropper-replace {
+  padding: 0 4px;
+  background: none;
+  color: #ffffff;
+}
+
+.cropper-done {
+  padding: 0 26px;
+  background: #5cc290;
+  color: #0d1a13;
+}
+
+.cropper-done:disabled {
+  opacity: 0.5;
+}
