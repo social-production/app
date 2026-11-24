@@ -4,6 +4,7 @@
 import { readFileSync } from 'node:fs';
 
 import { BASE, addPlan, continueSteps, device, log, phraseSignIn, reviewPlan } from './lib.mjs';
+import { addArt } from './demo/art.mjs';
 
 export const founders = () =>
   JSON.parse(readFileSync(new URL('./fixtures/dev-founders.json', import.meta.url)));
@@ -21,10 +22,11 @@ export async function signInFounders(viewport) {
 /** Founder one proposes what becomes a public event once an event plan leads it out of its
  * Plan phase (ADR 0059: public events start as typeless proposals) and supports it; founder
  * two joins and supports it. Returns its URL. */
-export async function createEvent(ann, bob, title) {
+export async function createEvent(ann, bob, title, art) {
   await ann.goto(BASE);
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
   await ann.getByRole('menuitem', { name: /Proposal/ }).click();
+  if (art) await addArt(ann, ...art);
   await ann.getByLabel('Title').fill(title);
   await ann.getByLabel('What do you propose?').fill('Weed, mulch and share lunch.');
   await continueSteps(ann, 3);

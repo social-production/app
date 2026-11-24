@@ -28,19 +28,19 @@ async function part(name, run) {
 const { ann, bob } = await signInFounders({ width: 390, height: 844 });
 
 const proposals = [
-  ['Fitzroy repair café', 'neighbourhood', 'Fitzroy Town Hall', 'Bring a broken toaster, lamp or jacket; volunteers fix it with you.'],
-  ['Brunswick seed library', 'gardening', 'Brunswick Library', 'Swap saved seeds from your garden; take some, leave some.'],
-  ['Carlton laneway mural', 'neighbourhood', 'Argyle Square, Carlton', 'Paint the grey wall behind the square with a mural local kids design.'],
-  ['Collingwood tool shed', 'neighbourhood', 'Collingwood Childrens Farm', 'A shared shed of ladders, drills and wheelbarrows to borrow.'],
-  ['Richmond bike lanes count', 'bikes', 'Richmond Station', 'Count riders on Swan Street for a week to show the council the need.'],
-  ['St Kilda beach clean-up crew', 'neighbourhood', 'St Kilda Pier', 'A monthly Sunday morning clean-up of the foreshore, gloves provided.'],
-  ['Footscray community kitchen', 'neighbourhood', 'Footscray Market', 'Cook big batches together once a week and share them with anyone.'],
-  ['Northcote pollinator strip', 'gardening', 'Ruckers Hill, Northcote', 'Plant native flowers along the nature strip for bees and butterflies.'],
-  ['Coburg kids bike library', 'bikes', 'Coburg Lake Reserve', 'Outgrown kids bikes, fixed up and lent to the next family.'],
+  ['Fitzroy repair café', ['🔧', 28], 'neighbourhood', 'Fitzroy Town Hall', 'Bring a broken toaster, lamp or jacket; volunteers fix it with you.'],
+  ['Brunswick seed library', ['🌱', 110], 'gardening', 'Brunswick Library', 'Swap saved seeds from your garden; take some, leave some.'],
+  ['Carlton laneway mural', ['🎨', 300], 'neighbourhood', 'Argyle Square, Carlton', 'Paint the grey wall behind the square with a mural local kids design.'],
+  ['Collingwood tool shed', ['🪜', 35], 'neighbourhood', 'Collingwood Childrens Farm', 'A shared shed of ladders, drills and wheelbarrows to borrow.'],
+  ['Richmond bike lanes count', ['🚲', 200], 'bikes', 'Richmond Station', 'Count riders on Swan Street for a week to show the council the need.'],
+  ['St Kilda beach clean-up crew', ['🌊', 190], 'neighbourhood', 'St Kilda Pier', 'A monthly Sunday morning clean-up of the foreshore, gloves provided.'],
+  ['Footscray community kitchen', ['🍲', 15], 'neighbourhood', 'Footscray Market', 'Cook big batches together once a week and share them with anyone.'],
+  ['Northcote pollinator strip', ['🐝', 50], 'gardening', 'Ruckers Hill, Northcote', 'Plant native flowers along the nature strip for bees and butterflies.'],
+  ['Coburg kids bike library', ['🚴', 260], 'bikes', 'Coburg Lake Reserve', 'Outgrown kids bikes, fixed up and lent to the next family.'],
 ];
 
-for (const [title, tag, place, text] of proposals) {
-  await part(`proposal: ${title}`, () => placedProposal(ann, { title, tag, place, text }));
+for (const [title, art, tag, place, text] of proposals) {
+  await part(`proposal: ${title}`, () => placedProposal(ann, { title, art, tag, place, text }));
 }
 
 const requests = [
@@ -56,7 +56,7 @@ for (const [title, tag, place, roles] of requests) {
 
 await part('event: Edinburgh Gardens picnic', async () => {
   const title = 'Edinburgh Gardens spring picnic';
-  const url = await createEvent(ann, bob, title);
+  const url = await createEvent(ann, bob, title, ['🧺', 95]);
   await advanceTo(ann, bob, 'Plan');
   await ann.goto(url);
   await placedEventPlan(ann, {
@@ -73,6 +73,7 @@ await part('project: Abbotsford compost hub', async () => {
   const title = 'Abbotsford compost hub';
   const url = await placedProposal(ann, {
     title,
+    art: ['♻️', 130],
     tag: 'gardening',
     place: 'Abbotsford Convent',
     text: 'Three big compost bays for the street’s food scraps, turned every Sunday.',
