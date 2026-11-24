@@ -41,21 +41,21 @@ log('the founders moved the proposal to its Plan phase');
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await addPlan(ann, 'Operations plan');
-const wizard = ann.getByRole('dialog', { name: 'Create Operations Plan' });
-const nextPlan = () => wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Plan title').fill(planTitle);
-await wizard.getByPlaceholder('Describe the plan').fill('Open the shed on Thursday evenings.');
+const wizard = ann.getByRole('dialog', { name: 'Operations plan' });
+const nextPlan = () => wizard.getByRole('button', { name: 'Continue' }).click();
+await wizard.getByLabel('Title').fill(planTitle);
+await wizard.getByLabel('Description').fill('Open the shed on Thursday evenings.');
 await nextPlan(); // → plan type
 await nextPlan(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('The shed');
 await nextPlan(); // → requests (left off: the members vote them on below)
 await nextPlan();
-await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Both of us asked.');
+await wizard.getByLabel('Support it answers').fill('Both of us asked.');
 await nextPlan();
-await wizard.getByPlaceholder('Stage title').fill('Open the shed');
+await wizard.getByPlaceholder('Harvest Friday').fill('Open the shed');
 await wizard.getByPlaceholder('What happens in this stage?').fill('Unlock and set out tools.');
 await nextPlan();
-await wizard.getByRole('button', { name: 'Submit Operations Plan' }).click();
+await wizard.getByRole('button', { name: 'Propose plan' }).click();
 await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
 
 /** Rate every criterion "Support" and vote Yes; waits for `yes` votes on the card. */
