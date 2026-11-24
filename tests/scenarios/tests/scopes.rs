@@ -64,8 +64,8 @@ async fn members(net: &Net, i: usize) -> Vec<AgentPubKey> {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn members_vote_someone_out_of_a_channel() {
-    // Agents 0–2 are founders (Full); agent 3 is New. Agent 0 creates #food. Only the 3 Full
-    // members are counted (ADR 0116), and 3 of 3 must vote (sp_governance quorum).
+    // Agents 0–2 are founders (Full); agent 3 is New. Agent 0 creates #food. All 4 members are
+    // counted (ADR 0118), and 3 of 4 must vote (sp_governance quorum).
     let net = Net::with_charter(4, 3, "scopes", scope("channel", "Food", "open")).await;
     assert_eq!(members(&net, 0).await.len(), 4);
 

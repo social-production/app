@@ -12,9 +12,9 @@ use crate::reads::{self, Found};
 use crate::roll::Roll;
 use crate::{calls, link_write, moves, plan_write, software};
 
-/// Why someone without Full standing can't propose or vote (ADR 0116).
+/// Why someone can't propose or vote: only an account found to be a bot (ADR 0118).
 pub const NOT_FULL: &str =
-    "Only Full members vote. You get Full standing from two vouches by Full members, or steady activity.";
+    "A community review found this account is a bot, so it can't vote or propose.";
 
 pub fn guest(message: impl Into<String>) -> WasmError {
     wasm_error!(WasmErrorInner::Guest(message.into()))
@@ -72,7 +72,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         kind,
         ProposalKind::Plan(_) | ProposalKind::Return { .. } | ProposalKind::Software(_)
     );
-    // The count is of Full members only, since only they vote (ADR 0116).
+    // The count leaves out accounts found to be bots, whose votes don't count (ADR 0118).
     let mut members = Vec::new();
     for hash in calls::member_snapshot()? {
         let full = match roll.agent(&hash)? {
@@ -169,14 +169,14 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
     let me = agent_info()?.agent_initial_pubkey;
     let membership = calls::my_membership()?;
     if membership.is_none() {
-        // A #platform project takes any Full member's vote (ADR 0109).
+        // A #platform project takes anyone's vote (ADR 0109, 0118).
         let platform = calls::base_charter()?
             .is_some_and(|c| c.tags.iter().any(|t| sp_scope::is_platform_tag(t)));
         if !platform {
             return Err(guest("Join the project to vote."));
         }
         if !calls::full_before(&me, sys_time()?)? {
-            return Err(guest("Only Full members vote on #platform projects."));
+            return Err(guest(NOT_FULL));
         }
     }
     if reads::votes(&proposal)?.iter().any(|v| v.author == me) || voted_locally(&proposal)? {
@@ -184,7 +184,7 @@ pub fn vote(proposal: ActionHash, choice: VoteChoice) -> ExternResult<ActionHash
     }
     let found = reads::proposal(&proposal)?
         .ok_or_else(|| guest("This proposal hasn't reached your node yet."))?;
-    // Only Full members vote (ADR 0116): a New member's vote would never count (ADR 0033).
+    // Everyone votes but accounts found to be bots (ADR 0118), whose votes never count.
     if membership.is_some() && !calls::full_before(&me, found.at)? {
         return Err(guest(NOT_FULL));
     }

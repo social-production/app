@@ -1,6 +1,6 @@
 # 0116 Only Full members vote, and only they are counted
 
-Status: accepted (owner, 2026-11-24)
+Status: superseded by 0118 (owner, 2026-11-24: everyone votes)
 
 ## Context
 ADR 0033 let anyone who was a member vote, then applied a decision only if the recount of

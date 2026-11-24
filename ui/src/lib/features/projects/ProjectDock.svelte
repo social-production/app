@@ -88,7 +88,7 @@
           stage={project.stage}
           phaseLabel={detail.phaseLabel}
           onVote={(p, c) => detail.vote(p, c)}
-          newVoter={detail.viewerFull === false}
+          newVoter={detail.viewerVotes === false}
           reveal={revealVote}
           {onRevealDone}
         />

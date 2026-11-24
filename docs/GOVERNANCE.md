@@ -31,17 +31,19 @@ Outcome  { proposal, votes: [ActionHash], result }    authored by ANY member
 A vote counts when the voter:
 
 1. is a **member** of the project (joining is instant and open: ADR 0006), and
-2. holds **full standing granted before the proposal was created**.
+2. had **not been found to be a bot** (paused by a bot review, ADR 0074) when the proposal was
+   created.
 
-Rule 2 is platform-wide (from the directory DNA), so brand-new projects can vote at once,
-while accounts created after a proposal opens cannot swing it.
-
-Since ADR 0116 a New member can't cast a vote or propose one at all, and the member snapshot
-(N) lists only Full members, so New members never make a decision harder to reach.
+Since ADR 0118 everyone votes from their first day with the same weight (this replaced ADR
+0116, which let only Full members vote). The member snapshot (N) lists every member not
+paused.
 
 ## Standing (ADR 0007)
 
-Levels: `New → Full`, or `Paused` (bot review). Only **Full** votes count. (FastAPI's "warm" step
+Levels: `New → Full`, or `Paused` (bot review). Since ADR 0118, Full and New are labels with
+no weight: everyone votes, and only `Paused` loses it. Full still decides who can vouch and
+who can mark an account as a bot (ADR 0118), and
+New members may start 2 projects a week (both are integrity rules). (FastAPI's "warm" step
 is dropped: M1 plan, docs/plans/M1-identity.md.)
 
 There is no live counting. A level is held through a **`StandingGrant`** that **cites its evidence**:
@@ -51,7 +53,7 @@ There is no live counting. A level is held through a **`StandingGrant`** that **
 
 Validators fetch exactly the cited records and check them, so every node reaches the same verdict.
 Each voucher may vouch **5 times per 30 days**. If someone you vouched for is paused by a
-`BotReview` Outcome (3 marks open it; full members decide), you lose the right to vouch for
+`BotReview` Outcome (3 marks open it; everyone decides, ADR 0118), you lose the right to vouch for
 **90 days**. You keep your own standing.
 
 **Bootstrap.** A named founder list of agent keys (directory DNA property) starts Full so that someone can vouch.

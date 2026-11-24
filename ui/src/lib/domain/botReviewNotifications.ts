@@ -17,7 +17,7 @@ export interface BotNotice {
 }
 
 /** web-backend `bot_reviews.py`'s `bot-review` (to the account), `bot-review-result` (to
- * whoever marked or voted) and `bot-review-vote` (to full members sharing a space) cards: "Account", no actor, opening the account's profile. */
+ * whoever marked or voted) and `bot-review-vote` (to people sharing a space) cards: "Account", no actor, opening the account's profile. */
 export function botReviewNotifications(
   notices: BotNotice[],
   me: string,
@@ -47,8 +47,10 @@ export function botReviewNotifications(
 export function ownCopy(n: BotNotice): [string, string] {
   if (n.kind === 'opened') {
     return [
-      'Members asked for a bot review of your account',
-      'Full members are voting on whether this account belongs to a real person. You can keep posting while the review is open.',
+      t('Members asked for a bot review of your account'),
+      t(
+        'People are voting on whether this account belongs to a real person. You can keep posting while the review is open.',
+      ),
     ];
   }
   if (n.kind === 'upheld') {
@@ -78,7 +80,7 @@ export function theirCopy(n: BotNotice, name: string): [string, string] {
     return [
       t('A bot review of {name} is open', { name }),
       t(
-        'Three full members marked {name}, so full members now vote Real person or Bot on their profile for up to 7 days.',
+        'Three full members marked {name}, so anyone can now vote Real person or Bot on their profile for up to 7 days.',
         { name },
       ),
     ];

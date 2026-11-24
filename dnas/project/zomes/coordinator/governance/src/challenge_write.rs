@@ -25,7 +25,7 @@ pub fn challenge(proposal: ActionHash) -> ExternResult<ActionHash> {
     let omitted = count.full_missing(&found, &roll, &mut Standing::default())?;
     if omitted.is_empty() {
         return Err(guest(
-            "Every Full member from when this was proposed is already counted.",
+            "Every member from when this was proposed is already counted.",
         ));
     }
     let hash = create_entry(EntryTypes::Challenge(Challenge {

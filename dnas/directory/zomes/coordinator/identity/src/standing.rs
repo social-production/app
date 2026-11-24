@@ -12,7 +12,10 @@ use crate::records::{action_targets, decode, links, live, own_latest};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct StandingView {
+    /// Full (vouched, or a founder) or New is a label only; Paused means found to be a bot.
     pub level: StandingLevel,
+    /// Whether this agent's votes count now: everyone's do unless paused (ADR 0118).
+    pub votes: bool,
     pub founder: bool,
     pub grant: Option<ActionHash>,
     /// Distinct agents with a live vouch for this agent.
@@ -35,21 +38,23 @@ pub fn view(agent: &AgentPubKey, founders: &[AgentPubKey]) -> ExternResult<Stand
         .collect();
     Ok(StandingView {
         level,
+        votes: level != StandingLevel::Paused,
         founder,
         grant,
         vouchers,
     })
 }
 
-/// Whether `agent` held Full standing before `at` (founders always have) and no bot review
-/// had paused it then (ADR 0074). Projects use this to filter voters when applying outcomes
-/// (ADR 0033).
-pub fn full_before(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
-    let full = full_since(agent)?.is_some_and(|from| from < at.as_micros());
-    Ok(full && !crate::bot_review::paused_at(agent, at.as_micros())?)
+/// Whether `agent`'s votes count at `at` (ADR 0118): everyone's do, from their first day,
+/// unless a bot review had found the account to be a bot then (ADR 0074). Full and New are
+/// only labels now (vouches), with no weight. Projects use this to filter voters when applying
+/// outcomes (ADR 0033).
+pub fn votes_at(agent: &AgentPubKey, at: Timestamp) -> ExternResult<bool> {
+    Ok(!crate::bot_review::paused_at(agent, at.as_micros())?)
 }
 
-/// Since when `agent` has had Full standing (`i64::MIN` for founders), ignoring bot reviews.
+/// Since when `agent` has had Full standing (`i64::MIN` for founders). Only marking an account
+/// as a possible bot needs it (ADR 0118): a brand-new account can't start a review.
 pub fn full_since(agent: &AgentPubKey) -> ExternResult<Option<i64>> {
     if founder_agents()?.contains(agent) {
         return Ok(Some(i64::MIN));

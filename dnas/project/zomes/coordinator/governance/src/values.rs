@@ -26,7 +26,7 @@ pub struct ValueView {
     pub author: AgentPubKey,
     pub created_at: Timestamp,
     pub label: String,
-    /// Importance votes from members with Full standing when they voted.
+    /// Importance votes from members not found to be bots when they voted (ADR 0118).
     pub count: u32,
     pub average_x100: u32,
     /// The caller's latest vote, counted or not.
