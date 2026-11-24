@@ -4,7 +4,11 @@
   import SkeletonRows from '#lib/components/loading/SkeletonRows.svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
+  import PlaceSearchField from '#lib/components/settings/PlaceSearchField.svelte';
   import SettingRow from '#lib/components/settings/SettingRow.svelte';
+  import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
+  import type { PlaceValue } from '#lib/domain/places.ts';
+  import { devicePlace, placeSearch } from '#lib/services/locations.ts';
   import { HANDLE_MAX, handleProblem } from '#lib/domain/handle.ts';
   import { BIO_MAX, HOME_AREA_MAX, type Avatar } from '#lib/domain/people.ts';
   import { toAvatar } from '#lib/components/people/avatar.ts';
@@ -25,6 +29,25 @@
   let loaded = $state(false);
   let photoInput = $state<HTMLInputElement>();
   let editing = $state<'name' | 'area' | 'bio' | null>(null);
+  // Home area comes from the place picker, as the Region place does (owner, 2026-11-24):
+  // the suburb or town and its state, e.g. "Fitzroy, Victoria".
+  let pickedArea = $state<PlaceValue | null>(null);
+  let areaMessage = $state('');
+  const areaOf = (p: PlaceValue): string =>
+    [p.displayLabel.split(',')[0]?.trim(), p.region ?? p.country]
+      .filter(Boolean)
+      .join(', ')
+      .slice(0, HOME_AREA_MAX);
+  function pickArea(p: PlaceValue): void {
+    pickedArea = p;
+    homeArea = areaOf(p);
+  }
+  async function locateArea(): Promise<void> {
+    areaMessage = '';
+    const result = await devicePlace();
+    if (result.ok) pickArea(result.place);
+    else areaMessage = devicePositionMessage(result.error);
+  }
 
   $effect(() => {
     void getPerson(me).then((person) => {
@@ -151,12 +174,15 @@
       />
       {#if problem}<p class="setting-hint">{problem}</p>{/if}
     {:else if editing === 'area'}
-      <input
-        bind:value={homeArea}
-        maxlength={HOME_AREA_MAX}
-        aria-label={t('Home area')}
-        placeholder={t('Home area, e.g. Brisbane, QLD')}
+      <PlaceSearchField
+        initial={homeArea}
+        picked={pickedArea}
+        onPick={pickArea}
+        onLocate={() => void locateArea()}
+        search={placeSearch.search}
+        failure={placeSearch.failure}
       />
+      {#if areaMessage}<p class="setting-hint">{areaMessage}</p>{/if}
     {:else if editing === 'bio'}
       <textarea
         bind:value={bio}
