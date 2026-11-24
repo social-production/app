@@ -1,4 +1,4 @@
-/** Russian, part of the catalogue (ADR 0114; see ../ru.ts): Propose edit and the crop screen. */
+/** Russian, part of the catalogue (ADR 0114; see ../ru.ts): Propose edit, the crop screen and the plan wizard. */
 import type { Entry } from '../languages.ts';
 
 export const part34: Record<string, Entry> = {
@@ -10,4 +10,6 @@ export const part34: Record<string, Entry> = {
   'Drag to move · pinch to zoom': 'Перетащите, чтобы сдвинуть · сведите пальцы, чтобы приблизить',
   Zoom: 'Масштаб',
   'Choose another': 'Выбрать другое',
+  'Propose plan': 'Предложить план',
+  'the required fields': 'обязательные поля',
 };

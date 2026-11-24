@@ -205,3 +205,34 @@
   display: grid;
   gap: 14px;
 }
+
+/* The plan wizard in this sheet (Edit, Plan and Meetup mockups §B, owner 2026-11-24): a
+   checkbox row reads left to right, and Add stage is a dashed full-width button. */
+.create-sheet.create-sheet .plan-wizard .checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--panel-hover);
+  font-size: 14px;
+}
+
+.create-sheet.create-sheet .plan-wizard .checkbox-row input {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  accent-color: var(--brand);
+}
+
+.create-sheet.create-sheet .plan-wizard .secondary-button {
+  width: 100%;
+  min-height: 44px;
+  border: 1.5px dashed var(--panel-border);
+  border-radius: 14px;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-weight: 600;
+}
