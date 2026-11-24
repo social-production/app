@@ -9,6 +9,7 @@
   import FeedActions from './FeedActions.svelte';
   import FeedCardTop from './FeedCardTop.svelte';
   import FeedSurface from './FeedSurface.svelte';
+  import NextSession from './NextSession.svelte';
   import SignalStrip from './SignalStrip.svelte';
 
   /** web's public-feed ProjectCard (classes styled by styles/cards.css, `.project-card`). */
@@ -48,6 +49,7 @@
       <p class="latest-summary">Latest: {card.latestUpdate}</p>
     {/if}
     <CardFacts place={card.locationLabel} target={href} />
+    {#if card.nextActivity}<NextSession next={card.nextActivity} {href} />{/if}
     <FeedActions
       commentHref={`${href}?tab=chat`}
       commentCount={card.commentCount}

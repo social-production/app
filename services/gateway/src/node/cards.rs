@@ -221,6 +221,7 @@ pub fn card(view: ListingView, project: Option<ProjectView>) -> ProjectCard {
         moderation: None,
         place,
         activities: Vec::new(),
+        next_activity: None,
         online,
         picture,
         cover,
