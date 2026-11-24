@@ -147,12 +147,14 @@
   box-sizing: border-box;
   height: 36px;
   min-height: 36px;
-  padding: 0 14px;
+  padding: 0 8px;
   border: none;
   border-radius: 999px;
-  background: var(--panel-hover);
+  /* Low-key: icons and counts with no bubble behind them (owner, 2026-11-24); a soft one
+     shows only under a pointer or a press. */
+  background: transparent;
   box-shadow: none;
-  color: var(--text-main);
+  color: var(--text-soft);
   font-size: 13.5px;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
@@ -180,14 +182,20 @@
 
 .shell .item-actions .feed-vote:has(.vote-button.active-up),
 .shell .comment-card .actions-row .feed-vote:has(.vote-button.active-up) {
-  background: var(--brand-soft);
   color: var(--brand-strong);
 }
 
 .shell .item-actions .feed-vote:has(.vote-button.active-down),
 .shell .comment-card .actions-row .feed-vote:has(.vote-button.active-down) {
-  background: color-mix(in srgb, var(--danger) 14%, transparent);
   color: var(--danger);
+}
+
+@media (hover: hover) {
+  .shell .item-pill:hover,
+  .shell .item-actions .share-button:hover,
+  .shell .item-actions .feed-vote button:hover {
+    background: var(--panel-hover);
+  }
 }
 
 .shell .item-actions .detail-tools,
