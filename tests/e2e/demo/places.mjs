@@ -1,6 +1,7 @@
 // Steps for demo-melbourne.mjs: the same flows as steps.mjs and social.mjs, but each place is
 // picked from the geocoder's suggestions, so it has coordinates and shows on the map.
 import { BASE, TAG_SEARCH, addPlan, pickScopeTag } from '../lib.mjs';
+import { addArt } from './art.mjs';
 
 /** Types `query` into the Place field `field` and picks the first suggestion (falls back to
  * the typed name when the geocoder offers none within 15 s). */
@@ -21,8 +22,9 @@ export async function pickPlace(page, field, query) {
 }
 
 /** A proposal at a picked place, supported by its author; returns its URL. */
-export async function placedProposal(page, { title, text, tag, place }) {
+export async function placedProposal(page, { title, text, tag, place, art }) {
   await page.goto(`${BASE}/create/project`);
+  if (art) await addArt(page, ...art);
   await page.getByLabel('Title').fill(title);
   await page.getByLabel('What do you propose?').fill(text);
   await page.getByRole('button', { name: 'Continue' }).click(); // → Tags
