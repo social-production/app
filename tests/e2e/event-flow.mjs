@@ -104,12 +104,12 @@ export async function filePlan(page, { title, date, range, start, finish, place 
   await page.reload();
   await page.getByRole('tab', { name: 'Participation' }).click();
   await addPlan(page, 'Event plan');
-  const wizard = page.getByRole('dialog', { name: /^Create event plan$/i });
-  const next = () => wizard.getByRole('button', { name: 'Next' }).click();
-  await wizard.getByPlaceholder('Plan title').fill(title);
-  await wizard.getByPlaceholder('Describe the plan').fill('Tools out at nine, lunch at noon.');
+  const wizard = page.getByRole('dialog', { name: /^Event plan$/i });
+  const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
+  await wizard.getByLabel('Title').fill(title);
+  await wizard.getByLabel('Description').fill('Tools out at nine, lunch at noon.');
   await next(); // → schedule mode
-  if (range) await wizard.getByLabel('Schedule').selectOption('range');
+  if (range) await wizard.getByLabel('Date range').check();
   await next(); // → date(s)
   if (range) {
     await wizard.getByLabel('Start date').fill(range[0]);
@@ -123,13 +123,13 @@ export async function filePlan(page, { title, date, range, start, finish, place 
   await next(); // → place
   await wizard.getByRole('textbox', { name: 'Place' }).fill(place);
   await next();
-  await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Everyone who signalled can come.');
+  await wizard.getByLabel('Support it answers').fill('Everyone who signalled can come.');
   await next();
-  await wizard.getByPlaceholder('Stage title').fill('Morning');
+  await wizard.getByPlaceholder('Harvest Friday').fill('Morning');
   await wizard.getByPlaceholder('What happens in this stage?').fill('Weed the beds.');
   await next(); // → review
   await wizard.getByText(`${start} – ${finish}`).waitFor();
-  await wizard.getByRole('button', { name: /^Submit event plan$/i }).click();
+  await wizard.getByRole('button', { name: 'Propose plan' }).click();
   await page.locator('.plan-card', { hasText: title }).waitFor({ timeout: 60_000 });
 }
 

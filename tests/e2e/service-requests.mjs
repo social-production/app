@@ -41,25 +41,26 @@ log('the founders moved the proposal to its Plan phase');
 await ann.reload();
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await addPlan(ann, 'Operations plan');
-const wizard = ann.getByRole('dialog', { name: 'Create Operations Plan' });
-const nextPlan = () => wizard.getByRole('button', { name: 'Next' }).click();
-await wizard.getByPlaceholder('Plan title').fill(planTitle);
-await wizard.getByPlaceholder('Describe the plan').fill('Open the shed on weekends.');
+const wizard = ann.getByRole('dialog', { name: 'Operations plan' });
+const nextPlan = () => wizard.getByRole('button', { name: 'Continue' }).click();
+await wizard.getByLabel('Title').fill(planTitle);
+await wizard.getByLabel('Description').fill('Open the shed on weekends.');
 await nextPlan(); // → plan type
 await nextPlan(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('The shed');
 await nextPlan(); // → requests
 await wizard.getByText('Will this service take requests?').waitFor();
-await wizard.getByLabel('Requests').selectOption({ index: 1 });
-const mode = (await wizard.getByLabel('Requests').locator('option:checked').innerText()).trim();
+const choice = wizard.getByRole('radiogroup', { name: 'Requests' }).locator('label').nth(1);
+await choice.locator('input').check();
+const mode = (await choice.locator('b').innerText()).trim();
 await ann.screenshot({ path: `${out}/phone390-plan-requests.png` });
 await nextPlan();
-await wizard.getByPlaceholder('Explain how this plan responds to support').fill('Neighbours keep asking.');
+await wizard.getByLabel('Support it answers').fill('Neighbours keep asking.');
 await nextPlan();
-await wizard.getByPlaceholder('Stage title').fill('Open the shed');
+await wizard.getByPlaceholder('Harvest Friday').fill('Open the shed');
 await wizard.getByPlaceholder('What happens in this stage?').fill('Unlock and set out tools.');
 await nextPlan();
-await wizard.getByRole('button', { name: 'Submit Operations Plan' }).click();
+await wizard.getByRole('button', { name: 'Propose plan' }).click();
 await ann.locator('.plan-card', { hasText: planTitle }).waitFor({ timeout: 60_000 });
 log(`ann filed an operations plan that takes requests (${mode})`);
 

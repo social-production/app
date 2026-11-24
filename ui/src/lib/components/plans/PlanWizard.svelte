@@ -18,6 +18,8 @@
   import PlanReview from './PlanReview.svelte';
   import PlanWizardStep from './PlanWizardStep.svelte';
 
+  import '#lib/components/styles/ux/planstages.css';
+
   /**
    * web's PlanCreationWizard for project plans (overview, subtype, repository or location,
    * support response, stages, review) and event plans (overview, schedule, place, support

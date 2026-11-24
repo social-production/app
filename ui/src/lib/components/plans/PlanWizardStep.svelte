@@ -16,9 +16,11 @@
     type PlanStep,
     type ProductionLocation,
   } from '#lib/domain/planForm.ts';
-  import type { PlaceSearch } from '#lib/domain/places.ts';
-  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
+  import { onlinePlaceValue, type PlaceSearch } from '#lib/domain/places.ts';
+  import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import { REQUEST_MODES, type ProjectSubtype } from '#lib/domain/projects.ts';
+
+  import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
 
   import PlanStagesEditor from './PlanStagesEditor.svelte';
 
@@ -55,24 +57,53 @@
   const zone = displayZone();
 </script>
 
+{#snippet where()}
+  <LocationIntent
+    intent={form.place.mode === 'online' ? 'online' : 'physical'}
+    place={form.place}
+    allowLater={false}
+    helperText=""
+    search={places.search}
+    failure={places.failure}
+    onIntent={(next) =>
+      (form = withPlanPlace(
+        form,
+        next === 'online' ? onlinePlaceValue() : { ...form.place, mode: 'physical' },
+      ))}
+    onPlace={(value) => (form = withPlanPlace(form, value))}
+  />
+{/snippet}
+
 {#if step.id === 'plan-overview'}
   <div class="overview-stack">
     <label>
-      <span class="field-inline-label">{t('Title')}</span>
-      <input bind:value={form.title} maxlength="120" placeholder={t('Plan title')} />
+      <span class="field-inline-label"><RequiredLabel>{t('Title')}</RequiredLabel></span>
+      <input
+        bind:value={form.title}
+        maxlength="120"
+        placeholder={t('Saturday veg share')}
+        aria-required="true"
+      />
     </label>
     <label>
-      <span class="field-inline-label">{t('Description')}</span>
-      <textarea bind:value={form.description} rows="5" placeholder={t('Describe the plan')}
-      ></textarea>
+      <span class="field-inline-label"><RequiredLabel>{t('Description')}</RequiredLabel></span>
+      <textarea
+        bind:value={form.description}
+        rows="4"
+        placeholder={t('Who it reaches, how often, and how it happens.')}
+        aria-required="true"></textarea>
     </label>
   </div>
 {:else if step.id === 'subtype'}
-  <select bind:value={form.subtype} aria-label={t('Plan type')}>
+  <div class="plan-opts" role="radiogroup" aria-label={t('Plan type')}>
     {#each subtypes as option (option.value)}
-      <option value={option.value}>{t(option.label)}</option>
+      <label
+        ><input type="radio" bind:group={form.subtype} value={option.value} /><b
+          >{t(option.label)}</b
+        ></label
+      >
     {/each}
-  </select>
+  </div>
 {:else if step.id === 'repository'}
   <aside class="license-notice" aria-label={t('Software license guidance')}>
     <strong>License: {SOFTWARE_LICENSE_LABEL}</strong>
@@ -89,15 +120,7 @@
   />
 {:else if step.id === 'location'}
   <div class="location-step">
-    <LocationPicker
-      value={form.place}
-      modes={['physical', 'online']}
-      portaled
-      elevated
-      onChange={(value) => (form = withPlanPlace(form, value))}
-      search={places.search}
-      failure={places.failure}
-    />
+    {@render where()}
   </div>
 {:else if step.id === 'distribution-location'}
   <div class="settings-stack location-step">
@@ -113,15 +136,7 @@
       </label>
     {/if}
     {#if !form.sameAsProduction}
-      <LocationPicker
-        value={form.place}
-        modes={['physical', 'online']}
-        portaled
-        elevated
-        onChange={(value) => (form = withPlanPlace(form, value))}
-        search={places.search}
-        failure={places.failure}
-      />
+      {@render where()}
     {/if}
     <label class="recipients-field">
       <span>{t('Recipients')}</span>
@@ -133,15 +148,19 @@
     </label>
   </div>
 {:else if step.id === 'requests'}
-  <select bind:value={form.requests} aria-label={t('Requests')}>
-    <option value="">{t('No requests for now')}</option>
+  <div class="plan-opts" role="radiogroup" aria-label={t('Requests')}>
+    <label
+      ><input type="radio" bind:group={form.requests} value="" /><b>{t('No requests for now')}</b
+      ></label
+    >
     {#each REQUEST_MODES as option (option.value)}
-      <option value={option.value}>{t(option.label)}</option>
+      <label
+        ><input type="radio" bind:group={form.requests} value={option.value} /><b
+          >{t(option.label)}</b
+        ><small>{t(option.summary)}</small></label
+      >
     {/each}
-  </select>
-  {#if form.requests}
-    <p class="helper-copy">{REQUEST_MODES.find((m) => m.value === form.requests)?.summary}</p>
-  {/if}
+  </div>
 {:else if step.id === 'demand-note'}
   <div class="signal-card" aria-label={t('Current support signals')}>
     <span class="signal-label">{t('Current support signals')}</span>
@@ -156,21 +175,20 @@
   </p>
   <textarea
     bind:value={form.demandNote}
-    rows="5"
-    placeholder={t('Explain how this plan responds to support')}></textarea>
+    rows="4"
+    aria-label={t('Support it answers')}
+    placeholder={t('Covers the 3 who asked, weekly.')}></textarea>
 {:else if step.id === 'schedule-mode'}
-  <select bind:value={form.scheduleMode} aria-label={t('Schedule')}>
-    <option value="date">{t('Single date')}</option>
-    <option value="range">{t('Date range')}</option>
-    <option value="any-day">{t('No set date')}</option>
-  </select>
-  {#if form.scheduleMode === 'any-day'}
-    <p class="helper-copy">
-      {t(
-        'For something ongoing, like weekly games: add each session as an activity, and people sign up to the ones they come to.',
-      )}
-    </p>
-  {/if}
+  <div class="plan-opts" role="radiogroup" aria-label={t('Schedule')}>
+    <label
+      ><input type="radio" bind:group={form.scheduleMode} value="date" /><b>{t('Single date')}</b
+      ><small>{t('One day, with a start and finish time.')}</small></label
+    >
+    <label
+      ><input type="radio" bind:group={form.scheduleMode} value="range" /><b>{t('Date range')}</b
+      ><small>{t('Several days in a row, like a festival.')}</small></label
+    >
+  </div>
 {:else if step.id === 'schedule-date'}
   <input type="date" bind:value={form.scheduledDate} aria-label={t('Date')} />
 {:else if step.id === 'schedule-range'}
