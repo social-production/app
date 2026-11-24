@@ -50,8 +50,8 @@ await nextPlan(); // → location
 await wizard.getByRole('textbox', { name: 'Place' }).fill('The shed');
 await nextPlan(); // → requests
 await wizard.getByText('Will this service take requests?').waitFor();
-const choice = wizard.getByRole('radiogroup', { name: 'Requests' }).locator('label').nth(1);
-await choice.locator('input').check();
+const choice = wizard.getByRole('radiogroup', { name: 'Requests' }).getByRole('radio').nth(1);
+await choice.click();
 const mode = (await choice.locator('b').innerText()).trim();
 await ann.screenshot({ path: `${out}/phone390-plan-requests.png` });
 await nextPlan();

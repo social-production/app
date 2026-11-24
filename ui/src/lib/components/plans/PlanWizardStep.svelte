@@ -9,24 +9,19 @@
   } from '#lib/domain/policy.ts';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleProblem } from '#lib/domain/eventSchedule.ts';
-  import {
-    sameAsProduction,
-    withPlanPlace,
-    type PlanForm,
-    type PlanStep,
-    type ProductionLocation,
-  } from '#lib/domain/planForm.ts';
-  import { onlinePlaceValue, type PlaceSearch } from '#lib/domain/places.ts';
-  import LocationIntent from '#lib/components/create/LocationIntent.svelte';
+  import { type PlanForm, type PlanStep, type ProductionLocation } from '#lib/domain/planForm.ts';
+  import type { PlaceSearch } from '#lib/domain/places.ts';
+  import ChoiceRows from '#lib/components/create/ChoiceRows.svelte';
   import { REQUEST_MODES, type ProjectSubtype } from '#lib/domain/projects.ts';
 
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
 
+  import PlanPlace from './PlanPlace.svelte';
   import PlanStagesEditor from './PlanStagesEditor.svelte';
 
   /**
-   * The fields of one plan wizard step (web's PlanCreationWizard body), places through web's
-   * LocationPicker (ADR 0080).
+   * The fields of one plan wizard step (web's PlanCreationWizard body) in the create flow's
+   * look (Edit, Plan and Meetup mockups §B): choices as rows, labelled filled fields.
    */
   interface Props {
     step: PlanStep;
@@ -39,6 +34,8 @@
     opposition: number;
     required: number;
     members: number;
+    /** Event plans give stages dates; other plans leave timing to activities. */
+    dated: boolean;
   }
 
   let {
@@ -51,28 +48,21 @@
     opposition,
     required,
     members,
+    dated,
   }: Props = $props();
 
   const total = $derived(demand + opposition);
   const zone = displayZone();
+  const SUBTYPE_HINTS: Partial<Record<ProjectSubtype, string>> = {
+    standard: t('Made, grown or done in person.'),
+    software: t('Code in a public repository, under AGPL v3.'),
+  };
+  // A box, code brackets, a calendar and two calendars.
+  const CUBE = 'M12 3 4 7.5v9L12 21l8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9';
+  const CODE = 'M8 8l-4 4 4 4M16 8l4 4-4 4M14 5l-4 14';
+  const CALENDAR = 'M5 5h14v15H5zM5 10h14M9 3v4M15 3v4';
+  const RANGE = 'M4 6h11v13H4zM4 10h11M8 4v3M18 9h2v12H9v-2';
 </script>
-
-{#snippet where()}
-  <LocationIntent
-    intent={form.place.mode === 'online' ? 'online' : 'physical'}
-    place={form.place}
-    allowLater={false}
-    helperText=""
-    search={places.search}
-    failure={places.failure}
-    onIntent={(next) =>
-      (form = withPlanPlace(
-        form,
-        next === 'online' ? onlinePlaceValue() : { ...form.place, mode: 'physical' },
-      ))}
-    onPlace={(value) => (form = withPlanPlace(form, value))}
-  />
-{/snippet}
 
 {#if step.id === 'plan-overview'}
   <div class="overview-stack">
@@ -95,51 +85,44 @@
     </label>
   </div>
 {:else if step.id === 'subtype'}
-  <div class="plan-opts" role="radiogroup" aria-label={t('Plan type')}>
-    {#each subtypes as option (option.value)}
-      <label
-        ><input type="radio" bind:group={form.subtype} value={option.value} /><b
-          >{t(option.label)}</b
-        ></label
-      >
-    {/each}
-  </div>
+  <ChoiceRows
+    value={form.subtype}
+    ariaLabel={t('Plan type')}
+    options={subtypes.map((o) => ({
+      value: o.value,
+      label: t(o.label),
+      hint: SUBTYPE_HINTS[o.value],
+      icon: o.value === 'software' ? CODE : CUBE,
+    }))}
+    onChange={(value) => (form.subtype = value)}
+  />
 {:else if step.id === 'repository'}
-  <aside class="license-notice" aria-label={t('Software license guidance')}>
-    <strong>License: {SOFTWARE_LICENSE_LABEL}</strong>
-    <p>{SOFTWARE_LICENSE_TITLE}</p>
+  <label>
+    <span class="field-inline-label"><RequiredLabel>{t('Repository URL')}</RequiredLabel></span>
+    <input
+      bind:value={form.repositoryUrl}
+      aria-required="true"
+      inputmode="url"
+      placeholder="https://github.com/org/repo"
+    />
+  </label>
+  <details class="plan-license">
+    <summary
+      ><b>{SOFTWARE_LICENSE_LABEL}</b><span>{SOFTWARE_LICENSE_TITLE}</span><u>{t('Read')}</u
+      ></summary
+    >
     <p>{SOFTWARE_LICENSE_BODY}</p>
     <ul>
       {#each SOFTWARE_LICENSE_WHY as reason (reason)}<li>{reason}</li>{/each}
     </ul>
-  </aside>
-  <input
-    bind:value={form.repositoryUrl}
-    aria-label={t('Repository URL')}
-    placeholder="https://github.com/org/repo"
-  />
+  </details>
 {:else if step.id === 'location'}
-  <div class="location-step">
-    {@render where()}
-  </div>
+  <PlanPlace bind:form {places} />
 {:else if step.id === 'distribution-location'}
   <div class="settings-stack location-step">
-    {#if productionLocation}
-      <label class="checkbox-row">
-        <input
-          checked={form.sameAsProduction}
-          type="checkbox"
-          onchange={(e) =>
-            (form = sameAsProduction(form, e.currentTarget.checked, productionLocation))}
-        />
-        <span>Same as production plan location ({t(productionLocation.label)})</span>
-      </label>
-    {/if}
-    {#if !form.sameAsProduction}
-      {@render where()}
-    {/if}
+    <PlanPlace bind:form {places} production={productionLocation} />
     <label class="recipients-field">
-      <span>{t('Recipients')}</span>
+      <span class="field-inline-label">{t('Recipients')}</span>
       <textarea
         bind:value={form.recipients}
         rows="2"
@@ -148,49 +131,64 @@
     </label>
   </div>
 {:else if step.id === 'requests'}
-  <div class="plan-opts" role="radiogroup" aria-label={t('Requests')}>
-    <label
-      ><input type="radio" bind:group={form.requests} value="" /><b>{t('No requests for now')}</b
-      ></label
-    >
-    {#each REQUEST_MODES as option (option.value)}
-      <label
-        ><input type="radio" bind:group={form.requests} value={option.value} /><b
-          >{t(option.label)}</b
-        ><small>{t(option.summary)}</small></label
-      >
-    {/each}
-  </div>
+  <ChoiceRows
+    value={form.requests}
+    ariaLabel={t('Requests')}
+    options={[
+      {
+        value: '' as const,
+        label: t('No requests for now'),
+        hint: t('Members can turn them on later.'),
+      },
+      ...REQUEST_MODES.map((o) => ({ value: o.value, label: t(o.label), hint: t(o.summary) })),
+    ]}
+    onChange={(value) => (form.requests = value)}
+  />
 {:else if step.id === 'demand-note'}
-  <div class="signal-card" aria-label={t('Current support signals')}>
-    <span class="signal-label">{t('Current support signals')}</span>
-    <strong>{demand} support · {opposition} opposition ({total} total)</strong>
-    <p class="helper-copy">
-      Support share: {total === 0 ? 0 : Math.round((demand / total) * 100)}%
-    </p>
+  <div class="plan-signals" aria-label={t('Current support signals')}>
+    <span><b>{demand}</b>{t('support')}</span>
+    <span><b>{opposition}</b>{t('against')}</span>
+    <span><b>{total === 0 ? 0 : Math.round((demand / total) * 100)}%</b>{t('share')}</span>
   </div>
+  <label>
+    <span class="field-inline-label"><RequiredLabel>{t('Support it answers')}</RequiredLabel></span>
+    <textarea
+      bind:value={form.demandNote}
+      rows="4"
+      aria-required="true"
+      placeholder={t('Covers the 3 who asked, weekly.')}></textarea>
+  </label>
   <p class="helper-copy">
-    Approval needs {required} of {plural(members, '{n} member', '{n} members')} to vote and at least 66%
-    yes.
+    {t('Approval needs {n} of {members} to vote, and at least 66% Yes.', {
+      n: required,
+      members: plural(members, '{n} member', '{n} members'),
+    })}
   </p>
-  <textarea
-    bind:value={form.demandNote}
-    rows="4"
-    aria-label={t('Support it answers')}
-    placeholder={t('Covers the 3 who asked, weekly.')}></textarea>
 {:else if step.id === 'schedule-mode'}
-  <div class="plan-opts" role="radiogroup" aria-label={t('Schedule')}>
-    <label
-      ><input type="radio" bind:group={form.scheduleMode} value="date" /><b>{t('Single date')}</b
-      ><small>{t('One day, with a start and finish time.')}</small></label
-    >
-    <label
-      ><input type="radio" bind:group={form.scheduleMode} value="range" /><b>{t('Date range')}</b
-      ><small>{t('Several days in a row, like a festival.')}</small></label
-    >
-  </div>
+  <ChoiceRows
+    value={form.scheduleMode}
+    ariaLabel={t('Schedule')}
+    options={[
+      {
+        value: 'date',
+        label: t('Single date'),
+        hint: t('One day, with a start and finish time.'),
+        icon: CALENDAR,
+      },
+      {
+        value: 'range',
+        label: t('Date range'),
+        hint: t('Several days in a row, like a festival.'),
+        icon: RANGE,
+      },
+    ]}
+    onChange={(value) => (form.scheduleMode = value)}
+  />
 {:else if step.id === 'schedule-date'}
-  <input type="date" bind:value={form.scheduledDate} aria-label={t('Date')} />
+  <label>
+    <span class="field-inline-label">{t('Date')}</span>
+    <input type="date" bind:value={form.scheduledDate} aria-label={t('Date')} />
+  </label>
 {:else if step.id === 'schedule-range'}
   <div class="field-grid">
     <label>
@@ -221,5 +219,5 @@
     Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
   </p>
 {:else if step.id === 'stages'}
-  <PlanStagesEditor bind:stages={form.stages} />
+  <PlanStagesEditor bind:stages={form.stages} {dated} />
 {/if}

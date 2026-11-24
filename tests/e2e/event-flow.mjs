@@ -109,7 +109,7 @@ export async function filePlan(page, { title, date, range, start, finish, place 
   await wizard.getByLabel('Title').fill(title);
   await wizard.getByLabel('Description').fill('Tools out at nine, lunch at noon.');
   await next(); // → schedule mode
-  if (range) await wizard.getByLabel('Date range').check();
+  if (range) await wizard.getByRole('radio', { name: /Date range/ }).click();
   await next(); // → date(s)
   if (range) {
     await wizard.getByLabel('Start date').fill(range[0]);

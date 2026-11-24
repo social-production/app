@@ -207,54 +207,77 @@
   font-size: 13px;
 }
 
-/* Choices as rows with a round mark instead of a dropdown. */
-.create-sheet .plan-opts {
+/* Support so far: three small figures in one filled row. */
+.create-sheet .plan-signals {
   display: grid;
-  gap: 8px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
 }
 
-.create-sheet.create-sheet .plan-opts label {
+.create-sheet .plan-signals span {
   display: grid;
-  grid-template-columns: 20px 1fr;
-  gap: 2px 10px;
-  align-items: start;
-  padding: 11px 13px;
-  border: 1.5px solid transparent;
-  border-radius: 14px;
+  padding: 9px 8px;
+  border-radius: 12px;
   background: var(--panel-hover);
+  color: var(--text-soft);
+  font-size: 12px;
+  text-align: center;
+}
+
+.create-sheet .plan-signals b {
+  color: var(--text-main);
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The software license as one line that opens its reasons. */
+.create-sheet .plan-license {
+  border-radius: 14px;
+  background: var(--brand-soft);
+  color: var(--text-main);
+  font-size: 13px;
+}
+
+.create-sheet .plan-license summary {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  padding: 10px 13px;
+  list-style: none;
   cursor: pointer;
 }
 
-.create-sheet.create-sheet .plan-opts label:has(input:checked) {
-  border-color: var(--brand);
-  background: var(--brand-soft);
+.create-sheet .plan-license summary::-webkit-details-marker {
+  display: none;
 }
 
-.create-sheet.create-sheet .plan-opts input {
-  grid-row: span 2;
-  width: 18px;
-  height: 18px;
-  margin: 1px 0 0;
-  accent-color: var(--brand);
+.create-sheet .plan-license summary b {
+  color: var(--brand-strong);
+  white-space: nowrap;
 }
 
-.create-sheet .plan-opts b {
-  font-size: 14px;
+.create-sheet .plan-license summary span {
+  flex: 1;
+  min-width: 0;
+  color: var(--text-soft);
+}
+
+.create-sheet .plan-license summary u {
+  color: var(--brand-strong);
   font-weight: 600;
 }
 
-.create-sheet .plan-opts small {
-  grid-column: 2;
-  color: var(--text-soft);
-  font-size: 12.5px;
+.create-sheet .plan-license[open] summary u {
+  display: none;
 }
 
-/* Support so far, as a filled card. */
-.create-sheet.create-sheet .plan-wizard .signal-card {
-  display: grid;
-  gap: 2px;
-  padding: 12px 13px;
-  border: none;
-  border-radius: 14px;
-  background: var(--panel-hover);
+.create-sheet .plan-license p,
+.create-sheet .plan-license ul {
+  margin: 0;
+  padding: 0 13px 10px;
+  color: var(--text-soft);
+}
+
+.create-sheet .plan-license ul {
+  padding-left: 30px;
 }
