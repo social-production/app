@@ -160,7 +160,7 @@ fn nearby(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -
             let distance = sp_place::distance_km(q.center, (p.latitude, p.longitude));
             (distance <= q.radius_km).then(|| {
                 RegionItem::Card(Box::new(RegionCard {
-                    card: c.clone(),
+                    card: super::next::served(c, q.now),
                     distance_km: Some(round_km(distance)),
                     is_online: false,
                 }))
@@ -232,7 +232,7 @@ fn online(cards: &[&ProjectCard], q: &RegionQuery, bounds: Option<(i64, i64)>) -
         .take(q.limit)
         .map(|c| {
             RegionItem::Card(Box::new(RegionCard {
-                card: c.clone(),
+                card: super::next::served(c, q.now),
                 distance_km: None,
                 is_online: true,
             }))
