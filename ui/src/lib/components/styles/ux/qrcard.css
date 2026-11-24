@@ -1,0 +1,146 @@
+/* QR share cards (QR Share Cards mockup, owner 2026-11-24): the Links tab's row and the
+   Download a QR card sheet. Sheets are portaled outside `.shell`, so rules double a class. */
+.shell .qr-card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 16px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.shell .qr-card-row .qr-card-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: var(--brand);
+  color: var(--on-brand, #fff);
+}
+
+.shell .qr-card-row .qr-card-icon svg {
+  width: 24px;
+  height: 24px;
+}
+
+.shell .qr-card-row .qr-card-copy {
+  display: grid;
+  flex: 1;
+  gap: 1px;
+  min-width: 0;
+}
+
+.shell .qr-card-row strong {
+  font-size: 15px;
+}
+
+.shell .qr-card-row small {
+  color: var(--text-soft);
+  font-size: 13px;
+}
+
+.shell .qr-card-row > svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--text-soft);
+}
+
+.qr-card-sheet.qr-card-sheet .overlay-body {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  padding: 4px 16px 16px;
+}
+
+.qr-card-sheet .qr-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 230px;
+  padding: 14px;
+  border-radius: 18px;
+  background: var(--panel-hover);
+}
+
+.qr-card-sheet .qr-preview.tall {
+  height: 300px;
+}
+
+.qr-card-sheet .qr-preview img {
+  width: auto;
+  height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  object-fit: contain;
+  border-radius: 6px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+}
+
+.qr-card-sheet .qr-preview-wait {
+  color: var(--text-soft);
+  font-size: 14px;
+}
+
+.qr-card-sheet .qr-formats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.qr-card-sheet.qr-card-sheet .qr-formats button {
+  display: grid;
+  align-content: center;
+  gap: 1px;
+  min-height: 54px;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.qr-card-sheet .qr-formats strong {
+  font-size: 14px;
+}
+
+.qr-card-sheet .qr-formats span {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.qr-card-sheet.qr-card-sheet .qr-formats button[aria-pressed='true'] {
+  border: 2px solid var(--brand);
+  background: var(--brand-soft);
+}
+
+.qr-card-sheet.qr-card-sheet .qr-svg-link {
+  justify-self: center;
+  min-height: 36px;
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.qr-card-sheet .qr-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 13px;
+}
