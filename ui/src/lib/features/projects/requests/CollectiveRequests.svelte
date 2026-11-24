@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { serviceMenu } from './serviceMenu.svelte.ts';
   import { t } from '#lib/i18n/index.ts';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
@@ -60,7 +61,6 @@
   const highlighted = $derived(page.url.searchParams.get('request'));
   const others = $derived((project?.members ?? []).filter((m) => m !== me));
   const canRequest = $derived(settings.enabled && others.length > 0);
-  let menuOpen = $state(false);
 
   $effect(() => {
     if (me) void requests.load();
@@ -165,14 +165,6 @@
       }}
     />
   {/if}
-  {#if member}
-    <RoundPlusButton
-      icon="gear"
-      label={t('Settings')}
-      ariaLabel={t('Service settings')}
-      onclick={() => (menuOpen = true)}
-    />
-  {/if}
 </PhaseWorkToolbar>
 
 <RequestsSheet
@@ -190,18 +182,18 @@
 />
 {#if member}
   <OverlaySheet
-    open={menuOpen}
+    open={serviceMenu.open}
     title={t('Settings')}
     labelledById="service-settings-menu"
     rootClass="collective-service"
-    onClose={() => (menuOpen = false)}
+    onClose={() => (serviceMenu.open = false)}
   >
     <div class="settings-menu">
       <button
         class="settings-option"
         type="button"
         onclick={() => {
-          menuOpen = false;
+          serviceMenu.open = false;
           requests.openSettings(settings);
         }}
       >
