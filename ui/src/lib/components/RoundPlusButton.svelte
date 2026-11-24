@@ -40,6 +40,6 @@
 >
   {#if icon}<ToolbarIcon name={icon} />{:else if plus}<span aria-hidden="true" class="plus-glyph"
       >+</span
-    >{/if}
+    ><span class="plus-icon"><ToolbarIcon name="plus" /></span>{/if}
   {#if label}<span class="plus-label">{t(label)}</span>{/if}
 </button>

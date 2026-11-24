@@ -40,8 +40,13 @@
 
   let voteOpen = $state(false);
   const project = $derived(detail.project);
+  // Support and Oppose stay on the dock in every phase until it closes, as on web (owner,
+  // 2026-11-24); an organizer-run event takes none.
   const signals = $derived(
-    !!project?.charter && takesSignals(project.charter.mode) && project.phase === 'phase-1',
+    !!project?.charter &&
+      takesSignals(project.charter.mode) &&
+      project.phase !== 'phase-7' &&
+      project.governance !== 'organizer_controlled',
   );
   // The stance just set here, until the project's own read catches up with it (a network
   // read lags a write), so the strip folds into the chip at once.
