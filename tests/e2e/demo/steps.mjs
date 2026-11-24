@@ -121,7 +121,7 @@ export async function operationsPlan(page, plan) {
   await next(); // → location
   await wizard.getByRole('textbox', { name: 'Place' }).fill(plan.place);
   await next(); // → requests
-  await wizard.getByRole('radiogroup', { name: 'Requests' }).locator('label').nth(1).locator('input').check();
+  await wizard.getByRole('radiogroup', { name: 'Requests' }).getByRole('radio').nth(1).click();
   await next();
   await finishPlan(page, wizard, 'Operations Plan', plan);
   await page.locator('.plan-card', { hasText: plan.title }).waitFor({ timeout: 60_000 });

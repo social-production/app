@@ -29,6 +29,7 @@ import { part32 } from './ru/part32.ts';
 import { part34 } from './ru/part34.ts';
 import { part36 } from './ru/part36.ts';
 import { part37 } from './ru/part37.ts';
+import { part38 } from './ru/part38.ts';
 import { part35 } from './ru/part35.ts';
 import { part29 } from './ru/part29.ts';
 import { part23 } from './ru/part23.ts';
@@ -74,6 +75,7 @@ export const ru: Record<string, Entry> = {
   ...part34,
   ...part36,
   ...part37,
+  ...part38,
   ...part35,
   ...part29,
   ...part23,

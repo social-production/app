@@ -51,7 +51,7 @@ const next = () => wizard.getByRole('button', { name: 'Continue' }).click();
 await wizard.getByLabel(/^Title/).first().fill(planTitle);
 await wizard.getByLabel(/^Description/).first().fill('Write the timer and the sensors.');
 await next();
-await wizard.getByRole('radio', { name: 'Software' }).check();
+await wizard.getByRole('radio', { name: /^Software/ }).click();
 await next();
 await wizard.getByLabel('Repository URL').fill(repo);
 await next();

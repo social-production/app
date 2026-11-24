@@ -7,10 +7,12 @@
 
   /**
    * The plan wizard's stages step as cards (Edit, Plan and Meetup mockups §B, owner
-   * 2026-11-24): a number, the title and a small line; tapping one opens its title, details
-   * and dates; hold ⠿ to drag it; a dashed "+ Add stage" at the end.
+   * 2026-11-24): a number, the title and a small line; tapping one opens its title and
+   * details (and dates, for an event plan only: other plans are timed by their activities,
+   * owner 2026-11-24); hold ⠿ to drag it; a dashed "+ Add stage" at the end.
    */
-  let { stages = $bindable() }: { stages: PlanForm['stages'] } = $props();
+  let { stages = $bindable(), dated = false }: { stages: PlanForm['stages']; dated?: boolean } =
+    $props();
 
   // The first stage starts open while it is empty.
   let opened = $state<number | null>(stages.length === 1 && !stages[0]?.title ? 0 : null);
@@ -99,16 +101,16 @@
               placeholder={t('What happens in this stage?')}
               aria-required="true"></textarea>
           </label>
-          <div class="stage-dates">
-            <label>
-              <span class="stage-lab">{t('Starts')}</span>
-              <input bind:value={stage.startDate} type="date" />
-            </label>
-            <label>
-              <span class="stage-lab">{t('Ends')}</span>
-              <input bind:value={stage.endDate} min={stage.startDate || undefined} type="date" />
-            </label>
-          </div>
+          {#if dated}<div class="stage-dates">
+              <label>
+                <span class="stage-lab">{t('Starts')}</span>
+                <input bind:value={stage.startDate} type="date" />
+              </label>
+              <label>
+                <span class="stage-lab">{t('Ends')}</span>
+                <input bind:value={stage.endDate} min={stage.startDate || undefined} type="date" />
+              </label>
+            </div>{/if}
           <div class="stage-tools">
             <button
               type="button"

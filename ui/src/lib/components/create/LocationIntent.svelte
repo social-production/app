@@ -1,7 +1,7 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import LocationPicker from '#lib/components/location/LocationPicker.svelte';
-  import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
+  import ChoiceRows from './ChoiceRows.svelte';
   import type { PlaceValue } from '#lib/domain/places.ts';
   import type { LocationChoice } from '#lib/domain/projects.ts';
 
@@ -27,11 +27,10 @@
     search,
     failure,
     allowLater = true,
-    helperText = 'People nearby will find it on the map. You can change the place later.',
+    helperText = t('People nearby find it on the map.'),
   }: Props = $props();
 
-  // Polish Pass mockups: three words in one segmented control, and one line that says
-  // what the choice means.
+  // Three rows, each with one line that says what the choice means.
   const choices: { value: LocationChoice; label: string; hint: string }[] = [
     { value: 'physical', label: t('In person'), hint: '' },
     { value: 'online', label: t('Online'), hint: t('It will not show on the map.') },
@@ -42,25 +41,39 @@
     },
   ];
   const shown = $derived(choices.filter((c) => allowLater || c.value !== 'later'));
-  const hint = $derived(choices.find((c) => c.value === intent)?.hint || helperText);
+  // A pin, a globe and a clock.
+  const ICONS: Record<LocationChoice, string> = {
+    physical:
+      'M12 21s-6-5.6-6-11a6 6 0 0 1 12 0c0 5.4-6 11-6 11ZM12 12.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z',
+    online:
+      'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM3 12h18M12 3c2.5 2.5 3.5 5.5 3.5 9s-1 6.5-3.5 9M12 3c-2.5 2.5-3.5 5.5-3.5 9s1 6.5 3.5 9',
+    later: 'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18ZM12 7v5l3 2',
+  };
 </script>
 
 <div class="location-intent">
-  <SegmentedChoice
+  <ChoiceRows
     value={intent}
     ariaLabel={t('Location intent')}
-    options={shown.map((c) => ({ value: c.value, label: c.label }))}
+    options={shown.map((c) => ({
+      value: c.value,
+      label: c.label,
+      hint: c.value === 'physical' ? helperText || t('On the map, at a place you pick.') : c.hint,
+      icon: ICONS[c.value],
+    }))}
     onChange={onIntent}
-  />
-  {#if intent === 'physical'}
-    <LocationPicker
-      value={place}
-      modes={['physical']}
-      placeholder={t('Search a place')}
-      onChange={onPlace}
-      {search}
-      {failure}
-    />
-  {/if}
-  <p class="helper">{hint}</p>
+  >
+    {#snippet under(chosen)}
+      {#if chosen === 'physical'}
+        <LocationPicker
+          value={place}
+          modes={['physical']}
+          placeholder={t('Search a place')}
+          onChange={onPlace}
+          {search}
+          {failure}
+        />
+      {/if}
+    {/snippet}
+  </ChoiceRows>
 </div>

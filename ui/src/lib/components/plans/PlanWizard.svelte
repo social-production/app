@@ -145,6 +145,7 @@
             {opposition}
             {required}
             {members}
+            dated={kind === 'Event'}
           />
         {/if}
       {/if}
