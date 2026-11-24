@@ -80,7 +80,9 @@
       <!-- The weekly limit shows only when it is close (Polish Pass mockups). -->
       {#if s.allowance !== null && s.allowance <= 1}
         <p class="helper-text">
-          New members can start 2 proposals a week ({s.allowance} left). Full members have no limit.
+          {t('New members can start 10 a week ({n} left). Full members have no limit.', {
+            n: s.allowance,
+          })}
         </p>
       {/if}
       <PolicyNotice />

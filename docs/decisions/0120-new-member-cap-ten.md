@@ -16,8 +16,8 @@ The owner: "lets remove the limit or make it like 10 until they have 2 vouchers"
 - The create form still shows the count only when one is left.
 
 ## Consequences
-The directory integrity zome checks the limit, so this is a new directory DNA and so a
-directory reset (and the project DNA, which also builds `sp_governance`, if its hash moves):
-every hosted account loses its username, profile, vouches and listings. Founders, demo people
-and demo content are put back by script afterwards; real people set their username again and
-are vouched again.
+The directory integrity zome checks the limit, so this is a new directory DNA and a directory
+reset (measured: only the directory hash moves; project and conversation keep theirs). Every
+hosted account loses its username, profile, vouches and listings, so existing projects drop out
+of the feed until relisted. Founders, demo people and demo content are put back by script
+afterwards; real people set their username again and are vouched again.

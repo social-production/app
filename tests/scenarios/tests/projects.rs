@@ -169,9 +169,10 @@ async fn new_members_start_two_projects_a_week() {
         "a listing can't name someone else as creator"
     );
 
-    for seed in ["a", "b"] {
+    for n in 0..10 {
+        let seed = format!("a{n}");
         let _: ActionHash =
-            Box::pin(conductors[1].call(&eve, "create_listing", listing(&eve_key, seed))).await;
+            Box::pin(conductors[1].call(&eve, "create_listing", listing(&eve_key, &seed))).await;
     }
     let left: Allowance = conductors[1].call(&eve, "project_allowance", ()).await;
     assert_eq!(left.remaining, Some(0));
@@ -183,7 +184,7 @@ async fn new_members_start_two_projects_a_week() {
     .await;
     assert!(
         third.is_err(),
-        "a New member's third project this week is refused"
+        "a New member's eleventh project this week is refused"
     );
 
     for seed in ["d", "e", "f"] {
@@ -196,9 +197,9 @@ async fn new_members_start_two_projects_a_week() {
 
     await_consistency(&cells).await.expect("consistency");
     let all: Vec<ListingView> = conductors[1].call(&eve, "list_projects", ()).await;
-    assert_eq!(all.len(), 5);
+    assert_eq!(all.len(), 13);
     let eves = all.iter().filter(|l| l.creator == eve_key).count();
-    assert_eq!(eves, 2);
+    assert_eq!(eves, 10);
     common::shut_down(conductors).await;
 }
 
