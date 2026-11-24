@@ -7,9 +7,11 @@
   import LinksPast from '#lib/components/links/LinksPast.svelte';
 
   import type { DetailState } from './detailState.svelte.ts';
+  import QrCardSheet from './qrcard/QrCardSheet.svelte';
   import { LinksState } from './linksState.svelte.ts';
 
   import '#lib/components/styles/links.css';
+  import '#lib/components/styles/ux/qrcard.css';
 
   /**
    * web's DetailLinksTab for projects (Polish Pass mockups, 2026-11-16): Propose a link at the
@@ -26,6 +28,8 @@
 
   const links = new LinksState(() => detail.project);
   let composing = $state(false);
+  // QR share cards (owner, 2026-11-24): a row at the top opens the download sheet.
+  let qrOpen = $state(false);
 
   $effect(() => {
     void links.load();
@@ -53,6 +57,31 @@
 {/snippet}
 
 <section class="links-tab">
+  {#if detail.project?.charter}
+    <button class="qr-card-row" type="button" onclick={() => (qrOpen = true)}>
+      <span class="qr-card-icon" aria-hidden="true"
+        ><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+          ><rect x="4" y="4" width="6" height="6" rx="1" /><rect
+            x="14"
+            y="4"
+            width="6"
+            height="6"
+            rx="1"
+          /><rect x="4" y="14" width="6" height="6" rx="1" /><path
+            d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2"
+            stroke-linecap="round"
+          /></svg
+        ></span
+      >
+      <span class="qr-card-copy">
+        <strong>{t('Download QR card')}</strong>
+        <small>{t('For posts, stories, stickers and flyers')}</small>
+      </span>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        ><path d="m9 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" /></svg
+      >
+    </button>
+  {/if}
   {#if links.error}<p class="tab-loading" role="alert">{links.error}</p>{/if}
 
   {#if !frame}
@@ -86,5 +115,13 @@
     search={links.search}
     onSubmit={(id, summary) => void submit(id, summary)}
     onClose={() => (composing = false)}
+  />
+{/if}
+
+{#if qrOpen && detail.project?.charter}
+  <QrCardSheet
+    id={detail.project.id}
+    charter={detail.project.charter}
+    onClose={() => (qrOpen = false)}
   />
 {/if}
