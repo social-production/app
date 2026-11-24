@@ -99,11 +99,6 @@
   white-space: pre-wrap;
 }
 
-/* Every item's menu is ⋯ (cards, detail headers, comments), as each mockup draws it, not ⋮. */
-.shell .report-trigger .menu-dots {
-  transform: rotate(90deg);
-}
-
 /* A post's comments sit flat with "Replying to …" and no lines (Profiles and Comments
    mockups §4, "On a post"): no rule from a comment down to its replies, no divider under
    each comment. */

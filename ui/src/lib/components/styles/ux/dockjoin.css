@@ -37,6 +37,24 @@
   overflow: visible;
 }
 
+/* With clipping off, the end segments round themselves, or a filled one (a cast vote) shows
+   square corners past the capsule's rounded ends (owner's photo, 2026-11-24). */
+.shell.shell .dock-capsule.dock-capsule > :first-child,
+.shell.shell .dock-capsule.dock-capsule > :first-child :is(button, a):first-child {
+  border-top-left-radius: 999px;
+  border-bottom-left-radius: 999px;
+}
+
+.shell.shell .dock-capsule.dock-capsule > :last-child,
+.shell.shell
+  .dock-capsule.dock-capsule
+  > :last-child
+  :is(button, a):last-child:not(.dock-more-card *),
+.shell.shell .dock-capsule.dock-capsule > .dock-more:last-child > button.dock-icon {
+  border-top-right-radius: 999px;
+  border-bottom-right-radius: 999px;
+}
+
 /* One row, always: a capsule with more than fits drops the words of its labelled actions
    (DetailActionDock's `tight`), keeping their icons, so the last ones are never cut off. */
 .shell .dock-capsule {
