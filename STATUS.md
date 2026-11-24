@@ -227,6 +227,11 @@ today, each its own PR, all merged after green CI unless marked:
   (`services/commentCounts.ts` reads each thread once; `commentLike.ts` context).
 - **#281:** Settings › Home area uses the place picker ("Fitzroy, Victoria") instead of a text box.
   All three smoked live at 390 px at 2:05 pm Melbourne.
+- **#283:** comments (threads, posts and profile rows) use the thread's own pills via
+  `components/cards/CommentPills.svelte`: ▲ score ▼, replies, Share (the owner: "copy the row
+  … from all other types"; #273's heart and #280's row are gone). Replying on phones puts the
+  back button on its own line above "Replying to x" and scrolls the answered comment to the
+  top (60vh room under the list while replying). Smoked live 2:23 pm.
 - **Calls work** (the owner's wife's microphone was off); loudspeaker and locked-phone calls
   wait for the native apps (roadmap).
 - **Open:** the owner said one create flow still has separate buttons ("such as
