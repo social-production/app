@@ -8,6 +8,7 @@ import { mkdirSync, readFileSync } from 'node:fs';
 import { deflateSync } from 'node:zlib';
 
 import { BASE, browser, device, errors, log, phraseSignIn } from './lib.mjs';
+import { keepCrop } from './demo/art.mjs';
 
 const out = process.argv[3] ?? 'screens';
 mkdirSync(out, { recursive: true });
@@ -58,7 +59,9 @@ const a = await device({ viewport: phone });
 await phraseSignIn(a, one.phrase.split(' '));
 await a.goto(`${BASE}/create/channel`);
 await a.getByLabel('Picture image').setInputFiles(file('picture.png', 200, 200, [220, 120, 40]));
+await keepCrop(a);
 await a.getByLabel('Cover image').setInputFiles(file('cover.png', 600, 200, [60, 140, 70]));
+await keepCrop(a);
 await a.locator('.scope-sheet-art .art-new').nth(1).waitFor({ timeout: 60_000 });
 await a.getByLabel(/Channel handle/).fill(handle);
 await a.getByLabel(/Description/).fill('Made by the pictures test.');
@@ -91,6 +94,7 @@ await b.getByRole('button', { name: `Leave ${handle}` }).waitFor({ timeout: 120_
 await b.getByRole('button', { name: 'Settings', exact: true }).click();
 const settings = b.locator('.scope-settings');
 await settings.getByLabel('Cover image').setInputFiles(file('new-cover.png', 600, 200, [40, 90, 200]));
+await keepCrop(b);
 await settings.locator('.scope-cover .art-new').waitFor({ timeout: 60_000 });
 await b.screenshot({ path: `${out}/phone390-scope-art-settings.png` });
 await settings.getByRole('button', { name: 'Propose change' }).click();

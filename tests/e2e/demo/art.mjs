@@ -21,6 +21,17 @@ export async function addArt(page, emoji, hue) {
   const cover = await draw(page, band, 1200, 400);
   const picture = await draw(page, tile, 400, 400);
   await page.getByLabel('Cover image').setInputFiles({ name: 'cover.png', mimeType: 'image/png', buffer: cover });
+  await keepCrop(page);
   await page.getByLabel('Picture image').setInputFiles({ name: 'picture.png', mimeType: 'image/png', buffer: picture });
+  await keepCrop(page);
   await page.waitForTimeout(1500);
+}
+
+/** Each chosen image opens the cropper (place and crop); keep it as framed. */
+export async function keepCrop(page) {
+  const cropper = page.getByRole('dialog', { name: 'Adjust image' });
+  await cropper.waitFor({ timeout: 10_000 }).catch(() => {});
+  if (!(await cropper.count())) return;
+  await cropper.getByRole('button', { name: 'Done' }).click();
+  await cropper.waitFor({ state: 'detached', timeout: 30_000 });
 }
