@@ -16,7 +16,7 @@
   import { connection } from '#lib/stores/connection.svelte.ts';
 
   import EmptyFeedEnd from '#lib/components/empty/FeedEnd.svelte';
-  import { keepRow, type FeedType } from '#lib/domain/feedTypes.ts';
+  import { keepRow, type FeedTypes } from '#lib/domain/feedTypes.ts';
   import { keepFeedFilters, readFeedFilters } from '#lib/stores/feedFilters.ts';
 
   import FeedHeader from './FeedHeader.svelte';
@@ -34,14 +34,14 @@
   const feed = new HomeFeedState(() => search);
   const signedIn = $derived(connection.current.status === 'connected');
   // The filters last across reloads, on this device.
-  const saved = readFeedFilters('home', { type: 'all', sort: 'trending', window: 'all' });
+  const saved = readFeedFilters('home', { type: [], sort: 'trending', window: 'all' });
   feed.public.sort = saved.sort;
   feed.public.window = saved.window;
-  let filter = $state<FeedType>(saved.type);
+  let filter = $state<FeedTypes>(saved.type);
   $effect(() => keepFeedFilters('home', { type: filter, sort: feed.sort, window: feed.window }));
   let sheetOpen = $state(false);
   const rows = $derived(feed.rows.filter((row) => keepRow(row, filter)));
-  const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
+  const narrowed = $derived(filter.length > 0 || feed.window !== 'all');
 
   // The Region centre is read once the connection settles (your default place is kept under
   // your key). The map's "Open as list" opens Region on its place (also while the feed shows).
@@ -99,7 +99,7 @@
         {narrowed}
         {search}
         onChoosePlace={() => (sheetOpen = true)}
-        onClear={() => ((filter = 'all'), void feed.setWindow('all'))}
+        onClear={() => ((filter = []), void feed.setWindow('all'))}
       />
     {:else}
       {#each rows as row (row.key)}

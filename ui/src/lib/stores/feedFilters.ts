@@ -1,4 +1,4 @@
-import { FEED_TYPES, type FeedType } from '#lib/domain/feedTypes.ts';
+import { feedTypesFrom, type FeedTypes } from '#lib/domain/feedTypes.ts';
 import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
 
 /**
@@ -8,7 +8,7 @@ import type { FeedSort, FeedWindow } from '#lib/domain/projects.ts';
  */
 export type FeedSurface = 'home' | 'scope' | 'profile';
 export interface FeedFilters {
-  type: FeedType;
+  type: FeedTypes;
   sort: FeedSort;
   window: FeedWindow;
 }
@@ -18,10 +18,12 @@ const WINDOWS: readonly string[] = ['today', 'week', 'month', 'all'];
 
 export function readFeedFilters(surface: FeedSurface, fallback: FeedFilters): FeedFilters {
   try {
-    const saved = JSON.parse(localStorage.getItem(`sp_feed_filters_${surface}`) ?? '{}') as Partial<
-      Record<keyof FeedFilters, string>
-    >;
-    const type = FEED_TYPES.find((t) => t.value === saved.type)?.value;
+    const saved = JSON.parse(localStorage.getItem(`sp_feed_filters_${surface}`) ?? '{}') as {
+      type?: unknown;
+      sort?: string;
+      window?: string;
+    };
+    const type = feedTypesFrom(saved.type);
     return {
       type: type ?? fallback.type,
       sort: SORTS.includes(saved.sort ?? '') ? (saved.sort as FeedSort) : fallback.sort,

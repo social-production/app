@@ -2,7 +2,7 @@
   import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import SegmentedChoice from '#lib/components/SegmentedChoice.svelte';
-  import type { FeedType } from '#lib/domain/feedTypes.ts';
+  import { toggleFeedType, type FeedTypes } from '#lib/domain/feedTypes.ts';
   import type { FeedScope, HomeAudience } from '#lib/domain/homeFeed.ts';
   import { radiusPresetOptions } from '#lib/domain/mapRadius.ts';
 
@@ -25,7 +25,7 @@
     feed: HomeFeedState;
     signedIn: boolean;
     guest?: boolean;
-    filter: FeedType;
+    filter: FeedTypes;
     open?: boolean;
   } = $props();
 
@@ -48,7 +48,7 @@
     scopes.find((s) => s.value === feed.shownScope)?.label ?? t('Global'),
   );
   // The dot: something narrower than the feed's widest view is on.
-  const narrowed = $derived(filter !== 'all' || feed.window !== 'all');
+  const narrowed = $derived(filter.length > 0 || feed.window !== 'all');
 </script>
 
 <header class="feed-header">
@@ -96,7 +96,7 @@
   type={filter}
   sort={feed.sort}
   window={feed.window}
-  onType={(v) => (filter = v)}
+  onType={(v) => (filter = toggleFeedType(filter, v))}
   onSort={(v) => void feed.setSort(v)}
   onWindow={(v) => void feed.setWindow(v)}
   onClose={() => (open = false)}

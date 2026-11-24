@@ -1,7 +1,7 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
-  import { feedSummary, type FeedType } from '#lib/domain/feedTypes.ts';
+  import { feedSummary, toggleFeedType, type FeedTypes } from '#lib/domain/feedTypes.ts';
   import type { FeedWindow } from '#lib/domain/projects.ts';
 
   import type { FeedState } from './feedState.svelte.ts';
@@ -16,10 +16,10 @@
     feed,
     name,
     type = $bindable(),
-  }: { feed: FeedState; name: string; type: FeedType } = $props();
+  }: { feed: FeedState; name: string; type: FeedTypes } = $props();
 
   let open = $state(false);
-  const narrowed = $derived(type !== 'all' || feed.window !== 'all');
+  const narrowed = $derived(type.length > 0 || feed.window !== 'all');
 
   function reload(change: () => void): void {
     change();
@@ -49,7 +49,7 @@
   {type}
   sort={feed.sort}
   window={feed.window}
-  onType={(v) => (type = v)}
+  onType={(v) => (type = toggleFeedType(type, v))}
   onSort={(v) => reload(() => (feed.sort = v))}
   onWindow={(v: FeedWindow) => reload(() => (feed.window = v))}
   onClose={() => (open = false)}
