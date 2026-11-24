@@ -29,6 +29,7 @@
   }
 
   async function via(): Promise<void> {
+    if (!nativeShare) return copy();
     try {
       await navigator.share({ url, title });
     } catch (e) {
@@ -53,23 +54,22 @@
     </span>
     <span role="status">{t(copied || 'Copy link')}</span>
   </button>
-  {#if nativeShare}
-    <button class="share-action" type="button" onclick={via}>
-      <span class="share-action-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="20" height="20"
-          ><path
-            d="M12 15V4.5M8 8l4-3.5L16 8M6 12.5V18a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-5.5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          /></svg
-        >
-      </span>
-      <span>{t('Share via…')}</span>
-    </button>
-  {/if}
+  <!-- Always offered (owner, 2026-11-25); without the device's sheet it copies the link. -->
+  <button class="share-action" type="button" onclick={via}>
+    <span class="share-action-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="20" height="20"
+        ><path
+          d="M12 15V4.5M8 8l4-3.5L16 8M6 12.5V18a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-5.5"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        /></svg
+      >
+    </span>
+    <span>{t('Share via…')}</span>
+  </button>
   {#if onQuote}
     <button class="share-action" type="button" onclick={onQuote}>
       <span class="share-action-icon" aria-hidden="true">

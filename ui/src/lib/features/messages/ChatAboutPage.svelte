@@ -30,7 +30,6 @@
     groups: { id: string; title: string; count: number }[];
     fileUrl: (attachment: ChatAttachment) => Promise<string>;
     onBack: () => void;
-    onMenu: (x: number, y: number) => void;
     onCall: () => void;
     onPrefs: (prefs: ListPrefs) => void;
     onEditGroup: () => void;
@@ -124,15 +123,6 @@
         /></svg
       >
     </button>
-    <button
-      class="about-round"
-      type="button"
-      aria-label={t('Chat menu')}
-      onclick={(event) => {
-        const box = event.currentTarget.getBoundingClientRect();
-        p.onMenu(box.right - 220, box.bottom + 6);
-      }}><ToolbarIcon name="kebab" /></button
-    >
   </div>
 
   <div class="about-scroll">

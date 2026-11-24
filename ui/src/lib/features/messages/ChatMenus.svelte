@@ -19,7 +19,8 @@
 
   /**
    * web's chat menu (MessagesPage `chatMenu`): View profile (direct), Pin, Mute, Chat info
-   * (groups), Delete, and Leave group after a divider; on a project chat's header, Mute only.
+   * (groups), Delete, and Leave group after a divider. A project chat's face opens its page instead
+   * (owner, 2026-11-24), where Mute and Pin are.
    * Leaving asks first, as on web.
    */
   interface Props {
@@ -54,7 +55,6 @@
         icon: chat?.muted ? 'bell' : 'mute',
         onSelect: () => apply(at, { muted: !chat?.muted }),
       };
-      if (at.header) return [mute];
       return [
         {
           label: chat?.pinned ? t('Unpin') : t('Pin'),

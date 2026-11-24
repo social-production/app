@@ -223,7 +223,6 @@
     {groups}
     fileUrl={thread.fileUrl}
     onBack={() => onAbout(false)}
-    {onMenu}
     onCall={call}
     onPrefs={(prefs) => void inbox.setPrefs(chat.id, prefs)}
     onEditGroup={onInfo}

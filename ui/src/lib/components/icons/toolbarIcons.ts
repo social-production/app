@@ -23,6 +23,10 @@ export const toolbarIcons: Record<string, string> = {
     '<circle cx="9" cy="9" r="3" fill="none" stroke="currentColor" stroke-width="1.8" /> <path d="M4.5 17.5c.8-2.2 2.3-3.5 4.5-3.5s3.7 1.3 4.5 3.5M16.5 11.5l1.5 1.5 3-3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
   shield:
     '<path d="M12 4.5 6.5 7v5.2c0 3.1 2.3 5.9 5.5 7.3 3.2-1.4 5.5-4.2 5.5-7.3V7L12 4.5Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />',
+  // The profile ⋮ menu's Vouch and Mark as bot, as the old profile buttons drew them.
+  vouch:
+    '<path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6l7-3Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /><path d="M8.5 12l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />',
+  bot: '<rect x="5" y="8" width="14" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.8" /><path d="M12 4v4M9.5 13h.01M14.5 13h.01M10 16.5h4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /><circle cx="12" cy="3.5" r="1" fill="currentColor" />',
   plus: '<path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none" />',
   'map-pin':
     '<path d="M12 21s6.5-5.1 6.5-10a6.5 6.5 0 1 0-13 0c0 4.9 6.5 10 6.5 10Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" /> <circle cx="12" cy="11" r="2.2" fill="none" stroke="currentColor" stroke-width="1.8" />',
