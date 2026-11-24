@@ -7,6 +7,7 @@
   import { ZoomPan } from './zoomPan.svelte.ts';
 
   import '#lib/components/styles/photo-viewer.css';
+  import '#lib/components/styles/ux/photos.css';
 
   /** web's components/shared/PhotoViewer: a full-screen photo, wheel or pinch to zoom, drag
    * to pan, Escape or × to close. With several photos (a post's, Profiles and Comments

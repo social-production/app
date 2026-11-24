@@ -18,6 +18,9 @@
 
   import { resolve } from '$app/paths';
 
+  import PhotoViewer from '#lib/components/overlay/PhotoViewer.svelte';
+
+  import { ScopeArt } from './scopes/scopeArt.svelte.ts';
   import SpaceArtHeader from './SpaceArtHeader.svelte';
 
   /**
@@ -44,6 +47,19 @@
 
   let { project, charter, plans, names, moderation, onModeration, onMembers, onPhase }: Props =
     $props();
+
+  // The cover and picture open full screen, zoomable, and step between each other (owner,
+  // 2026-11-24).
+  const art = new ScopeArt();
+  $effect(() => {
+    void art.show(charter.picture, charter.cover);
+  });
+  const shots = $derived([art.pictureUrl, art.coverUrl].filter((u): u is string => !!u));
+  let viewing = $state<number | null>(null);
+  const openShot = (url: string | null): void => {
+    const at = url ? shots.indexOf(url) : -1;
+    if (at >= 0) viewing = at;
+  };
 
   const event = $derived(charter.mode === 'event');
   const leading = $derived(
@@ -120,9 +136,14 @@
 <div class="project-overview">
   <div class="context-panel">
     <div class="space-head" class:has-cover={!!charter.cover}>
-      <SpaceArtHeader cover={charter.cover} />
+      <SpaceArtHeader
+        cover={charter.cover}
+        url={art.coverUrl}
+        onOpen={() => openShot(art.coverUrl)}
+      />
       <FeedCardTop
         picture={charter.picture ?? null}
+        onPicture={art.pictureUrl ? () => openShot(art.pictureUrl) : undefined}
         mode={charter.mode}
         tags={charter.tags}
         stage={project.stage}
@@ -164,3 +185,14 @@
     </div>
   </div>
 </div>
+
+{#if viewing !== null}
+  <PhotoViewer
+    url={shots[viewing] ?? null}
+    alt={viewing === shots.indexOf(art.coverUrl ?? '') ? t('Cover') : t('Picture')}
+    index={viewing}
+    count={shots.length}
+    onStep={(d) => (viewing = (viewing ?? 0) + d)}
+    onClose={() => (viewing = null)}
+  />
+{/if}

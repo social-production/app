@@ -1,24 +1,28 @@
 <script lang="ts">
-  import { ScopeArt } from './scopes/scopeArt.svelte.ts';
+  import { t } from '#lib/i18n/index.ts';
 
   import '#lib/components/styles/ux/spaceart.css';
 
   /**
    * A project's, service's or event's cover at the top of its page (ADR 0117), edge to edge
    * like a profile (Details Header Mockups, B). Its picture sits beside the channel line
-   * below, in the header's tile (FeedCardTop's `picture`).
+   * below, in the header's tile (FeedCardTop's `picture`). Tapping the cover opens it full
+   * screen (owner, 2026-11-24).
    */
-  let { cover }: { cover: string | null | undefined } = $props();
-
-  const art = new ScopeArt();
-  $effect(() => {
-    void art.show(null, cover);
-  });
+  let {
+    cover,
+    url,
+    onOpen,
+  }: { cover: string | null | undefined; url: string | null; onOpen: () => void } = $props();
 </script>
 
 {#if cover}
-  <div
+  <button
     class="space-art-cover"
-    style={art.coverUrl ? `background-image: url(${art.coverUrl})` : undefined}
-  ></div>
+    type="button"
+    aria-label={t('View cover')}
+    disabled={!url}
+    style={url ? `background-image: url(${url})` : undefined}
+    onclick={onOpen}
+  ></button>
 {/if}
