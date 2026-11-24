@@ -80,10 +80,16 @@ export function drawQrPanel(
   logo: HTMLImageElement | null,
   pad: number,
   radius: number,
+  edge: string | null = null,
 ): void {
   const [x, y, side] = box;
   roundRect(ctx, x, y, side, side, radius);
   ctx.fillStyle = '#ffffff';
   ctx.fill();
+  if (edge) {
+    ctx.strokeStyle = edge;
+    ctx.lineWidth = Math.max(2, side / 160);
+    ctx.stroke();
+  }
   drawQr(ctx, qr, [x + pad, y + pad, side - pad * 2], logo);
 }

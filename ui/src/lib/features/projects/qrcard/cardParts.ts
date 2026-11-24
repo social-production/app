@@ -1,6 +1,6 @@
 import { t } from '#lib/i18n/index.ts';
 
-import { BRAND, drawCover, fillRound, font, roundRect } from './canvasKit.ts';
+import { BRAND, INK, SOFT_INK, drawCover, fillRound, font, roundRect } from './canvasKit.ts';
 import type { QrMatrix } from './qr.ts';
 
 /** What every QR card shows of a project, service, proposal or event. */
@@ -12,25 +12,43 @@ export interface CardData {
   place: string;
   url: string;
   qr: QrMatrix;
-  cover: HTMLImageElement | null;
   picture: HTMLImageElement | null;
   logo: HTMLImageElement | null;
 }
 
-/** The cover, or a band of the brand's green when the space has none. */
-export function drawBand(
-  ctx: CanvasRenderingContext2D,
-  data: CardData,
-  box: [number, number, number, number],
-): void {
-  if (data.cover) return drawCover(ctx, data.cover, box);
-  const [x, y, w, h] = box;
-  const g = ctx.createLinearGradient(x, y, x + w, y + h);
-  g.addColorStop(0, '#256b4c');
-  g.addColorStop(1, '#4f9f78');
-  ctx.fillStyle = g;
-  ctx.fillRect(x, y, w, h);
+/** A card's colours: white or dark paper (owner, 2026-11-24: no cover photo behind the text,
+ * the picture is enough). */
+export interface Paper {
+  bg: string;
+  ink: string;
+  soft: string;
+  body: string;
+  /** "Scan to …" and other green words. */
+  accent: string;
+  /** The tinted box behind a flyer's code, and the QR panel's edge on white. */
+  tint: string;
+  edge: string | null;
 }
+
+export const WHITE: Paper = {
+  bg: '#ffffff',
+  ink: INK,
+  soft: SOFT_INK,
+  body: '#3a3d42',
+  accent: BRAND,
+  tint: '#eef5f1',
+  edge: '#dfe4e0',
+};
+
+export const DARK: Paper = {
+  bg: '#16181b',
+  ink: '#f4f5f3',
+  soft: '#a7adb3',
+  body: '#d3d7da',
+  accent: '#7fd3a8',
+  tint: '#22302a',
+  edge: null,
+};
 
 /** The picture in a rounded frame of `ring` in `ringColor`; the logo tile when it has none. */
 export function drawPicture(
