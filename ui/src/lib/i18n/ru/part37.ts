@@ -6,11 +6,10 @@ export const part37: Record<string, Entry> = {
   'Whenever members set a session': 'Когда участники назначат встречу',
   Meetup: 'Встреча',
   Meetups: 'Встречи',
-  'Private meetup': 'Закрытая встреча',
   'Meet regularly or whenever, like pickup games':
     'Встречайтесь регулярно или когда удобно, например на игру',
-  'A private meetup gathers the people you invite to meet regularly or whenever: pickup games, run clubs, game nights. For a public one, start a proposal: a meetup plan makes it one.':
-    'Закрытая встреча собирает приглашённых вами людей регулярно или когда удобно: игры, пробежки, вечера настолок. Для открытой начните предложение: план встречи сделает его встречей.',
+  'For things people do regularly or whenever: pickup games, run clubs, game nights. Anyone can find it and join, and members add each session.':
+    'Для того, что люди делают регулярно или когда удобно: игры, пробежки, вечера настолок. Любой может найти и присоединиться, а участники добавляют каждую встречу.',
   'Publish meetup': 'Опубликовать встречу',
   'How do you meet?': 'Как вы встречаетесь?',
   'On a regular day': 'В постоянный день',
@@ -36,4 +35,5 @@ export const part37: Record<string, Entry> = {
     'Проходит в назначенный день или дни. Делает это открытым событием.',
   'Meets regularly or whenever; members add sessions. Makes this a meetup.':
     'Собирается регулярно или когда удобно; участники добавляют встречи. Делает это встречей.',
+  'Meetup title': 'Название встречи',
 };

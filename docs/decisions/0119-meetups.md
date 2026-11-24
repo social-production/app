@@ -16,8 +16,9 @@ The owner asked for a separate name; the Edit, Plan and Meetup mockups (§C) pro
 - A proposal becomes a meetup through a **Meetup plan**: an event plan whose schedule is
   `weekly` or `any-day`. Governance reads that plan's subtype as `meetup` (coordinator
   `plans::chosen_subtype`), and the phase move that cites it sets the space's subtype, as
-  production and operations plans set theirs. A private meetup is created with subtype
-  `meetup` directly (Create › Private meetup).
+  production and operations plans set theirs. **Create › Meetup** makes one directly: public
+  (owner: "Its specifically not private"), no audience step, subtype `meetup` from the start;
+  its first plan is a meetup plan.
 - Each session is an activity, as for events. Feed and map cards show the next session
   (ADR "next activity", #299); a meetup's own map pin needs no date (`entity_type: "meetup"`),
   and the feed and map filters gain Meetups. Region orders a meetup by its next session.

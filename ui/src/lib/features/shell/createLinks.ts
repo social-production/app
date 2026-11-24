@@ -39,7 +39,7 @@ export const createLinks: CreateLink[] = [
   },
   {
     href: resolve('/create/meetup'),
-    label: t('Private meetup'),
+    label: t('Meetup'),
     description: t('Meet regularly or whenever, like pickup games'),
     icon: 'event',
   },

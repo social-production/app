@@ -58,10 +58,10 @@
 </script>
 
 <CreateSheet
-  title={meetup ? t('Private meetup') : t('Private event')}
+  title={meetup ? t('Meetup') : t('Private event')}
   description={meetup
     ? t(
-        'A private meetup gathers the people you invite to meet regularly or whenever: pickup games, run clubs, game nights. For a public one, start a proposal: a meetup plan makes it one.',
+        'For things people do regularly or whenever: pickup games, run clubs, game nights. Anyone can find it and join, and members add each session.',
       )
     : t(
         'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
@@ -79,7 +79,7 @@
     <div class="form-stack">
       <ScopeSheetArt kind="space" icon="event" art={s.art} canEdit />
       <label>
-        <RequiredLabel>{t('Event title')}</RequiredLabel>
+        <RequiredLabel>{meetup ? t('Meetup title') : t('Event title')}</RequiredLabel>
         <input bind:value={s.title} maxlength="200" aria-required="true" />
       </label>
       <label>

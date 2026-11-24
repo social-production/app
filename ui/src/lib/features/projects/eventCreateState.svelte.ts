@@ -38,7 +38,10 @@ export class EventCreateState extends CreateState {
     this.isPrivate ? this.chosenGovernance : 'collaborative',
   );
   readonly upfrontPlan = $derived(this.governance === 'organizer_controlled');
-  override readonly steps = $derived(eventSteps(this.isPrivate, this.upfrontPlan));
+  // A meetup is public (owner, 2026-11-24: "Its specifically not private"): no audience step.
+  override readonly steps = $derived(
+    eventSteps(this.isPrivate, this.upfrontPlan).filter((s) => !this.meetup || s.id !== 'audience'),
+  );
   readonly planProblems = $derived(
     this.upfrontPlan ? upfrontPlanProblems(this.planWithPlace(), this.intent === 'physical') : [],
   );
@@ -50,7 +53,10 @@ export class EventCreateState extends CreateState {
   constructor(meetup = false) {
     super('event');
     this.meetup = meetup;
-    if (meetup) this.plan.scheduleMode = 'weekly';
+    if (meetup) {
+      this.plan.scheduleMode = 'weekly';
+      this.audience = 'public';
+    }
   }
 
   override charter(): Charter {
