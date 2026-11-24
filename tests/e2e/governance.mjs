@@ -91,7 +91,7 @@ await ann.reload();
 await until(ann, () => ann.getByRole('button', { name: '2 members' }), 'the second member');
 await ann.getByRole('button', { name: 'More actions' }).click();
 await ann.getByRole('menuitem', { name: 'Edit' }).click();
-await ann.locator('.edit-sheet').getByLabel('Title').fill(`${title} co-op`);
+await ann.locator('.create-sheet').getByLabel('Title').fill(`${title} co-op`);
 await ann.getByRole('button', { name: 'Propose edit' }).click();
 await voteYes(bob);
 await until(bob, () => bob.getByRole('heading', { name: `${title} co-op` }), 'the edit to apply');
