@@ -1,16 +1,25 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
-  import LocationPicker from '#lib/components/location/LocationPicker.svelte';
-  import { emptyPlaceValue, type PlaceSearch, type PlaceValue } from '#lib/domain/places.ts';
-  import { charterDraft, type Charter, type CharterDraft } from '#lib/domain/projects.ts';
+  import CreateSheet from '#lib/components/create/CreateSheet.svelte';
+  import LocationIntent from '#lib/components/create/LocationIntent.svelte';
+  import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
+  import { onlinePlaceValue, type PlaceSearch, type PlaceValue } from '#lib/domain/places.ts';
+  import {
+    charterDraft,
+    type Charter,
+    type CharterDraft,
+    type LocationChoice,
+  } from '#lib/domain/projects.ts';
 
   import type { Snippet } from 'svelte';
 
-  import OverlaySheet from './OverlaySheet.svelte';
+  import '#lib/components/styles/ux/editsheet.css';
 
   /**
-   * web's ProposeEditSheet: title, description, location label, filed as a proposal (M3).
-   * Organizer-run events save directly ("Edit event", ADR 0061).
+   * web's ProposeEditSheet in the create flow's look (Edit, Plan and Meetup mockups §A, owner
+   * 2026-11-24): the cover and picture on top, filled fields, the place as In person / Online,
+   * and a "Changed" tag on each field that differs. Filed as a proposal (M3); organizer-run
+   * events save directly ("Edit event", ADR 0061).
    */
   interface Props {
     open: boolean;
@@ -44,72 +53,85 @@
 
   let title = $state('');
   let description = $state('');
-  let location = $state<PlaceValue>(emptyPlaceValue());
+  let location = $state<PlaceValue>(onlinePlaceValue());
+  const before = $derived(charterDraft(charter));
+  const intent = $derived<LocationChoice>(location.mode === 'online' ? 'online' : 'physical');
+  const missing = $derived(
+    [!title.trim() && 'Title', !description.trim() && 'Description'].filter(
+      (m): m is string => !!m,
+    ),
+  );
 
   // Each opening starts from the current values.
   $effect(() => {
     if (open) ({ title, description, location } = charterDraft(charter));
   });
 
-  function submit(event: SubmitEvent): void {
-    event.preventDefault();
-    onSubmit({ title: title.trim(), description, location });
+  function setIntent(next: LocationChoice): void {
+    if (next === 'online') location = onlinePlaceValue();
+    else if (location.mode === 'online') location = { ...before.location, mode: 'physical' };
   }
 </script>
 
-<OverlaySheet
-  {open}
-  title={sheetTitle}
-  labelledById="project-edit-sheet"
-  rootClass="edit-sheet"
-  {onClose}
->
-  {#snippet subtitle()}
-    <p class="sheet-lead">
-      {art
-        ? t('Change the picture, cover, title, description, or location.')
-        : t('Change the title, description, or location.')}
-      {appliesDirectly
-        ? t('It applies as soon as you save.')
-        : t(
-            'Members vote on it, and your proposal counts as your Yes. While few members are active, your Yes alone can be enough, and then it applies straight away.',
-          )}
-    </p>
-  {/snippet}
-  <form id="project-edit-sheet-form" class="edit-form" onsubmit={submit}>
-    {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
-    {@render art?.()}
-    <label class="field">
-      <span class="field-label">{t('Title')}</span>
-      <input bind:value={title} maxlength="120" placeholder={t('Project title')} />
-    </label>
-    <label class="field">
-      <span class="field-label">{t('Description')}</span>
-      <textarea bind:value={description} rows="6" placeholder={t('Describe the project...')}
-      ></textarea>
-    </label>
-    <div class="field">
-      <span class="field-label">{t('Location')}</span>
-      <LocationPicker
-        value={location}
-        portaled
-        elevated
-        modes={['physical', 'online']}
-        onChange={(next) => (location = next)}
-        search={places.search}
-        failure={places.failure}
-      />
+{#snippet changed(differs: boolean)}
+  {#if differs}<em class="field-changed">{t('Changed')}</em>{/if}
+{/snippet}
+
+{#if open}
+  <CreateSheet
+    title={t(sheetTitle)}
+    description={appliesDirectly
+      ? t('It applies as soon as you save.')
+      : t(
+          'Members vote on it, and your proposal counts as your Yes. While few members are active, your Yes alone can be enough, and then it applies straight away.',
+        )}
+    steps={[{ id: 'edit', title: sheetTitle }]}
+    stepIndex={0}
+    {missing}
+    submitLabel={t(submitLabel)}
+    submittingLabel={t('Working...')}
+    submitting={pending}
+    askBeforeClose={false}
+    onStep={() => {}}
+    onSubmit={() => onSubmit({ title: title.trim(), description, location })}
+    {onClose}
+  >
+    <div class="form-stack edit-form">
+      {#if message}<div class="warning-card" role="alert">{message}</div>{/if}
+      {@render art?.()}
+      <label>
+        <span class="edit-label"
+          ><RequiredLabel>{t('Title')}</RequiredLabel>{@render changed(
+            title.trim() !== before.title.trim(),
+          )}</span
+        >
+        <input bind:value={title} maxlength="120" aria-required="true" />
+      </label>
+      <label>
+        <span class="edit-label"
+          ><RequiredLabel>{t('Description')}</RequiredLabel>{@render changed(
+            description.trim() !== before.description.trim(),
+          )}</span
+        >
+        <textarea bind:value={description} rows="5" aria-required="true"></textarea>
+      </label>
+      <div class="edit-place">
+        <span class="edit-label"
+          >{t('Location')}{@render changed(
+            location.displayLabel !== before.location.displayLabel ||
+              location.mode !== before.location.mode,
+          )}</span
+        >
+        <LocationIntent
+          {intent}
+          place={location}
+          allowLater={false}
+          search={places.search}
+          failure={places.failure}
+          onIntent={setIntent}
+          onPlace={(next) => (location = next)}
+        />
+      </div>
     </div>
-  </form>
-  {#snippet footer()}
-    <div class="sheet-actions">
-      <button class="sheet-cancel" type="button" onclick={onClose}>{t('Cancel')}</button>
-      <button
-        class="sheet-submit"
-        disabled={pending || !title.trim() || !description.trim()}
-        form="project-edit-sheet-form"
-        type="submit">{pending ? t('Working...') : submitLabel}</button
-      >
-    </div>
-  {/snippet}
-</OverlaySheet>
+  </CreateSheet>
+{/if}
