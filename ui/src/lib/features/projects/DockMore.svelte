@@ -70,7 +70,7 @@
     aria-expanded={open}
     onclick={() => (open = !open)}
   >
-    <ToolbarIcon name="more" />
+    <ToolbarIcon name="kebab" />
   </button>
   {#if open}
     <div class="dock-more-card" role="menu">
