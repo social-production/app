@@ -1,0 +1,28 @@
+/* Feed rows' actions as the detail pages' soft pills (owner, 2026-11-24), left-aligned under
+   the row's text; the pills themselves are item.css's. */
+.shell .feed-actions.feed-pills {
+  justify-content: flex-start;
+  gap: 8px;
+  max-width: none;
+  margin: 10px 0 0;
+}
+
+.shell .feed-pills .item-pill {
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.shell .feed-pills .item-pill.static {
+  cursor: default;
+}
+
+.shell .feed-pills .feed-action-icon,
+.shell .feed-pills .share-button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.shell .feed-pills .share-button {
+  position: relative;
+  cursor: pointer;
+}
