@@ -58,6 +58,7 @@
       commentCount={card.commentCount}
       shareHref={href}
       shareTitle={card.title}
+      shareKind="help request"
     >
       <VoteStrip bare support={card.demand} oppose={card.opposition} mine={null} {onSignal} />
     </FeedActions>

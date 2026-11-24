@@ -3,6 +3,7 @@
   import type { Snippet } from 'svelte';
 
   import GroupsIcon from '#lib/components/icons/GroupsIcon.svelte';
+  import { shareLink, type ShareKind } from '#lib/components/overlay/shareLink.ts';
   import { formatCompactCount } from '#lib/domain/count.ts';
 
   import '#lib/components/styles/ux/feed.css';
@@ -19,6 +20,8 @@
     /** Resolved path of the item, shared as a full link. */
     shareHref: string;
     shareTitle: string;
+    /** What the share sheet calls it and how a sent share is worded. */
+    shareKind?: ShareKind;
     children: Snippet;
   }
 
@@ -28,16 +31,24 @@
     memberCount = null,
     shareHref,
     shareTitle,
+    shareKind = 'project',
     children,
   }: Props = $props();
+
+  const sheet = shareLink();
 
   const commentLabel = $derived(`${plural(commentCount, '{n} comment', '{n} comments')}`);
   let shared = $state<'' | 'Link copied' | 'Copy failed'>('');
   let timer: ReturnType<typeof setTimeout> | null = null;
 
-  /** web's shareLink: the device's share sheet, else the link copied. */
+  /** The app's share sheet (Owner Notes Mockups §6); outside the shell, web's shareLink: the
+   * device's share sheet, else the link copied. */
   async function share(event: MouseEvent): Promise<void> {
     event.stopPropagation();
+    if (sheet) {
+      sheet.open({ kind: shareKind, title: shareTitle, path: shareHref });
+      return;
+    }
     const url = new URL(shareHref, window.location.origin).href;
     try {
       if (typeof navigator.share === 'function') {

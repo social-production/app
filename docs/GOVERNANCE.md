@@ -36,6 +36,9 @@ A vote counts when the voter:
 Rule 2 is platform-wide (from the directory DNA), so brand-new projects can vote at once,
 while accounts created after a proposal opens cannot swing it.
 
+Since ADR 0116 a New member can't cast a vote or propose one at all, and the member snapshot
+(N) lists only Full members, so New members never make a decision harder to reach.
+
 ## Standing (ADR 0007)
 
 Levels: `New → Full`, or `Paused` (bot review). Only **Full** votes count. (FastAPI's "warm" step

@@ -151,3 +151,35 @@
     animation: none;
   }
 }
+
+/* Like, Reply and Share with their counts, as a tweet's reply row (owner, 2026-11-24). The ⋮
+   report menu stays at the end. */
+.shell .comment-card .actions-row .comment-act {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 36px;
+  height: 32px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.shell .comment-card .actions-row .comment-act svg {
+  width: 17px;
+  height: 17px;
+}
+
+.shell .comment-card .actions-row .comment-act.like.on {
+  color: var(--danger, #e0245e);
+}
+
+.shell .comment-card .actions-row .comment-act:active {
+  background: color-mix(in srgb, var(--text-soft) 12%, transparent);
+}

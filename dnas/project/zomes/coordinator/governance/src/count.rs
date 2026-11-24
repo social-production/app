@@ -8,6 +8,7 @@ use project_integrity::{Outcome, Proposal, Vote, VoteChoice};
 use sp_governance::challenge::{added, deciding, in_time, window_end};
 use sp_governance::{tally, Choice, Tally, Threshold};
 
+use crate::decide::Standing;
 use crate::reads::{self, Found};
 use crate::roll::Roll;
 
@@ -38,6 +39,25 @@ impl Count {
             })
             .collect();
         tally(&choices, self.population, Threshold::DEFAULT)
+    }
+
+    /// The left-out members who had Full standing before the proposal: only they vote, so only
+    /// they are worth a challenge (ADR 0116).
+    pub fn full_missing(
+        &self,
+        p: &Found<Proposal>,
+        roll: &Roll,
+        standing: &mut Standing,
+    ) -> ExternResult<Vec<ActionHash>> {
+        let mut out = Vec::new();
+        for hash in &self.missing {
+            if let Some(agent) = roll.member_at(hash, p.at) {
+                if standing.full(agent, p.at)? {
+                    out.push(hash.clone());
+                }
+            }
+        }
+        Ok(out)
     }
 
     /// Whether a challenge written now would still count.

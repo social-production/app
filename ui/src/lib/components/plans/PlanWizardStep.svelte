@@ -162,7 +162,15 @@
   <select bind:value={form.scheduleMode} aria-label={t('Schedule')}>
     <option value="date">{t('Single date')}</option>
     <option value="range">{t('Date range')}</option>
+    <option value="any-day">{t('No set date')}</option>
   </select>
+  {#if form.scheduleMode === 'any-day'}
+    <p class="helper-copy">
+      {t(
+        'For something ongoing, like weekly games: add each session as an activity, and people sign up to the ones they come to.',
+      )}
+    </p>
+  {/if}
 {:else if step.id === 'schedule-date'}
   <input type="date" bind:value={form.scheduledDate} aria-label={t('Date')} />
 {:else if step.id === 'schedule-range'}

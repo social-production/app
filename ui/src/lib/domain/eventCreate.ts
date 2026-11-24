@@ -43,16 +43,19 @@ export function eventSteps(isPrivate: boolean, upfrontPlan: boolean): EventStep[
 /** web's `validatePrivatePlan` messages, in its order (an empty list means ready). */
 export function upfrontPlanProblems(f: PlanForm, physical: boolean, now = Date.now()): string[] {
   const out: string[] = [];
+  const undated = f.scheduleMode === 'any-day';
   const range = f.scheduleMode === 'range';
   const hasDates = range ? !!f.rangeStartDate && !!f.rangeEndDate : !!f.scheduledDate;
   if (!f.title.trim()) out.push('Add a plan title.');
   if (!f.description.trim()) out.push('Add a plan description.');
   if (!f.location.trim() && physical) out.push('Add a location for the event plan.');
-  if (!range && !f.scheduledDate) out.push('Choose the event date.');
-  if (range && !hasDates) out.push('Choose both the start date and end date.');
-  if (!f.startTime) out.push('Choose a start time.');
-  if (!f.finishTime) out.push('Choose a finish time.');
-  if (hasDates && f.startTime && f.finishTime) {
+  if (!undated) {
+    if (!range && !f.scheduledDate) out.push('Choose the event date.');
+    if (range && !hasDates) out.push('Choose both the start date and end date.');
+    if (!f.startTime) out.push('Choose a start time.');
+    if (!f.finishTime) out.push('Choose a finish time.');
+  }
+  if (!undated && hasDates && f.startTime && f.finishTime) {
     const bounds = scheduleBounds(scheduleFromForm(f));
     if (!bounds || bounds.end <= bounds.start) out.push('Finish must be after the event start.');
     else if (bounds.start <= now) out.push('Event plans cannot start in the past.');

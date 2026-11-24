@@ -100,15 +100,15 @@ await people.locator('.member-row', { hasText: `bob_${stamp}` }).waitFor();
 await people.getByRole('button', { name: 'Back' }).click();
 log('Ann sees Bob on the People page');
 
-// web's "Share +" on the project page: send to Bob (a direct-chat message plus web's
-// `prj-share` notification), and "Create post" starts a post with the link.
+// The share sheet (Owner Notes Mockups §6) on the project page: send to Bob (a direct-chat
+// message plus web's `prj-share` notification), and "Quote in a post" quotes it.
 await ann.getByRole('button', { name: 'Share project' }).click();
 await ann.getByRole('button', { name: 'Copy link' }).waitFor();
-const shareSearch = ann.locator('#share-people-search');
+const shareSearch = ann.getByLabel('Search people');
 for (let i = 0; ; i++) {
   await shareSearch.fill('');
   await shareSearch.fill(`bob_${stamp}`);
-  const row = ann.locator('.contact-row', { hasText: `bob_${stamp}` }).first();
+  const row = ann.locator('.share-face', { hasText: `bob_${stamp}` }).first();
   if (await row.waitFor({ timeout: 5_000 }).then(() => true, () => false)) {
     await row.click();
     break;
@@ -118,12 +118,10 @@ for (let i = 0; ; i++) {
 await ann.getByRole('button', { name: 'Send', exact: true }).click();
 await shareSearch.waitFor({ state: 'detached', timeout: 120_000 });
 await ann.getByRole('button', { name: 'Share project' }).click();
-await ann.getByRole('button', { name: 'Create post' }).click();
+await ann.getByRole('button', { name: 'Quote in a post' }).click();
 await ann.waitForURL(/\/create\/post/);
-const prefilled = await ann.getByLabel(/What's on your mind/).inputValue();
-const link = new URL(projectUrl);
-assert.equal(prefilled, `Check this out: ${title}\n${link.origin}${link.pathname}`);
-log('Ann shared the project with Bob, and Create post starts from its link');
+await ann.locator('.quoted-card', { hasText: title }).waitFor({ timeout: 60_000 });
+log('Ann shared the project with Bob, and Quote in a post quotes it');
 
 const shared = bob.locator('.notification-card', { hasText: `${title} was shared with you.` });
 for (let i = 0; ; i++) {
