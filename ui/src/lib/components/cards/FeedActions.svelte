@@ -7,10 +7,13 @@
   import { formatCompactCount } from '#lib/domain/count.ts';
 
   import '#lib/components/styles/ux/feed.css';
+  import '#lib/components/styles/ux/item.css';
+  import '#lib/components/styles/ux/feedpills.css';
 
   /**
-   * A feed row's action row (ADR 0097): comments, the votes (the slot), members, share.
-   * Bare icon buttons spread across the row, as on Twitter's phone app.
+   * A feed row's action row: the votes (the slot), comments, members, Share, as the same soft
+   * pills the item's own page shows under it (owner, 2026-11-24: "the same bar as they do
+   * inside details").
    */
   interface Props {
     /** Resolved path (+ query or hash) of the comments. */
@@ -66,9 +69,10 @@
   }
 </script>
 
-<div class="feed-actions">
+<div class="feed-actions item-actions feed-pills">
+  {@render children()}
   <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved path + query -->
-  <a class="feed-action comment-link" href={commentHref} aria-label={commentLabel}>
+  <a class="item-pill" href={commentHref} aria-label={commentLabel}>
     <svg aria-hidden="true" viewBox="0 0 24 24" class="feed-action-icon"
       ><path
         d="M6 5.5h12a1.5 1.5 0 0 1 1.5 1.5v8a1.5 1.5 0 0 1-1.5 1.5h-8l-4 3v-3A1.5 1.5 0 0 1 4.5 15V7A1.5 1.5 0 0 1 6 5.5Z"
@@ -80,21 +84,14 @@
     >
     <span aria-hidden="true">{formatCompactCount(commentCount)}</span>
   </a>
-  {@render children()}
   {#if memberCount !== null}
-    <span class="feed-action static" title={`${memberCount} members`}>
+    <span class="item-pill static" title={`${memberCount} members`}>
       <GroupsIcon className="feed-action-icon" />
       <span>{formatCompactCount(memberCount)}</span>
     </span>
   {/if}
-  <button
-    class="feed-action"
-    type="button"
-    aria-label={t('Share')}
-    title={t('Share')}
-    onclick={share}
-  >
-    <svg aria-hidden="true" viewBox="0 0 24 24" class="feed-action-icon"
+  <button class="share-button" type="button" title={t('Share')} onclick={share}>
+    <svg aria-hidden="true" viewBox="0 0 24 24"
       ><path
         d="M12 15V4.5M8 8l4-3.5L16 8M6 12.5V18a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-5.5"
         fill="none"
@@ -104,6 +101,7 @@
         stroke-linejoin="round"
       /></svg
     >
+    <span>{t('Share')}</span>
     <span class="feed-action-note" role="status">{shared}</span>
   </button>
 </div>

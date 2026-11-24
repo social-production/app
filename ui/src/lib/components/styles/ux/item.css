@@ -126,11 +126,15 @@
 }
 
 /* The actions: soft pills, no lines (Reddit's feel). */
+/* Spread across the row, on feed cards, item pages and comments alike (owner, 2026-11-24:
+   "more spaced out"); wide screens keep them within reach of each other. */
 .shell .item-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
+  max-width: 520px;
   margin: 14px 0 0;
 }
 
