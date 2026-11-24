@@ -11,4 +11,7 @@ export const part39: Record<string, Entry> = {
   'Only full members can vouch.': 'Ручаться могут только полноправные участники.',
   'Opens once a full member vouches for you.':
     'Станет доступно, когда за вас поручится полноправный участник.',
+  'Can vouch for people and mark bots.': 'Может ручаться за людей и отмечать ботов.',
+  '{n} of 2 vouches; then they can vouch and mark bots.':
+    '{n} из 2 поручительств; после этого можно ручаться и отмечать ботов.',
 };
