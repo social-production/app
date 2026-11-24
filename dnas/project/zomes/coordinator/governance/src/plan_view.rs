@@ -45,7 +45,7 @@ pub struct PlanView {
     pub created_at: Timestamp,
     pub plan: Plan,
     pub tally: TallyView,
-    /// Passed, and the recount of Full members' votes passes too.
+    /// Passed, and the recount without bots' votes passes too.
     pub approved: bool,
     pub leader: Option<LeaderStatus>,
     pub criteria: Vec<CriterionView>,

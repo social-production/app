@@ -27,7 +27,7 @@ pub struct TallyView {
     pub settled: bool,
     /// Members challenges added to the count.
     pub added: u32,
-    /// The votes passed it, but not enough of them came from people with Full standing, so
+    /// The votes passed it, but not enough of them came from accounts that aren't bots, so
     /// nothing was applied (ADR 0033); shown as not passed.
     pub uncounted: bool,
     /// Members from before the proposal the count still leaves out, as this node sees them.

@@ -123,14 +123,16 @@ async fn an_edit_passes_with_enough_yes_votes_and_applies() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn rejected_and_ineligible_proposals_change_nothing() {
-    // Agents 0 and 1 are founders (Full); agent 2 is New.
+async fn rejected_proposals_change_nothing_and_new_members_vote() {
+    // Agents 0 and 1 are founders (Full); agent 2 is New, which carries no weight.
     let net = Net::new(3, 2, "reject").await;
     let rejected: ActionHash = net.call(0, "governance", "propose", rename("Nope")).await;
     net.settle().await;
-    vote(&net, 1, &rejected, VoteChoice::No)
-        .await
-        .expect("vote");
+    for agent in [1, 2] {
+        vote(&net, agent, &rejected, VoteChoice::No)
+            .await
+            .expect("vote");
+    }
     net.settle().await;
     // The last voter may not have seen every vote; anyone closes a settled proposal.
     let _: Option<ActionHash> = net
@@ -139,27 +141,33 @@ async fn rejected_and_ineligible_proposals_change_nothing() {
     net.settle().await;
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
     let closed = list.iter().find(|p| p.id == rejected).expect("listed");
-    assert_eq!((closed.no, &closed.status), (1, &Verdict::Rejected));
+    assert_eq!((closed.no, &closed.status), (2, &Verdict::Rejected));
 
-    // A New member neither proposes nor votes (ADR 0116): only Full members' votes count.
-    let sneaky: Result<ActionHash, String> = net
-        .try_call(2, "governance", "propose", rename("Sneaky"))
+    // A New member proposes and votes like anyone (ADR 0118), and counts in the snapshot.
+    let newcomer: ActionHash = net
+        .call(2, "governance", "propose", rename("Newcomer"))
         .await;
-    assert!(sneaky.is_err(), "a New member can't propose a vote");
-    let fair: ActionHash = net.call(0, "governance", "propose", rename("Fair")).await;
     net.settle().await;
-    assert!(
-        vote(&net, 2, &fair, VoteChoice::No).await.is_err(),
-        "a New member can't vote"
-    );
-    // The count is of the two Full members only, so it needs both their votes.
     let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
-    let open = list.iter().find(|p| p.id == fair).expect("listed");
+    let open = list.iter().find(|p| p.id == newcomer).expect("listed");
     assert_eq!(
-        (open.population, open.missing),
-        (2, 0),
-        "New members aren't counted"
+        (open.yes, open.population, open.missing),
+        (1, 3, 0),
+        "a New member's proposal carries their yes, and all three members count"
     );
+    for agent in [0, 1] {
+        vote(&net, agent, &newcomer, VoteChoice::No)
+            .await
+            .expect("vote");
+    }
+    net.settle().await;
+    let _: Option<ActionHash> = net
+        .call(0, "governance", "close_proposal", newcomer.clone())
+        .await;
+    net.settle().await;
+    let list: Vec<ProposalView> = net.call(0, "governance", "list_proposals", ()).await;
+    let closed = list.iter().find(|p| p.id == newcomer).expect("listed");
+    assert_eq!((closed.no, &closed.status), (2, &Verdict::Rejected));
     assert_eq!(
         project(&net, 1).await.charter.map(|c| c.title),
         Some("Garden".into())

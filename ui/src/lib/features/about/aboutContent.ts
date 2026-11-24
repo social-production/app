@@ -122,19 +122,19 @@ export const aboutDecisions: Block[] = [
     title: t('Votes'),
     paragraphs: [
       'A decision passes with at least 66% yes among the votes cast, once enough members have voted. How many is enough grows with the group but much more slowly than its size: it is the sample a pollster would need for a confident answer (Cochran’s formula, with a margin of error that tightens as the group grows), and never more than three quarters of the members. Small groups need most of their members; large ones need a representative share.',
-      'Votes are final once cast. A vote counts only if the voter was a full member before the proposal was made, and anyone can challenge a count that left eligible members out.',
+      'Votes are final once cast. A vote counts unless the voter’s account had been found to be a bot when the proposal was made, and anyone can challenge a count that left eligible members out.',
     ],
   },
   {
     title: t('Standing'),
     paragraphs: [
-      'New accounts can join projects, talk and help straight away. To vote and to vouch, an account needs full standing: two full members vouch for it, or it stays active for 30 days. Full members can mark an account they believe is a bot; three marks open a public review, and if 66% of the voting full members agree, the account is paused and its votes stop counting.',
+      'Every account can join projects, talk, help and vote straight away. Full member is a label for accounts that two full members vouched for (or that stayed active for 30 days); the only extra it brings is marking accounts as bots. A full member can mark an account they believe is a bot; three marks open a public review, and if 66% of the voters agree, the account is paused and its votes stop counting.',
     ],
   },
   {
     title: t('Moderation'),
     paragraphs: [
-      'Anyone can report a post, project, comment or message. Full members vote on the report, with a quorum sized from the people involved (its members, commenters and those who signalled on it) and a yes share of at least 66%, higher for older or popular items. Serious harm can be hidden quickly while the vote runs, behind a warning you can choose to look past.',
+      'Anyone can report a post, project, comment or message. Everyone can vote on the report, with a quorum sized from the people involved (its members, commenters and those who signalled on it) and a yes share of at least 66%, higher for older or popular items. Serious harm can be hidden quickly while the vote runs, behind a warning you can choose to look past.',
     ],
   },
 ];

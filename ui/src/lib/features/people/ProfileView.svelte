@@ -14,18 +14,16 @@
   import { claimFullStanding, getPerson, pairingOf, vouchFor } from '#lib/services/people.ts';
   import { connection } from '#lib/stores/connection.svelte.ts';
 
-  import BotButton from './BotButton.svelte';
   import BotReviewCard from './BotReviewCard.svelte';
   import EditProfileSheet from './EditProfileSheet.svelte';
   import FollowButton from './FollowButton.svelte';
   import FollowRequests from './FollowRequests.svelte';
   import { ProfileFollows } from './followState.svelte.ts';
   import MessageButton from './MessageButton.svelte';
-  import ProfileShare from './ProfileShare.svelte';
+  import ProfileMenu from './ProfileMenu.svelte';
   import { ProfileEditor } from './profileEdit.svelte.ts';
   import TrustSheets from './TrustSheets.svelte';
   import { ProfileTrust } from './trustState.svelte.ts';
-  import VouchButton from './VouchButton.svelte';
 
   import '#lib/components/styles/profile.css';
 
@@ -121,7 +119,6 @@
       <ProfileHero
         person={shown}
         {devices}
-        trustOpen={trust.open}
         cover={editor.cover}
         onCoverFile={own
           ? (file) => void placed(file, 'wide', (f) => editor.pickCover(f))
@@ -129,10 +126,6 @@
         onPhotoFile={own
           ? (file) => void placed(file, 'round', (f) => editor.pickPhoto(shown, f))
           : undefined}
-        onStanding={() => {
-          trust.open = !trust.open;
-          if (trust.open) follows.list = null;
-        }}
       >
         {#snippet counts()}
           {@const view = follows.view}
@@ -165,7 +158,6 @@
         {#snippet actions()}
           <!-- As on web, guests see no actions on someone's profile. -->
           {#if !own && me}
-            {@const viewing = me}
             <div class="action-row">
               <FollowButton
                 name={shown.profile?.name ?? 'them'}
@@ -177,31 +169,32 @@
                 <MessageButton
                   person={{ agent: shown.agent, name: shown.profile?.name ?? 'Unnamed' }}
                 />
-                <ProfileShare agent={shown.agent} name={shown.profile?.name ?? 'Unnamed'} compact />
-                <VouchButton
-                  person={shown}
-                  viewer={me}
-                  {busy}
-                  onVouch={() => run(() => vouchFor(agent))}
-                />
-                <BotButton
-                  name={shown.profile?.name ?? 'them'}
-                  marked={trust.markedBy(viewing.agent)}
-                  canMark={viewerFull && !trust.review?.myCooldownUntil}
-                  busy={trust.stancePending || !trust.review}
-                  onToggle={() => trust.toggleMark(viewing.agent)}
-                />
               {/if}
             </div>
           {/if}
         {/snippet}
         {#snippet aside()}
-          <!-- Edit profile opens over the profile, beside the photo (Profiles mockups §2). -->
+          <!-- Edit profile opens over the profile, beside the photo (Profiles mockups §2); the ⋮
+               holds Share, standing, Vouch and Mark as bot (owner, 2026-11-24). -->
           {#if own}
             <button class="edit-profile" type="button" onclick={() => (editor.open = true)}
               >{t('Edit profile')}</button
             >
           {/if}
+          <ProfileMenu
+            person={shown}
+            viewer={me}
+            {own}
+            marked={!!me && trust.markedBy(me.agent)}
+            canMark={viewerFull && !trust.review?.myCooldownUntil}
+            busy={busy || trust.stancePending || !trust.review}
+            onStanding={() => {
+              trust.open = true;
+              follows.list = null;
+            }}
+            onVouch={() => run(() => vouchFor(agent))}
+            onMark={() => me && trust.toggleMark(me.agent)}
+          />
         {/snippet}
       </ProfileHero>
       {#if own}<EditProfileSheet {editor} person={shown} />{/if}

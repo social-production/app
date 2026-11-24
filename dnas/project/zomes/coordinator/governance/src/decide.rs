@@ -1,7 +1,7 @@
 //! Which proposals passed (ADR 0033, 0040). For each proposal with a deciding Outcome (the
 //! earliest citing every counted challenge), every visible vote cast before it is recounted
-//! against the challenged population, keeping only voters with Full standing from before the
-//! proposal; it passed only if that recount passes.
+//! against the challenged population, leaving out voters found to be bots when the proposal
+//! was made (ADR 0118); it passed only if that recount passes.
 
 use std::collections::BTreeMap;
 
@@ -24,7 +24,7 @@ pub struct Decision {
     pub closed_by: AgentPubKey,
 }
 
-/// Full-standing answers from the directory cell, asked once per (agent, proposal time).
+/// Whose votes count (not bots, ADR 0118), from the directory cell, asked once per (agent, proposal time).
 #[derive(Default)]
 pub struct Standing(BTreeMap<(AgentPubKey, Timestamp), bool>);
 
@@ -40,8 +40,8 @@ impl Standing {
     }
 }
 
-/// The votes cast before `until` by people with Full standing from before the proposal: the
-/// only ones a decision is applied on (ADR 0033).
+/// The votes cast before `until` by people not found to be bots when the proposal was made:
+/// the only ones a decision is applied on (ADR 0033, 0118).
 pub fn eligible_votes(
     proposal: &Found<Proposal>,
     until: Timestamp,

@@ -5,11 +5,13 @@ import { commitToRole, helpActivity } from '#lib/services/helpRequests.ts';
 import { getPerson } from '#lib/services/people.ts';
 import { getProject, setSignal } from '#lib/services/projects.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+import { overHeld, withSignal, type HeldSignal } from '../heldSignal.ts';
 import { ModerationLoader } from '../moderationState.svelte.ts';
 
 /** One help request page (web's HelpRequestPageData): the space, its activity and names. */
 export class HelpState {
   project = $state<Project>();
+  #held: HeldSignal | null = null;
   activity = $state<Activity | null>(null);
   names = $state<Record<string, string>>({});
   error = $state<string>();
@@ -43,7 +45,7 @@ export class HelpState {
 
   private async fetch(): Promise<void> {
     const [project, activity] = await Promise.all([getProject(this.id), helpActivity(this.id)]);
-    this.project = project;
+    [this.project, this.#held] = overHeld(project, this.#held);
     this.activity = activity;
     this.error = undefined;
     const agents = [project.creator, ...(activity?.roles.flatMap((r) => r.people) ?? [])];
@@ -81,6 +83,7 @@ export class HelpState {
   async vote(next: Stance | null): Promise<void> {
     if (!requireViewer()) throw new Error('signed out');
     await setSignal(this.id, next);
+    if (this.project) [this.project, this.#held] = withSignal(this.project, next);
     void this.fetch().catch(() => undefined);
   }
 }

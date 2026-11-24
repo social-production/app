@@ -1,5 +1,5 @@
 //! ADR 0109: a channel's or community's picture and cover are directory `ScopeImage` records
-//! named by its charter and changed by its own votes; and on a #platform project any Full
+//! named by its charter and changed by its own votes; and on a #platform project anyone
 //! member may vote, members or not.
 
 use holochain::prelude::*;
@@ -139,9 +139,10 @@ async fn a_channel_takes_a_picture_and_votes_on_a_new_cover() {
 }
 
 #[tokio::test(flavor = "multi_thread")]
-async fn any_full_member_votes_on_a_platform_project() {
+async fn anyone_votes_on_a_platform_project() {
     // Agents 0–2 are Full, agent 3 is New; all join, then 2 and 3 leave. Two members remain,
-    // so the edit needs two yes votes: the proposer's and a Full non-member's.
+    // so the edit needs two yes votes: the proposer's and a non-member's, New or not (ADR
+    // 0118).
     let platform = Charter {
         tags: vec!["#platform".into()],
         ..charter("productive")
@@ -160,11 +161,9 @@ async fn any_full_member_votes_on_a_platform_project() {
         )
         .await;
     net.settle().await;
-    let new = vote(&net, 3, &proposal).await;
-    assert!(new.is_err(), "a New non-member can't vote: {new:?}");
-    vote(&net, 2, &proposal)
+    vote(&net, 3, &proposal)
         .await
-        .expect("a Full non-member votes");
+        .expect("a New non-member votes");
     net.settle().await;
     assert_eq!(
         charter_of(&net, 1).await.description,

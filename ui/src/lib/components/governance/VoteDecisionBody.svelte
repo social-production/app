@@ -48,13 +48,11 @@
   {/if}
   {#if newVoter && proposal.status === 'Open'}
     <p class="network-vote-line">
-      {t(
-        'Only Full members vote. You get Full standing from two vouches by Full members, or after steady activity.',
-      )}
+      {t('A community review found this account is a bot, so it can’t vote.')}
     </p>
   {/if}
   {#if isNetworkVote(charter.tags)}
-    <p class="network-vote-line">{t('Network vote: any Full member can vote')}</p>
+    <p class="network-vote-line">{t('Network vote: anyone can vote')}</p>
   {/if}
 
   {#if move}

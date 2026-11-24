@@ -14,7 +14,7 @@
 </script>
 
 <PeopleSheet
-  description={`${standingLabel(person)}. ${standingHint(person)} Only full members can vouch. Three bot marks from full members open a public review; marks alone never pause anyone.`}
+  description={`${standingLabel(person)}. ${standingHint(person)} Only full members can vouch or mark bots. Three bot marks open a public review that anyone can vote in; marks alone never pause anyone.`}
   open={trust.open}
   sectionLayout="tabs"
   sections={[
@@ -28,7 +28,7 @@
   open={trust.confirming}
   title={t('Mark {name} as a possible bot?', { name })}
   body={t(
-    'One mark only flags the account. When three full members mark it, a public review opens and full members vote on whether it is a bot. You can clear your mark any time.',
+    'One mark only flags the account. When three full members mark it, a public review opens and anyone can vote on whether it is a bot. You can clear your mark any time.',
   )}
   confirmLabel={t('Mark as bot')}
   danger

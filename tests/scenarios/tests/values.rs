@@ -1,5 +1,5 @@
 //! Project values (ADR 0041): members add values and rate their importance in the Proposal
-//! phase; only Full members' latest votes count, and values averaging 5 or more become plan
+//! phase; everyone's latest votes count (ADR 0118), and values averaging 5 or more become plan
 //! criteria.
 
 use holochain::prelude::*;
@@ -56,7 +56,8 @@ async fn vote_yes(net: &Net, i: usize, proposal: &ActionHash) {
     let _: ActionHash = net.call(i, "governance", "vote", input).await;
 }
 
-/// Values and their votes: duplicates refused, the latest vote counts, New members' don't.
+/// Values and their votes: duplicates refused, the latest vote counts, New members' count too
+/// (ADR 0118).
 async fn rated_values(net: &Net) -> ActionHash {
     let space = add(net, 0, "Use unused space").await.expect("added");
     net.settle().await;
@@ -85,8 +86,8 @@ async fn rated_values(net: &Net) -> ActionHash {
     let v = &seen[0];
     assert_eq!(
         (v.count, v.average_x100, v.mine),
-        (2, 700, Some(1)),
-        "Full members' latest votes"
+        (3, 500, Some(1)),
+        "everyone's latest votes"
     );
     assert_eq!((seen[1].count, seen[1].average_x100), (1, 300));
     space
@@ -94,9 +95,6 @@ async fn rated_values(net: &Net) -> ActionHash {
 
 /// Leaving Proposal closes values; the prominent one becomes a plan criterion.
 async fn criteria_on_a_plan(net: &Net, space: &ActionHash) {
-    // A New member's vote never counts, so with them in, 3 of 3 could never be reached.
-    let _: () = net.call(2, "project", "leave", ()).await;
-    net.settle().await;
     let to_plans = ProposalKind::Phase {
         to: "phase-2".into(),
         plan: None,
@@ -104,7 +102,9 @@ async fn criteria_on_a_plan(net: &Net, space: &ActionHash) {
     };
     let id: ActionHash = net.call(0, "governance", "propose", to_plans).await;
     net.settle().await;
+    // Three members: all three vote (sp_governance quorum), the New one too (ADR 0118).
     vote_yes(net, 1, &id).await;
+    vote_yes(net, 2, &id).await;
     net.settle().await;
     assert!(add(net, 0, "Late").await.is_err(), "Proposal phase only");
     assert!(rate(net, 0, space, 9).await.is_err(), "Proposal phase only");
@@ -170,7 +170,7 @@ fn beds() -> Plan {
 
 #[tokio::test(flavor = "multi_thread")]
 async fn values_are_rated_in_proposal_and_judge_the_plans() {
-    // Two Full founders and one New member.
+    // Two Full founders and one New member, whose votes count the same (ADR 0118).
     let net = Net::new(3, 2, "values").await;
     net.demand_all().await;
     let space = rated_values(&net).await;

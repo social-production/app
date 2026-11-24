@@ -11,7 +11,7 @@ export class BoardState {
   people = $state<Record<string, Person>>({});
   /** The viewer's key, so their row comes first and has no vote buttons. */
   me = $state('');
-  /** web's `canVolunteer`: Full standing (web's `ensure_established_voter`). */
+  /** web's `canVolunteer`: anyone not found to be a bot (ADR 0118). */
   canVolunteer = $state(false);
   error = $state<string>();
 
@@ -27,7 +27,7 @@ export class BoardState {
       );
       const found = await Promise.all(missing.map(getPerson));
       this.people = { ...this.people, ...Object.fromEntries(found.map((p) => [p.agent, p])) };
-      this.canVolunteer = !!me && this.people[me]?.standing.level === 'Full';
+      this.canVolunteer = !!me && !!this.people[me] && this.people[me].standing.level !== 'Paused';
       this.board = board;
     } catch (e) {
       this.error = explain(e);

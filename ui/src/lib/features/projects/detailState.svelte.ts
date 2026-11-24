@@ -23,6 +23,7 @@ import { getProject, joinProject, setSignal } from '#lib/services/projects.ts';
 import { addValue, listValues, rateValue } from '#lib/services/values.ts';
 import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
 
+import { overHeld, withSignal, type HeldSignal } from './heldSignal.ts';
 import { tellDecisions } from './outcomeNotices.ts';
 import { tellMembers } from './phaseNotice.ts';
 import { SoftwareState } from './software/softwareState.svelte.ts';
@@ -30,14 +31,15 @@ import { SoftwareState } from './software/softwareState.svelte.ts';
 /** One project page: the project, its people and proposals, and the viewer's actions on it. */
 export class DetailState {
   project = $state<Project>();
+  #held: HeldSignal | null = null;
   members = $state<Person[]>([]);
   proposals = $state<Proposal[]>([]);
   plans = $state<PlanBoard>();
   values = $state<ProjectValue[]>([]);
   /** Display names by agent key (creator, members, proposers, update authors). */
   names = $state<Record<string, string>>({});
-  /** Whether the viewer has Full standing: only Full members' votes decide (ADR 0033). */
-  viewerFull = $state<boolean | null>(null);
+  /** Whether the viewer's votes count: everyone's do unless found to be a bot (ADR 0118). */
+  viewerVotes = $state<boolean | null>(null);
   error = $state<string>();
   joining = $state(false);
   saving = $state(false);
@@ -136,8 +138,9 @@ export class DetailState {
       await Promise.all(settled.map((id) => closeProposal(this.id, id)));
       [project, proposals, plans, values] = await this.read();
     }
+    [project, this.#held] = overHeld(project, this.#held);
     const members = await Promise.all(project.members.map(getPerson));
-    if (this.viewerFull === null && project.amMember) void this.loadViewer();
+    if (this.viewerVotes === null && project.amMember) void this.loadViewer();
     this.project = project;
     this.members = members;
     this.proposals = proposals;
@@ -158,7 +161,7 @@ export class DetailState {
 
   private async loadViewer(): Promise<void> {
     try {
-      this.viewerFull = (await getPerson(await myAgent())).standing.level === 'Full';
+      this.viewerVotes = (await getPerson(await myAgent())).standing.level !== 'Paused';
     } catch {
       // Unknown standing shows no note.
     }
@@ -187,11 +190,12 @@ export class DetailState {
   }
 
   /** Guests see web's sign-in notice; the strip rolls back. */
-  signal(next: Stance | null): Promise<void> {
+  async signal(next: Stance | null): Promise<void> {
     if (!requireViewer('Sign in to support this project.')) {
-      return Promise.reject(new Error('Sign in to support this project.'));
+      throw new Error('Sign in to support this project.');
     }
-    return setSignal(this.id, next);
+    await setSignal(this.id, next);
+    if (this.project) [this.project, this.#held] = withSignal(this.project, next);
   }
 
   async vote(proposal: Proposal, choice: VoteChoice): Promise<void> {

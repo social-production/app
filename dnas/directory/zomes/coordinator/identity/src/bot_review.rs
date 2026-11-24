@@ -2,8 +2,6 @@
 //! the one re-review, as links on the account (identity integrity `bot_review`). The state is
 //! replayed from them by every reader (`sp_bot_review::replay`).
 
-use std::collections::BTreeMap;
-
 use hdk::prelude::*;
 use identity_integrity::{LinkTypes, MARK_BOT, VOTE_BOT};
 use sp_bot_review::{replay, Act, Kind, State, COOLDOWN_US};
@@ -63,26 +61,31 @@ fn acts_of(link_type: LinkTypes, account: &AgentPubKey) -> ExternResult<Vec<Act<
 /// The account's review, replayed up to now. `None` when nobody ever marked it (one link
 /// read: no marks means no review, so nothing else can be on the account).
 pub fn state(account: &AgentPubKey) -> ExternResult<Option<State<AgentPubKey>>> {
-    let mut acts = acts_of(LinkTypes::BotMarks, account)?;
+    let mut acts = full_markers_only(acts_of(LinkTypes::BotMarks, account)?)?;
     if acts.is_empty() {
         return Ok(None);
     }
     acts.extend(acts_of(LinkTypes::BotReviewVotes, account)?);
     acts.extend(acts_of(LinkTypes::ReReviews, account)?);
-    let mut since: BTreeMap<AgentPubKey, Option<i64>> = BTreeMap::new();
-    for act in &acts {
-        if !since.contains_key(&act.who) {
-            since.insert(act.who.clone(), full_since(&act.who)?);
+    // Everyone's votes count (ADR 0118); marks were filtered to full members above.
+    let counts = |_: &AgentPubKey, _: i64| true;
+    Ok(Some(replay(acts, counts, now()?)))
+}
+
+/// Bot marks count only from full members (vouched, or founders) at the time they marked:
+/// the one thing a new account can't do (ADR 0118). Clearing a mark always counts.
+fn full_markers_only(marks: Vec<Act<AgentPubKey>>) -> ExternResult<Vec<Act<AgentPubKey>>> {
+    let mut kept = Vec::with_capacity(marks.len());
+    for act in marks {
+        let counts = match act.kind {
+            Kind::Mark(true) => full_since(&act.who)?.is_some_and(|from| from < act.at),
+            _ => true,
+        };
+        if counts {
+            kept.push(act);
         }
     }
-    let counts = |who: &AgentPubKey, at: i64| {
-        since
-            .get(who)
-            .copied()
-            .flatten()
-            .is_some_and(|from| from < at)
-    };
-    Ok(Some(replay(acts, counts, now()?)))
+    Ok(kept)
 }
 
 /// Whether a review had found `agent` to be a bot at `at`.
@@ -147,14 +150,9 @@ pub fn view(account: &AgentPubKey) -> ExternResult<BotReviewView> {
     })
 }
 
-/// A full member who isn't paused (web's `ensure_not_paused` plus the FULL checks).
-fn ensure_full_and_active(what: &str) -> ExternResult<AgentPubKey> {
+/// Anyone not found to be a bot (web's `ensure_not_paused`; ADR 0118 drops the FULL check).
+fn ensure_not_bot() -> ExternResult<AgentPubKey> {
     let me = agent_info()?.agent_initial_pubkey;
-    if own_proof()?.is_none() {
-        return Err(guest_error(format!(
-            "{what} opens once your own votes count fully."
-        )));
-    }
     if paused_at(&me, now()?)? {
         return Err(guest_error(
             "A community review found this account is a bot, so it is read-only.",
@@ -171,7 +169,12 @@ pub fn set_mark(choice: BotChoice) -> ExternResult<ActionHash> {
         return Err(guest_error("You can't mark yourself."));
     }
     if choice.bot {
-        ensure_full_and_active("Marking as a bot")?;
+        ensure_not_bot()?;
+        if own_proof()?.is_none() {
+            return Err(guest_error(
+                "Marking as a bot opens once a full member vouches for you.",
+            ));
+        }
         let cooling = state(&choice.account)?.and_then(|s| s.cooling.get(&me).copied());
         if cooling.is_some_and(|until| now().is_ok_and(|n| n < until)) {
             return Err(guest_error(
@@ -195,7 +198,7 @@ pub fn my_mark_is_live(account: &AgentPubKey) -> ExternResult<bool> {
 }
 
 pub fn vote(choice: BotChoice) -> ExternResult<ActionHash> {
-    let me = ensure_full_and_active("Voting in bot reviews")?;
+    let me = ensure_not_bot()?;
     if choice.account == me {
         return Err(guest_error("You can't vote on your own review"));
     }

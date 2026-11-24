@@ -69,9 +69,11 @@ pub struct StandingAt {
     pub at: Timestamp,
 }
 
+/// Whether the agent's votes count at `at`: not found to be a bot then (ADR 0118). The name
+/// is older than the rule; project cells call it by name.
 #[hdk_extern]
 pub fn full_standing_before(query: StandingAt) -> ExternResult<bool> {
-    standing::full_before(&query.agent, query.at)
+    standing::votes_at(&query.agent, query.at)
 }
 
 /// web's profile bot review card and Trust sheet's "Bot marks" (ADR 0074).

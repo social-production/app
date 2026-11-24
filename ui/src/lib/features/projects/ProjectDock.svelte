@@ -48,29 +48,17 @@
       project.phase !== 'phase-7' &&
       project.governance !== 'organizer_controlled',
   );
-  // The stance just set here, until the project's own read catches up with it (a network
-  // read lags a write), so the strip folds into the chip at once.
-  let local = $state<{ mine: Stance | null; demand: number; opposition: number } | null>(null);
-  const stance = $derived(
-    local && local.mine !== (project?.mySignal ?? null)
-      ? local
-      : {
-          mine: project?.mySignal ?? null,
-          demand: project?.demand ?? 0,
-          opposition: project?.opposition ?? 0,
-        },
-  );
+  // detail.signal holds the stance you set until the project's read catches up (heldSignal.ts).
+  const stance = $derived({
+    mine: project?.mySignal ?? null,
+    demand: project?.demand ?? 0,
+    opposition: project?.opposition ?? 0,
+  });
   const total = $derived(stance.demand + stance.opposition);
   const percent = $derived(total > 0 ? `${Math.round((stance.demand / total) * 100)}%` : '—');
 
   async function signal(next: Stance | null): Promise<void> {
-    const before = stance;
-    const count = (s: Stance): number =>
-      (s === 'Demand' ? before.demand : before.opposition) -
-      Number(before.mine === s) +
-      Number(next === s);
     await detail.signal(next);
-    local = { mine: next, demand: count('Demand'), opposition: count('Oppose') };
     voteOpen = false;
   }
 </script>
@@ -100,7 +88,7 @@
           stage={project.stage}
           phaseLabel={detail.phaseLabel}
           onVote={(p, c) => detail.vote(p, c)}
-          newVoter={detail.viewerFull === false}
+          newVoter={detail.viewerVotes === false}
           reveal={revealVote}
           {onRevealDone}
         />
