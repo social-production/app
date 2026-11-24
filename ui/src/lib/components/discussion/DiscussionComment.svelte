@@ -39,6 +39,11 @@
     /** A report or vote changed this comment's state. */
     onModeration: (id: string, next: Moderation) => void;
     mentions?: CommentMentions | null;
+    /** Posts (owner, 2026-11-24): replies live in the comment's own view, which tapping the
+     * comment opens; its replies are not listed under it here. */
+    onOpen?: ((id: string) => void) | undefined;
+    /** List no replies under it (the opened comment, or one of its parents). */
+    hideReplies?: boolean;
   }
 
   let {
@@ -54,7 +59,15 @@
     onReply,
     onModeration,
     mentions = null,
+    onOpen,
+    hideReplies = false,
   }: Props = $props();
+
+  // Tapping the comment's words opens it; links and buttons inside keep their own taps.
+  function open(event: Event): void {
+    if (!onOpen || (event.target as HTMLElement).closest('a, button')) return;
+    onOpen(comment.id);
+  }
 
   let collapsed = $state(false);
   let revealed = $state(false);
@@ -142,7 +155,15 @@
       {#if removed}
         <p class="body moderated">{t(removedLabel(moderation.report?.reason))}</p>
       {:else if !canReveal || revealed}
-        <p class="body">
+        <!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+        <p
+          class="body"
+          class:opens={!!onOpen}
+          role={onOpen ? 'link' : undefined}
+          tabindex={onOpen ? 0 : undefined}
+          onclick={open}
+          onkeydown={(e) => e.key === 'Enter' && open(e)}
+        >
           {#each bodyParts(comment.body) as part, i (i)}
             {#if part.mention}
               {@const agent = mentions?.agentOf(part.mention)}
@@ -183,7 +204,7 @@
     </div>
   </div>
 
-  {#if comment.replies.length > 0}
+  {#if comment.replies.length > 0 && !onOpen && !hideReplies}
     <div class="reply-stack" hidden={collapsed}>
       {#each comment.replies as child (child.id)}
         <Self

@@ -201,3 +201,84 @@
   width: 16px;
   height: 16px;
 }
+
+/* A post's comment opens as its own view (owner, 2026-11-24, Twitter's screenshots): the post
+   and the opened comment read as the content, joined by a line through any comments between;
+   the opened comment is set like a post; its replies follow under "Replies". */
+.shell .comment-card .body.opens {
+  cursor: pointer;
+}
+
+.shell .post-head-detail.post-above {
+  position: relative;
+  padding-bottom: 6px;
+}
+
+.shell .post-head-detail.post-above::before,
+.shell .post-comment-chain > .comment-card:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 21px;
+  width: 2px;
+  border-radius: 2px;
+  background: var(--panel-border);
+}
+
+.shell .post-head-detail.post-above::before {
+  top: 52px;
+}
+
+/* Above an opened comment the post keeps to the column beside its photo, so the line runs
+   clear of its words. */
+.shell .post-head-detail.post-above > :not(.item-author) {
+  margin-left: 56px;
+}
+
+.shell .post-head-detail.post-above .item-author {
+  margin-bottom: -18px;
+}
+
+.shell .post-head-detail.post-above .item-author-text {
+  padding-bottom: 18px;
+}
+
+.shell .post-comment-chain {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.shell .post-comment-chain > .comment-card {
+  position: relative;
+}
+
+.shell .post-comment-chain > .comment-card::before {
+  top: 48px;
+}
+
+.shell .post-comment-chain .comment-card > .comment-self {
+  grid-template-columns: 44px minmax(0, 1fr);
+  border-bottom: none;
+}
+
+.shell .post-comment-chain .comment-avatar .avatar-badge {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
+}
+
+.shell.shell .post-comment-opened .comment-card .author-link {
+  font-size: 16px;
+}
+
+.shell.shell .post-comment-opened .comment-card .comment-body-block .body {
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.shell .post-comment-replies {
+  margin: 14px 0 0;
+  font-size: 17px;
+}

@@ -40,6 +40,10 @@
     onComment: (parent: string | null, body: string) => Promise<boolean>;
     onModeration: (id: string, next: Moderation) => void;
     mentions?: CommentMentions | null;
+    /** Posts: a comment opens its own view (its replies are not listed under it). */
+    onOpen?: ((id: string) => void) | undefined;
+    /** An opened comment: what the composer answers when no Reply was pressed. */
+    parent?: { id: string; author: string } | null;
   }
 
   let {
@@ -56,12 +60,15 @@
     onComment,
     onModeration,
     mentions = null,
+    onOpen,
+    parent = null,
   }: Props = $props();
 
   let draft = $state('');
   let replying = $state<{ id: string; author: string } | null>(null);
   // Names may arrive after Reply is pressed.
-  const replyName = $derived(replying ? (names[replying.author] ?? 'Unnamed') : '');
+  const answering = $derived(replying ?? parent);
+  const replyName = $derived(answering ? (names[answering.author] ?? 'Unnamed') : '');
   let focus = $state(0);
   const sorted = $derived(sortComments(comments, sortMode));
 
@@ -81,11 +88,11 @@
   }
 
   async function submit(): Promise<void> {
-    const parent = replying?.id ?? null;
+    const to = answering?.id ?? null;
     const body = draft;
     draft = '';
     replying = null;
-    if (!(await onComment(parent, body))) draft = body;
+    if (!(await onComment(to, body))) draft = body;
   }
 </script>
 
@@ -102,8 +109,8 @@
     <BackButton />
     <CommentComposer
       bind:value={draft}
-      placeholder={replying ? t('Reply to {name}', { name: replyName }) : t('Add a comment')}
-      submitLabel={replying ? t('Post reply') : t('Post comment')}
+      placeholder={answering ? t('Reply to {name}', { name: replyName }) : t('Add a comment')}
+      submitLabel={answering ? t('Post reply') : t('Post comment')}
       {focus}
       {signedIn}
       {onSignIn}
@@ -126,6 +133,7 @@
         onReply={startReply}
         {onModeration}
         {mentions}
+        {onOpen}
       />
     {/each}
   </div>
