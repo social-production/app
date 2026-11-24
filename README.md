@@ -14,6 +14,11 @@ network of desktops, Raspberry Pis and phones.
 (it runs alongside the current FastAPI site; that site is unaffected).
 
 What works today:
+- **The owner's mockup replies (PRs #271–#276, 2026-11-24 day Melbourne):** only Full members
+  vote (and count); events with no set date; the home-screen app reopens where you were; one
+  share sheet with quote posts; liked comments; docks of three; Create plan and Link a project
+  in the create look; pictures and covers for projects and events (a project network reset;
+  the demo content was reseeded with art).
 - **Create dock, permission sheets, chat pages, photo crop (PRs #265–#269, 2026-11-24 ~2 am
   Melbourne):** create flows in the joined dock style; short sheets before the browser asks for
   the microphone or notifications; a project chat's page from Messages; drag and zoom a photo

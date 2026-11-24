@@ -182,6 +182,56 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-24, day cloud session): the owner's replies to the mockups
+The owner answered Owner Notes Mockups in the morning ("All look great"), with notes. Built
+today, each its own PR, all merged after green CI unless marked:
+- **#274 (ADR 0116, coordinator only):** New members can't vote or propose a vote; the
+  member snapshot (N), `missing` and challenges count only Full members; Vote shows New
+  members the proposal without Yes/No, and Phase opens "Only Full members vote"
+  (`FullOnlySheet`). Scenarios run locally: governance `rejected_and_ineligible…`, scopes
+  `members_vote_someone_out…` (N=3 Full needs 3 of 3), challenges: all pass.
+- **#271:** events can have **No set date** (`any-day`, which integrity already allowed):
+  the owner's pick-up basketball as an event whose sessions are activities.
+- **#272:** the home-screen app reopens where you were (`resumePlace.ts`, standalone only,
+  6 h); an open chat's top tabs follow `visualViewport.offsetTop` on iPhone (`viewportTop.ts`,
+  `--vv-top`). Not checked on a real iPhone.
+- **#273:** one share sheet everywhere (`ShareSheet`, faces from recent direct chats,
+  Copy link / Share via… / Quote in a post), sending for non-members, quote posts (a post
+  ending in an app link shows a quoted card; `?quote=` on Create post), thread comments with
+  a like heart, reply count and Share.
+- **#275:** §10 docks (Post an update and Service settings in ⋯), the wizard frame in the
+  create look (plain ×, step bars, joined Back | Next) for Create plan, activities and pull
+  requests, Link a project as two steps, and New post's duplicate bottom button removed.
+- **#276 (ADR 0117, project network reset):** pictures and covers for projects, services,
+  proposals and events (not requests, threads or posts): at creation, in Propose edit, on the
+  page and as the feed tile. Scenario `scope_pictures` passed locally (2 tests, 35 min).
+  Merged 12:31 pm Melbourne; the seed node came back on the new project DNA
+  (`uhC0km4BKfhj…`) at 12:46 pm with an empty `/index/projects`. The Melbourne demo was
+  re-run with generated pictures and covers (`tests/e2e/demo/art.mjs`, #277): both
+  `demo-content.mjs` (with the saved accounts, `DEMO_SKIP=direct` first, then only `direct`)
+  and `demo-melbourne.mjs`; 23 items, every project and event with art.
+- **Lesson: a reset also wipes every hosted account's directory and conversation data.**
+  The seed removes all apps of the older hApp version (ADR 0064), cells included, so after
+  #276 the founders and demo people were "Unnamed" New members with no DMs, and the
+  moderator seats were empty. Restored with the scratchpad's `founders.cjs` (it now renames
+  the demo accounts too: names, vouches, claim Full, volunteer as moderator) and the demo
+  `direct messages` part. **Real people's accounts (the owner's and their wife's) lost their
+  names and standing too**: they must set their username again and get vouched. After every
+  reset: re-run demo-content, demo-melbourne and founders.cjs, and tell the owner.
+- **Details header (pending the owner's pick):** the owner wants the type tile gone, the
+  picture in its place (the type tile when none is set) and "a bit of styling". Mockups:
+  **Details Header Mockups** https://claude.ai/artifact/LHSTp9KX47meaMV2QF2GfF (A rounded
+  cover + picture over its corner, B full-width cover + picture beside the channel, C the
+  no-cover case). UI only, no reset.
+- **Calls work** (the owner's wife's microphone was off); loudspeaker and locked-phone calls
+  wait for the native apps (roadmap).
+- **Open:** the owner said one create flow still has separate buttons ("such as
+  revoeq [request?] for content creation"); New post's double button is fixed, the help
+  request flow looked joined at step 1 — ask which one if it persists. The mic and
+  notification sheets show "× | action" joined; the owner wants their dock "updated": ask
+  what they expect. The Linux desktop build's live smoke has failed twice (`profile after
+  log-in` timeout against the live seed); the scheduled nightly passed on 23 Nov.
+
 ## START HERE (2026-11-24, overnight cloud session): the owner's notes of 23 Nov
 The owner left ~40 notes before sleeping. Answers to the design ones are pending in
 **Owner Notes Mockups** (https://claude.ai/artifact/Q2Ror2gkjt9TAqHcpNknmB, §1–11).
