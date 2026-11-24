@@ -232,6 +232,13 @@ today, each its own PR, all merged after green CI unless marked:
   … from all other types"; #273's heart and #280's row are gone). Replying on phones puts the
   back button on its own line above "Replying to x" and scrolls the answered comment to the
   top (60vh room under the list while replying). Smoked live 2:23 pm.
+- **#285:** the reply/linked-comment ring pads every side. **#286:** feed cards (`FeedActions`)
+  draw the same `item.css` pills as item pages and comments, and every pill row spreads across
+  (`justify-content: space-between`, max 520px). Smoked live 3:11 pm.
+- **QR share cards (mockups, waiting on the owner):** https://claude.ai/artifact/4rwoqqVN3wB2NGGVyaLRBu
+  — Links tab › Download QR card sheet; square 1080², story 1080×1920, round 60 mm sticker
+  (PDF, cut line), A6 flyer (four-up on A4). The QR is high error correction with the logo in
+  the middle.
 - **Calls work** (the owner's wife's microphone was off); loudspeaker and locked-phone calls
   wait for the native apps (roadmap).
 - **Open:** the owner said one create flow still has separate buttons ("such as
