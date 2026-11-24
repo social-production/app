@@ -5,7 +5,7 @@
   import PlanWizard from '#lib/components/plans/PlanWizard.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
-  import TypeSelector from '#lib/components/create/TypeSelector.svelte';
+  import ChoiceRows from '#lib/components/create/ChoiceRows.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import { PLAN_MAKES, planMakesLine, type PlanKind, type Plan } from '#lib/domain/plans.ts';
   import { projectSubtype } from '#lib/domain/projects.ts';
@@ -30,6 +30,14 @@
   let { detail, kind, revealPlan = null, onRevealDone }: Props = $props();
 
   let composing = $state(false);
+  // A box (project), a hand (service), a calendar (event), a ball (meetup).
+  const PLAN_ICONS: Record<string, string> = {
+    Production: 'M12 3 4 7.5v9L12 21l8-4.5v-9L12 3ZM4 7.5l8 4.5 8-4.5M12 12v9',
+    Organisation: 'M3 15h4l3 2h5a2 2 0 0 1 0 4H8M8 13c0-5 3-8 9-9-.6 5.6-3.8 8.6-9 9Z',
+    Event: 'M5 5h14v15H5zM5 10h14M9 3v4M15 3v4',
+    Meetup:
+      'M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM4 12h16M12 4c-2.5 2.2-3.5 5-3.5 8s1 5.8 3.5 8M12 4c2.5 2.2 3.5 5 3.5 8s-1 5.8-3.5 8',
+  };
 
   const project = $derived(detail.project);
   const board = $derived(detail.plans);
@@ -105,12 +113,16 @@
         <p class="setting-hint">{t('What kind of thing should this become?')}</p>
       {/snippet}
       <div class="plan-kind-choice">
-        <TypeSelector
-          label={t('Plan kind')}
-          name="plan-kind"
-          selected={chosen}
-          options={PLAN_MAKES}
-          onSelect={(value) => (chosen = value)}
+        <ChoiceRows
+          value={chosen}
+          ariaLabel={t('Plan kind')}
+          options={PLAN_MAKES.map((m) => ({
+            value: m.value,
+            label: m.label,
+            hint: m.summary,
+            icon: PLAN_ICONS[m.value],
+          }))}
+          onChange={(value) => (chosen = value)}
         />
         <button
           class="plan-kind-continue"
