@@ -24,7 +24,11 @@
    * location → plan (organizer-controlled) → overview. A public event starts as a proposal;
    * an organizer-controlled one starts in Activity with its plan (ADR 0057, 0061).
    */
-  const s = new EventCreateState();
+  /** `/create/meetup`: the same flow for a meetup (ADR 0119). */
+  let { meetup = false }: { meetup?: boolean } = $props();
+
+  // svelte-ignore state_referenced_locally
+  const s = new EventCreateState(meetup);
   const AUDIENCE_LABELS: Record<EventAudience, string> = {
     public: 'Public',
     private_community: 'Private community',
@@ -54,14 +58,18 @@
 </script>
 
 <CreateSheet
-  title={t('Private event')}
-  description={t(
-    'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
-  )}
+  title={meetup ? t('Private meetup') : t('Private event')}
+  description={meetup
+    ? t(
+        'A private meetup gathers the people you invite to meet regularly or whenever: pickup games, run clubs, game nights. For a public one, start a proposal: a meetup plan makes it one.',
+      )
+    : t(
+        'A private event gathers the people you invite, or one private community. It can get its dates now. For a public event, start a proposal: an event plan makes it one.',
+      )}
   steps={s.steps}
   stepIndex={s.step}
   {missing}
-  submitLabel={t('Publish event')}
+  submitLabel={meetup ? t('Publish meetup') : t('Publish event')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}
@@ -146,7 +154,7 @@
       onPlace={(p) => s.setPlace(p)}
     />
   {:else if s.stepId === 'plan'}
-    <EventPlanStep bind:plan={s.plan} problems={s.planProblems} />
+    <EventPlanStep bind:plan={s.plan} problems={s.planProblems} {meetup} />
   {:else}
     <div class="form-stack overview">
       <CreatePreview

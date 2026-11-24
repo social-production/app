@@ -8,7 +8,7 @@ import {
 import type { Contact } from '#lib/domain/messages.ts';
 import type { Plan } from '#lib/domain/plans.ts';
 import { emptyPlanForm, planFromForm, type PlanForm } from '#lib/domain/planForm.ts';
-import type { EventAudience, EventGovernance } from '#lib/domain/projects.ts';
+import type { Charter, EventAudience, EventGovernance } from '#lib/domain/projects.ts';
 import type { Scope } from '#lib/domain/scopes.ts';
 import { myClosedCommunities } from '#lib/services/closedCommunities.ts';
 import { explain } from '#lib/services/errors.ts';
@@ -44,8 +44,17 @@ export class EventCreateState extends CreateState {
   );
   readonly canContinue = $derived(this.stepReady(this.stepId));
 
-  constructor() {
+  /** A meetup (ADR 0119): no single date, a usual day or whenever members set a session. */
+  readonly meetup: boolean;
+
+  constructor(meetup = false) {
     super('event');
+    this.meetup = meetup;
+    if (meetup) this.plan.scheduleMode = 'weekly';
+  }
+
+  override charter(): Charter {
+    return { ...super.charter(), subtype: this.meetup ? 'meetup' : 'standard' };
   }
 
   /** web's per-step gates (basics and location come from the project draft's `missing`). */

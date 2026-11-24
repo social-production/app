@@ -30,6 +30,18 @@ pub struct Approved {
     pub score: Score,
 }
 
+/// The subtype a plan gives its space: a production or operations plan's choice, or
+/// `meetup` for an event plan with no single date (ADR 0119: weekly, or whenever members
+/// set a session).
+fn chosen_subtype(plan: &project_integrity::Plan) -> Option<String> {
+    match (&plan.kind, &plan.schedule) {
+        (PlanKind::Event, Some(s)) if matches!(s.mode.as_str(), "any-day" | "weekly") => {
+            Some("meetup".to_string())
+        }
+        _ => plan.subtype.clone(),
+    }
+}
+
 /// Approved plans of kinds this project's mode takes, in the order they closed.
 pub fn approved(
     decisions: &[Decision],
@@ -49,7 +61,7 @@ pub fn approved(
             hash: d.proposal.hash.clone(),
             author: d.proposal.author.clone(),
             kind: plan.kind,
-            subtype: plan.subtype.clone(),
+            subtype: chosen_subtype(plan),
             repository: plan.repository_url.clone(),
             requests: plan.requests.clone(),
             yes: d.yes,

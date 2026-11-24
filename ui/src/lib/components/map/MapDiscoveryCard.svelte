@@ -68,11 +68,17 @@
   <FeedSurface {href} tone="public" accent={modeAccent(mode)}>
     <!-- Drawn as a Global feed row (owner, 2026-11-16): glyph, type · status · distance. -->
     <div class="feed-card-top feed-lead">
-      <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} feedGlyph /></span>
+      <span class="feed-lead-glyph"
+        ><SurfaceTypeLabel
+          projectMode={mode}
+          meetup={item.entityType === 'meetup'}
+          feedGlyph
+        /></span
+      >
       <div class="feed-lead-copy">
         {#if parent}<div class="feed-lead-tags"><span class="map-parent">{parent}</span></div>{/if}
         <div class="feed-lead-meta" class:alone={!parent}>
-          <SurfaceTypeLabel projectMode={mode} />
+          <SurfaceTypeLabel projectMode={mode} meetup={item.entityType === 'meetup'} />
           {#if status}<span class="feed-card-stage">{t(status)}</span>{/if}
           <span class="feed-card-time">{distance}</span>
         </div>

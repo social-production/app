@@ -1,6 +1,7 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
   import { displayZone } from '#lib/domain/zone.ts';
+  import MeetupSchedule from './MeetupSchedule.svelte';
   import RequiredLabel from './RequiredLabel.svelte';
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import type { PlanForm } from '#lib/domain/planForm.ts';
@@ -12,9 +13,11 @@
   interface Props {
     plan: PlanForm;
     problems: string[];
+    /** A meetup has a usual day or none, not dates (ADR 0119). */
+    meetup?: boolean;
   }
 
-  let { plan = $bindable(), problems }: Props = $props();
+  let { plan = $bindable(), problems, meetup = false }: Props = $props();
 
   const zone = displayZone();
 
@@ -41,29 +44,24 @@
     <RequiredLabel>{t('Plan description')}</RequiredLabel>
     <textarea bind:value={plan.description} rows="3" aria-required="true"></textarea>
   </label>
-  <fieldset class="schedule-fieldset">
-    <legend>{t('Schedule')}</legend>
-    <div class="schedule-mode-row" role="radiogroup" aria-label={t('Schedule mode')}>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'date'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="date" />
-        {t('Single date')}
-      </label>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'range'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="range" />
-        {t('Date range')}
-      </label>
-      <label class="schedule-mode-option" class:active={plan.scheduleMode === 'any-day'}>
-        <input type="radio" bind:group={plan.scheduleMode} value="any-day" />
-        {t('No set date')}
-      </label>
-    </div>
-    {#if plan.scheduleMode === 'any-day'}
-      <p class="helper-text">
-        {t(
-          'For something ongoing, like weekly games: add each session as an activity, and people sign up to the ones they come to.',
-        )}
-      </p>
-    {:else}
+  {#if meetup}
+    <fieldset class="schedule-fieldset">
+      <legend>{t('How do you meet?')}</legend>
+      <MeetupSchedule bind:form={plan} />
+    </fieldset>
+  {:else}
+    <fieldset class="schedule-fieldset">
+      <legend>{t('Schedule')}</legend>
+      <div class="schedule-mode-row" role="radiogroup" aria-label={t('Schedule mode')}>
+        <label class="schedule-mode-option" class:active={plan.scheduleMode === 'date'}>
+          <input type="radio" bind:group={plan.scheduleMode} value="date" />
+          {t('Single date')}
+        </label>
+        <label class="schedule-mode-option" class:active={plan.scheduleMode === 'range'}>
+          <input type="radio" bind:group={plan.scheduleMode} value="range" />
+          {t('Date range')}
+        </label>
+      </div>
       <div class="schedule-fields" class:is-range={plan.scheduleMode === 'range'}>
         {#if plan.scheduleMode === 'date'}
           <label>
@@ -95,8 +93,8 @@
       <p class="helper-text">
         Times are in {zoneOf(new Date()) ? `${zoneOf(new Date())} (${zone})` : zone}.
       </p>
-    {/if}
-  </fieldset>
+    </fieldset>
+  {/if}
   <div class="stages">
     <div class="stages-header">
       <div>

@@ -3,7 +3,7 @@
  * ISO times out, so the ported panel reads them as web's does. */
 import type { MapMarker } from '#lib/maps/types.ts';
 
-export type MarkerEntity = 'event' | 'project' | 'help_request' | 'activity';
+export type MarkerEntity = 'event' | 'meetup' | 'project' | 'help_request' | 'activity';
 
 export interface MapMarkerItem {
   id: string;
@@ -56,7 +56,7 @@ export interface GatewayMarker {
 export const isoOfMicros = (micros: number | null | undefined): string | null =>
   typeof micros === 'number' ? new Date(Math.floor(micros / 1000)).toISOString() : null;
 
-const ENTITIES: readonly string[] = ['project', 'help_request', 'activity'];
+const ENTITIES: readonly string[] = ['meetup', 'project', 'help_request', 'activity'];
 
 export function markerItem(m: GatewayMarker): MapMarkerItem {
   return {

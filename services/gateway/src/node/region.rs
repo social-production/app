@@ -29,7 +29,7 @@ pub struct RegionQuery<'a> {
     pub radius_km: f64,
     pub sort: Sort,
     pub window: Window,
-    /// `all`, `projects`, `events`, `help_requests` or `threads` (which is always empty).
+    /// `all`, `projects`, `events`, `meetups`, `help_requests` or `threads` (always empty).
     pub filter: &'a str,
     pub include_online: bool,
     /// Order by when things happen (soonest first, unscheduled last) instead of distance.
@@ -103,6 +103,7 @@ impl RegionItem {
 /// web's `filter_entity_type` for a card: projects, events and help requests have places.
 fn wanted(card: &ProjectCard, filter: &str) -> bool {
     let kind = match card.mode.as_str() {
+        "event" if card.subtype == "meetup" => "meetups",
         "event" => "events",
         "help-request" => "help_requests",
         m if PROJECT_MODES.contains(&m) => "projects",
@@ -115,6 +116,8 @@ fn wanted(card: &ProjectCard, filter: &str) -> bool {
 /// activity (`_next_project_activity_scheduled_at`).
 fn scheduled(card: &ProjectCard) -> Option<i64> {
     match card.mode.as_str() {
+        // A meetup's time is its next session (ADR 0119).
+        "event" if card.subtype == "meetup" => card.activities.iter().map(|a| a.starts_at).min(),
         "event" => card.scheduled_at,
         "help-request" => card.help.as_ref().and_then(|h| h.needed_at),
         _ => card.activities.iter().map(|a| a.starts_at).min(),

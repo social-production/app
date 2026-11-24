@@ -92,7 +92,7 @@ pub async fn map_markers(
 ) -> ApiResult<MarkerPage> {
     let radius_km = checked_area(p.lat, p.lon, p.radius_km)?;
     let filter = match p.filter.as_deref() {
-        Some(f @ ("projects" | "events" | "help_requests")) => f.to_owned(),
+        Some(f @ ("projects" | "events" | "meetups" | "help_requests")) => f.to_owned(),
         _ => "all".to_owned(),
     };
     let window = Window::parse(p.window.as_deref().unwrap_or("all"));

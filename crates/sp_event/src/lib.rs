@@ -4,12 +4,17 @@
 
 use sp_core::plan::is_date;
 
-/// The charter mode and subtype of every event.
+/// The charter mode of every event, and the subtype of one with a set date.
 pub const MODE: &str = "event";
 pub const SUBTYPE: &str = "standard";
+/// A meetup (ADR 0119): an event with no single date (pickup games, run clubs, pub nights);
+/// members add each session as an activity.
+pub const MEETUP: &str = "meetup";
+pub const SUBTYPES: [&str; 2] = [SUBTYPE, MEETUP];
 
-/// web's `EventPlanScheduleMode`.
-pub const SCHEDULE_MODES: [&str; 3] = ["any-day", "date", "range"];
+/// web's `EventPlanScheduleMode`, plus `weekly` (ADR 0119): a meetup's usual day, given by
+/// its first date, at an optional usual time.
+pub const SCHEDULE_MODES: [&str; 4] = ["any-day", "date", "range", "weekly"];
 
 /// An event plan's schedule, in UTC wall time (web's `schedule_to_utc`): the device converts
 /// from and to the display time zone.
@@ -42,10 +47,11 @@ pub fn check_schedule(s: &ScheduleFields<'_>) -> Result<(), String> {
         return Err("schedule times must be HH:MM".into());
     }
     match (s.mode, s.start_date, s.end_date) {
-        ("any-day", None, None) | ("date", Some(_), _) => Ok(()),
+        ("any-day", None, None) | ("date", Some(_), _) | ("weekly", Some(_), None) => Ok(()),
         ("range", Some(start), Some(end)) if end >= start => Ok(()),
         ("any-day", _, _) => Err("an any-day schedule has no dates".into()),
         ("date", None, _) => Err("a dated schedule needs its date".into()),
+        ("weekly", _, _) => Err("a weekly schedule has its first date and no end".into()),
         _ => Err("a range needs a start date and an end date on or after it".into()),
     }
 }
@@ -120,13 +126,13 @@ impl Audience {
     }
 }
 
-/// An event's charter and listing use mode `"event"` with subtype `"standard"`.
+/// An event's charter and listing use mode `"event"` with subtype `"standard"` or `"meetup"`.
 pub fn check_kind(mode: &str, subtype: &str) -> Result<(), String> {
-    if mode == MODE && subtype == SUBTYPE {
+    if mode == MODE && SUBTYPES.contains(&subtype) {
         Ok(())
     } else {
         Err(format!(
-            "an event has mode {MODE:?} and subtype {SUBTYPE:?}"
+            "an event has mode {MODE:?} and subtype {SUBTYPE:?} or {MEETUP:?}"
         ))
     }
 }
@@ -160,6 +166,11 @@ mod tests {
         assert!(check_schedule(&schedule("date", None, None)).is_err());
         assert!(check_schedule(&schedule("any-day", Some("2026-11-02"), None)).is_err());
         assert!(check_schedule(&schedule("weekly", None, None)).is_err());
+        assert!(check_schedule(&schedule("weekly", Some("2026-11-05"), None)).is_ok());
+        assert!(
+            check_schedule(&schedule("weekly", Some("2026-11-05"), Some("2026-11-12"))).is_err()
+        );
+        assert!(check_schedule(&schedule("fortnightly", Some("2026-11-05"), None)).is_err());
         assert!(check_schedule(&schedule("date", Some("2026-13-02"), None)).is_err());
     }
 
@@ -187,8 +198,9 @@ mod tests {
     }
 
     #[test]
-    fn events_are_standard() {
+    fn events_are_standard_or_meetups() {
         assert!(check_kind("event", "standard").is_ok());
+        assert!(check_kind("event", "meetup").is_ok());
         assert!(check_kind("event", "software").is_err());
         assert!(check_kind("productive", "standard").is_err());
     }

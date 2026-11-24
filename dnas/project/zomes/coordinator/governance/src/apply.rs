@@ -4,7 +4,7 @@
 use hdk::prelude::*;
 use project_integrity::{Applied, AppliedRequests, AppliedUpdate, Charter, ProposalKind};
 use sp_governance::phases::{next_phase, Phase, Shape, PROPOSAL};
-use sp_governance::plans::required_plan_kinds;
+use sp_governance::plans::{required_plan_kinds, PlanKind};
 use sp_governance::returns::{can_return, reopens_subtype};
 
 pub use crate::decide::{Decision, Standing};
@@ -236,7 +236,8 @@ fn phase_move(
         let cited = approved
             .iter()
             .find(|a| Some(&a.hash) == plan.as_ref() && kinds.contains(&a.kind) && a.at < at)?;
-        if cited.kind.sets_subtype() {
+        // An event plan makes a meetup when it has no single date (ADR 0119).
+        if cited.kind.sets_subtype() || cited.kind == PlanKind::Event {
             chosen.clone_from(&cited.subtype);
         }
         if mode == PROPOSAL {

@@ -10,6 +10,7 @@
   import { zoneOf } from '#lib/domain/activityTime.ts';
   import { scheduleProblem } from '#lib/domain/eventSchedule.ts';
   import {
+    isMeetupForm,
     sameAsProduction,
     withPlanPlace,
     type PlanForm,
@@ -20,6 +21,7 @@
   import LocationIntent from '#lib/components/create/LocationIntent.svelte';
   import { REQUEST_MODES, type ProjectSubtype } from '#lib/domain/projects.ts';
 
+  import MeetupSchedule from '#lib/components/create/MeetupSchedule.svelte';
   import RequiredLabel from '#lib/components/create/RequiredLabel.svelte';
 
   import PlanStagesEditor from './PlanStagesEditor.svelte';
@@ -178,6 +180,8 @@
     rows="4"
     aria-label={t('Support it answers')}
     placeholder={t('Covers the 3 who asked, weekly.')}></textarea>
+{:else if step.id === 'schedule-mode' && isMeetupForm(form)}
+  <MeetupSchedule bind:form />
 {:else if step.id === 'schedule-mode'}
   <div class="plan-opts" role="radiogroup" aria-label={t('Schedule')}>
     <label

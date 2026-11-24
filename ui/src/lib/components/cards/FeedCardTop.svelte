@@ -36,6 +36,7 @@
     stage,
     isPrivate = false,
     mode = null,
+    meetup = false,
     createdAt = null,
     updatedAt = null,
     distanceKm = null,
@@ -47,6 +48,8 @@
     stage: string;
     isPrivate?: boolean;
     mode?: CharterMode | null;
+    /** An event with no single date (ADR 0119). */
+    meetup?: boolean;
     createdAt?: number | null;
     updatedAt?: number | null;
     /** km away, before the clock (Region cards). */
@@ -138,7 +141,7 @@
             class="feed-lead-picture"
             src={pictureUrl}
             alt=""
-          />{:else}<SurfaceTypeLabel projectMode={mode} feedGlyph />{/if}</span
+          />{:else}<SurfaceTypeLabel projectMode={mode} {meetup} feedGlyph />{/if}</span
       >
     {/if}
     <div class="feed-lead-copy">
@@ -146,7 +149,7 @@
         <div class="feed-lead-tags">{@render tagList()}</div>
       {/if}
       <div class="feed-lead-meta" class:alone={tags.length === 0}>
-        <SurfaceTypeLabel projectMode={mode} />
+        <SurfaceTypeLabel projectMode={mode} {meetup} />
         <!-- A proposal in its Proposal phase would read "Proposal · Proposal". -->
         {#if network}
           <span class="feed-card-stage network-vote">{t('Network vote')}</span>
@@ -164,7 +167,7 @@
 {:else if tags.length > 0 || stage || isPrivate || children || mode}
   <div class="feed-card-top">
     <div class="feed-card-tags">
-      {#if mode}<SurfaceTypeLabel projectMode={mode} />{/if}
+      {#if mode}<SurfaceTypeLabel projectMode={mode} {meetup} />{/if}
       {#if tags.length > 0}{@render tagList()}{/if}
       {@render clock()}
     </div>

@@ -107,6 +107,7 @@ export const SUBTYPE_LABELS: Record<ProjectSubtype, string> = {
   standard: 'Standard',
   software: 'Software',
   'asset-management': 'Asset management',
+  meetup: 'Meetup',
 };
 
 /** web's `projectSubtypeOptions`, for the wizard's subtype step. */
@@ -120,8 +121,11 @@ export function subtypeOptions(mode: ProjectMode): { value: ProjectSubtype; labe
 
 /** What a proposal becomes when a plan of this kind leads it out of its Plan phase
  * (sp_governance `PlanKind::makes`, ADR 0059), with the wizard's choice copy. */
+export type PlanChoice = PlanKind | 'Meetup';
+
 export const PLAN_MAKES: {
-  value: PlanKind;
+  value: PlanChoice;
+  kind: PlanKind;
   mode: ProjectMode | 'event';
   label: string;
   summary: string;
@@ -129,6 +133,7 @@ export const PLAN_MAKES: {
 }[] = [
   {
     value: 'Production',
+    kind: 'Production',
     mode: 'productive',
     label: t('Production plan'),
     summary: t('Build or produce something new. Makes this a project.'),
@@ -136,6 +141,7 @@ export const PLAN_MAKES: {
   },
   {
     value: 'Organisation',
+    kind: 'Organisation',
     mode: 'collective-service',
     label: t('Operations plan'),
     summary: t('Run or maintain something in use. Makes this a service.'),
@@ -143,16 +149,25 @@ export const PLAN_MAKES: {
   },
   {
     value: 'Event',
+    kind: 'Event',
     mode: 'event',
     label: t('Event plan'),
-    summary: t('A dated occasion with a place. Makes this a public event.'),
+    summary: t('Happens on a set date or dates. Makes this a public event.'),
     makes: 'a public event',
+  },
+  {
+    value: 'Meetup',
+    kind: 'Event',
+    mode: 'event',
+    label: t('Meetup plan'),
+    summary: t('Meets regularly or whenever; members add sessions. Makes this a meetup.'),
+    makes: 'a meetup',
   },
 ];
 
 /** "Production plan · makes this a project", for a plan on a proposal. */
-export function planMakesLine(kind: PlanKind): string | null {
-  const made = PLAN_MAKES.find((m) => m.value === kind);
+export function planMakesLine(kind: PlanKind, meetup = false): string | null {
+  const made = PLAN_MAKES.find((m) => m.value === (meetup && kind === 'Event' ? 'Meetup' : kind));
   return made ? `${made.label} · makes this ${made.makes}` : null;
 }
 

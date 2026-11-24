@@ -18,7 +18,8 @@ export type ProjectMode = 'productive' | 'collective-service' | 'personal-servic
  * plan gives it its type (ADR 0059). */
 export type CharterMode =
   ProjectMode | 'proposal' | 'event' | 'help-request' | 'thread' | 'post' | 'channel' | 'community';
-export type ProjectSubtype = 'standard' | 'software' | 'asset-management';
+/** `meetup` is an event with no single date (ADR 0119). */
+export type ProjectSubtype = 'standard' | 'software' | 'asset-management' | 'meetup';
 export type FeedSort = 'trending' | 'recent' | 'top' | 'oldest';
 export type FeedWindow = 'today' | 'week' | 'month' | 'all';
 export type Stance = 'Demand' | 'Oppose';

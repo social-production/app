@@ -5,11 +5,12 @@
  */
 
 import { locale, t } from '#lib/i18n/index.ts';
+import { meetupLine, meetupSummary, weeklyFromForm } from './meetupSchedule.ts';
 import { fromWall, inZone, wall } from './zone.ts';
 
 /** project_integrity::EventSchedule. */
 export interface EventSchedule {
-  mode: 'any-day' | 'date' | 'range';
+  mode: 'any-day' | 'date' | 'range' | 'weekly';
   start_date: string | null;
   end_date: string | null;
   start_time: string | null;
@@ -18,8 +19,10 @@ export interface EventSchedule {
 
 /** web's plan wizard schedule fields (local dates and `HH:MM` times). */
 export interface ScheduleForm {
-  /** `any-day`: no set date (an ongoing event, like weekly pick-up games; owner 2026-11-24). */
-  scheduleMode: 'date' | 'range' | 'any-day';
+  /** A meetup's `weekly` (on `weeklyDay`) or `any-day` (ADR 0119); events have dates. */
+  scheduleMode: 'date' | 'range' | 'any-day' | 'weekly';
+  /** 0 Sunday … 6 Saturday. */
+  weeklyDay: number;
   scheduledDate: string;
   rangeStartDate: string;
   rangeEndDate: string;
@@ -29,6 +32,7 @@ export interface ScheduleForm {
 
 export const emptyScheduleForm = (): ScheduleForm => ({
   scheduleMode: 'date',
+  weeklyDay: 4,
   scheduledDate: '',
   rangeStartDate: '',
   rangeEndDate: '',
@@ -48,6 +52,7 @@ const local = (day: string, time: string): Date => fromWall(new Date(`${day}T${t
 
 /** web's `schedule_to_utc`: the form's local dates and times as UTC. */
 export function scheduleFromForm(f: ScheduleForm): EventSchedule {
+  if (f.scheduleMode === 'weekly') return weeklyFromForm(f);
   if (f.scheduleMode === 'any-day')
     return {
       mode: 'any-day',
@@ -72,7 +77,7 @@ export function scheduleFromForm(f: ScheduleForm): EventSchedule {
 
 /** web's wizard gates: dates for the mode, both times, and the finish after the start. */
 export function scheduleProblem(f: ScheduleForm): string | null {
-  if (f.scheduleMode === 'any-day') return null;
+  if (f.scheduleMode === 'any-day' || f.scheduleMode === 'weekly') return null;
   const range = f.scheduleMode === 'range';
   const startDay = range ? f.rangeStartDate : f.scheduledDate;
   const endDay = range ? f.rangeEndDate : f.scheduledDate;
@@ -85,7 +90,7 @@ export function scheduleProblem(f: ScheduleForm): string | null {
 
 /** The schedule's start and end instants (ms), or null when it names no date. */
 export function scheduleBounds(s: EventSchedule): { start: number; end: number } | null {
-  if (!s.start_date) return null;
+  if (!s.start_date || s.mode === 'weekly') return null;
   const end = s.end_date ?? s.start_date;
   const at = (day: string, time: string | null): number =>
     Date.parse(`${day}T${time ?? '00:00'}:00Z`);
@@ -118,7 +123,7 @@ const localStamp = (d: Date): string =>
 /** web-backend's `_can_propose_event_activity`: the plan hasn't ended yet. */
 export function planOpen(s: EventSchedule, now = Date.now()): boolean {
   // No set date: open until the event closes.
-  if (s.mode === 'any-day') return true;
+  if (s.mode === 'any-day' || s.mode === 'weekly') return true;
   const bounds = scheduleBounds(s);
   return !!bounds && bounds.end > now;
 }
@@ -162,7 +167,7 @@ const timeOptions: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: '2-di
 
 /** web's `formatLocalDateTimeRange` over the plan's start and end. */
 export function scheduleLine(s: EventSchedule, zone: (d: Date) => string): string {
-  if (s.mode === 'any-day') return t('No set date');
+  if (s.mode === 'any-day' || s.mode === 'weekly') return meetupLine(s);
   const bounds = scheduleBounds(s);
   if (!bounds) return '';
   const start = new Date(bounds.start);
@@ -180,7 +185,7 @@ export function scheduleLine(s: EventSchedule, zone: (d: Date) => string): strin
 
 /** The wizard's review line: "2026-11-14 · 09:00 – 13:00" (web's `scheduleSummary`). */
 export function scheduleSummary(f: ScheduleForm): string {
-  if (f.scheduleMode === 'any-day') return t('No set date');
+  if (f.scheduleMode === 'any-day' || f.scheduleMode === 'weekly') return meetupSummary(f);
   const days =
     f.scheduleMode === 'range'
       ? `${f.rangeStartDate || '—'} to ${f.rangeEndDate || '—'}`

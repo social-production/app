@@ -117,6 +117,7 @@ function datedSteps(f: ScheduleForm): PlanStep[] {
 /** web's `buildEventPlanCreationSteps`, with only the date step its schedule mode shows; no
  * set date skips the dates and times (sessions are the activities). */
 function eventPlanSteps(f: ScheduleForm): PlanStep[] {
+  if (isMeetupForm(f)) return meetupPlanSteps();
   return [
     {
       id: 'plan-overview',
@@ -125,11 +126,36 @@ function eventPlanSteps(f: ScheduleForm): PlanStep[] {
     },
     {
       id: 'schedule-mode',
-      question: t('How should the event be scheduled?'),
-      helper: t('Choose a single date, a date range, or no set date for something ongoing.'),
+      question: t('When is it?'),
+      helper: t('One day, or several days in a row.'),
     },
-    ...(f.scheduleMode === 'any-day' ? [] : datedSteps(f)),
+    ...datedSteps(f),
     { id: 'location', question: t('Where will this event happen?') },
+    DEMAND_NOTE,
+    STAGES,
+    REVIEW,
+  ];
+}
+
+/** A meetup plan (ADR 0119): an event plan with a usual day or none. */
+export const isMeetupForm = (f: ScheduleForm): boolean =>
+  f.scheduleMode === 'weekly' || f.scheduleMode === 'any-day';
+
+function meetupPlanSteps(): PlanStep[] {
+  return [
+    {
+      id: 'plan-overview',
+      question: t('What is this meetup called, and what happens?'),
+      helper: t('A clear title, and what people do when they meet.'),
+    },
+    {
+      id: 'schedule-mode',
+      question: t('How do you meet?'),
+      helper: t(
+        'Members add each session as an activity, and people sign up to the ones they come to.',
+      ),
+    },
+    { id: 'location', question: t('Where do you meet?') },
     DEMAND_NOTE,
     STAGES,
     REVIEW,

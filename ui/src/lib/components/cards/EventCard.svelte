@@ -45,6 +45,7 @@
       tags={card.tags}
       stage={card.phase}
       mode={card.mode}
+      meetup={card.subtype === 'meetup'}
       createdAt={card.createdAt}
       updatedAt={card.lastActivityAt}
       distanceKm={card.distanceKm ?? null}><CardReport {card} {href} /></FeedCardTop
