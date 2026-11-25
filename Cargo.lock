@@ -8390,10 +8390,12 @@ dependencies = [
  "holo_hash",
  "holochain",
  "identity_integrity",
+ "kitsune2_bootstrap_srv",
  "serde",
  "serde_bytes",
  "sp_governance",
  "tokio",
+ "url2",
 ]
 
 [[package]]
