@@ -45,17 +45,7 @@ pub fn validate_entry(
             Ok(()) => allow(manager(t.by.as_ref())?, "only the manager names a group"),
             Err(reason) => invalid(&reason),
         },
-        EntryTypes::Manager(_) | EntryTypes::Picture(_) if !group => {
-            invalid("only groups have managers and a photo")
-        }
-        EntryTypes::Manager(m) if m.on && &m.agent == author => {
-            invalid("a manager is made by another manager")
-        }
-        EntryTypes::Manager(m) => allow(manager(m.by.as_ref())?, "only a manager makes managers"),
-        EntryTypes::Picture(p) if p.bytes.is_empty() || p.bytes.len() > crate::PICTURE_MAX => {
-            invalid("a group photo is at most 96 KB")
-        }
-        EntryTypes::Picture(p) => allow(manager(p.by.as_ref())?, "only a manager sets the photo"),
+        EntryTypes::Manager(_) | EntryTypes::Picture(_) => validate_admin(entry, author, group),
         EntryTypes::Removal(_) if !group => invalid("only groups remove people"),
         EntryTypes::Removal(r) if &r.agent == author => {
             invalid("leave instead of removing yourself")
@@ -95,6 +85,36 @@ pub fn validate_entry(
         | EntryTypes::RequestStatus(_) => validate_cited(entry, author, &creator),
         EntryTypes::ReadMark(_) | EntryTypes::Prefs(_) => validate_private(),
         EntryTypes::Declined(_) => invalid("declines are checked above"),
+    }
+}
+
+/// Co-managers and the group photo (ADR 0122): only in groups, and only by a manager.
+fn validate_admin(
+    entry: &EntryTypes,
+    author: &AgentPubKey,
+    group: bool,
+) -> ExternResult<ValidateCallbackResult> {
+    let creator = match chat()? {
+        Ok((creator, _)) if group => creator,
+        _ => return invalid("only groups have managers and a photo"),
+    };
+    let creator = &creator;
+    match entry {
+        EntryTypes::Manager(m) if m.on && &m.agent == author => {
+            invalid("a manager is made by another manager")
+        }
+        EntryTypes::Manager(m) => allow(
+            manages(author, m.by.as_ref(), creator)?,
+            "only a manager makes managers",
+        ),
+        EntryTypes::Picture(p) if p.bytes.is_empty() || p.bytes.len() > crate::PICTURE_MAX => {
+            invalid("a group photo is at most 96 KB")
+        }
+        EntryTypes::Picture(p) => allow(
+            manages(author, p.by.as_ref(), creator)?,
+            "only a manager sets the photo",
+        ),
+        _ => invalid("not a manager or photo entry"),
     }
 }
 

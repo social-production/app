@@ -33,16 +33,24 @@ pub fn moderator_at(q: crate::StandingAt) -> ExternResult<bool> {
     board::moderator_at(&q.agent, q.at)
 }
 
-/// Write this week's `Active` link if the caller hasn't (ADR 0095). Returns whether it wrote.
+/// Write an `Active` link unless the caller wrote one in the last hour (ADRs 0095, 0121).
+/// Returns whether it wrote.
 #[hdk_extern]
 pub fn record_active(_: ()) -> ExternResult<bool> {
     active::record()
 }
 
-/// Full members active in the last complete week before `at` (default now).
+/// People (not bots) active in the seven days before `at` (default now; ADR 0121).
 #[hdk_extern]
 pub fn weekly_active(at: Option<Timestamp>) -> ExternResult<WeeklyActive> {
     active::count_at(at)
+}
+
+/// Which of `agents` were active (not as bots) in the seven days before `at`: a vote's
+/// population is a space's members who were (ADR 0121, web's `weekly_active_project_members`).
+#[hdk_extern]
+pub fn active_among(q: active::Among) -> ExternResult<Vec<AgentPubKey>> {
+    active::among(q)
 }
 
 /// Deactivate the caller's account for good (ADR 0088). The UI confirms first.

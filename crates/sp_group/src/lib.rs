@@ -90,15 +90,19 @@ impl<A: Clone + PartialEq, T: Copy + Ord> Roster<A, T> {
                     }
                 }
             }
-            Change::Grant { by, agent, on: true }
-                if self.manages(by) && self.members.contains(agent) && !self.manages(agent) =>
-            {
+            Change::Grant {
+                by,
+                agent,
+                on: true,
+            } if self.manages(by) && self.members.contains(agent) && !self.manages(agent) => {
                 self.managers.push(agent.clone());
             }
             // Stepping down or stopping someone, as long as someone still manages.
-            Change::Grant { by, agent, on: false }
-                if self.manages(by) && self.manages(agent) && self.managers.len() > 1 =>
-            {
+            Change::Grant {
+                by,
+                agent,
+                on: false,
+            } if self.manages(by) && self.manages(agent) && self.managers.len() > 1 => {
                 self.managers.retain(|m| m != agent);
             }
             _ => {}

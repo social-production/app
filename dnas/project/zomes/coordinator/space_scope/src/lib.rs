@@ -147,7 +147,21 @@ pub fn touch() -> ExternResult<()> {
     if !done {
         create_link(bucket, space, LinkTypes::Recent, ())?;
     }
+    record_active();
     Ok(())
+}
+
+/// A write in a space is a meaningful action: mark the writer active in the directory (ADR
+/// 0121; at most one `Active` link an hour), so votes count them. Best effort: a busy or
+/// missing directory cell never fails the write itself.
+fn record_active() {
+    let _ = call(
+        CallTargetCell::OtherRole("directory".into()),
+        ZomeName::from("identity"),
+        "record_active".into(),
+        None,
+        (),
+    );
 }
 
 /// Spaces active in `hour` (hours since the Unix epoch), each once.

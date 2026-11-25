@@ -123,8 +123,8 @@ struct WeeklyActive {
     count: u32,
 }
 
-/// People (not bots; ADR 0118) active in the last complete week before `at`, from the caller's directory
-/// cell (ADR 0095): a #platform project's population (ADR 0109).
+/// People (not bots; ADR 0118) active in the seven days before `at` (ADR 0121), from the
+/// caller's directory cell (ADR 0095): a #platform project's population (ADR 0109).
 pub fn weekly_active(at: Timestamp) -> ExternResult<u32> {
     let response = call(
         CallTargetCell::OtherRole("directory".into()),
@@ -134,4 +134,32 @@ pub fn weekly_active(at: Timestamp) -> ExternResult<u32> {
         Some(at),
     )?;
     decode::<WeeklyActive>(response, "identity/weekly_active").map(|w| w.count)
+}
+
+#[derive(Serialize, Debug)]
+struct Among {
+    agents: Vec<AgentPubKey>,
+    at: Timestamp,
+}
+
+/// Which of `agents` were active (not as bots) in the seven days before `at` (ADR 0121).
+pub fn active_among(agents: Vec<AgentPubKey>, at: Timestamp) -> ExternResult<Vec<AgentPubKey>> {
+    if agents.is_empty() {
+        return Ok(agents);
+    }
+    // Without a directory cell (a lone project network) everyone counts, as before ADR 0121.
+    let response = call(
+        CallTargetCell::OtherRole("directory".into()),
+        ZomeName::from("identity"),
+        "active_among".into(),
+        None,
+        Among {
+            agents: agents.clone(),
+            at,
+        },
+    );
+    match response {
+        Ok(ok @ ZomeCallResponse::Ok(_)) => decode(ok, "identity/active_among"),
+        _ => Ok(agents),
+    }
 }

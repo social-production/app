@@ -100,7 +100,15 @@ pub fn board() -> ExternResult<PlanBoard> {
         _ => None,
     };
     let open_kinds = PlanKind::open_kinds(state.mode(), state.phase());
-    let members = u32::try_from(crate::calls::member_snapshot()?.len()).unwrap_or(u32::MAX);
+    // A plan vote opened now would count the members active in the last seven days (ADR 0121).
+    let members = crate::voters::snapshot(
+        &crate::roll::Roll::load()?,
+        crate::calls::my_membership()?.as_ref(),
+        sys_time()?,
+        &mut crate::decide::Standing::default(),
+        true,
+    )?;
+    let members = u32::try_from(members.len()).unwrap_or(u32::MAX);
     Ok(PlanBoard {
         plans,
         open_kind: open_kinds.first().copied(),

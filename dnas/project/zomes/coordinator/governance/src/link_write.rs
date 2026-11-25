@@ -54,11 +54,18 @@ pub fn propose(link: LinkRequest) -> ExternResult<ActionHash> {
     } else {
         None
     };
+    let members = crate::voters::snapshot(
+        &crate::roll::Roll::load()?,
+        membership.as_ref(),
+        sys_time()?,
+        &mut crate::decide::Standing::default(),
+        !decides,
+    )?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         space: space_scope::current()?,
         kind: ProposalKind::Link(link),
         membership,
-        members: calls::member_snapshot()?,
+        members,
         organizer,
     }))?;
     create_link(space_scope::base()?, hash.clone(), LinkTypes::Proposals, ())?;

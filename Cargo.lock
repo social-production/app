@@ -5616,6 +5616,7 @@ dependencies = [
  "sp_call",
  "sp_core",
  "sp_event",
+ "sp_group",
  "sp_moderation",
  "sp_service",
 ]

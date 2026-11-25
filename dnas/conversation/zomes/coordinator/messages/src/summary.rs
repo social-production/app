@@ -6,8 +6,8 @@ use messages_integrity::{EntryTypes, LinkTypes, Picture, Prefs, ReadMark, Title,
 use sp_core::conversation::ChatKind;
 
 use crate::entries::{all, private};
-use crate::people::{load, Chat, MEMBERS};
 use crate::files::Bytes;
+use crate::people::{load, Chat, MEMBERS};
 use crate::{reads, receipts, MessageView};
 
 /// A view for the UI, so its flags are plain fields (web's row has the same ones).

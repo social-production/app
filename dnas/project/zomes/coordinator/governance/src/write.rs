@@ -10,7 +10,7 @@ use crate::count::count;
 use crate::decide::Standing;
 use crate::reads::{self, Found};
 use crate::roll::Roll;
-use crate::{calls, link_write, moves, plan_write, software};
+use crate::{calls, link_write, moves, plan_write, software, voters};
 
 /// Why someone can't propose or vote: only an account found to be a bot (ADR 0118).
 pub const NOT_FULL: &str =
@@ -72,17 +72,7 @@ pub fn propose(kind: ProposalKind) -> ExternResult<ActionHash> {
         kind,
         ProposalKind::Plan(_) | ProposalKind::Return { .. } | ProposalKind::Software(_)
     );
-    // The count leaves out accounts found to be bots, whose votes don't count (ADR 0118).
-    let mut members = Vec::new();
-    for hash in calls::member_snapshot()? {
-        let full = match roll.agent(&hash)? {
-            Some(agent) => hash == membership || standing.full(&agent, now)?,
-            None => false,
-        };
-        if full || !votes {
-            members.push(hash);
-        }
-    }
+    let members = voters::snapshot(&roll, Some(&membership), now, &mut standing, votes)?;
     let hash = create_entry(EntryTypes::Proposal(Proposal {
         space: space_scope::current()?,
         kind,

@@ -77,6 +77,20 @@ impl Window {
         })
     }
 
+    /// Whether `who` was active (not as a bot) in the seven days before `at`.
+    pub fn active(&self, who: &AgentPubKey, at: i64) -> bool {
+        self.links.iter().any(|(w, t)| {
+            w == who
+                && *t > at - sp_active::WINDOW_US
+                && *t <= at
+                && !self
+                    .reviews
+                    .get(w)
+                    .and_then(Option::as_ref)
+                    .is_some_and(|s| s.paused_at(*t))
+        })
+    }
+
     /// Distinct people active in the seven days before `at`, leaving out accounts found to
     /// be bots when they wrote (ADR 0118: everyone votes, so everyone counts).
     pub fn count(&self, at: i64) -> u32 {
@@ -88,6 +102,21 @@ impl Window {
                 .is_some_and(|s| s.paused_at(t))
         })
     }
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Among {
+    pub agents: Vec<AgentPubKey>,
+    pub at: Timestamp,
+}
+
+pub fn among(q: Among) -> ExternResult<Vec<AgentPubKey>> {
+    let at = q.at.as_micros();
+    let window = Window::load(at, at)?;
+    Ok(q.agents
+        .into_iter()
+        .filter(|a| window.active(a, at))
+        .collect())
 }
 
 pub fn count_at(at: Option<Timestamp>) -> ExternResult<WeeklyActive> {

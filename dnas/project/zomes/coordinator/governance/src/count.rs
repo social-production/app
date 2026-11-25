@@ -103,12 +103,7 @@ pub fn count(p: &Found<Proposal>, roll: &Roll) -> ExternResult<Count> {
         })
         .collect();
     let decided = deciding(&cited, &counted).and_then(|i| outcomes.into_iter().nth(i));
-    let missing = roll
-        .members_at(p.at)
-        .into_iter()
-        .filter(|(agent, _)| !snapshot.contains(agent) && !added.contains(agent))
-        .map(|(_, hash)| hash)
-        .collect();
+    let missing = missing(roll, p.at, &snapshot, &added)?;
     let to_u32 = |n: usize| u32::try_from(n).unwrap_or(u32::MAX);
     Ok(Count {
         population: roll.population(to_u32(p.entry.members.len() + added.len()), p.at)?,
@@ -118,4 +113,31 @@ pub fn count(p: &Found<Proposal>, roll: &Roll) -> ExternResult<Count> {
         window_end: first.map(|f| Timestamp::from_micros(window_end(f))),
         missing,
     })
+}
+
+/// Left out and challengeable: members active in the seven days before it opened whom its
+/// count doesn't hold (ADR 0121: inactive members aren't counted, so aren't missing).
+fn missing(
+    roll: &Roll,
+    at: Timestamp,
+    snapshot: &BTreeSet<AgentPubKey>,
+    added: &BTreeSet<AgentPubKey>,
+) -> ExternResult<Vec<ActionHash>> {
+    let left_out: Vec<(AgentPubKey, ActionHash)> = roll
+        .members_at(at)
+        .into_iter()
+        .filter(|(agent, _)| !snapshot.contains(agent) && !added.contains(agent))
+        .collect();
+    if left_out.is_empty() {
+        return Ok(Vec::new());
+    }
+    let agents = left_out.iter().map(|(a, _)| a.clone()).collect();
+    let active: BTreeSet<AgentPubKey> = crate::calls::active_among(agents, at)?
+        .into_iter()
+        .collect();
+    Ok(left_out
+        .into_iter()
+        .filter(|(agent, _)| active.contains(agent))
+        .map(|(_, hash)| hash)
+        .collect())
 }
