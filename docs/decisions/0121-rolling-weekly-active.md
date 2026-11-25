@@ -17,8 +17,18 @@ except bots (ADR 0118 already).
 - Weekly active at any moment `at` is the number of distinct people with a link in
   `(at − 7 days, at]`, leaving out links written while their author was found to be a bot
   (`sp_active::active_at`). Readers load the eight day paths the window touches.
-- Votes snapshot it when they open, as before (ADR 0033), and the moderator board's quorum at
-  any moment is `required_votes` of the count then. The board still settles weekly.
+- **Every vote is sized the same way** (owner, 2026-11-25; web's `weekly_active_project_members`):
+  a project's, event's, service's, channel's or community's proposal (phases, plans, edits,
+  updates, links, returns) snapshots the members who were active anywhere on the network in
+  the seven days before it opened, leaving out bots; the proposer always counts. The snapshot
+  is the proposal's `members`, so integrity and every reader agree without the directory
+  (`governance/voters.rs`, the directory's `active_among`). Organizer-decided votes keep every
+  member. A challenge (ADR 0040) can still add a member the snapshot left out; "missing" lists
+  only members who were active then. #platform votes still use the network-wide count.
+- Any write in a space marks its writer active (`space_scope::touch` calls `record_active`, best
+  effort), as web records a meaningful action server-side; the app also records after its calls.
+- Votes snapshot their count when they open, as before (ADR 0033), and the moderator board's
+  quorum at any moment is `required_votes` of the count then. The board still settles weekly.
 - Platform shows "N active in the last 7 days"; ADR 0095's "last week" wording goes.
 
 ## Consequences
