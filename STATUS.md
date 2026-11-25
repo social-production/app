@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-16 evening Melbourne by the owner's PC session and the cloud parity session; start at "START HERE (2026-11-16 afternoon)", then the cloud session's "In flight")
+# Status: where the P2P app stands (updated 2026-11-25 by the UX cloud session; start at the newest "START HERE")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -182,6 +182,48 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-25, UX cloud session): #294–#316
+Each its own PR, merged after green CI.
+- **24 Nov evening (#294–#302):** QR cards on white or dark paper with a square sticker; Support
+  and Oppose in every phase's dock; a joined Take part capsule; Propose edit and Create plan in
+  the create look, with a crop screen for covers and pictures; feed cards show the next planned
+  activity; plan steps as tappable rows. **#301 (ADR 0119, project reset):** meetups, events with
+  no single date whose sessions are activities.
+- **#303–#305:** a profile ⋮ menu (vouching moved there), Support stays shown across tabs, and
+  everyone votes (Full standing adds vouching and bot marks).
+- **#306:** demo seeding and `scope-pictures` press Done in the cropper (`keepCrop` in
+  `tests/e2e/demo/art.mjs`). **#307 (ADR 0120, directory reset):** new members start 10 things a
+  week (was 3). Only the directory hash moved; the demo was reseeded and `founders.cjs` re-run.
+- **#308** solid disabled Log in button (no see-through overlap; passkey login unchanged).
+  **#309** profile picture and cover use the shared crop screen (`PhotoCropHost`, `cropPhoto`).
+  **#310** the create preview shows the chosen picture. **#311** a phase move that already
+  passed says "It has already moved: it is in … now." and reloads.
+- **#312 plan review** (mockup https://claude.ai/artifact/4mTRRmBNc9RtjnPEjbkV8a): one question
+  per screen, answers in words (No … Yes, fully), your answers before the vote.
+- **#313 map list** uses the feed's `SpaceCard`; sessions fold into their meetup, event or project.
+- **#314 activity creation** (mockup v2 https://claude.ai/artifact/EmRPes7yqE2Qg94Uw3mMf1): four
+  steps (when: month calendar and time wheels; where: the usual place or another; who: role
+  cards with steppers; review with an optional note).
+- **#315 map pin card** (mockup https://claude.ai/artifact/Ppb6jHLDhfJPgMRQpiBoRQ): a tapped pin
+  shows the meetup/event/project with its picture and up to three upcoming sessions (tapped one
+  first, then same spot, then by time); a meetup's sessions never show as events; sessions held
+  elsewhere keep their own pin; two at one spot badge "2". **Places:** public places save the
+  exact spot, requests stay approximate (~1 km) with an "about here" halo and no Directions
+  (`editedPlace` keeps the saved precision when the spot is unmoved). Older items stay rounded
+  until edited or reseeded. Coordinator/UI only.
+- **#316:** "help request" is "request" everywhere people see it (English and Russian; stage
+  label in the project coordinator). Internal keys, routes (`/help-requests/`) and the share
+  key keep the old name; old share messages still parse.
+- **Lessons:** container restarts kill a long reseed, so write its output straight to a log and
+  re-run the missing part; vouching is in the profile ⋮ menu now; every picture upload passes the
+  crop step. The local seed node (`cloud-seed.sh`) never finished sign-in this session, so the
+  browser tests weren't run locally; screens were checked with throwaway `src/routes/zz-*`
+  previews (deleted before commit) and live at 390 px, light and dark.
+- **Not seen yet:** two sessions at once and the "about here" halo on live (no such data yet).
+- **Open:** the basketball demo carries the "testing" channel; fix demo channel tags or reseed.
+  Older pending: #22 captures, #24 push for every notice, #36 joined docks (request flow, mic
+  and notify sheets), #57 dock review, #58 bot report UX.
+
 ## START HERE (2026-11-24, day cloud session): the owner's replies to the mockups
 The owner answered Owner Notes Mockups in the morning ("All look great"), with notes. Built
 today, each its own PR, all merged after green CI unless marked:
