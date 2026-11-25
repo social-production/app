@@ -59,16 +59,22 @@ log("ann started the group");
 await ann.getByRole("button", { name: "Chat menu" }).click();
 await ann.getByRole("menuitem", { name: "Chat info" }).click();
 const info = ann.getByRole("dialog");
-await info.getByPlaceholder("Rename group chat").fill(renamed);
+await info.getByLabel("Group name").fill(renamed);
 await info.getByRole("button", { name: "Save" }).click();
 await info.getByText("Group name updated.").waitFor({ timeout: 60_000 });
-await info.getByRole("button", { name: "Add member" }).click();
+await info.getByRole("button", { name: "Add people" }).click();
 await info.getByPlaceholder("Type a username").fill(catName);
-await info.getByRole("button", { name: catName }).click({ timeout: 60_000 });
 await info
-  .getByText(`${catName} joined the group chat.`)
+  .locator(".group-search .group-row", { hasText: catName })
+  .getByRole("button", { name: "Add" })
+  .click({ timeout: 60_000 });
+await info
+  .getByText(`${catName} joined the group.`)
   .waitFor({ timeout: 60_000 });
-await info.getByText(`${annName} (you) · manages the group`).waitFor();
+await info
+  .locator(".group-row", { hasText: `${annName} (you)` })
+  .getByText("Manager")
+  .waitFor();
 await ann.screenshot({ path: `${out}/phone390-chat-info.png` });
 await ann.keyboard.press("Escape");
 await ann
@@ -121,7 +127,8 @@ await bob.getByRole("button", { name: "Chat menu" }).click();
 await bob.getByRole("menuitem", { name: "Chat info" }).click();
 await bob
   .getByRole("dialog")
-  .getByText(`${bobName} (you) · manages the group`)
+  .locator(".group-row", { hasText: `${bobName} (you)` })
+  .getByText("Manager")
   .waitFor({
     timeout: 60_000,
   });
