@@ -10,7 +10,7 @@ import { zoneOf } from './activityTime.ts';
 import type { Proposal, VoteChoice } from './governance.ts';
 import type { SideStatus } from './links.ts';
 import type { PlanView } from './plans.ts';
-import { isHelpKind, type HelpKind } from './helpRail.ts';
+import type { HelpKind } from './helpRail.ts';
 import { HELP_MODE } from './helpRequests.ts';
 import type { CharterMode } from './projects.ts';
 import type { SoftwareGovernance } from './software.ts';
@@ -46,6 +46,9 @@ export interface RailItem {
   /** web's body preview (help requests). */
   body?: string;
   projectMode: CharterMode;
+  /** The space's subtype (`meetup`) and picture hash, added by the rail service. */
+  subtype?: string;
+  picture?: string | null;
   activityId?: string;
   voteKindLabel?: RailVoteKind;
   viewerParticipated?: boolean;
@@ -60,6 +63,8 @@ export interface RailProject {
   description: string;
   creator: string;
   mode: CharterMode;
+  subtype?: string;
+  picture?: string | null;
   amMember: boolean;
   phase: string;
   phaseLabel: (id: string) => string;
@@ -260,26 +265,6 @@ export function countActionable(
   return items.filter((i) => !dismissed.includes(i.id) && !seen.includes(i.id)).length;
 }
 
-const SOFTWARE_KICKERS: Partial<Record<RailVoteKind, string>> = {
-  pull_request_merge: 'Action · merge needed',
-  pull_request: 'Vote · pull request',
-  merge_capability: 'Vote · merge capability',
-  repository_replacement: 'Vote · repository',
-};
-
-/** web's `itemKicker`. */
-export function railKicker(item: RailItem): string {
-  if (item.kind === 'vote') {
-    const software = item.voteKindLabel && SOFTWARE_KICKERS[item.voteKindLabel];
-    if (software) return software;
-    const kind = item.voteKindLabel ? ` · ${t(item.voteKindLabel.replace('_', ' '))}` : '';
-    return `${t('Vote')}${kind}`;
-  }
-  if (item.kind === 'request') return t('Service request');
-  if (isHelpKind(item.kind)) return t('Request');
-  return t('Project activity');
-}
-
 /** web's `formatLocalDateTime`: "Tue, Oct 27, 2026, 6:00 PM AEDT" (the Display timezone). */
 export function railTime(micros: number): string {
   const date = new Date(micros / 1000);
@@ -295,3 +280,5 @@ export function railTime(micros: number): string {
   const zone = zoneOf(date);
   return zone ? `${formatted} ${zone}` : formatted;
 }
+
+export { railKicker } from './railKicker.ts';

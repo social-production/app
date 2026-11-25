@@ -37,10 +37,13 @@ const ITEM_TYPE: Partial<Record<SearchType, SearchResultKind>> = {
   post: 'post',
 };
 
-const itemKind = (mode: CharterMode): SearchResultKind => ITEM_KIND[mode] ?? 'project';
+/** A meetup is an event with subtype `meetup` (ADR 0119); it shows as a meetup. */
+const itemKind = (mode: CharterMode, subtype?: string): SearchResultKind =>
+  mode === 'event' && subtype === 'meetup' ? 'meetup' : (ITEM_KIND[mode] ?? 'project');
 
 const ITEM_PATH: Record<string, string> = {
   event: '/events',
+  meetup: '/events',
   'help-request': '/help-requests',
   thread: '/threads',
   post: '/posts',
@@ -92,7 +95,7 @@ async function itemMatches(q: string, type: SearchType): Promise<SearchResultIte
   return (await visiblePosts(page.items))
     .filter((c) => !only || itemKind(c.mode) === only)
     .map((c) => {
-      const kind = itemKind(c.mode);
+      const kind = itemKind(c.mode, c.subtype);
       return {
         id: c.id,
         kind,

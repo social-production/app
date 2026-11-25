@@ -35,7 +35,13 @@ import { loadSoftware } from './software.ts';
 /** The part of `get_project` the rail reads. */
 interface GlanceWire {
   creator: AgentPubKey;
-  charter: { title: string; description: string; mode: CharterMode; subtype: string } | null;
+  charter: {
+    title: string;
+    description: string;
+    mode: CharterMode;
+    subtype: string;
+    picture?: string | null;
+  } | null;
   am_member: boolean;
   phase: string;
   phases: { id: string; label: string }[];
@@ -93,15 +99,18 @@ export async function myActivityRail(): Promise<{ items: RailItem[]; history: Ra
   ]);
   const projects = settled.flatMap((r) => (r.status === 'fulfilled' && r.value ? [r.value] : []));
   const now = Date.now() * 1000;
+  // Each card shows its space's picture and kind (a meetup, not an event; owner, 2026-11-25).
+  const art = new Map(projects.map((p) => [p.seed, { subtype: p.subtype, picture: p.picture }]));
+  const withArt = (i: RailItem): RailItem => ({ ...i, ...art.get(i.seed) });
   return {
     items: [
       ...railItems(projects, now),
       ...helpRailItems(projects, openHelp, me, now),
       ...requests,
-    ],
-    history: [...railHistory(projects, now), ...helpRailHistory(projects, me, now)].sort(
-      (a, b) => b.createdAt - a.createdAt,
-    ),
+    ].map(withArt),
+    history: [...railHistory(projects, now), ...helpRailHistory(projects, me, now)]
+      .sort((a, b) => b.createdAt - a.createdAt)
+      .map(withArt),
   };
 }
 
@@ -149,6 +158,8 @@ async function railProject(seed: string): Promise<RailProject | null> {
     description: project.charter.description,
     creator: hashToString(project.creator),
     mode: project.charter.mode,
+    subtype: project.charter.subtype,
+    picture: project.charter.picture ?? null,
     amMember: project.am_member,
     phase: project.phase,
     phaseLabel: (id) => t(labels.get(id) ?? id),
