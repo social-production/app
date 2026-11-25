@@ -7,6 +7,7 @@
   import { devicePositionMessage } from '#lib/domain/defaultLocation.ts';
   import { BIO_MAX, HOME_AREA_MAX, type Person } from '#lib/domain/people.ts';
   import { devicePlace } from '#lib/services/locations.ts';
+  import { cropPhoto } from '#lib/stores/photoCrop.svelte.ts';
 
   import type { ProfileEditor } from './profileEdit.svelte.ts';
 
@@ -52,8 +53,13 @@
     area = person.profile?.home_area ?? '';
   });
 
-  const picked = (event: Event): File | undefined =>
-    (event.currentTarget as HTMLInputElement).files?.[0];
+  /** The chosen file, framed in the crop screen first; undefined when none or cancelled. */
+  async function picked(event: Event, shape: 'round' | 'wide'): Promise<File | undefined> {
+    const input = event.currentTarget as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = '';
+    return file ? ((await cropPhoto(file, shape)) ?? undefined) : undefined;
+  }
 
   async function save(): Promise<void> {
     const done = await editor.run(() =>
@@ -108,8 +114,8 @@
       type="file"
       accept="image/*"
       aria-label={t('Cover photo')}
-      onchange={(e) => {
-        const file = picked(e);
+      onchange={async (e) => {
+        const file = await picked(e, 'wide');
         if (file) void editor.pickCover(file);
       }}
     />
@@ -119,8 +125,8 @@
       type="file"
       accept="image/*"
       aria-label={t('Profile photo')}
-      onchange={(e) => {
-        const file = picked(e);
+      onchange={async (e) => {
+        const file = await picked(e, 'round');
         if (file) void editor.pickPhoto(person, file);
       }}
     />
