@@ -56,7 +56,7 @@ for (const [title, tag, place, roles] of requests) {
 
 await part('event: Edinburgh Gardens picnic', async () => {
   const title = 'Edinburgh Gardens spring picnic';
-  const url = await createEvent(ann, bob, title, ['🧺', 95]);
+  const url = await createEvent(ann, bob, title, ['🧺', 95], 'A long lunch on the grass to welcome spring. Bring a plate to share.');
   await advanceTo(ann, bob, 'Plan');
   await ann.goto(url);
   await placedEventPlan(ann, {
@@ -72,7 +72,7 @@ await part('event: Edinburgh Gardens picnic', async () => {
 
 await part('meetup: Thursday pickup basketball', async () => {
   const title = 'Thursday pickup basketball';
-  await createEvent(ann, bob, title, ['🏀', 20]);
+  await createEvent(ann, bob, title, ['🏀', 20], 'Casual weekly basketball for anyone nearby. All levels welcome.');
   await advanceTo(ann, bob, 'Plan');
   await placedMeetupPlan(ann, {
     title: 'Pickup at the Edinburgh Gardens courts',
