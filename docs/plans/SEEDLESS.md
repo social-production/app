@@ -117,7 +117,10 @@ moving a hosted account), 3 (bootstrap list), 3b (Help the network), 5
 (geocoding on the device). Deactivation's directory part (ADR 0095). **Phase A** (25 Nov,
 `tests/scenarios/tests/seedless.rs`): three conductors whose only server is one started with
 `helping.rs`'s production config find each other through it, share data, and keep sharing
-after it stops (passed locally in 4 min 20 s).
+after it stops (passed locally in 4 min 20 s). **B1** (25 Nov, PR #328): the feed index lives in
+`services/archive` (`archive_round` and `people_round` over a `Calls` trait, plus every
+query); the gateway implements `Calls` with its embedded conductor and behaves the same
+(live after the deploy: 26 feed items, people search, 12 map markers). Next: B2.
 
 **Phase A: prove what is built (S).** Owner, 19 Nov: test it soon. Railway's bootstrap stays on as long as possible, as a backup, never the only way in. The 3b test, as a scenario rather than three real
 machines. Three conductors, Railway's bootstrap off, and the third conductor runs

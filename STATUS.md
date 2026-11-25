@@ -182,6 +182,17 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-26 early, UX cloud session): #324–#328
+- **#324:** a group's photo shows in the chat header and chats list (it only showed on the
+  group page, so it looked unsaved); it appears at once while saving; Save closes the page;
+  the shrink falls back to a page canvas on older Safari; New group's name box is the edit
+  page's name card. **#325:** an event with no sessions gets its own date row on the map card.
+- **#326:** demo events tag `neighbourhood` (`createEvent`/`continueSteps` take a tag). On
+  live both founders closed the two `#testing` events and the demo re-made them.
+- **SEEDLESS A (#327)** `tests/scenarios/tests/seedless.rs` (260 s) and **B1 (#328)**
+  `services/archive`; live smoke after the seed redeploy at about 6:41 am. Next: **B2**
+  (desktop runs `archive`, Tauri commands, `holo/feed.ts` asks the device).
+
 ## START HERE (2026-11-25 late, UX cloud session): #318–#322, accounts and chats reset
 - **#318–#320:** meetups show as Meetup in search and the rail (picture, two-people icon);
   the right rail redesign (Rail and Group Chat mockup §1: picture tiles, day groups, clock chip,
