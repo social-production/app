@@ -291,6 +291,7 @@ export class DetailState {
       return true;
     } catch (e) {
       this.sheetMessage = explain(e);
+      void this.load(); // the page may be behind, e.g. a move that already passed
       return false;
     } finally {
       this.saving = false;
