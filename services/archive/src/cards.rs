@@ -2,7 +2,7 @@
 //! makes. A help request's card also carries its time and sign-ups (ADR 0067).
 
 use holo_hash::{ActionHashB64, AgentPubKeyB64, EntryHashB64};
-use holochain::prelude::*;
+use holochain_types::prelude::*;
 use serde::{Deserialize, Serialize};
 
 use super::ProjectCard;

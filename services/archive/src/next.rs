@@ -49,7 +49,7 @@ pub fn served(card: &ProjectCard, now: i64) -> ProjectCard {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::node::markers::ActivityPlace;
+    use crate::markers::ActivityPlace;
 
     fn activity(id: &str, starts_at: i64, ends_at: i64) -> CardActivity {
         CardActivity {

@@ -6,8 +6,8 @@ use anyhow::anyhow;
 use serde::Deserialize;
 
 use super::archivist::provisioned;
-use super::spaces::{space_of_seed, Scoped};
 use super::Node;
+use archive::{space_of_seed, Scoped};
 
 /// Read-only calls a guest may make, by zome. Every one is public to any member of the
 /// network anyway: listings, profiles, standing, follows and feedback in the directory; a project's page,

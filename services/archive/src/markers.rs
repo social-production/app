@@ -63,6 +63,7 @@ pub struct CardActivity {
 }
 
 /// web's `/feeds/map-markers` parameters.
+#[derive(Debug)]
 pub struct MarkerQuery<'a> {
     pub center: (f64, f64),
     pub radius_km: f64,

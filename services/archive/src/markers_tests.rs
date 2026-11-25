@@ -1,7 +1,7 @@
 //! Tests for web's map markers (`markers.rs`).
 
 use super::*;
-use crate::node::cards::HelpCard;
+use crate::cards::HelpCard;
 
 const FITZROY: (f64, f64) = (-37.8, 144.98);
 
@@ -114,7 +114,7 @@ fn timed_items_need_a_time_and_upcoming_ones_come_first() {
 #[test]
 fn removed_items_and_online_places_have_no_pin() {
     let mut removed = card("removed", "productive", Some(FITZROY));
-    removed.moderation = Some(crate::node::index::REMOVED.into());
+    removed.moderation = Some(crate::index::REMOVED.into());
     assert!(markers(&[removed], &query("all")).is_empty());
     let online = PlaceMirror {
         latitude: None,

@@ -24,6 +24,7 @@ const PROJECT_MODES: [&str; 4] = [
 const ONLINE_LABELS: [&str; 3] = ["online", "remote", "virtual"];
 
 /// web's `/feeds/region` parameters, checked by the route.
+#[derive(Debug)]
 pub struct RegionQuery<'a> {
     pub center: (f64, f64),
     pub radius_km: f64,
