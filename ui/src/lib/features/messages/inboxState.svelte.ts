@@ -1,3 +1,4 @@
+import { setGroupManager, setGroupPicture } from '#lib/services/groupAdmin.ts';
 import { t } from '#lib/i18n/index.ts';
 import { HOLDER_PREFIX } from '#lib/domain/serviceRequests.ts';
 import { startVisibilityPoll } from '#lib/components/actions/visibilityPoll.ts';
@@ -133,6 +134,14 @@ export class InboxState {
 
   removeMember(id: string, agent: string): Promise<void> {
     return this.write(() => removeGroupMember(id, agent));
+  }
+
+  setManager(id: string, agent: string, on: boolean): Promise<void> {
+    return this.write(() => setGroupManager(id, agent, on));
+  }
+
+  setPicture(id: string, photo: Blob): Promise<void> {
+    return this.write(() => setGroupPicture(id, photo));
   }
 
   unreadTotal = $derived(this.chats.reduce((sum, c) => sum + c.unread, 0));

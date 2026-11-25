@@ -3,7 +3,7 @@
 
 use hdi::prelude::*;
 
-use crate::{is_type, Invite, Leave, UnitEntryTypes};
+use crate::{is_type, Invite, Leave, Manager, UnitEntryTypes};
 
 pub(crate) fn decode<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
     record: &Record,
@@ -15,7 +15,8 @@ pub(crate) fn decode<T: TryFrom<SerializedBytes, Error = SerializedBytesError>>(
 }
 
 /// `author` manages the chat: they are its creator (`by` is `None`), or `by` is the valid
-/// `Leave` by which the previous manager handed the group to them.
+/// `Leave` by which the previous manager handed the group to them, or a valid `Manager` grant
+/// making them one (ADR 0122).
 pub fn manages(
     author: &AgentPubKey,
     by: Option<&ActionHash>,
@@ -25,6 +26,9 @@ pub fn manages(
         return Ok(author == creator);
     };
     let record = must_get_valid_record(by.clone())?;
+    if is_type(record.action(), UnitEntryTypes::Manager)? {
+        return Ok(decode::<Manager>(&record)?.is_some_and(|m| m.on && &m.agent == author));
+    }
     if !is_type(record.action(), UnitEntryTypes::Leave)? {
         return Ok(false);
     }

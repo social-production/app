@@ -1,0 +1,11 @@
+[package]
+name = "sp_group"
+description = "Who is in a chat and who manages a group over time, with several managers (ADR 0122). Its own crate: any change to sp_core changes every DNA's hash."
+edition.workspace = true
+license.workspace = true
+version.workspace = true
+
+[dependencies]
+
+[lints]
+workspace = true

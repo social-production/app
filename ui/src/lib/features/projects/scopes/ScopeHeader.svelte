@@ -59,8 +59,8 @@
   const pending = $derived(s.joining || (!s.project && !!scope?.id));
   const typeName = $derived(kind === 'channel' ? t('Channel') : t('Community'));
   const organized = $derived(s.project?.governance === 'organizer_controlled');
-  // The Platform counts people active last week (what its votes are sized from), not members
-  // (Platform and Moderators mockups §1).
+  // The Platform counts people active in the seven days before now (what its votes are sized
+  // from; ADR 0121), not members (Platform and Moderators mockups §1).
   const sub = $derived.by(() => {
     if (!s.platform) {
       const members = `${plural(count, '{n} member', '{n} members')}`;
@@ -68,12 +68,9 @@
     }
     const n = board?.weeklyActive;
     if (n === undefined) return t('The whole network');
-    const last = n === 0 ? t('Nobody active last week') : `${n.toLocaleString()} active last week`;
-    // The week so far too, so a quiet last week doesn't read as an empty network (2026-11-25).
-    const now = board?.thisWeek;
-    return now
-      ? `${t('{n} active so far this week', { n: now.toLocaleString() })} · ${last}`
-      : last;
+    return n === 0
+      ? t('Nobody active in the last 7 days')
+      : t('{n} active in the last 7 days', { n: n.toLocaleString() });
   });
   let networkOpen = $state(false);
   const faces = $derived((board?.moderators ?? []).slice(0, 3));

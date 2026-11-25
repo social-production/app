@@ -16,6 +16,7 @@ messages_integrity = { workspace = true }
 sp_attachment = { workspace = true }
 sp_call = { workspace = true }
 sp_core = { workspace = true }
+sp_group = { workspace = true }
 sp_event = { workspace = true }
 sp_moderation = { workspace = true }
 sp_service = { workspace = true }

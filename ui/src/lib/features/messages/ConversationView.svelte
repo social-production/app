@@ -7,6 +7,7 @@
   import { ChatState } from '#lib/components/chat/chatState.svelte.ts';
   import { withReceipts } from '#lib/components/chat/chatFormat.ts';
   import { MentionSource } from '#lib/components/chat/mentionSource.svelte.ts';
+  import { cropPhoto } from '#lib/stores/photoCrop.svelte.ts';
   import GroupInfoSheet from '#lib/components/messages/GroupInfoSheet.svelte';
 
   import ChatAboutPage from './ChatAboutPage.svelte';
@@ -240,11 +241,16 @@
     {title}
     me={inbox.me}
     manager={chat.manager}
+    managers={chat.managers}
+    picture={chat.picture}
     {members}
     search={(q) => inbox.search(q)}
     onRename={(name) => inbox.rename(seed, name)}
     onAdd={(c) => inbox.addMember(seed, c.agent)}
     onRemove={(c) => inbox.removeMember(seed, c.agent)}
+    onManager={(c, on) => inbox.setManager(seed, c.agent, on)}
+    onPicture={(photo) => inbox.setPicture(seed, photo)}
+    crop={(file) => cropPhoto(file, 'round')}
     onLeave={() => inbox.leave(seed)}
     onClose={onInfoClose}
   />

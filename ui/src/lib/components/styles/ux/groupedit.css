@@ -250,6 +250,11 @@
   cursor: pointer;
 }
 
+.group-page .group-more-slot {
+  flex: none;
+  cursor: default;
+}
+
 .group-page .group-more:hover,
 .group-page .group-more[aria-expanded='true'] {
   background: var(--panel-hover);
@@ -314,6 +319,49 @@
   color: var(--danger);
   font: inherit;
   font-size: 15px;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+/* The group's photo with a camera badge, and Change photo under it (ADR 0122). */
+.group-page .group-face {
+  gap: 8px;
+}
+
+.group-page .group-face-inner {
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.group-page .group-face-inner img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.group-page .group-camera {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--page-bg);
+  border-radius: 50%;
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+  cursor: pointer;
+}
+
+.group-page .group-change {
+  border: none;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-size: 14px;
   font-weight: 650;
   cursor: pointer;
 }

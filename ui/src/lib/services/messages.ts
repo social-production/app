@@ -34,6 +34,8 @@ interface SummaryWire {
   kind: ChatKind;
   creator: AgentPubKey;
   manager: AgentPubKey | null;
+  managers?: AgentPubKey[];
+  picture?: Uint8Array | null;
   members: AgentPubKey[];
   title: string | null;
   last: {
@@ -78,6 +80,18 @@ export async function myChats(): Promise<{ seed: string; at: number }[]> {
     .map(({ seed, at }) => ({ seed, at }));
 }
 
+const pictures = new Map<string, { size: number; url: string }>();
+
+/** One object URL per group photo, replaced (and the old one freed) when it changes. */
+function pictureUrl(seed: string, bytes: Uint8Array): string {
+  const known = pictures.get(seed);
+  if (known?.size === bytes.length) return known.url;
+  if (known) URL.revokeObjectURL(known.url);
+  const url = URL.createObjectURL(new Blob([bytes.slice()], { type: 'image/jpeg' }));
+  pictures.set(seed, { size: bytes.length, url });
+  return url;
+}
+
 export async function chatSummary(seed: string, invitedAt: number): Promise<ChatSummary> {
   const s = await chat<SummaryWire>(seed, 'summary');
   return {
@@ -85,6 +99,8 @@ export async function chatSummary(seed: string, invitedAt: number): Promise<Chat
     kind: s.kind,
     creator: hashToString(s.creator),
     manager: s.manager && hashToString(s.manager),
+    managers: (s.managers ?? []).map(hashToString),
+    picture: s.picture ? pictureUrl(seed, s.picture) : null,
     members: s.members.map(hashToString),
     title: s.title,
     last: s.last && {

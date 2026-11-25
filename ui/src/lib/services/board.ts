@@ -52,23 +52,12 @@ function member(r: RowWire, quorum: number, weeklyActive: number): BoardMember {
   };
 }
 
-/** The week in progress: `weekly_active` counts the week before `at`, so ask as of a week on. */
-async function thisWeek(): Promise<number> {
-  const weekOn = (Date.now() + 7 * 24 * 60 * 60 * 1000) * 1000;
-  return (await identity<{ count: number }>('weekly_active', weekOn)).count;
-}
-
 export async function getBoard(): Promise<Board> {
-  const [w, me, now] = await Promise.all([
-    identity<BoardWire>('get_board'),
-    myAgent().catch(() => ''),
-    thisWeek().catch(() => undefined),
-  ]);
+  const [w, me] = await Promise.all([identity<BoardWire>('get_board'), myAgent().catch(() => '')]);
   const rows = w.rows.map((r) => member(r, w.quorum, w.weekly_active));
   const mine = rows.find((r) => r.agent === me);
   return {
     weeklyActive: w.weekly_active,
-    thisWeek: now,
     quorum: w.quorum,
     moderators: rows.filter((r) => r.moderator),
     candidates: rows.filter((r) => !r.moderator),

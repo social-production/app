@@ -17,6 +17,10 @@ export interface ChatSummary {
   creator: string;
   /** Who manages a group now (web's `createdBy`, which moves when the manager leaves). */
   manager: string | null;
+  /** Everyone who manages a group now (ADR 0122). */
+  managers: string[];
+  /** The group's photo (an object URL), when a manager set one. */
+  picture: string | null;
   /** Everyone in the chat now, longest-standing first. */
   members: string[];
   title: string | null;

@@ -2,10 +2,11 @@
 //! hide), all private to you except the chat's name and members.
 
 use hdk::prelude::*;
-use messages_integrity::{EntryTypes, LinkTypes, Prefs, ReadMark, Title, UnitEntryTypes};
+use messages_integrity::{EntryTypes, LinkTypes, Picture, Prefs, ReadMark, Title, UnitEntryTypes};
 use sp_core::conversation::ChatKind;
 
 use crate::entries::{all, private};
+use crate::files::Bytes;
 use crate::people::{load, Chat, MEMBERS};
 use crate::{reads, receipts, MessageView};
 
@@ -16,8 +17,12 @@ pub struct ChatSummary {
     /// "direct" or "group".
     pub kind: String,
     pub creator: AgentPubKey,
-    /// Who manages a group now (web's `created_by` after handovers).
+    /// Who manages a group now (web's `created_by` after handovers): the longest-managing.
     pub manager: Option<AgentPubKey>,
+    /// Everyone who manages it now (ADR 0122).
+    pub managers: Vec<AgentPubKey>,
+    /// The group's photo (a small JPEG), when a manager set one.
+    pub picture: Option<Bytes>,
     /// Everyone in the chat now, longest-standing first.
     pub members: Vec<AgentPubKey>,
     pub title: Option<String>,
@@ -56,8 +61,18 @@ fn title(chat: &Chat) -> ExternResult<Option<String>> {
     Ok(
         all::<Title>(UnitEntryTypes::Title, LinkTypes::Titles, MEMBERS)?
             .into_iter()
-            .rfind(|f| chat.roster.manager_at(f.at) == Some(&f.author))
+            .rfind(|f| chat.roster.managed_at(&f.author, f.at))
             .map(|f| f.entry.title),
+    )
+}
+
+/// The group's newest photo by whoever managed it at the time (ADR 0122).
+fn picture(chat: &Chat) -> ExternResult<Option<Bytes>> {
+    Ok(
+        all::<Picture>(UnitEntryTypes::Picture, LinkTypes::Pictures, MEMBERS)?
+            .into_iter()
+            .rfind(|f| chat.roster.managed_at(&f.author, f.at))
+            .map(|f| Bytes(f.entry.bytes)),
     )
 }
 
@@ -102,7 +117,13 @@ pub fn summary() -> ExternResult<ChatSummary> {
     Ok(ChatSummary {
         kind: chat.kind.as_str().into(),
         creator: chat.creator.clone(),
-        manager: chat.roster.manager.clone(),
+        manager: chat.roster.manager().cloned(),
+        managers: chat.roster.managers.clone(),
+        picture: if chat.kind == ChatKind::Group {
+            picture(&chat)?
+        } else {
+            None
+        },
         members: chat.roster.members.clone(),
         title: if chat.kind == ChatKind::Group {
             title(&chat)?

@@ -35,7 +35,7 @@ pub fn pinned(chat: &Chat) -> ExternResult<BTreeMap<ActionHash, Timestamp>> {
     for f in all::<Pin>(UnitEntryTypes::Pin, LinkTypes::Pins, MESSAGES)? {
         let allowed = match chat.kind {
             ChatKind::Direct => chat.roster.in_at(&f.author, f.at),
-            ChatKind::Group => chat.roster.manager_at(f.at) == Some(&f.author),
+            ChatKind::Group => chat.roster.managed_at(&f.author, f.at),
         };
         if allowed {
             state.insert(f.entry.message, (f.entry.pinned, f.at));

@@ -8,28 +8,42 @@
 
   /**
    * A group's page, as the Rail and Group Chat mockup §3 draws it (owner 2026-11-25): a top bar
-   * with Cancel and Save, the group's face, its name, then its members with their role and a ⋮
-   * menu for managers, and Leave group. Everyone else sees Group info without the controls.
+   * with Cancel and Save, the group's photo (Change photo for managers), its name, then its
+   * members with their role and a ⋮ menu for managers (make or stop a manager, remove; ADR
+   * 0122), and Leave group. Everyone else sees Group info without the controls.
    */
   interface Props {
     open: boolean;
     title: string;
     me: string;
     manager: string | null;
+    managers: string[];
+    picture: string | null;
     members: Contact[];
     search: (query: string) => Promise<Contact[]>;
     onRename: (title: string) => Promise<void>;
     onAdd: (contact: Contact) => Promise<void>;
     onRemove: (contact: Contact) => Promise<void>;
+    onManager: (contact: Contact, on: boolean) => Promise<void>;
+    onPicture: (photo: Blob) => Promise<void>;
+    /** The shared crop screen: the placed photo, or `null` when closed. */
+    crop: (file: File) => Promise<Blob | null>;
     onLeave?: () => Promise<void>;
     onClose: () => void;
   }
 
   let p: Props = $props();
 
-  const isManager = (agent: string) => agent === p.manager;
+  const isManager = (agent: string) =>
+    p.managers.length > 0 ? p.managers.includes(agent) : agent === p.manager;
   const managing = $derived(isManager(p.me));
-  const managerName = $derived(p.members.find((m) => isManager(m.agent))?.name ?? '');
+  const managerNames = $derived(
+    p.members
+      .filter((m) => isManager(m.agent))
+      .map((m) => m.name)
+      .join(` ${t('and')} `),
+  );
+  const managerCount = $derived(p.members.filter((m) => isManager(m.agent)).length);
   let draft = $state('');
   let adding = $state(false);
   let query = $state('');
@@ -88,6 +102,22 @@
     if (feedback?.ok) query = '';
   }
 
+  let picking = $state<HTMLInputElement | null>(null);
+  async function choose(file: File | undefined): Promise<void> {
+    if (!file) return;
+    const placed = await p.crop(file);
+    if (placed) await run(() => p.onPicture(placed), 'Group photo updated.', 'Could not save it.');
+  }
+
+  async function grant(member: Contact, on: boolean): Promise<void> {
+    openMenu = null;
+    await run(
+      () => p.onManager(member, on),
+      on ? `${member.name} manages the group too.` : `${member.name} no longer manages it.`,
+      'Could not change that.',
+    );
+  }
+
   async function leave(): Promise<void> {
     if (!leaving) {
       leaving = true;
@@ -131,7 +161,51 @@
     </header>
 
     <div class="group-scroll">
-      <div class="group-face"><AvatarBadge name={p.title} /></div>
+      <div class="group-face">
+        <span class="group-face-inner">
+          {#if p.picture}<img src={p.picture} alt="" />{:else}<AvatarBadge name={p.title} />{/if}
+          {#if managing}
+            <button
+              class="group-camera"
+              type="button"
+              aria-label={t('Change photo')}
+              onclick={() => picking?.click()}
+            >
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"
+                ><path
+                  d="M4 8h3l2-3h6l2 3h3v11H4z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                  stroke-linejoin="round"
+                /><circle
+                  cx="12"
+                  cy="13"
+                  r="3.5"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.2"
+                /></svg
+              >
+            </button>
+          {/if}
+        </span>
+        {#if managing}
+          <button class="group-change" type="button" onclick={() => picking?.click()}
+            >{t('Change photo')}</button
+          >
+          <input
+            bind:this={picking}
+            hidden
+            type="file"
+            accept="image/*"
+            onchange={(e) => {
+              void choose(e.currentTarget.files?.[0]);
+              e.currentTarget.value = '';
+            }}
+          />
+        {/if}
+      </div>
       {#if managing}
         <label class="group-name-field">
           <span>{t('Group name')}</span>
@@ -142,7 +216,7 @@
         <p class="group-sub">
           {[
             `${p.members.length} members`,
-            managerName ? t('managed by {name}', { name: managerName }) : '',
+            managerNames ? t('managed by {name}', { name: managerNames }) : '',
           ]
             .filter(Boolean)
             .join(' · ')}
@@ -151,6 +225,7 @@
 
       <div class="group-section">
         <span>{t('Members')} · {p.members.length}</span>
+        {#if managerCount > 1}<span>{managerCount} {t('managers')}</span>{/if}
       </div>
       <div class="group-list">
         {#if managing}
@@ -178,9 +253,11 @@
             you={member.agent === p.me}
             manager={isManager(member.agent)}
             canManage={managing && member.agent !== p.me}
+            keepSlot={managing}
             menuOpen={openMenu === member.agent}
             profile={resolve('/profile/[agent]', { agent: member.agent })}
             onMenu={(open) => (openMenu = open ? member.agent : null)}
+            onManager={() => void grant(member, !isManager(member.agent))}
             onRemove={() => {
               openMenu = null;
               void run(

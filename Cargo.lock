@@ -5616,6 +5616,7 @@ dependencies = [
  "sp_call",
  "sp_core",
  "sp_event",
+ "sp_group",
  "sp_moderation",
  "sp_service",
 ]
@@ -9088,6 +9089,10 @@ version = "0.0.1"
 dependencies = [
  "serde",
 ]
+
+[[package]]
+name = "sp_group"
+version = "0.0.1"
 
 [[package]]
 name = "sp_help"

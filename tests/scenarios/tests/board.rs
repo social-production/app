@@ -1,6 +1,6 @@
-//! Platform moderators, the weekly active count and deactivation (ADRs 0095, 0088). Anyone
-//! volunteers and votes (ADR 0118); the replay seats and removes moderators; one `Active` link per
-//! person per week; a deactivated account's chain is closed.
+//! Platform moderators, the rolling weekly active count and deactivation (ADRs 0095, 0088,
+//! 0121). Anyone volunteers and votes (ADR 0118); the replay seats and removes moderators; one
+//! `Active` link per person an hour, from its day's path; a deactivated account's chain is closed.
 
 use holochain::prelude::*;
 use holochain::sweettest::{await_consistency, SweetCell, SweetConductorBatch};
@@ -8,7 +8,9 @@ use serde::{Deserialize, Serialize};
 
 mod common;
 
-const WEEK_US: i64 = 7 * 24 * 60 * 60 * 1_000_000;
+const DAY_US: i64 = 24 * 60 * 60 * 1_000_000;
+const WEEK_US: i64 = 7 * DAY_US;
+const HOUR_US: i64 = 60 * 60 * 1_000_000;
 
 #[derive(Serialize, Debug)]
 struct BoardVote {
@@ -34,7 +36,7 @@ struct BoardView {
 
 #[derive(Deserialize, Debug, PartialEq)]
 struct WeeklyActive {
-    week: i64,
+    at: i64,
     count: u32,
 }
 
@@ -93,7 +95,7 @@ async fn moderators_active_weeks_and_deactivation() {
     let cells = common::directory_network(&mut conductors, 4).await;
     let net = Net { conductors, cells };
     volunteers_are_seated_and_removed(&net).await;
-    one_active_link_a_week(&net).await;
+    one_active_link_an_hour(&net).await;
     a_deactivated_chain_is_closed(&net).await;
     common::shut_down(net.conductors).await;
 }
@@ -112,9 +114,10 @@ async fn volunteers_are_seated_and_removed(net: &Net) {
         .await
     );
     net.settle().await;
-    // Nobody was active last week, so the quorum is 0 and a volunteer is seated at once (web).
+    // Nobody was active before ann volunteered, so the quorum then was 0 and she is seated at
+    // once (web); volunteering wrote her link, so the count now is 1.
     let board = net.board(4).await;
-    assert_eq!((board.weekly_active, board.quorum), (0, 0));
+    assert_eq!((board.weekly_active, board.quorum), (1, 1));
     assert_eq!(board.rows.len(), 1);
     assert_eq!(
         (board.rows[0].agent.clone(), board.rows[0].standing.as_str()),
@@ -146,38 +149,35 @@ async fn volunteers_are_seated_and_removed(net: &Net) {
     assert!(net.board(4).await.rows.is_empty(), "withdrawn");
 }
 
-async fn one_active_link_a_week(net: &Net) {
-    // Volunteering and voting already wrote ann's to dan's link for this week.
+async fn one_active_link_an_hour(net: &Net) {
+    // Volunteering and voting already wrote ann's to dan's link within the hour.
     let wrote: bool = net.call(0, "record_active", ()).await;
-    assert!(!wrote, "one a week");
+    assert!(!wrote, "one an hour");
     let eve: bool = net.call(4, "record_active", ()).await;
     assert!(eve);
-    let week: WeeklyActive = net.call(0, "weekly_active", None::<Timestamp>).await;
-    // `week` is last week (the one counted); this week is `week + 1`.
+    let today = Timestamp::now().as_micros().div_euclid(DAY_US);
     assert!(
-        net.refused(0, "submit_active_link", week.week + 1).await,
-        "a second link this week"
+        net.refused(0, "submit_active_link", today).await,
+        "a second link within the hour"
     );
     assert!(
-        net.refused(0, "submit_active_link", week.week + 2).await,
-        "next week's path"
+        net.refused(4, "submit_active_link", today + 1).await,
+        "tomorrow's path"
     );
     assert!(
-        net.refused(1, "submit_active_link", week.week).await,
-        "last week's path"
+        net.refused(4, "submit_active_link", today - 1).await,
+        "yesterday's path"
     );
     net.settle().await;
-    assert_eq!(week.count, 0, "the current week isn't counted yet");
-    // Counted from next week: the four founders and eve, New or not (ADR 0118).
-    let later = Timestamp::from_micros(Timestamp::now().as_micros() + WEEK_US);
-    let next: WeeklyActive = net.call(4, "weekly_active", Some(later)).await;
-    assert_eq!(
-        next,
-        WeeklyActive {
-            week: week.week + 1,
-            count: 5
-        }
-    );
+    // The seven days before now: the four founders and eve, New or not (ADR 0118).
+    let now: WeeklyActive = net.call(4, "weekly_active", None::<Timestamp>).await;
+    assert_eq!(now.count, 5);
+    // An hour on everyone still counts; a week and an hour on, everyone has aged out.
+    let soon = Timestamp::from_micros(now.at + HOUR_US);
+    let later = Timestamp::from_micros(now.at + WEEK_US + HOUR_US);
+    let at_soon: WeeklyActive = net.call(0, "weekly_active", Some(soon)).await;
+    let at_later: WeeklyActive = net.call(0, "weekly_active", Some(later)).await;
+    assert_eq!((at_soon.count, at_later.count), (5, 0));
 }
 
 async fn a_deactivated_chain_is_closed(net: &Net) {

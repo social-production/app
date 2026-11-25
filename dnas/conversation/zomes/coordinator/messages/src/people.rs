@@ -1,10 +1,12 @@
-//! Who is in the chat and who manages it, replayed from its invitations, removals and leaves
-//! (`sp_core::roster`, ADR 0045), and the citations the caller's writes need.
+//! Who is in the chat and who manages it, replayed from its invitations, removals, leaves and
+//! manager grants (`sp_group`, ADRs 0045 and 0122), and the citations the caller's writes need.
 
 use hdk::prelude::*;
-use messages_integrity::{network, Invite, Leave, LinkTypes, Network, Removal, UnitEntryTypes};
+use messages_integrity::{
+    network, Invite, Leave, LinkTypes, Manager, Network, Removal, UnitEntryTypes,
+};
 use sp_core::conversation::ChatKind;
-use sp_core::roster::{Change, Roster};
+use sp_group::{Change, Roster};
 
 use crate::entries::{all, Found};
 use crate::guest;
@@ -26,6 +28,7 @@ pub struct Chat {
     pub roster: Roster<AgentPubKey, Timestamp>,
     pub invites: Vec<Found<Invite>>,
     pub leaves: Vec<Found<Leave>>,
+    pub grants: Vec<Found<Manager>>,
 }
 
 pub fn load() -> ExternResult<Chat> {
@@ -33,6 +36,7 @@ pub fn load() -> ExternResult<Chat> {
     let invites: Vec<Found<Invite>> = all(UnitEntryTypes::Invite, LinkTypes::Invites, MEMBERS)?;
     let removals: Vec<Found<Removal>> = all(UnitEntryTypes::Removal, LinkTypes::Removals, MEMBERS)?;
     let leaves: Vec<Found<Leave>> = all(UnitEntryTypes::Leave, LinkTypes::Leaves, MEMBERS)?;
+    let grants: Vec<Found<Manager>> = all(UnitEntryTypes::Manager, LinkTypes::Managers, MEMBERS)?;
     let mut changes: Vec<(Timestamp, ActionHash, Change<AgentPubKey>)> = Vec::new();
     for f in &invites {
         let change = Change::Invite {
@@ -55,6 +59,14 @@ pub fn load() -> ExternResult<Chat> {
         };
         changes.push((f.at, f.hash.clone(), change));
     }
+    for f in &grants {
+        let change = Change::Grant {
+            by: f.author.clone(),
+            agent: f.entry.agent.clone(),
+            on: f.entry.on,
+        };
+        changes.push((f.at, f.hash.clone(), change));
+    }
     changes.sort_by(|a, b| (a.0, &a.1).cmp(&(b.0, &b.1)));
     let timeline: Vec<(Timestamp, Change<AgentPubKey>)> =
         changes.into_iter().map(|(at, _, c)| (at, c)).collect();
@@ -65,6 +77,7 @@ pub fn load() -> ExternResult<Chat> {
         me: agent_info()?.agent_initial_pubkey,
         invites,
         leaves,
+        grants,
     })
 }
 
@@ -74,7 +87,7 @@ impl Chat {
     }
 
     pub fn is_manager(&self) -> bool {
-        self.roster.manager.as_ref() == Some(&self.me)
+        self.roster.manages(&self.me)
     }
 
     /// The caller's newest invitation, which their messages cite; `None` for the creator.
@@ -92,27 +105,30 @@ impl Chat {
             })
     }
 
-    /// How the caller manages the group: `None` as its creator, else the `Leave` that handed
-    /// it to them.
+    /// How the caller manages the group: `None` as its creator who never stopped, else the
+    /// newest grant or `Leave` that made them a manager (ADR 0122).
     pub fn my_authority(&self) -> ExternResult<Option<ActionHash>> {
         if !self.is_manager() {
-            return Err(guest("Only the group creator can manage members"));
+            return Err(guest("Only a manager of this group can do that."));
         }
-        if self.me == self.creator && self.handed_over_by_me().is_none() {
+        if self.me == self.creator && !self.roster.stopped_once(&self.me) {
             return Ok(None);
         }
-        self.leaves
+        let granted = self
+            .grants
             .iter()
-            .rev()
-            .find(|f| f.entry.successor.as_ref() == Some(&self.me))
-            .map(|f| Some(f.hash.clone()))
-            .ok_or_else(|| guest("The group's handover hasn't arrived yet. Try again in a moment."))
-    }
-
-    fn handed_over_by_me(&self) -> Option<&Found<Leave>> {
-        self.leaves
+            .filter(|f| f.entry.on && f.entry.agent == self.me)
+            .map(|f| (f.at, f.hash.clone()));
+        let handed = self
+            .leaves
             .iter()
-            .find(|f| f.author == self.me && f.entry.successor.is_some())
+            .filter(|f| f.entry.successor.as_ref() == Some(&self.me))
+            .map(|f| (f.at, f.hash.clone()));
+        granted
+            .chain(handed)
+            .max_by_key(|(at, _)| *at)
+            .map(|(_, hash)| Some(hash))
+            .ok_or_else(|| guest("Your manager role hasn't arrived yet. Try again in a moment."))
     }
 
     /// What the caller cites to pin: either person in a direct chat, the manager in a group.

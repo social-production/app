@@ -22,8 +22,6 @@ export interface BoardMember {
 
 export interface Board {
   weeklyActive: number;
-  /** People active so far this week (shown beside last week's; votes use last week's). */
-  thisWeek?: number | undefined;
   quorum: number;
   moderators: BoardMember[];
   candidates: BoardMember[];

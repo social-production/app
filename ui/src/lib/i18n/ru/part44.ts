@@ -7,4 +7,9 @@ export const part44: Record<string, string> = {
   'View profile': 'Открыть профиль',
   'Remove from group': 'Удалить из группы',
   'Tap again to leave': 'Нажмите ещё раз, чтобы выйти',
+  'Change photo': 'Сменить фото',
+  'Make manager': 'Сделать менеджером',
+  'Stop managing': 'Снять с управления',
+  managers: 'менеджера',
+  and: 'и',
 };

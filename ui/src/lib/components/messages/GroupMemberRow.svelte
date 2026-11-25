@@ -1,21 +1,22 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
-  import type { Snippet } from 'svelte';
   import AvatarBadge from '#lib/components/icons/AvatarBadge.svelte';
   import type { Contact } from '#lib/domain/messages.ts';
 
   /** One member on a group's page: face, name, Manager pill, and for a manager a ⋮ with a
-   * floating menu (View profile, Remove from group; `extra` adds manager actions). */
+   * floating menu (Make manager or Stop managing, View profile, Remove from group). */
   interface Props {
     member: Contact;
     you: boolean;
     manager: boolean;
     canManage: boolean;
+    /** Keep the ⋮ column even without a menu, so every Manager pill lines up. */
+    keepSlot?: boolean;
     menuOpen: boolean;
     profile: string;
     onMenu: (open: boolean) => void;
     onRemove: () => void;
-    extra?: Snippet;
+    onManager?: () => void;
   }
 
   let p: Props = $props();
@@ -61,7 +62,11 @@
     </button>
     {#if p.menuOpen}
       <div class="group-menu" role="menu">
-        {@render p.extra?.()}
+        {#if p.onManager}
+          <button role="menuitem" type="button" onclick={p.onManager}
+            >{p.manager ? t('Stop managing') : t('Make manager')}</button
+          >
+        {/if}
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by the page -->
         <a role="menuitem" href={p.profile}>{t('View profile')}</a>
         <button role="menuitem" class="danger" type="button" onclick={p.onRemove}
@@ -69,5 +74,7 @@
         >
       </div>
     {/if}
+  {:else if p.keepSlot}
+    <span class="group-more group-more-slot" aria-hidden="true"></span>
   {/if}
 </div>

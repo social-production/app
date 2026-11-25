@@ -21,6 +21,7 @@ mod software;
 mod software_view;
 mod values;
 mod views;
+mod voters;
 mod write;
 
 use hdk::prelude::*;

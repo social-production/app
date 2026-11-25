@@ -1,51 +1,55 @@
-//! The weekly active count (ADR 0095), in place of web-backend's `weekly_active_users_global`.
+//! The weekly active count (ADR 0095, rolling since ADR 0121), in place of web-backend's
+//! `weekly_active_users_global`.
 //!
-//! The first meaningful action of each week (a vote, post, comment, role taken) writes one
-//! `Active` link from the week's path to its author, signed by them. Weekly active is the
-//! number of distinct people with Full standing who wrote one for the last complete week.
-//! Any reader counts the same links (full nodes hold them all), so votes snapshot the count
-//! when they open (ADR 0033) and ADR 0040's challenge window covers an under-count.
+//! A meaningful action (a vote, post, comment, role taken) writes an `Active` link from its
+//! day's path to its author, signed by them, at most one an hour. Weekly active at any moment
+//! is the number of distinct people (not bots, ADR 0118) with a link in the seven days before
+//! it, so it moves as people act and as their last action ages out (owner, 2026-11-25). Any
+//! reader counts the same links (full nodes hold them all), so votes snapshot the count when
+//! they open (ADR 0033) and ADR 0040's challenge window covers an under-count.
 //! Pure: no HDK, no I/O.
 
 use std::collections::BTreeSet;
+use std::ops::RangeInclusive;
 
 const DAY_US: i64 = 24 * 60 * 60 * 1_000_000;
 pub const WEEK_US: i64 = 7 * DAY_US;
+/// The rolling window weekly active counts over.
+pub const WINDOW_US: i64 = WEEK_US;
+/// A person writes at most one `Active` link an hour, so the count is right to the hour.
+pub const RECORD_GAP_US: i64 = 60 * 60 * 1_000_000;
 /// 1970-01-01 was a Thursday; weeks start on Mondays (00:00 UTC), as ISO weeks do.
 const MONDAY_OFFSET_US: i64 = 4 * DAY_US;
 
-/// The start of the week holding `at` (microseconds since the epoch).
+/// The start of the week holding `at` (microseconds since the epoch): the moderator board
+/// still settles weekly (`sp_board`).
 #[must_use]
 pub fn week_start(at: i64) -> i64 {
     (at - MONDAY_OFFSET_US).div_euclid(WEEK_US) * WEEK_US + MONDAY_OFFSET_US
 }
 
-/// The week number of `at` (weeks since the Monday before the epoch): the `Active` path's
-/// name is `active.<week>`.
+/// The UTC day of `at` (days since the epoch): an `Active` path's name is `active.day.<day>`.
 #[must_use]
-pub fn week_of(at: i64) -> i64 {
-    (at - MONDAY_OFFSET_US).div_euclid(WEEK_US)
+pub fn day_of(at: i64) -> i64 {
+    at.div_euclid(DAY_US)
 }
 
-/// The last complete week before `at`, which a vote opening at `at` counts. Devices that were
-/// offline write their link when they next start, so the current week is never final.
+/// The days whose paths hold every link in the window before `at`.
 #[must_use]
-pub fn counted_week(at: i64) -> i64 {
-    week_of(at) - 1
+pub fn window_days(at: i64) -> RangeInclusive<i64> {
+    day_of(at - WINDOW_US)..=day_of(at)
 }
 
-/// The weekly active count from one week's `Active` links: distinct authors, each counted
-/// only if `is_full(author, at)` held when they wrote it, and only links written in that week
-/// or later (an `Active` link can't be backdated past its own timestamp).
-pub fn weekly_active<A: Ord>(
-    week: i64,
+/// Weekly active at `at`: distinct authors with a link in `(at - WINDOW_US, at]`, each link
+/// counting only if `counts(author, written)` held (not a bot then).
+pub fn active_at<A: Ord>(
+    at: i64,
     links: impl IntoIterator<Item = (A, i64)>,
-    is_full: impl Fn(&A, i64) -> bool,
+    counts: impl Fn(&A, i64) -> bool,
 ) -> u32 {
-    let start = MONDAY_OFFSET_US + week * WEEK_US;
     let people: BTreeSet<A> = links
         .into_iter()
-        .filter(|(who, at)| *at >= start && is_full(who, *at))
+        .filter(|(who, t)| *t > at - WINDOW_US && *t <= at && counts(who, *t))
         .map(|(who, _)| who)
         .collect();
     u32::try_from(people.len()).unwrap_or(u32::MAX)
@@ -57,35 +61,39 @@ mod tests {
 
     // 2026-11-16 00:00 UTC is a Monday.
     const MONDAY: i64 = 1_794_787_200 * 1_000_000;
+    const HOUR: i64 = RECORD_GAP_US;
 
     #[test]
     fn weeks_start_on_monday() {
         assert_eq!(week_start(MONDAY), MONDAY);
         assert_eq!(week_start(MONDAY + 6 * DAY_US + 1), MONDAY);
         assert_eq!(week_start(MONDAY - 1), MONDAY - WEEK_US);
-        assert_eq!(week_of(MONDAY) - week_of(MONDAY - 1), 1);
-        assert_eq!(MONDAY_OFFSET_US + week_of(MONDAY) * WEEK_US, MONDAY);
     }
 
     #[test]
-    fn a_vote_counts_the_last_complete_week() {
-        assert_eq!(counted_week(MONDAY + DAY_US), week_of(MONDAY) - 1);
-        assert_eq!(counted_week(MONDAY), week_of(MONDAY - 1));
+    fn the_window_spans_eight_day_paths() {
+        let at = MONDAY + 10 * HOUR;
+        let days = window_days(at);
+        assert_eq!(days.end() - days.start(), 7);
+        assert_eq!(*days.end(), day_of(at));
     }
 
     #[test]
-    fn counts_distinct_full_members_and_drops_backdated_links() {
-        let week = week_of(MONDAY);
+    fn counts_the_seven_days_before_the_moment() {
+        let at = MONDAY + 12 * HOUR;
         let links = [
-            ("ann", MONDAY + 1),
-            ("ann", MONDAY + 2),
-            ("bob", MONDAY + DAY_US),
-            ("new", MONDAY + DAY_US),
-            ("old", MONDAY - 1),
-            // Written late (offline device): still counts.
-            ("cat", MONDAY + 9 * DAY_US),
+            ("ann", at - HOUR),
+            ("ann", at - 2 * HOUR),
+            // Exactly seven days ago has just aged out; a second later is still in.
+            ("old", at - WINDOW_US),
+            ("bob", at - WINDOW_US + 1),
+            ("bot", at - HOUR),
+            // After the moment: not yet.
+            ("cat", at + 1),
         ];
-        let n = weekly_active(week, links, |who, _| *who != "new");
-        assert_eq!(n, 3);
+        assert_eq!(active_at(at, links, |who, _| *who != "bot"), 2);
+        assert_eq!(active_at(at + 1, links, |who, _| *who != "bot"), 2);
+        // An hour on, bob and old have aged out and cat has come in.
+        assert_eq!(active_at(at + HOUR, links, |_, _| true), 3);
     }
 }

@@ -19,7 +19,7 @@ declare -A minutes=(
   [governance]=49 [private_events]=43 [reports]=42 [service_requests]=38 [bookings]=33
   [activities]=32 [values]=30 [scopes]=28 [discussion]=28 [collective_bookings]=24
   [identity]=23 [projects]=22 [events]=22 [plans]=20 [help_requests]=20 [health]=18
-  [threads]=16 [proposals]=15 [challenges]=15 [links]=14 [convert]=14 [board]=14 [groups]=11
+  [threads]=16 [proposals]=15 [challenges]=15 [links]=14 [convert]=14 [board]=14 [groups]=11 [group_managers]=8
   [places]=10 [messages]=10 [chat_reports]=10 [software]=9 [bot_reviews]=9 [attachments]=8
   [reverts]=7 [follows]=7 [receipts]=6 [feedback]=5 [collective_requests]=5 [notes]=4
   [feedback_comments]=3 [calls]=3 [scale]=0
