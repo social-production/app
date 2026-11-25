@@ -1,0 +1,212 @@
+/* A group's page (Rail and Group Chat mockup §3, owner 2026-11-25): its face and name, then
+   its members as rows with their role or a ⋮ for the manager. */
+.group-edit .group-edit-body {
+  display: grid;
+  gap: 12px;
+  padding: 0 16px 8px;
+}
+
+.group-edit .group-face {
+  justify-self: center;
+  margin-top: 4px;
+}
+
+.group-edit .group-face .avatar-badge {
+  width: 88px;
+  height: 88px;
+  font-size: 30px;
+}
+
+.group-edit .group-title {
+  margin: 0;
+  font-size: 19px;
+  text-align: center;
+}
+
+.group-edit .group-sub {
+  margin: -6px 0 0;
+  color: var(--text-soft);
+  font-size: 13.5px;
+  text-align: center;
+}
+
+.group-edit .group-name-field {
+  display: grid;
+  gap: 2px;
+  padding: 9px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 14px;
+}
+
+.group-edit .group-name-field > span:first-child {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.group-edit .group-name-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.group-edit .group-name-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+  border: none;
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+  outline: none;
+}
+
+.group-edit .group-save,
+.group-edit .group-chip-button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 999px;
+  background: var(--brand);
+  color: var(--on-brand, var(--page-bg));
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.group-edit .group-section {
+  margin: 6px 4px -4px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.group-edit .group-list {
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+}
+
+.group-edit .group-row {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  width: 100%;
+  min-height: 56px;
+  padding: 8px 12px;
+  border: none;
+  border-bottom: 1px solid var(--panel-border);
+  background: transparent;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+}
+
+.group-edit .group-list > :last-child {
+  border-bottom: none;
+}
+
+.group-edit .group-row b {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 14.5px;
+}
+
+.group-edit .group-person {
+  display: flex;
+  flex: 1;
+  gap: 11px;
+  align-items: center;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.group-edit .group-add {
+  color: var(--brand-strong, var(--brand));
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.group-edit .group-plus {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--brand-soft);
+  font-size: 22px;
+}
+
+.group-edit .group-search {
+  display: grid;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.group-edit .group-search input {
+  margin: 4px 12px 8px;
+  padding: 9px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+}
+
+.group-edit .group-search .group-row:last-child {
+  border-bottom: none;
+}
+
+.group-edit .group-role {
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--brand-soft);
+  color: var(--brand-strong, var(--brand));
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.group-edit .group-more {
+  width: 34px;
+  height: 34px;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text-soft);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.group-edit .group-more:hover,
+.group-edit .group-more[aria-expanded='true'] {
+  background: var(--panel-hover);
+}
+
+.group-edit .group-menu {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.group-edit .group-menu > * {
+  padding: 7px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 999px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.group-edit .group-menu .danger {
+  color: var(--danger, #c23b30);
+}
