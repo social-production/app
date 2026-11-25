@@ -16,6 +16,7 @@
   import MapPeek from './MapPeek.svelte';
   import MapResults from './MapResults.svelte';
   import { cardOf } from './mapCards.ts';
+  import { tappedCard } from './mapSessions.ts';
   import { markerHref } from './markerHref.ts';
   import { MarkerLoader } from './markerLoader.ts';
   import { MapPanelState } from './panelState.svelte.ts';
@@ -36,7 +37,7 @@
   // eslint-disable-next-line svelte/no-navigation-without-resolve -- hrefs come from the index's own routes
   const navigate = (href: string): void => void goto(href).then(onClose);
   const view = new MapView(s, navigate, (coords) => loader.schedule(coords));
-  const selected = $derived(s.listItems.find((i) => i.id === s.selectedId) ?? null);
+  const tapped = $derived(tappedCard(s.allItems, s.selectedId));
   const loader = new MarkerLoader(s, view, () => mapContainer);
 
   const stageStyle = $derived(
@@ -228,11 +229,13 @@
         {#if s.overlayFilters}
           {@render filters(true)}
         {/if}
-        {#if selected}
+        {#if tapped}
           <MapPeek
-            item={selected}
-            card={cardOf(s.cards, selected)}
-            href={markerHref(selected)}
+            item={tapped.head}
+            card={cardOf(s.cards, tapped.head)}
+            sessions={tapped.sessions}
+            href={markerHref(tapped.head)}
+            hrefOf={markerHref}
             onClose={() => view.select(null)}
             onOpen={() => (view.select(null), onClose())}
           />

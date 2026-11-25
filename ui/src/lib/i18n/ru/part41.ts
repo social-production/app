@@ -27,4 +27,6 @@ export const part41: Record<string, string> = {
   'Leave it as Players for a session anyone can join.':
     'Оставьте «Игроки», чтобы присоединиться мог любой.',
   "Keep it within the plan's times that day.": 'Уложитесь во время плана на этот день.',
+  'about here': 'примерно здесь',
+  '{n} of {min}': '{n} из {min}',
 };

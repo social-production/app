@@ -45,6 +45,8 @@ export class MapPanelState {
   mapTileError = $state('');
   markers: MapMarker[] = [];
   listItems = $state<MapMarkerItem[]>([]);
+  /** Every marker in the area, sessions included (pins and a pin's card read these). */
+  allItems = $state<MapMarkerItem[]>([]);
   /** The Region feed's card for each item on the map, by id: the list draws the feed's own
    * card, and a pin's card its picture and type (owner, 2026-11-25). */
   cards = $state<Record<string, RegionCard>>({});

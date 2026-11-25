@@ -6,7 +6,7 @@ import type { NextActivity } from './nextSession.ts';
 import {
   fitLabel,
   fromPlace,
-  placeRecord,
+  editedPlace,
   samePlace,
   type Place,
   type PlaceValue,
@@ -271,7 +271,7 @@ export function charterEdit(draft: CharterDraft, c: Charter) {
   const changed = (next: string, now: string): string | null =>
     next.trim() === now.trim() ? null : next;
   const label = fitLabel(draft.location.displayLabel, LOCATION_LABEL_MAX);
-  const place = placeRecord(draft.location, label);
+  const place = editedPlace(draft.location, label, c);
   const moved = label !== c.location_label.trim() || !samePlace(place, c.place);
   return {
     title: changed(draft.title, c.title),
