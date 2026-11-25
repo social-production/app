@@ -182,6 +182,27 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-25 late, UX cloud session): #318–#322, accounts and chats reset
+- **#318–#320:** meetups show as Meetup in search and the rail (picture, two-people icon);
+  the right rail redesign (Rail and Group Chat mockup §1: picture tiles, day groups, clock chip,
+  vote bars). **#321:** the group page layout (mockup §3).
+- **#322 (directory + conversation reset; ADRs 0121, 0122):** weekly active is a rolling 7 days
+  from now (every non-bot account, recorded at most hourly); every project, event and proposal
+  vote counts only members active in the 7 days before it opened (plus the proposer), and
+  "missing" lists only those; group co-managers and a group photo (Change photo, Make manager /
+  Stop managing). Scenarios run locally before merging: group_managers, groups, board,
+  governance, challenges, plans (all passed). Merged 11:28 pm Melbourne; seed node up on the
+  new DNAs (directory `uhC0kr6EV0O8…`, conversation `uhC0kTkE1fTX…`) at 11:42 pm.
+- **The reset also emptied projects** (the seed drops the old hApp's cells even when the project
+  hash is unchanged). Reseeded: founders.cjs, demo-content (help requests needed the
+  "Publish request" button fix in `demo/social.mjs`), demo-melbourne, then the direct
+  messages part: 22 projects/events/requests.
+- **Live smoke (maya_k):** Platform "5 active in the last 7 days"; a new group "Pickup crew …"
+  got a photo and tomas_b as co-manager, "2 managers", tags aligned. (Browser tests skip the
+  crop screen by design: `navigator.webdriver`.) The smoke left a few "Pickup crew" test groups
+  in the demo accounts' chats.
+- **Owner to do:** set their username again and get vouched (also their wife's account).
+
 ## START HERE (2026-11-25, UX cloud session): #294–#316
 Each its own PR, merged after green CI.
 - **24 Nov evening (#294–#302):** QR cards on white or dark paper with a square sticker; Support
