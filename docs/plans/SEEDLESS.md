@@ -113,8 +113,11 @@ this now as not much usage." The FastAPI site is gone, so this is now the main t
 last parity checks. Nothing here is urgent: build it in this order, one PR at a time.
 
 **Done:** 1 (desktop builds in CI for Linux, Windows and macOS, plus a smoke test), 2 (phrase sign-in and
-moving a hosted account), 3 (bootstrap list), 3b (Help the network, except its test), 5
-(geocoding on the device). Deactivation's directory part (ADR 0095).
+moving a hosted account), 3 (bootstrap list), 3b (Help the network), 5
+(geocoding on the device). Deactivation's directory part (ADR 0095). **Phase A** (25 Nov,
+`tests/scenarios/tests/seedless.rs`): three conductors whose only server is one started with
+`helping.rs`'s production config find each other through it, share data, and keep sharing
+after it stops (passed locally in 4 min 20 s).
 
 **Phase A: prove what is built (S).** Owner, 19 Nov: test it soon. Railway's bootstrap stays on as long as possible, as a backup, never the only way in. The 3b test, as a scenario rather than three real
 machines. Three conductors, Railway's bootstrap off, and the third conductor runs
