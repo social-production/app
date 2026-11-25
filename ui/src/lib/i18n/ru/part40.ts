@@ -23,4 +23,5 @@ export const part40: Record<string, string> = {
   'Review and vote': 'Оценить и проголосовать',
   '1 quick question': '1 короткий вопрос',
   '{n} quick questions': 'Коротких вопросов: {n}',
+  'Session of {name}': 'Встреча: {name}',
 };
