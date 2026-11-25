@@ -1,5 +1,19 @@
 /* Plan review (Plan review mockup, owner 2026-11-25): progress, one question per screen with
    answers in words, then your answers with the final vote. */
+.overlay-root.plan-scope .overlay-header-copy:has(.plan-kicker) {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.overlay-root.plan-scope .plan-kicker {
+  display: grid;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  /* The header runs to the sheet's right edge (room for its actions); match the left gutter. */
+  padding-right: 20px;
+}
+
 .overlay-root.plan-scope .plan-progress {
   display: flex;
   gap: 4px;

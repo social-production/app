@@ -110,15 +110,17 @@
 >
   {#snippet kicker()}
     {#if screen !== null}
-      <div class="plan-progress" aria-hidden="true">
-        {#each criteria as c, i (c.id)}<i class:on={i < done || i === screen}></i>{/each}
-      </div>
-      {#if current && typeof screen === 'number'}
-        <div class="plan-q-top">
-          <span>{t('Question {n} of {total}', { n: screen + 1, total })}</span>
-          <span class="plan-q-tag">{criterionTag(current)}</span>
+      <div class="plan-kicker">
+        <div class="plan-progress" aria-hidden="true">
+          {#each criteria as c, i (c.id)}<i class:on={i < done || i === screen}></i>{/each}
         </div>
-      {/if}
+        {#if current && typeof screen === 'number'}
+          <div class="plan-q-top">
+            <span>{t('Question {n} of {total}', { n: screen + 1, total })}</span>
+            <span class="plan-q-tag">{criterionTag(current)}</span>
+          </div>
+        {/if}
+      </div>
     {:else}
       <VoteKicker
         label={kindLine}
