@@ -20,7 +20,13 @@ struct AsArchivist<'n> {
 }
 
 impl Calls for AsArchivist<'_> {
-    async fn call<I, O>(&self, cell: &CellId, zome: &str, func: &str, payload: I) -> anyhow::Result<O>
+    async fn call<I, O>(
+        &self,
+        cell: &CellId,
+        zome: &str,
+        func: &str,
+        payload: I,
+    ) -> anyhow::Result<O>
     where
         I: serde::Serialize + std::fmt::Debug + Send,
         O: serde::de::DeserializeOwned + std::fmt::Debug + Send,

@@ -94,9 +94,7 @@ pub async fn people_round(
     directory: &CellId,
     people: &PeopleIndex,
 ) -> anyhow::Result<usize> {
-    let keys: Vec<AgentPubKey> = calls
-        .call(directory, "identity", "list_people", ())
-        .await?;
+    let keys: Vec<AgentPubKey> = calls.call(directory, "identity", "list_people", ()).await?;
     let mut found = Vec::with_capacity(keys.len());
     for key in keys {
         let profile: Option<Profile> = calls

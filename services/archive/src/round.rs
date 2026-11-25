@@ -46,7 +46,12 @@ pub async fn archive_round(
     } else {
         let hour = Timestamp::now().as_micros() / 3_600_000_000;
         let found: Vec<ActionHash> = calls
-            .call(&cells.commons, "project", "active_spaces", vec![hour - 1, hour])
+            .call(
+                &cells.commons,
+                "project",
+                "active_spaces",
+                vec![hour - 1, hour],
+            )
             .await?;
         found.into_iter().collect()
     };
@@ -89,7 +94,12 @@ async fn read_card(
         .unwrap_or(None);
     // The username comes with the card, so guests see it without a session.
     let profile: Option<Profile> = calls
-        .call(&cells.directory, "identity", "get_profile", view.creator.clone())
+        .call(
+            &cells.directory,
+            "identity",
+            "get_profile",
+            view.creator.clone(),
+        )
         .await
         .unwrap_or(None);
     // Only the count is used; each message is skipped, not decoded.
