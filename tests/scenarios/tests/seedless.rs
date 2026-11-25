@@ -49,12 +49,19 @@ async fn nodes_meet_through_a_desktops_bootstrap_and_keep_talking_after_it_stops
     let mut conductors = SweetConductorBatch::from_config_rendezvous(3, config).await;
     let dna = common::load_dna("directory").await;
     // No `exchange_peer_info`: the nodes must find each other through the bootstrap.
-    let apps = conductors.setup_app("sp", &[dna]).await.expect("install app");
+    let apps = conductors
+        .setup_app("sp", &[dna])
+        .await
+        .expect("install app");
     let cells = apps.cells_flattened();
     let zomes: Vec<SweetZome> = cells.iter().map(|c| c.zome("health")).collect();
 
     let first: ActionHash = conductors[0]
-        .call(&zomes[0], "post_heartbeat", "found through a desktop".to_string())
+        .call(
+            &zomes[0],
+            "post_heartbeat",
+            "found through a desktop".to_string(),
+        )
         .await;
     sees(&conductors, 1, &zomes[1], &first).await;
     sees(&conductors, 2, &zomes[2], &first).await;
@@ -62,7 +69,11 @@ async fn nodes_meet_through_a_desktops_bootstrap_and_keep_talking_after_it_stops
     // The desktop stops helping: what the nodes already know keeps them connected.
     server.shutdown().expect("stop the bootstrap server");
     let second: ActionHash = conductors[1]
-        .call(&zomes[1], "post_heartbeat", "still here without it".to_string())
+        .call(
+            &zomes[1],
+            "post_heartbeat",
+            "still here without it".to_string(),
+        )
         .await;
     sees(&conductors, 0, &zomes[0], &second).await;
     sees(&conductors, 2, &zomes[2], &second).await;
