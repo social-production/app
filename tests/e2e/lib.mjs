@@ -204,11 +204,13 @@ export async function tagTestChannel(page, label = TAG_SEARCH) {
   await pickScopeTag(page, label, TEST_CHANNEL);
 }
 
-/** Clicks Continue `n` times, tagging the test channel first whenever it is on a scope step
- * (a project's or help request's primary channel, or an event's channel tags). */
-export async function continueSteps(page, n = 1) {
+/** Clicks Continue `n` times, tagging the test channel (or `tag`, for demo content) first
+ * whenever it is on a scope step (a project's or help request's primary channel, or an event's
+ * channel tags). */
+export async function continueSteps(page, n = 1, tag = null) {
   for (let i = 0; i < n; i++) {
-    if (await page.getByLabel(TAG_SEARCH, { exact: true }).count()) await tagTestChannel(page);
+    if (await page.getByLabel(TAG_SEARCH, { exact: true }).count())
+      await (tag ? pickScopeTag(page, TAG_SEARCH, tag) : tagTestChannel(page));
     await page.getByRole('button', { name: 'Continue' }).click();
   }
 }

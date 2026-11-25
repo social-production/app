@@ -22,14 +22,14 @@ export async function signInFounders(viewport) {
 /** Founder one proposes what becomes a public event once an event plan leads it out of its
  * Plan phase (ADR 0059: public events start as typeless proposals) and supports it; founder
  * two joins and supports it. Returns its URL. */
-export async function createEvent(ann, bob, title, art, about = 'Weed, mulch and share lunch.') {
+export async function createEvent(ann, bob, title, art, about = 'Weed, mulch and share lunch.', tag = null) {
   await ann.goto(BASE);
   await ann.getByRole('button', { name: 'Create', exact: true }).click();
   await ann.getByRole('menuitem', { name: /Proposal/ }).click();
   if (art) await addArt(ann, ...art);
   await ann.getByLabel(/^Title/).first().fill(title);
   await ann.getByLabel('What do you propose?').fill(about);
-  await continueSteps(ann, 3);
+  await continueSteps(ann, 3, tag);
   await ann.getByRole('button', { name: 'Publish proposal' }).click();
   await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   const eventUrl = ann.url().split('?')[0];
