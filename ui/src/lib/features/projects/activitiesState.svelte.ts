@@ -157,7 +157,8 @@ export class ActivitiesState {
         place,
         location: placeRecord(f.online ? onlinePlaceValue(place) : f.location, place),
         meetingUrl: f.online && f.meetingUrl.trim() ? f.meetingUrl.trim() : null,
-        note: f.note.trim(),
+        // The note is optional now; a session without one keeps its name (the record needs one).
+        note: f.note.trim() || f.title.trim(),
         planStage: f.planStage,
         roles: roles.map((r) => ({ ...r, suggest: r.suggest?.agent ?? null })),
         booking: this.planning,

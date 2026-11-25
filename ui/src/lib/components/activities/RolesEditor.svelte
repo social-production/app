@@ -1,6 +1,5 @@
 <script lang="ts">
   import { t } from '#lib/i18n/index.ts';
-  import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import { emptyRole, type RoleDraft } from '#lib/domain/activityForm.ts';
 
   /** web's ProjectActivityRolesEditor: one row per role, with an optional suggested person. */
@@ -56,72 +55,75 @@
   }
 </script>
 
-<div class="role-editor-shell">
-  <div class="role-editor-header">
-    <div>
-      <span class="field-inline-label">{t('Roles needed')}</span>
-      <p class="role-editor-note">
-        {t(
-          'Add one row per role. Set the minimum needed, and leave max blank if that role has no cap.',
-        )}
-      </p>
-    </div>
-  </div>
-
-  <div class="role-row-stack">
-    {#each roles as role, index (index)}
-      <div class="role-row">
-        <label class="role-field role-name-field">
-          <span class="field-inline-label">{t('Role')}</span>
-          <input
-            maxlength="80"
-            placeholder={t('For example: Intake desk')}
-            type="text"
-            value={role.label}
-            oninput={(e) => patch(index, { label: e.currentTarget.value })}
-          />
-        </label>
-        <label class="role-field role-count-field">
-          <span class="field-inline-label">{t('Minimum')}</span>
-          <input
-            min="1"
-            type="number"
-            value={role.required}
-            oninput={(e) => setRequired(index, e.currentTarget.valueAsNumber)}
-          />
-        </label>
-        <label class="role-field role-count-field">
-          <span class="field-inline-label">{t('Maximum')}</span>
-          <input
-            min={role.required}
-            placeholder={t('No cap')}
-            type="number"
-            value={role.maximum ?? ''}
-            oninput={(e) => setMaximum(index, e.currentTarget.value)}
-          />
-        </label>
-        <div class="role-remove-cell">
-          {#if roles.length > 1}
-            <button class="secondary-button" type="button" onclick={() => remove(index)}
-              >{t('Remove')}</button
-            >
-          {/if}
-        </div>
+<!-- Roles as cards with steppers (Activity creation mockup §3, owner 2026-11-25). -->
+<div class="role-cards">
+  {#each roles as role, index (index)}
+    <div class="role-card">
+      <div class="role-card-top">
+        <input
+          class="role-card-name"
+          maxlength="80"
+          aria-label={t('Role')}
+          placeholder={t('For example: Intake desk')}
+          type="text"
+          value={role.label}
+          oninput={(e) => patch(index, { label: e.currentTarget.value })}
+        />
+        {#if roles.length > 1}
+          <button class="role-card-remove" type="button" onclick={() => remove(index)}
+            >{t('Remove')}</button
+          >
+        {/if}
       </div>
-      <label class="role-field role-suggest-field">
-        <span class="field-inline-label">{t('Suggest someone (optional)')}</span>
+      <div class="role-step">
+        <span>{t('Needed')}</span>
+        <span class="stepper">
+          <button
+            type="button"
+            aria-label={t('Fewer needed')}
+            disabled={role.required <= 1}
+            onclick={() => setRequired(index, role.required - 1)}>−</button
+          >
+          <b aria-live="polite">{role.required}</b>
+          <button
+            type="button"
+            aria-label={t('More needed')}
+            onclick={() => setRequired(index, role.required + 1)}>+</button
+          >
+        </span>
+      </div>
+      <div class="role-step">
+        <span>{t('Up to')}</span>
+        <span class="stepper">
+          <button
+            type="button"
+            aria-label={t('Lower the most')}
+            disabled={role.maximum === null}
+            onclick={() =>
+              setMaximum(
+                index,
+                role.maximum === null || role.maximum <= role.required
+                  ? ''
+                  : String(role.maximum - 1),
+              )}>−</button
+          >
+          <b aria-live="polite">{role.maximum ?? t('Any')}</b>
+          <button
+            type="button"
+            aria-label={t('Raise the most')}
+            onclick={() => setMaximum(index, String((role.maximum ?? role.required) + 1))}>+</button
+          >
+        </span>
+      </div>
+      <div class="role-ask">
         {#if role.suggest}
-          <div class="suggested-chip-row">
-            <span class="suggested-chip">Suggested · {role.suggest.name}</span>
-            <button
-              class="text-button"
-              type="button"
-              onclick={() => patch(index, { suggest: null })}>{t('Clear')}</button
-            >
-          </div>
+          <span>{t('Asked')} · <b>{role.suggest.name}</b></span>
+          <button type="button" onclick={() => patch(index, { suggest: null })}>{t('Clear')}</button
+          >
         {:else}
           <input
-            placeholder={t('Search username')}
+            aria-label={t('Ask someone (optional)')}
+            placeholder={t('Ask someone (optional)')}
             type="text"
             value={queries[index] ?? ''}
             oninput={(e) => search(index, e.currentTarget.value)}
@@ -136,10 +138,10 @@
             </div>
           {/if}
         {/if}
-      </label>
-    {/each}
-  </div>
-  <div class="role-add-row">
-    <RoundPlusButton label={t('Add role')} onclick={() => (roles = [...roles, emptyRole()])} />
-  </div>
+      </div>
+    </div>
+  {/each}
+  <button class="role-add" type="button" onclick={() => (roles = [...roles, emptyRole()])}
+    >+ {t('Add a role')}</button
+  >
 </div>

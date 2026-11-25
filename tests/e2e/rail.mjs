@@ -7,6 +7,7 @@
 //   node tests/e2e/rail.mjs http://localhost:4174 [screens dir]
 // It needs the dev founders, so it runs only against a local seed node.
 import assert from 'node:assert/strict';
+import { createActivity } from './activityWizard.mjs';
 import { mkdirSync } from 'node:fs';
 
 import { BASE, browser, device, errors, log, rail, railButton, railShows, railTab, railTabs, signUp, continueSteps } from './lib.mjs';
@@ -57,18 +58,13 @@ await ann.goto(eventUrl);
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 await ann.getByRole('tab', { name: 'Participation' }).click();
 await ann.getByRole('button', { name: 'Add activity' }).click();
-const next = () => ann.getByRole('button', { name: 'Next', exact: true }).click();
-await ann.getByPlaceholder('Activity title').fill(activity);
-await next();
-await next();
-await ann.getByPlaceholder('Search a place').fill('The shed');
-await next();
-await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
-await ann.getByPlaceholder('No cap').fill('1');
-await next();
-await ann.getByPlaceholder('What should happen in this activity?').fill('Fix brakes and chains.');
-await next();
-await ann.getByRole('button', { name: 'Create activity' }).click();
+await createActivity(ann, {
+  title: activity,
+  place: 'The shed',
+  role: 'Helper',
+  maximum: 1,
+  note: 'Fix brakes and chains.',
+});
 await ann.locator('.agenda-row', { hasText: activity }).waitFor({ timeout: 60_000 });
 log('ann added an activity');
 

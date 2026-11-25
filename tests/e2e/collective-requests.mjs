@@ -7,6 +7,7 @@
 // right rail's Project Activity row.
 //   node tests/e2e/collective-requests.mjs http://localhost:4174 [screens dir]
 import assert from 'node:assert/strict';
+import { createActivity } from './activityWizard.mjs';
 import { mkdirSync } from 'node:fs';
 
 import { BASE, addPlan, browser, continueSteps, device, errors, log, rail, railShows, shots, signUp, reviewPlan } from './lib.mjs';
@@ -139,17 +140,14 @@ assert.equal(await card.getByRole('link', { name: 'Open conversation' }).count()
 await card.getByRole('button', { name: 'Plan request' }).click();
 await bob.screenshot({ path: `${out}/phone390-collective-plan.png` });
 assert.equal(await bob.getByPlaceholder('Activity title').inputValue(), ask);
-const next = () => bob.getByRole('button', { name: 'Next', exact: true }).click();
-await next(); // → schedule (web's default time)
-await next(); // → place
-await bob.getByPlaceholder('Search a place').fill('The shed');
-await next(); // → plan stage
-await bob.locator('select:visible').first().selectOption({ index: 1 });
-await next(); // → roles: web's "Service lead"
-assert.equal(await bob.getByPlaceholder('For example: Intake desk').first().inputValue(), 'Service lead');
-await next(); // → note: the request's details
-await next();
-await bob.getByRole('button', { name: 'Create activity' }).click();
+// web's default time; the request's place, stage, "Service lead" role and details.
+await createActivity(bob, {
+  place: 'The shed',
+  stage: true,
+  beforeCreate: async () => {
+    assert.match(await bob.locator('.activity-rev').innerText(), /Service lead/);
+  },
+});
 const row = (page) => page.locator('.agenda-row', { hasText: ask });
 await row(bob).waitFor({ timeout: 60_000 });
 assert.match(await row(bob).locator('.agenda-chip').innerText(), /1 more needed/);

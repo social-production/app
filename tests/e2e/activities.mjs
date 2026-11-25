@@ -9,6 +9,7 @@
 //   node tests/e2e/activities.mjs http://localhost:4174 [screens dir]
 // It needs the dev founders, so it runs only against a local seed node.
 import assert from 'node:assert/strict';
+import { createActivity, hhmm, soon } from './activityWizard.mjs';
 import { mkdirSync } from 'node:fs';
 
 import { BASE, browser, device, errors, log, signUp } from './lib.mjs';
@@ -51,19 +52,15 @@ const takePart = async (page) => {
 
 await takePart(ann);
 await ann.getByRole('button', { name: 'Add activity' }).click();
-const next = () => ann.getByRole('button', { name: 'Next', exact: true }).click();
-await ann.getByPlaceholder('Activity title').fill(activity);
-await next();
-await next(); // the next hour, web's default
-await ann.getByPlaceholder('Search a place').fill('The shed');
-await next();
-await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
-await ann.getByPlaceholder('No cap').fill('1');
-await next();
-await ann.getByPlaceholder('What should happen in this activity?').fill('Fix brakes and chains.');
-await next();
-await ann.screenshot({ path: `${out}/phone390-activity-review.png` });
-await ann.getByRole('button', { name: 'Create activity' }).click();
+// The next hour, web's default time.
+await createActivity(ann, {
+  title: activity,
+  place: 'The shed',
+  role: 'Helper',
+  maximum: 1,
+  note: 'Fix brakes and chains.',
+  beforeCreate: () => ann.screenshot({ path: `${out}/phone390-activity-review.png` }),
+});
 const row = (page) => page.locator('.agenda-row', { hasText: activity });
 await row(ann).waitFor({ timeout: 60_000 });
 assert.equal(await row(ann).locator('.agenda-chip').innerText(), '1 more needed');
@@ -155,27 +152,20 @@ await ann.screenshot({ path: `${out}/phone390-event-chat-photo.png` });
 log('bob sent a photo in the event chat; ann sees it');
 
 // Past activity: a short activity ends; Bob checks in Completed and rates it 4 stars.
-const local = (d) => {
-  const pad = (n) => String(n).padStart(2, '0');
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
 const quick = `Quick tune ${stamp}`;
-const start = new Date(Date.now() + 2 * 60_000);
-const end = new Date(start.getTime() + 60_000);
+// The wheels step in five minutes: the next mark two minutes away, for five minutes.
+const start = soon(2);
+const end = new Date(start.getTime() + 5 * 60_000);
 await takePart(ann);
 await ann.getByRole('button', { name: 'Add activity' }).click();
-await ann.getByPlaceholder('Activity title').fill(quick);
-await next();
-await ann.getByLabel('Start time').fill(local(start));
-await ann.getByLabel('Finish time').fill(local(end));
-await next();
-await ann.getByPlaceholder('Search a place').fill('The shed');
-await next();
-await ann.getByPlaceholder('For example: Intake desk').fill('Helper');
-await next();
-await ann.getByPlaceholder('What should happen in this activity?').fill('A quick tune-up.');
-await next();
-await ann.getByRole('button', { name: 'Create activity' }).click();
+await createActivity(ann, {
+  title: quick,
+  start: hhmm(start),
+  end: hhmm(end),
+  place: 'The shed',
+  role: 'Helper',
+  note: 'A quick tune-up.',
+});
 const quickRow = (page) => page.locator('.agenda-row', { hasText: quick });
 await quickRow(ann).waitFor({ timeout: 60_000 });
 for (let i = 0; ; i++) {
@@ -188,7 +178,7 @@ const quickSheet = bob.getByRole('dialog', { name: quick });
 await quickSheet.getByRole('button', { name: 'Join', exact: true }).click();
 await quickSheet.getByRole('button', { name: 'Leave', exact: true }).waitFor({ timeout: 60_000 });
 await bob.keyboard.press('Escape');
-log('bob took a role in a two-minute activity');
+log('bob took a role in a five-minute activity');
 await bob.waitForTimeout(Math.max(0, end.getTime() - Date.now()) + 5_000);
 await takePart(bob);
 await bob.getByText('Past activity').click();
