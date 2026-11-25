@@ -25,3 +25,8 @@ export function finishCrop(result: File | null): void {
   done?.(result);
   done = null;
 }
+
+/** "Choose another" in the crop screen: crop a different file for the same request. */
+export function replaceCrop(file: File): void {
+  if (photoCrop.file) photoCrop.file = file;
+}
