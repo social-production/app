@@ -55,6 +55,7 @@
   $effect(() => {
     if (!p.open) {
       draft = p.title;
+      preview = null;
       adding = false;
       openMenu = null;
       leaving = false;
@@ -103,10 +104,18 @@
   }
 
   let picking = $state<HTMLInputElement | null>(null);
+  let preview = $state<string | null>(null);
+  const face = $derived(preview ?? p.picture);
   async function choose(file: File | undefined): Promise<void> {
     if (!file) return;
     const placed = await p.crop(file);
-    if (placed) await run(() => p.onPicture(placed), 'Group photo updated.', 'Could not save it.');
+    if (!placed) return;
+    // The placed photo shows at once while it saves.
+    const url = URL.createObjectURL(placed);
+    preview = url;
+    feedback = { text: t('Saving photo…'), ok: true };
+    await run(() => p.onPicture(placed), 'Group photo updated.', 'Could not save it.');
+    if (!feedback?.ok) preview = null;
   }
 
   async function grant(member: Contact, on: boolean): Promise<void> {
@@ -116,6 +125,16 @@
       on ? `${member.name} manages the group too.` : `${member.name} no longer manages it.`,
       'Could not change that.',
     );
+  }
+
+  // Save keeps a new name, then closes; a photo or manager change is already saved.
+  let saving = $state(false);
+  async function save(): Promise<void> {
+    if (!renamed) return p.onClose();
+    saving = true;
+    await run(() => p.onRename(draft.trim()), 'Group name updated.', 'Could not rename it.');
+    saving = false;
+    if (feedback?.ok) p.onClose();
   }
 
   async function leave(): Promise<void> {
@@ -152,10 +171,8 @@
         <button
           class="group-top-side group-save"
           type="button"
-          disabled={!renamed}
-          onclick={() =>
-            run(() => p.onRename(draft.trim()), 'Group name updated.', 'Could not rename it.')}
-          >{t('Save')}</button
+          disabled={saving}
+          onclick={() => void save()}>{t('Save')}</button
         >
       {:else}<span class="group-top-side"></span>{/if}
     </header>
@@ -163,7 +180,7 @@
     <div class="group-scroll">
       <div class="group-face">
         <span class="group-face-inner">
-          {#if p.picture}<img src={p.picture} alt="" />{:else}<AvatarBadge name={p.title} />{/if}
+          {#if face}<img src={face} alt="" />{:else}<AvatarBadge name={p.title} />{/if}
           {#if managing}
             <button
               class="group-camera"

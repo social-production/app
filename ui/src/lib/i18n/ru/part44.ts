@@ -12,4 +12,5 @@ export const part44: Record<string, string> = {
   'Stop managing': 'Снять с управления',
   managers: 'менеджера',
   and: 'и',
+  'Saving photo…': 'Сохраняем фото…',
 };

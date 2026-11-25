@@ -75,7 +75,7 @@
             {p.chat.members.length} members
           </p>{/if}
       </div>
-      <AvatarBadge size="md" name={p.title} {avatar} />
+      <AvatarBadge size="md" name={p.title} {avatar} src={p.chat.picture} />
     </button>
   </div>
   <div class="header-actions">

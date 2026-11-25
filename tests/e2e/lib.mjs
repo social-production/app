@@ -284,7 +284,7 @@ export async function startGroup(page, title, members, body, shot = async () => 
   await page.getByText(`${members.length} selected`).waitFor();
   await shot('members');
   await page.getByRole('button', { name: 'Next' }).click();
-  await page.getByPlaceholder('Group name').fill(title);
+  await page.getByLabel('Group name').fill(title);
   await shot('name');
   await page.getByRole('button', { name: 'Create group' }).click();
   await page.waitForURL(/\/messages\?conversation=/, { timeout: 300_000 });
