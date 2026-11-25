@@ -3,7 +3,7 @@
 //! goes to the project role's base cell as `{space, input}`.
 
 use holo_hash::ActionHashB64;
-use holochain::prelude::ActionHash;
+use holochain_types::prelude::ActionHash;
 use serde::Serialize;
 
 /// A call's input with the space it is about (the coordinators' `In<T>`).
@@ -27,7 +27,7 @@ pub fn space_of_seed(seed: &str) -> Option<ActionHash> {
 mod tests {
     use super::space_of_seed;
     use holo_hash::ActionHashB64;
-    use holochain::prelude::ActionHash;
+    use holochain_types::prelude::ActionHash;
 
     #[test]
     fn reads_the_space_from_a_listing_seed() {

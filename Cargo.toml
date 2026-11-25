@@ -6,6 +6,7 @@ members = [
   "zomes/*/coordinator",
   "dnas/*/zomes/integrity/*",
   "dnas/*/zomes/coordinator/*",
+  "services/archive",
   "services/gateway",
   "services/geo",
   "services/push",
@@ -52,6 +53,7 @@ sp_active = { path = "crates/sp_active" }
 sp_group = { path = "crates/sp_group" }
 sp_scope = { path = "crates/sp_scope" }
 sp_index = { path = "crates/sp_index" }
+archive = { path = "services/archive" }
 geo = { path = "services/geo" }
 push = { path = "services/push" }
 health_integrity = { path = "zomes/health/integrity" }

@@ -3,20 +3,12 @@
 
 mod archivist;
 mod bundle;
-mod cards;
-mod event_time;
 mod hosting;
-mod index;
-mod markers;
-mod next;
-mod people;
 mod public;
-mod region;
 mod release;
 mod restore;
 mod seeds;
 mod signals;
-mod spaces;
 
 use std::collections::BTreeMap;
 use std::path::Path;
@@ -30,14 +22,13 @@ use holochain_keystore::MetaLairClient;
 use holochain_types::prelude::CoordinatorBundle;
 use holochain_types::websocket::AllowedOrigins;
 
-pub use event_time::utc_micros;
+pub use archive::{
+    utc_micros, Marker, MarkerQuery, PeopleIndex, PersonCard, ProjectCard, ProjectIndex,
+    RegionItem, RegionQuery, Who,
+};
 pub use hosting::app_id;
-pub use index::{ProjectCard, ProjectIndex, Who};
-pub use markers::{Marker, MarkerQuery};
 
-pub use people::{PeopleIndex, PersonCard};
 pub use public::{PublicRead, Refused};
-pub use region::{RegionItem, RegionQuery};
 
 use crate::config::Config;
 

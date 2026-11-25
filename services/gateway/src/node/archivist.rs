@@ -1,167 +1,60 @@
 //! The archivist (ADR 0031): an agent of this node that holds the commons (every public
 //! space, ADR 0065), so projects stay available while their members are offline, and that
-//! reads each listed space's counts for the feed index. Community nodes can run the same.
+//! reads each listed space's counts for the feed index (`archive`, shared with the desktop
+//! app). Community nodes can run the same.
 
-use std::collections::BTreeSet;
 use std::path::Path;
 
 use anyhow::anyhow;
-use holo_hash::ActionHashB64;
+use archive::{Calls, Cells};
 use holochain::conductor::api::{AdminRequest, AppInfo, CellInfo};
 use holochain::prelude::*;
 use holochain_types::app::{AppBundleSource, InstallAppPayload};
 
-use super::cards::{
-    card, card_activity, help_of, moderation_of, ActivityView, ListingView, ModerationView,
-    Profile, ProjectView,
-};
-use super::event_time::{event_facts, EventFacts, PlanBoard};
-use super::spaces::{space_of_seed, Scoped};
-use super::{Node, ProjectCard};
+use super::Node;
 
-/// Every this many rounds (15 s each) every space is re-read: about every 15 minutes.
-const FULL_EVERY: u64 = 60;
-/// Every this many rounds the recently written spaces are: about once a minute.
-const ACTIVE_EVERY: u64 = 4;
+/// The node's zome calls as the archivist's agent, for `archive`'s rounds.
+struct AsArchivist<'n> {
+    node: &'n Node,
+    agent: AgentPubKey,
+}
+
+impl Calls for AsArchivist<'_> {
+    async fn call<I, O>(&self, cell: &CellId, zome: &str, func: &str, payload: I) -> anyhow::Result<O>
+    where
+        I: serde::Serialize + std::fmt::Debug + Send,
+        O: serde::de::DeserializeOwned + std::fmt::Debug + Send,
+    {
+        self.node
+            .call(&self.agent, cell.clone(), zome, func, payload)
+            .await
+    }
+}
 
 impl Node {
-    /// One pass over the listed public spaces (ADR 0065): all of them live in the archivist's
-    /// one commons cell, so nothing is joined per project. A space is re-read when it is new
-    /// to the index or was written to lately (its `recent.<hour>` bucket); every
-    /// `FULL_EVERY` rounds all are. Returns the spaces indexed.
+    /// One pass over the listed public spaces into the feed index (`archive::archive_round`).
     pub async fn archive_round(&self, happ: &Path, round: u64) -> anyhow::Result<usize> {
         let app = self.archivist_app(happ).await?;
-        let agent = app.agent_pub_key.clone();
+        let cells = Cells {
+            directory: provisioned(&app, "directory")?,
+            commons: provisioned(&app, "project")?,
+        };
+        let calls = AsArchivist {
+            node: self,
+            agent: app.agent_pub_key.clone(),
+        };
+        archive::archive_round(&calls, &cells, &self.index, round).await
+    }
+
+    /// Re-read every profile in the directory into the people index. Returns how many.
+    pub async fn people_round(&self, happ: &Path) -> anyhow::Result<usize> {
+        let app = self.archivist_app(happ).await?;
         let directory = provisioned(&app, "directory")?;
-        let commons = provisioned(&app, "project")?;
-        let listings: Vec<ListingView> = self
-            .call(&agent, directory.clone(), "identity", "list_projects", ())
-            .await?;
-        let full = round.is_multiple_of(FULL_EVERY);
-        // Spaces written to this hour or the last; a writer marks a space once an hour, so a
-        // marked space is re-read (once a minute) until its hour has passed.
-        let active: BTreeSet<ActionHash> = if full || !round.is_multiple_of(ACTIVE_EVERY) {
-            BTreeSet::new()
-        } else {
-            let hour = Timestamp::now().as_micros() / 3_600_000_000;
-            let found: Vec<ActionHash> = self
-                .call(
-                    &agent,
-                    commons.clone(),
-                    "project",
-                    "active_spaces",
-                    vec![hour - 1, hour],
-                )
-                .await?;
-            found.into_iter().collect()
+        let calls = AsArchivist {
+            node: self,
+            agent: app.agent_pub_key.clone(),
         };
-        let before = self.index.by_id().await;
-        let mut cards = Vec::with_capacity(listings.len());
-        for view in listings {
-            let Some(space) = space_of_seed(&view.listing.network_seed) else {
-                continue; // not a commons space (a listing from before ADR 0065)
-            };
-            let id = ActionHashB64::from(view.id.clone()).to_string();
-            if let Some(card) = before
-                .get(&id)
-                .filter(|_| !full && !active.contains(&space))
-            {
-                cards.push(card.clone());
-                continue;
-            }
-            cards.push(Box::pin(self.read_card(&agent, &directory, &commons, view, space)).await);
-        }
-        let count = cards.len();
-        self.index.replace(cards).await;
-        Ok(count)
-    }
-
-    /// A space's card: its listing, its live counts and its creator's name.
-    async fn read_card(
-        &self,
-        agent: &AgentPubKey,
-        directory: &CellId,
-        commons: &CellId,
-        view: ListingView,
-        space: ActionHash,
-    ) -> ProjectCard {
-        let at = |input| Scoped {
-            space: space.clone(),
-            input,
-        };
-        let project: Option<ProjectView> = self
-            .call(agent, commons.clone(), "project", "get_project", at(()))
-            .await
-            .unwrap_or(None);
-        // The username comes with the card, so guests see it without a session.
-        let profile: Option<Profile> = self
-            .call(
-                agent,
-                directory.clone(),
-                "identity",
-                "get_profile",
-                view.creator.clone(),
-            )
-            .await
-            .unwrap_or(None);
-        // Only the count is used; each message is skipped, not decoded.
-        let messages: Vec<serde::de::IgnoredAny> = self
-            .call(
-                agent,
-                commons.clone(),
-                "discussion",
-                "list_messages",
-                at(()),
-            )
-            .await
-            .unwrap_or_default();
-        let help = project.as_ref().is_some_and(ProjectView::is_help_request);
-        // Every space's, for the map's activity markers (ADR 0083); a help request's card
-        // shows its one activity too.
-        let activities: Vec<ActivityView> = self
-            .call(
-                agent,
-                commons.clone(),
-                "activities",
-                "list_activities",
-                at(()),
-            )
-            .await
-            .unwrap_or_default();
-        let moderation: Option<ModerationView> = self
-            .call(agent, commons.clone(), "discussion", "moderation", at(()))
-            .await
-            .ok();
-        let mut card = card(view, project);
-        card.moderation = moderation_of(moderation);
-        card.help = help.then(|| help_of(&activities));
-        card.activities = activities.iter().map(card_activity).collect();
-        if card.mode == "event" {
-            self.event_facts(agent, commons, &space)
-                .await
-                .apply(&mut card);
-        }
-        card.creator_name = profile.map(|p| p.name).unwrap_or_default();
-        card.comment_count = u32::try_from(messages.len()).unwrap_or(u32::MAX);
-        card
-    }
-
-    /// An event's start and place (web's `scheduledAt`): its leading approved plan's.
-    async fn event_facts(
-        &self,
-        agent: &AgentPubKey,
-        commons: &CellId,
-        space: &ActionHash,
-    ) -> EventFacts {
-        let at = Scoped {
-            space: space.clone(),
-            input: (),
-        };
-        let board: Option<PlanBoard> = self
-            .call(agent, commons.clone(), "governance", "list_plans", at)
-            .await
-            .ok();
-        board.as_ref().map(event_facts).unwrap_or_default()
+        archive::people_round(&calls, &directory, &self.people).await
     }
 
     pub(super) async fn archivist_app(&self, happ: &Path) -> anyhow::Result<AppInfo> {

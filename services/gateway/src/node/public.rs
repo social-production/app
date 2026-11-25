@@ -6,7 +6,7 @@ use anyhow::anyhow;
 use serde::Deserialize;
 
 use super::archivist::provisioned;
-use super::spaces::{space_of_seed, Scoped};
+use archive::{space_of_seed, Scoped};
 use super::Node;
 
 /// Read-only calls a guest may make, by zome. Every one is public to any member of the

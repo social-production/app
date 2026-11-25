@@ -3,16 +3,14 @@
 //! people too without listing the directory themselves. Ranking follows web-backend's
 //! `search.py`: exact name, then prefix, then anywhere in the name or bio.
 
-use std::path::Path;
 use std::sync::Arc;
 
 use holo_hash::AgentPubKeyB64;
-use holochain::prelude::*;
+use holochain_types::prelude::*;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
-use super::archivist::provisioned;
-use super::Node;
+use crate::Calls;
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -90,49 +88,36 @@ fn rank(people: &[PersonCard], query: &str, limit: usize) -> Vec<PersonCard> {
         .collect()
 }
 
-impl Node {
-    /// Re-read every profile in the directory into the people index. Returns how many.
-    pub async fn people_round(&self, happ: &Path) -> anyhow::Result<usize> {
-        let app = self.archivist_app(happ).await?;
-        let agent = app.agent_pub_key.clone();
-        let directory = provisioned(&app, "directory")?;
-        let keys: Vec<AgentPubKey> = self
-            .call(&agent, directory.clone(), "identity", "list_people", ())
-            .await?;
-        let mut people = Vec::with_capacity(keys.len());
-        for key in keys {
-            let profile: Option<Profile> = self
-                .call(
-                    &agent,
-                    directory.clone(),
-                    "identity",
-                    "get_profile",
-                    key.clone(),
-                )
-                .await
-                .unwrap_or(None);
-            let Some(p) = profile else { continue };
-            let standing: Option<Standing> = self
-                .call(
-                    &agent,
-                    directory.clone(),
-                    "identity",
-                    "get_standing",
-                    key.clone(),
-                )
-                .await
-                .ok();
-            people.push(PersonCard {
-                agent: AgentPubKeyB64::from(key).to_string(),
-                name: p.name,
-                bio: p.bio,
-                paused: standing.is_some_and(|s| s.level == "Paused"),
-            });
-        }
-        let count = people.len();
-        *self.people.0.write().await = people;
-        Ok(count)
+/// Re-read every profile in the directory into `people`. Returns how many.
+pub async fn people_round(
+    calls: &impl Calls,
+    directory: &CellId,
+    people: &PeopleIndex,
+) -> anyhow::Result<usize> {
+    let keys: Vec<AgentPubKey> = calls
+        .call(directory, "identity", "list_people", ())
+        .await?;
+    let mut found = Vec::with_capacity(keys.len());
+    for key in keys {
+        let profile: Option<Profile> = calls
+            .call(directory, "identity", "get_profile", key.clone())
+            .await
+            .unwrap_or(None);
+        let Some(p) = profile else { continue };
+        let standing: Option<Standing> = calls
+            .call(directory, "identity", "get_standing", key.clone())
+            .await
+            .ok();
+        found.push(PersonCard {
+            agent: AgentPubKeyB64::from(key).to_string(),
+            name: p.name,
+            bio: p.bio,
+            paused: standing.is_some_and(|s| s.level == "Paused"),
+        });
     }
+    let count = found.len();
+    *people.0.write().await = found;
+    Ok(count)
 }
 
 #[cfg(test)]
