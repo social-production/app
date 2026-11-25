@@ -37,13 +37,13 @@ export interface ActivityForm {
   note: string;
 }
 
-export type ActivityStepType =
-  'title' | 'schedule' | 'location' | 'plan-stage' | 'roles' | 'note' | 'review';
+/** The four steps (Activity creation mockup, owner 2026-11-25): what and when, where (and
+ * which plan stage), who's needed, then check and create with an optional note. */
+export type ActivityStepType = 'when' | 'where' | 'who' | 'review';
 
 export interface ActivityStep {
   type: ActivityStepType;
   question: string;
-  helper: string;
 }
 
 export const emptyRole = (): RoleDraft => ({
@@ -62,42 +62,19 @@ export function newActivityForm(place = ''): ActivityForm {
     place,
     location: { ...emptyPlaceValue(), displayLabel: place },
     meetingUrl: '',
-    roles: [emptyRole()],
+    // One role to start, so a session anyone can join needs no setup (Activity mockup §3).
+    roles: [{ ...emptyRole(), label: t('Players') }],
     planStage: null,
     note: '',
   };
 }
 
-export function activitySteps(hasPlanStages: boolean): ActivityStep[] {
-  const step = (type: ActivityStepType, question: string, helper: string): ActivityStep => ({
-    type,
-    question,
-    helper,
-  });
+export function activitySteps(): ActivityStep[] {
   return [
-    step(
-      'title',
-      'What is this activity called?',
-      'Give it a clear title so others know what they are signing up for.',
-    ),
-    step('schedule', 'When does it happen?', 'Set a start and finish time for this activity.'),
-    step(
-      'location',
-      'Where does it happen?',
-      'Search for a place or mark it online, like help requests and plans.',
-    ),
-    ...(hasPlanStages
-      ? [
-          step(
-            'plan-stage',
-            'Which plan stage does this support?',
-            'Link the activity to a stage from the leading plan.',
-          ),
-        ]
-      : []),
-    step('roles', 'Who is needed?', 'Define the roles others can sign up for.'),
-    step('note', 'What should happen?', 'Describe what participants will do during this activity.'),
-    step('review', 'Review activity', 'Check the details before creating this activity.'),
+    { type: 'when', question: t("What's on, and when?") },
+    { type: 'where', question: t('Where?') },
+    { type: 'who', question: t("Who's needed?") },
+    { type: 'review', question: t('Check and create') },
   ];
 }
 
@@ -170,21 +147,17 @@ export function scheduleProblem(form: ActivityForm, now = Date.now()): string | 
   return null;
 }
 
-/** web's `validateActivityStep`. */
-export function stepReady(type: ActivityStepType, form: ActivityForm): boolean {
+/** web's `validateActivityStep`, for the four steps; the stage is asked on Where. */
+export function stepReady(type: ActivityStepType, form: ActivityForm, hasStages = false): boolean {
   switch (type) {
-    case 'title':
-      return !!form.title.trim();
-    case 'schedule':
-      return !!form.scheduledAt && !!form.endsAt && scheduleProblem(form) === null;
-    case 'location':
-      return form.online || !!form.place.trim();
-    case 'plan-stage':
-      return !!form.planStage;
-    case 'roles':
+    case 'when':
+      return (
+        !!form.title.trim() && !!form.scheduledAt && !!form.endsAt && scheduleProblem(form) === null
+      );
+    case 'where':
+      return (form.online || !!form.place.trim()) && (!hasStages || !!form.planStage);
+    case 'who':
       return namedRoles(form.roles).length > 0;
-    case 'note':
-      return !!form.note.trim();
     case 'review':
       return true;
   }

@@ -213,7 +213,8 @@
       open={state.composing}
       bind:form={state.form}
       planStages={stages}
-      {planWindow}
+      schedule={schedule ?? null}
+      session={project?.charter?.mode === 'event'}
       busy={state.busy}
       error={state.error}
       onSubmit={() => void submitActivity()}

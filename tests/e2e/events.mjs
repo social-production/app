@@ -75,11 +75,11 @@ assert.equal(await planned.locator('.calendar-day-number').innerText(), String(d
 await bob.getByText('Click a marked plan day to add the first activity.').waitFor();
 await bob.getByRole('button', { name: 'Add activity' }).click();
 await bob.getByPlaceholder('Activity title').fill('Weeding');
-await bob.getByRole('button', { name: 'Next', exact: true }).click();
-const startField = bob.getByLabel('Start time');
-assert.equal(await startField.getAttribute('min'), `${iso}T09:00`);
-assert.equal(await startField.getAttribute('max'), `${iso}T13:00`);
-assert.equal(await startField.inputValue(), `${iso}T09:00`, 'opens inside the plan day');
+// The calendar offers only the plan day, and the wheels open inside its times.
+const calendar = bob.locator('.mini-cal-grid');
+assert.equal(await calendar.locator('button:not([disabled])').count(), 1, 'only the plan day');
+assert.equal(await calendar.locator('button.sel').innerText(), String(day.getDate()));
+assert.equal(await bob.locator('[id="tw-Starts-09:00"]').getAttribute('aria-selected'), 'true');
 await bob.screenshot({ path: `${shots}/event-activity-wizard-390.png` });
 log('the plan day is marked, and new activities stay inside it');
 

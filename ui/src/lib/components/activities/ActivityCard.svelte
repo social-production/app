@@ -181,7 +181,7 @@
           <ToolbarIcon name="layers" /><span>{p.planStage}</span>
         </p>
       {/if}
-      {#if a.note.trim()}
+      {#if a.note.trim() && a.note.trim() !== a.title.trim()}
         <p class="activity-note">{a.note.trim()}</p>
       {/if}
       {#if a.roles.length > 0}

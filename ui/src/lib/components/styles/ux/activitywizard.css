@@ -1,0 +1,249 @@
+/* Activity creation (mockup v2, owner 2026-11-25): a month calendar, time wheels, the plan's
+   place first, role cards with steppers and a check-and-create list. */
+.activity-wizard-v2 {
+  display: grid;
+  gap: 14px;
+}
+
+.activity-wizard-v2 h2 {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.activity-wizard-v2 .activity-when {
+  display: grid;
+  gap: 12px;
+}
+
+.activity-wizard-v2 .activity-field {
+  display: grid;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.activity-wizard-v2 .activity-field input,
+.activity-wizard-v2 .activity-field textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 14px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.activity-stages {
+  display: grid;
+  gap: 8px;
+  color: var(--text-soft);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.activity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.activity-chips button {
+  padding: 8px 13px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--panel-hover);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.activity-chips button.sel {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.role-cards {
+  display: grid;
+  gap: 10px;
+}
+
+.role-card {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+.role-card-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.role-card-name {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid var(--panel-border);
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.role-card-remove,
+.role-ask button {
+  border: 0;
+  background: none;
+  color: var(--text-soft);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.role-step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14.5px;
+}
+
+.role-step .stepper {
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--panel);
+}
+
+.role-step .stepper button {
+  width: 40px;
+  height: 36px;
+  border: 0;
+  background: none;
+  color: var(--text-main);
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.role-step .stepper button:disabled {
+  color: var(--text-soft);
+  opacity: 0.5;
+}
+
+.role-step .stepper b {
+  min-width: 34px;
+  text-align: center;
+}
+
+.role-ask {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  color: var(--text-soft);
+  font-size: 13.5px;
+}
+
+.role-ask input {
+  flex: 1;
+  min-width: 0;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--panel);
+  color: var(--text-main);
+  font: inherit;
+  font-size: 15px;
+}
+
+.role-ask .suggestion-list {
+  flex-basis: 100%;
+}
+
+.role-add {
+  justify-self: start;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--brand-strong);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* The wizard's generic field and button rules are stronger than the above: win them here. */
+.wizard-shell .activity-wizard-v2 .activity-chips button.sel {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.wizard-shell .activity-wizard-v2 .role-card-name {
+  min-height: 0;
+  padding: 6px 0;
+  border: 0;
+  border-bottom: 1px solid var(--panel-border);
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.wizard-shell .activity-wizard-v2 .activity-rev {
+  display: grid;
+  overflow: hidden;
+  border-radius: 16px;
+  background: var(--panel-hover);
+}
+
+.wizard-shell .activity-wizard-v2 .activity-rev > button {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 1px 8px;
+  width: 100%;
+  padding: 11px 13px;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  color: var(--text-main);
+  font: inherit;
+  text-align: left;
+}
+
+.wizard-shell .activity-wizard-v2 .activity-rev > button + button {
+  border-top: 1px solid var(--panel-border);
+}
+
+.activity-rev small {
+  color: var(--text-soft);
+  font-size: 12px;
+}
+
+.activity-rev b {
+  grid-column: 1;
+  font-size: 14.5px;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.activity-rev u {
+  grid-row: 1 / span 2;
+  grid-column: 2;
+  align-self: center;
+  color: var(--brand-strong);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
