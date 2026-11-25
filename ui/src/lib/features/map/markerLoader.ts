@@ -53,6 +53,7 @@ export class MarkerLoader {
     );
     if (lat == null || lon == null) {
       s.markers = [];
+      s.allItems = [];
       s.listItems = [];
       return this.view.applyMarkers(false);
     }
@@ -63,18 +64,21 @@ export class MarkerLoader {
       const area = { lat, lon, radiusKm, window: s.windowFilter, filter: s.entityFilter };
       // The feed's cards for the same area; the map still works if they don't come.
       const cards = mapCards(area).catch(() => ({}));
-      const items = foldSessions(
-        await getMapMarkers({
-          ...area,
-          ...(s.showCustomDates && s.dateFrom ? { dateFrom: s.dateFrom } : {}),
-          ...(s.showCustomDates && s.dateTo ? { dateTo: s.dateTo } : {}),
-          upcomingOnly: s.upcomingOnly,
-        }),
-      );
+      const items = await getMapMarkers({
+        ...area,
+        ...(s.showCustomDates && s.dateFrom ? { dateFrom: s.dateFrom } : {}),
+        ...(s.showCustomDates && s.dateTo ? { dateTo: s.dateTo } : {}),
+        upcomingOnly: s.upcomingOnly,
+      });
       s.cards = await cards;
       if (token !== this.token) return;
+      // Pins: everything (a session at its meetup's spot nests in the meetup's pin, one held
+      // elsewhere keeps its own). The list: the feed's cards, a session folded into its parent's.
+      const meetups = new Set(items.filter((i) => i.entityType === 'meetup').map((i) => i.id));
+      for (const i of items) if (i.parentId && meetups.has(i.parentId)) i.meetup = true;
+      s.allItems = items;
       s.markers = items.map(pinOf);
-      s.listItems = byDistance(items);
+      s.listItems = byDistance(foldSessions(items));
       await this.view.applyMarkers(true);
       this.view.syncRadiusOverlay();
     } catch (error) {
@@ -142,8 +146,9 @@ export class MarkerLoader {
     // Opened from a card or page: that thing's own pin opens selected, card and all.
     const select = request.select;
     const match = select
-      ? this.s.listItems.find(
-          (i) => i.entityType !== 'activity' && select.endsWith(i.href.split('?')[0] ?? i.href),
+      ? this.s.allItems.find(
+          // By id: a meetup's pin links to /events/<id> while its page can be /projects/<id>.
+          (i) => i.entityType !== 'activity' && (select.split('?')[0] ?? '').endsWith(`/${i.id}`),
         )
       : undefined;
     if (match) this.view.select(match.id);

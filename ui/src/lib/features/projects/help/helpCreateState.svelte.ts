@@ -120,7 +120,7 @@ export class HelpCreateState {
         body: this.body.trim(),
         online: this.intent === 'online',
         location,
-        place: intentPlace(this.intent, this.placeValue, location),
+        place: intentPlace(this.intent, this.placeValue, location, 'approximate'),
         startsAt: inputMicros(this.neededAt),
         endsAt: inputMicros(this.endsAt),
         tags: this.tags,

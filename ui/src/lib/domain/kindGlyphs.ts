@@ -55,9 +55,11 @@ export function kindOfMarker(item: {
   entityType?: string | null;
   activitySource?: string | null;
   projectMode?: string | null;
+  /** A session of a meetup (owner, 2026-11-25: never shown as an event). */
+  meetup?: boolean | null;
 }): Kind {
   if (item.entityType === 'event') return 'event';
-  if (item.entityType === 'meetup') return 'meetup';
+  if (item.entityType === 'meetup' || item.meetup) return 'meetup';
   if (item.entityType === 'help_request') return 'request';
   if (item.entityType === 'activity' && item.activitySource === 'event') return 'event';
   return kindOf(item.projectMode);

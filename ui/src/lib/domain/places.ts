@@ -133,8 +133,14 @@ export function fitLabel(label: string, max: number): string {
  * The record's place for a picked value, as web-backend's `create_location` saves it: an
  * online place, or a physical one with coordinates rounded to its precision. A typed label
  * without coordinates has no place (as on web). `label` is the record's own (cut) label.
+ * Public things sit on their exact spot; a request, often someone's home, stays about 1 km
+ * out (owner, 2026-11-25: "requests should be approximate and public stuff exact").
  */
-export function placeRecord(value: PlaceValue, label: string): Place | null {
+export function placeRecord(
+  value: PlaceValue,
+  label: string,
+  precision: PlacePrecision = 'exact',
+): Place | null {
   if (!label.trim()) return null;
   if (value.mode === 'online' || value.isOnline) {
     return {
@@ -151,12 +157,12 @@ export function placeRecord(value: PlaceValue, label: string): Place | null {
   if (value.mode !== 'physical' || value.latitude == null || value.longitude == null) return null;
   return {
     label,
-    latitude: roundCoordinate(value.latitude, value.precision),
-    longitude: roundCoordinate(value.longitude, value.precision),
+    latitude: roundCoordinate(value.latitude, precision),
+    longitude: roundCoordinate(value.longitude, precision),
     region: area(value.region, 120),
     country: area(value.country, 120),
     provider_id: area(value.providerPlaceId, 160),
-    precision: value.precision,
+    precision,
     online: false,
   };
 }
@@ -166,9 +172,10 @@ export function intentPlace(
   intent: 'physical' | 'online' | 'later',
   value: PlaceValue,
   label: string,
+  precision: PlacePrecision = 'exact',
 ): Place | null {
   if (intent === 'online') return placeRecord(onlinePlaceValue(label), label);
-  return intent === 'physical' ? placeRecord(value, label) : null;
+  return intent === 'physical' ? placeRecord(value, label, precision) : null;
 }
 
 /** Two places say the same thing (an edit changes the location when its place differs). */
@@ -210,4 +217,23 @@ export function dedupeQuickPicks(picks: (PlaceQuickPick | null | undefined)[]): 
 export function isPickSelected(pick: PlaceQuickPick, value: PlaceValue): boolean {
   if (value.mode !== 'physical' || value.isOnline) return false;
   return pick.label.trim().toLowerCase() === value.displayLabel.trim().toLowerCase();
+}
+
+/**
+ * An edited record's place: a request's stays approximate (someone's home, often), public
+ * things are exact, and a spot that hasn't moved keeps the precision it was saved with.
+ */
+export function editedPlace(
+  value: PlaceValue,
+  label: string,
+  was: { mode: string; place?: Place | null },
+): Place | null {
+  const same =
+    was.place && was.place.latitude === value.latitude && was.place.longitude === value.longitude;
+  const precision = same && was.place ? was.place.precision : null;
+  return placeRecord(
+    value,
+    label,
+    precision ?? (was.mode === 'help-request' ? 'approximate' : 'exact'),
+  );
 }

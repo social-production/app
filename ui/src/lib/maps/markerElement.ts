@@ -42,17 +42,21 @@ export function buildMarkerElement(
     small && !highlighted ? 'sp-pin--small' : '',
     highlighted ? 'sp-pin--selected' : '',
     isPastMarker(item) ? 'sp-pin--past' : '',
+    item.entityType === 'help_request' && item.precision === 'approximate' ? 'sp-pin--about' : '',
   ]
     .filter(Boolean)
     .join(' ');
   element.setAttribute('aria-label', item.label);
   element.dataset.markerId = item.id;
   element.style.setProperty('--pin', `var(--kind-${kind})`);
-  const children = (item.children?.length ?? 0) + sameSpot;
+  // The badge counts a meetup's sessions here when there are two or more (Map cards mockup
+  // v2), or the other things sharing this spot.
+  const sessions = item.children?.length ?? 0;
+  const count = sameSpot > 0 ? sameSpot + 1 : sessions >= 2 ? sessions : 0;
   element.innerHTML =
     (highlighted ? `<span class="sp-pin__name"></span>` : '') +
     `<span class="sp-pin__head"><svg viewBox="0 0 24 24" aria-hidden="true">${KIND_GLYPHS[kind]}</svg>` +
-    (children > 0 ? `<span class="sp-pin__count">${children + 1}</span>` : '') +
+    (count > 0 ? `<span class="sp-pin__count">${count}</span>` : '') +
     `</span><span class="sp-pin__tail"></span>`;
   const name = element.querySelector('.sp-pin__name');
   if (name) name.textContent = truncate(item.label, 32);

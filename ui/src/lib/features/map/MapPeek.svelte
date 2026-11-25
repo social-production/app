@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { t } from '#lib/i18n/index.ts';
+  import { locale, t } from '#lib/i18n/index.ts';
   import type { ResolvedPathname } from '$app/types';
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
@@ -9,70 +9,124 @@
   import { SPACE_PICTURES, type SpacePictureOf } from '#lib/domain/scopes.ts';
   import { getContext } from 'svelte';
   import { formatMarkerScheduleRange } from '#lib/domain/markerTime.ts';
+  import { shortPlace } from '#lib/domain/shortPlace.ts';
+  import { wall } from '#lib/domain/zone.ts';
   import DirectionsSheet from './DirectionsSheet.svelte';
 
-  /** A tapped pin's card (Map Redesign, owner 2026-11-17): what it is, when and how far, with
-   * Directions and Open; the map stays where it is until you choose. */
+  /**
+   * A tapped pin's card (Map cards mockup v2, owner 2026-11-25): the meetup, event or project
+   * with its picture, type and distance, then its next sessions (up to three); Open goes to
+   * the first one. A request's place is approximate: "about here" and no Directions.
+   */
   interface Props {
+    /** What the card is about: the parent, or a lone item. */
     item: MapMarkerItem;
-    /** The item's feed card (its parent's, for a session): picture and type. */
+    /** Its feed card: picture, type, channel. */
     card?: RegionCard | null;
+    sessions: MapMarkerItem[];
     href: ResolvedPathname;
+    hrefOf: (item: MapMarkerItem) => ResolvedPathname;
     onClose: () => void;
     /** Opening the page leaves the map (its overlay closes). */
     onOpen: () => void;
   }
 
-  let { item, card = null, href, onClose, onOpen }: Props = $props();
+  let { item, card = null, sessions, href, hrefOf, onClose, onOpen }: Props = $props();
 
   // A meetup's session is a meetup's, not an event's (owner, 2026-11-25).
   const kind = $derived(card?.subtype === 'meetup' ? 'meetup' : kindOfMarker(item));
   const pictureOf = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
   const picture = $derived(card?.picture ? (pictureOf?.(card.picture) ?? null) : null);
-  const session = $derived(item.entityType === 'activity' && !!item.parentTitle);
-  const when = $derived(formatMarkerScheduleRange(item.scheduledAt, item.endsAt));
+  const approximate = $derived(
+    item.precision === 'approximate' && item.entityType === 'help_request',
+  );
+  const title = $derived(
+    card?.title ?? (item.entityType === 'activity' ? item.parentTitle : null) ?? item.title,
+  );
+  const channel = $derived(card?.tags?.[0]?.replace(/^[#@]/, '') ?? '');
   const distance = $derived(
     item.distanceKm < 1
-      ? `${Math.round(item.distanceKm * 1000)} m away`
-      : `${item.distanceKm.toFixed(1)} km away`,
+      ? `${Math.round(item.distanceKm * 1000)} m`
+      : `${item.distanceKm.toFixed(1)} km`,
+  );
+  const when = $derived(
+    sessions.length ? '' : formatMarkerScheduleRange(item.scheduledAt, item.endsAt),
   );
   const line = $derived(
-    [
-      session ? t('Session of {name}', { name: item.parentTitle ?? '' }) : t(KIND_LABELS[kind]),
-      when,
-      distance,
-    ]
+    [t(KIND_LABELS[kind]), channel, when, approximate ? t('about here') : distance]
       .filter(Boolean)
       .join(' · '),
   );
+  const shown = $derived(sessions.slice(0, 3));
+  const openHref = $derived(sessions[0] ? hrefOf(sessions[0]) : href);
   let directionsOpen = $state(false);
   const to = $derived({
     latitude: item.latitude,
     longitude: item.longitude,
     label: item.displayLabel.trim() || item.title,
   });
+
+  // The app's chosen time zone, as everywhere else.
+  const at = (iso: string | null): Date | null => (iso ? wall(Date.parse(iso)) : null);
+  const day = (iso: string | null, opts: Intl.DateTimeFormatOptions): string =>
+    at(iso)?.toLocaleDateString(locale(), opts) ?? '';
+  const clock = (iso: string | null): string =>
+    at(iso)?.toLocaleTimeString(locale(), { hour: 'numeric', minute: '2-digit' }) ?? '';
+  const times = (s: MapMarkerItem): string =>
+    [clock(s.scheduledAt), clock(s.endsAt)].filter(Boolean).join(' – ');
+  // "0 of 6" (going of the minimum), as the mockup; "8 going" once it's met.
+  const going = (s: MapMarkerItem): string => {
+    if (s.minimumParticipants == null) return '';
+    const n = s.committedCount ?? 0;
+    return n < s.minimumParticipants
+      ? t('{n} of {min}', { n, min: s.minimumParticipants })
+      : t('{n} going', { n });
+  };
 </script>
 
-<div class="map-peek" role="dialog" aria-label={item.title} style={`--pin: ${kindColor(kind)}`}>
+<div class="map-peek" role="dialog" aria-label={title} style={`--pin: ${kindColor(kind)}`}>
   <div class="map-peek-head">
     <span class="map-peek-icon" class:has-picture={!!picture}
       >{#if picture}<img src={picture} alt="" />{:else}<KindGlyph {kind} size={18} />{/if}</span
     >
     <div>
-      <b>{item.title}</b>
+      <b>{title}</b>
       <small>{line}</small>
     </div>
     <button class="map-peek-close" type="button" aria-label={t('Close')} onclick={onClose}>
       <ToolbarIcon name="x" />
     </button>
   </div>
+  {#if shown.length > 0}
+    <div class="map-peek-sessions">
+      {#each shown as s (s.id)}
+        <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
+        <a class="map-peek-session" href={hrefOf(s)} onclick={onOpen}>
+          <span class="map-peek-day"
+            ><small>{day(s.scheduledAt, { weekday: 'short' })}</small><b
+              >{day(s.scheduledAt, { day: 'numeric' })}</b
+            ></span
+          >
+          <span class="map-peek-session-copy">
+            <b>{s.title}</b>
+            <span>{[times(s), shortPlace(s.displayLabel)].filter(Boolean).join(' · ')}</span>
+          </span>
+          {#if going(s)}<em>{going(s)}</em>{/if}
+        </a>
+      {/each}
+      {#if sessions.length > shown.length}
+        <p class="map-peek-more">{t('+{n} more', { n: sessions.length - shown.length })}</p>
+      {/if}
+    </div>
+  {/if}
   <div class="map-peek-actions">
-    <button class="map-peek-secondary" type="button" onclick={() => (directionsOpen = true)}
-      >{t('Directions')}</button
-    >
+    {#if !approximate}
+      <button class="map-peek-secondary" type="button" onclick={() => (directionsOpen = true)}
+        >{t('Directions')}</button
+      >
+    {/if}
     <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
-    <a class="map-peek-primary" {href} onclick={onOpen}>{t('Open')}</a>
+    <a class="map-peek-primary" href={openHref} onclick={onOpen}>{t('Open')}</a>
   </div>
 </div>
-
 <DirectionsSheet open={directionsOpen} {to} onClose={() => (directionsOpen = false)} />

@@ -71,14 +71,17 @@
       <span class="feed-lead-glyph"
         ><SurfaceTypeLabel
           projectMode={mode}
-          meetup={item.entityType === 'meetup'}
+          meetup={item.entityType === 'meetup' || !!item.meetup}
           feedGlyph
         /></span
       >
       <div class="feed-lead-copy">
         {#if parent}<div class="feed-lead-tags"><span class="map-parent">{parent}</span></div>{/if}
         <div class="feed-lead-meta" class:alone={!parent}>
-          <SurfaceTypeLabel projectMode={mode} meetup={item.entityType === 'meetup'} />
+          <SurfaceTypeLabel
+            projectMode={mode}
+            meetup={item.entityType === 'meetup' || !!item.meetup}
+          />
           {#if status}<span class="feed-card-stage">{t(status)}</span>{/if}
           <span class="feed-card-time">{distance}</span>
         </div>

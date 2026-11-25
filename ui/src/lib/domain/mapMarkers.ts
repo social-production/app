@@ -26,6 +26,8 @@ export interface MapMarkerItem {
   slotsNeeded: number | null;
   committedCount: number | null;
   minimumParticipants: number | null;
+  /** A session of a meetup on the map (set by the map from its parent). */
+  meetup?: boolean;
 }
 
 /** What the gateway sends (`routes/map.rs` `Marker`). */
@@ -150,6 +152,8 @@ export function pinOf(item: MapMarkerItem): MapMarker {
     slotsNeeded: item.slotsNeeded,
     committedCount: item.committedCount,
     minimumParticipants: item.minimumParticipants,
+    precision: item.precision,
+    meetup: item.meetup ?? false,
   };
 }
 

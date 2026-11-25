@@ -37,6 +37,10 @@ export interface MapMarker {
   slotsNeeded?: number | null;
   committedCount?: number | null;
   minimumParticipants?: number | null;
+  /** `approximate` places (requests) draw a soft halo instead of pointing at a spot. */
+  precision?: string | null;
+  /** A session of a meetup. */
+  meetup?: boolean;
 }
 
 export interface MapAdapter {
