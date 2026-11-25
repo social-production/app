@@ -253,6 +253,7 @@
             you={member.agent === p.me}
             manager={isManager(member.agent)}
             canManage={managing && member.agent !== p.me}
+            keepSlot={managing}
             menuOpen={openMenu === member.agent}
             profile={resolve('/profile/[agent]', { agent: member.agent })}
             onMenu={(open) => (openMenu = open ? member.agent : null)}

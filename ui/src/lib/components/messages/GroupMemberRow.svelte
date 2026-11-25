@@ -10,6 +10,8 @@
     you: boolean;
     manager: boolean;
     canManage: boolean;
+    /** Keep the ⋮ column even without a menu, so every Manager pill lines up. */
+    keepSlot?: boolean;
     menuOpen: boolean;
     profile: string;
     onMenu: (open: boolean) => void;
@@ -72,5 +74,7 @@
         >
       </div>
     {/if}
+  {:else if p.keepSlot}
+    <span class="group-more group-more-slot" aria-hidden="true"></span>
   {/if}
 </div>

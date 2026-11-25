@@ -250,6 +250,11 @@
   cursor: pointer;
 }
 
+.group-page .group-more-slot {
+  flex: none;
+  cursor: default;
+}
+
 .group-page .group-more:hover,
 .group-page .group-more[aria-expanded='true'] {
   background: var(--panel-hover);
