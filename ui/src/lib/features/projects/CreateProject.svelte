@@ -108,6 +108,7 @@
         title={s.title.trim()}
         body={s.description.trim()}
         place={s.intent === 'physical' ? s.locationLabel : ''}
+        picture={s.art.newPicture?.url ?? null}
       />
       <button class="overview-row" type="button" onclick={() => (s.step = s.stepOf('scope'))}>
         <strong>{t('Channels')}</strong><span>{tagCounts(s.tags)}</span><em>{t('Edit')}</em>

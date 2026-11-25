@@ -237,6 +237,12 @@
 }
 
 /* The preview draws the feed row's glyph and type line as the feed does (feedrow.css). */
+.create-sheet .create-preview-card .feed-card-top.feed-lead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .create-sheet .create-preview-card .feed-lead-glyph .surface-type-label {
   display: grid;
   place-items: center;
