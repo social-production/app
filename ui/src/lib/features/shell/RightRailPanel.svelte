@@ -7,7 +7,8 @@
   import RailCleared from '#lib/components/rail/RailCleared.svelte';
   import RailHistory from '#lib/components/rail/RailHistory.svelte';
   import RailRow from '#lib/components/rail/RailRow.svelte';
-  import { railTime, type RailItem } from '#lib/domain/activityRail.ts';
+  import type { RailItem } from '#lib/domain/activityRail.ts';
+  import { byRailDay } from '#lib/domain/railDays.ts';
   import { isHelpKind } from '#lib/domain/helpRail.ts';
   import { projectPageOf } from '#lib/services/notifications.ts';
   import {
@@ -35,6 +36,7 @@
   );
   const cleared = $derived(activityRail.items.filter((i) => activityRail.dismissed.includes(i.id)));
   const activities = $derived(visible.filter((i) => i.kind === 'project'));
+  const days = $derived(byRailDay(activities, (i) => i.createdAt));
   const votes = $derived(visible.filter((i) => i.kind === 'vote'));
   const requests = $derived(visible.filter((i) => i.kind === 'request'));
   const help = $derived(visible.filter((i) => isHelpKind(i.kind)));
@@ -92,16 +94,18 @@
 
   {#if tab === 'coming'}
     <div class="rail-tab-panel" role="tabpanel">
-      {#each activities as item (item.id)}
-        <RailRow
-          {item}
-          unseen={unseen(item)}
-          rowClass=""
-          dismissLabel={t('Dismiss activity card')}
-          time={railTime(item.createdAt)}
-          onOpen={() => openItem(item)}
-          onDismiss={() => dismissRailItem(item.id)}
-        />
+      {#each days as group (group.day)}
+        <h3 class="rail-day">{group.day}</h3>
+        {#each group.items as item (item.id)}
+          <RailRow
+            {item}
+            unseen={unseen(item)}
+            rowClass=""
+            dismissLabel={t('Dismiss activity card')}
+            onOpen={() => openItem(item)}
+            onDismiss={() => dismissRailItem(item.id)}
+          />
+        {/each}
       {:else}
         <EmptyState
           icon="calendar"
@@ -112,13 +116,13 @@
     </div>
   {:else if tab === 'votes'}
     <div class="rail-tab-panel rail-section-votes" role="tabpanel">
+      {#if votes.length > 0}<h3 class="rail-day">{t('Waiting for your vote')}</h3>{/if}
       {#each votes as item (item.id)}
         <RailRow
           {item}
           unseen={false}
           rowClass="vote-row"
           dismissLabel={t('Dismiss vote card')}
-          time={railTime(item.createdAt)}
           onOpen={() => openItem(item)}
           onDismiss={() => dismissRailItem(item.id)}
         >
@@ -153,7 +157,6 @@
             unseen={unseen(item)}
             rowClass="help-request-row"
             dismissLabel={t('Dismiss request card')}
-            time={railTime(item.createdAt)}
             onOpen={() => openItem(item)}
             onDismiss={() => dismissRailItem(item.id)}
           />
@@ -166,7 +169,6 @@
             unseen={unseen(item)}
             rowClass=""
             dismissLabel={t('Dismiss request card')}
-            time={railTime(item.createdAt)}
             onOpen={() => openItem(item)}
             onDismiss={() => dismissRailItem(item.id)}
           />
