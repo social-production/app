@@ -16,8 +16,8 @@ export const KIND_GLYPHS: Record<Kind, string> = {
   // A leaf in a hand's cup: a project that serves people.
   service: `<path d="M8 13c0-5 3-8 9-9-.6 5.6-3.8 8.6-9 9Z" ${stroke}/><path d="M3 15h4l3 2h5a2 2 0 0 1 0 4H8" ${stroke}/>`,
   event: `<rect x="4" y="5" width="16" height="15" rx="3" ${stroke}/><path d="M4 10h16M9 3v4M15 3v4" ${stroke}/>`,
-  // A ball: people meeting up to play, run or hang out (ADR 0119).
-  meetup: `<circle cx="12" cy="12" r="8" ${stroke}/><path d="M4 12h16M12 4c-2.5 2.2-3.5 5-3.5 8s1 5.8 3.5 8M12 4c2.5 2.2 3.5 5 3.5 8s-1 5.8-3.5 8" ${stroke}/>`,
+  // Two people: neighbours meeting up to play, run or hang out (owner, 2026-11-25; ADR 0119).
+  meetup: `<circle cx="8.5" cy="8" r="3" ${stroke}/><circle cx="16" cy="9" r="2.6" ${stroke}/><path d="M3 19.5c0-3.3 2.5-5.5 5.5-5.5s5.5 2.2 5.5 5.5M13.5 14.6c.8-.4 1.6-.6 2.5-.6 2.6 0 4.5 1.9 4.5 4.8" ${stroke}/>`,
   request: `<path d="M7 11V6.5a1.5 1.5 0 0 1 3 0V11M10 10V5a1.5 1.5 0 0 1 3 0v5M13 10V6a1.5 1.5 0 0 1 3 0v6c0 4-2.5 8-6.5 8S5 17 4.5 14l-1-3a1.5 1.5 0 0 1 2.8-1L7 12" ${stroke}/>`,
   proposal: `<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.4 1 1.1 1 1.8V16h5v-.3c0-.7.4-1.4 1-1.8A6 6 0 0 0 12 3Z" ${stroke}/>`,
   thread: `<path d="M6 5.5h12A1.5 1.5 0 0 1 19.5 7v8a1.5 1.5 0 0 1-1.5 1.5h-8l-4 3v-3A1.5 1.5 0 0 1 4.5 15V7A1.5 1.5 0 0 1 6 5.5Z" ${stroke}/><path d="M8.5 9.5h7M8.5 12.5h4.5" ${stroke}/>`,

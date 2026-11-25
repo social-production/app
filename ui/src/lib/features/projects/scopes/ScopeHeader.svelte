@@ -68,7 +68,12 @@
     }
     const n = board?.weeklyActive;
     if (n === undefined) return t('The whole network');
-    return n === 0 ? t('Nobody active last week') : `${n.toLocaleString()} active last week`;
+    const last = n === 0 ? t('Nobody active last week') : `${n.toLocaleString()} active last week`;
+    // The week so far too, so a quiet last week doesn't read as an empty network (2026-11-25).
+    const now = board?.thisWeek;
+    return now
+      ? `${t('{n} active so far this week', { n: now.toLocaleString() })} · ${last}`
+      : last;
   });
   let networkOpen = $state(false);
   const faces = $derived((board?.moderators ?? []).slice(0, 3));
