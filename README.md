@@ -11,7 +11,7 @@ network of desktops, Raspberry Pis and phones.
 ## Status (2026-11-25)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
-(it runs alongside the current FastAPI site; that site is unaffected).
+(it runs alongside the current FastAPI site; that site is unaffected). Latest (25 Nov, late): rolling 7-day active counts, active-only vote populations, group photos and co-managers (accounts and chats reset, demo reseeded).
 
 What works today:
 - **Map, activities, plan review, requests (PRs #303–#316, 2026-11-25 Melbourne):** a tapped
