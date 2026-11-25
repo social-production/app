@@ -27,7 +27,9 @@ export function shareTargets(input: ShareInput): { id: string; label: string; hr
 
 /** shares.py `send_share_message`: what lands in the direct chat. */
 export function shareMessage(kindLabel: string, title: string, href: string): string {
-  return `Shared a ${kindLabel}: ${title}\nOpen ${kindLabel}: ${href}`;
+  // Requests were "help requests" (owner, 2026-11-25); the kind's key keeps the old name.
+  const shown = kindLabel === 'help request' ? 'request' : kindLabel;
+  return `Shared a ${shown}: ${title}\nOpen ${shown}: ${href}`;
 }
 
 /** What web's shares.py sends for each kind it shares: the message's label, the page's path,
@@ -44,13 +46,14 @@ const SHARED = {
 type SharedLabel = keyof typeof SHARED;
 
 const SHARE =
-  /^Shared a (project|event|help request|thread|post): (.+)\nOpen \1: \S*\/([a-z-]+)\/([^\s/?#]+)$/;
+  /^Shared a (project|event|help request|request|thread|post): (.+)\nOpen \1: \S*\/([a-z-]+)\/([^\s/?#]+)$/;
 
 /** A space shared in a message, as `shareMessage` wrote it. */
 export function sharedSpace(
   body: string,
 ): { label: SharedLabel; title: string; id: string } | null {
-  const [, label, title, path, id] = SHARE.exec(body.trim()) ?? [];
+  const [, said, title, path, id] = SHARE.exec(body.trim()) ?? [];
+  const label = said === 'request' ? 'help request' : said;
   if (!label || !title || !id) return null;
   const known = SHARED[label as SharedLabel];
   return known.path === path
@@ -62,7 +65,7 @@ export function sharedSpace(
 function shareBody(label: SharedLabel, title: string): string {
   return label === 'project' || label === 'event'
     ? `${title} was shared with you.`
-    : `A ${label} was shared with you.`;
+    : `A ${label === 'help request' ? 'request' : label} was shared with you.`;
 }
 
 /**

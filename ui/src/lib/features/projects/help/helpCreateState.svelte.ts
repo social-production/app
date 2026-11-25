@@ -63,7 +63,7 @@ export class HelpCreateState {
   /** web's buildValidationMessages, per step (web needs a channel tag; the app has none yet). */
   readonly problems = $derived.by(() => ({
     basics: [
-      !this.title.trim() && 'Help request title is required.',
+      !this.title.trim() && 'Request title is required.',
       !this.body.trim() && 'Description is required.',
     ],
     location: [

@@ -26,7 +26,7 @@ export const filterOptions = [
   { value: 'events', label: t('Events') },
   { value: 'meetups', label: t('Meetups') },
   { value: 'projects', label: t('Projects') },
-  { value: 'help_requests', label: t('Help requests') },
+  { value: 'help_requests', label: t('Requests') },
 ];
 
 export class MapPanelState {

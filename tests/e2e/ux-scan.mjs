@@ -120,7 +120,7 @@ if (!only || only === 'create') {
     await shot('create-request-5');
     await next();
     await shot('create-request-6');
-    await page.getByRole('button', { name: 'Publish help request' }).click();
+    await page.getByRole('button', { name: 'Publish request' }).click();
     await page.locator('.role-bar').first().waitFor({ timeout: 120_000 });
     await shot('page-request');
   });

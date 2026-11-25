@@ -98,7 +98,7 @@ export const aboutHow: Block[] = [
     title: t('Signals instead of prices'),
     paragraphs: [
       'A market coordinates through prices: a high price tells producers that something is wanted and that they can profit by making it. It is a powerful signal, but it only counts wants backed by money, and it tells you nothing about need.',
-      'Social Production coordinates through stigmergy, the way ants and termites build without a plan or a boss: each one leaves a trace in the shared environment, and the traces guide what others do next. Here the traces are open and readable by everyone. You can mark a proposed project with Demand or Oppose, join it, take a role in an activity, or ask for help. Each mark changes what others see: projects with strong demand rise in the feed, a role with open places shows on the calendar and in the right rail, a help request stays visible until its places are filled or its time has passed.',
+      'Social Production coordinates through stigmergy, the way ants and termites build without a plan or a boss: each one leaves a trace in the shared environment, and the traces guide what others do next. Here the traces are open and readable by everyone. You can mark a proposed project with Demand or Oppose, join it, take a role in an activity, or ask for help. Each mark changes what others see: projects with strong demand rise in the feed, a role with open places shows on the calendar and in the right rail, a request stays visible until its places are filled or its time has passed.',
       'Nobody allocates the work. People see what is wanted, where help is short and what is already under way, and choose for themselves.',
     ],
   },
@@ -107,7 +107,7 @@ export const aboutHow: Block[] = [
     paragraphs: [
       'Every project starts as a proposal. While it collects signals, members add and rate the values it should keep to. Once at least 66% of the signals are Demand, members can vote to move on to planning: a production plan and a distribution plan for a project, an operations plan and an access plan for a service. Members can write competing plans, assess them against the agreed values and vote; the plan that leads is the one carried out.',
       'In the Activity phase the plan becomes dated activities with roles. People sign up for roles, the activity goes ahead once its roles are filled, and afterwards the people who took part check in and rate how it went.',
-      'Alongside projects there are events, help requests (for one-off help with a time and roles), services that people can request, and channels and communities for discussion.',
+      'Alongside projects there are events, requests (for one-off help with a time and roles), services that people can request, and channels and communities for discussion.',
     ],
   },
 ];

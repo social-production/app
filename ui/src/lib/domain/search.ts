@@ -42,7 +42,7 @@ export const searchKindLabels: Record<SearchResultKind, string> = {
   channel: 'Channel',
   community: 'Community',
   profile: 'Profile',
-  'help-request': 'Help request',
+  'help-request': 'Request',
   post: 'Post',
 };
 

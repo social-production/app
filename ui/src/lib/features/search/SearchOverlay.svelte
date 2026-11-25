@@ -72,7 +72,7 @@
     project: 'Project',
     thread: 'Thread',
     event: 'Event',
-    'help-request': 'Help request',
+    'help-request': 'Request',
     post: 'Post',
     profile: 'Person',
   };

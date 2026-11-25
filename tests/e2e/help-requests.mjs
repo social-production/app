@@ -37,7 +37,7 @@ await ann.getByLabel('Role title').nth(1).fill('Company');
 await ann.getByLabel('People needed', { exact: true }).nth(1).fill('0');
 await next(); // → Overview
 await ann.locator('.overview-row', { hasText: 'Driver, Company' }).waitFor();
-await ann.getByRole('button', { name: 'Publish help request' }).click();
+await ann.getByRole('button', { name: 'Publish request' }).click();
 await ann.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.match(ann.url(), /\/help-requests\//);
 const url = ann.url();
@@ -85,7 +85,7 @@ await helper.getByRole('button', { name: `Leave ${TEST_CHANNEL}` }).waitFor({ ti
 const helpRow = (page, text) =>
   rail(page).locator('.rail-section-help-requests .help-request-row', { hasText: title }).filter({ hasText: text });
 await railShows(helper, () => helpRow(helper, '0 signed up · 1 needed'), 'the open help request', 20_000);
-assert.match(await helpRow(helper, title).innerText(), /help request/i);
+assert.match(await helpRow(helper, title).innerText(), /request/i);
 assert.match(await helpRow(helper, title).innerText(), /Friday morning, with a suitcase\./);
 if (process.argv[3]) await helper.screenshot({ path: `${process.argv[3]}/rail-help-open.png` });
 await helpRow(helper, title).locator('.activity-open-button').click();
@@ -126,7 +126,7 @@ log('the helper left the role');
 
 // web's Share menu: share outside the app (Copy link), then send to the helper by name.
 await ann.goto(url);
-await ann.getByRole('button', { name: 'Share help request' }).click();
+await ann.getByRole('button', { name: 'Share request' }).click();
 await ann.getByRole('button', { name: 'Copy link' }).waitFor();
 const search = ann.locator('#share-people-search');
 // The directory may take a moment to list someone who just signed up.
@@ -144,7 +144,7 @@ await ann.getByRole('button', { name: 'Send', exact: true }).click();
 await search.waitFor({ state: 'detached', timeout: 120_000 });
 log('founder one shared it with the helper');
 
-const shared = helper.locator('.notification-card', { hasText: 'A help request was shared with you.' });
+const shared = helper.locator('.notification-card', { hasText: 'A request was shared with you.' });
 for (let i = 0; ; i++) {
   await helper.goto(`${BASE}/notifications`);
   await helper.getByRole('heading', { name: 'Notifications' }).waitFor({ timeout: 60_000 });
@@ -152,7 +152,7 @@ for (let i = 0; ; i++) {
   if (i >= 40) throw new Error('the share never reached the helper');
 }
 await shared.first().getByText(title).waitFor();
-assert.match(await shared.first().locator('.note-by').innerText(), /^Help request · /);
+assert.match(await shared.first().locator('.note-by').innerText(), /^Request · /);
 await shared.first().click();
 await helper.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
 assert.equal(new URL(helper.url()).pathname, new URL(url).pathname);
