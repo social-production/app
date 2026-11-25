@@ -1,7 +1,7 @@
 //! Tests for web's Region feed (`region.rs`).
 
 use super::*;
-use crate::node::cards::HelpCard;
+use crate::cards::HelpCard;
 use crate::markers::{CardActivity, CardPlace};
 
 const FITZROY: (f64, f64) = (-37.8, 144.98);

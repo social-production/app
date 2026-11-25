@@ -69,6 +69,7 @@ pub struct ProjectCard {
 pub const REMOVED: &str = "removed";
 
 /// Whose items a feed page holds.
+#[derive(Debug)]
 pub enum Who<'a> {
     /// The public feed: everyone's items but posts, which live on personal feeds (ADR 0070);
     /// Search asks for posts too (`with_posts`).
