@@ -6,4 +6,5 @@ export const part44: Record<string, string> = {
   'Add people': 'Добавить людей',
   'View profile': 'Открыть профиль',
   'Remove from group': 'Удалить из группы',
+  'Tap again to leave': 'Нажмите ещё раз, чтобы выйти',
 };

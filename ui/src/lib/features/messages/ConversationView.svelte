@@ -245,6 +245,7 @@
     onRename={(name) => inbox.rename(seed, name)}
     onAdd={(c) => inbox.addMember(seed, c.agent)}
     onRemove={(c) => inbox.removeMember(seed, c.agent)}
+    onLeave={() => inbox.leave(seed)}
     onClose={onInfoClose}
   />
 {/if}
