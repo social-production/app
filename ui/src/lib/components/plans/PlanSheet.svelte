@@ -6,22 +6,24 @@
   import VoteTally from '#lib/components/governance/VoteTally.svelte';
   import type { VoteChoice } from '#lib/domain/governance.ts';
   import {
+    criterionQuestion,
+    criterionTag,
     planChip,
-    type PlanCriterion,
     type PlanRating,
     type PlanView,
   } from '#lib/domain/plans.ts';
   import { relativeTime } from '#lib/domain/time.ts';
 
-  import CriterionRatingRow from './CriterionRatingRow.svelte';
   import PlanDetails from './PlanDetails.svelte';
+  import PlanQuestion from './PlanQuestion.svelte';
+  import PlanReviewSummary from './PlanReviewSummary.svelte';
 
   import '#lib/components/styles/plans.css';
 
   /**
-   * An opened plan as the one vote sheet (owner, 2026-11-18): the plan, the count, and
-   * "Review · N questions" in the dock. The review asks one question per screen; the last
-   * one's dock is No / Yes. The final vote is final (ADR 0033).
+   * An opened plan as the one vote sheet (owner, 2026-11-18; Plan review mockup, 2026-11-25):
+   * the plan and its count; then one question per screen, answered in words with one tap that
+   * moves on; then your answers on one page with the final No / Yes (ADR 0033).
    */
   interface Props {
     open: boolean;
@@ -37,14 +39,16 @@
 
   let { open, plan, authorName, kindLine, canVote, onRate, onVote, onClose }: Props = $props();
 
-  /** The question on screen, or null for the plan itself. */
-  let question = $state<number | null>(null);
+  /** A question's index, your answers, or null for the plan itself. */
+  let screen = $state<number | 'answers' | null>(null);
+  // Changing one answer from the answers page goes back there.
+  let fromAnswers = $state(false);
   // Shown at once; the next load brings the network's view.
   let local = $state<Record<string, PlanRating | null>>({});
   let localVote = $state<VoteChoice>();
 
   $effect(() => {
-    if (!open) question = null;
+    if (!open) screen = null;
   });
 
   const criteria = $derived(
@@ -53,47 +57,70 @@
   const myVote = $derived(localVote ?? plan.tally.myVote);
   const voteOpen = $derived(plan.tally.status === 'Open');
   const chip = $derived(planChip(plan));
-  const current = $derived(question === null ? null : (criteria[question] ?? null));
-  const last = $derived(question !== null && question === criteria.length - 1);
+  const current = $derived(typeof screen === 'number' ? (criteria[screen] ?? null) : null);
   const allRated = $derived(criteria.every((c) => c.mine !== null));
-  const ask = (c: PlanCriterion): string =>
-    c.kind === 'Value' ? t('How well does it satisfy "{value}"?', { value: c.label }) : c.label;
+  const total = $derived(criteria.length);
+  const done = $derived(screen === 'answers' ? total : typeof screen === 'number' ? screen : 0);
 
-  function rate(id: string, rating: PlanRating | null): void {
-    local = { ...local, [id]: rating };
-    onRate(id, rating);
+  function answer(index: number, rating: PlanRating): void {
+    const c = criteria[index];
+    if (c && c.mine !== rating) {
+      local = { ...local, [c.id]: rating };
+      onRate(c.id, rating);
+    }
+    // A moment to see the choice land, then on.
+    setTimeout(() => {
+      screen = fromAnswers || index + 1 >= total ? 'answers' : index + 1;
+      fromAnswers = false;
+    }, 220);
   }
 
-  function step(by: number): void {
-    if (question !== null) question = Math.max(question + by, 0);
+  function back(): void {
+    if (screen === 'answers') screen = total - 1;
+    else if (typeof screen === 'number') screen = screen > 0 ? screen - 1 : null;
+  }
+
+  function begin(): void {
+    fromAnswers = false;
+    screen = allRated ? 'answers' : criteria.findIndex((c) => c.mine === null);
   }
 
   function vote(choice: VoteChoice): void {
     localVote = choice;
-    question = null;
+    screen = null;
     onVote(choice);
   }
 </script>
 
-{#snippet back()}
-  <button class="vote-back" type="button" aria-label={t('Back')} onclick={() => step(-1)}>‹</button>
+{#snippet backButton()}
+  <button class="vote-back" type="button" aria-label={t('Back')} onclick={back}>‹</button>
 {/snippet}
 
 <OverlaySheet
   {open}
-  title={current ? ask(current) : plan.plan.title}
+  title={current
+    ? criterionQuestion(current)
+    : screen === 'answers'
+      ? t('Your review')
+      : plan.plan.title}
   labelledById={`plan-sheet-${plan.id}`}
   rootClass="plan-scope vote-dock-root"
   wide
   {onClose}
 >
   {#snippet kicker()}
-    {#if current && question !== null}
-      <VoteKicker
-        label={t('Plan')}
-        status={current.kind === 'Value' ? t('Shared value') : null}
-        meta={t('{n} of {total}', { n: question + 1, total: criteria.length })}
-      />
+    {#if screen !== null}
+      <div class="plan-kicker">
+        <div class="plan-progress" aria-hidden="true">
+          {#each criteria as c, i (c.id)}<i class:on={i < done || i === screen}></i>{/each}
+        </div>
+        {#if current && typeof screen === 'number'}
+          <div class="plan-q-top">
+            <span>{t('Question {n} of {total}', { n: screen + 1, total })}</span>
+            <span class="plan-q-tag">{criterionTag(current)}</span>
+          </div>
+        {/if}
+      </div>
     {:else}
       <VoteKicker
         label={kindLine}
@@ -103,13 +130,22 @@
     {/if}
   {/snippet}
   <div class="plan-sheet vote-sheet">
-    {#if current}
-      <CriterionRatingRow
+    {#if current && typeof screen === 'number'}
+      {@const index = screen}
+      <PlanQuestion
         criterion={current}
+        planTitle={plan.plan.title}
         {canVote}
-        onSelect={(rating) => rate(current.id, rating)}
+        onAnswer={(rating) => answer(index, rating)}
       />
-      {#if last}<p class="outcome">{t('Does this plan meet the need? Your vote is final.')}</p>{/if}
+    {:else if screen === 'answers'}
+      <PlanReviewSummary
+        {criteria}
+        onEdit={(i) => {
+          fromAnswers = true;
+          screen = i;
+        }}
+      />
     {:else}
       <PlanDetails plan={plan.plan} onMap={onClose} />
       <VoteTally
@@ -121,30 +157,22 @@
     {/if}
   </div>
   {#snippet footer()}
-    {#if current && question !== null}
-      {#if last}
-        <VoteChoiceBar docked mine={null} disabled={!allRated} onChoose={vote}>
-          {#snippet lead()}{@render back()}{/snippet}
-        </VoteChoiceBar>
-      {:else}
-        <div class="sheet-actions">
-          {#if question > 0}{@render back()}{/if}
-          <button
-            class="sheet-submit"
-            type="button"
-            disabled={!current.mine}
-            onclick={() => step(1)}>{t('Next')}</button
-          >
-        </div>
-      {/if}
+    {#if typeof screen === 'number'}
+      <div class="sheet-actions">{@render backButton()}</div>
+    {:else if screen === 'answers'}
+      <VoteChoiceBar docked mine={myVote ?? null} disabled={!allRated} onChoose={vote}>
+        {#snippet lead()}{@render backButton()}{/snippet}
+      </VoteChoiceBar>
     {:else if myVote}
       <VoteChoiceBar docked mine={myVote} onChoose={() => undefined} />
-    {:else if canVote && voteOpen && criteria.length === 0}
+    {:else if canVote && voteOpen && total === 0}
       <VoteChoiceBar docked mine={null} onChoose={vote} />
     {:else if canVote && voteOpen}
       <div class="sheet-actions">
-        <button class="sheet-submit" type="button" onclick={() => (question = 0)}
-          >{t('Review · {n} questions', { n: criteria.length })}</button
+        <button class="sheet-submit plan-begin" type="button" onclick={begin}
+          >{t('Review and vote')}<small
+            >{total === 1 ? t('1 quick question') : t('{n} quick questions', { n: total })}</small
+          ></button
         >
       </div>
     {/if}
