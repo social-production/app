@@ -16,9 +16,11 @@
     body: string;
     when?: string;
     place?: string;
+    /** The picture chosen in the first step (ADR 0117): the row's tile, as in the feed. */
+    picture?: string | null;
   }
 
-  let { mode, scope, title, body, when = '', place = '' }: Props = $props();
+  let { mode, scope, title, body, when = '', place = '', picture = null }: Props = $props();
 </script>
 
 <figure class="create-preview">
@@ -26,7 +28,12 @@
   <!-- `shell` so the feed row's own styles reach it inside the portaled sheet. -->
   <div class="shell create-preview-card">
     <div class="feed-card-top feed-lead">
-      <span class="feed-lead-glyph"><SurfaceTypeLabel projectMode={mode} feedGlyph /></span>
+      <span class="feed-lead-glyph"
+        >{#if picture}<img class="feed-lead-picture" src={picture} alt="" />{:else}<SurfaceTypeLabel
+            projectMode={mode}
+            feedGlyph
+          />{/if}</span
+      >
       <div class="feed-lead-copy">
         {#if scope}<div class="feed-lead-tags">
             <span class="create-preview-scope">{scope}</span>
