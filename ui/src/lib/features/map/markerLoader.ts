@@ -15,6 +15,7 @@ import { readDefaultLocation, writeDefaultLocation } from '#lib/stores/defaultLo
 import type { MapFocusRequest } from '#lib/stores/mapFocus.svelte.ts';
 import { DEFAULT_CAMERA_CENTER, type MapPanelState } from './panelState.svelte.ts';
 import type { MapView } from './mapView.ts';
+import { foldSessions, mapCards } from './mapCards.ts';
 
 type Coords = { lat: number; lon: number; radiusKm?: number };
 
@@ -58,16 +59,19 @@ export class MarkerLoader {
     if (s.listItems.length === 0) s.loading = true;
     s.errorMessage = '';
     try {
-      const items = await getMapMarkers({
-        lat,
-        lon,
-        radiusKm: this.radiusFor(coords),
-        window: s.windowFilter,
-        filter: s.entityFilter,
-        ...(s.showCustomDates && s.dateFrom ? { dateFrom: s.dateFrom } : {}),
-        ...(s.showCustomDates && s.dateTo ? { dateTo: s.dateTo } : {}),
-        upcomingOnly: s.upcomingOnly,
-      });
+      const radiusKm = this.radiusFor(coords);
+      const area = { lat, lon, radiusKm, window: s.windowFilter, filter: s.entityFilter };
+      // The feed's cards for the same area; the map still works if they don't come.
+      const cards = mapCards(area).catch(() => ({}));
+      const items = foldSessions(
+        await getMapMarkers({
+          ...area,
+          ...(s.showCustomDates && s.dateFrom ? { dateFrom: s.dateFrom } : {}),
+          ...(s.showCustomDates && s.dateTo ? { dateTo: s.dateTo } : {}),
+          upcomingOnly: s.upcomingOnly,
+        }),
+      );
+      s.cards = await cards;
       if (token !== this.token) return;
       s.markers = items.map(pinOf);
       s.listItems = byDistance(items);

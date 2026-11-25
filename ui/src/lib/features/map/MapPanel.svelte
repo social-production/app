@@ -15,6 +15,7 @@
   import MapLoading from './MapLoading.svelte';
   import MapPeek from './MapPeek.svelte';
   import MapResults from './MapResults.svelte';
+  import { cardOf } from './mapCards.ts';
   import { markerHref } from './markerHref.ts';
   import { MarkerLoader } from './markerLoader.ts';
   import { MapPanelState } from './panelState.svelte.ts';
@@ -230,6 +231,7 @@
         {#if selected}
           <MapPeek
             item={selected}
+            card={cardOf(s.cards, selected)}
             href={markerHref(selected)}
             onClose={() => view.select(null)}
             onOpen={() => (view.select(null), onClose())}

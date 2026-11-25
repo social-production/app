@@ -41,6 +41,8 @@ export interface RegionQuery {
   /** Nearest first, or by when things happen (owner, 2026-11-23). */
   order: RegionOrder;
   offset: number;
+  /** Page size; the map asks for its whole area at once (up to 100). */
+  limit?: number;
 }
 
 export type RegionOrder = 'nearest' | 'soonest';

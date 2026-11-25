@@ -25,3 +25,9 @@
 .location-picker.location-portal {
   z-index: var(--z-menu);
 }
+
+/* The map overlay covers the page: the page's own dock (Join, Share) stays behind it rather
+   than floating over the map's list (owner, 2026-11-25). */
+.shell.shell-map-open .detail-action-dock {
+  display: none;
+}

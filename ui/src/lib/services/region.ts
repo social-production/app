@@ -13,7 +13,7 @@ export function regionFeed(q: RegionQuery): Promise<{ items: RegionItem[]; total
     include_online: String(q.includeOnline),
     order: q.order,
     offset: String(q.offset),
-    limit: '20',
+    limit: String(q.limit ?? 20),
     tzOffset: String(-new Date().getTimezoneOffset()),
   });
 }

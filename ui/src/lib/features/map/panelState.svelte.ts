@@ -5,6 +5,7 @@
 import { t } from '#lib/i18n/index.ts';
 import { emptyPlaceValue, type PlaceValue } from '#lib/domain/places.ts';
 import type { MapMarkerItem } from '#lib/domain/mapMarkers.ts';
+import type { RegionCard } from '#lib/domain/regionFeed.ts';
 import { writeMapPreferences } from '#lib/stores/mapPreferences.svelte.ts';
 import type { MapMarker } from '#lib/maps/adapter.ts';
 
@@ -44,6 +45,9 @@ export class MapPanelState {
   mapTileError = $state('');
   markers: MapMarker[] = [];
   listItems = $state<MapMarkerItem[]>([]);
+  /** The Region feed's card for each item on the map, by id: the list draws the feed's own
+   * card, and a pin's card its picture and type (owner, 2026-11-25). */
+  cards = $state<Record<string, RegionCard>>({});
   highlightedId = $state<string | null>(null);
   /** The pin whose card is open (Map Redesign). */
   selectedId = $state<string | null>(null);
