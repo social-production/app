@@ -15,6 +15,8 @@
     title: string;
     /** A direct chat's other person: their photo. */
     agent?: string | null;
+    /** A group's photo. */
+    picture?: string | null;
     /** A public chat's space type: its kind tile, as on feed cards, in place of initials. */
     mode?: CharterMode | null;
     preview: string;
@@ -31,6 +33,7 @@
   let {
     title,
     agent = null,
+    picture = null,
     mode = null,
     preview,
     time,
@@ -101,7 +104,7 @@
       aria-hidden="true"><KindGlyph kind={kindOf(mode)} size={20} /></span
     >
   {:else}
-    <AvatarBadge size="sm" name={title} {agent} />
+    <AvatarBadge size="sm" name={title} {agent} src={picture} />
   {/if}
   <div class="conversation-copy">
     <div class="conversation-topline">

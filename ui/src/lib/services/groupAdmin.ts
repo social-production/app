@@ -18,14 +18,33 @@ async function shrink(photo: Blob): Promise<Uint8Array> {
   const image = await createImageBitmap(photo);
   const side = Math.min(512, Math.max(image.width, image.height));
   const scale = side / Math.max(image.width, image.height);
-  const canvas = new OffscreenCanvas(
-    Math.round(image.width * scale),
-    Math.round(image.height * scale),
-  );
-  canvas.getContext('2d')?.drawImage(image, 0, 0, canvas.width, canvas.height);
+  const width = Math.round(image.width * scale);
+  const height = Math.round(image.height * scale);
+  const encode = canvasFor(width, height, (ctx) => ctx.drawImage(image, 0, 0, width, height));
   for (const quality of [0.85, 0.7, 0.55, 0.4]) {
-    const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality });
-    if (blob.size <= 96 * 1024) return new Uint8Array(await blob.arrayBuffer());
+    const blob = await encode(quality);
+    if (blob && blob.size <= 96 * 1024) return new Uint8Array(await blob.arrayBuffer());
   }
   throw new Error('That photo is too large. Try a smaller one.');
+}
+
+type Draw = (ctx: CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D) => void;
+
+/** A JPEG encoder: OffscreenCanvas where there is one, a page canvas on older Safari. */
+function canvasFor(width: number, height: number, draw: Draw) {
+  if (typeof OffscreenCanvas !== 'undefined') {
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      draw(ctx);
+      return (quality: number) => canvas.convertToBlob({ type: 'image/jpeg', quality });
+    }
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext('2d');
+  if (ctx) draw(ctx);
+  return (quality: number) =>
+    new Promise<Blob | null>((done) => canvas.toBlob(done, 'image/jpeg', quality));
 }

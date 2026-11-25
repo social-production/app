@@ -9,9 +9,11 @@
     /** Whose face it is: their photo is looked up when no `avatar` is given. */
     agent?: string | null;
     size?: 'xs' | 'sm' | 'md';
+    /** A ready picture URL (a group's photo), used before `avatar` and `agent`. */
+    src?: string | null;
   }
 
-  let { name, avatar = null, agent = null, size = 'md' }: Props = $props();
+  let { name, avatar = null, agent = null, size = 'md', src = null }: Props = $props();
 
   const source = avatarSource();
   const photo = $derived(avatar ?? (agent && source ? (source.of(agent) ?? null) : null));
@@ -36,8 +38,8 @@
   class:size-md={size === 'md'}
   class="avatar-badge"
 >
-  {#if url}
-    <img alt="" class="avatar-image" src={url} />
+  {#if src || url}
+    <img alt="" class="avatar-image" src={src ?? url} />
   {:else}
     {initials}
   {/if}

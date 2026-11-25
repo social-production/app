@@ -221,6 +221,7 @@
               <ChatRow
                 title={inbox.title(chat)}
                 agent={inbox.partner(chat)}
+                picture={chat.picture}
                 preview={inbox.preview(chat)}
                 time={relativeCompact(chat.last?.createdAt ?? chat.invitedAt)}
                 unread={chat.unread}

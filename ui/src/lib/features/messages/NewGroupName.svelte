@@ -64,14 +64,11 @@
     }}
   >
     <span class="group-glyph"><GroupsIcon /></span>
-    <input
-      bind:value={title}
-      type="text"
-      aria-label={t('Group name')}
-      placeholder={t('Group name')}
-      maxlength="200"
-      {@attach (node) => node.focus()}
-    />
+    <!-- The edit page's name card (owner, 2026-11-25: "Edit is better"). -->
+    <label class="group-name-card">
+      <span>{t('Group name')}</span>
+      <input bind:value={title} type="text" maxlength="200" {@attach (node) => node.focus()} />
+    </label>
   </form>
   {#if error}<p class="new-message-note error" role="alert">{error}</p>{/if}
   {#if creating}<p class="new-message-note">{t('Creating the group…')}</p>{/if}
