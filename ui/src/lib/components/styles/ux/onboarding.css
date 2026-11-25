@@ -171,8 +171,11 @@
   color: var(--on-brand);
 }
 
+/* Solid, not see-through: the button floats over the page, which scrolls under it (owner,
+   2026-11-25: the language link showed through the empty Log in button). */
 .shell .onboarding .button-primary:disabled {
-  opacity: 0.45;
+  background: color-mix(in srgb, var(--brand) 40%, var(--page-bg));
+  color: color-mix(in srgb, var(--on-brand) 75%, var(--page-bg));
 }
 
 .shell .onboarding .button-secondary {
