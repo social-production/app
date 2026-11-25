@@ -1,6 +1,14 @@
 /** web's search result kinds (types/search.ts) that the app has (no activities yet). */
 export type SearchResultKind =
-  'project' | 'thread' | 'event' | 'channel' | 'community' | 'profile' | 'help-request' | 'post';
+  | 'project'
+  | 'thread'
+  | 'event'
+  | 'meetup'
+  | 'channel'
+  | 'community'
+  | 'profile'
+  | 'help-request'
+  | 'post';
 
 /** web's `SearchEntityType` filter values for the kinds the app has. */
 export type SearchType =
@@ -39,6 +47,7 @@ export const searchKindLabels: Record<SearchResultKind, string> = {
   project: 'Project',
   thread: 'Thread',
   event: 'Event',
+  meetup: 'Meetup',
   channel: 'Channel',
   community: 'Community',
   profile: 'Profile',

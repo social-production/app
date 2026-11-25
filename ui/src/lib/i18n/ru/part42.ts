@@ -9,4 +9,6 @@ export const part42: Record<string, string> = {
   'New request': 'Новый запрос',
   'Requests in your projects and channels show up here.':
     'Здесь появляются запросы в ваших проектах и каналах.',
+  'Meetup activity': 'Активность встречи',
+  'Event activity': 'Активность события',
 };

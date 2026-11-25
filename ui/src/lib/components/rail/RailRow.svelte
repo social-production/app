@@ -4,7 +4,9 @@
 
   import KindGlyph from '#lib/components/icons/KindGlyph.svelte';
   import { railKicker, type RailItem } from '#lib/domain/activityRail.ts';
-  import { kindColor, kindOf } from '#lib/domain/kindGlyphs.ts';
+  import { kindColor, kindOfSpace } from '#lib/domain/kindGlyphs.ts';
+  import { SPACE_PICTURES, type SpacePictureOf } from '#lib/domain/scopes.ts';
+  import { getContext } from 'svelte';
 
   /** One row in Your activity (Screen Review §1, 2026-11-18): the kind's tile as on the feed
    * and the map, what it is and when, the title and its details; × clears it. */
@@ -20,7 +22,9 @@
   }
 
   let p: Props = $props();
-  const kind = $derived(kindOf(p.item.projectMode));
+  const kind = $derived(kindOfSpace(p.item.projectMode, p.item.subtype));
+  const pictureOf = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
+  const picture = $derived(p.item.picture ? (pictureOf?.(p.item.picture) ?? null) : null);
 </script>
 
 <article
@@ -28,8 +32,8 @@
   class:activity-row-unseen={p.unseen}
 >
   <button class="activity-open-button" type="button" onclick={p.onOpen}>
-    <span class="rail-tile" style={`--tile: ${kindColor(kind)}`}
-      ><KindGlyph {kind} size={18} /></span
+    <span class="rail-tile" class:has-picture={!!picture} style={`--tile: ${kindColor(kind)}`}
+      >{#if picture}<img src={picture} alt="" />{:else}<KindGlyph {kind} size={18} />{/if}</span
     >
     <span class="rail-copy">
       <span class="card-kicker">{railKicker(p.item)}{p.time ? ` · ${p.time}` : ''}</span>
