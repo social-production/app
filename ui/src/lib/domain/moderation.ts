@@ -107,7 +107,7 @@ export function itemLabelOf(mode: string): string {
     case 'event':
       return 'event';
     case 'help-request':
-      return 'help request';
+      return 'request';
     case 'thread':
       return 'thread';
     case 'post':

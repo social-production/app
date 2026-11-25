@@ -59,7 +59,7 @@ export async function placedHelpRequest(page, { title, text, place, tag, roles }
     await page.getByLabel('Role details').nth(i).fill(details);
   }
   await next(); // → Overview
-  await page.getByRole('button', { name: 'Publish help request' }).click();
+  await page.getByRole('button', { name: 'Publish request' }).click();
   await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
   return page.url().split('?')[0];
 }

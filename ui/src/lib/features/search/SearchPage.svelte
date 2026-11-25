@@ -31,7 +31,7 @@
     { value: 'project', label: t('Projects') },
     { value: 'thread', label: t('Threads') },
     { value: 'event', label: t('Events') },
-    { value: 'help_request', label: t('Help requests') },
+    { value: 'help_request', label: t('Requests') },
     { value: 'post', label: t('Posts') },
     { value: 'channel', label: t('Channels') },
     { value: 'community', label: t('Communities') },

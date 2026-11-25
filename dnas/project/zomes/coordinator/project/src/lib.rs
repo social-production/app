@@ -209,7 +209,7 @@ fn lifecycle(
     current: Phase,
 ) -> (Vec<PhaseStep>, Option<PhaseStep>, Vec<PhaseStep>, String) {
     if mode == sp_help::MODE {
-        return (Vec::new(), None, Vec::new(), "Help request".into());
+        return (Vec::new(), None, Vec::new(), "Request".into());
     }
     // Threads and posts never move either (ADR 0070).
     if mode == sp_discussion::THREAD {

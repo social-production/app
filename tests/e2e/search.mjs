@@ -58,7 +58,7 @@ assert.deepEqual(await chips.getByRole("radio").allInnerTexts(), [
   "Projects",
   "Threads",
   "Events",
-  "Help requests",
+  "Requests",
   "Posts",
   "Channels",
   "Communities",

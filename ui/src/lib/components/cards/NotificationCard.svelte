@@ -37,7 +37,7 @@
           : item.projectMode === 'event'
             ? 'Event'
             : item.projectMode === 'help-request'
-              ? 'Help request'
+              ? 'Request'
               : 'Project',
   );
   /** The map pins' and feed cards' symbol and colour for what the notice is about. */
@@ -48,7 +48,7 @@
         ? 'post'
         : subject === 'Event'
           ? 'event'
-          : subject === 'Help request'
+          : subject === 'Request'
             ? 'request'
             : kindOf(item.projectMode),
   );

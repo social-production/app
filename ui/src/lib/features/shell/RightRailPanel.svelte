@@ -152,7 +152,7 @@
             {item}
             unseen={unseen(item)}
             rowClass="help-request-row"
-            dismissLabel={t('Dismiss help request card')}
+            dismissLabel={t('Dismiss request card')}
             time={railTime(item.createdAt)}
             onOpen={() => openItem(item)}
             onDismiss={() => dismissRailItem(item.id)}
@@ -176,7 +176,7 @@
         <EmptyState
           icon="message"
           title={t('No requests to answer')}
-          text={t('Help and service requests in your projects and channels show up here.')}
+          text={t('Requests in your projects and channels show up here.')}
         />
       {/if}
     </div>

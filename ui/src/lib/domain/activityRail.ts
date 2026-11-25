@@ -276,7 +276,7 @@ export function railKicker(item: RailItem): string {
     return `${t('Vote')}${kind}`;
   }
   if (item.kind === 'request') return t('Service request');
-  if (isHelpKind(item.kind)) return t('Help request');
+  if (isHelpKind(item.kind)) return t('Request');
   return t('Project activity');
 }
 

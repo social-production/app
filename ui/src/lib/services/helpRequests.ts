@@ -37,7 +37,7 @@ export async function createHelpRequest(d: HelpDraft): Promise<string> {
     subtype: 'standard',
     location_label: d.location,
     place: d.place,
-    phase: 'Help request',
+    phase: 'Request',
     tags: d.tags,
   });
   const activity = {

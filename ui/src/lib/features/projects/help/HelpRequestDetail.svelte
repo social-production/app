@@ -91,7 +91,7 @@
         <DetailTopTabs
           active={tab}
           available={['context', 'chat']}
-          ariaLabel={t('Help request detail tabs')}
+          ariaLabel={t('Request detail tabs')}
           onSelect={(t) => (tab = t)}
         />
         {#if tab === 'context'}
@@ -105,7 +105,7 @@
               >
                 <ReportControl
                   id={help.id}
-                  itemLabel={t('help request')}
+                  itemLabel={t('request')}
                   moderation={help.moderation.value}
                   owner={project.creator}
                   copyUrl={`${location.origin}${location.pathname}`}

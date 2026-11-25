@@ -52,14 +52,14 @@
 </script>
 
 <CreateSheet
-  title={t('Ask for help')}
+  title={t('New request')}
   description={t(
-    'A help request asks people to take a role for a specific need, with a time and a place.',
+    'A request asks people to take a role for a specific need, with a time and a place.',
   )}
   steps={[...HELP_STEPS]}
   stepIndex={s.step}
   missing={s.missing}
-  submitLabel={t('Publish help request')}
+  submitLabel={t('Publish request')}
   submitting={s.submitting}
   onStep={(i) => (s.step = i)}
   onSubmit={() => void publish()}

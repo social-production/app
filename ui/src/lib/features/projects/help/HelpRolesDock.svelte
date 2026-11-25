@@ -29,7 +29,7 @@
 
   async function send(contact: Contact): Promise<string | null> {
     try {
-      await shareHelpRequest(contact, help.project?.charter?.title ?? t('Help request'), url);
+      await shareHelpRequest(contact, help.project?.charter?.title ?? t('Request'), url);
       return null;
     } catch (e) {
       return explain(e);
@@ -95,7 +95,7 @@
     {#if signedIn}
       <ShareUserMenu
         copyLinkUrl={url}
-        menuTitle={t('Share help request')}
+        menuTitle={t('Share request')}
         compact
         shareTitle={help.project.charter?.title ?? null}
         searchContacts={search}

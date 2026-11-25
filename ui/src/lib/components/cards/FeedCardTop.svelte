@@ -60,6 +60,8 @@
     onPicture?: (() => void) | undefined;
     children?: Snippet;
   } = $props();
+  // Requests were "help requests" (owner, 2026-11-25); older listings still say so.
+  const shownStage = $derived(stage === 'Help request' ? 'Request' : stage);
   const spacePicture = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
   const pictureUrl = $derived(picture ? (spacePicture?.(picture) ?? null) : null);
   // A #platform project takes a network vote (ADR 0095); threads and posts take none.
@@ -154,7 +156,7 @@
         {#if network}
           <span class="feed-card-stage network-vote">{t('Network vote')}</span>
         {:else if stage && !(mode === 'proposal' && stage === 'Proposal')}
-          <span class="feed-card-stage">{t(stage)}</span>
+          <span class="feed-card-stage">{t(shownStage)}</span>
         {/if}
         {@render clock()}
       </div>
@@ -173,7 +175,7 @@
     </div>
     <div class="feed-card-end">
       {#if isPrivate}<PrivateMark />{/if}
-      {#if stage}<span class="feed-card-stage">{t(stage)}</span>{/if}
+      {#if stage}<span class="feed-card-stage">{t(shownStage)}</span>{/if}
       {@render children?.()}
     </div>
   </div>
