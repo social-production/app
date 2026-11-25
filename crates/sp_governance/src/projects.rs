@@ -3,7 +3,9 @@
 
 const DAY_US: i64 = 24 * 60 * 60 * 1_000_000;
 
-pub const NEW_PROJECT_CAP: usize = 2;
+/// Ten a week until two vouches (owner, 2026-11-24; ADR 0120): room to start a real
+/// group's worth of proposals, threads and help requests, still a brake on a bot's flood.
+pub const NEW_PROJECT_CAP: usize = 10;
 pub const NEW_PROJECT_WINDOW_US: i64 = 7 * DAY_US;
 
 /// `earlier` holds the times of the creator's earlier listings; `now` is the new one's.
@@ -25,12 +27,16 @@ mod tests {
     use super::*;
 
     #[test]
-    fn two_per_week_for_new_members() {
+    fn ten_per_week_for_new_members() {
         let now = 100 * DAY_US;
+        let nine: Vec<i64> = (1..10).map(|h| now - h * 3_600_000_000).collect();
+        let ten: Vec<i64> = (1..11).map(|h| now - h * 3_600_000_000).collect();
         assert!(check_new_member_project_cap(&[], now).is_ok());
-        assert!(check_new_member_project_cap(&[now - DAY_US], now).is_ok());
-        assert!(check_new_member_project_cap(&[now - DAY_US, now - 2 * DAY_US], now).is_err());
+        assert!(check_new_member_project_cap(&nine, now).is_ok());
+        assert!(check_new_member_project_cap(&ten, now).is_err());
         // Older than 7 days no longer counts.
-        assert!(check_new_member_project_cap(&[now - 8 * DAY_US, now - 2 * DAY_US], now).is_ok());
+        let mut aged = nine.clone();
+        aged.push(now - 8 * DAY_US);
+        assert!(check_new_member_project_cap(&aged, now).is_ok());
     }
 }

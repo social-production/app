@@ -14,4 +14,6 @@ export const part39: Record<string, Entry> = {
   'Can vouch for people and mark bots.': 'Может ручаться за людей и отмечать ботов.',
   '{n} of 2 vouches; then they can vouch and mark bots.':
     '{n} из 2 поручительств; после этого можно ручаться и отмечать ботов.',
+  'New members can start 10 a week ({n} left). Full members have no limit.':
+    'Новые участники могут начать 10 в неделю (осталось {n}). У полноправных участников нет ограничений.',
 };
