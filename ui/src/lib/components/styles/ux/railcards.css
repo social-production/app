@@ -1,0 +1,146 @@
+/* Your activity's cards (Rail and Group Chat mockup §1, owner 2026-11-25): each card on its
+   own rounded surface under a day heading, the space's picture with its kind on the corner,
+   an activity's start in a chip and a vote's progress as a bar. */
+.right-rail .rail-tabs-panel .rail-tab-panel {
+  gap: 8px;
+}
+
+.right-rail .rail-tabs-panel .rail-day {
+  margin: 8px 2px 0;
+  color: var(--text-soft);
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.right-rail .rail-tabs-panel .rail-day:first-child {
+  margin-top: 2px;
+}
+
+.right-rail .rail-tabs-panel .rail-item.rail-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 8px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid var(--panel-border);
+  border-radius: 16px;
+  background: var(--panel);
+  box-shadow: none;
+}
+
+.right-rail .rail-tabs-panel .rail-card .activity-open-button {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 11px;
+  align-items: center;
+  padding: 0 22px 0 0;
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-tile {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-tile.has-picture {
+  background: var(--panel-hover);
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-tile-kind {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  display: grid;
+  place-items: center;
+  width: 19px;
+  height: 19px;
+  border: 2px solid var(--panel);
+  border-radius: 7px;
+  background: var(--tile);
+  color: var(--kind-on);
+}
+
+.right-rail .rail-tabs-panel .rail-card.activity-row-unseen .rail-tile::after {
+  top: -4px;
+  right: auto;
+  left: -4px;
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-clock {
+  align-self: center;
+  min-width: 48px;
+  padding: 5px 8px;
+  border-radius: 10px;
+  background: var(--panel-hover);
+  font-size: 12.5px;
+  font-weight: 700;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-clock small {
+  display: block;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-bar {
+  display: block;
+  height: 6px;
+  margin-top: 6px;
+  overflow: hidden;
+  border-radius: 9px;
+  background: var(--panel-hover);
+}
+
+.right-rail .rail-tabs-panel .rail-card .rail-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand);
+}
+
+.right-rail .rail-tabs-panel .rail-card .dismiss-card {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  font-size: 16px;
+}
+
+.right-rail .rail-tabs-panel .rail-card .vote-row-actions {
+  justify-content: flex-end;
+  padding-left: 55px;
+}
+
+.right-rail .rail-tabs-panel .rail-card .card-kicker {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.right-rail .rail-tabs-panel .rail-card .card-meta {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
+
+.right-rail .rail-tabs-panel .rail-card.vote-row .rail-bar {
+  margin-right: 92px;
+}
+
+.right-rail .rail-tabs-panel .rail-card .vote-row-actions {
+  margin-top: -34px;
+  pointer-events: none;
+}
+
+.right-rail .rail-tabs-panel .rail-card .vote-row-actions button {
+  pointer-events: auto;
+}

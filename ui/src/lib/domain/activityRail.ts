@@ -46,6 +46,10 @@ export interface RailItem {
   /** web's body preview (help requests). */
   body?: string;
   projectMode: CharterMode;
+  /** The project, event or meetup an activity belongs to. */
+  spaceTitle?: string;
+  /** Votes cast so far and the votes it needs (the card's bar). */
+  progress?: { votes: number; required: number };
   /** The space's subtype (`meetup`) and picture hash, added by the rail service. */
   subtype?: string;
   picture?: string | null;
@@ -139,12 +143,18 @@ function upcomingActivities(projects: RailProject[], now: number): RailItem[] {
       meta: a.place.trim() || (a.online ? 'Online' : ''),
       createdAt: a.startsAt,
       countLabel: signupLabel(a),
+      spaceTitle: p.title,
       projectMode: p.mode,
       activityId: a.id,
     }));
 }
 
 const tally = (t: { yes: number; no: number }): string => `${t.yes} yes / ${t.no} no`;
+
+const progressOf = (v: { yes: number; no: number; neutral: number; required: number }) => ({
+  votes: v.yes + v.no + v.neutral,
+  required: v.required,
+});
 
 const newestFirst = <T extends { createdAt: number }>(rows: T[]): T[] =>
   rows.slice().sort((a, b) => b.createdAt - a.createdAt);
@@ -229,6 +239,7 @@ function proposalItem(
     meta,
     createdAt: v.createdAt,
     countLabel: tally(v),
+    progress: progressOf(v),
     projectMode: p.mode,
     voteKindLabel: kind,
   };
@@ -248,6 +259,7 @@ function planItem(p: RailProject, x: PlanView): RailItem {
       : t('Assess and approve this plan'),
     createdAt: x.createdAt,
     countLabel: tally(x.tally),
+    progress: progressOf(x.tally),
     projectMode: p.mode,
     voteKindLabel: 'plan',
   };
