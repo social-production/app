@@ -253,3 +253,15 @@
 .shell .map-panel:has(.map-peek) .map-filter-top .map-locate-button {
   visibility: hidden;
 }
+
+/* A pin's card shows the item's picture when it has one, as its feed row does. */
+.shell .map-panel .map-peek-icon.has-picture {
+  overflow: hidden;
+  background: var(--panel-hover);
+}
+
+.shell .map-panel .map-peek-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}

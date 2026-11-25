@@ -5,6 +5,9 @@
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import { KIND_LABELS, kindColor, kindOfMarker } from '#lib/domain/kindGlyphs.ts';
   import type { MapMarkerItem } from '#lib/domain/mapMarkers.ts';
+  import type { RegionCard } from '#lib/domain/regionFeed.ts';
+  import { SPACE_PICTURES, type SpacePictureOf } from '#lib/domain/scopes.ts';
+  import { getContext } from 'svelte';
   import { formatMarkerScheduleRange } from '#lib/domain/markerTime.ts';
   import DirectionsSheet from './DirectionsSheet.svelte';
 
@@ -12,22 +15,36 @@
    * Directions and Open; the map stays where it is until you choose. */
   interface Props {
     item: MapMarkerItem;
+    /** The item's feed card (its parent's, for a session): picture and type. */
+    card?: RegionCard | null;
     href: ResolvedPathname;
     onClose: () => void;
     /** Opening the page leaves the map (its overlay closes). */
     onOpen: () => void;
   }
 
-  let { item, href, onClose, onOpen }: Props = $props();
+  let { item, card = null, href, onClose, onOpen }: Props = $props();
 
-  const kind = $derived(kindOfMarker(item));
+  // A meetup's session is a meetup's, not an event's (owner, 2026-11-25).
+  const kind = $derived(card?.subtype === 'meetup' ? 'meetup' : kindOfMarker(item));
+  const pictureOf = getContext<SpacePictureOf | undefined>(SPACE_PICTURES);
+  const picture = $derived(card?.picture ? (pictureOf?.(card.picture) ?? null) : null);
+  const session = $derived(item.entityType === 'activity' && !!item.parentTitle);
   const when = $derived(formatMarkerScheduleRange(item.scheduledAt, item.endsAt));
   const distance = $derived(
     item.distanceKm < 1
       ? `${Math.round(item.distanceKm * 1000)} m away`
       : `${item.distanceKm.toFixed(1)} km away`,
   );
-  const line = $derived([KIND_LABELS[kind], when, distance].filter(Boolean).join(' · '));
+  const line = $derived(
+    [
+      session ? t('Session of {name}', { name: item.parentTitle ?? '' }) : t(KIND_LABELS[kind]),
+      when,
+      distance,
+    ]
+      .filter(Boolean)
+      .join(' · '),
+  );
   let directionsOpen = $state(false);
   const to = $derived({
     latitude: item.latitude,
@@ -38,7 +55,9 @@
 
 <div class="map-peek" role="dialog" aria-label={item.title} style={`--pin: ${kindColor(kind)}`}>
   <div class="map-peek-head">
-    <span class="map-peek-icon"><KindGlyph {kind} size={18} /></span>
+    <span class="map-peek-icon" class:has-picture={!!picture}
+      >{#if picture}<img src={picture} alt="" />{:else}<KindGlyph {kind} size={18} />{/if}</span
+    >
     <div>
       <b>{item.title}</b>
       <small>{line}</small>

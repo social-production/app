@@ -4,6 +4,11 @@
   import EmptyState from '#lib/components/empty/EmptyState.svelte';
   import ToolbarIcon from '#lib/components/icons/ToolbarIcon.svelte';
   import MapDiscoveryCard from '#lib/components/map/MapDiscoveryCard.svelte';
+  import SpaceCard from '#lib/components/cards/SpaceCard.svelte';
+  import type { Stance } from '#lib/domain/projects.ts';
+  import { setSignal } from '#lib/services/projects.ts';
+  import { requireViewer } from '#lib/stores/authNotice.svelte.ts';
+  import { cardOf } from './mapCards.ts';
   import { markerHref } from './markerHref.ts';
   import type { MapPanelState } from './panelState.svelte.ts';
 
@@ -37,6 +42,13 @@
   });
 
   const isPast = (iso: string | null): boolean => !!iso && new Date(iso).getTime() < Date.now();
+
+  async function signal(id: string, next: Stance | null): Promise<void> {
+    if (!requireViewer('Sign in to support this project.')) {
+      throw new Error('Sign in to support this project.');
+    }
+    await setSignal(id, next);
+  }
 </script>
 
 <section class="list-panel" aria-label={t('Map results list')}>
@@ -63,16 +75,30 @@
     {/if}
     <div class="card-list">
       {#each s.listItems as item (item.id)}
-        <MapDiscoveryCard
-          {item}
-          href={markerHref(item)}
-          isPast={!s.upcomingOnly && isPast(item.scheduledAt)}
-          highlighted={s.highlightedId === item.id}
-          {onHover}
-          {onLeave}
-          {onSelect}
-          {onClose}
-        />
+        {@const card = item.entityType === 'activity' ? null : cardOf(s.cards, item)}
+        {#if card}
+          <!-- The feed's own card (owner, 2026-11-25); hovering lights its pin. -->
+          <!-- svelte-ignore a11y_no_static_element_interactions -->
+          <div
+            class="map-feed-card"
+            class:highlighted={s.highlightedId === item.id}
+            onmouseenter={() => onHover(item.id)}
+            onmouseleave={onLeave}
+          >
+            <SpaceCard {card} onSignal={(next) => signal(card.id, next)} />
+          </div>
+        {:else}
+          <MapDiscoveryCard
+            {item}
+            href={markerHref(item)}
+            isPast={!s.upcomingOnly && isPast(item.scheduledAt)}
+            highlighted={s.highlightedId === item.id}
+            {onHover}
+            {onLeave}
+            {onSelect}
+            {onClose}
+          />
+        {/if}
       {/each}
     </div>
   {/if}
