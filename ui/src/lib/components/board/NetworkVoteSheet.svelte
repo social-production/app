@@ -5,7 +5,7 @@
   /**
    * What a network vote is (Platform and Moderators mockups §1, §4; ADR 0095): on a project
    * tagged #platform, anyone can vote, not only its members, and the votes needed
-   * are sized from the people active last week.
+   * are sized from the people active in the last 7 days.
    */
   let {
     open,
@@ -15,8 +15,8 @@
 
   const sized = $derived(
     !weeklyActive
-      ? t('the people active last week')
-      : `the ${weeklyActive.toLocaleString()} ${weeklyActive === 1 ? 'person' : 'people'} active last week`,
+      ? t('the people active in the last 7 days')
+      : `the ${weeklyActive.toLocaleString()} ${weeklyActive === 1 ? 'person' : 'people'} active in the last 7 days`,
   );
 </script>
 

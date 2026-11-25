@@ -111,6 +111,8 @@
     kind: 'group',
     creator: '',
     manager: null,
+    managers: [],
+    picture: null,
     members: memberAgents,
     title: chat.title,
     last: null,

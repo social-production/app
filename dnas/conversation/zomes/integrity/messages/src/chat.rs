@@ -45,6 +45,17 @@ pub fn validate_entry(
             Ok(()) => allow(manager(t.by.as_ref())?, "only the manager names a group"),
             Err(reason) => invalid(&reason),
         },
+        EntryTypes::Manager(_) | EntryTypes::Picture(_) if !group => {
+            invalid("only groups have managers and a photo")
+        }
+        EntryTypes::Manager(m) if m.on && &m.agent == author => {
+            invalid("a manager is made by another manager")
+        }
+        EntryTypes::Manager(m) => allow(manager(m.by.as_ref())?, "only a manager makes managers"),
+        EntryTypes::Picture(p) if p.bytes.is_empty() || p.bytes.len() > crate::PICTURE_MAX => {
+            invalid("a group photo is at most 96 KB")
+        }
+        EntryTypes::Picture(p) => allow(manager(p.by.as_ref())?, "only a manager sets the photo"),
         EntryTypes::Removal(_) if !group => invalid("only groups remove people"),
         EntryTypes::Removal(r) if &r.agent == author => {
             invalid("leave instead of removing yourself")
@@ -210,6 +221,8 @@ pub fn validate_link(
         LinkTypes::ReportVotes => UnitEntryTypes::ReportVote,
         LinkTypes::Requests => UnitEntryTypes::ServiceRequest,
         LinkTypes::RequestStatuses => UnitEntryTypes::RequestStatus,
+        LinkTypes::Managers => UnitEntryTypes::Manager,
+        LinkTypes::Pictures => UnitEntryTypes::Picture,
         LinkTypes::Inbox => unreachable!("handled above"),
     };
     // Whether the entry itself was allowed is the entry's own validation.

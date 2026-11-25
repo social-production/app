@@ -3,6 +3,8 @@
 //! people they invited write there. The uncloned base cell is everyone's inbox: an `Inbox` link
 //! on a person's key carries an invitation (the chat's seed), encrypted to them.
 
+mod group;
+pub use group::{Manager, Picture, PICTURE_MAX};
 mod attachments;
 mod chat;
 mod report;
@@ -184,6 +186,8 @@ pub enum EntryTypes {
     Declined(Declined),
     ServiceRequest(ServiceRequest),
     RequestStatus(RequestStatus),
+    Manager(Manager),
+    Picture(Picture),
 }
 
 #[derive(Serialize, Deserialize)]
@@ -211,6 +215,9 @@ pub enum LinkTypes {
     ReportVotes,
     Requests,
     RequestStatuses,
+    /// Chat anchor → a manager grant or a group photo, by a manager (ADR 0122).
+    Managers,
+    Pictures,
 }
 
 /// Which network this cell is: one chat (its creator and kind) or the inbox.

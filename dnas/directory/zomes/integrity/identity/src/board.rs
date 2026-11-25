@@ -1,7 +1,7 @@
 //! Moderators, the weekly active count and deactivation (ADRs 0095 and 0088): links in the
 //! directory, written as yourself (the target is always the author) and never deleted.
 //! Candidacies hang from the "board" path; votes from the account voted on; `Active` from
-//! its week's path; `Deactivated` from the account itself. Who is a moderator, how many people were
+//! its day's path (ADR 0121); `Deactivated` from the account itself. Who is a moderator, how many people were
 //! active and who is deactivated is replayed by every reader (`sp_board`, `sp_active`); these
 //! rules only keep the history honest.
 
@@ -20,10 +20,10 @@ pub const BOARD_NEUTRAL: u8 = 2;
 /// The path every candidacy hangs from, so readers list the board with one read.
 pub const BOARD_PATH: &str = "board";
 
-/// The path an `Active` link for `week` starts from (`sp_active::week_of`).
+/// The path an `Active` link written on UTC `day` starts from (`sp_active::day_of`).
 #[must_use]
-pub fn active_path(week: i64) -> Path {
-    Path::from(format!("active.{week}"))
+pub fn active_path(day: i64) -> Path {
+    Path::from(format!("active.day.{day}"))
 }
 
 pub fn validate_create_link(
@@ -54,29 +54,29 @@ pub fn validate_create_link(
     }
 }
 
-/// One `Active` link per person per week, from that week's path, with no tag.
+/// An `Active` link is from its own day's path, with no tag, at most one an hour per person
+/// (ADR 0121: the rolling count is right to the hour without a link per action).
 fn validate_active(action: &TypedAction<CreateLinkData>) -> ExternResult<ValidateCallbackResult> {
     let at = action.timestamp().as_micros();
-    let week = sp_active::week_of(at);
-    let path = AnyLinkableHash::from(active_path(week).path_entry_hash()?);
+    let path = AnyLinkableHash::from(active_path(sp_active::day_of(at)).path_entry_hash()?);
     if action.base_address != path || !action.tag.0.is_empty() {
-        return invalid("an active link is from its own week's path, with no tag");
+        return invalid("an active link is from its own day's path, with no tag");
     }
-    let since = Timestamp::from_micros(sp_active::week_start(at));
+    let since = Timestamp::from_micros(at - sp_active::RECORD_GAP_US);
     let filter = ChainFilter::until_timestamp(prev_action_of(action.prev_action())?, since);
     let active: ScopedLinkType = LinkTypes::Active.try_into()?;
     let earlier = must_get_agent_activity(action.author().clone(), filter)?
         .into_iter()
         .any(|a| match &a.action.hashed.content.data {
             ActionData::CreateLink(l) => {
-                l.zome_index == active.zome_index
+                a.action.hashed.content.timestamp().as_micros() > at - sp_active::RECORD_GAP_US
+                    && l.zome_index == active.zome_index
                     && l.link_type == active.zome_type
-                    && l.base_address == path
             }
             _ => false,
         });
     if earlier {
-        return invalid("one active link per person per week");
+        return invalid("one active link per person an hour");
     }
     valid()
 }

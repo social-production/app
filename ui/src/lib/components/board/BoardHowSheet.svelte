@@ -16,7 +16,7 @@
     ],
     [
       'A seat',
-      'Enough votes (sized from the people active last week) and at least 66% yes. With nobody active last week, a volunteer is seated straight away.',
+      'Enough votes (sized from the people active in the last 7 days) and at least 66% yes. With nobody active in the last 7 days, a volunteer is seated straight away.',
     ],
     [
       "A week's grace",

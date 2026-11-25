@@ -240,11 +240,15 @@
     {title}
     me={inbox.me}
     manager={chat.manager}
+    managers={chat.managers}
+    picture={chat.picture}
     {members}
     search={(q) => inbox.search(q)}
     onRename={(name) => inbox.rename(seed, name)}
     onAdd={(c) => inbox.addMember(seed, c.agent)}
     onRemove={(c) => inbox.removeMember(seed, c.agent)}
+    onManager={(c, on) => inbox.setManager(seed, c.agent, on)}
+    onPicture={(photo) => inbox.setPicture(seed, photo)}
     onClose={onInfoClose}
   />
 {/if}

@@ -1,5 +1,6 @@
-/** The weekly active count (ADR 0095): the first meaningful action of each week also writes
- * this person's `Active` link in the directory (the zome skips it if one exists this week). */
+/** The weekly active count (ADR 0095, rolling since ADR 0121): a meaningful action also writes
+ * this person's `Active` link in the directory, at most one an hour (the zome skips it if one
+ * exists within the hour). */
 
 /** Zome functions that count as taking part (web's `record_meaningful_action` callers). */
 const MEANINGFUL = new Set([
@@ -25,23 +26,21 @@ const MEANINGFUL = new Set([
   'vote_bot_review',
 ]);
 
-const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
-/** Weeks start on Monday 00:00 UTC; 1970-01-01 was a Thursday (`sp_active::week_of`). */
-const weekOf = (ms: number): number => Math.floor((ms - 4 * 24 * 60 * 60 * 1000) / WEEK_MS);
+const HOUR_MS = 60 * 60 * 1000;
 
-let recordedWeek = -1;
+let recordedAt = -Infinity;
 
-/** After a successful call: write this week's link once, in the background. */
+/** After a successful call: write a link at most once an hour, in the background. */
 export function noteCall(fn: string, record: () => Promise<unknown>): void {
   if (!MEANINGFUL.has(fn)) return;
-  const week = weekOf(Date.now());
-  if (week === recordedWeek) return;
-  recordedWeek = week;
+  const now = Date.now();
+  if (now - recordedAt < HOUR_MS) return;
+  recordedAt = now;
   // A little later: the action that got here is often followed at once by another write to
   // the directory (publishing lists the project), and two writes at once refuse one of them.
   setTimeout(() => {
     void record().catch(() => {
-      recordedWeek = -1; // try again on the next action
+      recordedAt = -Infinity; // try again on the next action
     });
   }, 5000);
 }

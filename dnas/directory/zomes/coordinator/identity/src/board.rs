@@ -8,11 +8,10 @@ use hdk::prelude::*;
 use identity_integrity::{
     LinkTypes, BOARD_NEUTRAL, BOARD_NO, BOARD_PATH, BOARD_YES, VOLUNTEER, WITHDRAW,
 };
-use sp_active::counted_week;
 use sp_board::{replay, Act, Kind, Standing, State};
 use sp_governance::quorum::required_votes;
 
-use crate::active::Counter;
+use crate::active::Window;
 use crate::guest_error;
 use crate::records::links;
 use crate::standing::votes_at;
@@ -93,10 +92,9 @@ fn vote_kind(tag: u8) -> Option<Kind> {
     }
 }
 
-/// Each account that ever volunteered, replayed to `at`, and the weekly active count at `at`.
+/// Each account that ever volunteered, replayed to `at`, and the rolling active count at `at`.
 pub fn states(at: i64) -> ExternResult<(BTreeMap<AgentPubKey, State<AgentPubKey>>, u32)> {
     let candidacies = counted(links(board_path()?, LinkTypes::BoardCandidacy)?, candidacy)?;
-    let mut counter = Counter::default();
     let accounts: BTreeSet<AgentPubKey> = candidacies.iter().map(|a| a.who.clone()).collect();
     let mut acts: BTreeMap<AgentPubKey, Vec<Act<AgentPubKey>>> = BTreeMap::new();
     for c in candidacies {
@@ -106,18 +104,15 @@ pub fn states(at: i64) -> ExternResult<(BTreeMap<AgentPubKey, State<AgentPubKey>
         let votes = counted(links(account.clone(), LinkTypes::BoardVotes)?, vote_kind)?;
         acts.entry(account.clone()).or_default().extend(votes);
     }
-    // The quorum at any time: `required_votes` of the last complete week's count.
+    // The quorum at any moment: `required_votes` of the rolling count then (ADR 0121).
     let first = acts.values().flatten().map(|a| a.at).min().unwrap_or(at);
-    let mut quorums = BTreeMap::new();
-    for week in counted_week(first)..=counted_week(at) {
-        quorums.insert(week, required_votes(counter.week(week)?));
-    }
-    let quorum = |t: i64| quorums.get(&counted_week(t)).copied().unwrap_or(0);
+    let window = Window::load(first.min(at), at)?;
+    let quorum = |t: i64| required_votes(window.count(t));
     let out = acts
         .iter()
         .map(|(who, acts)| (who.clone(), replay(who, acts, at, quorum)))
         .collect();
-    let weekly = counter.week(counted_week(at))?;
+    let weekly = window.count(at);
     Ok((out, weekly))
 }
 

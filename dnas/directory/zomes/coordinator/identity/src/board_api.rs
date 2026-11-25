@@ -56,11 +56,11 @@ pub fn deactivated_since(agent: AgentPubKey) -> ExternResult<Option<Timestamp>> 
     deactivation::since(&agent)
 }
 
-/// Write an `Active` link from `week`'s path exactly as asked, skipping `record_active`'s
-/// check (see `submit_vouch`): tests prove a wrong week or a second link fails.
+/// Write an `Active` link from `day`'s path exactly as asked, skipping `record_active`'s
+/// check (see `submit_vouch`): tests prove a wrong day or a second link within the hour fails.
 #[hdk_extern]
-pub fn submit_active_link(week: i64) -> ExternResult<ActionHash> {
+pub fn submit_active_link(day: i64) -> ExternResult<ActionHash> {
     let me = agent_info()?.agent_initial_pubkey;
-    let path = identity_integrity::active_path(week).path_entry_hash()?;
+    let path = identity_integrity::active_path(day).path_entry_hash()?;
     create_link(path, me, identity_integrity::LinkTypes::Active, ())
 }
