@@ -3,7 +3,7 @@
 
 use hdk::prelude::*;
 use project_integrity::ProposalKind;
-use sp_governance::phases::{next_phase, signal_gate_met, Phase, Shape, PROPOSAL};
+use sp_governance::phases::{next_phase, signal_gate_met, stage_label, Phase, Shape, PROPOSAL};
 use sp_governance::plans::{required_plan_kinds, Leader};
 use sp_governance::returns::can_return;
 
@@ -41,6 +41,13 @@ pub fn check_phase_move(state: &State, to: &str) -> ExternResult<Option<ActionHa
         },
         None => shape,
     };
+    // A second tap on a move that already passed (owner, 2026-11-25): say where it is now.
+    if Phase::parse(to).is_some_and(|t| t <= current) {
+        return Err(guest(format!(
+            "It has already moved: it is in {} now.",
+            stage_label(shape, current)
+        )));
+    }
     let gated = !kinds.is_empty() && leader.is_none();
     if !gated && next_phase(leaving, current).map(Phase::id) != Some(to) {
         return Err(guest("A project can only move to its next phase."));

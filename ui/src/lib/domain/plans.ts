@@ -187,13 +187,44 @@ export function planKindFor(mode: CharterMode, phase: string): PlanKind | null {
 export const planPhaseOf = (kind: PlanKind): string =>
   kind === 'Production' || kind === 'Organisation' || kind === 'Event' ? 'phase-2' : 'phase-3';
 
+/** Answers in words that fit a question (Plan review mockup, owner 2026-11-25); 1–5 below. */
 export const PLAN_RATING_OPTIONS: { value: PlanRating; label: string }[] = [
-  { value: 1, label: t('Strongly oppose') },
-  { value: 2, label: 'Oppose' },
-  { value: 3, label: 'Neutral' },
-  { value: 4, label: 'Support' },
-  { value: 5, label: t('Strongly support') },
+  { value: 1, label: t('No') },
+  { value: 2, label: t('Not really') },
+  { value: 3, label: t('Unsure') },
+  { value: 4, label: t('Mostly') },
+  { value: 5, label: t('Yes, fully') },
 ];
+
+/** Each rubric question's tag and short form (sp_governance::rubric ids). */
+const RUBRIC_SHORT: Record<string, [string, string]> = {
+  'rubric:description-clarity': ['Clarity', 'Clear what and why?'],
+  'rubric:achievability': ['Achievable', 'Realistically achievable?'],
+  'rubric:timing-suitable': ['Timing', 'Timing realistic?'],
+  'rubric:location-appropriate': ['Place', 'Place appropriate and accessible?'],
+  'rubric:production-approach': ['Approach', 'Production approach appropriate?'],
+  'rubric:repository-clear': ['Repository', 'Repository clear enough?'],
+  'rubric:access-approach': ['Access', 'Access and requests appropriate?'],
+};
+
+/** The small tag over a question: what it asks about, or "Shared value". */
+export function criterionTag(c: PlanCriterion): string {
+  if (c.kind === 'Value') return t('Shared value');
+  return t(RUBRIC_SHORT[c.id]?.[0] ?? 'Plan');
+}
+
+/** The full question, as asked one per screen. */
+export function criterionQuestion(c: PlanCriterion): string {
+  return c.kind === 'Value'
+    ? t('How well does it satisfy "{value}"?', { value: c.label })
+    : t(c.label);
+}
+
+/** The question in a few words, for the list of your answers. */
+export function criterionShort(c: PlanCriterion): string {
+  if (c.kind === 'Value') return c.label;
+  return t(RUBRIC_SHORT[c.id]?.[1] ?? c.label);
+}
 
 export function ratingLabel(rating: PlanRating | null): string {
   return PLAN_RATING_OPTIONS.find((o) => o.value === rating)?.label ?? t('Not rated');

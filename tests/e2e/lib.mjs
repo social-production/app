@@ -295,28 +295,25 @@ export async function startGroup(page, title, members, body, shot = async () => 
 }
 
 /**
- * Review an opened plan sheet one question at a time (owner, 2026-11-18): rate each "4" and
- * vote Yes on the last. Returns each question's kind line, e.g. "Plan · Shared value · 3 of 3".
+ * Review an opened plan sheet (Plan review mockup, owner 2026-11-25): answer each question
+ * "Mostly" (4), which moves on by itself, then vote Yes on the answers page. Returns each
+ * question's tag and text, e.g. "Shared value · How well does it satisfy "Safety"?".
  */
 export async function reviewPlan(page, onQuestion = async () => {}) {
-  await page.getByRole('button', { name: /^Review · \d+ questions$/ }).click();
+  await page.getByRole('button', { name: /^Review and vote/ }).click();
   const sheet = page.locator('.overlay-root.plan-scope');
   const kinds = [];
   for (let i = 0; i < 20; i++) {
-    const row = sheet.locator('.criterion-row');
-    await row.waitFor();
-    kinds.push(`${await sheet.locator('.vote-kicker').innerText()} · ${await sheet.locator('h2').innerText()}`);
-    await row.getByRole('button', { name: /^4$/ }).click();
-    await row.getByText('Your rating: Support').waitFor({ timeout: 30_000 });
+    const question = sheet.locator('.plan-q');
+    await question.or(sheet.locator('.plan-answers')).first().waitFor();
+    if (!(await question.count())) break;
+    const asked = await sheet.locator('h2').innerText();
+    kinds.push(`${await sheet.locator('.plan-q-tag').innerText()} · ${asked}`);
     await onQuestion(i);
-    const yes = sheet.locator('.choice-bar .choice.yes');
-    if (await yes.count()) {
-      await yes.click();
-      break;
-    }
-    await sheet.getByRole('button', { name: 'Next', exact: true }).click();
-    await sheet.getByText(`${i + 2} of`).waitFor();
+    await question.getByRole('radio', { name: /Mostly$/ }).click();
+    await sheet.locator('h2', { hasNotText: asked }).waitFor({ timeout: 30_000 });
   }
+  await sheet.locator('.choice-bar .choice.yes').click();
   await sheet.getByRole('button', { name: /You voted Yes/ }).waitFor({ timeout: 30_000 });
   return kinds;
 }
