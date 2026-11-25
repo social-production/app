@@ -49,11 +49,8 @@
       ? `${Math.round(item.distanceKm * 1000)} m`
       : `${item.distanceKm.toFixed(1)} km`,
   );
-  const when = $derived(
-    sessions.length ? '' : formatMarkerScheduleRange(item.scheduledAt, item.endsAt),
-  );
   const line = $derived(
-    [t(KIND_LABELS[kind]), channel, when, approximate ? t('about here') : distance]
+    [t(KIND_LABELS[kind]), channel, approximate ? t('about here') : distance]
       .filter(Boolean)
       .join(' · '),
   );
@@ -82,6 +79,21 @@
       ? t('{n} of {min}', { n, min: s.minimumParticipants })
       : t('{n} going', { n });
   };
+  // An event with no sessions gets its own date row, like a session's (owner, 2026-11-25:
+  // the date crammed into the type line looked messy).
+  const own = $derived(!sessions.length && !!item.scheduledAt);
+  const sameDay = $derived(
+    !item.endsAt ||
+      day(item.scheduledAt, { dateStyle: 'short' }) === day(item.endsAt, { dateStyle: 'short' }),
+  );
+  const ownDate = $derived(
+    sameDay
+      ? day(item.scheduledAt, { weekday: 'long', day: 'numeric', month: 'long' })
+      : formatMarkerScheduleRange(item.scheduledAt, item.endsAt),
+  );
+  const ownDetail = $derived(
+    [sameDay ? times(item) : '', shortPlace(item.displayLabel)].filter(Boolean).join(' · '),
+  );
 </script>
 
 <div class="map-peek" role="dialog" aria-label={title} style={`--pin: ${kindColor(kind)}`}>
@@ -97,7 +109,23 @@
       <ToolbarIcon name="x" />
     </button>
   </div>
-  {#if shown.length > 0}
+  {#if own}
+    <div class="map-peek-sessions">
+      <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
+      <a class="map-peek-session" {href} onclick={onOpen}>
+        <span class="map-peek-day"
+          ><small>{day(item.scheduledAt, { weekday: 'short' })}</small><b
+            >{day(item.scheduledAt, { day: 'numeric' })}</b
+          ></span
+        >
+        <span class="map-peek-session-copy">
+          <b>{ownDate}</b>
+          {#if ownDetail}<span>{ownDetail}</span>{/if}
+        </span>
+        {#if going(item)}<em>{going(item)}</em>{/if}
+      </a>
+    </div>
+  {:else if shown.length > 0}
     <div class="map-peek-sessions">
       {#each shown as s (s.id)}
         <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -- resolved by markerHref -->
