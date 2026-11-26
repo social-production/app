@@ -1,4 +1,4 @@
-# Status: where the P2P app stands (updated 2026-11-25 by the UX cloud session; start at the newest "START HERE")
+# Status: where the P2P app stands (updated 2026-11-26 by the UX cloud session; start at the newest "START HERE")
 
 Read this first in a new chat, then `CLAUDE.md` (it has a **Cloud sessions** section), `README.md`
 (roadmap) and `docs/CODE_RULES.md`. The workspace-level `../STATUS.md` covers web/web-backend.
@@ -182,6 +182,31 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
+## START HERE (2026-11-26 midday, UX cloud session): #330–#332, the older open items closed; service dock mockup
+- **Demo moderators (live, no PR):** after the 25 Nov reset the board needed 4 votes a seat
+  (5 active). The two dev founders and the three demo accounts voted Yes on each other
+  (scratchpad `seat.cjs`); maya_k, tomas_b and priya_r are seated, 4 of 4 yes each.
+- **#330 push for every notice kind:** `services/pushAsks.ts`: a comment that answers no one
+  pushes "replied to your project/thread/post/event/request" to the owner, Messages › Public
+  chats push replies too, and an opened bot review asks the people sharing a project with the
+  account ("Is X a real person?"). Every `NotificationKind` now has a sender.
+- **#331 captures (Notifications, Devices, Account, mic, Request service, Request create
+  flow; 390 px light/dark, signed in locally against the live gateway):** reply cards name what
+  you started instead of always "project". Keys stay shown whole (tests read them).
+- **Joined docks:** the Request create flow, mic, notify and Request service sheets already
+  had them (#265 + `sheetjoin.css`); no sheet footer is left outside the rule. No PR.
+- **#332 bot report UX:** New members could not vote in a bot review from the profile, though
+  ADR 0118 and the zome allow it (fixed); the card is the vote sheets' bar + joined
+  Real person | Bot, all through `t()` (`ru/part46.ts`); the can't-mark hint says two vouches.
+- **Dock review (live, every type, guest and member, Details and Take part):** joined and
+  complete everywhere except services. The owner (2026-11-26): "that request button is whack",
+  and a software service with requests is "a bunch of pluses". A non-member's Take part is
+  Join, Share, Request, Your requests (no words, two greens); a software member's is Add
+  activity, Pull request, Repository, Requests, Phase (five, so "+ + ⑂ ≡"). Mockup, waiting
+  on the owner's pick: https://claude.ai/artifact/Xd48ggwyx9HeMxWo5oopVD (recommended A:
+  Request ▾ and + Add ▾ menus, Repository inside Phase ▾).
+- **Not run:** the local seed browser tests (`notifications.mjs`, `bot-reviews.mjs`).
+
 ## START HERE (2026-11-26 early, UX cloud session): #324–#328
 - **#324:** a group's photo shows in the chat header and chats list (it only showed on the
   group page, so it looked unsaved); it appears at once while saving; Save closes the page;
@@ -253,8 +278,7 @@ Each its own PR, merged after green CI.
   previews (deleted before commit) and live at 390 px, light and dark.
 - **Not seen yet:** two sessions at once and the "about here" halo on live (no such data yet).
 - **Open:** the basketball demo carries the "testing" channel; fix demo channel tags or reseed.
-  Older pending: #22 captures, #24 push for every notice, #36 joined docks (request flow, mic
-  and notify sheets), #57 dock review, #58 bot report UX.
+  Older pending items: done 2026-11-26 (see that START HERE).
 
 ## START HERE (2026-11-24, day cloud session): the owner's replies to the mockups
 The owner answered Owner Notes Mockups in the morning ("All look great"), with notes. Built
