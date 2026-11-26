@@ -2,11 +2,13 @@ import type { BotReview } from '#lib/domain/botReview.ts';
 import { ownCopy, theirCopy, type BotNotice } from '#lib/domain/botReviewNotifications.ts';
 import { getBotReview } from '#lib/services/botReview.ts';
 import { namesOf } from '#lib/services/people.ts';
+import { reviewVoteNotice } from '#lib/services/pushAsks.ts';
 import { botReviewNotice } from '#lib/services/pushNotices.ts';
 
 /**
  * Push for a bot review this device's mark or vote just opened or closed (ADR 0108): the
- * account hears its own copy, and whoever had marked it hears theirs, as the cards say.
+ * account hears its own copy, and whoever had marked it hears theirs, as the cards say. An
+ * opened review also asks the people who share a project with the account.
  */
 export async function tellReview(account: string, before: BotReview | undefined): Promise<void> {
   if (!before) return;
@@ -31,4 +33,7 @@ export async function tellReview(account: string, before: BotReview | undefined)
   const markers = [...new Set([...before.markers, ...after.markers])].filter((m) => m !== account);
   await botReviewNotice([account], 'bot-review', ownCopy(n), account);
   await botReviewNotice(markers, 'bot-review-result', theirCopy(n, name), account);
+  if (kind === 'opened') {
+    await reviewVoteNotice(account, markers, theirCopy({ ...n, kind: 'vote' }, name));
+  }
 }
