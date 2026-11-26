@@ -12,7 +12,17 @@ import { cellFor, myProjectSeeds, type ProjectRef } from './projects.ts';
 interface Glance {
   creator: AgentPubKey;
   members: AgentPubKey[];
+  charter: { mode: string } | null;
 }
+
+/** What the owner started, as their reply card names it. */
+const NOUN: Record<string, string> = {
+  thread: 'thread',
+  post: 'post',
+  event: 'event',
+  'help-request': 'request',
+  proposal: 'proposal',
+};
 
 async function glance(cell: Awaited<ReturnType<typeof projectCell>>): Promise<Glance | null> {
   return callCell<Glance | null>(cell, 'project', 'get_project');
@@ -34,7 +44,8 @@ export async function replyNotice(
     const p = await glance(await cellFor(project));
     if (!p) return;
     const owner = hashToString(p.creator);
-    await notify([owner], 'reply', (me) => `${me} replied to your project`, body, link);
+    const noun = NOUN[p.charter?.mode ?? ''] ?? 'project';
+    await notify([owner], 'reply', (me) => `${me} replied to your ${noun}`, body, link);
   } catch {
     /* Best effort. */
   }
