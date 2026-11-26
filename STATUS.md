@@ -182,7 +182,7 @@ frames under `project/*.dc.html`).
 11. Post Header options (option A): https://claude.ai/artifact/UZFHQJuuozrxSRXd9xZ2qM
 12. Detail Page Mockups: https://claude.ai/artifact/2Svg4vucNtbCK9E7ZyNnop
 13. Nav and Feed Mockups: https://claude.ai/artifact/74TJNbHMNYBmvHWSohaDbd
-## START HERE (2026-11-26 midday, UX cloud session): #330–#332, the older open items closed; service dock mockup
+## START HERE (2026-11-26 midday, UX cloud session): #330–#334, the older open items closed; service docks
 - **Demo moderators (live, no PR):** after the 25 Nov reset the board needed 4 votes a seat
   (5 active). The two dev founders and the three demo accounts voted Yes on each other
   (scratchpad `seat.cjs`); maya_k, tomas_b and priya_r are seated, 4 of 4 yes each.
@@ -199,12 +199,16 @@ frames under `project/*.dc.html`).
   ADR 0118 and the zome allow it (fixed); the card is the vote sheets' bar + joined
   Real person | Bot, all through `t()` (`ru/part46.ts`); the can't-mark hint says two vouches.
 - **Dock review (live, every type, guest and member, Details and Take part):** joined and
-  complete everywhere except services. The owner (2026-11-26): "that request button is whack",
-  and a software service with requests is "a bunch of pluses". A non-member's Take part is
-  Join, Share, Request, Your requests (no words, two greens); a software member's is Add
-  activity, Pull request, Repository, Requests, Phase (five, so "+ + ⑂ ≡"). Mockup, waiting
-  on the owner's pick: https://claude.ai/artifact/Xd48ggwyx9HeMxWo5oopVD (recommended A:
-  Request ▾ and + Add ▾ menus, Repository inside Phase ▾).
+  complete everywhere except services, which the owner then flagged ("that request button is
+  whack"; a software service was "a bunch of pluses").
+- **#334 service docks (mockup option A, approved; https://claude.ai/artifact/Xd48ggwyx9HeMxWo5oopVD):**
+  - One plain Request segment; with requests to list as well it is Request ▾ (non-members)
+    or Requests ▾ (members): New request, Your requests (n).
+  - One green "+ Add activity", or "+ Add ▾" (Activity, Pull request) on software services.
+  - The repository votes moved into the Phase ▾ sheet as a "Repository" group (`PhaseMoveSheet`
+    `extras`); `SoftwareDock` and `RepositoryMenu` are gone (`AddMenu` is new).
+  - Dock segments no longer shrink (a crowded dock goes tight instead of clipping), and tight
+    menus keep their words. `software.mjs` and `collective-requests.mjs` were updated but not run.
 - **Not run:** the local seed browser tests (`notifications.mjs`, `bot-reviews.mjs`).
 
 ## START HERE (2026-11-26 early, UX cloud session): #324–#328
