@@ -77,10 +77,25 @@
   font-size: 0;
 }
 
-.shell
-  .dock-capsule.tight
-  :is(.round-plus-button:not(.no-plus) .plus-label, .phase-action-group .label) {
+.shell .dock-capsule.tight .round-plus-button:not(.no-plus) .plus-label {
   display: none;
+}
+
+/* A menu (Phase ▾, Requests ▾, + Add ▾) has no icon to fall back on, so it keeps its word and
+   only narrows; and no segment shrinks, so a crowded dock goes tight instead of clipping one
+   (owner, 2026-11-26: the service dock's "+ + ≡" and a clipped "Add activity"). */
+.shell.shell .dock-capsule :is(.round-plus-button, .phase-menu-trigger).round-plus-button,
+.shell.shell .dock-capsule .phase-menu-trigger.phase-menu-trigger {
+  flex-shrink: 0;
+}
+
+/* The green "+ Add ▾" narrows to "+ ▾" like the plain "+ Add activity" narrows to "+". */
+.shell .dock-capsule.tight .phase-menu-trigger.standout .label {
+  display: none;
+}
+
+.shell .dock-capsule.tight .phase-menu-trigger.phase-menu-trigger.phase-menu-trigger {
+  padding: 0 12px;
 }
 
 .shell .dock-capsule .round-plus-button .toolbar-icon {

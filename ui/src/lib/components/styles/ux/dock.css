@@ -461,3 +461,17 @@
   background: var(--brand-strong);
   color: var(--on-brand);
 }
+
+/* "+ Add ▾": the dock's one green add action when there is more than one thing to add
+   (owner-approved service dock mockup, 2026-11-26). */
+.shell .dock-capsule .phase-menu-trigger.standout.standout.standout {
+  background: var(--brand);
+  color: var(--on-brand);
+}
+
+.shell .dock-capsule .phase-menu-trigger.standout .plus {
+  margin-right: 2px;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+}

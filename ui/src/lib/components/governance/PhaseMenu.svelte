@@ -24,6 +24,8 @@
     sheetTitle?: string;
     /** Opens the caller's own sheet instead of this list (the one-sheet phase move). */
     onOpen?: () => void;
+    /** The dock's green "+ Add ▾" (service docks, owner-approved mockup 2026-11-26). */
+    standout?: boolean;
   }
 
   let {
@@ -33,6 +35,7 @@
     label = 'Phase',
     sheetTitle = 'Change phase',
     onOpen,
+    standout = false,
   }: Props = $props();
 
   let open = $state(false);
@@ -51,6 +54,7 @@
     <button
       class="phase-menu-trigger"
       class:muted={!hasChoice}
+      class:standout
       data-participation-action="propose-advance"
       type="button"
       aria-haspopup="dialog"
@@ -58,6 +62,7 @@
       title={sheetTitle}
       onclick={() => (onOpen ? onOpen() : (open = true))}
     >
+      {#if standout}<span class="plus" aria-hidden="true">+</span>{/if}
       <span class="label">{t(label)}</span>
       <svg class="caret" aria-hidden="true" viewBox="0 0 24 24"
         ><path

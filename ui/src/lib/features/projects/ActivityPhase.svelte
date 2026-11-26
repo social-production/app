@@ -20,7 +20,6 @@
   import { ActivitiesState, stageOptions } from './activitiesState.svelte.ts';
   import type { DetailState } from './detailState.svelte.ts';
   import CollectiveRequests from './requests/CollectiveRequests.svelte';
-  import SoftwareDock from './software/SoftwareDock.svelte';
   import SoftwarePanel from './software/SoftwarePanel.svelte';
   import { openSoftwareLink } from './software/softwareLink.ts';
   import SoftwareWizard from './software/SoftwareWizard.svelte';
@@ -142,7 +141,17 @@
       onActivity={focus}
       onCreate={() =>
         state.composing ? (state.composing = false) : state.openComposer(composerDay, planWindow)}
-      extra={software && sw.governance?.canPropose ? dock : undefined}
+      adds={software && sw.governance?.canPropose
+        ? [
+            {
+              id: 'pull-request',
+              glyph: '⑂',
+              label: t('Pull request'),
+              detail: t('Propose a change to the code for members to vote on.'),
+              onSelect: () => sw.open('create-pr'),
+            },
+          ]
+        : undefined}
     />
     {#if state.showing === 'upcoming' || !hasPast}
       <section class="card-rail-section live-section">
@@ -235,8 +244,4 @@
     onCheckIn={state.checkIn}
     onRate={state.rate}
   />
-{/snippet}
-
-{#snippet dock()}
-  <SoftwareDock {sw} />
 {/snippet}
