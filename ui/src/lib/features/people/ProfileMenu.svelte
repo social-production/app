@@ -63,7 +63,7 @@
   }
 
   function markRow(): ChatMenuItem {
-    const why = p.marked || p.canMark ? '' : t('Opens once a full member vouches for you.');
+    const why = p.marked || p.canMark ? '' : t('Opens once two full members vouch for you.');
     return {
       label: p.marked ? t('Clear bot mark') : t('Mark {name} as a bot', { name }),
       icon: 'bot',
