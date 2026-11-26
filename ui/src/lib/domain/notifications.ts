@@ -137,6 +137,15 @@ export function projectNotifications(p: ProjectActivity, me: string, myName: str
 }
 
 /** Chat replies and @mentions (governance.py `_notify_comment_recipients`). */
+/** The owner's reply lead names what they started (a thread isn't a "project"). */
+const OWN_LEAD: Partial<Record<CharterMode, string>> = {
+  thread: 'Replied to your thread',
+  post: 'Replied to your post',
+  event: 'Replied to your event',
+  'help-request': 'Replied to your request',
+  proposal: 'Replied to your proposal',
+};
+
 function chatNotifications(p: ProjectActivity, me: string, myName: string): Unread[] {
   const base = { subject: 'project' as const, seed: p.seed, projectMode: p.mode };
   const out: Unread[] = [];
@@ -162,7 +171,7 @@ function chatNotifications(p: ProjectActivity, me: string, myName: string): Unre
       m.replyTo?.author === me
         ? 'Replied to your comment'
         : p.creator === me
-          ? 'Replied to your project'
+          ? (OWN_LEAD[p.mode] ?? 'Replied to your project')
           : null;
     if (!lead) continue;
     out.push({
