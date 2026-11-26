@@ -8,12 +8,16 @@ network of desktops, Raspberry Pis and phones.
 - How it fits together: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
 - Why it is built this way: [docs/decisions/](docs/decisions/)
 
-## Status (2026-11-25)
+## Status (2026-11-26)
 
 **M3 governance (plans, phase returns, project values, links) and M4 chats (project chat, direct and group messages) and notifications are live** on the test network: https://ui-production-333c.up.railway.app
 (it runs alongside the current FastAPI site; that site is unaffected). Latest (25 Nov, late): rolling 7-day active counts, active-only vote populations, group photos and co-managers (accounts and chats reset, demo reseeded).
 
 What works today:
+- **Pushes and bot reviews (PRs #330–#332, 2026-11-26 Melbourne):** every notification kind
+  sends a push (comments on what you started, bot review asks); reply cards name the thread,
+  post or event; anyone can vote in a bot review, on a card in the vote sheets' style; the
+  demo accounts sit on the Platform's moderator board.
 - **Map, activities, plan review, requests (PRs #303–#316, 2026-11-25 Melbourne):** a tapped
   map pin shows the item's picture and its next sessions; the map list uses the feed's cards;
   public places are exact and requests approximate; activities are made in four steps with a
