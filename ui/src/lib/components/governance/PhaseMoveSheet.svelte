@@ -12,6 +12,15 @@
     /** Convert: close and continue as a new proposal (ADR 0106). */
     convert?: boolean;
   }
+
+  /** Other votes on how the project runs, listed under the moves (a software project's
+   * Repository votes; owner-approved mockup, 2026-11-26). Each opens its own sheet. */
+  export interface PhaseExtra {
+    id: string;
+    label: string;
+    detail: string;
+    onSelect: () => void;
+  }
 </script>
 
 <script lang="ts">
@@ -32,9 +41,10 @@
     message: string | undefined;
     onSubmit: (move: PhaseMove, reason: string) => void;
     onClose: () => void;
+    extras?: { title: string; items: PhaseExtra[] } | undefined;
   }
 
-  let { open, moves, pending, message, onSubmit, onClose }: Props = $props();
+  let { open, moves, pending, message, onSubmit, onClose, extras }: Props = $props();
 
   let chosen = $state('');
   let reason = $state('');
@@ -68,40 +78,52 @@
   rootClass="phase-move-sheet"
   {onClose}
 >
-  <div class="phase-moves" role="radiogroup" aria-label={t('Phase moves')}>
-    {#each moves as option (option.id)}
-      <button
-        role="radio"
-        aria-checked={chosen === option.id}
-        class="phase-move"
-        class:on={chosen === option.id}
-        class:danger={option.danger}
-        disabled={option.disabled}
-        type="button"
-        onclick={() => (chosen = option.id)}
-      >
-        <span class="radio" aria-hidden="true"></span>
-        <span class="phase-move-copy">
-          <strong>{t(option.label)}</strong>
-          <small>{option.detail}</small>
-        </span>
-      </button>
-    {/each}
-  </div>
-  <label class="phase-move-reason">
-    <span>{t('Reason, shown to members with the vote')}</span>
-    <textarea
-      bind:value={reason}
-      rows="3"
-      maxlength="2000"
-      placeholder={t('State why this phase change should happen now.')}></textarea>
-  </label>
-  {#if alert}<p class="phase-move-alert" role="alert">{alert}</p>{/if}
-  {#snippet footer()}
-    <div class="sheet-actions">
-      <button class="sheet-submit" disabled={pending || !move} type="button" onclick={submit}
-        >{pending ? t('Working...') : t('Start the vote')}</button
-      >
+  {#if moves.length}<div class="phase-moves" role="radiogroup" aria-label={t('Phase moves')}>
+      {#each moves as option (option.id)}
+        <button
+          role="radio"
+          aria-checked={chosen === option.id}
+          class="phase-move"
+          class:on={chosen === option.id}
+          class:danger={option.danger}
+          disabled={option.disabled}
+          type="button"
+          onclick={() => (chosen = option.id)}
+        >
+          <span class="radio" aria-hidden="true"></span>
+          <span class="phase-move-copy">
+            <strong>{t(option.label)}</strong>
+            <small>{option.detail}</small>
+          </span>
+        </button>
+      {/each}
     </div>
+    <label class="phase-move-reason">
+      <span>{t('Reason, shown to members with the vote')}</span>
+      <textarea
+        bind:value={reason}
+        rows="3"
+        maxlength="2000"
+        placeholder={t('State why this phase change should happen now.')}></textarea>
+    </label>{/if}
+  {#if alert}<p class="phase-move-alert" role="alert">{alert}</p>{/if}
+  {#if extras?.items.length}
+    <section class="phase-extras" aria-label={extras.title}>
+      <h3>{extras.title}</h3>
+      {#each extras.items as extra (extra.id)}
+        <button class="phase-extra" type="button" onclick={extra.onSelect}>
+          <span class="phase-move-copy"
+            ><strong>{extra.label}</strong><small>{extra.detail}</small></span
+          ><span class="chev" aria-hidden="true">›</span>
+        </button>
+      {/each}
+    </section>
+  {/if}
+  {#snippet footer()}
+    {#if moves.length}<div class="sheet-actions">
+        <button class="sheet-submit" disabled={pending || !move} type="button" onclick={submit}
+          >{pending ? t('Working...') : t('Start the vote')}</button
+        >
+      </div>{/if}
   {/snippet}
 </OverlaySheet>

@@ -1,9 +1,9 @@
 <script lang="ts">
   import { locale, plural, t } from '#lib/i18n/index.ts';
-  import type { Snippet } from 'svelte';
 
+  import AddMenu from '#lib/components/governance/AddMenu.svelte';
+  import type { PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
-  import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
   import type { Activity } from '#lib/domain/activities.ts';
   import {
     defaultDay,
@@ -36,8 +36,9 @@
     toneOf?: ToneOf;
     /** The UX pass's week strip (ADR 0102): one week shown, the month behind its name. */
     week?: boolean;
-    /** web's `dock-extra` slot: a software project's Pull request and Repository ▾. */
-    extra?: Snippet | undefined;
+    /** Other things to add beside an activity (a software project's Pull request): with
+     * them the dock shows one "+ Add ▾" (owner-approved mockup, 2026-11-26). */
+    adds?: PhaseMenuItem[] | undefined;
   }
 
   let p: Props = $props();
@@ -249,19 +250,25 @@
   </div>
 </div>
 
-{#if p.canCreate || p.extra}
+{#if p.canCreate || p.adds?.length}
   <PhaseWorkToolbar>
-    {#if p.canCreate}
-      <RoundPlusButton
-        standout
-        active={p.createActive}
-        label={t('Add activity')}
-        ariaLabel={t('Add activity')}
-        onclick={p.onCreate}
-      />
-    {/if}
-    {#snippet governance()}
-      {@render p.extra?.()}
-    {/snippet}
+    <AddMenu
+      items={[
+        ...(p.canCreate
+          ? [
+              {
+                id: 'activity',
+                glyph: '+',
+                label: t('Activity'),
+                detail: t('A session, shift or task people can sign up for.'),
+                onSelect: p.onCreate,
+              },
+            ]
+          : []),
+        ...(p.adds ?? []),
+      ]}
+      single={t('Add activity')}
+      active={p.createActive}
+    />
   </PhaseWorkToolbar>
 {/if}

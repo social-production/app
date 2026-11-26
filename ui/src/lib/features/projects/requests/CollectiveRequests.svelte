@@ -1,6 +1,7 @@
 <script lang="ts">
   import { serviceMenu } from './serviceMenu.svelte.ts';
   import { t } from '#lib/i18n/index.ts';
+  import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
   import PhaseWorkToolbar from '#lib/components/governance/PhaseWorkToolbar.svelte';
   import OverlaySheet from '#lib/components/overlay/OverlaySheet.svelte';
   import RoundPlusButton from '#lib/components/RoundPlusButton.svelte';
@@ -61,6 +62,32 @@
   const highlighted = $derived(page.url.searchParams.get('request'));
   const others = $derived((project?.members ?? []).filter((m) => m !== me));
   const canRequest = $derived(settings.enabled && others.length > 0);
+  const showList = $derived(
+    member ? settings.enabled || requests.shown.length > 0 : requests.shown.length > 0,
+  );
+  const requestItems = $derived<PhaseMenuItem[]>([
+    {
+      id: 'new-request',
+      glyph: '+',
+      label: t('New request'),
+      detail: t('Ask the members for something; whoever plans it starts a chat with you.'),
+      onSelect: openRequest,
+    },
+    {
+      id: 'requests',
+      glyph: '≡',
+      label: member ? t('Requests') : t('Your requests ({n})', { n: requests.shown.length }),
+      detail: member
+        ? t('Everyone’s requests to this service, to plan or decline.')
+        : t('What you asked for, and where each one stands.'),
+      onSelect: showRequests,
+    },
+  ]);
+
+  function showRequests(): void {
+    requests.listOpen = true;
+    void requests.load();
+  }
 
   $effect(() => {
     if (me) void requests.load();
@@ -144,27 +171,33 @@
   }
 </script>
 
+<!-- One Request segment, never green (Join is the dock's call to action), owner-approved
+     mockup 2026-11-26: with a list to show as well it is "Request ▾"/"Requests ▾". -->
 <PhaseWorkToolbar>
-  {#if canRequest}
-    <RoundPlusButton
-      standout
-      icon="send"
-      label={t('Request')}
-      ariaLabel={t('Request service')}
-      onclick={openRequest}
-    />
-  {/if}
-  {#if member ? settings.enabled || requests.shown.length > 0 : requests.shown.length > 0}
-    <RoundPlusButton
-      icon="list"
-      label={member ? t('Requests') : t('Your requests')}
-      ariaLabel={t('Show service requests')}
-      onclick={() => {
-        requests.listOpen = true;
-        void requests.load();
-      }}
-    />
-  {/if}
+  {#snippet governance()}
+    {#if canRequest && showList}
+      <PhaseMenu
+        items={requestItems}
+        label={member ? t('Requests') : t('Request')}
+        sheetTitle={member ? t('Requests') : t('Request')}
+        labelledById="request-menu-title"
+      />
+    {:else if canRequest}
+      <RoundPlusButton
+        plus={false}
+        label={t('Request')}
+        ariaLabel={t('Request service')}
+        onclick={openRequest}
+      />
+    {:else if showList}
+      <RoundPlusButton
+        plus={false}
+        label={member ? t('Requests') : t('Your requests')}
+        ariaLabel={t('Show service requests')}
+        onclick={showRequests}
+      />
+    {/if}
+  {/snippet}
 </PhaseWorkToolbar>
 
 <RequestsSheet

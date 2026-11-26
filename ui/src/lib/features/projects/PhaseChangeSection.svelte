@@ -4,7 +4,10 @@
 
   import { portal } from '#lib/components/actions/portal.ts';
   import PhaseMenu, { type PhaseMenuItem } from '#lib/components/governance/PhaseMenu.svelte';
-  import PhaseMoveSheet, { type PhaseMove } from '#lib/components/governance/PhaseMoveSheet.svelte';
+  import PhaseMoveSheet, {
+    type PhaseExtra,
+    type PhaseMove,
+  } from '#lib/components/governance/PhaseMoveSheet.svelte';
   import { planGateMessage, signalGateMet } from '#lib/domain/phaseCopy.ts';
 
   import type { DetailState } from './detailState.svelte.ts';
@@ -120,8 +123,35 @@
     detail.sheetMessage = undefined;
     moving = true;
   };
+  // A software project's Repository votes sit under the moves (owner-approved mockup,
+  // 2026-11-26), so its dock keeps three labelled segments.
+  const sw = $derived(detail.software);
+  const repository = $derived.by<PhaseExtra[]>(() => {
+    const g = sw.governance;
+    if (!g?.canPropose) return [];
+    const pick = (sheet: 'repository-replacement' | 'merge-capability') => (): void => {
+      moving = false;
+      sw.open(sheet);
+    };
+    const list: PhaseExtra[] = [
+      {
+        id: 'replace-repository',
+        label: t('Replace repository'),
+        detail: t('Members vote to move the project to a different repository.'),
+        onSelect: pick('repository-replacement'),
+      },
+    ];
+    if (!g.platform)
+      list.push({
+        id: 'merge-capability',
+        label: t('Grant or revoke merge capability'),
+        detail: t('Members vote on who can merge approved pull requests.'),
+        onSelect: pick('merge-capability'),
+      });
+    return list;
+  });
   const items = $derived<PhaseMenuItem[]>(
-    moves.length
+    moves.length || repository.length
       ? [{ id: 'moves', glyph: '›', label: t('Phase'), detail: '', onSelect: open }]
       : [],
   );
@@ -158,5 +188,6 @@
     message={detail.sheetMessage}
     onSubmit={(move, reason) => void file(move, reason)}
     onClose={() => (moving = false)}
+    extras={repository.length ? { title: t('Repository'), items: repository } : undefined}
   />
 {/if}

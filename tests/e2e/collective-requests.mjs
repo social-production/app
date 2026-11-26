@@ -74,8 +74,9 @@ await until(bob, () => bob.locator('.plan-card.leading', { hasText: planTitle })
 await advanceTo(ann, bob, 'Activity');
 log('the operations plan made it a collective service as it reached Activity');
 
-/** The Participation tab, reloaded until `name`'s toolbar button shows; then press it. */
-async function press(page, name) {
+/** The Participation tab, reloaded until `name`'s toolbar button shows; then press it, and
+ * pick `item` from its menu when it is one (Request ▾ once there are requests to list). */
+async function press(page, name, item = null) {
   for (let i = 0; i < 20; i++) {
     await page.goto(projectUrl);
     await page.getByRole('heading', { name: title }).waitFor({ timeout: 120_000 });
@@ -83,6 +84,7 @@ async function press(page, name) {
     const button = page.getByRole('button', { name, exact: true });
     if (await button.waitFor({ timeout: 10_000 }).then(() => true, () => false)) {
       await button.click();
+      if (item) await page.getByRole('dialog').getByRole('button', { name: item }).click();
       return;
     }
   }
@@ -154,7 +156,7 @@ assert.match(await row(bob).locator('.agenda-chip').innerText(), /1 more needed/
 log('bob planned the request into an activity that waits for its role');
 
 for (let i = 0; i < 20; i++) {
-  await press(cleo, 'Your requests');
+  await press(cleo, 'Request', /^Your requests/);
   const mine = cleo.locator('.request-card-shell', { hasText: ask });
   if (await mine.getByText('Accepted', { exact: true }).waitFor({ timeout: 10_000 }).then(() => true, () => false)) break;
   if (i === 19) throw new Error("cleo's request never read Accepted");
@@ -166,7 +168,7 @@ log("cleo's request reads Accepted");
 const cleoCard = cleo.locator('.request-card-shell', { hasText: ask });
 const talk = cleoCard.getByRole('link', { name: 'Open conversation' });
 for (let i = 0; i < 10 && !(await talk.count()); i++) {
-  await press(cleo, 'Your requests');
+  await press(cleo, 'Request', /^Your requests/);
   await cleoCard.locator('summary').click();
   await talk.waitFor({ state: 'attached', timeout: 10_000 }).catch(() => {});
 }

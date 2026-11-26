@@ -97,7 +97,9 @@ assert.doesNotMatch(mergers, /No one yet/, 'the plan author may merge');
 await ann.screenshot({ path: `${out}/software-panel-390.png` });
 log('the panel shows the repository and its merger');
 
-await ann.getByRole('button', { name: 'Pull request' }).click();
+// One "+ Add ▾" holds Activity and Pull request (owner-approved dock mockup, 2026-11-26).
+await ann.getByRole('button', { name: 'Add', exact: true }).click();
+await ann.getByRole('dialog', { name: 'Add' }).getByRole('button', { name: /Pull request/ }).click();
 const submit = ann.getByRole('dialog', { name: 'Submit pull request' });
 const step = () => submit.getByRole('button', { name: 'Next' }).click();
 await submit.getByPlaceholder('Pull request title').fill(prTitle);
@@ -177,12 +179,13 @@ for (let i = 0; i < 40 && (await queue().count()); i++) {
 assert.equal(await queue().count(), 0, 'a confirmed merge leaves the in-progress list');
 log('both confirmed the merge; the pull request left the in-progress list');
 
-await panel(bob, () => bob.getByRole('button', { name: 'Repository', exact: true }), 'Repository ▾');
-await bob.getByRole('button', { name: 'Repository', exact: true }).click();
-const menu = bob.getByRole('dialog', { name: 'Repository' });
+// The Repository votes sit under the phase moves in Phase ▾'s sheet.
+await panel(bob, () => bob.getByRole('button', { name: 'Phase', exact: true }), 'Phase ▾');
+await bob.getByRole('button', { name: 'Phase', exact: true }).click();
+const menu = bob.getByRole('dialog', { name: 'Where should this go next?' });
 await menu.getByRole('button', { name: /Replace repository/ }).waitFor();
 await menu.getByRole('button', { name: /Grant or revoke merge capability/ }).waitFor();
-log("bob's Repository ▾ offers web's two votes");
+log("bob's Phase ▾ sheet offers web's two repository votes");
 
 // Bob asks for merge capability; Ann votes from her rail in Take part's vote sheet.
 await menu.getByRole('button', { name: /Grant or revoke merge capability/ }).click();
