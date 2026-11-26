@@ -16,6 +16,7 @@
   import { mentionPool } from '#lib/services/messages.ts';
   import { notifyMentions } from '#lib/services/notices.ts';
   import { namesOf, viewer } from '#lib/services/people.ts';
+  import { replyNotice } from '#lib/services/pushAsks.ts';
   import { markProjectChatRead, projectChatMembers } from '#lib/services/publicChats.ts';
 
   import { spaceHref } from '#lib/components/cards/spaceHref.ts';
@@ -47,6 +48,8 @@
       post: async (body, replyTo, files) => {
         const sent = await inTurn(() => postMessage(project, body, replyTo, files));
         const link = `${location.pathname}${location.search}`;
+        const answered = replyTo ? talk.messages.find((m) => m.id === replyTo)?.author : null;
+        void replyNotice(project, answered ?? null, body, link);
         notifyMentions(mentions.mentioned(body), 'in a project chat', body, link);
         return sent;
       },
