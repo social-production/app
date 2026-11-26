@@ -78,7 +78,7 @@ export async function myBotNotices(): Promise<BotNotice[]> {
 }
 
 /** Reviews of people you share a project or chat with that ask you to vote (web's
- * `bot-review-vote`; the zome asks only full members). */
+ * `bot-review-vote`; anyone who isn't paused may vote, ADR 0118). */
 export async function voteAskNotices(people: string[]): Promise<BotNotice[]> {
   if (people.length === 0) return [];
   const accounts = people.map(stringToHash);

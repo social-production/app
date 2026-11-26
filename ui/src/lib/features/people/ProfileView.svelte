@@ -207,7 +207,7 @@
         <BotReviewCard
           review={trust.review}
           {own}
-          canVote={!own && viewerFull && !viewerPaused}
+          canVote={!own && !viewerPaused}
           pending={trust.reviewPending}
           message={trust.reviewMessage}
           onVote={(vote) => void trust.vote(vote)}
